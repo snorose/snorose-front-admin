@@ -11,7 +11,7 @@ import { Sidebar } from './components';
 function App() {
   return (
     <BrowserRouter>
-      <div className='flex flex-row'>
+      <div className='flex h-screen'>
         <Sidebar />
         <Routes>
           <Route path='/' element={<SignInPage />} />
