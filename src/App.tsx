@@ -5,6 +5,8 @@ import {
   MemberInfoPage,
   PointAdjustmentPage,
   SignInPage,
+  PostPage,
+  CommentPage,
 } from './pages';
 import { Sidebar } from './components';
 
@@ -18,6 +20,8 @@ function App() {
           <Route path='/exam' element={<ExamReviewPage />} />
           <Route path='/member' element={<MemberInfoPage />} />
           <Route path='/point' element={<PointAdjustmentPage />} />
+          <Route path='/post' element={<PostPage />} />
+          <Route path='/comment' element={<CommentPage />} />
         </Routes>
       </div>
     </BrowserRouter>
