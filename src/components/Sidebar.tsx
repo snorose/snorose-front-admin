@@ -1,14 +1,22 @@
 import { Link, useLocation } from 'react-router-dom';
 import { snoroseLogo } from '@/assets';
-import { FaBookOpen, FaMoneyBillWave, FaUserGear } from 'react-icons/fa6';
+import { HiBookOpen, HiChatAlt, HiDocumentText } from 'react-icons/hi';
+import { BiCoinStack } from 'react-icons/bi';
+import { FaUserCog } from 'react-icons/fa';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
 
   const MENU_ITEMS = [
-    { path: '/member', label: '회원 정보', icon: <FaUserGear /> },
-    { path: '/exam', label: '시험 후기', icon: <FaBookOpen /> },
-    { path: '/point', label: '포인트 증감', icon: <FaMoneyBillWave /> },
+    { path: '/member', label: '회원 정보', icon: <FaUserCog /> },
+    { path: '/exam', label: '시험 후기', icon: <HiBookOpen /> },
+    { path: '/point', label: '포인트 증감', icon: <BiCoinStack /> },
+    { path: '/post', label: '게시글 관리 (준비중)', icon: <HiDocumentText /> },
+    {
+      path: '/comment',
+      label: '댓글 관리 (준비중)',
+      icon: <HiChatAlt />,
+    },
   ];
 
   return (
