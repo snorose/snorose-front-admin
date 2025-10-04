@@ -5,17 +5,25 @@ import {
   MemberInfoPage,
   PointAdjustmentPage,
   SignInPage,
+  PostPage,
+  CommentPage,
 } from './pages';
+import { Sidebar } from './components';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<SignInPage />} />
-        <Route path='/exam' element={<ExamReviewPage />} />
-        <Route path='/member' element={<MemberInfoPage />} />
-        <Route path='/point' element={<PointAdjustmentPage />} />
-      </Routes>
+      <div className='flex h-screen'>
+        <Sidebar />
+        <Routes>
+          <Route path='/' element={<SignInPage />} />
+          <Route path='/exam' element={<ExamReviewPage />} />
+          <Route path='/member' element={<MemberInfoPage />} />
+          <Route path='/point' element={<PointAdjustmentPage />} />
+          <Route path='/post' element={<PostPage />} />
+          <Route path='/comment' element={<CommentPage />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
