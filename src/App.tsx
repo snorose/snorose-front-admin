@@ -13,9 +13,9 @@ import { Header, Sidebar } from './components';
 function App() {
   return (
     <BrowserRouter>
-      <div className='flex flex-col w-screen'>
+      <div className='flex flex-col w-screen h-screen overflow-hidden'>
         <Header />
-        <main className='flex h-[calc(100vh-2.5rem)]'>
+        <main className='flex h-[calc(100vh-3.5rem)]'>
           <Sidebar />
           <Routes>
             <Route path='/' element={<SignInPage />} />
