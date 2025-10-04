@@ -19,8 +19,8 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <nav className='p-4 flex flex-col gap-4 border-r-1 border-gray-200'>
-      <ul className='text-left flex flex-col gap-2'>
+    <nav className='p-6 py-10 flex flex-col border-r-1 border-gray-200 w-70'>
+      <ul className='text-left flex flex-col gap-6'>
         {MENU_ITEMS.map((item) => (
           <li
             key={item.path}
