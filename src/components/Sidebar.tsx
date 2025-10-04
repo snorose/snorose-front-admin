@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router-dom';
-import { snoroseLogo } from '@/assets';
 import { HiBookOpen, HiChatAlt, HiDocumentText } from 'react-icons/hi';
 import { BiCoinStack } from 'react-icons/bi';
 import { FaUserCog } from 'react-icons/fa';
@@ -20,11 +19,7 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <nav className='p-4 w-50 flex flex-col gap-4 border-r-2 border-gray-200'>
-      <div>
-        <img src={snoroseLogo} alt='logo' />
-      </div>
-
+    <nav className='p-4 flex flex-col gap-4 border-r-1 border-gray-200'>
       <ul className='text-left flex flex-col gap-2'>
         {MENU_ITEMS.map((item) => (
           <li
