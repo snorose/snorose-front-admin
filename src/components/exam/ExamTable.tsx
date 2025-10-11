@@ -9,8 +9,11 @@ import {
 import {
   EXAM_REVIEW_LIST_DUMMY,
   STATUS_COLOR,
+  SEMESTER_LIST,
+  EXAM_TYPE_LIST,
   MANAGER_LIST,
 } from '@/constants/exam-table-options';
+import { StatusDropdown, TextDropdown } from './ExamDropdown';
 import { useState, useEffect } from 'react';
 
 interface ExamReview {
@@ -32,73 +35,6 @@ interface ExamTableProps {
   data?: ExamReview[];
 }
 
-// 상태 드롭다운 컴포넌트
-const StatusDropdown = ({
-  isOpen,
-  onStatusSelect,
-  onClose,
-}: {
-  isOpen: boolean;
-  onStatusSelect: (statusCode: string, statusName: string) => void;
-  onClose: () => void;
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <ul
-      className='absolute top-0 left-full z-50 ml-1 w-48 bg-blue-100 border border-gray-300 rounded-md shadow-lg'
-      onClick={(e) => e.stopPropagation()}
-    >
-      {STATUS_COLOR.map((statusOption) => (
-        <li
-          key={statusOption.id}
-          className='flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer'
-          onClick={() => {
-            onStatusSelect(statusOption.code, statusOption.name);
-            onClose();
-          }}
-        >
-          <div className={`w-3 h-3 rounded-full ${statusOption.color} mr-2`} />
-          <span className='text-sm'>{statusOption.name}</span>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-// 담당자 드롭다운 컴포넌트
-const ManagerDropdown = ({
-  isOpen,
-  onManagerSelect,
-  onClose,
-}: {
-  isOpen: boolean;
-  onManagerSelect: (managerName: string) => void;
-  onClose: () => void;
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <ul
-      className='absolute top-0 right-full z-50 mr-1 w-24 max-h-[200px] overflow-y-scroll bg-blue-100 border border-gray-300 rounded-md shadow-lg'
-      onClick={(e) => e.stopPropagation()}
-    >
-      {MANAGER_LIST.map((manager, index) => (
-        <li
-          key={index}
-          className='flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer'
-          onClick={() => {
-            onManagerSelect(manager);
-            onClose();
-          }}
-        >
-          <span className='text-sm'>{manager}</span>
-        </li>
-      ))}
-    </ul>
-  );
-};
-
 // 상태 점 컴포넌트
 const StatusDot = ({ status }: { status: string }) => {
   const getStatusColor = (status: string) => {
@@ -119,6 +55,16 @@ const StatusDot = ({ status }: { status: string }) => {
 export default function ExamTable({
   data = EXAM_REVIEW_LIST_DUMMY,
 }: ExamTableProps) {
+  // 필터 옵션 (선택된 필터 값들)
+  const [selectedFilters, setSelectedFilters] = useState<{
+    semester: string[];
+    examType: string[];
+    manager: string[];
+  }>({
+    semester: [],
+    examType: [],
+    manager: [],
+  });
   // 체크박스 상태 관리
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
@@ -127,6 +73,9 @@ export default function ExamTable({
   const [openManagerDropdown, setOpenManagerDropdown] = useState<number | null>(
     null
   );
+
+  // 헤더 필터 드롭다운 상태 관리
+  const [openHeaderFilter, setOpenHeaderFilter] = useState<string | null>(null);
 
   // 전체 선택/해제 함수
   const handleSelectAll = (checked: boolean) => {
@@ -174,38 +123,133 @@ export default function ExamTable({
     console.log(`Review ID: ${reviewId}, Selected Manager: ${managerName}`);
   };
 
+  // 헤더 필터 토글 함수
+  const toggleHeaderFilter = (filterType: string) => {
+    setOpenHeaderFilter(openHeaderFilter === filterType ? null : filterType);
+    // 다른 드롭다운들 닫기
+    setOpenDropdown(null);
+    setOpenManagerDropdown(null);
+  };
+
+  // 헤더 필터 선택 함수
+  const handleHeaderFilterSelect = (filterType: string, value: string) => {
+    setSelectedFilters((prev) => {
+      const currentFilters = prev[filterType as keyof typeof prev];
+      const isSelected = currentFilters.includes(value);
+
+      // 토글 방식: 이미 선택된 값이면 제거, 아니면 추가
+      const updatedFilters = isSelected
+        ? currentFilters.filter((filter) => filter !== value)
+        : [...currentFilters, value];
+
+      return {
+        ...prev,
+        [filterType]: updatedFilters,
+      };
+    });
+
+    console.log(`Filter Type: ${filterType}, Selected Value: ${value}`);
+    // 헤더 필터는 드롭다운을 닫지 않음 (다중 선택 가능)
+  };
+
   // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
     const handleClickOutside = () => {
       setOpenDropdown(null);
       setOpenManagerDropdown(null);
+      setOpenHeaderFilter(null);
     };
 
-    if (openDropdown !== null || openManagerDropdown !== null) {
+    if (
+      openDropdown !== null ||
+      openManagerDropdown !== null ||
+      openHeaderFilter !== null
+    ) {
       document.addEventListener('click', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [openDropdown, openManagerDropdown]);
+  }, [openDropdown, openManagerDropdown, openHeaderFilter]);
+
+  // 선택된 필터 상태 디버깅
+  useEffect(() => {
+    console.log('Selected Filters:', selectedFilters);
+  }, [selectedFilters]);
 
   return (
     <div className='bg-white rounded-lg shadow overflow-hidden max-h-[400px] overflow-y-auto pr-4'>
       <Table>
-        <TableHeader>
+        {/* Table Header */}
+        <TableHeader className='sticky top-0 bg-gray-100 z-10 shadow-sm [&_tr]:border-b'>
           <TableRow>
             <TableHead className='w-[60px] text-center'>상태</TableHead>
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
             <TableHead className='w-[80px]'>교수</TableHead>
-            <TableHead className='w-[100px]'>수강학기</TableHead>
-            <TableHead className='w-[80px]'>시험종류</TableHead>
+            <TableHead
+              className='w-[100px] cursor-pointer relative hover:bg-gray-200'
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleHeaderFilter('semester');
+              }}
+            >
+              수강학기 ▼{/* 수강학기 필터 드롭다운 */}
+              <TextDropdown
+                isOpen={openHeaderFilter === 'semester'}
+                onSelect={(value) =>
+                  handleHeaderFilterSelect('semester', value)
+                }
+                onClose={() => setOpenHeaderFilter(null)}
+                options={SEMESTER_LIST}
+                position='bottom'
+                width='w-32'
+                selectedValues={selectedFilters.semester}
+              />
+            </TableHead>
+            <TableHead
+              className='w-[80px] cursor-pointer relative hover:bg-gray-200'
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleHeaderFilter('examType');
+              }}
+            >
+              시험종류 ▼{/* 시험종류 필터 드롭다운 */}
+              <TextDropdown
+                isOpen={openHeaderFilter === 'examType'}
+                onSelect={(value) =>
+                  handleHeaderFilterSelect('examType', value)
+                }
+                onClose={() => setOpenHeaderFilter(null)}
+                options={EXAM_TYPE_LIST}
+                position='bottom'
+                width='w-28'
+                selectedValues={selectedFilters.examType}
+              />
+            </TableHead>
             <TableHead className='min-w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[130px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
             <TableHead className='min-w-[160px]'>기타 논의사항</TableHead>
-            <TableHead className='w-[60px]'>담당리자</TableHead>
+            <TableHead
+              className='w-[60px] cursor-pointer relative hover:bg-gray-200'
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleHeaderFilter('manager');
+              }}
+            >
+              담당리자 ▼{/* 담당리자 필터 드롭다운 */}
+              <TextDropdown
+                isOpen={openHeaderFilter === 'manager'}
+                onSelect={(value) => handleHeaderFilterSelect('manager', value)}
+                onClose={() => setOpenHeaderFilter(null)}
+                options={MANAGER_LIST}
+                position='bottom'
+                width='w-32'
+                selectedValues={selectedFilters.manager}
+              />
+            </TableHead>
             <TableHead
               className='w-[20px] text-center cursor-pointer'
               onClick={() =>
@@ -225,6 +269,8 @@ export default function ExamTable({
             </TableHead>
           </TableRow>
         </TableHeader>
+
+        {/* Table Body */}
         <TableBody>
           {data.map((review) => (
             <TableRow key={review.id} className='hover:cursor-pointer'>
@@ -299,9 +345,9 @@ export default function ExamTable({
                 {review.manager}
 
                 {/* 담당자 드롭다운 메뉴 */}
-                <ManagerDropdown
+                <TextDropdown
                   isOpen={openManagerDropdown === review.id}
-                  onManagerSelect={(managerName) =>
+                  onSelect={(managerName) =>
                     handleManagerSelect(review.id, managerName)
                   }
                   onClose={() => setOpenManagerDropdown(null)}
