@@ -206,6 +206,7 @@ export default function ExamTable({
         {/* Table Header */}
         <TableHeader className='sticky top-0 bg-gray-100 z-10 shadow-sm [&_tr]:border-b'>
           <TableRow>
+            <TableHead className='w-[20px] text-center'>idx</TableHead>
             <TableHead className='w-[60px] text-center'>상태</TableHead>
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
@@ -300,8 +301,11 @@ export default function ExamTable({
 
         {/* Table Body */}
         <TableBody>
-          {currentPageData.map((review) => (
+          {currentPageData.map((review, index) => (
             <TableRow key={review.id} className='hover:cursor-pointer'>
+              <TableCell className='text-center text-sm text-gray-600'>
+                {startIndex + index + 1}
+              </TableCell>
               <TableCell
                 className='text-center relative cursor-pointer'
                 onClick={(e) => {
