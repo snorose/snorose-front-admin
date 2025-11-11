@@ -187,9 +187,9 @@ export default function ExamTable({
             <TableHead className='w-[60px] text-center'>상태</TableHead>
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
-            <TableHead className='w-[80px]'>교수</TableHead>
+            <TableHead className='w-[60px]'>교수</TableHead>
             <TableHead
-              className='w-[100px] cursor-pointer relative hover:bg-gray-200'
+              className='w-[60px] cursor-pointer relative hover:bg-gray-200'
               onClick={(e) => {
                 e.stopPropagation();
                 toggleHeaderFilter('semester');
@@ -209,7 +209,7 @@ export default function ExamTable({
               />
             </TableHead>
             <TableHead
-              className='w-[80px] cursor-pointer relative hover:bg-gray-200'
+              className='w-[60px] cursor-pointer relative hover:bg-gray-200'
               onClick={(e) => {
                 e.stopPropagation();
                 toggleHeaderFilter('examType');
@@ -229,11 +229,11 @@ export default function ExamTable({
               />
             </TableHead>
             <TableHead className='min-w-[150px]'>시험 유형 및 문항수</TableHead>
-            <TableHead className='w-[130px]'>업로드 시간</TableHead>
+            <TableHead className='w-[110px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
             <TableHead className='min-w-[160px]'>기타 논의사항</TableHead>
             <TableHead
-              className='w-[60px] cursor-pointer relative hover:bg-gray-200'
+              className='w-[70px] cursor-pointer relative hover:bg-gray-200'
               onClick={(e) => {
                 e.stopPropagation();
                 toggleHeaderFilter('manager');
@@ -258,14 +258,16 @@ export default function ExamTable({
                 )
               }
             >
-              <input
-                type='checkbox'
-                checked={
-                  selectedItems.length === data.length && data.length > 0
-                }
-                onChange={(e) => handleSelectAll(e.target.checked)}
-                className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:flex checked:before:items-center checked:before:justify-center checked:before:h-full pointer-events-none'
-              />
+              <div className='flex items-center justify-center h-full'>
+                <input
+                  type='checkbox'
+                  checked={
+                    selectedItems.length === data.length && data.length > 0
+                  }
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center relative pointer-events-none'
+                />
+              </div>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -310,11 +312,7 @@ export default function ExamTable({
               </TableCell>
               <TableCell>{review.professor}</TableCell>
               <TableCell className='text-sm'>{review.semester}</TableCell>
-              <TableCell>
-                <span className='inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-800'>
-                  {review.examType}
-                </span>
-              </TableCell>
+              <TableCell className='text-sm'>{review.examType}</TableCell>
               <TableCell className='text-sm'>
                 <div
                   className='max-w-[150px] truncate'
@@ -336,7 +334,7 @@ export default function ExamTable({
                 </div>
               </TableCell>
               <TableCell
-                className='text-sm cursor-pointer relative'
+                className='cursor-pointer relative'
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleManagerDropdown(review.id);
@@ -351,6 +349,7 @@ export default function ExamTable({
                     handleManagerSelect(review.id, managerName)
                   }
                   onClose={() => setOpenManagerDropdown(null)}
+                  position='left'
                 />
               </TableCell>
               <TableCell
@@ -362,14 +361,16 @@ export default function ExamTable({
                   )
                 }
               >
-                <input
-                  type='checkbox'
-                  checked={selectedItems.includes(review.id)}
-                  onChange={(e) =>
-                    handleSelectItem(review.id, e.target.checked)
-                  }
-                  className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:flex checked:before:items-center checked:before:justify-center checked:before:h-full pointer-events-none'
-                />
+                <div className='flex items-center justify-center h-full'>
+                  <input
+                    type='checkbox'
+                    checked={selectedItems.includes(review.id)}
+                    onChange={(e) =>
+                      handleSelectItem(review.id, e.target.checked)
+                    }
+                    className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center relative pointer-events-none'
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}

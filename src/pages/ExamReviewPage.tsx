@@ -11,7 +11,7 @@ export default function ExamReviewPage() {
         className='w-[480px] h-[36px] rounded-2xl border-2 border-blue-500 bg-white px-4 py-2 mb-6'
       />
 
-      {/* 필터 */}
+      {/* 기간 필터 */}
       <ExamPeriod />
 
       {/* 시험후기 테이블 */}
