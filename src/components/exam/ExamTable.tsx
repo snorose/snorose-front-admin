@@ -55,6 +55,10 @@ const StatusDot = ({ status }: { status: string }) => {
 export default function ExamTable({
   data = EXAM_REVIEW_LIST_DUMMY,
 }: ExamTableProps) {
+  // 페이지네이션 설정
+  const ITEMS_PER_PAGE = 15;
+  const [currentPage, setCurrentPage] = useState(1);
+
   // 필터 옵션 (선택된 필터 값들)
   const [selectedFilters, setSelectedFilters] = useState<{
     semester: string[];
@@ -77,12 +81,30 @@ export default function ExamTable({
   // 헤더 필터 드롭다운 상태 관리
   const [openHeaderFilter, setOpenHeaderFilter] = useState<string | null>(null);
 
-  // 전체 선택/해제 함수
+  // 페이지네이션 계산
+  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentPageData = data.slice(startIndex, endIndex);
+
+  // 페이지 변경 시 체크박스 선택 해제
+  useEffect(() => {
+    setSelectedItems([]);
+  }, [currentPage]);
+
+  // 전체 선택/해제 함수 (현재 페이지의 데이터만)
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedItems(data.map((review) => review.id));
+      setSelectedItems((prev) => [
+        ...prev,
+        ...currentPageData
+          .map((review) => review.id)
+          .filter((id) => !prev.includes(id)),
+      ]);
     } else {
-      setSelectedItems([]);
+      setSelectedItems((prev) =>
+        prev.filter((id) => !currentPageData.some((review) => review.id === id))
+      );
     }
   };
 
@@ -179,7 +201,7 @@ export default function ExamTable({
   }, [selectedFilters]);
 
   return (
-    <div className='bg-white rounded-lg shadow overflow-hidden max-h-[400px] overflow-y-auto pr-4'>
+    <div className='bg-white rounded-lg shadow overflow-hidden pr-4'>
       <Table>
         {/* Table Header */}
         <TableHeader className='sticky top-0 bg-gray-100 z-10 shadow-sm [&_tr]:border-b'>
@@ -252,17 +274,21 @@ export default function ExamTable({
             </TableHead>
             <TableHead
               className='w-[20px] text-center cursor-pointer'
-              onClick={() =>
-                handleSelectAll(
-                  !(selectedItems.length === data.length && data.length > 0)
-                )
-              }
+              onClick={() => {
+                const allCurrentPageSelected = currentPageData.every((review) =>
+                  selectedItems.includes(review.id)
+                );
+                handleSelectAll(!allCurrentPageSelected);
+              }}
             >
               <div className='flex items-center justify-center h-full'>
                 <input
                   type='checkbox'
                   checked={
-                    selectedItems.length === data.length && data.length > 0
+                    currentPageData.length > 0 &&
+                    currentPageData.every((review) =>
+                      selectedItems.includes(review.id)
+                    )
                   }
                   onChange={(e) => handleSelectAll(e.target.checked)}
                   className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center relative pointer-events-none'
@@ -274,7 +300,7 @@ export default function ExamTable({
 
         {/* Table Body */}
         <TableBody>
-          {data.map((review) => (
+          {currentPageData.map((review) => (
             <TableRow key={review.id} className='hover:cursor-pointer'>
               <TableCell
                 className='text-center relative cursor-pointer'
@@ -376,6 +402,50 @@ export default function ExamTable({
           ))}
         </TableBody>
       </Table>
+
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div className='flex flex-col items-center px-4 py-4 border-t border-gray-200 gap-3'>
+          <div className='text-sm text-gray-600'>
+            {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
+          </div>
+          <div className='flex items-center gap-2'>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className='px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              이전
+            </button>
+            <div className='flex items-center gap-1'>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 text-sm rounded ${
+                      currentPage === page
+                        ? 'bg-gray-300 text-gray-900'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+            </div>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+              disabled={currentPage === totalPages}
+              className='px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              다음
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
