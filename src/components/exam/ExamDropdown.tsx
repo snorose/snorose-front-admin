@@ -1,36 +1,72 @@
 import { STATUS_COLOR, MANAGER_LIST } from '@/constants/exam-table-options';
+import { useEffect, useRef } from 'react';
 
 // 상태 드롭다운 컴포넌트 (아이콘 + 텍스트)
 export const StatusDropdown = ({
   isOpen,
   onStatusSelect,
   onClose,
+  children,
 }: {
   isOpen: boolean;
   onStatusSelect: (statusCode: string, statusName: string) => void;
   onClose: () => void;
+  children: React.ReactNode;
 }) => {
-  if (!isOpen) return null;
+  const dropdownRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const tableContainer = dropdownRef.current.closest(
+        '[data-slot="table-container"]'
+      );
+      const tableRect = tableContainer?.getBoundingClientRect();
+
+      if (tableRect && rect.bottom > tableRect.bottom) {
+        dropdownRef.current.style.top = 'auto';
+        dropdownRef.current.style.bottom = '0';
+        dropdownRef.current.style.marginBottom = '4px';
+      } else if (rect.bottom > viewportHeight) {
+        dropdownRef.current.style.top = 'auto';
+        dropdownRef.current.style.bottom = '100%';
+        dropdownRef.current.style.marginBottom = '4px';
+      } else {
+        dropdownRef.current.style.top = '0';
+        dropdownRef.current.style.bottom = 'auto';
+        dropdownRef.current.style.marginBottom = '0';
+      }
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return <>{children}</>;
 
   return (
-    <ul
-      className='absolute top-0 left-full z-50 ml-1 w-48 bg-blue-100 border border-gray-300 rounded-md shadow-lg'
-      onClick={(e) => e.stopPropagation()}
-    >
-      {STATUS_COLOR.map((statusOption) => (
-        <li
-          key={statusOption.id}
-          className='flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer'
-          onClick={() => {
-            onStatusSelect(statusOption.code, statusOption.name);
-            onClose();
-          }}
-        >
-          <div className={`w-3 h-3 rounded-full ${statusOption.color} mr-2`} />
-          <span className='text-sm'>{statusOption.name}</span>
-        </li>
-      ))}
-    </ul>
+    <>
+      {children}
+      <ul
+        ref={dropdownRef}
+        className='absolute top-0 left-full z-50 ml-1 w-48 bg-blue-100 border border-gray-300 rounded-md shadow-lg'
+        onClick={(e) => e.stopPropagation()}
+      >
+        {STATUS_COLOR.map((statusOption) => (
+          <li
+            key={statusOption.id}
+            className='flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer'
+            onClick={() => {
+              onStatusSelect(statusOption.code, statusOption.name);
+              onClose();
+            }}
+          >
+            <div
+              className={`w-3 h-3 rounded-full ${statusOption.color} mr-2`}
+            />
+            <span className='text-sm'>{statusOption.name}</span>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 
@@ -43,6 +79,7 @@ export const TextDropdown = ({
   position = 'right',
   width = 'w-24',
   selectedValues = [],
+  children,
 }: {
   isOpen: boolean;
   onSelect: (value: string) => void;
@@ -51,8 +88,53 @@ export const TextDropdown = ({
   position?: 'left' | 'right' | 'bottom';
   width?: string;
   selectedValues?: string[];
+  children?: React.ReactNode;
 }) => {
-  if (!isOpen) return null;
+  const dropdownRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const tableContainer = dropdownRef.current.closest(
+        '[data-slot="table-container"]'
+      );
+      const tableRect = tableContainer?.getBoundingClientRect();
+
+      if (position === 'bottom') {
+        if (tableRect && rect.bottom > tableRect.bottom) {
+          dropdownRef.current.style.top = 'auto';
+          dropdownRef.current.style.bottom = '100%';
+          dropdownRef.current.style.marginBottom = '4px';
+          dropdownRef.current.style.marginTop = '0';
+        } else if (rect.bottom > viewportHeight) {
+          dropdownRef.current.style.top = 'auto';
+          dropdownRef.current.style.bottom = '100%';
+          dropdownRef.current.style.marginBottom = '4px';
+          dropdownRef.current.style.marginTop = '0';
+        } else {
+          dropdownRef.current.style.top = '';
+          dropdownRef.current.style.bottom = '';
+          dropdownRef.current.style.marginBottom = '';
+          dropdownRef.current.style.marginTop = '';
+        }
+      } else {
+        if (tableRect && rect.bottom > tableRect.bottom) {
+          dropdownRef.current.style.top = 'auto';
+          dropdownRef.current.style.bottom = '0';
+          dropdownRef.current.style.marginBottom = '4px';
+        } else if (rect.bottom > viewportHeight) {
+          dropdownRef.current.style.top = 'auto';
+          dropdownRef.current.style.bottom = '0';
+          dropdownRef.current.style.marginBottom = '4px';
+        } else {
+          dropdownRef.current.style.top = '';
+          dropdownRef.current.style.bottom = '';
+          dropdownRef.current.style.marginBottom = '';
+        }
+      }
+    }
+  }, [isOpen, position]);
 
   const getPositionClasses = () => {
     switch (position) {
@@ -67,38 +149,44 @@ export const TextDropdown = ({
     }
   };
 
+  if (!isOpen) return <>{children}</>;
+
   return (
-    <ul
-      className={`absolute ${getPositionClasses()} z-50 ${width} max-h-[200px] overflow-y-scroll bg-blue-100 border border-gray-300 rounded-md shadow-lg`}
-      onClick={(e) => e.stopPropagation()}
-    >
-      {options.map((option, index) => {
-        const isSelected = selectedValues.includes(option);
-        return (
-          <li
-            key={index}
-            className={`flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer ${
-              isSelected ? 'bg-blue-100' : ''
-            }`}
-            onClick={() => {
-              onSelect(option); // 헤더 필터인 경우 - 다중선택 위해 선택했을 때 드롭다운 닫지 않음
-              if (selectedValues && selectedValues.length >= 0) {
-                return;
-              }
-              onClose();
-            }}
-          >
-            <span
-              className={`text-sm flex-1 ${isSelected ? 'font-bold' : 'font-medium'}`}
+    <>
+      {children}
+      <ul
+        ref={dropdownRef}
+        className={`absolute ${getPositionClasses()} z-50 ${width} max-h-[200px] overflow-y-scroll bg-blue-100 border border-gray-300 rounded-md shadow-lg`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {options.map((option, index) => {
+          const isSelected = selectedValues.includes(option);
+          return (
+            <li
+              key={index}
+              className={`flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer ${
+                isSelected ? 'bg-blue-100' : ''
+              }`}
+              onClick={() => {
+                onSelect(option);
+                if (selectedValues && selectedValues.length >= 0) {
+                  return;
+                }
+                onClose();
+              }}
             >
-              {option}
-            </span>
-            {isSelected && (
-              <span className='text-blue-600 ml-2 text-sm'>✓</span>
-            )}
-          </li>
-        );
-      })}
-    </ul>
+              <span
+                className={`text-sm flex-1 ${isSelected ? 'font-bold' : 'font-medium'}`}
+              >
+                {option}
+              </span>
+              {isSelected && (
+                <span className='text-blue-600 ml-2 text-sm'>✓</span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 };
