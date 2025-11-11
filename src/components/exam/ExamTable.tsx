@@ -201,12 +201,12 @@ export default function ExamTable({
   }, [selectedFilters]);
 
   return (
-    <div className='bg-white rounded-lg shadow overflow-hidden pr-4'>
+    <div className='bg-white rounded-lg shadow pr-4 overflow-visible'>
       <Table>
         {/* Table Header */}
-        <TableHeader className='sticky top-0 bg-gray-100 z-10 shadow-sm [&_tr]:border-b'>
+        <TableHeader className='bg-gray-100 z-10 shadow-sm [&_tr]:border-b'>
           <TableRow>
-            <TableHead className='w-[20px] text-center'>idx</TableHead>
+            <TableHead className='w-[20px] text-center'></TableHead>
             <TableHead className='w-[60px] text-center'>상태</TableHead>
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
@@ -268,7 +268,7 @@ export default function ExamTable({
                 onSelect={(value) => handleHeaderFilterSelect('manager', value)}
                 onClose={() => setOpenHeaderFilter(null)}
                 options={MANAGER_LIST}
-                position='bottom'
+                position='left'
                 width='w-32'
                 selectedValues={selectedFilters.manager}
               />
@@ -302,7 +302,10 @@ export default function ExamTable({
         {/* Table Body */}
         <TableBody>
           {currentPageData.map((review, index) => (
-            <TableRow key={review.id} className='hover:cursor-pointer'>
+            <TableRow
+              key={review.id}
+              className='hover:cursor-pointer [&_td]:h-[24px]'
+            >
               <TableCell className='text-center text-sm text-gray-600'>
                 {startIndex + index + 1}
               </TableCell>
@@ -404,6 +407,28 @@ export default function ExamTable({
               </TableCell>
             </TableRow>
           ))}
+          {/* 빈 행 추가하여 항상 15개 행 표시 */}
+          {Array.from({ length: ITEMS_PER_PAGE - currentPageData.length }).map(
+            (_, index) => (
+              <TableRow key={`empty-${index}`} className='[&_td]:h-[24px]'>
+                <TableCell className='text-center text-sm text-gray-600'>
+                  &nbsp;
+                </TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+                <TableCell>&nbsp;</TableCell>
+              </TableRow>
+            )
+          )}
         </TableBody>
       </Table>
 
