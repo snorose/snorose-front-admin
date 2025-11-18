@@ -70,7 +70,6 @@ body {
   display: flex;
   place-items: center;
   min-width: 320px;
-  font-size: 1.6rem;
 }
 
 @media (prefers-color-scheme: light) {
