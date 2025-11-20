@@ -1,17 +1,30 @@
 import { Button, Input } from '@/components/ui';
-import { MEMBER_SAMPLE_DATA } from '@/__mocks__/members';
+import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
 
 const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
-  { label: '이름', key: 'name' },
-  { label: '아이디', key: 'id' },
-  { label: '학번', key: 'studentId' },
   { label: '사용자 ID', key: 'userId' },
+  { label: '이름', key: 'userName' },
+  { label: '아이디', key: 'loginId' },
+  { label: '학번', key: 'studentNumber' },
   { label: '전공', key: 'major' },
-  { label: '보유 포인트', key: 'ownedPoint' },
-  { label: '회원등급', key: 'memberGrade' },
-  { label: '생년월일', key: 'birthDate' },
 ];
+
+const MEMBER_FIELDS: (keyof MemberInfo)[] = [
+  'userId',
+  'userName',
+  'loginId',
+  'studentNumber',
+  'major',
+];
+
+const SELECTED_MEMBER_DATA: Pick<MemberInfo, (typeof MEMBER_FIELDS)[number]>[] =
+  MEMBER_SAMPLE_DATA.map((member) =>
+    MEMBER_FIELDS.reduce(
+      (acc, key) => ({ ...acc, [key]: member[key] }),
+      {} as Pick<MemberInfo, (typeof MEMBER_FIELDS)[number]>
+    )
+  );
 
 export default function PointAdjustmentPage() {
   return (
@@ -46,10 +59,10 @@ export default function PointAdjustmentPage() {
                 {info.label}
               </span>
             ))}
-            {MEMBER_SAMPLE_DATA.map((member) =>
+            {SELECTED_MEMBER_DATA.map((member) =>
               MEMBER_INFO.map((info) => (
-                <span key={`${member.id}-${info.key}`}>
-                  {member[info.key as keyof typeof member] ?? '-'}
+                <span key={`${member.userId}-${info.key}`}>
+                  {member[info.key]}
                 </span>
               ))
             )}

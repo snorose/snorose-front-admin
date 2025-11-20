@@ -1,10 +1,12 @@
 export type MemberInfo = {
-  name: string;
-  id: string;
-  studentId: number;
   userId: number;
+  loginId: string;
+  userName: string;
+  email: string;
+  nickname: string;
+  userRoleId: number;
+  studentNumber: string;
   major: string;
-  memberGrade: string;
-  birthDate: string; // YYYY-MM-DD
-  ownedPoint: number;
+  birthday: string; // YYYY-MM-DD
+  balance: number;
 };
