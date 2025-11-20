@@ -1,6 +1,7 @@
 import { Button, Input } from '@/components/ui';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
+import { useState } from 'react';
 
 const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
   { label: '사용자 ID', key: 'userId' },
@@ -27,6 +28,15 @@ const SELECTED_MEMBER_DATA: Pick<MemberInfo, (typeof MEMBER_FIELDS)[number]>[] =
   );
 
 export default function PointAdjustmentPage() {
+  const [isSelectedMembers, setIsSelectedMembers] = useState<
+    Record<number, boolean>
+  >({});
+
+  const handleSelectMember = (userId: number) => {
+    console.log('handleSelectMember', userId);
+    setIsSelectedMembers((prev) => ({ ...prev, [userId]: !prev[userId] }));
+  };
+
   return (
     <div className='flex flex-col gap-4 w-full'>
       <h1 className='text-2xl font-bold'>포인트 증감(지급/차감)</h1>
@@ -43,51 +53,81 @@ export default function PointAdjustmentPage() {
             <span>검색</span>
           </Button>
         </div>
-        <div className='flex gap-2 border rounded-md p-2 w-full'>
-          <div
-            className='grid gap-2'
-            style={{
-              gridTemplateColumns: `repeat(${MEMBER_INFO.length}, minmax(0, 1fr))`,
-            }}
-          >
-            {MEMBER_INFO.map((info) => (
-              <span key={`header-${info.key}`} className='font-semibold'>
-                {info.label}
-              </span>
-            ))}
-            {SELECTED_MEMBER_DATA.map((member) =>
-              MEMBER_INFO.map((info) => (
-                <span key={`${member.userId}-${info.key}`}>
-                  {member[info.key]}
-                </span>
-              ))
-            )}
-          </div>
+        <div className='border rounded-md p-2 w-full'>
+          <table className='w-full'>
+            <thead>
+              <tr>
+                {MEMBER_INFO.map((info) => (
+                  <th
+                    key={`header-${info.key}`}
+                    className='font-semibold text-left p-2'
+                  >
+                    {info.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {SELECTED_MEMBER_DATA.map((member) => (
+                <tr
+                  key={`${member.userId}`}
+                  className='hover:bg-gray-100 cursor-pointer'
+                >
+                  {MEMBER_INFO.map((info) => (
+                    <td key={`${member.userId}-${info.key}`} className='p-2'>
+                      {member[info.key]}
+                    </td>
+                  ))}
+                  <td>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      className='cursor-pointer'
+                      onClick={() => handleSelectMember(member.userId)}
+                    >
+                      {isSelectedMembers[member.userId] ? (
+                        <span className='text-red-500'>해제</span>
+                      ) : (
+                        <span>선택</span>
+                      )}
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </article>
 
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>선택된 회원 (총 2명)</h3>
-        <div className='flex gap-2 border rounded-md p-2 w-full'>
-          <div
-            className='grid gap-2'
-            style={{
-              gridTemplateColumns: `repeat(${MEMBER_INFO.length}, minmax(0, 1fr))`,
-            }}
-          >
-            {MEMBER_INFO.map((info) => (
-              <span key={`header-${info.key}`} className='font-semibold'>
-                {info.label}
-              </span>
-            ))}
-            {SELECTED_MEMBER_DATA.map((member) =>
-              MEMBER_INFO.map((info) => (
-                <span key={`${member.userId}-${info.key}`}>
-                  {member[info.key]}
-                </span>
-              ))
-            )}
-          </div>
+        <div className='border rounded-md p-2 w-full'>
+          <table className='w-full'>
+            <thead>
+              <tr>
+                {MEMBER_INFO.map((info) => (
+                  <th
+                    key={`header-${info.key}`}
+                    className='font-semibold text-left p-2'
+                  >
+                    {info.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {SELECTED_MEMBER_DATA.map((member) => (
+                <tr key={`${member.userId}`}>
+                  {MEMBER_INFO.map((info) => (
+                    <td key={`${member.userId}-${info.key}`} className='p-2'>
+                      {member[info.key]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </article>
 
