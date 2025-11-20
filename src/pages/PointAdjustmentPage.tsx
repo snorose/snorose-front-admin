@@ -208,7 +208,7 @@ export default function PointAdjustmentPage() {
             <Input
               type='number'
               id='difference'
-              placeholder='증감할 포인트를 입력 (예: 20, -50)'
+              placeholder='양수 또는 음수 입력 (예: 20, -50)'
               value={difference}
               onChange={(e) => setDifference(Number(e.target.value) || '')}
             />
