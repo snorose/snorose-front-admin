@@ -114,7 +114,7 @@ export default function PointAdjustmentPage() {
                         onClick={() => handleSelectMember(member)}
                       >
                         {isSelected ? (
-                          <span className='text-red-500 hover:text-red-700'>
+                          <span className='text-red-500 active:text-red-700'>
                             해제
                           </span>
                         ) : (
@@ -189,6 +189,25 @@ export default function PointAdjustmentPage() {
           </div>
         </div>
       </article>
+
+      <div className='flex justify-end gap-2'>
+        <Button
+          type='submit'
+          size='lg'
+          variant='outline'
+          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400'
+        >
+          초기화
+        </Button>
+        <Button
+          type='submit'
+          size='lg'
+          variant='outline'
+          className='text-md h-10 w-32 cursor-pointer font-bold'
+        >
+          적용
+        </Button>
+      </div>
     </div>
   );
 }
