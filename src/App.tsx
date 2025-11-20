@@ -22,13 +22,15 @@ function App() {
               <Header />
               <main className='flex h-screen pt-14'>
                 <Sidebar />
-                <Routes>
-                  <Route path='/exam' element={<ExamReviewPage />} />
-                  <Route path='/member' element={<MemberInfoPage />} />
-                  <Route path='/point' element={<PointAdjustmentPage />} />
-                  <Route path='/post' element={<PostPage />} />
-                  <Route path='/comment' element={<CommentPage />} />
-                </Routes>
+                <section className='flex px-6 py-4 w-full'>
+                  <Routes>
+                    <Route path='/exam' element={<ExamReviewPage />} />
+                    <Route path='/member' element={<MemberInfoPage />} />
+                    <Route path='/point' element={<PointAdjustmentPage />} />
+                    <Route path='/post' element={<PostPage />} />
+                    <Route path='/comment' element={<CommentPage />} />
+                  </Routes>
+                </section>
               </main>
             </div>
           }
