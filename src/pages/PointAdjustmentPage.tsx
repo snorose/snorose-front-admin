@@ -43,6 +43,27 @@ export default function PointAdjustmentPage() {
             <span>검색</span>
           </Button>
         </div>
+        <div className='flex gap-2 border rounded-md p-2 w-full'>
+          <div
+            className='grid gap-2'
+            style={{
+              gridTemplateColumns: `repeat(${MEMBER_INFO.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {MEMBER_INFO.map((info) => (
+              <span key={`header-${info.key}`} className='font-semibold'>
+                {info.label}
+              </span>
+            ))}
+            {SELECTED_MEMBER_DATA.map((member) =>
+              MEMBER_INFO.map((info) => (
+                <span key={`${member.userId}-${info.key}`}>
+                  {member[info.key]}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
       </article>
 
       <article className='flex flex-col gap-1'>
