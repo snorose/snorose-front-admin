@@ -19,12 +19,12 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <nav className='p-6 py-10 flex flex-col border-r-1 border-gray-200 w-70'>
-      <ul className='text-left flex flex-col gap-6'>
+    <nav className='p-4 py-6 flex flex-col border-r-1 border-gray-200'>
+      <ul className='text-left flex flex-col gap-4'>
         {MENU_ITEMS.map((item) => (
           <li
             key={item.path}
-            className={`hover:text-blue-500 ${location.pathname === item.path ? 'text-blue-500 font-bold active' : ''}`}
+            className={`hover:text-blue-500 text-base ${location.pathname === item.path ? 'text-blue-500 font-bold active' : ''}`}
           >
             <Link to={item.path} className={`flex items-center gap-2 `}>
               {item.icon}
