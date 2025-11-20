@@ -25,7 +25,7 @@ const ACTION_COLUMN_LABEL = '선택/해제';
 
 export default function PointAdjustmentPage() {
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
-  const [userId, setUserId] = useState<string>('');
+  const [userId, setUserId] = useState<number | ''>('');
   const [selectedCategory, setSelectedCategory] = useState<
     keyof typeof POINT_CATEGORY | ''
   >('');
@@ -38,15 +38,16 @@ export default function PointAdjustmentPage() {
     if (selectedMember?.userId === member.userId) {
       setUserId('');
     } else {
-      setUserId(String(member.userId));
+      setUserId(member.userId);
     }
   };
 
   const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUserId(value);
+    const numValue = value === '' ? '' : Number(value);
+    setUserId(numValue);
 
-    if (selectedMember && String(selectedMember.userId) !== value) {
+    if (selectedMember && selectedMember.userId !== numValue) {
       setSelectedMember(null);
     }
   };
