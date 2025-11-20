@@ -18,11 +18,11 @@ function App() {
         <Route
           path='/*'
           element={
-            <div className='flex flex-col h-screen overflow-hidden'>
+            <div className='flex min-h-screen flex-col'>
               <Header />
-              <main className='flex h-screen pt-14'>
+              <main className='flex flex-1 overflow-hidden pt-14'>
                 <Sidebar />
-                <section className='flex px-6 py-4 w-full'>
+                <section className='flex w-full flex-1 overflow-auto px-6 pt-4 pb-20'>
                   <Routes>
                     <Route path='/exam' element={<ExamReviewPage />} />
                     <Route path='/member' element={<MemberInfoPage />} />
