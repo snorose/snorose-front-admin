@@ -2,7 +2,7 @@ import type { MemberInfo } from '@/types';
 
 export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
   {
-    userId: 11111111,
+    userId: 1111111,
     loginId: 'Noonsong',
     userName: '김눈송',
     email: 'Noonsong@sookmyung.ac.kr',
@@ -14,25 +14,25 @@ export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
     balance: 100,
   },
   {
-    userId: 22222222,
+    userId: 2222222,
     loginId: 'sooksook',
     userName: '김숙명',
     email: 'sooksook@sookmyung.ac.kr',
     nickname: '숙명이',
     userRoleId: 2,
-    studentNumber: '2533333',
+    studentNumber: '2522222',
     major: '컴퓨터과학전공',
     birthday: '2001-03-11',
     balance: -200,
   },
   {
-    userId: 33333333,
+    userId: 3333333,
     loginId: 'yongsan0422',
     userName: '박용산',
     email: 'yongsan@sookmyung.ac.kr',
     nickname: '용산이',
     userRoleId: 3,
-    studentNumber: '2544444',
+    studentNumber: '2533333',
     major: '성악과',
     birthday: '2002-04-22',
     balance: 300,

@@ -20,7 +20,6 @@ const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
   { label: '학번', key: 'studentNumber' },
   { label: '전공', key: 'major' },
 ];
-
 const ACTION_COLUMN_LABEL = '선택/해제';
 
 export default function PointAdjustmentPage() {
@@ -29,6 +28,8 @@ export default function PointAdjustmentPage() {
   const [selectedCategory, setSelectedCategory] = useState<
     keyof typeof POINT_CATEGORY | ''
   >('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
 
   const handleSelectMember = (member: MemberInfo) => {
     setSelectedMember((prev) =>
@@ -52,6 +53,26 @@ export default function PointAdjustmentPage() {
     }
   };
 
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+    const results = MEMBER_SAMPLE_DATA.filter(
+      (member) =>
+        member.userName.toLowerCase().includes(query) ||
+        member.loginId.toLowerCase().includes(query) ||
+        member.studentNumber.toLowerCase().includes(query)
+    );
+    setSearchResults(results);
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <div className='flex w-full flex-col gap-6'>
       <h1 className='text-2xl font-bold'>포인트 증감(지급/차감)</h1>
@@ -62,12 +83,20 @@ export default function PointAdjustmentPage() {
             type='text'
             placeholder='이름, 아이디, 학번 중 하나를 입력해주세요'
             className='w-96'
+            value={searchQuery}
+            onChange={handleSearchInputChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
           />
           <Button
-            type='submit'
+            type='button'
             size='sm'
             variant='outline'
             className='h-auto w-20 cursor-pointer text-black'
+            onClick={handleSearch}
           >
             검색
           </Button>
@@ -90,42 +119,56 @@ export default function PointAdjustmentPage() {
               </tr>
             </thead>
             <tbody>
-              {MEMBER_SAMPLE_DATA.map((member) => {
-                const isSelected = selectedMember?.userId === member.userId;
-
-                return (
-                  <tr
-                    key={`${member.userId}`}
-                    className={cn(
-                      'cursor-pointer hover:bg-gray-100',
-                      isSelected && 'bg-blue-100 text-blue-600'
-                    )}
+              {searchResults.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={MEMBER_INFO.length + 1}
+                    className='p-4 text-center text-gray-500'
                   >
-                    {MEMBER_INFO.map((info) => (
-                      <td key={`${member.userId}-${info.key}`} className='p-2'>
-                        {member[info.key]}
+                    조회된 회원이 없어요.
+                  </td>
+                </tr>
+              ) : (
+                searchResults.map((member) => {
+                  const isSelected = selectedMember?.userId === member.userId;
+
+                  return (
+                    <tr
+                      key={`${member.userId}`}
+                      className={cn(
+                        'cursor-pointer hover:bg-gray-100',
+                        isSelected && 'bg-blue-100 text-blue-600'
+                      )}
+                    >
+                      {MEMBER_INFO.map((info) => (
+                        <td
+                          key={`${member.userId}-${info.key}`}
+                          className='p-2'
+                        >
+                          {member[info.key]}
+                        </td>
+                      ))}
+                      <td className='p-2'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='cursor-pointer'
+                          onClick={() => handleSelectMember(member)}
+                        >
+                          {isSelected ? (
+                            <span className='text-red-500 active:text-red-700'>
+                              해제
+                            </span>
+                          ) : (
+                            <span>선택</span>
+                          )}
+                        </Button>
                       </td>
-                    ))}
-                    <td className='p-2'>
-                      <Button
-                        type='button'
-                        variant='outline'
-                        size='sm'
-                        className='cursor-pointer'
-                        onClick={() => handleSelectMember(member)}
-                      >
-                        {isSelected ? (
-                          <span className='text-red-500 active:text-red-700'>
-                            해제
-                          </span>
-                        ) : (
-                          <span>선택</span>
-                        )}
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
