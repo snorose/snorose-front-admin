@@ -18,9 +18,9 @@ function App() {
         <Route
           path='/*'
           element={
-            <div className='flex flex-col w-screen h-screen overflow-hidden'>
+            <div className='flex flex-col overflow-hidden'>
               <Header />
-              <main className='flex h-[calc(100vh-3.5rem)]'>
+              <main className='flex h-[calc(100vh-7rem)]'>
                 <Sidebar />
                 <Routes>
                   <Route path='/exam' element={<ExamReviewPage />} />
