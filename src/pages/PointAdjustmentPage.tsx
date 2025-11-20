@@ -30,6 +30,8 @@ export default function PointAdjustmentPage() {
   >('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
+  const [difference, setDifference] = useState<number | ''>('');
+  const [memo, setMemo] = useState<string>('');
 
   const handleSelectMember = (member: MemberInfo) => {
     setSelectedMember((prev) =>
@@ -71,6 +73,16 @@ export default function PointAdjustmentPage() {
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleResetButtonClick = () => {
+    setUserId('');
+    setSelectedMember(null);
+    setSelectedCategory('');
+    setSearchQuery('');
+    setSearchResults([]);
+    setDifference('');
+    setMemo('');
   };
 
   return (
@@ -123,7 +135,7 @@ export default function PointAdjustmentPage() {
                 <tr>
                   <td
                     colSpan={MEMBER_INFO.length + 1}
-                    className='p-4 text-center text-gray-500'
+                    className='p-5 text-center text-gray-500'
                   >
                     조회된 회원이 없어요.
                   </td>
@@ -197,6 +209,8 @@ export default function PointAdjustmentPage() {
               type='number'
               id='difference'
               placeholder='증감할 포인트를 입력 (예: 20, -50)'
+              value={difference}
+              onChange={(e) => setDifference(Number(e.target.value) || '')}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -207,7 +221,7 @@ export default function PointAdjustmentPage() {
               onValueChange={(selectedKey: keyof typeof POINT_CATEGORY | '') =>
                 setSelectedCategory(selectedKey)
               }
-              value={selectedCategory || undefined}
+              value={selectedCategory ?? undefined}
             >
               <SelectTrigger className='w-full'>
                 <SelectValue placeholder='포인트 유형을 선택해주세요' />
@@ -229,6 +243,8 @@ export default function PointAdjustmentPage() {
               type='text'
               id='memo'
               placeholder='이벤트 당첨 포인트 지급, 시험 후기 오류 제보 등'
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
             />
           </div>
         </div>
@@ -239,7 +255,8 @@ export default function PointAdjustmentPage() {
           type='submit'
           size='lg'
           variant='outline'
-          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400'
+          onClick={handleResetButtonClick}
+          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
         >
           초기화
         </Button>
