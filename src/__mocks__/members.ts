@@ -1,0 +1,40 @@
+import type { MemberInfo } from '@/types';
+
+export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
+  {
+    userId: 1111111,
+    loginId: 'Noonsong',
+    userName: '김눈송',
+    email: 'Noonsong@sookmyung.ac.kr',
+    nickname: '눈송이',
+    userRoleId: 1,
+    studentNumber: '2511111',
+    major: '경영학과',
+    birthday: '1906-05-22',
+    balance: 100,
+  },
+  {
+    userId: 2222222,
+    loginId: 'sooksook',
+    userName: '김숙명',
+    email: 'sooksook@sookmyung.ac.kr',
+    nickname: '숙명이',
+    userRoleId: 2,
+    studentNumber: '2522222',
+    major: '컴퓨터과학전공',
+    birthday: '2001-03-11',
+    balance: -200,
+  },
+  {
+    userId: 3333333,
+    loginId: 'yongsan0422',
+    userName: '박용산',
+    email: 'yongsan@sookmyung.ac.kr',
+    nickname: '용산이',
+    userRoleId: 3,
+    studentNumber: '2533333',
+    major: '성악과',
+    birthday: '2002-04-22',
+    balance: 300,
+  },
+];
