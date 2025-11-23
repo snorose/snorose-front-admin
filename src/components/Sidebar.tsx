@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { snoroseLogo } from '@/assets';
 import { cn } from '@/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 
 export const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
@@ -60,12 +61,23 @@ export const Sidebar: React.FC = () => {
             isSidebarOpen ? 'opacity-100' : 'hidden w-0'
           )}
         />
-        <PanelLeft
-          size={ICON_SIZE}
-          onClick={toggleSidebar}
-          className='box-content cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-gray-200'
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PanelLeft
+              size={ICON_SIZE}
+              onClick={toggleSidebar}
+              className='box-content cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-gray-200'
+            />
+          </TooltipTrigger>
+          <TooltipContent
+            side={isSidebarOpen ? 'top' : 'right'}
+            className='text-xs'
+          >
+            {isSidebarOpen ? '사이드바 닫기' : '사이드바 열기'}
+          </TooltipContent>
+        </Tooltip>
       </div>
+
       <ul className='flex flex-1 flex-col overflow-y-auto text-left'>
         {MENU_ITEMS.map((item) => (
           <li
