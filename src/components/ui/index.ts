@@ -13,3 +13,9 @@ export {
   TooltipTrigger,
   TooltipProvider,
 } from './tooltip';
+export {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './accordion';
