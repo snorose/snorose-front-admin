@@ -48,19 +48,22 @@ export const Sidebar: React.FC = () => {
     >
       <div
         className={cn(
-          'flex items-center px-4.5 py-6',
+          'flex items-center px-2.5 py-4',
           isSidebarOpen && 'justify-between'
         )}
       >
         <img
           src={snoroseLogo}
           alt='logo'
-          className={cn('h-5', isSidebarOpen ? 'opacity-100' : 'w-0 opacity-0')}
+          className={cn(
+            'box-content h-5 p-2',
+            isSidebarOpen ? 'opacity-100' : 'hidden w-0'
+          )}
         />
         <PanelLeft
           size={ICON_SIZE}
           onClick={toggleSidebar}
-          className='cursor-pointer text-gray-500'
+          className='box-content cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-gray-200'
         />
       </div>
       <ul className='flex flex-1 flex-col overflow-y-auto text-left'>
