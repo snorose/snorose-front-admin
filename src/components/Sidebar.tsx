@@ -10,82 +10,28 @@ import {
   PanelLeft,
   Rose,
   Settings,
+  type LucideIcon,
 } from 'lucide-react';
 import { snoroseLogo } from '@/assets';
 import { cn } from '@/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
+import { SIDEBAR_MENUS } from '@/constants';
+
+const iconMap: Record<string, LucideIcon> = {
+  House,
+  UserCog,
+  BookOpen,
+  CircleParking,
+  FileText,
+  TriangleAlert,
+  Settings,
+};
 
 export const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const location = useLocation();
 
   const ICON_SIZE = 16;
-  const MENU_ITEMS = [
-    { path: '/home', label: '홈 (준비중)', icon: House, subMenu: [] },
-    {
-      path: '/member',
-      label: '회원 정보',
-      icon: UserCog,
-      subMenu: [
-        { path: '/member/list', label: '회원 관리' },
-        { path: '/member/warning', label: '경고 및 강등 관리' },
-      ],
-    },
-    {
-      path: '/board',
-      label: '게시글 관리 (준비중)',
-      icon: FileText,
-      subMenu: [
-        { path: 'board/list', label: '게시글 관리' },
-        {
-          path: 'board/comment',
-          label: '댓글 관리',
-        },
-      ],
-    },
-    {
-      path: '/exam',
-      label: '시험 후기 (준비중)',
-      icon: BookOpen,
-      subMenu: [
-        { path: '/exam/list', label: '시험 후기 관리' },
-        {
-          path: '/exam/period',
-          label: '시험후기 작성 기간 설정',
-        },
-      ],
-    },
-    {
-      path: '/point',
-      label: '포인트',
-      icon: CircleParking,
-      subMenu: [
-        { path: '/point/single', label: '포인트 증감 (단건)' },
-        { path: '/point/multiple', label: '포인트 증감 (일괄)' },
-        { path: '/point/all', label: '포인트 증감 (정회원)' },
-      ],
-    },
-    {
-      path: '/report',
-      label: '문의 및 신고',
-      icon: TriangleAlert,
-      subMenu: [
-        { path: '/report/inquiry', label: '문의 및 신고' },
-        { path: '/report/report', label: '신고 글/댓글 조회' },
-      ],
-    },
-    {
-      path: '/operation',
-      label: '운영',
-      icon: Settings,
-      subMenu: [
-        { path: '/operation/push', label: '푸쉬 알림 발송' },
-        { path: '/operation/event', label: '이벤트 신청자 조회' },
-        { path: '/operation/popup', label: '팝업 관리' },
-        { path: '/operation/banner', label: '배너 관리' },
-      ],
-    },
-  ];
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -130,45 +76,60 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <ul className='flex flex-1 flex-col overflow-y-auto text-left'>
-        {MENU_ITEMS.map((item) => (
-          <li
-            key={item.path}
-            className={`text-sm hover:text-blue-500 ${location.pathname === item.path ? 'active font-bold text-blue-500' : ''}`}
-          >
-            <Link
-              to={item.path}
+        {SIDEBAR_MENUS.map((item) => {
+          const IconComponent = iconMap[item.icon];
+          const isActive =
+            item.type === 'single'
+              ? location.pathname === item.path
+              : item.items.some(
+                  (subItem) => location.pathname === subItem.path
+                );
+
+          return (
+            <li
+              key={item.path}
               className={cn(
-                'flex items-center px-2.5',
-                isSidebarOpen && 'gap-1'
+                'text-sm hover:text-blue-500',
+                isActive && 'font-bold text-blue-500'
               )}
             >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <item.icon
-                    className='box-content cursor-pointer p-2'
-                    size={ICON_SIZE}
-                  />
-                </TooltipTrigger>
-                {!isSidebarOpen && (
-                  <TooltipContent
-                    side={isSidebarOpen ? 'top' : 'right'}
-                    className='text-xs'
-                  >
-                    {item.label}
-                  </TooltipContent>
-                )}
-              </Tooltip>
-              <span
+              <Link
+                to={item.type === 'single' ? item.path : item.items[0].path}
                 className={cn(
-                  'overflow-hidden whitespace-nowrap',
-                  isSidebarOpen ? 'opacity-100' : 'w-0 opacity-0'
+                  'flex items-center px-2.5',
+                  isSidebarOpen && 'gap-1'
                 )}
               >
-                {item.label}
-              </span>
-            </Link>
-          </li>
-        ))}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    {IconComponent && (
+                      <IconComponent
+                        className='box-content cursor-pointer p-2'
+                        size={ICON_SIZE}
+                      />
+                    )}
+                  </TooltipTrigger>
+                  {!isSidebarOpen && (
+                    <TooltipContent
+                      side={isSidebarOpen ? 'top' : 'right'}
+                      className='text-xs'
+                    >
+                      {item.label}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+                <span
+                  className={cn(
+                    'overflow-hidden whitespace-nowrap',
+                    isSidebarOpen ? 'opacity-100' : 'w-0 opacity-0'
+                  )}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
 
       <div className='flex items-center gap-2 border-t border-gray-200 px-4.5 py-4.5'>
