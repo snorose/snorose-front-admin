@@ -19,8 +19,8 @@ export default function LogInPage() {
 
   // TODO: 아이디, 비밀번호에 required 추가 (현재 주석 처리해둠)
   return (
-    <main className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4'>
-      <div className='flex flex-col items-center justify-center gap-8 rounded-2xl bg-white px-16 py-20 shadow-sm'>
+    <main className='flex min-h-screen items-center justify-center p-4'>
+      <div className='flex flex-col items-center justify-center gap-8 rounded-2xl bg-white px-16 py-20 shadow-[0_-2px_8px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.10)]'>
         <div className='flex flex-col items-center gap-2'>
           <img className='h-12 w-auto' src={snoroseLogo} alt='스노로즈 로고' />
           <p className='text-sm text-gray-600'>
