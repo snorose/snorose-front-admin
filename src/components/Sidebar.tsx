@@ -41,7 +41,7 @@ const Sidebar: React.FC = () => {
   return (
     <nav
       className={cn(
-        'flex flex-col gap-8 border-r-1 border-gray-200 py-4 transition-all duration-300',
+        'flex flex-col gap-8 border-r-1 border-gray-200 bg-gray-50 py-4 transition-all duration-300',
         isSidebarOpen ? 'w-50' : 'w-auto'
       )}
     >
