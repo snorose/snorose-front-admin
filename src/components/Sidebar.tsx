@@ -12,8 +12,8 @@ import {
 import { snoroseLogo } from '@/assets';
 import { cn } from '@/utils';
 
-const Sidebar: React.FC = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+export const Sidebar: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const location = useLocation();
 
   const ICON_SIZE = 16;
@@ -41,38 +41,45 @@ const Sidebar: React.FC = () => {
   return (
     <nav
       className={cn(
-        'flex flex-col gap-8 border-r-1 border-gray-200 bg-gray-50 py-4 transition-all duration-300',
+        'flex flex-col gap-5 border-r-1 border-gray-200 bg-gray-50 py-6 transition-all duration-300 ease-in-out',
         isSidebarOpen ? 'w-50' : 'w-auto'
       )}
     >
       <div
-        className={`flex items-center justify-between px-4.5 transition-all duration-300`}
+        className={cn(
+          'flex items-center px-4.5',
+          isSidebarOpen && 'justify-between'
+        )}
       >
         <img
           src={snoroseLogo}
           alt='logo'
-          className={cn(
-            'h-5 transition-all duration-300',
-            isSidebarOpen ? 'w-auto opacity-100' : 'hidden opacity-0'
-          )}
+          className={cn('h-5', isSidebarOpen ? 'opacity-100' : 'w-0 opacity-0')}
         />
         <PanelLeft
           size={ICON_SIZE}
-          className='cursor-pointer'
           onClick={toggleSidebar}
+          className='cursor-pointer text-gray-500'
         />
       </div>
-      <ul className='flex flex-col gap-4 text-left'>
+      <ul className='flex flex-col text-left'>
         {MENU_ITEMS.map((item) => (
           <li
             key={item.path}
-            className={`text-sm hover:text-blue-500 ${location.pathname === item.path ? 'active font-bold text-blue-500' : ''}`}
+            className={`py-2 text-sm hover:text-blue-500 ${location.pathname === item.path ? 'active font-bold text-blue-500' : ''}`}
           >
-            <Link to={item.path} className={`flex items-center gap-2 px-4.5`}>
+            <Link
+              to={item.path}
+              className={cn(
+                'flex items-center px-4.5',
+                isSidebarOpen ? 'gap-2' : 'gap-0'
+              )}
+            >
               <item.icon size={ICON_SIZE} />
               <span
                 className={cn(
-                  isSidebarOpen ? 'opacity-100' : 'hidden opacity-0'
+                  'overflow-hidden whitespace-nowrap',
+                  isSidebarOpen ? 'opacity-100' : 'w-0 opacity-0'
                 )}
               >
                 {item.label}
@@ -84,5 +91,3 @@ const Sidebar: React.FC = () => {
     </nav>
   );
 };
-
-export default Sidebar;
