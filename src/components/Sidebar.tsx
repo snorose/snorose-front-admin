@@ -57,7 +57,7 @@ export const Sidebar: React.FC = () => {
           src={snoroseLogo}
           alt='logo'
           className={cn(
-            'box-content h-5 p-2',
+            'box-content h-5 px-1',
             isSidebarOpen ? 'opacity-100' : 'hidden w-0'
           )}
         />
@@ -82,16 +82,31 @@ export const Sidebar: React.FC = () => {
         {MENU_ITEMS.map((item) => (
           <li
             key={item.path}
-            className={`py-2 text-sm hover:text-blue-500 ${location.pathname === item.path ? 'active font-bold text-blue-500' : ''}`}
+            className={`text-sm hover:text-blue-500 ${location.pathname === item.path ? 'active font-bold text-blue-500' : ''}`}
           >
             <Link
               to={item.path}
               className={cn(
-                'flex items-center px-4.5',
-                isSidebarOpen && 'gap-2'
+                'flex items-center px-2.5',
+                isSidebarOpen && 'gap-1'
               )}
             >
-              <item.icon size={ICON_SIZE} />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <item.icon
+                    className='box-content cursor-pointer p-2'
+                    size={ICON_SIZE}
+                  />
+                </TooltipTrigger>
+                {!isSidebarOpen && (
+                  <TooltipContent
+                    side={isSidebarOpen ? 'top' : 'right'}
+                    className='text-xs'
+                  >
+                    {item.label}
+                  </TooltipContent>
+                )}
+              </Tooltip>
               <span
                 className={cn(
                   'overflow-hidden whitespace-nowrap',
