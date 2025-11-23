@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { snoroseLogo } from '@/assets';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button, Input } from '@/components/ui';
 
 export default function LogInPage() {
   const navigate = useNavigate();
@@ -11,44 +10,45 @@ export default function LogInPage() {
     navigate('/member');
   };
 
+  // TODO: 아이디, 비밀번호에 required 추가 (현재 주석 처리)
   return (
-    <main className='flex flex-col items-center justify-center w-full h-full gap-4'>
-      <div className='w-full p-4 flex justify-center items-center flex-col gap-4'>
-        <img className='w-64' src={snoroseLogo} alt='logo' />
-        <p className='text-lg text-center'>
-          스노로즈 어드민 페이지에 오신 것을 환영합니다.
-        </p>
-      </div>
-
-      <form className='p-4 flex flex-col gap-4 w-80' onSubmit={handleLogin}>
-        <div className='flex flex-col gap-1'>
-          <label htmlFor='id' className='text-lg'>
-            아이디
-          </label>
+    <main className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4'>
+      <div className='flex flex-col items-center justify-center gap-8 rounded-2xl bg-white px-16 py-20 shadow-sm'>
+        <div className='flex flex-col items-center gap-2'>
+          <img className='h-12 w-auto' src={snoroseLogo} alt='스노로즈 로고' />
+          <p className='text-sm text-gray-600'>
+            어드민 페이지에 오신 것을 환영합니다
+          </p>
+        </div>
+        <form className='flex w-80 flex-col gap-2' onSubmit={handleLogin}>
           <Input
             id='id'
-            placeholder='아이디를 입력하세요'
+            placeholder='스노로즈 아이디'
             name='id'
             type='text'
-            className='h-10'
+            className='h-11 text-base'
+            // required
           />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <label htmlFor='password' className='text-lg'>
-            비밀번호
-          </label>
+
           <Input
             id='password'
-            placeholder='비밀번호를 입력하세요'
+            placeholder='스노로즈 비밀번호'
             name='password'
             type='password'
-            className='h-10'
+            className='h-11 text-base'
+            // required
           />
-        </div>
-        <Button type='submit' className='text-black h-10 text-lg'>
-          <span>로그인</span>
-        </Button>
-      </form>
+
+          <Button
+            type='submit'
+            size='lg'
+            variant='outline'
+            className='hover: h-11 w-full cursor-pointer text-base'
+          >
+            로그인
+          </Button>
+        </form>
+      </div>
     </main>
   );
 }
