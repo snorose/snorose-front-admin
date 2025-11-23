@@ -1,16 +1,23 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { snoroseLogo } from '@/assets';
 import { Button, Input } from '@/components/ui';
 
 export default function LogInPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate('/member');
   };
 
-  // TODO: 아이디, 비밀번호에 required 추가 (현재 주석 처리)
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  // TODO: 아이디, 비밀번호에 required 추가 (현재 주석 처리해둠)
   return (
     <main className='flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4'>
       <div className='flex flex-col items-center justify-center gap-8 rounded-2xl bg-white px-16 py-20 shadow-sm'>
@@ -30,14 +37,28 @@ export default function LogInPage() {
             // required
           />
 
-          <Input
-            id='password'
-            placeholder='스노로즈 비밀번호'
-            name='password'
-            type='password'
-            className='h-11 text-base'
-            // required
-          />
+          <div className='relative'>
+            <Input
+              id='password'
+              placeholder='스노로즈 비밀번호'
+              name='password'
+              type={showPassword ? 'text' : 'password'}
+              className='h-11 text-base'
+              // required
+            />
+            <button
+              type='button'
+              onClick={togglePasswordVisibility}
+              className='absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 hover:cursor-pointer'
+              aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+            >
+              {showPassword ? (
+                <Eye className='size-5' />
+              ) : (
+                <EyeOff className='size-5' />
+              )}
+            </button>
+          </div>
 
           <Button
             type='submit'
