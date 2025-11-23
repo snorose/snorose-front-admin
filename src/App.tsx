@@ -8,7 +8,7 @@ import {
   PostPage,
   CommentPage,
 } from './pages';
-import { Header, Sidebar } from './components';
+import { Sidebar } from '@/components';
 
 function App() {
   return (
@@ -18,11 +18,10 @@ function App() {
         <Route
           path='/*'
           element={
-            <div className='flex min-h-screen flex-col'>
-              <Header />
-              <main className='flex flex-1 overflow-hidden pt-14'>
-                <Sidebar />
-                <section className='flex w-full flex-1 overflow-auto px-6 pt-4 pb-20'>
+            <div className='flex min-h-screen'>
+              <Sidebar />
+              <main className='flex flex-1 flex-col overflow-hidden px-6 pt-4 pb-20'>
+                <section className='flex w-full flex-1 overflow-auto'>
                   <Routes>
                     <Route path='/exam' element={<ExamReviewPage />} />
                     <Route path='/member' element={<MemberInfoPage />} />
