@@ -8,6 +8,7 @@ import {
   FileText,
   MessageCircle,
   PanelLeft,
+  Rose,
 } from 'lucide-react';
 import { snoroseLogo } from '@/assets';
 import { cn } from '@/utils';
@@ -41,13 +42,13 @@ export const Sidebar: React.FC = () => {
   return (
     <nav
       className={cn(
-        'flex flex-col gap-5 border-r-1 border-gray-200 bg-gray-50 py-6 transition-all duration-300 ease-in-out',
-        isSidebarOpen ? 'w-50' : 'w-auto'
+        'flex h-screen flex-col border-r-1 border-gray-200 bg-gray-50 transition-all duration-300 ease-in-out',
+        isSidebarOpen ? 'w-48' : 'w-auto'
       )}
     >
       <div
         className={cn(
-          'flex items-center px-4.5',
+          'flex items-center px-4.5 py-6',
           isSidebarOpen && 'justify-between'
         )}
       >
@@ -62,7 +63,7 @@ export const Sidebar: React.FC = () => {
           className='cursor-pointer text-gray-500'
         />
       </div>
-      <ul className='flex flex-col text-left'>
+      <ul className='flex flex-1 flex-col overflow-y-auto text-left'>
         {MENU_ITEMS.map((item) => (
           <li
             key={item.path}
@@ -72,7 +73,7 @@ export const Sidebar: React.FC = () => {
               to={item.path}
               className={cn(
                 'flex items-center px-4.5',
-                isSidebarOpen ? 'gap-2' : 'gap-0'
+                isSidebarOpen && 'gap-2'
               )}
             >
               <item.icon size={ICON_SIZE} />
@@ -88,6 +89,25 @@ export const Sidebar: React.FC = () => {
           </li>
         ))}
       </ul>
+
+      <div className='flex items-center gap-2 border-t border-gray-200 px-4.5 py-4.5'>
+        <div
+          className={cn(
+            'flex cursor-pointer items-center',
+            isSidebarOpen && 'gap-2'
+          )}
+        >
+          <Rose size={ICON_SIZE} className='text-red-400' />
+          <span
+            className={cn(
+              'overflow-hidden text-sm whitespace-nowrap',
+              isSidebarOpen ? 'opacity-100' : 'w-0 opacity-0'
+            )}
+          >
+            리자 이름
+          </span>
+        </div>
+      </div>
     </nav>
   );
 };
