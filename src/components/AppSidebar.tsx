@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { ChevronRight, Rose } from 'lucide-react';
 import {
   Collapsible,
@@ -22,6 +23,8 @@ export const AppSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
+  const location = useLocation();
+  const isActive = (url: string) => location.pathname.startsWith(url);
 
   const ICON_SIZE = 16;
 
@@ -70,8 +73,11 @@ export const AppSidebar = ({
                   <SidebarMenuSub>
                     {item.items.map((item) => (
                       <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild>
-                          <a href={item.url}>{item.title}</a>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={isActive(item.url)}
+                        >
+                          <NavLink to={item.url}> {item.title}</NavLink>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
