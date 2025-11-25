@@ -1,3 +1,107 @@
+import { useState } from 'react';
+import {
+  Button,
+  Input,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  Label,
+} from '@/components/ui';
+import { POINT_CATEGORY } from '@/constants';
+
 export default function PointAllPage() {
-  return <div>PointAllPage</div>;
+  const [selectedCategory, setSelectedCategory] = useState<
+    keyof typeof POINT_CATEGORY | ''
+  >('');
+  const [difference, setDifference] = useState<number | ''>(0);
+  const [memo, setMemo] = useState<string>('');
+
+  const handleResetButtonClick = () => {
+    setSelectedCategory('');
+    setDifference('');
+    setMemo('');
+  };
+
+  return (
+    <div className='flex w-full flex-col gap-6'>
+      <h1 className='text-2xl font-bold'>정회원 전체 포인트 지급/차감</h1>
+
+      <article className='flex flex-col gap-1'>
+        <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
+        <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
+          {' '}
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='category' required>
+              포인트 유형
+            </Label>
+            <Select
+              onValueChange={(
+                selectedCategory: keyof typeof POINT_CATEGORY | ''
+              ) => setSelectedCategory(selectedCategory)}
+              value={selectedCategory ?? undefined}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='포인트 유형을 선택해주세요' />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(POINT_CATEGORY).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='difference' required>
+              포인트 지급/차감량
+            </Label>
+            <Input
+              type='number'
+              id='difference'
+              value={difference}
+              onChange={(e) => setDifference(Number(e.target.value) || 0)}
+            />
+            <p className='text-xs text-gray-500'>
+              양수 또는 음수만 입력 가능 (예: 20, -50)
+            </p>
+          </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='memo' required>
+              메모
+            </Label>
+            <Input
+              type='text'
+              id='memo'
+              placeholder='이벤트 당첨 포인트 지급, 시험 후기 오류 제보 등'
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+            />
+          </div>
+        </div>
+      </article>
+
+      <div className='flex justify-end gap-2'>
+        <Button
+          type='submit'
+          size='lg'
+          variant='outline'
+          onClick={handleResetButtonClick}
+          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+        >
+          초기화
+        </Button>
+        <Button
+          type='submit'
+          size='lg'
+          variant='outline'
+          className='text-md h-10 w-32 cursor-pointer font-bold'
+        >
+          적용
+        </Button>
+      </div>
+    </div>
+  );
 }

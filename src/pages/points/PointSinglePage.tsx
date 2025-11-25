@@ -31,7 +31,7 @@ export default function PointAdjustmentPage() {
   >('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
-  const [difference, setDifference] = useState<number | ''>('');
+  const [difference, setDifference] = useState<number | ''>(0);
   const [memo, setMemo] = useState<string>('');
 
   const handleSelectMember = (member: MemberInfo) => {
@@ -204,15 +204,17 @@ export default function PointAdjustmentPage() {
           </div>
           <div className='flex flex-col gap-1'>
             <Label htmlFor='difference' required>
-              증감 포인트
+              포인트 지급/차감량
             </Label>
             <Input
               type='number'
               id='difference'
-              placeholder='양수 또는 음수 입력 (예: 20, -50)'
               value={difference}
-              onChange={(e) => setDifference(Number(e.target.value) || '')}
+              onChange={(e) => setDifference(Number(e.target.value) || 0)}
             />
+            <p className='text-xs text-gray-500'>
+              양수 또는 음수만 입력 가능 (예: 20, -50)
+            </p>
           </div>
           <div className='flex flex-col gap-1'>
             <Label htmlFor='category' required>
