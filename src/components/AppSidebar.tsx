@@ -1,5 +1,5 @@
-import { ChevronRight } from 'lucide-react';
-import { SIDEBAR_MENUS } from '@/constants';
+import { useState, useEffect } from 'react';
+import { ChevronRight, Rose } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,13 +15,28 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from '@/components/ui';
-import { Rose } from 'lucide-react';
 import { snoroseLogo } from '@/assets';
+import { SIDEBAR_MENUS } from '@/constants';
 
 export const AppSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
+  const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
+
   const ICON_SIZE = 16;
+
+  useEffect(() => {
+    const storedStates = localStorage.getItem('sidebar-open-states');
+    if (storedStates) {
+      setOpenStates(JSON.parse(storedStates));
+    }
+  }, []);
+
+  const handleOpenChange = (itemTitle: string, open: boolean) => {
+    const updated = { ...openStates, [itemTitle]: open };
+    setOpenStates(updated);
+    localStorage.setItem('sidebar-open-states', JSON.stringify(updated));
+  };
 
   return (
     <Sidebar {...props}>
@@ -34,8 +49,11 @@ export const AppSidebar = ({
           <Collapsible
             key={item.title}
             title={item.title}
-            defaultOpen
             className='group/collapsible'
+            open={openStates[item.title] ?? false}
+            onOpenChange={(open) => {
+              handleOpenChange(item.title, open);
+            }}
           >
             <SidebarGroup>
               <SidebarGroupLabel
