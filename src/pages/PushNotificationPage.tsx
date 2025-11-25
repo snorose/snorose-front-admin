@@ -2,19 +2,34 @@ import { useState } from 'react';
 import { Button, Input, Switch, Textarea } from '@/components/ui';
 
 export default function PushNotificationPage() {
+  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [url, setUrl] = useState('');
   const [isMarketing, setIsMarketing] = useState(false);
   const [isTest, setIsTest] = useState(true);
-  const [bodyLength, setBodyLength] = useState(0);
   const [titleLength, setTitleLength] = useState(0);
-  const [name, setName] = useState('');
-  const [url, setUrl] = useState('/');
+  const [bodyLength, setBodyLength] = useState(0);
 
   const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBody(e.target.value);
     setBodyLength(e.target.value.length);
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
     setTitleLength(e.target.value.length);
+  };
+
+  const handleResetButtonClick = () => {
+    setName('');
+    setTitle('');
+    setTitleLength(0);
+    setBody('');
+    setBodyLength(0);
+    setUrl('');
+    setIsMarketing(false);
+    setIsTest(true);
   };
 
   return (
@@ -32,8 +47,9 @@ export default function PushNotificationPage() {
                 type='text'
                 id='name'
                 placeholder='예: 251013 리뉴얼 1주년 기념 포인트 지급 안내'
+                value={name}
                 onChange={(e) => setName(e.target.value)}
-              />{' '}
+              />
               <div className='flex px-1'>
                 <p className='text-xs text-gray-500'>내부 확인 및 구분용</p>
               </div>
@@ -48,6 +64,7 @@ export default function PushNotificationPage() {
                 id='title'
                 maxLength={21}
                 placeholder='예: 스노로즈 리뉴얼 1주년 기념 포인트'
+                value={title}
                 onChange={handleTitleChange}
               />
               <div className='flex justify-end px-1'>
@@ -63,6 +80,7 @@ export default function PushNotificationPage() {
                 id='body'
                 maxLength={100}
                 placeholder='예: 모든 정회원 여러분께 10포인트 선물이 도착했습니다! 지급 내역은 [내정보 &gt; 포인트 내역 보기] 에서 확인하실 수 있습니다. (2025.10.12 19시 기준 정회원 대상)'
+                value={body}
                 onChange={handleBodyChange}
                 className='h-24'
               />
@@ -78,9 +96,8 @@ export default function PushNotificationPage() {
               <Input
                 type='text'
                 id='url'
-                placeholder='기본 주소의 뒷부분 (예: /board/notice/post/1863135)'
+                value={url || '/'}
                 onChange={(e) => setUrl(e.target.value)}
-                value={'/'}
               />
               <div className='flex px-1'>
                 <p className='text-xs text-gray-500'>
@@ -142,7 +159,7 @@ export default function PushNotificationPage() {
           type='submit'
           size='lg'
           variant='outline'
-          // onClick={handleResetButtonClick}
+          onClick={handleResetButtonClick}
           className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
         >
           초기화
