@@ -62,3 +62,4 @@ export {
   SheetClose,
 } from './sheet';
 export { Skeleton } from './skeleton';
+export { Textarea } from './textarea';
