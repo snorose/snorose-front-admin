@@ -31,7 +31,12 @@ export const AppSidebar = ({
   useEffect(() => {
     const storedStates = localStorage.getItem('sidebar-open-states');
     if (storedStates) {
-      setOpenStates(JSON.parse(storedStates));
+      try {
+        setOpenStates(JSON.parse(storedStates));
+      } catch (error) {
+        console.error('Error parsing sidebar open states:', error);
+        localStorage.removeItem('sidebar-open-states');
+      }
     }
   }, []);
 
