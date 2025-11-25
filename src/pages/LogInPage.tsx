@@ -10,7 +10,7 @@ export default function LogInPage() {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/member');
+    navigate('/member/info');
   };
 
   const togglePasswordVisibility = () => {
