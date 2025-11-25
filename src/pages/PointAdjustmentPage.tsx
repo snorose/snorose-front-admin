@@ -191,7 +191,7 @@ export default function PointAdjustmentPage() {
         <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
         <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='userId' required className='my-1'>
+            <Label htmlFor='userId' required>
               회원 ID (userId)
             </Label>
             <Input
@@ -203,7 +203,7 @@ export default function PointAdjustmentPage() {
             />
           </div>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='difference' required className='my-1'>
+            <Label htmlFor='difference' required>
               증감 포인트
             </Label>
             <Input
@@ -215,7 +215,7 @@ export default function PointAdjustmentPage() {
             />
           </div>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='category' required className='my-1'>
+            <Label htmlFor='category' required>
               포인트 유형
             </Label>
             <Select
@@ -237,9 +237,7 @@ export default function PointAdjustmentPage() {
             </Select>
           </div>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='memo' className='my-1'>
-              메모
-            </Label>
+            <Label htmlFor='memo'>메모</Label>
             <Input
               type='text'
               id='memo'

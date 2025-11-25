@@ -51,7 +51,7 @@ export default function PushNotificationPage() {
           <h3 className='text-lg font-bold'>필수 정보</h3>
           <div className='flex w-full flex-col gap-4 rounded-md border p-4'>
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='name' required className='my-1'>
+              <Label htmlFor='name' required>
                 알림명
               </Label>
               <Input
@@ -69,7 +69,7 @@ export default function PushNotificationPage() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='title' required className='my-1'>
+              <Label htmlFor='title' required>
                 알림 제목
               </Label>
               <Input
@@ -88,7 +88,7 @@ export default function PushNotificationPage() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='body' required className='my-1'>
+              <Label htmlFor='body' required>
                 알림 내용
               </Label>
               <Textarea
@@ -107,7 +107,7 @@ export default function PushNotificationPage() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='url' required className='my-1'>
+              <Label htmlFor='url' required>
                 알림 클릭 시 연결되는 주소
               </Label>
               <Input
