@@ -89,7 +89,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     url: '/operation',
     items: [
       {
-        title: '푸시 알림 관리',
+        title: '푸시 알림 전송',
         url: '/operation/push',
       },
       // {

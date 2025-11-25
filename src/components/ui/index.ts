@@ -62,3 +62,6 @@ export {
   SheetClose,
 } from './sheet';
 export { Skeleton } from './skeleton';
+export { Textarea } from './textarea';
+export { Switch } from './switch';
+export { Label } from './label';

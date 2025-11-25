@@ -7,6 +7,7 @@ import {
   LogInPage,
   PostPage,
   CommentPage,
+  PushNotificationPage,
 } from './pages';
 import { AppSidebar } from '@/components';
 import { SidebarProvider } from '@/components/ui';
@@ -33,6 +34,10 @@ function App() {
                       />
                       <Route path='/post' element={<PostPage />} />
                       <Route path='/comment' element={<CommentPage />} />
+                      <Route
+                        path='/operation/push'
+                        element={<PushNotificationPage />}
+                      />
                     </Routes>
                   </section>
                 </main>

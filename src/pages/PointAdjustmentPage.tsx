@@ -7,6 +7,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  Label,
 } from '@/components/ui';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
@@ -120,12 +121,12 @@ export default function PointAdjustmentPage() {
                 {MEMBER_INFO.map((info) => (
                   <th
                     key={`header-${info.key}`}
-                    className='w-1/6 p-2 text-left font-semibold'
+                    className='w-1/6 p-2 text-left text-sm font-semibold'
                   >
                     {info.label}
                   </th>
                 ))}
-                <th className='p-2 text-left font-semibold'>
+                <th className='p-2 text-left text-sm font-semibold'>
                   {ACTION_COLUMN_LABEL}
                 </th>
               </tr>
@@ -135,7 +136,7 @@ export default function PointAdjustmentPage() {
                 <tr>
                   <td
                     colSpan={MEMBER_INFO.length + 1}
-                    className='p-5 text-center text-gray-500'
+                    className='p-5 text-center text-sm text-gray-500'
                   >
                     조회된 회원이 없어요.
                   </td>
@@ -155,12 +156,12 @@ export default function PointAdjustmentPage() {
                       {MEMBER_INFO.map((info) => (
                         <td
                           key={`${member.userId}-${info.key}`}
-                          className='p-2'
+                          className='p-2 text-sm'
                         >
                           {member[info.key]}
                         </td>
                       ))}
-                      <td className='p-2'>
+                      <td className='p-2 text-sm'>
                         <Button
                           type='button'
                           variant='outline'
@@ -190,9 +191,9 @@ export default function PointAdjustmentPage() {
         <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
         <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
           <div className='flex flex-col gap-1'>
-            <label htmlFor='userId' className='font-semibold'>
-              회원 ID (userId) *
-            </label>
+            <Label htmlFor='userId' required>
+              회원 ID (userId)
+            </Label>
             <Input
               type='number'
               id='userId'
@@ -202,9 +203,9 @@ export default function PointAdjustmentPage() {
             />
           </div>
           <div className='flex flex-col gap-1'>
-            <label htmlFor='difference' className='font-semibold'>
-              증감 포인트 *
-            </label>
+            <Label htmlFor='difference' required>
+              증감 포인트
+            </Label>
             <Input
               type='number'
               id='difference'
@@ -214,9 +215,9 @@ export default function PointAdjustmentPage() {
             />
           </div>
           <div className='flex flex-col gap-1'>
-            <label htmlFor='category' className='font-semibold'>
-              포인트 유형 *
-            </label>
+            <Label htmlFor='category' required>
+              포인트 유형
+            </Label>
             <Select
               onValueChange={(selectedKey: keyof typeof POINT_CATEGORY | '') =>
                 setSelectedCategory(selectedKey)
@@ -236,9 +237,7 @@ export default function PointAdjustmentPage() {
             </Select>
           </div>
           <div className='flex flex-col gap-1'>
-            <label htmlFor='memo' className='font-semibold'>
-              메모
-            </label>
+            <Label htmlFor='memo'>메모</Label>
             <Input
               type='text'
               id='memo'
