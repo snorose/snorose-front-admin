@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Megaphone } from 'lucide-react';
 import {
   Button,
   Input,
@@ -8,6 +9,9 @@ import {
   SelectContent,
   SelectItem,
   Label,
+  Alert,
+  AlertTitle,
+  AlertDescription,
 } from '@/components/ui';
 import { POINT_CATEGORY } from '@/constants';
 
@@ -27,6 +31,23 @@ export default function PointAllPage() {
   return (
     <div className='flex w-full flex-col gap-6'>
       <h1 className='text-2xl font-bold'>정회원 전체 포인트 지급/차감</h1>
+
+      <Alert>
+        <Megaphone />
+        <AlertTitle>안내 사항</AlertTitle>
+        <AlertDescription>
+          <p>
+            모든 정회원에게 포인트를 지급/차감하는 기능이니, 신중히 진행해
+            주세요.
+          </p>
+          <ul className='list-inside list-disc text-sm'>
+            <li>포인트 카테고리, 메모, 지급량을 설정할 수 있어요.</li>
+            <li>
+              포인트가 자동 지급되지 않으니, 직접 지급/차감을 진행해 주세요.
+            </li>
+          </ul>
+        </AlertDescription>
+      </Alert>
 
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
