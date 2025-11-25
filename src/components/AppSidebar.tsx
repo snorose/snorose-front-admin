@@ -76,13 +76,13 @@ export const AppSidebar = ({
               {item.items?.length ? (
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items.map((item) => (
-                      <SidebarMenuSubItem key={item.title}>
+                    {item.items.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
                           asChild
-                          isActive={isActive(item.url)}
+                          isActive={isActive(subItem.url)}
                         >
-                          <NavLink to={item.url}> {item.title}</NavLink>
+                          <NavLink to={subItem.url}> {subItem.title}</NavLink>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
