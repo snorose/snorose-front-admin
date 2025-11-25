@@ -1,10 +1,21 @@
 import { useState } from 'react';
-
 import { Button, Input, Switch, Textarea } from '@/components/ui';
 
 export default function PushNotificationPage() {
   const [isMarketing, setIsMarketing] = useState(false);
   const [isTest, setIsTest] = useState(true);
+  const [bodyLength, setBodyLength] = useState(0);
+  const [titleLength, setTitleLength] = useState(0);
+  const [name, setName] = useState('');
+  const [url, setUrl] = useState('/');
+
+  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setBodyLength(e.target.value.length);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitleLength(e.target.value.length);
+  };
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -20,10 +31,12 @@ export default function PushNotificationPage() {
               <Input
                 type='text'
                 id='name'
-                placeholder='내부 확인 및 구분용 (예: 251013 리뉴얼 1주년 기념 포인트 지급 안내)'
-                // value={userId}
-                // onChange={handleUserIdChange}
-              />
+                placeholder='예: 251013 리뉴얼 1주년 기념 포인트 지급 안내'
+                onChange={(e) => setName(e.target.value)}
+              />{' '}
+              <div className='flex px-1'>
+                <p className='text-xs text-gray-500'>내부 확인 및 구분용</p>
+              </div>
             </div>
 
             <div className='flex flex-col gap-1'>
@@ -33,12 +46,12 @@ export default function PushNotificationPage() {
               <Input
                 type='text'
                 id='title'
+                maxLength={21}
                 placeholder='예: 스노로즈 리뉴얼 1주년 기념 포인트'
-                // value={difference}
-                // onChange={(e) => setDifference(Number(e.target.value) || '')}
+                onChange={handleTitleChange}
               />
-              <div className='flex px-2'>
-                <p className='text-xs text-gray-500'>0 / 21자</p>
+              <div className='flex justify-end px-1'>
+                <p className='text-xs text-gray-500'>{titleLength} / 21자</p>
               </div>
             </div>
 
@@ -48,12 +61,13 @@ export default function PushNotificationPage() {
               </label>
               <Textarea
                 id='body'
+                maxLength={100}
                 placeholder='예: 모든 정회원 여러분께 10포인트 선물이 도착했습니다! 지급 내역은 [내정보 &gt; 포인트 내역 보기] 에서 확인하실 수 있습니다. (2025.10.12 19시 기준 정회원 대상)'
-                // value={difference}
-                // onChange={(e) => setDifference(Number(e.target.value) || '')}
+                onChange={handleBodyChange}
+                className='h-24'
               />
-              <div className='flex px-2'>
-                <p className='text-xs text-gray-500'>0 / 100자</p>
+              <div className='flex justify-end px-1'>
+                <p className='text-xs text-gray-500'>{bodyLength} / 100자</p>
               </div>
             </div>
 
@@ -64,29 +78,44 @@ export default function PushNotificationPage() {
               <Input
                 type='text'
                 id='url'
-                placeholder='기본 주소의 뒷부분, 기본값: “/” (예: /board/notice/post/1863135)'
-                // value={memo}
-                // onChange={(e) => setMemo(e.target.value)}
+                placeholder='기본 주소의 뒷부분 (예: /board/notice/post/1863135)'
+                onChange={(e) => setUrl(e.target.value)}
+                value={'/'}
               />
+              <div className='flex px-1'>
+                <p className='text-xs text-gray-500'>
+                  기본 주소의 뒷부분 입력 (예:{' '}
+                  <a
+                    href='https://www.snorose.com/board/notice/post/1863135'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='hover:!underline'
+                  >
+                    /board/notice/post/1863135
+                  </a>
+                  )
+                </p>
+              </div>
             </div>
           </div>
         </article>
 
         <article className='flex w-full flex-col gap-1'>
           <h3 className='text-lg font-bold'>발송 옵션</h3>
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-1'>
                 <label htmlFor='isMarketing' className='font-semibold'>
                   광고성 알림 여부 *
                 </label>
-                <p className='text-gray-500'>true: 광고성 / false: 정보성</p>
+                <p className='text-sm text-gray-500'>
+                  true: 광고성 / false: 정보성
+                </p>
               </div>
               <Switch
                 id='isMarketing'
                 checked={isMarketing}
                 onCheckedChange={setIsMarketing}
-                className='!data-[state=checked]:bg-gray-700 !data-[state=unchecked]:bg-gray-400'
               />
             </div>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
@@ -94,7 +123,7 @@ export default function PushNotificationPage() {
                 <label htmlFor='isTest' className='font-semibold'>
                   테스트 발송 여부 *
                 </label>
-                <p className='text-gray-500'>
+                <p className='text-sm text-gray-500'>
                   true: 관리자에게만 / false: 전체 발송
                 </p>
               </div>
@@ -102,7 +131,6 @@ export default function PushNotificationPage() {
                 id='isTest'
                 checked={isTest}
                 onCheckedChange={setIsTest}
-                className='!data-[state=checked]:bg-gray-700 !data-[state=unchecked]:bg-gray-400'
               />
             </div>
           </div>
