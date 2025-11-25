@@ -40,7 +40,7 @@ export const SIDEBAR_MENUS: {
         url: '/exam/list',
       },
       {
-        title: '시험후기 작성 기간 설정',
+        title: '작성 기간 설정',
         url: '/exam/period',
       },
     ],
