@@ -1,6 +1,11 @@
+import { useState } from 'react';
+
 import { Button, Input, Switch, Textarea } from '@/components/ui';
 
 export default function PushNotificationPage() {
+  const [isMarketing, setIsMarketing] = useState(false);
+  const [isTest, setIsTest] = useState(true);
+
   return (
     <div className='flex w-full flex-col gap-6'>
       <h1 className='text-2xl font-bold'>푸시 알림 전송</h1>
@@ -79,8 +84,9 @@ export default function PushNotificationPage() {
               </div>
               <Switch
                 id='isMarketing'
-                // checked={isMarketing}
-                // onCheckedChange={setIsMarketing}
+                checked={isMarketing}
+                onCheckedChange={setIsMarketing}
+                className='!data-[state=checked]:bg-gray-700 !data-[state=unchecked]:bg-gray-400'
               />
             </div>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
@@ -94,8 +100,9 @@ export default function PushNotificationPage() {
               </div>
               <Switch
                 id='isTest'
-                // checked={isTest}
-                // onCheckedChange={setIsTest}
+                checked={isTest}
+                onCheckedChange={setIsTest}
+                className='!data-[state=checked]:bg-gray-700 !data-[state=unchecked]:bg-gray-400'
               />
             </div>
           </div>
