@@ -9,15 +9,12 @@ export default function PushNotificationPage() {
     url: '/',
     isMarketing: false,
     isTest: true,
-    titleLength: 0,
-    bodyLength: 0,
   });
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       title: e.target.value,
-      titleLength: e.target.value.length,
     });
   };
 
@@ -25,7 +22,6 @@ export default function PushNotificationPage() {
     setFormData({
       ...formData,
       body: e.target.value,
-      bodyLength: e.target.value.length,
     });
   };
 
@@ -38,8 +34,6 @@ export default function PushNotificationPage() {
       url: '/',
       isMarketing: false,
       isTest: true,
-      titleLength: 0,
-      bodyLength: 0,
     });
   };
 
@@ -82,7 +76,7 @@ export default function PushNotificationPage() {
               />
               <div className='flex justify-end px-1'>
                 <p className='text-xs text-gray-500'>
-                  {formData.titleLength} / 21자
+                  {formData.title.length} / 21자
                 </p>
               </div>
             </div>
@@ -101,7 +95,7 @@ export default function PushNotificationPage() {
               />
               <div className='flex justify-end px-1'>
                 <p className='text-xs text-gray-500'>
-                  {formData.bodyLength} / 100자
+                  {formData.body.length} / 100자
                 </p>
               </div>
             </div>
