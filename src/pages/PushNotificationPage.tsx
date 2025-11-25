@@ -1,4 +1,4 @@
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Switch, Textarea } from '@/components/ui';
 
 export default function PushNotificationPage() {
   return (
@@ -69,16 +69,34 @@ export default function PushNotificationPage() {
 
         <article className='flex w-full flex-col gap-1'>
           <h3 className='text-lg font-bold'>발송 옵션</h3>
-          <div className='flex flex-col gap-4 rounded-md border p-4'>
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='isMarketing' className='font-semibold'>
-                광고성 알림 여부
-              </label>
+          <div className='flex flex-col gap-4'>
+            <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
+              <div className='flex flex-col gap-1'>
+                <label htmlFor='isMarketing' className='font-semibold'>
+                  광고성 알림 여부 *
+                </label>
+                <p className='text-gray-500'>true: 광고성 / false: 정보성</p>
+              </div>
+              <Switch
+                id='isMarketing'
+                // checked={isMarketing}
+                // onCheckedChange={setIsMarketing}
+              />
             </div>
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='isTest' className='font-semibold'>
-                테스트 발송 여부
-              </label>
+            <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
+              <div className='flex flex-col gap-1'>
+                <label htmlFor='isTest' className='font-semibold'>
+                  테스트 발송 여부 *
+                </label>
+                <p className='text-gray-500'>
+                  true: 관리자에게만 / false: 전체 발송
+                </p>
+              </div>
+              <Switch
+                id='isTest'
+                // checked={isTest}
+                // onCheckedChange={setIsTest}
+              />
             </div>
           </div>
         </article>
