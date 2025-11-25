@@ -88,7 +88,7 @@ export default function PointAdjustmentPage() {
 
   return (
     <div className='flex w-full flex-col gap-6'>
-      <h1 className='text-2xl font-bold'>포인트 증감(지급/차감)</h1>
+      <h1 className='text-2xl font-bold'>단일건 포인트 지급/차감</h1>
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>회원 조회</h3>
         <div className='flex gap-2'>
