@@ -46,11 +46,11 @@ export const SIDEBAR_MENUS: {
     ],
   },
   {
-    title: '포인트 증감 (지급/차감)',
+    title: '포인트 지급/차감',
     url: '/point',
     items: [
       {
-        title: '단건 증감',
+        title: '단건',
         url: '/point/single',
       },
       // {
@@ -58,7 +58,7 @@ export const SIDEBAR_MENUS: {
       //   url: '/point/multiple',
       // },
       {
-        title: '정회원 증감',
+        title: '정회원 대상 전체',
         url: '/point/all',
       },
     ],
