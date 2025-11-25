@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Input, Switch, Textarea } from '@/components/ui';
+import { Button, Input, Label, Switch, Textarea } from '@/components/ui';
 
 export default function PushNotificationPage() {
   const [formData, setFormData] = useState({
@@ -51,9 +51,9 @@ export default function PushNotificationPage() {
           <h3 className='text-lg font-bold'>필수 정보</h3>
           <div className='flex w-full flex-col gap-4 rounded-md border p-4'>
             <div className='flex flex-col gap-1'>
-              <label htmlFor='name' className='font-semibold'>
-                알림명 *
-              </label>
+              <Label htmlFor='name' required className='my-1'>
+                알림명
+              </Label>
               <Input
                 type='text'
                 id='name'
@@ -69,9 +69,9 @@ export default function PushNotificationPage() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <label htmlFor='title' className='font-semibold'>
-                알림 제목 *
-              </label>
+              <Label htmlFor='title' required className='my-1'>
+                알림 제목
+              </Label>
               <Input
                 type='text'
                 id='title'
@@ -88,9 +88,9 @@ export default function PushNotificationPage() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <label htmlFor='body' className='font-semibold'>
-                알림 내용 *
-              </label>
+              <Label htmlFor='body' required className='my-1'>
+                알림 내용
+              </Label>
               <Textarea
                 id='body'
                 maxLength={100}
@@ -107,9 +107,9 @@ export default function PushNotificationPage() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <label htmlFor='url' className='font-semibold'>
-                알림 클릭 시 연결되는 주소 *
-              </label>
+              <Label htmlFor='url' required className='my-1'>
+                알림 클릭 시 연결되는 주소
+              </Label>
               <Input
                 type='text'
                 id='url'
@@ -141,9 +141,9 @@ export default function PushNotificationPage() {
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-1'>
-                <label htmlFor='isMarketing' className='font-semibold'>
-                  광고성 알림 여부 *
-                </label>
+                <Label htmlFor='isMarketing' required>
+                  광고성 알림 여부
+                </Label>
                 <p className='text-sm text-gray-500'>
                   true: 광고성 / false: 정보성
                 </p>
@@ -157,10 +157,10 @@ export default function PushNotificationPage() {
               />
             </div>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
-              <div className='flex flex-col gap-1'>
-                <label htmlFor='isTest' className='font-semibold'>
-                  테스트 발송 여부 *
-                </label>
+              <div className='flex flex-col gap-2'>
+                <Label htmlFor='isTest' required>
+                  테스트 발송 여부
+                </Label>
                 <p className='text-sm text-gray-500'>
                   true: 관리자에게만 / false: 전체 발송
                 </p>
