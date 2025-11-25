@@ -1,8 +1,15 @@
-export const SIDEBAR_MENUS: {
+export type SidebarMenu = {
   title: string;
   url: string;
-  items: { title: string; url: string }[];
-}[] = [
+  items: SidebarSubMenu[];
+};
+
+export type SidebarSubMenu = {
+  title: string;
+  url: string;
+};
+
+export const SIDEBAR_MENUS: SidebarMenu[] = [
   {
     title: '회원',
     url: '/member',
