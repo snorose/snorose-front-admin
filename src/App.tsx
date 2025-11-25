@@ -8,7 +8,8 @@ import {
   PostPage,
   CommentPage,
 } from './pages';
-import { Sidebar } from '@/components';
+import { AppSidebar } from '@/components';
+import { SidebarProvider } from '@/components/ui';
 
 function App() {
   return (
@@ -19,18 +20,23 @@ function App() {
           path='/*'
           element={
             <div className='flex min-h-screen'>
-              <Sidebar />
-              <main className='flex flex-1 flex-col overflow-hidden px-6 pt-5 pb-20'>
-                <section className='flex w-full flex-1 overflow-auto'>
-                  <Routes>
-                    <Route path='/exam' element={<ExamReviewPage />} />
-                    <Route path='/member' element={<MemberInfoPage />} />
-                    <Route path='/point' element={<PointAdjustmentPage />} />
-                    <Route path='/post' element={<PostPage />} />
-                    <Route path='/comment' element={<CommentPage />} />
-                  </Routes>
-                </section>
-              </main>
+              <SidebarProvider>
+                <AppSidebar />
+                <main className='flex flex-1 flex-col overflow-hidden px-6 pt-5 pb-20'>
+                  <section className='flex w-full flex-1 overflow-auto'>
+                    <Routes>
+                      <Route path='/member/info' element={<MemberInfoPage />} />
+                      <Route path='/exam/list' element={<ExamReviewPage />} />
+                      <Route
+                        path='/point/single'
+                        element={<PointAdjustmentPage />}
+                      />
+                      <Route path='/post' element={<PostPage />} />
+                      <Route path='/comment' element={<CommentPage />} />
+                    </Routes>
+                  </section>
+                </main>
+              </SidebarProvider>
             </div>
           }
         />
