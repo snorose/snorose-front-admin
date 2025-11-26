@@ -19,7 +19,7 @@ export default function PointAllPage() {
   const [selectedCategory, setSelectedCategory] = useState<
     keyof typeof POINT_CATEGORY | ''
   >('');
-  const [difference, setDifference] = useState<number | ''>(0);
+  const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
 
   const handleResetButtonClick = () => {
@@ -34,8 +34,14 @@ export default function PointAllPage() {
         alert('모든 필수 항목을 입력해주세요.');
         return;
       }
-    } catch (error) {
-      console.error(error);
+
+      const numDifference = Number(difference);
+
+      if (isNaN(numDifference) || numDifference === 0) {
+        alert('유효한 포인트 지급/차감량을 입력해주세요.');
+        return;
+      }
+    } catch {
       alert('포인트 지급/차감에 실패했습니다.');
     }
   };
@@ -94,11 +100,9 @@ export default function PointAllPage() {
               type='number'
               id='difference'
               value={difference}
-              onChange={(e) => setDifference(Number(e.target.value) || 0)}
+              placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
+              onChange={(e) => setDifference(e.target.value)}
             />
-            <p className='text-xs text-gray-500'>
-              양수 또는 음수만 입력 가능 (예: 20, -50)
-            </p>
           </div>
           <div className='flex flex-col gap-1'>
             <Label htmlFor='memo' required>
