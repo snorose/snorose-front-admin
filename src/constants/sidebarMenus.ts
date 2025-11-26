@@ -1,6 +1,5 @@
 export type SidebarMenu = {
   title: string;
-  url: string;
   items: SidebarSubMenu[];
 };
 
@@ -12,7 +11,6 @@ export type SidebarSubMenu = {
 export const SIDEBAR_MENUS: SidebarMenu[] = [
   {
     title: '회원',
-    url: '/member',
     items: [
       {
         title: '회원 관리',
@@ -40,7 +38,6 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   // },
   {
     title: '시험 후기',
-    url: '/exam',
     items: [
       {
         title: '시험 후기 관리',
@@ -54,19 +51,18 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   },
   {
     title: '포인트 지급/차감',
-    url: '/point',
     items: [
       {
-        title: '단건',
-        url: '/point/single',
+        title: '단일 지급',
+        url: '/points/single',
       },
       // {
       //   title: '일괄 증감',
-      //   url: '/point/multiple',
+      //   url: '/points/multiple',
       // },
       {
-        title: '정회원 대상 전체',
-        url: '/point/all',
+        title: '정회원 전체',
+        url: '/points/all',
       },
     ],
   },
@@ -86,7 +82,6 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   // },
   {
     title: '운영',
-    url: '/operation',
     items: [
       {
         title: '푸시 알림 전송',

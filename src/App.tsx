@@ -3,7 +3,8 @@ import './App.css';
 import {
   ExamReviewPage,
   MemberInfoPage,
-  PointAdjustmentPage,
+  PointSinglePage,
+  PointAllPage,
   LogInPage,
   PostPage,
   CommentPage,
@@ -29,9 +30,10 @@ function App() {
                       <Route path='/member/info' element={<MemberInfoPage />} />
                       <Route path='/exam/list' element={<ExamReviewPage />} />
                       <Route
-                        path='/point/single'
-                        element={<PointAdjustmentPage />}
+                        path='/points/single'
+                        element={<PointSinglePage />}
                       />
+                      <Route path='/points/all' element={<PointAllPage />} />
                       <Route path='/post' element={<PostPage />} />
                       <Route path='/comment' element={<CommentPage />} />
                       <Route

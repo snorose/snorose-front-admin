@@ -31,7 +31,7 @@ export default function PointAdjustmentPage() {
   >('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
-  const [difference, setDifference] = useState<number | ''>('');
+  const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
 
   const handleSelectMember = (member: MemberInfo) => {
@@ -86,9 +86,26 @@ export default function PointAdjustmentPage() {
     setMemo('');
   };
 
+  const handleApplyButtonClick = () => {
+    try {
+      if (!userId || !selectedCategory || !difference) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+      const numDifference = Number(difference);
+
+      if (isNaN(numDifference) || numDifference === 0) {
+        alert('유효한 포인트 지급/차감량을 입력해주세요.');
+        return;
+      }
+    } catch {
+      alert('포인트 지급/차감에 실패했습니다.');
+    }
+  };
+
   return (
     <div className='flex w-full flex-col gap-6'>
-      <h1 className='text-2xl font-bold'>포인트 증감(지급/차감)</h1>
+      <h1 className='text-2xl font-bold'>단일건 포인트 지급/차감</h1>
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>회원 조회</h3>
         <div className='flex gap-2'>
@@ -204,14 +221,14 @@ export default function PointAdjustmentPage() {
           </div>
           <div className='flex flex-col gap-1'>
             <Label htmlFor='difference' required>
-              증감 포인트
+              포인트 지급/차감량
             </Label>
             <Input
               type='number'
               id='difference'
-              placeholder='양수 또는 음수 입력 (예: 20, -50)'
               value={difference}
-              onChange={(e) => setDifference(Number(e.target.value) || '')}
+              placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
+              onChange={(e) => setDifference(e.target.value)}
             />
           </div>
           <div className='flex flex-col gap-1'>
@@ -264,6 +281,7 @@ export default function PointAdjustmentPage() {
           size='lg'
           variant='outline'
           className='text-md h-10 w-32 cursor-pointer font-bold'
+          onClick={handleApplyButtonClick}
         >
           적용
         </Button>
