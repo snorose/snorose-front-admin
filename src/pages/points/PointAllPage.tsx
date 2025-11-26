@@ -28,6 +28,18 @@ export default function PointAllPage() {
     setMemo('');
   };
 
+  const handleApplyButtonClick = () => {
+    try {
+      if (!selectedCategory || !difference || !memo) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      alert('포인트 지급/차감에 실패했습니다.');
+    }
+  };
+
   return (
     <div className='flex w-full flex-col gap-6'>
       <h1 className='text-2xl font-bold'>정회원 전체 포인트 지급/차감</h1>
@@ -118,6 +130,7 @@ export default function PointAllPage() {
           type='submit'
           size='lg'
           variant='outline'
+          onClick={handleApplyButtonClick}
           className='text-md h-10 w-32 cursor-pointer font-bold'
         >
           적용
