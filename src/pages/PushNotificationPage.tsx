@@ -1,0 +1,195 @@
+import { useState } from 'react';
+import { Button, Input, Label, Switch, Textarea } from '@/components/ui';
+
+export default function PushNotificationPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    title: '',
+    body: '',
+    url: '/',
+    isMarketing: false,
+    isTest: true,
+  });
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      title: e.target.value,
+    });
+  };
+
+  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      body: e.target.value,
+    });
+  };
+
+  const handleResetButtonClick = () => {
+    setFormData({
+      ...formData,
+      name: '',
+      title: '',
+      body: '',
+      url: '/',
+      isMarketing: false,
+      isTest: true,
+    });
+  };
+
+  return (
+    <div className='flex w-full flex-col gap-6'>
+      <h1 className='text-2xl font-bold'>푸시 알림 전송</h1>
+      <section className='flex gap-4'>
+        <article className='flex w-full flex-col gap-1'>
+          <h3 className='text-lg font-bold'>필수 정보</h3>
+          <div className='flex w-full flex-col gap-4 rounded-md border p-4'>
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor='name' required>
+                알림명
+              </Label>
+              <Input
+                type='text'
+                id='name'
+                placeholder='예: 251013 리뉴얼 1주년 기념 포인트 지급 안내'
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+              <div className='flex px-1'>
+                <p className='text-xs text-gray-500'>내부 확인 및 구분용</p>
+              </div>
+            </div>
+
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor='title' required>
+                알림 제목
+              </Label>
+              <Input
+                type='text'
+                id='title'
+                maxLength={21}
+                placeholder='예: 스노로즈 리뉴얼 1주년 기념 포인트'
+                value={formData.title}
+                onChange={handleTitleChange}
+              />
+              <div className='flex justify-end px-1'>
+                <p className='text-xs text-gray-500'>
+                  {formData.title.length} / 21자
+                </p>
+              </div>
+            </div>
+
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor='body' required>
+                알림 내용
+              </Label>
+              <Textarea
+                id='body'
+                maxLength={100}
+                placeholder='예: 모든 정회원 여러분께 10포인트 선물이 도착했습니다! 지급 내역은 [내정보 &gt; 포인트 내역 보기] 에서 확인하실 수 있습니다. (2025.10.12 19시 기준 정회원 대상)'
+                value={formData.body}
+                onChange={handleBodyChange}
+                className='h-24'
+              />
+              <div className='flex justify-end px-1'>
+                <p className='text-xs text-gray-500'>
+                  {formData.body.length} / 100자
+                </p>
+              </div>
+            </div>
+
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor='url' required>
+                알림 클릭 시 연결되는 주소
+              </Label>
+              <Input
+                type='text'
+                id='url'
+                value={formData.url || '/'}
+                onChange={(e) =>
+                  setFormData({ ...formData, url: e.target.value })
+                }
+              />
+              <div className='flex px-1'>
+                <p className='text-xs text-gray-500'>
+                  기본 주소의 뒷부분 입력 (예:{' '}
+                  <a
+                    href='https://www.snorose.com/board/notice/post/1863135'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='hover:!underline'
+                  >
+                    /board/notice/post/1863135
+                  </a>
+                  )
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article className='flex w-full flex-col gap-1'>
+          <h3 className='text-lg font-bold'>발송 옵션</h3>
+          <div className='flex flex-col gap-2'>
+            <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
+              <div className='flex flex-col gap-1'>
+                <Label htmlFor='isMarketing' required>
+                  광고성 알림 여부
+                </Label>
+                <p className='text-sm text-gray-500'>
+                  true: 광고성 / false: 정보성
+                </p>
+              </div>
+              <Switch
+                id='isMarketing'
+                checked={formData.isMarketing}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isMarketing: checked })
+                }
+              />
+            </div>
+            <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
+              <div className='flex flex-col gap-2'>
+                <Label htmlFor='isTest' required>
+                  테스트 발송 여부
+                </Label>
+                <p className='text-sm text-gray-500'>
+                  true: 관리자에게만 / false: 전체 발송
+                </p>
+              </div>
+              <Switch
+                id='isTest'
+                checked={formData.isTest}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isTest: checked })
+                }
+              />
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <div className='flex justify-end gap-2'>
+        <Button
+          type='submit'
+          size='lg'
+          variant='outline'
+          onClick={handleResetButtonClick}
+          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+        >
+          초기화
+        </Button>
+        <Button
+          type='submit'
+          size='lg'
+          variant='outline'
+          className='text-md h-10 w-32 cursor-pointer font-bold'
+        >
+          알림 전송
+        </Button>
+      </div>
+    </div>
+  );
+}
