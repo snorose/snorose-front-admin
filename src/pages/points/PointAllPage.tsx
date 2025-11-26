@@ -69,10 +69,10 @@ export default function PointAllPage() {
               포인트 유형
             </Label>
             <Select
-              onValueChange={(
-                selectedCategory: keyof typeof POINT_CATEGORY | ''
-              ) => setSelectedCategory(selectedCategory)}
-              value={selectedCategory ?? undefined}
+              onValueChange={(value: keyof typeof POINT_CATEGORY | '') =>
+                setSelectedCategory(value)
+              }
+              value={selectedCategory}
             >
               <SelectTrigger className='w-full'>
                 <SelectValue placeholder='포인트 유형을 선택해주세요' />
