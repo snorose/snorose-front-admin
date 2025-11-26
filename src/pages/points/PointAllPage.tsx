@@ -117,7 +117,7 @@ export default function PointAllPage() {
 
       <div className='flex justify-end gap-2'>
         <Button
-          type='submit'
+          type='button'
           size='lg'
           variant='outline'
           onClick={handleResetButtonClick}
