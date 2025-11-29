@@ -13,6 +13,7 @@ import {
   AlertTitle,
   AlertDescription,
 } from '@/components/ui';
+import { PageHeader } from '@/components';
 import { POINT_CATEGORY } from '@/constants';
 
 export default function PointAllPage() {
@@ -48,16 +49,15 @@ export default function PointAllPage() {
 
   return (
     <div className='flex w-full flex-col gap-6'>
-      <h1 className='text-2xl font-bold'>정회원 전체 포인트 지급/차감</h1>
+      <PageHeader
+        title='정회원 전체 포인트 지급/차감'
+        description='모든 정회원에게 포인트를 지급/차감하는 기능이니, 신중히 진행해 주세요.'
+      />
 
       <Alert>
         <Megaphone />
         <AlertTitle>안내 사항</AlertTitle>
         <AlertDescription>
-          <p>
-            모든 정회원에게 포인트를 지급/차감하는 기능이니, 신중히 진행해
-            주세요.
-          </p>
           <ul className='list-inside list-disc text-sm'>
             <li>포인트 카테고리, 메모, 지급량을 설정할 수 있어요.</li>
             <li>

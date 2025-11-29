@@ -9,6 +9,7 @@ import {
   SelectItem,
   Label,
 } from '@/components/ui';
+import { PageHeader } from '@/components';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
 import { cn } from '@/utils';
@@ -105,7 +106,10 @@ export default function PointAdjustmentPage() {
 
   return (
     <div className='flex w-full flex-col gap-6'>
-      <h1 className='text-2xl font-bold'>단일건 포인트 지급/차감</h1>
+      <PageHeader
+        title='단일건 포인트 지급/차감'
+        description='특정 회원에게 포인트를 지급/차감합니다.'
+      />
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>회원 조회</h3>
         <div className='flex gap-2'>
