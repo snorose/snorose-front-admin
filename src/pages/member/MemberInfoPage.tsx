@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button, Input, Label } from '@/components/ui';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
@@ -27,26 +27,28 @@ export default function MemberInfoPage() {
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     const query = searchQuery.trim().toLowerCase();
+
     if (!query) {
       setSelectedMember(null);
       setErrorMessage('');
       return;
     }
-    const found = MEMBER_SAMPLE_DATA.find(
-      (member) =>
-        member.loginId.toLowerCase().includes(query) ||
-        member.studentNumber.toLowerCase().includes(query)
-    );
-    if (!found) {
-      setSelectedMember(null);
-      setErrorMessage('사용자가 존재하지 않아요');
-    } else {
+    const found = MEMBER_SAMPLE_DATA.find((member) => {
+      const loginId = member.loginId?.toLowerCase() ?? '';
+      const studentNumber = member.studentNumber?.toLowerCase() ?? '';
+
+      return loginId === query || studentNumber === query;
+    });
+    if (found) {
       setSelectedMember(found);
       setErrorMessage('');
+    } else {
+      setSelectedMember(null);
+      setErrorMessage('사용자가 존재하지 않아요');
     }
-  };
+  }, [searchQuery]);
 
   return (
     <div className='flex w-full flex-col gap-3'>
