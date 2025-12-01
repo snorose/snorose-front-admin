@@ -1,3 +1,3 @@
-export default function MemberPenaltyManagemntPage() {
-  return <div>MemberPenaltyManagemntPage</div>;
+export default function MemberPenaltyManagementPage() {
+  return <div>MemberPenaltyManagementPage</div>;
 }
