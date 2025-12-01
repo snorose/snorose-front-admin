@@ -18,7 +18,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       },
       {
         title: '경고 및 강등 관리',
-        url: '/member/warning',
+        url: '/member/managePenalty',
       },
     ],
   },

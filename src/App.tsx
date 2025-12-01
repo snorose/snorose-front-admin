@@ -3,6 +3,7 @@ import './App.css';
 import {
   ExamReviewPage,
   MemberInfoPage,
+  MemberPenaltyManagementPage,
   PointSinglePage,
   PointAllPage,
   LogInPage,
@@ -28,6 +29,10 @@ function App() {
                   <section className='flex w-full flex-1 overflow-auto'>
                     <Routes>
                       <Route path='/member/info' element={<MemberInfoPage />} />
+                      <Route
+                        path='/member/managePenalty'
+                        element={<MemberPenaltyManagementPage />}
+                      />
                       <Route path='/exam/list' element={<ExamReviewPage />} />
                       <Route
                         path='/points/single'

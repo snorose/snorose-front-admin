@@ -1,6 +1,7 @@
 export { default as CommentPage } from './CommentPage';
 export { default as ExamReviewPage } from './ExamReviewPage';
-export { default as MemberInfoPage } from './MemberInfoPage';
+export { default as MemberInfoPage } from './member/MemberInfoPage';
+export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
 export { default as PointSinglePage } from './points/PointSinglePage';
 export { default as PointMultiplePage } from './points/PointMultiplePage';
 export { default as PointAllPage } from './points/PointAllPage';
