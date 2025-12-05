@@ -76,6 +76,9 @@ body {
     color: #213547;
     background-color: #ffffff;
   }
+  a:hover {
+    color: #747bff;
+  }
 }
 
 @theme inline {
@@ -167,5 +170,16 @@ body {
     font-family: inherit;
     font-size: inherit;
     color: inherit;
+  }
+  button {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    cursor: pointer;
   }
 }
