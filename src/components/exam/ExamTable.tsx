@@ -45,7 +45,7 @@ const StatusDot = ({ status }: { status: string }) => {
   return (
     <div className='flex items-center justify-center'>
       <div
-        className={`w-3 h-3 rounded-full ${getStatusColor(status)}`}
+        className={`h-3 w-3 rounded-full ${getStatusColor(status)}`}
         title={status}
       />
     </div>
@@ -201,17 +201,17 @@ export default function ExamTable({
   }, [selectedFilters]);
 
   return (
-    <div className='bg-white rounded-lg shadow pr-4 overflow-visible'>
+    <div className='overflow-visible rounded-lg bg-white pr-4 shadow'>
       <Table>
         {/* Table Header */}
-        <TableHeader className='bg-gray-100 z-10 shadow-sm [&_tr]:border-b'>
+        <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow>
             <TableHead className='w-[20px] text-center'></TableHead>
             <TableHead className='w-[60px] text-center'>상태</TableHead>
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
             <TableHead className='w-[60px]'>교수</TableHead>
-            <TableHead className='w-[60px] relative hover:bg-gray-200'>
+            <TableHead className='relative w-[60px] hover:bg-gray-200'>
               <TextDropdown
                 isOpen={openHeaderFilter === 'semester'}
                 onSelect={(value) =>
@@ -234,7 +234,7 @@ export default function ExamTable({
                 </div>
               </TextDropdown>
             </TableHead>
-            <TableHead className='w-[60px] relative hover:bg-gray-200'>
+            <TableHead className='relative w-[60px] hover:bg-gray-200'>
               <TextDropdown
                 isOpen={openHeaderFilter === 'examType'}
                 onSelect={(value) =>
@@ -261,7 +261,7 @@ export default function ExamTable({
             <TableHead className='w-[110px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
             <TableHead className='min-w-[160px]'>기타 논의사항</TableHead>
-            <TableHead className='w-[70px] relative hover:bg-gray-200'>
+            <TableHead className='relative w-[70px] hover:bg-gray-200'>
               <TextDropdown
                 isOpen={openHeaderFilter === 'manager'}
                 onSelect={(value) => handleHeaderFilterSelect('manager', value)}
@@ -283,7 +283,7 @@ export default function ExamTable({
               </TextDropdown>
             </TableHead>
             <TableHead
-              className='w-[20px] text-center cursor-pointer'
+              className='w-[20px] cursor-pointer text-center'
               onClick={() => {
                 const allCurrentPageSelected = currentPageData.every((review) =>
                   selectedItems.includes(review.id)
@@ -291,7 +291,7 @@ export default function ExamTable({
                 handleSelectAll(!allCurrentPageSelected);
               }}
             >
-              <div className='flex items-center justify-center h-full'>
+              <div className='flex h-full items-center justify-center'>
                 <input
                   type='checkbox'
                   checked={
@@ -301,7 +301,7 @@ export default function ExamTable({
                     )
                   }
                   onChange={(e) => handleSelectAll(e.target.checked)}
-                  className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center relative pointer-events-none'
+                  className='pointer-events-none relative h-4 w-4 appearance-none rounded border-2 border-gray-300 bg-white checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-xs checked:before:text-white checked:before:content-["✓"] focus:ring-2 focus:ring-blue-200'
                 />
               </div>
             </TableHead>
@@ -313,13 +313,17 @@ export default function ExamTable({
           {currentPageData.map((review, index) => (
             <TableRow
               key={review.id}
-              className='hover:cursor-pointer [&_td]:h-[24px]'
+              className={`hover:cursor-pointer [&_td]:h-[24px] ${
+                openDropdown === review.id || openManagerDropdown === review.id
+                  ? 'bg-blue-100 hover:bg-blue-100'
+                  : ''
+              }`}
             >
               <TableCell className='text-center text-sm text-gray-600'>
                 {startIndex + index + 1}
               </TableCell>
               <TableCell
-                className='text-center relative cursor-pointer'
+                className='relative cursor-pointer text-center'
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleDropdown(review.id);
@@ -332,7 +336,7 @@ export default function ExamTable({
                   }
                   onClose={() => setOpenDropdown(null)}
                 >
-                  <div className='w-full h-full flex items-center justify-center outline-none border-none'>
+                  <div className='flex h-full w-full items-center justify-center border-none outline-none'>
                     <StatusDot status={review.status} />
                   </div>
                 </StatusDropdown>
@@ -391,13 +395,13 @@ export default function ExamTable({
                   onClose={() => setOpenManagerDropdown(null)}
                   position='left'
                 >
-                  <div className='w-full h-full outline-none border-none'>
+                  <div className='h-full w-full border-none outline-none'>
                     {review.manager}
                   </div>
                 </TextDropdown>
               </TableCell>
               <TableCell
-                className='max-w-[20px] text-center cursor-pointer'
+                className='max-w-[20px] cursor-pointer text-center'
                 onClick={() =>
                   handleSelectItem(
                     review.id,
@@ -405,14 +409,14 @@ export default function ExamTable({
                   )
                 }
               >
-                <div className='flex items-center justify-center h-full'>
+                <div className='flex h-full items-center justify-center'>
                   <input
                     type='checkbox'
                     checked={selectedItems.includes(review.id)}
                     onChange={(e) =>
                       handleSelectItem(review.id, e.target.checked)
                     }
-                    className='w-4 h-4 appearance-none bg-white border-2 border-gray-300 rounded checked:bg-blue-500 checked:border-blue-500 focus:ring-2 focus:ring-blue-200 checked:before:content-["✓"] checked:before:text-white checked:before:text-xs checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center relative pointer-events-none'
+                    className='pointer-events-none relative h-4 w-4 appearance-none rounded border-2 border-gray-300 bg-white checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-xs checked:before:text-white checked:before:content-["✓"] focus:ring-2 focus:ring-blue-200'
                   />
                 </div>
               </TableCell>
@@ -445,7 +449,7 @@ export default function ExamTable({
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className='flex flex-col items-center px-4 py-4 border-t border-gray-200 gap-3'>
+        <div className='flex flex-col items-center gap-3 border-t border-gray-200 px-4 py-4'>
           <div className='text-sm text-gray-600'>
             {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
           </div>
@@ -453,7 +457,7 @@ export default function ExamTable({
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className='px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='rounded bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
             >
               이전
             </button>
@@ -463,7 +467,7 @@ export default function ExamTable({
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 text-sm rounded ${
+                    className={`rounded px-3 py-1 text-sm ${
                       currentPage === page
                         ? 'bg-gray-300 text-gray-900'
                         : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -479,7 +483,7 @@ export default function ExamTable({
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1))
               }
               disabled={currentPage === totalPages}
-              className='px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='rounded bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
             >
               다음
             </button>

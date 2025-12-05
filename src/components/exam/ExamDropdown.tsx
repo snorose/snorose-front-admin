@@ -47,20 +47,20 @@ export const StatusDropdown = ({
       {children}
       <ul
         ref={dropdownRef}
-        className='absolute top-0 left-full z-50 ml-1 w-48 bg-blue-100 border border-gray-300 rounded-md shadow-lg'
+        className='absolute top-0 left-full z-50 ml-1 w-48 rounded-md border border-gray-400 bg-white shadow-[5px_5px_10px_6px_rgba(0,0,0,0.1)]'
         onClick={(e) => e.stopPropagation()}
       >
         {STATUS_COLOR.map((statusOption) => (
           <li
             key={statusOption.id}
-            className='flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer'
+            className='flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100'
             onClick={() => {
               onStatusSelect(statusOption.code, statusOption.name);
               onClose();
             }}
           >
             <div
-              className={`w-3 h-3 rounded-full ${statusOption.color} mr-2`}
+              className={`h-3 w-3 rounded-full ${statusOption.color} mr-2`}
             />
             <span className='text-sm'>{statusOption.name}</span>
           </li>
@@ -156,7 +156,7 @@ export const TextDropdown = ({
       {children}
       <ul
         ref={dropdownRef}
-        className={`absolute ${getPositionClasses()} z-50 ${width} max-h-[200px] overflow-y-scroll bg-blue-100 border border-gray-300 rounded-md shadow-lg`}
+        className={`absolute ${getPositionClasses()} z-50 ${width} max-h-[200px] overflow-y-scroll rounded-md border border-gray-300 bg-blue-100 shadow-lg`}
         onClick={(e) => e.stopPropagation()}
       >
         {options.map((option, index) => {
@@ -164,7 +164,7 @@ export const TextDropdown = ({
           return (
             <li
               key={index}
-              className={`flex items-center px-3 py-2 hover:bg-blue-200 cursor-pointer ${
+              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-blue-200 ${
                 isSelected ? 'bg-blue-100' : ''
               }`}
               onClick={() => {
@@ -176,12 +176,12 @@ export const TextDropdown = ({
               }}
             >
               <span
-                className={`text-sm flex-1 ${isSelected ? 'font-bold' : 'font-medium'}`}
+                className={`flex-1 text-sm ${isSelected ? 'font-bold' : 'font-medium'}`}
               >
                 {option}
               </span>
               {isSelected && (
-                <span className='text-blue-600 ml-2 text-sm'>✓</span>
+                <span className='ml-2 text-sm text-blue-600'>✓</span>
               )}
             </li>
           );
