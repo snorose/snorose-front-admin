@@ -45,7 +45,7 @@ const StatusDot = ({ status }: { status: string }) => {
   return (
     <div className='flex items-center justify-center'>
       <div
-        className={`h-3 w-3 rounded-full ${getStatusColor(status)}`}
+        className={`h-2 w-2 rounded-full ${getStatusColor(status)}`}
         title={status}
       />
     </div>
@@ -201,12 +201,12 @@ export default function ExamTable({
   }, [selectedFilters]);
 
   return (
-    <div className='overflow-visible rounded-lg bg-white pr-4 shadow'>
+    <div className='overflow-visible rounded-lg bg-white shadow'>
       <Table>
         {/* Table Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow>
-            <TableHead className='w-[20px] text-center'></TableHead>
+            <TableHead className='min-w-[40px] text-center'></TableHead>
             <TableHead className='w-[60px] text-center'>상태</TableHead>
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
@@ -319,7 +319,7 @@ export default function ExamTable({
                   : ''
               }`}
             >
-              <TableCell className='text-center text-sm text-gray-600'>
+              <TableCell className='text-center text-gray-600'>
                 {startIndex + index + 1}
               </TableCell>
               <TableCell
@@ -358,9 +358,9 @@ export default function ExamTable({
                 </div>
               </TableCell>
               <TableCell>{review.professor}</TableCell>
-              <TableCell className='text-sm'>{review.semester}</TableCell>
-              <TableCell className='text-sm'>{review.examType}</TableCell>
-              <TableCell className='text-sm'>
+              <TableCell>{review.semester}</TableCell>
+              <TableCell>{review.examType}</TableCell>
+              <TableCell>
                 <div
                   className='max-w-[150px] truncate'
                   title={review.examFormat}
@@ -368,11 +368,11 @@ export default function ExamTable({
                   {review.examFormat}
                 </div>
               </TableCell>
-              <TableCell className='text-sm text-gray-600'>
+              <TableCell className='text-gray-600'>
                 {review.uploadTime}
               </TableCell>
               <TableCell>{review.author}</TableCell>
-              <TableCell className='text-sm'>
+              <TableCell>
                 <div
                   className='max-w-[60px] truncate'
                   title={review.discussion}
@@ -395,7 +395,7 @@ export default function ExamTable({
                   onClose={() => setOpenManagerDropdown(null)}
                   position='left'
                 >
-                  <div className='h-full w-full border-none outline-none'>
+                  <div className='flex h-full w-full items-center justify-center border-none outline-none'>
                     {review.manager}
                   </div>
                 </TextDropdown>
@@ -426,7 +426,7 @@ export default function ExamTable({
           {Array.from({ length: ITEMS_PER_PAGE - currentPageData.length }).map(
             (_, index) => (
               <TableRow key={`empty-${index}`} className='[&_td]:h-[24px]'>
-                <TableCell className='text-center text-sm text-gray-600'>
+                <TableCell className='text-center text-gray-600'>
                   &nbsp;
                 </TableCell>
                 <TableCell>&nbsp;</TableCell>
@@ -450,14 +450,14 @@ export default function ExamTable({
       {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className='flex flex-col items-center gap-3 border-t border-gray-200 px-4 py-4'>
-          <div className='text-sm text-gray-600'>
+          <div className='text-xs text-gray-600'>
             {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
           </div>
           <div className='flex items-center gap-2'>
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className='rounded bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
+              className='rounded bg-gray-100 px-3 py-1 text-xs text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
             >
               이전
             </button>
@@ -467,7 +467,7 @@ export default function ExamTable({
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`rounded px-3 py-1 text-sm ${
+                    className={`rounded px-3 py-1 text-xs ${
                       currentPage === page
                         ? 'bg-gray-300 text-gray-900'
                         : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -483,7 +483,7 @@ export default function ExamTable({
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1))
               }
               disabled={currentPage === totalPages}
-              className='rounded bg-gray-100 px-3 py-1 text-sm text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
+              className='rounded bg-gray-100 px-3 py-1 text-xs text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
             >
               다음
             </button>

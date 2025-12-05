@@ -1,3 +1,5 @@
+import { snoroseLogo } from '@/assets';
+
 export default function Header() {
   return (
     <header className='bg-background fixed top-0 right-0 left-0 z-10 h-14 w-screen border-b border-gray-200'>

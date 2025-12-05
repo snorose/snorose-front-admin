@@ -3,12 +3,12 @@ import ExamPeriod from '@/components/exam/ExamPeriod';
 
 export default function ExamReviewPage() {
   return (
-    <div className='w-full max-w-full py-10 px-6 box-border'>
+    <div className='box-border w-full max-w-full pt-6'>
       {/* 검색창 */}
       <input
         type='text'
         placeholder='검색'
-        className='w-[480px] h-[36px] rounded-2xl border-2 border-blue-500 bg-white px-4 py-2 mb-6'
+        className='mb-4 h-8 w-[480px] rounded-md border-1 border-gray-500 bg-white px-4 py-2 text-sm'
       />
 
       {/* 기간 필터 */}

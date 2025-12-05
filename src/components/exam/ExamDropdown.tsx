@@ -47,22 +47,22 @@ export const StatusDropdown = ({
       {children}
       <ul
         ref={dropdownRef}
-        className='absolute top-0 left-full z-50 ml-1 w-48 rounded-md border border-gray-400 bg-white shadow-[5px_5px_10px_6px_rgba(0,0,0,0.1)]'
+        className='absolute top-0 left-full z-50 ml-1 w-28 rounded-md border border-gray-400 bg-white shadow-[5px_5px_10px_6px_rgba(0,0,0,0.1)]'
         onClick={(e) => e.stopPropagation()}
       >
         {STATUS_COLOR.map((statusOption) => (
           <li
             key={statusOption.id}
-            className='flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100'
+            className='flex cursor-pointer items-center rounded-md px-3 py-1.5 hover:bg-gray-100'
             onClick={() => {
               onStatusSelect(statusOption.code, statusOption.name);
               onClose();
             }}
           >
             <div
-              className={`h-3 w-3 rounded-full ${statusOption.color} mr-2`}
+              className={`h-2 w-2 rounded-full ${statusOption.color} mr-2`}
             />
-            <span className='text-sm'>{statusOption.name}</span>
+            <span className='text-[10px]'>{statusOption.name}</span>
           </li>
         ))}
       </ul>
@@ -164,7 +164,7 @@ export const TextDropdown = ({
           return (
             <li
               key={index}
-              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-blue-200 ${
+              className={`flex cursor-pointer items-center px-3 py-1.5 hover:bg-blue-200 ${
                 isSelected ? 'bg-blue-100' : ''
               }`}
               onClick={() => {
@@ -176,12 +176,12 @@ export const TextDropdown = ({
               }}
             >
               <span
-                className={`flex-1 text-sm ${isSelected ? 'font-bold' : 'font-medium'}`}
+                className={`flex-1 text-[10px] ${isSelected ? 'font-bold' : 'font-medium'}`}
               >
                 {option}
               </span>
               {isSelected && (
-                <span className='ml-2 text-sm text-blue-600'>✓</span>
+                <span className='ml-2 text-[10px] text-blue-600'>✓</span>
               )}
             </li>
           );
