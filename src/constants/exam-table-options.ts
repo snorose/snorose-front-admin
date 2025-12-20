@@ -279,6 +279,20 @@ export const EXAM_REVIEW_LIST_DUMMY = [
     discussion: '환경 이슈 정리 필요',
     manager: '박관리자',
   },
+  {
+    id: 21,
+    status: 'PUNISHMENT',
+    reviewTitle: '환경학 중간고사 후기 - 현장 사례 다수',
+    courseName: '환경과학',
+    professor: '정교수',
+    semester: '2024-2',
+    examType: '중간고사',
+    examFormat: '사례분석 12문항, 계산 8문항',
+    uploadTime: '2024-10-15 11:30',
+    author: '김학생',
+    discussion: '환경 이슈 정리 필요',
+    manager: '박관리자',
+  },
 ];
 
 // 상태 리스트
