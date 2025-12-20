@@ -201,8 +201,8 @@ export default function ExamTable({
   }, [selectedFilters]);
 
   return (
-    <div className='overflow-visible rounded-lg bg-white shadow'>
-      <Table>
+    <div className='overflow-visible'>
+      <Table className='rounded-lg bg-white shadow'>
         {/* Table Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow>
@@ -449,10 +449,7 @@ export default function ExamTable({
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className='flex flex-col items-center gap-3 border-t border-gray-200 px-4 py-4'>
-          <div className='text-xs text-gray-600'>
-            {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
-          </div>
+        <div className='relative flex flex-col items-center gap-3 px-4 py-4'>
           <div className='flex items-center gap-2'>
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
@@ -487,6 +484,9 @@ export default function ExamTable({
             >
               다음
             </button>
+          </div>
+          <div className='absolute right-0 text-xs text-gray-600'>
+            {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
           </div>
         </div>
       )}

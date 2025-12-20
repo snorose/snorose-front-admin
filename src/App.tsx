@@ -25,7 +25,7 @@ function App() {
             <div className='flex min-h-screen'>
               <SidebarProvider>
                 <AppSidebar />
-                <main className='flex flex-1 flex-col overflow-hidden px-6 pt-5 pb-20'>
+                <main className='flex flex-1 flex-col overflow-hidden px-6 py-5'>
                   <section className='flex w-full flex-1 overflow-auto'>
                     <Routes>
                       <Route path='/member/info' element={<MemberInfoPage />} />

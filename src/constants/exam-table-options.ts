@@ -283,17 +283,37 @@ export const EXAM_REVIEW_LIST_DUMMY = [
 
 // 상태 리스트
 export const STATUS_COLOR = [
-  { id: 1, code: 'CONFIRMED', name: '확인완료', color: 'bg-blue-500' },
+  { id: 1, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-300' },
+  { id: 2, code: 'CONFIRMED', name: '확인완료', color: 'bg-blue-500' },
   {
-    id: 2,
+    id: 3,
     code: 'CONFIRMED_WITH_MODIFICATION',
     name: '수정+확인완료',
     color: 'bg-green-500',
   },
-  { id: 3, code: 'NEED_DISCUSSION', name: '논의필요', color: 'bg-orange-500' },
-  { id: 4, code: 'PUNISHMENT', name: '징계', color: 'bg-red-500' },
-  { id: 5, code: 'DELETED', name: '삭제된 족보', color: 'bg-gray-300' },
-  { id: 6, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-900' },
+  { id: 4, code: 'NEED_DISCUSSION', name: '논의필요', color: 'bg-yellow-500' },
+  { id: 5, code: 'DELETED', name: '삭제된 족보', color: 'bg-red-500' },
+  { id: 6, code: 'PUNISHMENT', name: '징계', color: 'bg-gray-900' },
+];
+
+// 아이콘 정보 리스트
+export const ICON_INFO_LIST = [
+  { id: 1, code: 'ASSIGN', name: '담당 리자 지정', icon: 'user' },
+  {
+    id: 2,
+    code: 'EDIT',
+    name: '편집',
+    icon: 'edit',
+  },
+  { id: 3, code: 'DISCUSSION', name: '논의필요', icon: 'discussion' },
+  { id: 4, code: 'PUNISHMENT', name: '징계', icon: 'punishment' },
+  { id: 5, code: 'DELETE', name: '단순 삭제', icon: 'delete' },
+  {
+    id: 6,
+    code: 'APPROVE',
+    name: '족보 확인 처리',
+    icon: 'check',
+  },
 ];
 
 // 수강 학기
