@@ -14,7 +14,7 @@ import {
   MANAGER_LIST,
 } from '@/constants/exam-table-options';
 import { StatusDropdown, TextDropdown } from './ExamDropdown';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, createRef } from 'react';
 
 interface ExamReview {
   id: number;
@@ -56,7 +56,7 @@ export default function ExamTable({
   data = EXAM_REVIEW_LIST_DUMMY,
 }: ExamTableProps) {
   // 페이지네이션 설정
-  const ITEMS_PER_PAGE = 15;
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   // 필터 옵션 (선택된 필터 값들)
@@ -80,6 +80,38 @@ export default function ExamTable({
 
   // 헤더 필터 드롭다운 상태 관리
   const [openHeaderFilter, setOpenHeaderFilter] = useState<string | null>(null);
+
+  // 헤더 필터 셀 기준 ref
+  const semesterHeaderRef = useRef<HTMLTableCellElement>(null);
+  const examTypeHeaderRef = useRef<HTMLTableCellElement>(null);
+  const managerHeaderRef = useRef<HTMLTableCellElement>(null);
+
+  // 각 행의 셀 ref를 저장하는 Map
+  const statusCellRefs = useRef<
+    Map<number, React.RefObject<HTMLTableCellElement | null>>
+  >(new Map());
+  const managerCellRefs = useRef<
+    Map<number, React.RefObject<HTMLTableCellElement | null>>
+  >(new Map());
+
+  // 각 행에 대한 ref 생성 함수
+  const getStatusCellRef = (
+    id: number
+  ): React.RefObject<HTMLTableCellElement | null> => {
+    if (!statusCellRefs.current.has(id)) {
+      statusCellRefs.current.set(id, createRef<HTMLTableCellElement | null>());
+    }
+    return statusCellRefs.current.get(id)!;
+  };
+
+  const getManagerCellRef = (
+    id: number
+  ): React.RefObject<HTMLTableCellElement | null> => {
+    if (!managerCellRefs.current.has(id)) {
+      managerCellRefs.current.set(id, createRef<HTMLTableCellElement | null>());
+    }
+    return managerCellRefs.current.get(id)!;
+  };
 
   // 페이지네이션 계산
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
@@ -174,35 +206,9 @@ export default function ExamTable({
     // 헤더 필터는 드롭다운을 닫지 않음 (다중 선택 가능)
   };
 
-  // 외부 클릭 시 드롭다운 닫기
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setOpenDropdown(null);
-      setOpenManagerDropdown(null);
-      setOpenHeaderFilter(null);
-    };
-
-    if (
-      openDropdown !== null ||
-      openManagerDropdown !== null ||
-      openHeaderFilter !== null
-    ) {
-      document.addEventListener('click', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [openDropdown, openManagerDropdown, openHeaderFilter]);
-
-  // 선택된 필터 상태 디버깅
-  useEffect(() => {
-    console.log('Selected Filters:', selectedFilters);
-  }, [selectedFilters]);
-
   return (
-    <div className='overflow-visible rounded-lg bg-white shadow'>
-      <Table>
+    <div className='overflow-visible'>
+      <Table className='rounded-lg bg-white shadow'>
         {/* Table Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow>
@@ -211,17 +217,19 @@ export default function ExamTable({
             <TableHead className='min-w-[200px]'>시험후기명</TableHead>
             <TableHead className='min-w-[120px]'>강의명</TableHead>
             <TableHead className='w-[60px]'>교수</TableHead>
-            <TableHead className='relative w-[60px] hover:bg-gray-200'>
-              <TextDropdown
-                isOpen={openHeaderFilter === 'semester'}
-                onSelect={(value) =>
-                  handleHeaderFilterSelect('semester', value)
-                }
-                onClose={() => setOpenHeaderFilter(null)}
-                options={SEMESTER_LIST}
-                position='bottom'
-                width='w-32'
-                selectedValues={selectedFilters.semester}
+            <TextDropdown
+              isOpen={openHeaderFilter === 'semester'}
+              onSelect={(value) => handleHeaderFilterSelect('semester', value)}
+              onClose={() => setOpenHeaderFilter(null)}
+              options={SEMESTER_LIST}
+              position='bottom'
+              width='w-32'
+              selectedValues={selectedFilters.semester}
+              triggerRef={semesterHeaderRef}
+            >
+              <TableHead
+                ref={semesterHeaderRef}
+                className='relative w-[60px] hover:bg-gray-200'
               >
                 <div
                   className='cursor-pointer'
@@ -232,19 +240,21 @@ export default function ExamTable({
                 >
                   수강학기 ▼
                 </div>
-              </TextDropdown>
-            </TableHead>
-            <TableHead className='relative w-[60px] hover:bg-gray-200'>
-              <TextDropdown
-                isOpen={openHeaderFilter === 'examType'}
-                onSelect={(value) =>
-                  handleHeaderFilterSelect('examType', value)
-                }
-                onClose={() => setOpenHeaderFilter(null)}
-                options={EXAM_TYPE_LIST}
-                position='bottom'
-                width='w-28'
-                selectedValues={selectedFilters.examType}
+              </TableHead>
+            </TextDropdown>
+            <TextDropdown
+              isOpen={openHeaderFilter === 'examType'}
+              onSelect={(value) => handleHeaderFilterSelect('examType', value)}
+              onClose={() => setOpenHeaderFilter(null)}
+              options={EXAM_TYPE_LIST}
+              position='bottom'
+              width='w-28'
+              selectedValues={selectedFilters.examType}
+              triggerRef={examTypeHeaderRef}
+            >
+              <TableHead
+                ref={examTypeHeaderRef}
+                className='relative w-[60px] hover:bg-gray-200'
               >
                 <div
                   className='cursor-pointer'
@@ -255,21 +265,25 @@ export default function ExamTable({
                 >
                   시험종류 ▼
                 </div>
-              </TextDropdown>
-            </TableHead>
+              </TableHead>
+            </TextDropdown>
             <TableHead className='min-w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[110px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
             <TableHead className='min-w-[160px]'>기타 논의사항</TableHead>
-            <TableHead className='relative w-[70px] hover:bg-gray-200'>
-              <TextDropdown
-                isOpen={openHeaderFilter === 'manager'}
-                onSelect={(value) => handleHeaderFilterSelect('manager', value)}
-                onClose={() => setOpenHeaderFilter(null)}
-                options={MANAGER_LIST}
-                position='left'
-                width='w-32'
-                selectedValues={selectedFilters.manager}
+            <TextDropdown
+              isOpen={openHeaderFilter === 'manager'}
+              onSelect={(value) => handleHeaderFilterSelect('manager', value)}
+              onClose={() => setOpenHeaderFilter(null)}
+              options={MANAGER_LIST}
+              position='left'
+              width='w-32'
+              selectedValues={selectedFilters.manager}
+              triggerRef={managerHeaderRef}
+            >
+              <TableHead
+                ref={managerHeaderRef}
+                className='relative w-[70px] hover:bg-gray-200'
               >
                 <div
                   className='cursor-pointer'
@@ -280,8 +294,8 @@ export default function ExamTable({
                 >
                   담당리자 ▼
                 </div>
-              </TextDropdown>
-            </TableHead>
+              </TableHead>
+            </TextDropdown>
             <TableHead
               className='w-[20px] cursor-pointer text-center'
               onClick={() => {
@@ -322,25 +336,28 @@ export default function ExamTable({
               <TableCell className='text-center text-gray-600'>
                 {startIndex + index + 1}
               </TableCell>
-              <TableCell
-                className='relative cursor-pointer text-center'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDropdown(review.id);
-                }}
+              <StatusDropdown
+                isOpen={openDropdown === review.id}
+                onStatusSelect={(statusCode, statusName) =>
+                  handleStatusSelect(review.id, statusCode, statusName)
+                }
+                onClose={() => setOpenDropdown(null)}
+                triggerRef={getStatusCellRef(review.id)}
+                position='right'
               >
-                <StatusDropdown
-                  isOpen={openDropdown === review.id}
-                  onStatusSelect={(statusCode, statusName) =>
-                    handleStatusSelect(review.id, statusCode, statusName)
-                  }
-                  onClose={() => setOpenDropdown(null)}
+                <TableCell
+                  ref={getStatusCellRef(review.id)}
+                  className='relative cursor-pointer text-center'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleDropdown(review.id);
+                  }}
                 >
                   <div className='flex h-full w-full items-center justify-center border-none outline-none'>
                     <StatusDot status={review.status} />
                   </div>
-                </StatusDropdown>
-              </TableCell>
+                </TableCell>
+              </StatusDropdown>
               <TableCell>
                 <div
                   className='max-w-[200px] truncate'
@@ -380,26 +397,28 @@ export default function ExamTable({
                   {review.discussion}
                 </div>
               </TableCell>
-              <TableCell
-                className='relative cursor-pointer'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleManagerDropdown(review.id);
-                }}
+              <TextDropdown
+                isOpen={openManagerDropdown === review.id}
+                onSelect={(managerName) =>
+                  handleManagerSelect(review.id, managerName)
+                }
+                onClose={() => setOpenManagerDropdown(null)}
+                triggerRef={getManagerCellRef(review.id)}
+                position='left'
               >
-                <TextDropdown
-                  isOpen={openManagerDropdown === review.id}
-                  onSelect={(managerName) =>
-                    handleManagerSelect(review.id, managerName)
-                  }
-                  onClose={() => setOpenManagerDropdown(null)}
-                  position='left'
+                <TableCell
+                  ref={getManagerCellRef(review.id)}
+                  className='relative cursor-pointer'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleManagerDropdown(review.id);
+                  }}
                 >
                   <div className='flex h-full w-full items-center justify-center border-none outline-none'>
                     {review.manager}
                   </div>
-                </TextDropdown>
-              </TableCell>
+                </TableCell>
+              </TextDropdown>
               <TableCell
                 className='max-w-[20px] cursor-pointer text-center'
                 onClick={() =>
@@ -449,10 +468,7 @@ export default function ExamTable({
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div className='flex flex-col items-center gap-3 border-t border-gray-200 px-4 py-4'>
-          <div className='text-xs text-gray-600'>
-            {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
-          </div>
+        <div className='relative flex flex-col items-center gap-3 px-4 py-4'>
           <div className='flex items-center gap-2'>
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
@@ -487,6 +503,9 @@ export default function ExamTable({
             >
               다음
             </button>
+          </div>
+          <div className='absolute right-0 text-xs text-gray-600'>
+            {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
           </div>
         </div>
       )}
