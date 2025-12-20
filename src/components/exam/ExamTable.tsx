@@ -56,7 +56,7 @@ export default function ExamTable({
   data = EXAM_REVIEW_LIST_DUMMY,
 }: ExamTableProps) {
   // 페이지네이션 설정
-  const ITEMS_PER_PAGE = 15;
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   // 필터 옵션 (선택된 필터 값들)
