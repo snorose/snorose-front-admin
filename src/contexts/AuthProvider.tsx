@@ -121,9 +121,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
           throw new Error(response.message || '로그인에 실패했습니다.');
         }
       } catch (error: unknown) {
-        const errorMessage = isAxiosError<ApiErrorResponse>(error)
-          ? error.response?.data?.message
-          : '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        const errorMessage =
+          (isAxiosError<ApiErrorResponse>(error) &&
+            error.response?.data?.message) ||
+          '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
 
         setUser(null);
         setIsAuthenticated(false);
