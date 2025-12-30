@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
-import { AuthContext } from './AutoContext';
+import { AuthContext } from './AuthContext';
 import type {
   User,
   LoginRequest,
