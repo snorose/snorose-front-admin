@@ -25,7 +25,7 @@ export default function LogInPage() {
     });
 
     if (!result.success && result.error) {
-      alert(result.error);
+      return;
     }
   };
 

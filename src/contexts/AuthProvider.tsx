@@ -7,8 +7,14 @@ import {
   type JSX,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 import { AuthContext } from './AutoContext';
-import type { User, LoginRequest, AuthContextType } from '@/types';
+import type {
+  User,
+  LoginRequest,
+  AuthContextType,
+  ApiErrorResponse,
+} from '@/types';
 import { tokenStorage, TokenRefreshManager } from '@/utils';
 import { loginAPI, reissueTokenAPI } from '@/apis';
 
@@ -99,9 +105,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         if (response.isSuccess) {
           const { tokenResponse, ...userData } = response.result;
 
-          // 토큰 저장 (accessToken: 쿠키 15분, refreshToken: 쿠키 7일)
-          tokenStorage.setAccessToken(tokenResponse.accessToken, 15);
-          tokenStorage.setRefreshToken(tokenResponse.refreshToken, 7);
+          tokenStorage.setAccessToken(tokenResponse.accessToken, 15); // 15분
+          tokenStorage.setRefreshToken(tokenResponse.refreshToken, 7); // 7일
 
           // 사용자 정보 상태 업데이트
           setUser(userData);
@@ -116,10 +121,9 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
           throw new Error(response.message || '로그인에 실패했습니다.');
         }
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        const errorMessage = isAxiosError<ApiErrorResponse>(error)
+          ? error.response?.data?.message
+          : '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
 
         setUser(null);
         setIsAuthenticated(false);
