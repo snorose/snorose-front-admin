@@ -19,7 +19,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Toaster />
+        <Toaster richColors position='top-right' />
         <Routes>
           <Route path='/' element={<LogInPage />} />
           <Route

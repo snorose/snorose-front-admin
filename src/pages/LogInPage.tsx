@@ -16,10 +16,7 @@ export default function LogInPage() {
     clearError();
 
     if (!loginId || !password) {
-      toast.info('아이디와 비밀번호를 입력해주세요.', {
-        richColors: true,
-        position: 'top-right',
-      });
+      toast.info('아이디와 비밀번호를 입력해주세요.', {});
 
       return;
     }
@@ -30,10 +27,7 @@ export default function LogInPage() {
     });
 
     if (!result.success && result.error) {
-      toast.error(result.error, {
-        richColors: true,
-        position: 'top-right',
-      });
+      toast.error(result.error, {});
 
       return;
     }
