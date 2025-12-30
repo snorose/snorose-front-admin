@@ -20,25 +20,32 @@ import {
 } from '@/components/ui';
 import { useAuth } from '@/hooks';
 
+const EXTERNAL_LINKS = [
+  {
+    icon: ExternalLink,
+    label: '스노로즈',
+    url: 'https://snorose.com',
+  },
+  {
+    icon: NotebookPen,
+    label: '스노로즈 블로그',
+    url: 'https://snorose.notion.site/1a37ef0aa3bf8071bcd0cb35c035636e',
+  },
+  {
+    icon: Instagram,
+    label: '인스타그램',
+    url: 'https://www.instagram.com/snorose1906',
+  },
+] as const;
+
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { user, logout } = useAuth();
 
   const ICON_SIZE = 16;
 
-  const SnoroseLinkButtonClick = () => {
-    window.open('https://snorose.com', '_blank');
-  };
-
-  const BlogLinkButtonClick = () => {
-    window.open(
-      'https://snorose.notion.site/1a37ef0aa3bf8071bcd0cb35c035636e',
-      '_blank'
-    );
-  };
-
-  const InstagramLinkButtonClick = () => {
-    window.open('https://www.instagram.com/snorose1906', '_blank');
+  const handleExternalLink = (url: string) => {
+    window.open(url, '_blank');
   };
 
   return (
@@ -64,18 +71,15 @@ export function NavUser() {
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={SnoroseLinkButtonClick}>
-                <ExternalLink />
-                스노로즈
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={BlogLinkButtonClick}>
-                <NotebookPen />
-                스노로즈 블로그
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={InstagramLinkButtonClick}>
-                <Instagram />
-                인스타그램
-              </DropdownMenuItem>
+              {EXTERNAL_LINKS.map(({ icon: Icon, label, url }) => (
+                <DropdownMenuItem
+                  key={label}
+                  onClick={() => handleExternalLink(url)}
+                >
+                  <Icon />
+                  {label}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
