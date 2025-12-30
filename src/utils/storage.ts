@@ -1,15 +1,23 @@
+import {
+  REFRESH_TOKEN_EXPIRE_DAYS,
+  ACCESS_TOKEN_EXPIRE_MINUTES,
+} from '@/constants';
+
 export const cookie = {
   get: (name: string): string | null => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
+
     if (parts.length === 2) {
       return parts.pop()?.split(';').shift() || null;
     }
+
     return null;
   },
 
-  set: (name: string, value: string, days: number = 7): void => {
+  set: (name: string, value: string, days: number): void => {
     const expires = new Date();
+
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
   },
@@ -22,15 +30,19 @@ export const cookie = {
 export const tokenStorage = {
   getAccessToken: (): string | null => cookie.get('accessToken'),
 
-  setAccessToken: (token: string, minutes: number = 15): void =>
-    cookie.set('accessToken', token, minutes / (24 * 60)),
+  setAccessToken: (
+    token: string,
+    minutes: number = ACCESS_TOKEN_EXPIRE_MINUTES
+  ): void => cookie.set('accessToken', token, minutes / (24 * 60)),
 
   removeAccessToken: (): void => cookie.remove('accessToken'),
 
   getRefreshToken: (): string | null => cookie.get('refreshToken'),
 
-  setRefreshToken: (token: string, days: number = 7): void =>
-    cookie.set('refreshToken', token, days),
+  setRefreshToken: (
+    token: string,
+    days: number = REFRESH_TOKEN_EXPIRE_DAYS
+  ): void => cookie.set('refreshToken', token, days),
 
   removeRefreshToken: (): void => cookie.remove('refreshToken'),
 
