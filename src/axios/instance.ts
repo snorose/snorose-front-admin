@@ -13,54 +13,12 @@ import {
 class AxiosInstanceManager {
   private static instance: AxiosInstance | null = null;
   private static isRefreshing = false;
-  private static isInitialRefreshing = false; // 초기 토큰 재발급 플래그
   private static failedQueue: Array<{
     resolve: (value?: unknown) => void;
     reject: (reason?: unknown) => void;
   }> = [];
 
   private constructor() {}
-
-  // 초기 토큰 재발급 (새로고침 시)
-  public static async initializeToken(): Promise<boolean> {
-    if (this.isInitialRefreshing) {
-      return false; // 이미 재발급 중
-    }
-
-    const refreshToken = tokenStorage.getRefreshToken();
-
-    if (!refreshToken) {
-      return false;
-    }
-
-    this.isInitialRefreshing = true;
-
-    try {
-      const response = await axios.post<ReissueTokenResponse>(
-        `${import.meta.env.VITE_API_BASE_URL}/v1/users/reissueToken`,
-        { refreshToken }
-      );
-
-      if (response.data.isSuccess) {
-        const { accessToken, refreshToken: newRefreshToken } =
-          response.data.result;
-
-        tokenStorage.setAccessToken(accessToken, ACCESS_TOKEN_EXPIRE_MINUTES);
-        tokenStorage.setRefreshToken(
-          newRefreshToken,
-          REFRESH_TOKEN_EXPIRE_DAYS
-        );
-
-        return true;
-      }
-
-      return false;
-    } catch {
-      return false;
-    } finally {
-      this.isInitialRefreshing = false;
-    }
-  }
 
   private static processQueue(
     error: Error | null = null,
