@@ -1,23 +1,42 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 import { snoroseLogo } from '@/assets';
 import { Button, Input } from '@/components/ui';
+import { useAuth } from '@/hooks';
 
 export default function LogInPage() {
-  const navigate = useNavigate();
+  const { login, isLoading, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    navigate('/member/info');
+    clearError();
+
+    if (!loginId || !password) {
+      toast.info('아이디와 비밀번호를 입력해주세요.', {});
+
+      return;
+    }
+
+    const result = await login({
+      loginId,
+      password,
+    });
+
+    if (!result.success && result.error) {
+      toast.error(result.error, {});
+
+      return;
+    }
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
 
-  // TODO: 아이디, 비밀번호에 required 추가 (현재 주석 처리해둠)
   return (
     <main className='flex min-h-screen items-center justify-center p-4'>
       <div className='flex flex-col items-center justify-center gap-8 rounded-2xl bg-white px-16 py-20 shadow-[0_-2px_8px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.10)]'>
@@ -34,7 +53,9 @@ export default function LogInPage() {
             name='id'
             type='text'
             className='h-11 text-base'
-            // required
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            disabled={isLoading}
           />
 
           <div className='relative'>
@@ -44,7 +65,9 @@ export default function LogInPage() {
               name='password'
               type={showPassword ? 'text' : 'password'}
               className='h-11 text-base'
-              // required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
             <button
               type='button'
@@ -65,8 +88,9 @@ export default function LogInPage() {
             size='lg'
             variant='outline'
             className='hover: h-11 w-full cursor-pointer text-base'
+            disabled={isLoading}
           >
-            로그인
+            {isLoading ? '로그인 중...' : '로그인'}
           </Button>
         </form>
       </div>
