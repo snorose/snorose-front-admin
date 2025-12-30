@@ -19,10 +19,12 @@ import {
   tokenStorage,
   TokenRefreshManager,
   executeTokenRefresh,
+  userStorage,
 } from '@/utils';
 import {
   ACCESS_TOKEN_EXPIRE_MINUTES,
   REFRESH_TOKEN_EXPIRE_DAYS,
+  ADMIN_ROLE_ID,
 } from '@/constants';
 import { loginAPI } from '@/apis';
 
@@ -96,6 +98,16 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         if (response.isSuccess) {
           const { tokenResponse, ...userData } = response.result;
 
+          if (userData.userRoleId !== ADMIN_ROLE_ID) {
+            setUser(null);
+            userStorage.removeUser();
+            setIsAuthenticated(false);
+            setIsLoading(false);
+            setError('접근 권한이 없습니다.');
+
+            return { success: false, error: '접근 권한이 없습니다.' };
+          }
+
           tokenStorage.setAccessToken(
             tokenResponse.accessToken,
             ACCESS_TOKEN_EXPIRE_MINUTES
@@ -107,6 +119,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
           // 사용자 정보 상태 업데이트
           setUser(userData);
+          userStorage.setUser(userData);
           setIsAuthenticated(true);
           setIsLoading(false);
 
