@@ -6,6 +6,7 @@ import {
   ExamDeletePanel,
   ExamDegradePanel,
 } from './index';
+import type { ExamReview } from './ExamTable';
 
 type Tab = 'edit' | 'warning' | 'delete' | 'demotion' | 'discussion';
 
@@ -21,7 +22,11 @@ const TABS: { value: Tab; label: string }[] = [
   { value: 'demotion', label: '강등' },
 ];
 
-export default function ExamPanel() {
+interface ExamPanelProps {
+  selectedExamReview?: ExamReview | null;
+}
+
+export default function ExamPanel({ selectedExamReview }: ExamPanelProps = {}) {
   const [activeTab, setActiveTab] = useState<Tab>('edit');
 
   const handleTabClick = (tab: Tab) => {
@@ -50,7 +55,10 @@ export default function ExamPanel() {
 
       {/* 테이블 영역 */}
       <div className='flex-1'>
-        {activeTab === 'edit' && <ExamEditPanel />} {/* 편집 */}
+        {activeTab === 'edit' && (
+          <ExamEditPanel selectedExamReview={selectedExamReview} />
+        )}{' '}
+        {/* 편집 */}
         {activeTab === 'discussion' && <ExamDiscussionPanel />} {/* 논의사항 */}
         {activeTab === 'delete' && <ExamDeletePanel />} {/* 삭제 */}
         {activeTab === 'warning' && <ExamWarningPanel />} {/* 경고 */}

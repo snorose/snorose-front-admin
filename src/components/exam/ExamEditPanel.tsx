@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Select,
@@ -13,13 +13,14 @@ import {
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
 } from '@/constants/exam-table-options';
+import type { ExamReview } from './ExamTable';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[10px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;
 const TABLE_DATA_STYLE = `${TABLE_CELL_BASE_STYLE} p-0 font-medium`;
 const TABLE_DATA_READONLY_STYLE = `${TABLE_DATA_STYLE} bg-gray-50 text-gray-400`;
 const SELECT_TRIGGER_STYLE =
-  'm-1 !h-5 border-0 bg-transparent px-1 py-0.5 text-[10px] shadow-none hover:bg-transparent data-[size=default]:!h-5 data-[size=sm]:!h-5';
+  'm-1 !h-5 border-0 bg-transparent px-2 py-0.5 text-[10px] shadow-none hover:bg-transparent data-[size=default]:!h-5 data-[size=sm]:!h-5';
 const SELECT_CONTENT_STYLE =
   'text-[10px] max-h-[200px] overflow-y-auto bg-blue-50 [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-highlighted]]:bg-blue-100/50 [&_[data-state=checked]]:bg-blue-100';
 
@@ -40,7 +41,13 @@ const StatusDot = ({ status }: { status: string }) => {
   );
 };
 
-export default function ExamEditPanel() {
+interface ExamEditPanelProps {
+  selectedExamReview?: ExamReview | null;
+}
+
+export default function ExamEditPanel({
+  selectedExamReview,
+}: ExamEditPanelProps = {}) {
   // 초기값 상수
   const INITIAL_VALUES = {
     status: 'CONFIRMED',
@@ -52,6 +59,8 @@ export default function ExamEditPanel() {
     examTypeAndQuestions: '객관식 5문항',
     discussionNotes: '',
     manager: '관리자1',
+    uploadTime: '2024-06-01 12:00',
+    author: '홍길동',
   };
 
   const [status, setStatus] = useState<string>(INITIAL_VALUES.status);
@@ -71,7 +80,26 @@ export default function ExamEditPanel() {
   const [semester, setSemester] = useState(INITIAL_VALUES.semester);
   const [examType, setExamType] = useState(INITIAL_VALUES.examType);
   const [manager, setManager] = useState(INITIAL_VALUES.manager);
+  const [uploadTime, setUploadTime] = useState(INITIAL_VALUES.uploadTime);
+  const [author, setAuthor] = useState(INITIAL_VALUES.author);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+
+  // selectedExamReview가 변경되면 폼 값 업데이트
+  useEffect(() => {
+    if (selectedExamReview) {
+      setStatus(selectedExamReview.status);
+      setExamReviewName(selectedExamReview.reviewTitle);
+      setLectureName(selectedExamReview.courseName);
+      setProfessorName(selectedExamReview.professor);
+      setSemester(selectedExamReview.semester);
+      setExamType(selectedExamReview.examType);
+      setExamTypeAndQuestions(selectedExamReview.examFormat);
+      setDiscussionNotes(selectedExamReview.discussion);
+      setManager(selectedExamReview.manager);
+      setUploadTime(selectedExamReview.uploadTime);
+      setAuthor(selectedExamReview.author);
+    }
+  }, [selectedExamReview]);
 
   // 상태 이름 가져오기
   const getStatusName = (statusCode: string) => {
@@ -96,7 +124,7 @@ export default function ExamEditPanel() {
                       <span>{getStatusName(status)}</span>
                     </div>
                   </SelectTrigger>
-                  <SelectContent className={SELECT_CONTENT_STYLE}>
+                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
                     {STATUS_COLOR.map((statusOption) => (
                       <SelectItem
                         key={statusOption.code}
@@ -177,7 +205,7 @@ export default function ExamEditPanel() {
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <SelectValue>{semester}</SelectValue>
                   </SelectTrigger>
-                  <SelectContent className={SELECT_CONTENT_STYLE}>
+                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
                     {SEMESTER_LIST.map((semesterOption) => (
                       <SelectItem
                         key={semesterOption}
@@ -198,7 +226,7 @@ export default function ExamEditPanel() {
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <SelectValue>{examType}</SelectValue>
                   </SelectTrigger>
-                  <SelectContent className={SELECT_CONTENT_STYLE}>
+                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
                     {EXAM_TYPE_LIST.map((examTypeOption) => (
                       <SelectItem
                         key={examTypeOption}
@@ -234,13 +262,13 @@ export default function ExamEditPanel() {
             <tr>
               <th className={TABLE_HEADER_STYLE}>업로드 시간</th>
               <td className={TABLE_DATA_READONLY_STYLE}>
-                <div className='px-2 py-1'>2024-06-01 12:00</div>
+                <div className='px-2 py-1'>{uploadTime}</div>
               </td>
             </tr>
             <tr>
               <th className={TABLE_HEADER_STYLE}>게시자</th>
               <td className={TABLE_DATA_READONLY_STYLE}>
-                <div className='px-2 py-1'>홍길동</div>
+                <div className='px-2 py-1'>{author}</div>
               </td>
             </tr>
             <tr>
@@ -269,7 +297,7 @@ export default function ExamEditPanel() {
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <SelectValue>{manager}</SelectValue>
                   </SelectTrigger>
-                  <SelectContent className={SELECT_CONTENT_STYLE}>
+                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
                     {MANAGER_LIST.map((managerOption) => (
                       <SelectItem
                         key={managerOption}
