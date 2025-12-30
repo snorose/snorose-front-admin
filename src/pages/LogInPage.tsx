@@ -16,7 +16,7 @@ export default function LogInPage() {
     clearError();
 
     if (!loginId || !password) {
-      toast.info('아이디와 비밀번호를 입력해주세요.', {});
+      toast.info('아이디와 비밀번호를 입력해 주세요.');
 
       return;
     }
@@ -27,7 +27,7 @@ export default function LogInPage() {
     });
 
     if (!result.success && result.error) {
-      toast.error(result.error, {});
+      toast.error(result.error);
 
       return;
     }
