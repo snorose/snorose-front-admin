@@ -99,13 +99,13 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
           const { tokenResponse, ...userData } = response.result;
 
           if (userData.userRoleId !== ADMIN_ROLE_ID) {
-            setUser(null);
-            userStorage.removeUser();
-            setIsAuthenticated(false);
-            setIsLoading(false);
-            setError('접근 권한이 없습니다.');
+            const errorMessage = '접근 권한이 없습니다.';
 
-            return { success: false, error: '접근 권한이 없습니다.' };
+            userStorage.removeUser();
+            setIsLoading(false);
+            setError(errorMessage);
+
+            return { success: false, error: errorMessage };
           }
 
           tokenStorage.setAccessToken(
