@@ -80,7 +80,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
               return true;
             }
             return false;
-          } catch {
+          } catch (error) {
+            console.error('초기화 시 토큰 재발급 실패:', error);
             return false;
           }
         });

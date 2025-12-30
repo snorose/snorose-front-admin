@@ -17,7 +17,8 @@ export class TokenRefreshManager {
       .then((result) => {
         return result;
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('토큰 재발급 실패:', error);
         return false;
       })
       .finally(() => {
