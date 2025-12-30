@@ -5,6 +5,10 @@ import axios, {
 } from 'axios';
 import { tokenStorage } from '@/utils';
 import type { ReissueTokenResponse } from '@/types';
+import {
+  ACCESS_TOKEN_EXPIRE_MINUTES,
+  REFRESH_TOKEN_EXPIRE_DAYS,
+} from '@/constants';
 
 class AxiosInstanceManager {
   private static instance: AxiosInstance | null = null;
@@ -41,8 +45,11 @@ class AxiosInstanceManager {
         const { accessToken, refreshToken: newRefreshToken } =
           response.data.result;
 
-        tokenStorage.setAccessToken(accessToken, 15); // 15분
-        tokenStorage.setRefreshToken(newRefreshToken, 7); // 7일
+        tokenStorage.setAccessToken(accessToken, ACCESS_TOKEN_EXPIRE_MINUTES);
+        tokenStorage.setRefreshToken(
+          newRefreshToken,
+          REFRESH_TOKEN_EXPIRE_DAYS
+        );
 
         return true;
       }
@@ -151,8 +158,14 @@ class AxiosInstanceManager {
                   response.data.result;
 
                 // 새로운 토큰 저장
-                tokenStorage.setAccessToken(accessToken, 15); // 15분
-                tokenStorage.setRefreshToken(newRefreshToken, 7); // 7일
+                tokenStorage.setAccessToken(
+                  accessToken,
+                  ACCESS_TOKEN_EXPIRE_MINUTES
+                );
+                tokenStorage.setRefreshToken(
+                  newRefreshToken,
+                  REFRESH_TOKEN_EXPIRE_DAYS
+                );
 
                 // 대기 중인 요청들에 새 토큰 전달
                 this.processQueue(null, accessToken);

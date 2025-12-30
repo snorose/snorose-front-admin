@@ -16,6 +16,10 @@ import type {
   ApiErrorResponse,
 } from '@/types';
 import { tokenStorage, TokenRefreshManager } from '@/utils';
+import {
+  ACCESS_TOKEN_EXPIRE_MINUTES,
+  REFRESH_TOKEN_EXPIRE_DAYS,
+} from '@/constants';
 import { loginAPI, reissueTokenAPI } from '@/apis';
 
 type AuthProviderProps = {
@@ -64,8 +68,14 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
               } = response.result;
 
               // 새 토큰 저장
-              tokenStorage.setAccessToken(newAccessToken, 15); // 15분
-              tokenStorage.setRefreshToken(newRefreshToken, 7);
+              tokenStorage.setAccessToken(
+                newAccessToken,
+                ACCESS_TOKEN_EXPIRE_MINUTES
+              );
+              tokenStorage.setRefreshToken(
+                newRefreshToken,
+                REFRESH_TOKEN_EXPIRE_DAYS
+              );
 
               return true;
             }
@@ -105,8 +115,14 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         if (response.isSuccess) {
           const { tokenResponse, ...userData } = response.result;
 
-          tokenStorage.setAccessToken(tokenResponse.accessToken, 15); // 15분
-          tokenStorage.setRefreshToken(tokenResponse.refreshToken, 7); // 7일
+          tokenStorage.setAccessToken(
+            tokenResponse.accessToken,
+            ACCESS_TOKEN_EXPIRE_MINUTES
+          );
+          tokenStorage.setRefreshToken(
+            tokenResponse.refreshToken,
+            REFRESH_TOKEN_EXPIRE_DAYS
+          );
 
           // 사용자 정보 상태 업데이트
           setUser(userData);
