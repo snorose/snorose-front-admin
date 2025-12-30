@@ -38,11 +38,11 @@ const EXTERNAL_LINKS = [
   },
 ] as const;
 
+const ICON_SIZE = 16;
+
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { user, logout } = useAuth();
-
-  const ICON_SIZE = 16;
 
   const handleExternalLink = (url: string) => {
     window.open(url, '_blank');
