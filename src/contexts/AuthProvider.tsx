@@ -55,6 +55,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
       // accessToken이 있으면 이미 인증됨
       if (accessToken && refreshToken) {
+        const savedUser = userStorage.getUser();
+        if (savedUser) {
+          setUser(savedUser);
+        }
         setIsAuthenticated(true);
         setIsLoading(false);
         return;
@@ -69,10 +73,14 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         });
 
         if (success) {
+          const savedUser = userStorage.getUser();
+          if (savedUser) {
+            setUser(savedUser);
+          }
           setIsAuthenticated(true);
         } else {
-          // 토큰 재발급 실패 시 로그아웃
           tokenStorage.clearAll();
+          userStorage.removeUser();
           setIsAuthenticated(false);
         }
         setIsLoading(false);
@@ -150,6 +158,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
   // 로그아웃
   const logout = useCallback(() => {
     tokenStorage.clearAll();
+    userStorage.removeUser();
     setUser(null);
     setIsAuthenticated(false);
     setError(null);
