@@ -40,6 +40,13 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
   const [error, setError] = useState<string | null>(null);
   const initAttempted = useRef(false); // 초기화 시도 여부 플래그
 
+  const rehydrateUser = useCallback(() => {
+    const savedUser = userStorage.getUser();
+    if (savedUser) {
+      setUser(savedUser);
+    }
+  }, []);
+
   // 초기 인증 상태 확인 및 토큰 재발급
   useEffect(() => {
     // 이미 초기화를 시도했다면 실행하지 않음
@@ -55,10 +62,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
       // accessToken이 있으면 이미 인증됨
       if (accessToken && refreshToken) {
-        const savedUser = userStorage.getUser();
-        if (savedUser) {
-          setUser(savedUser);
-        }
+        rehydrateUser();
         setIsAuthenticated(true);
         setIsLoading(false);
         return;
@@ -73,10 +77,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         });
 
         if (success) {
-          const savedUser = userStorage.getUser();
-          if (savedUser) {
-            setUser(savedUser);
-          }
+          rehydrateUser();
           setIsAuthenticated(true);
         } else {
           tokenStorage.clearAll();
@@ -92,7 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
     };
 
     initAuth();
-  }, []);
+  }, [rehydrateUser]);
 
   // 로그인
   const login = useCallback(
