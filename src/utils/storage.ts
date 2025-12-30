@@ -55,13 +55,21 @@ export const tokenStorage = {
 
 export const userStorage = {
   getUser: (): User | null => {
-    const user = localStorage.getItem('user');
-    return user ? (JSON.parse(user) as User) : null;
+    const nickname = localStorage.getItem('userNickname');
+    if (!nickname) return null;
+
+    return { nickname } as User;
   },
+
   setUser: (user: User): void => {
-    localStorage.setItem('user', JSON.stringify(user));
+    try {
+      localStorage.setItem('userNickname', user.nickname);
+    } catch {
+      return;
+    }
   },
+
   removeUser: (): void => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('userNickname');
   },
 };
