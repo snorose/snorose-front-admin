@@ -44,10 +44,6 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const { user, logout } = useAuth();
 
-  const handleExternalLink = (url: string) => {
-    window.open(url, '_blank');
-  };
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -72,12 +68,11 @@ export function NavUser() {
           >
             <DropdownMenuGroup>
               {EXTERNAL_LINKS.map(({ icon: Icon, label, url }) => (
-                <DropdownMenuItem
-                  key={label}
-                  onClick={() => handleExternalLink(url)}
-                >
-                  <Icon />
-                  {label}
+                <DropdownMenuItem key={label} asChild>
+                  <a href={url} target='_blank' rel='noopener noreferrer'>
+                    <Icon />
+                    {label}
+                  </a>
                 </DropdownMenuItem>
               ))}
             </DropdownMenuGroup>
