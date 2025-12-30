@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Button, Input, Label } from '@/components/ui';
+import { PageHeader } from '@/components';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
 
@@ -51,8 +52,11 @@ export default function MemberInfoPage() {
   }, [searchQuery]);
 
   return (
-    <div className='flex w-full flex-col gap-3'>
-      <h1 className='text-2xl font-bold'>회원 상세 조회</h1>
+    <div className='flex w-full flex-col gap-6'>
+      <PageHeader
+        title='회원 상세 조회'
+        description='회원 정보를 조회할 수 있어요.'
+      />
       <div className='flex gap-2'>
         <Input
           type='text'
