@@ -15,12 +15,16 @@ import type {
   AuthContextType,
   ApiErrorResponse,
 } from '@/types';
-import { tokenStorage, TokenRefreshManager } from '@/utils';
+import {
+  tokenStorage,
+  TokenRefreshManager,
+  executeTokenRefresh,
+} from '@/utils';
 import {
   ACCESS_TOKEN_EXPIRE_MINUTES,
   REFRESH_TOKEN_EXPIRE_DAYS,
 } from '@/constants';
-import { loginAPI, reissueTokenAPI } from '@/apis';
+import { loginAPI } from '@/apis';
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -58,32 +62,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
       if (!accessToken && refreshToken) {
         // TokenRefreshManager를 통해 중복 호출 방지
         const success = await TokenRefreshManager.refresh(async () => {
-          try {
-            const response = await reissueTokenAPI({ refreshToken });
-
-            if (response.isSuccess) {
-              const {
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
-              } = response.result;
-
-              // 새 토큰 저장
-              tokenStorage.setAccessToken(
-                newAccessToken,
-                ACCESS_TOKEN_EXPIRE_MINUTES
-              );
-              tokenStorage.setRefreshToken(
-                newRefreshToken,
-                REFRESH_TOKEN_EXPIRE_DAYS
-              );
-
-              return true;
-            }
-            return false;
-          } catch (error) {
-            console.error('초기화 시 토큰 재발급 실패:', error);
-            return false;
-          }
+          const result = await executeTokenRefresh();
+          return result.success;
         });
 
         if (success) {

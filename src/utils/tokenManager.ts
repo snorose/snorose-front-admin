@@ -1,3 +1,44 @@
+import { tokenStorage } from './storage';
+import { reissueTokenAPI } from '@/apis';
+import {
+  ACCESS_TOKEN_EXPIRE_MINUTES,
+  REFRESH_TOKEN_EXPIRE_DAYS,
+} from '@/constants';
+
+/**
+ * 토큰 재발급을 수행하는 공통 함수
+ * @returns 성공 시 { success: true, accessToken: string }, 실패 시 { success: false }
+ */
+export async function executeTokenRefresh(): Promise<{
+  success: boolean;
+  accessToken?: string;
+}> {
+  const refreshToken = tokenStorage.getRefreshToken();
+
+  if (!refreshToken) {
+    return { success: false };
+  }
+
+  try {
+    const response = await reissueTokenAPI({ refreshToken });
+
+    if (response.isSuccess) {
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+        response.result;
+
+      // 새로운 토큰 저장
+      tokenStorage.setAccessToken(newAccessToken, ACCESS_TOKEN_EXPIRE_MINUTES);
+      tokenStorage.setRefreshToken(newRefreshToken, REFRESH_TOKEN_EXPIRE_DAYS);
+
+      return { success: true, accessToken: newAccessToken };
+    }
+
+    return { success: false };
+  } catch {
+    return { success: false };
+  }
+}
+
 // 전역 토큰 재발급 상태 관리
 export class TokenRefreshManager {
   private static isRefreshing = false;

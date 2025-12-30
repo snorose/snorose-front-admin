@@ -5,6 +5,7 @@ import type {
   ReissueTokenRequest,
   ReissueTokenResponse,
 } from '@/types';
+import { REISSUE_TOKEN_ENDPOINT } from '@/constants';
 
 export const loginAPI = async (
   credentials: LoginRequest
@@ -20,9 +21,8 @@ export const reissueTokenAPI = async (
   request: ReissueTokenRequest
 ): Promise<ReissueTokenResponse> => {
   const response = await axiosInstance.post<ReissueTokenResponse>(
-    '/v1/users/reissueToken',
+    REISSUE_TOKEN_ENDPOINT,
     request
   );
   return response.data;
 };
-

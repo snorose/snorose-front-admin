@@ -3,12 +3,8 @@ import axios, {
   type AxiosError,
   type InternalAxiosRequestConfig,
 } from 'axios';
-import { tokenStorage } from '@/utils';
-import type { ReissueTokenResponse } from '@/types';
-import {
-  ACCESS_TOKEN_EXPIRE_MINUTES,
-  REFRESH_TOKEN_EXPIRE_DAYS,
-} from '@/constants';
+import { tokenStorage, executeTokenRefresh } from '@/utils';
+import { REISSUE_TOKEN_ENDPOINT } from '@/constants';
 
 class AxiosInstanceManager {
   private static instance: AxiosInstance | null = null;
@@ -74,7 +70,7 @@ class AxiosInstanceManager {
             error.response?.status === 401 &&
             originalRequest &&
             !originalRequest._retry &&
-            originalRequest.url !== '/v1/users/reissueToken'
+            originalRequest.url !== REISSUE_TOKEN_ENDPOINT
           ) {
             // 이미 토큰 재발급 중이면 대기열에 추가
             if (this.isRefreshing) {
@@ -95,43 +91,17 @@ class AxiosInstanceManager {
             originalRequest._retry = true;
             this.isRefreshing = true;
 
-            const refreshToken = tokenStorage.getRefreshToken();
-
-            if (!refreshToken) {
-              // refreshToken이 없으면 로그아웃 처리
-              this.isRefreshing = false;
-              this.processQueue(new Error('No refresh token'), null);
-              this.handleLogout();
-              return Promise.reject(error);
-            }
-
             try {
-              // 토큰 재발급 API 호출
-              const response = await axios.post<ReissueTokenResponse>(
-                `${import.meta.env.VITE_API_BASE_URL}/v1/users/reissueToken`,
-                { refreshToken }
-              );
+              // 공통 토큰 재발급 함수 사용
+              const result = await executeTokenRefresh();
 
-              if (response.data.isSuccess) {
-                const { accessToken, refreshToken: newRefreshToken } =
-                  response.data.result;
-
-                // 새로운 토큰 저장
-                tokenStorage.setAccessToken(
-                  accessToken,
-                  ACCESS_TOKEN_EXPIRE_MINUTES
-                );
-                tokenStorage.setRefreshToken(
-                  newRefreshToken,
-                  REFRESH_TOKEN_EXPIRE_DAYS
-                );
-
+              if (result.success && result.accessToken) {
                 // 대기 중인 요청들에 새 토큰 전달
-                this.processQueue(null, accessToken);
+                this.processQueue(null, result.accessToken);
 
                 // 원래 요청 재시도
                 if (originalRequest.headers) {
-                  originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+                  originalRequest.headers.Authorization = `Bearer ${result.accessToken}`;
                 }
 
                 this.isRefreshing = false;
