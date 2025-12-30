@@ -18,10 +18,12 @@ import {
 } from '@/components/ui';
 import { snoroseLogo } from '@/assets';
 import { SIDEBAR_MENUS } from '@/constants';
+import { useAuth } from '@/hooks';
 
 export const AppSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
+  const { user } = useAuth();
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const location = useLocation();
   const isActive = (url: string) => location.pathname.startsWith(url);
@@ -99,7 +101,7 @@ export const AppSidebar = ({
         <SidebarMenuButton asChild>
           <div className='flex items-center'>
             <Rose size={ICON_SIZE} className='mr-2 text-red-400' />
-            <span>리자 이름</span>
+            <span>{user?.nickname || '리자'}</span>
           </div>
         </SidebarMenuButton>
       </SidebarFooter>
