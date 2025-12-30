@@ -42,7 +42,7 @@ export default function PushNotificationPage() {
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
         title='푸시 알림 전송'
-        description='푸시 알림을 전송합니다.'
+        description='푸시 알림을 허용한 회원을 대상으로 전송할 수 있어요.'
       />
       <section className='flex gap-4'>
         <article className='flex w-full flex-col gap-1'>

@@ -52,7 +52,7 @@ export default function PointAllPage() {
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
         title='정회원 전체 포인트 지급/차감'
-        description='모든 정회원에게 포인트를 지급/차감하는 기능이니, 신중히 진행해 주세요.'
+        description='모든 정회원에게 포인트를 지급/차감할 수 있어요.'
       />
 
       <Alert>
@@ -60,10 +60,8 @@ export default function PointAllPage() {
         <AlertTitle>안내 사항</AlertTitle>
         <AlertDescription>
           <ul className='list-inside list-disc text-sm'>
-            <li>포인트 카테고리, 메모, 지급량을 설정할 수 있어요.</li>
-            <li>
-              포인트가 자동 지급되지 않으니, 직접 지급/차감을 진행해 주세요.
-            </li>
+            <li>포인트 카테고리, 메모, 지급/차감량을 설정할 수 있어요.</li>
+            <li>포인트 지급/차감은 즉시 적용되므로 신중히 진행해 주세요.</li>
           </ul>
         </AlertDescription>
       </Alert>
@@ -112,7 +110,7 @@ export default function PointAllPage() {
             <Input
               type='text'
               id='memo'
-              placeholder='이벤트 당첨 포인트 지급, 시험 후기 오류 제보 등'
+              placeholder='스노로즈 후원금 모금 이벤트 보상 등'
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
             />
