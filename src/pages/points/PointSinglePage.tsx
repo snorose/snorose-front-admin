@@ -14,6 +14,7 @@ import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
 import { cn } from '@/utils';
 import { POINT_CATEGORY } from '@/constants';
+import { toast } from 'sonner';
 
 const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
   { label: '회원 ID', key: 'userId' },
@@ -90,17 +91,17 @@ export default function PointAdjustmentPage() {
   const handleApplyButtonClick = () => {
     try {
       if (!userId || !selectedCategory || !difference) {
-        alert('모든 필수 항목을 입력해주세요.');
+        toast.info('모든 필수 항목을 입력해주세요.');
         return;
       }
       const numDifference = Number(difference);
 
       if (isNaN(numDifference) || numDifference === 0) {
-        alert('유효한 포인트 지급/차감량을 입력해주세요.');
+        toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
         return;
       }
     } catch {
-      alert('포인트 지급/차감에 실패했습니다.');
+      toast.error('포인트 지급/차감에 실패했습니다.');
     }
   };
 
