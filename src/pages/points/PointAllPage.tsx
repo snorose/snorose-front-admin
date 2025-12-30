@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { PageHeader } from '@/components';
 import { POINT_CATEGORY } from '@/constants';
+import { toast } from 'sonner';
 
 export default function PointAllPage() {
   const [selectedCategory, setSelectedCategory] = useState<
@@ -32,18 +33,18 @@ export default function PointAllPage() {
   const handleApplyButtonClick = () => {
     try {
       if (!selectedCategory || !difference || !memo) {
-        alert('모든 필수 항목을 입력해주세요.');
+        toast.info('모든 필수 항목을 입력해주세요.');
         return;
       }
 
       const numDifference = Number(difference);
 
       if (isNaN(numDifference) || numDifference === 0) {
-        alert('유효한 포인트 지급/차감량을 입력해주세요.');
+        toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
         return;
       }
     } catch {
-      alert('포인트 지급/차감에 실패했습니다.');
+      toast.error('포인트 지급/차감에 실패했습니다.');
     }
   };
 
