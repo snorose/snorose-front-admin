@@ -2,6 +2,7 @@ import {
   REFRESH_TOKEN_EXPIRE_DAYS,
   ACCESS_TOKEN_EXPIRE_MINUTES,
 } from '@/constants';
+import type { User } from '@/types';
 
 export const cookie = {
   get: (name: string): string | null => {
@@ -49,5 +50,26 @@ export const tokenStorage = {
   clearAll: (): void => {
     tokenStorage.removeAccessToken();
     tokenStorage.removeRefreshToken();
+  },
+};
+
+export const userStorage = {
+  getUser: (): User | null => {
+    const nickname = localStorage.getItem('userNickname');
+    if (!nickname) return null;
+
+    return { nickname } as User;
+  },
+
+  setUser: (user: User): void => {
+    try {
+      localStorage.setItem('userNickname', user.nickname);
+    } catch {
+      return;
+    }
+  },
+
+  removeUser: (): void => {
+    localStorage.removeItem('userNickname');
   },
 };

@@ -19,10 +19,12 @@ import {
   tokenStorage,
   TokenRefreshManager,
   executeTokenRefresh,
+  userStorage,
 } from '@/utils';
 import {
   ACCESS_TOKEN_EXPIRE_MINUTES,
   REFRESH_TOKEN_EXPIRE_DAYS,
+  ADMIN_ROLE_ID,
 } from '@/constants';
 import { loginAPI } from '@/apis';
 
@@ -37,6 +39,13 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const initAttempted = useRef(false); // 초기화 시도 여부 플래그
+
+  const rehydrateUser = useCallback(() => {
+    const savedUser = userStorage.getUser();
+    if (savedUser) {
+      setUser(savedUser);
+    }
+  }, []);
 
   // 초기 인증 상태 확인 및 토큰 재발급
   useEffect(() => {
@@ -53,6 +62,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
       // accessToken이 있으면 이미 인증됨
       if (accessToken && refreshToken) {
+        rehydrateUser();
         setIsAuthenticated(true);
         setIsLoading(false);
         return;
@@ -67,10 +77,11 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         });
 
         if (success) {
+          rehydrateUser();
           setIsAuthenticated(true);
         } else {
-          // 토큰 재발급 실패 시 로그아웃
           tokenStorage.clearAll();
+          userStorage.removeUser();
           setIsAuthenticated(false);
         }
         setIsLoading(false);
@@ -82,7 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
     };
 
     initAuth();
-  }, []);
+  }, [rehydrateUser]);
 
   // 로그인
   const login = useCallback(
@@ -96,6 +107,16 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         if (response.isSuccess) {
           const { tokenResponse, ...userData } = response.result;
 
+          if (userData.userRoleId !== ADMIN_ROLE_ID) {
+            const errorMessage = '접근 권한이 없습니다.';
+
+            userStorage.removeUser();
+            setIsLoading(false);
+            setError(errorMessage);
+
+            return { success: false, error: errorMessage };
+          }
+
           tokenStorage.setAccessToken(
             tokenResponse.accessToken,
             ACCESS_TOKEN_EXPIRE_MINUTES
@@ -107,6 +128,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
           // 사용자 정보 상태 업데이트
           setUser(userData);
+          userStorage.setUser(userData);
           setIsAuthenticated(true);
           setIsLoading(false);
 
@@ -137,6 +159,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
   // 로그아웃
   const logout = useCallback(() => {
     tokenStorage.clearAll();
+    userStorage.removeUser();
     setUser(null);
     setIsAuthenticated(false);
     setError(null);
