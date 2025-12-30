@@ -73,7 +73,8 @@ class AxiosInstanceManager {
           if (
             error.response?.status === 401 &&
             originalRequest &&
-            !originalRequest._retry
+            !originalRequest._retry &&
+            originalRequest.url !== '/v1/users/reissueToken'
           ) {
             // 이미 토큰 재발급 중이면 대기열에 추가
             if (this.isRefreshing) {
