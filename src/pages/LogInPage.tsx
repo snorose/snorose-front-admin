@@ -6,7 +6,7 @@ import { Button, Input } from '@/components/ui';
 import { useAuth } from '@/hooks';
 
 export default function LogInPage() {
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, clearError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
