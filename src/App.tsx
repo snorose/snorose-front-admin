@@ -12,13 +12,14 @@ import {
   PushNotificationPage,
 } from './pages';
 import { AppSidebar, ProtectedRoute } from '@/components';
-import { SidebarProvider } from '@/components/ui';
+import { SidebarProvider, Toaster } from '@/components/ui';
 import { AuthProvider } from '@/contexts';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <Toaster />
         <Routes>
           <Route path='/' element={<LogInPage />} />
           <Route

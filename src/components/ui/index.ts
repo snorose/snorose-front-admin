@@ -66,3 +66,4 @@ export { Textarea } from './textarea';
 export { Switch } from './switch';
 export { Label } from './label';
 export { Alert, AlertTitle, AlertDescription } from './alert';
+export { Toaster } from 'sonner';

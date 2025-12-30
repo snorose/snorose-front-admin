@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 import { snoroseLogo } from '@/assets';
 import { Button, Input } from '@/components/ui';
 import { useAuth } from '@/hooks';
@@ -15,7 +16,11 @@ export default function LogInPage() {
     clearError();
 
     if (!loginId || !password) {
-      alert('아이디와 비밀번호를 모두 입력해주세요.');
+      toast.info('아이디와 비밀번호를 입력해주세요.', {
+        richColors: true,
+        position: 'top-right',
+      });
+
       return;
     }
 
@@ -25,6 +30,11 @@ export default function LogInPage() {
     });
 
     if (!result.success && result.error) {
+      toast.error(result.error, {
+        richColors: true,
+        position: 'top-right',
+      });
+
       return;
     }
   };
@@ -52,7 +62,6 @@ export default function LogInPage() {
             value={loginId}
             onChange={(e) => setLoginId(e.target.value)}
             disabled={isLoading}
-            required
           />
 
           <div className='relative'>
@@ -65,7 +74,6 @@ export default function LogInPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              required
             />
             <button
               type='button'
@@ -80,8 +88,6 @@ export default function LogInPage() {
               )}
             </button>
           </div>
-
-          {error && <p className='mb-2 text-sm text-red-500'>{error}</p>}
 
           <Button
             type='submit'
