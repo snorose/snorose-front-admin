@@ -67,3 +67,12 @@ export { Switch } from './switch';
 export { Label } from './label';
 export { Alert, AlertTitle, AlertDescription } from './alert';
 export { Toaster } from 'sonner';
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+} from './dropdown-menu';
