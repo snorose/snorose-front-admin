@@ -127,10 +127,10 @@ export default function PointAdjustmentPage() {
       });
 
       toast.success('포인트 지급/차감이 완료되었습니다.');
-      setIsConfirmModalOpen(false);
       handleResetButtonClick();
     } catch {
       toast.error('포인트 지급/차감에 실패했습니다.');
+    } finally {
       setIsConfirmModalOpen(false);
     }
   };
