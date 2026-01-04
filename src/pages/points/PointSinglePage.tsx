@@ -8,6 +8,12 @@ import {
   SelectContent,
   SelectItem,
   Label,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui';
 import { PageHeader } from '@/components';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
@@ -38,6 +44,7 @@ export default function PointAdjustmentPage() {
   const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
   const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const handleSelectMember = (member: MemberInfo) => {
     setSelectedMember((prev) =>
@@ -91,32 +98,40 @@ export default function PointAdjustmentPage() {
     setMemo('');
   };
 
-  const handleApplyButtonClick = async () => {
-    try {
-      if (!userId || !selectedCategory || !difference) {
-        toast.info('모든 필수 항목을 입력해주세요.');
-        return;
-      }
-      const numDifference = Number(difference);
+  const handleApplyButtonClick = () => {
+    if (!userId || !selectedCategory || !difference) {
+      toast.info('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+    const numDifference = Number(difference);
 
-      if (isNaN(numDifference) || numDifference === 0) {
-        toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
-        return;
-      }
+    if (isNaN(numDifference) || numDifference === 0) {
+      toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
+      return;
+    }
+
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmApply = async () => {
+    try {
+      const numDifference = Number(difference);
 
       await postSinglePointAPI({
         userId: userId as number,
         difference: numDifference,
-        category: selectedCategory,
+        category: selectedCategory as keyof typeof POINT_CATEGORY,
         sourceId: user?.userId,
         source: 'ADMIN',
         ...(memo && { memo }),
       });
 
       toast.success('포인트 지급/차감이 완료되었습니다.');
+      setIsConfirmModalOpen(false);
       handleResetButtonClick();
     } catch {
       toast.error('포인트 지급/차감에 실패했습니다.');
+      setIsConfirmModalOpen(false);
     }
   };
 
@@ -306,6 +321,59 @@ export default function PointAdjustmentPage() {
           적용
         </Button>
       </div>
+
+      <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>포인트 지급/차감 확인</DialogTitle>
+            <DialogDescription>
+              아래 내용으로 포인트를 적용하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex flex-col gap-3 py-4'>
+            <div className='flex items-center gap-2'>
+              <span className='w-24 text-sm font-semibold'>회원 ID:</span>
+              <span className='text-sm'>{userId}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <span className='w-24 text-sm font-semibold'>포인트 유형:</span>
+              <span className='text-sm'>
+                {selectedCategory && POINT_CATEGORY[selectedCategory]}
+              </span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <span className='w-24 text-sm font-semibold'>포인트:</span>
+              <span
+                className={cn(
+                  'text-sm',
+                  Number(difference) > 0 ? 'text-blue-600' : 'text-red-600'
+                )}
+              >
+                {Number(difference) > 0 ? '+' : ''}
+                {difference}
+              </span>
+            </div>
+            {memo && (
+              <div className='flex items-center gap-2'>
+                <span className='w-24 text-sm font-semibold'>메모:</span>
+                <span className='text-sm'>{memo}</span>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => setIsConfirmModalOpen(false)}
+            >
+              취소
+            </Button>
+            <Button type='button' onClick={handleConfirmApply}>
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
