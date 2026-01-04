@@ -15,6 +15,8 @@ import type { MemberInfo } from '@/types';
 import { cn } from '@/utils';
 import { POINT_CATEGORY } from '@/constants';
 import { toast } from 'sonner';
+import { postSinglePointAPI } from '@/apis';
+import { useAuth } from '@/hooks';
 
 const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
   { label: '회원 ID', key: 'userId' },
@@ -26,6 +28,7 @@ const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
 const ACTION_COLUMN_LABEL = '선택/해제';
 
 export default function PointAdjustmentPage() {
+  const { user } = useAuth();
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
   const [userId, setUserId] = useState<number | ''>('');
   const [selectedCategory, setSelectedCategory] = useState<
@@ -88,7 +91,7 @@ export default function PointAdjustmentPage() {
     setMemo('');
   };
 
-  const handleApplyButtonClick = () => {
+  const handleApplyButtonClick = async () => {
     try {
       if (!userId || !selectedCategory || !difference) {
         toast.info('모든 필수 항목을 입력해주세요.');
@@ -100,6 +103,18 @@ export default function PointAdjustmentPage() {
         toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
         return;
       }
+
+      await postSinglePointAPI({
+        userId: userId as number,
+        difference: numDifference,
+        category: selectedCategory,
+        sourceId: user?.userId,
+        source: 'ADMIN',
+        ...(memo && { memo }),
+      });
+
+      toast.success('포인트 지급/차감이 완료되었습니다.');
+      handleResetButtonClick();
     } catch {
       toast.error('포인트 지급/차감에 실패했습니다.');
     }
