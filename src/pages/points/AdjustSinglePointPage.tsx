@@ -75,8 +75,10 @@ export default function AdjustSinglePointPage() {
 
       toast.success('포인트 지급/차감이 완료되었어요.');
       handleResetButtonClick();
-    } catch {
-      toast.error('포인트 지급/차감에 실패했어요.');
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || '포인트 지급/차감에 실패했어요.';
+      toast.error(errorMessage);
     } finally {
       setIsConfirmModalOpen(false);
     }
