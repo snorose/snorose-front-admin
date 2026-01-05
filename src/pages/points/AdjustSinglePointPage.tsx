@@ -35,23 +35,10 @@ export default function AdjustSinglePointPage() {
     setIsSearching(true);
     try {
       const data = await searchUsersAPI(searchQuery.trim());
-
-      if (!data.isSuccess) {
-        toast.error(data.message || '회원 조회에 실패했습니다.');
-        setSearchedMember(null);
-        return;
-      }
-
-      if (!data.result) {
-        toast.info('조회된 회원이 없습니다.');
-        setSearchedMember(null);
-        return;
-      }
-
       setSearchedMember(data.result);
       setUserId(data.result.userId);
-    } catch {
-      toast.error('회원 조회에 실패했습니다.');
+    } catch (error) {
+      toast.error(error.response.data.message || '회원 조회에 실패했습니다.');
       setSearchedMember(null);
     } finally {
       setIsSearching(false);
@@ -84,10 +71,10 @@ export default function AdjustSinglePointPage() {
         ...(memo && { memo }),
       });
 
-      toast.success('포인트 지급/차감이 완료되었습니다.');
+      toast.success('포인트 지급/차감이 완료되었어요.');
       handleResetButtonClick();
     } catch {
-      toast.error('포인트 지급/차감에 실패했습니다.');
+      toast.error('포인트 지급/차감에 실패했어요.');
     } finally {
       setIsConfirmModalOpen(false);
     }
@@ -104,7 +91,7 @@ export default function AdjustSinglePointPage() {
         <div className='flex gap-2'>
           <Input
             type='text'
-            placeholder='아이디 또는 학번을 입력해주세요'
+            placeholder='아이디 또는 학번을 입력해주세요.'
             className='w-96'
             value={searchQuery}
             onChange={handleSearchInputChange}
