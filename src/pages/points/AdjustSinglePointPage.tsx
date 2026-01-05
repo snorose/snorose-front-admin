@@ -15,7 +15,10 @@ import { POINT_CATEGORY } from '@/constants';
 import { toast } from 'sonner';
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/hooks';
-import { ConfirmPointAdjustmentModal } from '@/domains/Points';
+import {
+  ConfirmPointAdjustmentModal,
+  MemberInfoSection,
+} from '@/domains/Points';
 
 export default function AdjustSinglePointPage() {
   const { user } = useAuth();
@@ -146,75 +149,11 @@ export default function AdjustSinglePointPage() {
         </div>
       </article>
 
-      <article className='flex flex-col gap-1'>
-        <h3 className='text-lg font-bold'>회원 정보 상세</h3>
-        <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='userName' required>
-              이름
-            </Label>
-            <Input
-              type='text'
-              id='userName'
-              placeholder='검색 후 회원을 선택해주세요'
-              value={searchedMember?.userName ?? ''}
-              readOnly
-              className='bg-gray-50'
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='major' required>
-              전공
-            </Label>
-            <Input
-              type='text'
-              id='major'
-              placeholder='검색 후 회원을 선택해주세요'
-              value={searchedMember?.major ?? ''}
-              readOnly
-              className='bg-gray-50'
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='loginId' required>
-              아이디
-            </Label>
-            <Input
-              type='text'
-              id='loginId'
-              placeholder='검색 후 회원을 선택해주세요'
-              value={searchedMember?.loginId ?? ''}
-              readOnly
-              className='bg-gray-50'
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='studentNumber' required>
-              학번
-            </Label>
-            <Input
-              type='text'
-              id='studentNumber'
-              placeholder='검색 후 회원을 선택해주세요'
-              value={searchedMember?.studentNumber ?? ''}
-              readOnly
-              className='bg-gray-50'
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='userId' required>
-              userId
-            </Label>
-            <Input
-              type='text'
-              id='userId'
-              placeholder='직접 입력'
-              value={userId ?? ''}
-              onChange={(e) => setUserId(Number(e.target.value))}
-            />
-          </div>
-        </div>
-      </article>
+      <MemberInfoSection
+        searchedMember={searchedMember as MemberInfo}
+        userId={userId as number}
+        onUserIdChange={setUserId}
+      />
 
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
