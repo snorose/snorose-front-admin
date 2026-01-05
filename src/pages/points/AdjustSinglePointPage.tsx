@@ -10,6 +10,7 @@ import {
   ConfirmPointAdjustmentModal,
   MemberInfoSection,
   PointDetailSection,
+  PointActionButtons,
 } from '@/domains/Points';
 
 export default function AdjustSinglePointPage() {
@@ -41,7 +42,7 @@ export default function AdjustSinglePointPage() {
         return;
       }
 
-      if (!data.result || data.result.length === 0) {
+      if (!data.result) {
         toast.info('조회된 회원이 없습니다.');
         setSearchedMember(null);
         return;
@@ -68,21 +69,6 @@ export default function AdjustSinglePointPage() {
     setSearchQuery('');
     setDifference('');
     setMemo('');
-  };
-
-  const handleApplyButtonClick = () => {
-    if (!userId || !setSearchedMember || !selectedCategory || !difference) {
-      toast.info('모든 필수 항목을 입력해주세요.');
-      return;
-    }
-    const numDifference = Number(difference);
-
-    if (isNaN(numDifference) || numDifference === 0) {
-      toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
-      return;
-    }
-
-    setIsConfirmModalOpen(true);
   };
 
   const handleConfirmModalButtonClick = async () => {
@@ -156,26 +142,13 @@ export default function AdjustSinglePointPage() {
         onMemoChange={setMemo}
       />
 
-      <div className='flex justify-end gap-2'>
-        <Button
-          type='submit'
-          size='lg'
-          variant='outline'
-          onClick={handleResetButtonClick}
-          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
-        >
-          초기화
-        </Button>
-        <Button
-          type='submit'
-          size='lg'
-          variant='outline'
-          className='text-md h-10 w-32 cursor-pointer font-bold'
-          onClick={handleApplyButtonClick}
-        >
-          적용
-        </Button>
-      </div>
+      <PointActionButtons
+        userId={userId}
+        selectedCategory={selectedCategory}
+        difference={difference}
+        onReset={handleResetButtonClick}
+        onApply={() => setIsConfirmModalOpen(true)}
+      />
 
       {searchedMember && (
         <ConfirmPointAdjustmentModal
