@@ -37,8 +37,10 @@ export default function AdjustSinglePointPage() {
       const data = await searchUsersAPI(searchQuery.trim());
       setSearchedMember(data.result);
       setUserId(data.result.userId);
-    } catch (error) {
-      toast.error(error.response.data.message || '회원 조회에 실패했습니다.');
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message || '회원 조회에 실패했습니다.';
+      toast.error(errorMessage);
       setSearchedMember(null);
     } finally {
       setIsSearching(false);
