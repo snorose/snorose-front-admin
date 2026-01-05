@@ -16,22 +16,20 @@ import {
   DialogTitle,
 } from '@/components/ui';
 import { PageHeader } from '@/components';
-import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
 import { cn } from '@/utils';
 import { POINT_CATEGORY } from '@/constants';
 import { toast } from 'sonner';
-import { postSinglePointAPI } from '@/apis';
+import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/hooks';
 
 const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
-  { label: '회원 ID', key: 'userId' },
   { label: '이름', key: 'userName' },
+  { label: 'userId', key: 'userId' },
   { label: '아이디', key: 'loginId' },
   { label: '학번', key: 'studentNumber' },
   { label: '전공', key: 'major' },
 ];
-const ACTION_COLUMN_LABEL = '선택/해제';
 
 export default function PointAdjustmentPage() {
   const { user } = useAuth();
@@ -42,46 +40,46 @@ export default function PointAdjustmentPage() {
   >('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
-  const handleSelectMember = (member: MemberInfo) => {
-    setSelectedMember((prev) =>
-      prev?.userId === member.userId ? null : member
-    );
-    // 회원 선택 시 userId 입력란에 자동으로 채우기
-    if (selectedMember?.userId === member.userId) {
-      setUserId('');
-    } else {
-      setUserId(member.userId);
-    }
-  };
-
-  const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const numValue = value === '' ? '' : Number(value);
-    setUserId(numValue);
-
-    if (selectedMember && selectedMember.userId !== numValue) {
-      setSelectedMember(null);
-    }
-  };
-
-  const handleSearch = () => {
+  const handleSearchButtonClick = async () => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
+      toast.info('검색어를 입력해주세요.');
       return;
     }
 
-    const query = searchQuery.trim().toLowerCase();
-    const results = MEMBER_SAMPLE_DATA.filter(
-      (member) =>
-        member.userName.toLowerCase().includes(query) ||
-        member.loginId.toLowerCase().includes(query) ||
-        member.studentNumber.toLowerCase().includes(query)
-    );
-    setSearchResults(results);
+    setIsSearching(true);
+    try {
+      const data = await searchUsersAPI(searchQuery.trim());
+
+      if (!data.isSuccess) {
+        toast.error(data.message || '회원 조회에 실패했습니다.');
+        setSearchResults([]);
+        setSelectedMember(null);
+        return;
+      }
+
+      if (!data.result || data.result.length === 0) {
+        toast.info('조회된 회원이 없습니다.');
+        setSearchResults([]);
+        setSelectedMember(null);
+        return;
+      }
+
+      setSearchResults([data.result]);
+      setSelectedMember(data.result);
+      setUserId(data.result.userId);
+    } catch {
+      toast.error('회원 조회에 실패했습니다.');
+      setSearchResults([]);
+      setSelectedMember(null);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,8 +87,8 @@ export default function PointAdjustmentPage() {
   };
 
   const handleResetButtonClick = () => {
-    setUserId('');
     setSelectedMember(null);
+    setUserId('');
     setSelectedCategory('');
     setSearchQuery('');
     setSearchResults([]);
@@ -99,7 +97,7 @@ export default function PointAdjustmentPage() {
   };
 
   const handleApplyButtonClick = () => {
-    if (!userId || !selectedCategory || !difference) {
+    if (!userId || !selectedMember || !selectedCategory || !difference) {
       toast.info('모든 필수 항목을 입력해주세요.');
       return;
     }
@@ -113,7 +111,7 @@ export default function PointAdjustmentPage() {
     setIsConfirmModalOpen(true);
   };
 
-  const handleConfirmApply = async () => {
+  const handleConfirmModalButtonClick = async () => {
     try {
       const numDifference = Number(difference);
 
@@ -146,13 +144,13 @@ export default function PointAdjustmentPage() {
         <div className='flex gap-2'>
           <Input
             type='text'
-            placeholder='이름, 아이디, 학번 중 하나를 입력해주세요'
+            placeholder='아이디 또는 학번을 입력해주세요'
             className='w-96'
             value={searchQuery}
             onChange={handleSearchInputChange}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                handleSearch();
+                handleSearchButtonClick();
               }
             }}
           />
@@ -161,111 +159,87 @@ export default function PointAdjustmentPage() {
             size='sm'
             variant='outline'
             className='h-auto w-20 cursor-pointer text-black'
-            onClick={handleSearch}
+            onClick={handleSearchButtonClick}
+            disabled={isSearching}
           >
-            검색
+            {isSearching ? '검색중..' : '검색'}
           </Button>
         </div>
-        <div className='w-full rounded-md border p-2'>
-          <table className='w-full'>
-            <thead>
-              <tr>
-                {MEMBER_INFO.map((info) => (
-                  <th
-                    key={`header-${info.key}`}
-                    className='w-1/6 p-2 text-left text-sm font-semibold'
-                  >
-                    {info.label}
-                  </th>
-                ))}
-                <th className='p-2 text-left text-sm font-semibold'>
-                  {ACTION_COLUMN_LABEL}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {searchResults.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={MEMBER_INFO.length + 1}
-                    className='p-5 text-center text-sm text-gray-500'
-                  >
-                    조회된 회원이 없어요.
-                  </td>
-                </tr>
-              ) : (
-                searchResults.map((member) => {
-                  const isSelected = selectedMember?.userId === member.userId;
+      </article>
 
-                  return (
-                    <tr
-                      key={`${member.userId}`}
-                      className={cn(
-                        'cursor-pointer hover:bg-gray-100',
-                        isSelected && 'bg-blue-100 text-blue-600'
-                      )}
-                    >
-                      {MEMBER_INFO.map((info) => (
-                        <td
-                          key={`${member.userId}-${info.key}`}
-                          className='p-2 text-sm'
-                        >
-                          {member[info.key]}
-                        </td>
-                      ))}
-                      <td className='p-2 text-sm'>
-                        <Button
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          className='cursor-pointer'
-                          onClick={() => handleSelectMember(member)}
-                        >
-                          {isSelected ? (
-                            <span className='text-red-500 active:text-red-700'>
-                              해제
-                            </span>
-                          ) : (
-                            <span>선택</span>
-                          )}
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+      <article className='flex flex-col gap-1'>
+        <h3 className='text-lg font-bold'>회원 정보 상세</h3>
+        <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='userName' required>
+              이름
+            </Label>
+            <Input
+              type='text'
+              id='userName'
+              placeholder='검색 후 회원을 선택해주세요'
+              value={selectedMember?.userName ?? ''}
+              readOnly
+              className='bg-gray-50'
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='major' required>
+              전공
+            </Label>
+            <Input
+              type='text'
+              id='major'
+              placeholder='검색 후 회원을 선택해주세요'
+              value={selectedMember?.major ?? ''}
+              readOnly
+              className='bg-gray-50'
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='loginId' required>
+              아이디
+            </Label>
+            <Input
+              type='text'
+              id='loginId'
+              placeholder='검색 후 회원을 선택해주세요'
+              value={selectedMember?.loginId ?? ''}
+              readOnly
+              className='bg-gray-50'
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='studentNumber' required>
+              학번
+            </Label>
+            <Input
+              type='text'
+              id='studentNumber'
+              placeholder='검색 후 회원을 선택해주세요'
+              value={selectedMember?.studentNumber ?? ''}
+              readOnly
+              className='bg-gray-50'
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='userId' required>
+              userId
+            </Label>
+            <Input
+              type='text'
+              id='userId'
+              placeholder='직접 입력'
+              value={userId ?? ''}
+              onChange={(e) => setUserId(e.target.value)}
+            />
+          </div>
         </div>
       </article>
 
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
         <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='userId' required>
-              회원 ID (userId)
-            </Label>
-            <Input
-              type='number'
-              id='userId'
-              placeholder='직접 입력 or 검색 후 선택'
-              value={userId}
-              onChange={handleUserIdChange}
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='difference' required>
-              포인트 지급/차감량
-            </Label>
-            <Input
-              type='number'
-              id='difference'
-              value={difference}
-              placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
-              onChange={(e) => setDifference(e.target.value)}
-            />
-          </div>
           <div className='flex flex-col gap-1'>
             <Label htmlFor='category' required>
               포인트 유형
@@ -288,6 +262,19 @@ export default function PointAdjustmentPage() {
               </SelectContent>
             </Select>
           </div>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor='difference' required>
+              포인트 지급/차감량
+            </Label>
+            <Input
+              type='number'
+              id='difference'
+              value={difference}
+              placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
+              onChange={(e) => setDifference(e.target.value)}
+            />
+          </div>
+
           <div className='flex flex-col gap-1'>
             <Label htmlFor='memo'>메모</Label>
             <Input
@@ -332,8 +319,20 @@ export default function PointAdjustmentPage() {
           </DialogHeader>
           <div className='flex flex-col gap-3 py-4'>
             <div className='flex items-center gap-2'>
-              <span className='w-24 text-sm font-semibold'>회원 ID:</span>
-              <span className='text-sm'>{userId}</span>
+              <span className='w-24 text-sm font-semibold'>아이디:</span>
+              <span className='text-sm'>{selectedMember?.loginId}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <span className='w-24 text-sm font-semibold'>이름:</span>
+              <span className='text-sm'>{selectedMember?.userName}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <span className='w-24 text-sm font-semibold'>학과:</span>
+              <span className='text-sm'>{selectedMember?.major}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <span className='w-24 text-sm font-semibold'>학번:</span>
+              <span className='text-sm'>{selectedMember?.studentNumber}</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-24 text-sm font-semibold'>포인트 유형:</span>
@@ -368,7 +367,7 @@ export default function PointAdjustmentPage() {
             >
               취소
             </Button>
-            <Button type='button' onClick={handleConfirmApply}>
+            <Button type='button' onClick={handleConfirmModalButtonClick}>
               확인
             </Button>
           </DialogFooter>
