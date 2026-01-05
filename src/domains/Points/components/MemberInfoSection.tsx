@@ -50,7 +50,7 @@ export default function MemberInfoSection({
               value={value ?? ''}
               readOnly
               className='bg-gray-50'
-              placeholder='회원을 검색하여 자동으로 입력됩니다.'
+              placeholder='회원을 검색해 주세요.'
             />
           </div>
         ))}
@@ -62,7 +62,7 @@ export default function MemberInfoSection({
           <Input
             type='text'
             id='userId'
-            placeholder='직접 입력'
+            placeholder='직접 입력해 주세요.'
             value={userId}
             onChange={(e) => onUserIdChange(Number(e.target.value))}
           />

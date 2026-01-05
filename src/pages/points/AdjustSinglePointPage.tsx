@@ -100,7 +100,7 @@ export default function AdjustSinglePointPage() {
         description='특정 회원에게 포인트를 지급/차감할 수 있어요.'
       />
       <article className='flex flex-col gap-1'>
-        <h3 className='text-lg font-bold'>회원 조회</h3>
+        <h3 className='text-lg font-bold'>회원 검색</h3>
         <div className='flex gap-2'>
           <Input
             type='text'
