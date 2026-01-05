@@ -4,7 +4,7 @@ import {
   ExamReviewPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
-  PointSinglePage,
+  AdjustSinglePointPage,
   PointAllPage,
   LogInPage,
   PostPage,
@@ -46,7 +46,7 @@ function App() {
                           />
                           <Route
                             path='/points/single'
-                            element={<PointSinglePage />}
+                            element={<AdjustSinglePointPage />}
                           />
                           <Route
                             path='/points/all'

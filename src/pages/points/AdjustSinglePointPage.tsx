@@ -23,23 +23,14 @@ import { toast } from 'sonner';
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/hooks';
 
-const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
-  { label: '이름', key: 'userName' },
-  { label: 'userId', key: 'userId' },
-  { label: '아이디', key: 'loginId' },
-  { label: '학번', key: 'studentNumber' },
-  { label: '전공', key: 'major' },
-];
-
-export default function PointAdjustmentPage() {
+export default function AdjustSinglePointPage() {
   const { user } = useAuth();
-  const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
-  const [userId, setUserId] = useState<number | ''>('');
+  const [searchedMember, setSearchedMember] = useState<MemberInfo | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<
     keyof typeof POINT_CATEGORY | ''
   >('');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<MemberInfo[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
@@ -47,7 +38,6 @@ export default function PointAdjustmentPage() {
 
   const handleSearchButtonClick = async () => {
     if (!searchQuery.trim()) {
-      setSearchResults([]);
       toast.info('검색어를 입력해주세요.');
       return;
     }
@@ -58,25 +48,21 @@ export default function PointAdjustmentPage() {
 
       if (!data.isSuccess) {
         toast.error(data.message || '회원 조회에 실패했습니다.');
-        setSearchResults([]);
-        setSelectedMember(null);
+        setSearchedMember(null);
         return;
       }
 
       if (!data.result || data.result.length === 0) {
         toast.info('조회된 회원이 없습니다.');
-        setSearchResults([]);
-        setSelectedMember(null);
+        setSearchedMember(null);
         return;
       }
 
-      setSearchResults([data.result]);
-      setSelectedMember(data.result);
+      setSearchedMember(data.result);
       setUserId(data.result.userId);
     } catch {
       toast.error('회원 조회에 실패했습니다.');
-      setSearchResults([]);
-      setSelectedMember(null);
+      setSearchedMember(null);
     } finally {
       setIsSearching(false);
     }
@@ -87,17 +73,16 @@ export default function PointAdjustmentPage() {
   };
 
   const handleResetButtonClick = () => {
-    setSelectedMember(null);
-    setUserId('');
+    setSearchedMember(null);
+    setUserId(null);
     setSelectedCategory('');
     setSearchQuery('');
-    setSearchResults([]);
     setDifference('');
     setMemo('');
   };
 
   const handleApplyButtonClick = () => {
-    if (!userId || !selectedMember || !selectedCategory || !difference) {
+    if (!userId || !setSearchedMember || !selectedCategory || !difference) {
       toast.info('모든 필수 항목을 입력해주세요.');
       return;
     }
@@ -178,7 +163,7 @@ export default function PointAdjustmentPage() {
               type='text'
               id='userName'
               placeholder='검색 후 회원을 선택해주세요'
-              value={selectedMember?.userName ?? ''}
+              value={searchedMember?.userName ?? ''}
               readOnly
               className='bg-gray-50'
             />
@@ -191,7 +176,7 @@ export default function PointAdjustmentPage() {
               type='text'
               id='major'
               placeholder='검색 후 회원을 선택해주세요'
-              value={selectedMember?.major ?? ''}
+              value={searchedMember?.major ?? ''}
               readOnly
               className='bg-gray-50'
             />
@@ -204,7 +189,7 @@ export default function PointAdjustmentPage() {
               type='text'
               id='loginId'
               placeholder='검색 후 회원을 선택해주세요'
-              value={selectedMember?.loginId ?? ''}
+              value={searchedMember?.loginId ?? ''}
               readOnly
               className='bg-gray-50'
             />
@@ -217,7 +202,7 @@ export default function PointAdjustmentPage() {
               type='text'
               id='studentNumber'
               placeholder='검색 후 회원을 선택해주세요'
-              value={selectedMember?.studentNumber ?? ''}
+              value={searchedMember?.studentNumber ?? ''}
               readOnly
               className='bg-gray-50'
             />
@@ -231,7 +216,7 @@ export default function PointAdjustmentPage() {
               id='userId'
               placeholder='직접 입력'
               value={userId ?? ''}
-              onChange={(e) => setUserId(e.target.value)}
+              onChange={(e) => setUserId(Number(e.target.value))}
             />
           </div>
         </div>
@@ -320,19 +305,19 @@ export default function PointAdjustmentPage() {
           <div className='flex flex-col gap-3 py-4'>
             <div className='flex items-center gap-2'>
               <span className='w-24 text-sm font-semibold'>아이디:</span>
-              <span className='text-sm'>{selectedMember?.loginId}</span>
+              <span className='text-sm'>{searchedMember?.loginId}</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-24 text-sm font-semibold'>이름:</span>
-              <span className='text-sm'>{selectedMember?.userName}</span>
+              <span className='text-sm'>{searchedMember?.userName}</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-24 text-sm font-semibold'>학과:</span>
-              <span className='text-sm'>{selectedMember?.major}</span>
+              <span className='text-sm'>{searchedMember?.major}</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-24 text-sm font-semibold'>학번:</span>
-              <span className='text-sm'>{selectedMember?.studentNumber}</span>
+              <span className='text-sm'>{searchedMember?.studentNumber}</span>
             </div>
             <div className='flex items-center gap-2'>
               <span className='w-24 text-sm font-semibold'>포인트 유형:</span>
