@@ -5,8 +5,8 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  Button,
 } from '@/components/ui';
-import { Button } from '@/components/ui';
 import { cn } from '@/utils';
 import { POINT_CATEGORY } from '@/constants';
 import type { MemberInfo } from '@/types';
@@ -30,6 +30,14 @@ export default function ConfirmPointAdjustmentModal({
   difference,
   memo,
 }: ConfirmPointAdjustmentModalProps) {
+  const CONFIRMATION_DATA = [
+    { label: '아이디', value: searchedMember?.loginId },
+    { label: '이름', value: searchedMember.userName },
+    { label: '학과', value: searchedMember.major },
+    { label: '학번', value: searchedMember.studentNumber },
+    { label: '포인트 유형', value: POINT_CATEGORY[selectedCategory] },
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -40,28 +48,12 @@ export default function ConfirmPointAdjustmentModal({
           </DialogDescription>
         </DialogHeader>
         <div className='flex flex-col gap-3 py-4'>
-          <div className='flex items-center gap-2'>
-            <span className='w-24 text-sm font-semibold'>아이디:</span>
-            <span className='text-sm'>{searchedMember?.loginId}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <span className='w-24 text-sm font-semibold'>이름:</span>
-            <span className='text-sm'>{searchedMember?.userName}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <span className='w-24 text-sm font-semibold'>학과:</span>
-            <span className='text-sm'>{searchedMember?.major}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <span className='w-24 text-sm font-semibold'>학번:</span>
-            <span className='text-sm'>{searchedMember?.studentNumber}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <span className='w-24 text-sm font-semibold'>포인트 유형:</span>
-            <span className='text-sm'>
-              {selectedCategory && POINT_CATEGORY[selectedCategory]}
-            </span>
-          </div>
+          {CONFIRMATION_DATA.map((data) => (
+            <div className='flex items-center gap-2' key={data.label}>
+              <span className='w-24 text-sm font-semibold'>{data.label}:</span>
+              <span className='text-sm'>{data.value}</span>
+            </div>
+          ))}
           <div className='flex items-center gap-2'>
             <span className='w-24 text-sm font-semibold'>포인트:</span>
             <span
