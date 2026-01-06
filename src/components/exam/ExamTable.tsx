@@ -21,7 +21,7 @@ import {
   MANAGER_LIST,
 } from '@/constants/exam-table-options';
 import { useState, useEffect, useCallback } from 'react';
-import { getExamReviews } from '@/apis/exam';
+import { getExamReviews, confirmExamReview } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import type { ExamReviewApiResponse } from '@/apis/exam';
@@ -338,18 +338,44 @@ export default function ExamTable({
   // };
 
   // 상태 선택 함수
-  const handleStatusSelect = (
+  const handleStatusSelect = async (
     reviewId: number,
     statusCode: string,
     statusName: string
   ) => {
-    setSelectedStatus((prev) => ({
-      ...prev,
-      [reviewId]: statusCode,
-    }));
-    console.log(
-      `Review ID: ${reviewId}, Selected Status: ${statusCode} (${statusName})`
-    );
+    // 상태 코드에 따라 isConfirmed 값 결정
+    const isConfirmed = statusCode === 'CONFIRMED';
+
+    try {
+      // API 호출
+      const response = await confirmExamReview(reviewId, { isConfirmed });
+
+      if (response.isSuccess) {
+        // 성공 시 로컬 상태 업데이트
+        setSelectedStatus((prev) => ({
+          ...prev,
+          [reviewId]: statusCode,
+        }));
+
+        // API 데이터도 업데이트
+        setApiData((prev) =>
+          prev.map((review) =>
+            review.id === reviewId ? { ...review, status: statusCode } : review
+          )
+        );
+
+        toast.success(
+          `시험 후기가 ${statusName === '확인완료' ? '확인완료' : '미확인 족보'}로 변경되었습니다.`
+        );
+      } else {
+        toast.error(response.message || '시험 후기 상태 변경에 실패했습니다.');
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        (isAxiosError(error) && error.response?.data?.message) ||
+        '시험 후기 상태 변경에 실패했습니다.';
+      toast.error(errorMessage);
+    }
   };
 
   // 추후 api값 추가되면 사용
@@ -556,10 +582,13 @@ export default function ExamTable({
             </TableRow>
           ) : (
             currentPageData.map((review) => {
-              const isRowActive =
-                openStatusSelect[review.id] ||
-                // openManagerSelect[review.id] ||
-                clickedRow === review.id;
+              // Select가 열린 행이 있는지 확인
+              const hasOpenSelect =
+                Object.values(openStatusSelect).some(Boolean);
+              // Select가 열린 행이 있으면 그 행만 active, 없으면 clickedRow만 active
+              const isRowActive = hasOpenSelect
+                ? openStatusSelect[review.id]
+                : clickedRow === review.id;
               return (
                 <TableRow
                   key={review.id}
@@ -577,12 +606,12 @@ export default function ExamTable({
                   <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
                     <Select
                       value={selectedStatus[review.id] || review.status}
-                      onValueChange={(value) => {
+                      onValueChange={async (value) => {
                         const statusOption = STATUS_COLOR.find(
                           (s) => s.code === value
                         );
                         if (statusOption) {
-                          handleStatusSelect(
+                          await handleStatusSelect(
                             review.id,
                             statusOption.code,
                             statusOption.name
