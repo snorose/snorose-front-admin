@@ -482,7 +482,7 @@ export default function ExamTable({
                         <SelectItem
                           key={statusOption.id}
                           value={statusOption.code}
-                          className='text-[12px]'
+                          className='text-[12px] font-medium'
                         >
                           <div className='flex items-center gap-2'>
                             <div

@@ -129,7 +129,7 @@ export default function ExamEditPanel({
                       <SelectItem
                         key={statusOption.code}
                         value={statusOption.code}
-                        className='text-[10px]'
+                        className='text-[12px] font-medium'
                       >
                         <div className='flex items-center gap-2'>
                           <StatusDot status={statusOption.code} />
@@ -210,7 +210,7 @@ export default function ExamEditPanel({
                       <SelectItem
                         key={semesterOption}
                         value={semesterOption}
-                        className='text-[10px]'
+                        className='text-[12px] font-medium'
                       >
                         {semesterOption}
                       </SelectItem>
@@ -231,7 +231,7 @@ export default function ExamEditPanel({
                       <SelectItem
                         key={examTypeOption}
                         value={examTypeOption}
-                        className='text-[10px]'
+                        className='text-[12px] font-medium'
                       >
                         {examTypeOption}
                       </SelectItem>
@@ -302,7 +302,7 @@ export default function ExamEditPanel({
                       <SelectItem
                         key={managerOption}
                         value={managerOption}
-                        className='text-[10px]'
+                        className='text-[12px] font-medium'
                       >
                         {managerOption}
                       </SelectItem>
