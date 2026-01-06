@@ -17,7 +17,7 @@ import {
   DialogDescription,
 } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { getFreezingPointsAPI } from '@/apis';
+import { getFreezingPointsAPI, postFreezingPointAPI } from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
 
@@ -34,13 +34,13 @@ export default function FreezingPointPage() {
   const [freezingPoints, setFreezingPoints] = useState<FreezingPoint[]>([]);
   const [formData, setFormData] = useState({
     title: '',
-    startDate: '',
-    endDate: '',
+    startAt: '',
+    endAt: '',
   });
   const [updateFormData, setUpdateFormData] = useState({
     title: '',
-    startDate: '',
-    endDate: '',
+    startAt: '',
+    endAt: '',
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<FreezingPoint | null>(null);
@@ -73,11 +73,11 @@ export default function FreezingPointPage() {
   };
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, startDate: e.target.value });
+    setFormData({ ...formData, startAt: e.target.value });
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, endDate: e.target.value });
+    setFormData({ ...formData, endAt: e.target.value });
   };
 
   const handleUpdateScheduleClick = (id: number) => {
@@ -88,8 +88,8 @@ export default function FreezingPointPage() {
       setSelectedItem(updatedItem);
       setUpdateFormData({
         title: updatedItem.title,
-        startDate: updatedItem.startAt,
-        endDate: updatedItem.endAt,
+        startAt: updatedItem.startAt,
+        endAt: updatedItem.endAt,
       });
     }
   };
@@ -102,6 +102,43 @@ export default function FreezingPointPage() {
   const handleUpdateConfirm = () => {
     console.log(selectedItem);
   };
+
+  const handleResetButtonClick = () => {
+    setFormData({
+      title: '',
+      startAt: '',
+      endAt: '',
+    });
+  };
+
+  const handleCreateButtonClick = async () => {
+    if (
+      formData.title === '' ||
+      formData.startAt === '' ||
+      formData.endAt === ''
+    ) {
+      toast.error('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    const formatDateTime = (dateTimeString: string) => {
+      return dateTimeString.replace('T', ' ') + ':00';
+    };
+    try {
+      await postFreezingPointAPI({
+        title: formData.title,
+        startAt: formatDateTime(formData.startAt),
+        endAt: formatDateTime(formData.endAt),
+      });
+      toast.success('미지급 일정 생성이 완료되었어요.');
+      handleResetButtonClick();
+    } catch (error: unknown) {
+      const errorMessage =
+        error?.response?.data?.message || '미지급 일정 생성에 실패했습니다.';
+      toast.error(errorMessage);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -146,7 +183,7 @@ export default function FreezingPointPage() {
                 <Input
                   type='datetime-local'
                   id='startDate'
-                  value={formData.startDate}
+                  value={formData.startAt}
                   onChange={handleStartDateChange}
                 />
               </div>
@@ -157,7 +194,7 @@ export default function FreezingPointPage() {
                 <Input
                   type='datetime-local'
                   id='endDate'
-                  value={formData.endDate}
+                  value={formData.endAt}
                   onChange={handleEndDateChange}
                 />
               </div>
@@ -168,6 +205,7 @@ export default function FreezingPointPage() {
                 size='sm'
                 variant='outline'
                 className='w-16 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+                onClick={handleResetButtonClick}
               >
                 초기화
               </Button>
@@ -176,6 +214,7 @@ export default function FreezingPointPage() {
                 size='sm'
                 variant='outline'
                 className='w-16 cursor-pointer font-bold'
+                onClick={handleCreateButtonClick}
               >
                 생성
               </Button>
@@ -295,7 +334,7 @@ export default function FreezingPointPage() {
             <Input
               type='datetime-local'
               id='startDate'
-              value={updateFormData.startDate}
+              value={updateFormData.startAt}
               onChange={handleStartDateChange}
             />
           </div>
@@ -304,7 +343,7 @@ export default function FreezingPointPage() {
             <Input
               type='datetime-local'
               id='endDate'
-              value={updateFormData.endDate}
+              value={updateFormData.endAt}
               onChange={handleEndDateChange}
             />
           </div>
