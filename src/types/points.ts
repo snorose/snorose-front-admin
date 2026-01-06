@@ -6,3 +6,9 @@ export interface AdjustSinglePoint {
   source: string;
   memo?: string;
 }
+
+export interface FreezingPoint {
+  title: string;
+  startAt: string;
+  endAt: string;
+}

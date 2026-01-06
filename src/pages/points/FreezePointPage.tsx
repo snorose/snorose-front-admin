@@ -17,11 +17,11 @@ import {
   DialogDescription,
 } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { getPendingPointsAPI } from '@/apis';
+import { getFreezingPointsAPI } from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
 
-interface PendingPoint {
+interface FreezingPoint {
   id: number;
   title: string;
   startAt: string;
@@ -30,8 +30,8 @@ interface PendingPoint {
   updatedAt: string;
 }
 
-export default function PendingPointPage() {
-  const [pendingPoints, setPendingPoints] = useState<PendingPoint[]>([]);
+export default function FreezingPointPage() {
+  const [freezingPoints, setFreezingPoints] = useState<FreezingPoint[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     startDate: '',
@@ -43,10 +43,10 @@ export default function PendingPointPage() {
     endDate: '',
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<PendingPoint | null>(null);
+  const [selectedItem, setSelectedItem] = useState<FreezingPoint | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const handleDeleteScheduleClick = (id: number) => {
-    const deletedItem = pendingPoints.find((item) => item.id === id);
+    const deletedItem = freezingPoints.find((item) => item.id === id);
     if (deletedItem) {
       setSelectedItem(deletedItem);
       setIsDeleteModalOpen(true);
@@ -55,8 +55,8 @@ export default function PendingPointPage() {
 
   const handleDeleteConfirm = () => {
     if (selectedItem) {
-      setPendingPoints(
-        pendingPoints.filter((item) => item.id !== selectedItem.id)
+      setFreezingPoints(
+        freezingPoints.filter((item) => item.id !== selectedItem.id)
       );
       setIsDeleteModalOpen(false);
       setSelectedItem(null);
@@ -82,7 +82,7 @@ export default function PendingPointPage() {
 
   const handleUpdateScheduleClick = (id: number) => {
     setIsUpdateModalOpen(true);
-    const updatedItem = pendingPoints.find((item) => item.id === id);
+    const updatedItem = freezingPoints.find((item) => item.id === id);
 
     if (updatedItem) {
       setSelectedItem(updatedItem);
@@ -105,8 +105,8 @@ export default function PendingPointPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getPendingPointsAPI();
-        setPendingPoints(data.result as PendingPoint[]);
+        const data = await getFreezingPointsAPI();
+        setFreezingPoints(data.result as FreezingPoint[]);
       } catch {
         toast.error('미지급 일정 조회에 실패했습니다.');
       }
@@ -124,11 +124,11 @@ export default function PendingPointPage() {
 
       <section className='flex flex-col gap-4'>
         <article className='flex w-full flex-col gap-1'>
-          <h3 className='text-lg font-bold'>일정 생성</h3>
+          <h3 className='text-lg font-bold'>미지급 일정 생성</h3>
           <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
             <div className='flex flex-col gap-1'>
               <Label htmlFor='title' required>
-                미지급 일정 제목
+                일정 제목
               </Label>
               <Input
                 type='text'
@@ -184,12 +184,12 @@ export default function PendingPointPage() {
         </article>
 
         <article className='flex w-full flex-col gap-1'>
-          <h3 className='text-lg font-bold'>일정 조회</h3>
+          <h3 className='text-lg font-bold'>미지급 일정 조회</h3>
           <Table className='w-full'>
             <TableHeader>
               <TableRow className='text-center'>
                 <TableHead className='text-center'>ID</TableHead>
-                <TableHead className='text-center'>미지급 일정 제목</TableHead>
+                <TableHead className='text-center'>일정 제목</TableHead>
                 <TableHead className='text-center'>시작 일시</TableHead>
                 <TableHead className='text-center'>종료 일시</TableHead>
                 <TableHead className='text-center'>생성 일시</TableHead>
@@ -199,8 +199,8 @@ export default function PendingPointPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pendingPoints.length > 0 ? (
-                pendingPoints.map(
+              {freezingPoints.length > 0 ? (
+                freezingPoints.map(
                   ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
                     <TableRow key={id}>
                       <TableCell className='text-center'>{id}</TableCell>
