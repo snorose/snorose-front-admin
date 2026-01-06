@@ -19,7 +19,7 @@ import {
 import { useState, useEffect } from 'react';
 import { getPendingPointsAPI } from '@/apis';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
+import { PencilIcon, Trash2 } from 'lucide-react';
 
 interface PendingPoint {
   id: number;
@@ -37,9 +37,14 @@ export default function PendingPointPage() {
     startDate: '',
     endDate: '',
   });
+  const [updateFormData, setUpdateFormData] = useState({
+    title: '',
+    startDate: '',
+    endDate: '',
+  });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PendingPoint | null>(null);
-
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const handleDeleteScheduleClick = (id: number) => {
     const deletedItem = pendingPoints.find((item) => item.id === id);
     if (deletedItem) {
@@ -75,6 +80,28 @@ export default function PendingPointPage() {
     setFormData({ ...formData, endDate: e.target.value });
   };
 
+  const handleUpdateScheduleClick = (id: number) => {
+    setIsUpdateModalOpen(true);
+    const updatedItem = pendingPoints.find((item) => item.id === id);
+
+    if (updatedItem) {
+      setSelectedItem(updatedItem);
+      setUpdateFormData({
+        title: updatedItem.title,
+        startDate: updatedItem.startAt,
+        endDate: updatedItem.endAt,
+      });
+    }
+  };
+
+  const handleUpdateCancel = () => {
+    setIsUpdateModalOpen(false);
+    setSelectedItem(null);
+  };
+
+  const handleUpdateConfirm = () => {
+    console.log(selectedItem);
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -168,6 +195,7 @@ export default function PendingPointPage() {
                 <TableHead className='text-center'>생성 일시</TableHead>
                 <TableHead className='text-center'>수정 일시</TableHead>
                 <TableHead className='text-center'>삭제</TableHead>
+                <TableHead className='text-center'>수정</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -187,13 +215,19 @@ export default function PendingPointPage() {
                           onClick={() => handleDeleteScheduleClick(id)}
                         />
                       </TableCell>
+                      <TableCell className='items-center justify-center align-middle'>
+                        <PencilIcon
+                          className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
+                          onClick={() => handleUpdateScheduleClick(id)}
+                        />
+                      </TableCell>
                     </TableRow>
                   )
                 )
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className='text-center'>
-                    미지급 일정이 없습니다.
+                  <TableCell colSpan={8} className='text-center'>
+                    등록된 일정이 없습니다.
                   </TableCell>
                 </TableRow>
               )}
@@ -236,6 +270,54 @@ export default function PendingPointPage() {
             </Button>
             <Button type='button' onClick={handleDeleteConfirm}>
               삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+        <DialogContent className='max-w-xs sm:max-w-sm'>
+          <DialogHeader>
+            <DialogTitle>일정 수정</DialogTitle>
+            <DialogDescription>
+              아래 내용으로 포인트 미지급 일정을 수정하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex flex-col gap-3'>
+            <Label className='text-sm font-semibold'>일정 제목: </Label>
+            <Input
+              type='text'
+              id='title'
+              value={updateFormData.title}
+              onChange={handleTitleChange}
+            />
+            <Label className='text-sm font-semibold'>시작 일시: </Label>
+            <Input
+              type='datetime-local'
+              id='startDate'
+              value={updateFormData.startDate}
+              onChange={handleStartDateChange}
+            />
+          </div>
+          <div className='flex flex-col gap-3'>
+            <Label className='text-sm font-semibold'>종료 일시: </Label>
+            <Input
+              type='datetime-local'
+              id='endDate'
+              value={updateFormData.endDate}
+              onChange={handleEndDateChange}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => handleUpdateCancel()}
+            >
+              취소
+            </Button>
+            <Button type='button' onClick={() => handleUpdateConfirm()}>
+              수정
             </Button>
           </DialogFooter>
         </DialogContent>
