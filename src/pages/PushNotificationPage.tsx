@@ -47,7 +47,7 @@ export default function PushNotificationPage() {
       <section className='flex gap-4'>
         <article className='flex w-full flex-col gap-1'>
           <h3 className='text-lg font-bold'>필수 정보</h3>
-          <div className='flex w-full flex-col gap-4 rounded-md border p-4'>
+          <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
             <div className='flex flex-col gap-1'>
               <Label htmlFor='name' required>
                 알림명

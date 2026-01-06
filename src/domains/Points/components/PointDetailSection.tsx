@@ -29,7 +29,7 @@ export default function PointDetailSection({
   return (
     <article className='flex flex-col gap-1'>
       <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
-      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
+      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
         <div className='flex flex-col gap-1'>
           <Label htmlFor='category' required>
             포인트 유형
