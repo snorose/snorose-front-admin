@@ -17,7 +17,11 @@ import {
   DialogDescription,
 } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { getFreezingPointsAPI, postFreezingPointAPI } from '@/apis';
+import {
+  getFreezingPointsAPI,
+  postFreezingPointAPI,
+  patchFreezingPointAPI,
+} from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
 
@@ -80,16 +84,37 @@ export default function FreezingPointPage() {
     setFormData({ ...formData, endAt: e.target.value });
   };
 
-  const handleUpdateScheduleClick = (id: number) => {
+  const handleTitleUpdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUpdateFormData({ ...updateFormData, title: e.target.value });
+  };
+
+  const handleStartDateUpdateChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setUpdateFormData({ ...updateFormData, startAt: e.target.value });
+  };
+
+  const handleEndDateUpdateChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setUpdateFormData({ ...updateFormData, endAt: e.target.value });
+  };
+
+  const handleUpdateScheduleButtonClick = (id: number) => {
     setIsUpdateModalOpen(true);
     const updatedItem = freezingPoints.find((item) => item.id === id);
 
     if (updatedItem) {
       setSelectedItem(updatedItem);
+
+      const formatDateTime = (dateTimeString: string) => {
+        return dateTimeString.replace(' ', 'T').slice(0, 16);
+      };
+
       setUpdateFormData({
-        title: updatedItem.title,
-        startAt: updatedItem.startAt,
-        endAt: updatedItem.endAt,
+        ...updatedItem,
+        startAt: formatDateTime(updatedItem.startAt),
+        endAt: formatDateTime(updatedItem.endAt),
       });
     }
   };
@@ -99,8 +124,24 @@ export default function FreezingPointPage() {
     setSelectedItem(null);
   };
 
-  const handleUpdateConfirm = () => {
-    console.log(selectedItem);
+  const handleUpdateConfirm = async () => {
+    const formatDateTime = (dateTimeString: string) => {
+      return dateTimeString.replace('T', ' ') + ':00';
+    };
+
+    try {
+      await patchFreezingPointAPI(selectedItem?.id as number, {
+        title: updateFormData.title,
+        startAt: formatDateTime(updateFormData.startAt),
+        endAt: formatDateTime(updateFormData.endAt),
+      });
+      toast.success('미지급 일정 수정이 완료되었어요.');
+      handleUpdateCancel();
+    } catch (error: unknown) {
+      const errorMessage =
+        error?.response?.data?.message || '미지급 일정 수정에 실패했습니다.';
+      toast.error(errorMessage);
+    }
   };
 
   const handleResetButtonClick = () => {
@@ -257,7 +298,7 @@ export default function FreezingPointPage() {
                       <TableCell className='items-center justify-center align-middle'>
                         <PencilIcon
                           className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
-                          onClick={() => handleUpdateScheduleClick(id)}
+                          onClick={() => handleUpdateScheduleButtonClick(id)}
                         />
                       </TableCell>
                     </TableRow>
@@ -328,14 +369,14 @@ export default function FreezingPointPage() {
               type='text'
               id='title'
               value={updateFormData.title}
-              onChange={handleTitleChange}
+              onChange={handleTitleUpdateChange}
             />
             <Label className='text-sm font-semibold'>시작 일시: </Label>
             <Input
               type='datetime-local'
               id='startDate'
               value={updateFormData.startAt}
-              onChange={handleStartDateChange}
+              onChange={handleStartDateUpdateChange}
             />
           </div>
           <div className='flex flex-col gap-3'>
@@ -344,7 +385,7 @@ export default function FreezingPointPage() {
               type='datetime-local'
               id='endDate'
               value={updateFormData.endAt}
-              onChange={handleEndDateChange}
+              onChange={handleEndDateUpdateChange}
             />
           </div>
           <DialogFooter>

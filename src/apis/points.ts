@@ -19,11 +19,11 @@ export const getFreezingPointsAPI = async () => {
   return response.data;
 };
 
-export const updateFreezingPointAPI = async (
+export const patchFreezingPointAPI = async (
   id: number,
-  data: AdjustSinglePoint
+  data: FreezingPoint
 ) => {
-  const response = await axiosInstance.put(
+  const response = await axiosInstance.patch(
     `/v1/admin/points/point-freeze/${id}`,
     data
   );
