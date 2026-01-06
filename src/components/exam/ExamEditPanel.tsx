@@ -9,7 +9,8 @@ import {
 } from '../ui';
 import {
   STATUS_COLOR,
-  MANAGER_LIST,
+  // 추후 api값 추가되면 사용
+  // MANAGER_LIST,
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
 } from '@/constants/exam-table-options';
@@ -57,8 +58,9 @@ export default function ExamEditPanel({
     semester: '2024-1',
     examType: '중간고사',
     examTypeAndQuestions: '객관식 5문항',
-    discussionNotes: '',
-    manager: '관리자1',
+    // 추후 api값 추가되면 사용
+    // discussionNotes: '',
+    // manager: '관리자1',
     uploadTime: '2024-06-01 12:00',
     author: '홍길동',
   };
@@ -74,12 +76,14 @@ export default function ExamEditPanel({
   const [examTypeAndQuestions, setExamTypeAndQuestions] = useState(
     INITIAL_VALUES.examTypeAndQuestions
   );
-  const [discussionNotes, setDiscussionNotes] = useState(
-    INITIAL_VALUES.discussionNotes
-  );
+  // 추후 api값 추가되면 사용
+  // const [discussionNotes, setDiscussionNotes] = useState(
+  //   INITIAL_VALUES.discussionNotes
+  // );
   const [semester, setSemester] = useState(INITIAL_VALUES.semester);
   const [examType, setExamType] = useState(INITIAL_VALUES.examType);
-  const [manager, setManager] = useState(INITIAL_VALUES.manager);
+  // 추후 api값 추가되면 사용
+  // const [manager, setManager] = useState(INITIAL_VALUES.manager);
   const [uploadTime, setUploadTime] = useState(INITIAL_VALUES.uploadTime);
   const [author, setAuthor] = useState(INITIAL_VALUES.author);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -93,11 +97,12 @@ export default function ExamEditPanel({
       setProfessorName(selectedExamReview.professor);
       setSemester(selectedExamReview.semester);
       setExamType(selectedExamReview.examType);
-      setExamTypeAndQuestions(selectedExamReview.examFormat);
-      setDiscussionNotes(selectedExamReview.discussion);
-      setManager(selectedExamReview.manager);
+      setExamTypeAndQuestions(selectedExamReview.questionDetail);
+      // 추후 api값 추가되면 사용
+      // setDiscussionNotes(selectedExamReview.discussion);
+      // setManager(selectedExamReview.manager);
       setUploadTime(selectedExamReview.uploadTime);
-      setAuthor(selectedExamReview.author);
+      setAuthor(selectedExamReview.userDisplay);
     }
   }, [selectedExamReview]);
 
@@ -271,7 +276,8 @@ export default function ExamEditPanel({
                 <div className='px-2 py-1'>{author}</div>
               </td>
             </tr>
-            <tr>
+            {/* 추후 api값 추가되면 사용 */}
+            {/* <tr>
               <th className={TABLE_HEADER_STYLE}>기타 논의사항</th>
               <td
                 className={`border p-0 text-left text-[10px] font-medium ${
@@ -310,7 +316,7 @@ export default function ExamEditPanel({
                   </SelectContent>
                 </Select>
               </td>
-            </tr>
+            </tr> */}
           </tbody>
         </table>
       </div>
@@ -320,8 +326,8 @@ export default function ExamEditPanel({
           variant='secondary'
           size='sm'
           className='h-6 w-20 text-sm'
-          disabled={!discussionNotes}
-          onClick={() => setDiscussionNotes('')}
+          // disabled={!discussionNotes}
+          // onClick={() => setDiscussionNotes('')}
         >
           취소
         </Button>
@@ -329,7 +335,7 @@ export default function ExamEditPanel({
           variant='default'
           size='sm'
           className='h-6 w-20 bg-gray-700 text-sm'
-          disabled={!discussionNotes}
+          // disabled={!discussionNotes}
         >
           저장
         </Button>

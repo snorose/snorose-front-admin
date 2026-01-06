@@ -297,17 +297,17 @@ export const EXAM_REVIEW_LIST_DUMMY = [
 
 // 상태 리스트
 export const STATUS_COLOR = [
-  { id: 1, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-300' },
-  { id: 2, code: 'CONFIRMED', name: '확인완료', color: 'bg-blue-500' },
-  {
-    id: 3,
-    code: 'CONFIRMED_WITH_MODIFICATION',
-    name: '수정+확인완료',
-    color: 'bg-green-500',
-  },
-  { id: 4, code: 'NEED_DISCUSSION', name: '논의필요', color: 'bg-yellow-500' },
-  { id: 5, code: 'DELETED', name: '삭제된 족보', color: 'bg-red-500' },
-  { id: 6, code: 'PUNISHMENT', name: '징계', color: 'bg-gray-900' },
+  { id: 1, code: 'CONFIRMED', name: '확인완료', color: 'bg-blue-500' },
+  // {
+  //   id: 2,
+  //   code: 'CONFIRMED_WITH_MODIFICATION',
+  //   name: '수정+확인완료',
+  //   color: 'bg-green-500',
+  // },
+  // { id: 3, code: 'NEED_DISCUSSION', name: '논의필요', color: 'bg-yellow-500' },
+  // { id: 4, code: 'DELETED', name: '삭제된 족보', color: 'bg-red-500' },
+  // { id: 5, code: 'PUNISHMENT', name: '징계', color: 'bg-gray-900' },
+  { id: 6, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-300' },
 ];
 
 // 아이콘 정보 리스트
