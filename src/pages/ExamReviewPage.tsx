@@ -9,6 +9,12 @@ import type { ExamReview } from '@/components/exam/ExamTable';
 export default function ExamReviewPage() {
   const [selectedExamReview, setSelectedExamReview] =
     useState<ExamReview | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleSaveSuccess = () => {
+    // Table과 Panel을 새로고침하기 위해 refreshKey 증가
+    setRefreshKey((prev) => prev + 1);
+  };
 
   return (
     <div className='box-border w-full max-w-full'>
@@ -26,10 +32,17 @@ export default function ExamReviewPage() {
       </div>
 
       {/* 시험후기 테이블 */}
-      <ExamTable onRowSelect={setSelectedExamReview} />
+      <ExamTable
+        onRowSelect={setSelectedExamReview}
+        refreshKey={refreshKey}
+        selectedId={selectedExamReview?.id}
+      />
 
       {/* 시험후기 패널 - 편집, 삭제, 경고, 메모, 강등... */}
-      <ExamPanel selectedExamReview={selectedExamReview} />
+      <ExamPanel
+        selectedExamReview={selectedExamReview}
+        onSaveSuccess={handleSaveSuccess}
+      />
     </div>
   );
 }

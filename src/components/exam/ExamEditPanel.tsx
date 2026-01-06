@@ -14,6 +14,9 @@ import {
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
 } from '@/constants/exam-table-options';
+import { updateExamReview } from '@/apis/exam';
+import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 import type { ExamReview } from './ExamTable';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[10px]';
@@ -44,10 +47,12 @@ const StatusDot = ({ status }: { status: string }) => {
 
 interface ExamEditPanelProps {
   selectedExamReview?: ExamReview | null;
+  onSaveSuccess?: () => void;
 }
 
 export default function ExamEditPanel({
   selectedExamReview,
+  onSaveSuccess,
 }: ExamEditPanelProps = {}) {
   // 초기값 상수
   const INITIAL_VALUES = {
@@ -110,6 +115,106 @@ export default function ExamEditPanel({
   const getStatusName = (statusCode: string) => {
     const statusOption = STATUS_COLOR.find((s) => s.code === statusCode);
     return statusOption?.name || '확인';
+  };
+
+  // semester 문자열을 enum으로 변환: "2024-1" -> "FIRST", "2024-2" -> "SECOND" 등
+  const convertSemesterToEnum = (
+    semesterStr: string
+  ): 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER' => {
+    if (
+      semesterStr.includes('1') &&
+      !semesterStr.includes('여름') &&
+      !semesterStr.includes('겨울')
+    ) {
+      return 'FIRST';
+    }
+    if (
+      semesterStr.includes('2') &&
+      !semesterStr.includes('여름') &&
+      !semesterStr.includes('겨울')
+    ) {
+      return 'SECOND';
+    }
+    if (semesterStr.includes('여름')) {
+      return 'SUMMER';
+    }
+    if (semesterStr.includes('겨울')) {
+      return 'WINTER';
+    }
+    return 'OTHER';
+  };
+
+  // examType 문자열을 enum으로 변환: "중간고사" -> "MIDTERM", "기말고사" -> "FINALTERM"
+  const convertExamTypeToEnum = (
+    examTypeStr: string
+  ): 'MIDTERM' | 'FINALTERM' => {
+    if (examTypeStr === '중간고사') {
+      return 'MIDTERM';
+    }
+    return 'FINALTERM';
+  };
+
+  // 저장 핸들러
+  const handleSave = async () => {
+    if (!selectedExamReview) {
+      toast.error('선택된 시험 후기가 없습니다.');
+      return;
+    }
+
+    try {
+      // semester에서 연도 추출 (예: "2024-1" -> 2024)
+      const yearMatch = semester.match(/^(\d{4})/);
+      const lectureYear = yearMatch ? parseInt(yearMatch[1], 10) : undefined;
+
+      // semester enum 변환
+      const semesterEnum = convertSemesterToEnum(semester);
+
+      // examType enum 변환
+      const examTypeEnum = convertExamTypeToEnum(examType);
+
+      // status를 isConfirmed로 변환
+      const isConfirmed = status === 'CONFIRMED';
+
+      const response = await updateExamReview(selectedExamReview.id, {
+        post: {
+          lectureName,
+          professor: professorName,
+          lectureYear,
+          semester: semesterEnum,
+          isConfirmed,
+          examType: examTypeEnum,
+          questionDetail: examTypeAndQuestions,
+        },
+      });
+
+      if (response.isSuccess) {
+        toast.success('시험 후기가 성공적으로 수정되었습니다.');
+        onSaveSuccess?.();
+      } else {
+        toast.error(response.message || '시험 후기 수정에 실패했습니다.');
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        (isAxiosError(error) && error.response?.data?.message) ||
+        '시험 후기 수정에 실패했습니다.';
+      toast.error(errorMessage);
+    }
+  };
+
+  // 취소 핸들러
+  const handleCancel = () => {
+    if (selectedExamReview) {
+      // 원래 값으로 복원
+      setStatus(selectedExamReview.status);
+      setExamReviewName(selectedExamReview.reviewTitle);
+      setLectureName(selectedExamReview.courseName);
+      setProfessorName(selectedExamReview.professor);
+      setSemester(selectedExamReview.semester);
+      setExamType(selectedExamReview.examType);
+      setExamTypeAndQuestions(selectedExamReview.questionDetail);
+      setUploadTime(selectedExamReview.uploadTime);
+      setAuthor(selectedExamReview.userDisplay);
+    }
   };
 
   return (
@@ -326,8 +431,8 @@ export default function ExamEditPanel({
           variant='secondary'
           size='sm'
           className='h-6 w-20 text-sm'
-          // disabled={!discussionNotes}
-          // onClick={() => setDiscussionNotes('')}
+          onClick={handleCancel}
+          disabled={!selectedExamReview}
         >
           취소
         </Button>
@@ -335,7 +440,8 @@ export default function ExamEditPanel({
           variant='default'
           size='sm'
           className='h-6 w-20 bg-gray-700 text-sm'
-          // disabled={!discussionNotes}
+          onClick={handleSave}
+          disabled={!selectedExamReview}
         >
           저장
         </Button>

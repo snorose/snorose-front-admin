@@ -79,6 +79,8 @@ const transformApiResponseToExamReview = (
 interface ExamTableProps {
   data?: ExamReview[];
   onRowSelect?: (review: ExamReview | null) => void;
+  refreshKey?: number;
+  selectedId?: number | null;
 }
 
 // 상태 점 컴포넌트
@@ -240,6 +242,8 @@ const MultiSelect = ({
 export default function ExamTable({
   data: propData,
   onRowSelect,
+  refreshKey,
+  selectedId,
 }: ExamTableProps) {
   // API 데이터 상태 관리
   const [apiData, setApiData] = useState<ExamReview[]>([]);
@@ -437,6 +441,16 @@ export default function ExamTable({
         setApiData(transformedData);
         setHasNext(response.result.hasNext);
         // setTotalCount(transformedData.length); // 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제
+
+        // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
+        if (selectedId && onRowSelect) {
+          const updatedReview = transformedData.find(
+            (review: ExamReview) => review.id === selectedId
+          );
+          if (updatedReview) {
+            onRowSelect(updatedReview);
+          }
+        }
       } else {
         toast.error(
           response.message || '시험 후기 목록을 불러오는데 실패했습니다.'
@@ -458,12 +472,21 @@ export default function ExamTable({
     lectureYear,
     selectedSemester,
     selectedExamType,
+    onRowSelect,
+    selectedId,
   ]);
 
   // 초기 로드 및 필터/페이지 변경 시 재로드
   useEffect(() => {
     loadExamReviews();
   }, [loadExamReviews]);
+
+  // refreshKey가 변경되면 데이터 다시 로드
+  useEffect(() => {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      loadExamReviews();
+    }
+  }, [refreshKey, loadExamReviews]);
 
   // 선택된 필터 상태 디버깅
   useEffect(() => {

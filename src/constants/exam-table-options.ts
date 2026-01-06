@@ -310,26 +310,6 @@ export const STATUS_COLOR = [
   { id: 6, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-300' },
 ];
 
-// 아이콘 정보 리스트
-export const ICON_INFO_LIST = [
-  { id: 1, code: 'ASSIGN', name: '담당 리자 지정', icon: 'user' },
-  {
-    id: 2,
-    code: 'EDIT',
-    name: '편집',
-    icon: 'edit',
-  },
-  { id: 3, code: 'DISCUSSION', name: '논의필요', icon: 'discussion' },
-  { id: 4, code: 'PUNISHMENT', name: '징계', icon: 'punishment' },
-  { id: 5, code: 'DELETE', name: '단순 삭제', icon: 'delete' },
-  {
-    id: 6,
-    code: 'APPROVE',
-    name: '족보 확인 처리',
-    icon: 'check',
-  },
-];
-
 // 수강 학기
 export const SEMESTER_LIST = [
   '2025-1',

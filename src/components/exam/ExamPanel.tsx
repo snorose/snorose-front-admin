@@ -24,9 +24,13 @@ const TABS: { value: Tab; label: string }[] = [
 
 interface ExamPanelProps {
   selectedExamReview?: ExamReview | null;
+  onSaveSuccess?: () => void;
 }
 
-export default function ExamPanel({ selectedExamReview }: ExamPanelProps = {}) {
+export default function ExamPanel({
+  selectedExamReview,
+  onSaveSuccess,
+}: ExamPanelProps = {}) {
   const [activeTab, setActiveTab] = useState<Tab>('edit');
 
   const handleTabClick = (tab: Tab) => {
@@ -56,7 +60,10 @@ export default function ExamPanel({ selectedExamReview }: ExamPanelProps = {}) {
       {/* 테이블 영역 */}
       <div className='flex-1'>
         {activeTab === 'edit' && (
-          <ExamEditPanel selectedExamReview={selectedExamReview} />
+          <ExamEditPanel
+            selectedExamReview={selectedExamReview}
+            onSaveSuccess={onSaveSuccess}
+          />
         )}{' '}
         {/* 편집 */}
         {activeTab === 'discussion' && <ExamDiscussionPanel />} {/* 논의사항 */}
