@@ -15,13 +15,15 @@ import {
 } from '@/components/ui/select';
 import * as Popover from '@radix-ui/react-popover';
 import {
-  EXAM_REVIEW_LIST_DUMMY,
   STATUS_COLOR,
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
   MANAGER_LIST,
 } from '@/constants/exam-table-options';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { getExamReviews } from '@/apis/exam';
+import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 
 export interface ExamReview {
   id: number;
@@ -37,6 +39,56 @@ export interface ExamReview {
   discussion: string;
   manager: string;
 }
+
+// API 응답 타입
+interface ExamReviewApiResponse {
+  userDisplay: string;
+  isWriterWithdrawn: boolean;
+  postId: number;
+  title: string;
+  questionDetail: string;
+  isConfirmed: boolean;
+  commentCount: number;
+  scrapCount: number;
+  isScrapped: boolean;
+  createdAt: string;
+  isEdited: boolean;
+}
+
+// API 응답을 ExamReview로 변환하는 함수
+const transformApiResponseToExamReview = (
+  apiData: ExamReviewApiResponse
+): ExamReview => {
+  // title 파싱: "2023-1/기말/프로그래밍입문/이종우/001"
+  const titleParts = apiData.title.split('/');
+  const semester = titleParts[0] || '';
+  const examType = titleParts[1] || '';
+  const courseName = titleParts[2] || '';
+  const professor = titleParts[3] || '';
+  const reviewTitle = apiData.title;
+
+  // createdAt 포맷 변환: "2026-01-06T13:12:37.886Z" -> "2026-01-06 13:12"
+  const date = new Date(apiData.createdAt);
+  const uploadTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+  // isConfirmed를 status로 변환
+  const status = apiData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
+
+  return {
+    id: apiData.postId,
+    status,
+    reviewTitle,
+    courseName,
+    professor,
+    semester,
+    examType,
+    examFormat: '', // API 응답에 없음
+    uploadTime,
+    author: apiData.userDisplay,
+    discussion: apiData.questionDetail,
+    manager: '', // API 응답에 없음
+  };
+};
 
 interface ExamTableProps {
   data?: ExamReview[];
@@ -200,12 +252,28 @@ const MultiSelect = ({
 };
 
 export default function ExamTable({
-  data = EXAM_REVIEW_LIST_DUMMY,
+  data: propData,
   onRowSelect,
 }: ExamTableProps) {
+  // API 데이터 상태 관리
+  const [apiData, setApiData] = useState<ExamReview[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasNext, setHasNext] = useState(false);
+  // const [totalCount, setTotalCount] = useState(0);
+
   // 페이지네이션 설정
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
+
+  // 검색 및 필터 상태
+  const [searchKeyword] = useState<string>('');
+  const [lectureYear] = useState<number | undefined>();
+  const [selectedSemester, setSelectedSemester] = useState<
+    string | undefined
+  >();
+  const [selectedExamType, setSelectedExamType] = useState<
+    string | undefined
+  >();
 
   // 체크박스 상태 관리
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -245,11 +313,12 @@ export default function ExamTable({
     manager: MANAGER_LIST,
   });
 
+  // propData가 제공되면 사용, 없으면 API 데이터 사용
+  const data = propData || apiData;
+
   // 페이지네이션 계산
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentPageData = data.slice(startIndex, endIndex);
+  // API 기반이므로 현재 페이지 데이터는 이미 API에서 받아온 데이터
+  const currentPageData = data;
 
   // 페이지 변경 시 체크박스 선택 해제
   useEffect(() => {
@@ -315,7 +384,71 @@ export default function ExamTable({
       [filterType]: value,
     }));
     console.log(`Filter Type: ${filterType}, Selected Values:`, value);
+
+    // 필터 변경 시 API 파라미터 업데이트 (필터 변경 시 1페이지로 이동)
+    if (filterType === 'semester' && value.length === 1) {
+      setSelectedSemester(value[0]);
+      setCurrentPage(1);
+    } else if (filterType === 'semester' && value.length === 0) {
+      setSelectedSemester(undefined);
+      setCurrentPage(1);
+    }
+
+    if (filterType === 'examType' && value.length === 1) {
+      setSelectedExamType(value[0]);
+      setCurrentPage(1);
+    } else if (filterType === 'examType' && value.length === 0) {
+      setSelectedExamType(undefined);
+      setCurrentPage(1);
+    }
   };
+
+  // API 데이터 로드 함수
+  const loadExamReviews = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await getExamReviews({
+        page: currentPage - 1, // API는 0부터 시작
+        keyword: searchKeyword || undefined,
+        lectureYear,
+        semester: selectedSemester,
+        examType: selectedExamType,
+      });
+
+      if (response.isSuccess && response.result) {
+        const transformedData = response.result.data.map(
+          transformApiResponseToExamReview
+        );
+        setApiData(transformedData);
+        setHasNext(response.result.hasNext);
+        // setTotalCount(transformedData.length); // 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제
+      } else {
+        toast.error(
+          response.message || '시험 후기 목록을 불러오는데 실패했습니다.'
+        );
+        setApiData([]);
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        (isAxiosError(error) && error.response?.data?.message) ||
+        '시험 후기 목록을 불러오는데 실패했습니다.';
+      toast.error(errorMessage);
+      setApiData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    currentPage,
+    searchKeyword,
+    lectureYear,
+    selectedSemester,
+    selectedExamType,
+  ]);
+
+  // 초기 로드 및 필터/페이지 변경 시 재로드
+  useEffect(() => {
+    loadExamReviews();
+  }, [loadExamReviews]);
 
   // 선택된 필터 상태 디버깅
   useEffect(() => {
@@ -324,11 +457,11 @@ export default function ExamTable({
 
   return (
     <div className='overflow-visible'>
-      <Table className='rounded-lg bg-white shadow'>
+      <Table className='table-fixed rounded-lg bg-white shadow'>
         {/* Table Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow className='hover:bg-gray-100'>
-            <TableHead className='min-w-[40px] text-center'></TableHead>
+            <TableHead className='w-[70px] text-center'>id</TableHead>
             <MultiSelect
               value={headerFilters.status}
               onValueChange={(value) =>
@@ -340,12 +473,12 @@ export default function ExamTable({
               align='start'
               showStatusDot={true}
             >
-              <TableHead className='relative w-[60px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+              <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
                 상태 ▼
               </TableHead>
             </MultiSelect>
-            <TableHead className='min-w-[200px]'>시험후기명</TableHead>
-            <TableHead className='min-w-[120px]'>강의명</TableHead>
+            <TableHead className='w-[200px]'>시험후기명</TableHead>
+            <TableHead className='w-[120px]'>강의명</TableHead>
             <TableHead className='w-[60px]'>교수</TableHead>
             <MultiSelect
               value={headerFilters.semester}
@@ -357,7 +490,7 @@ export default function ExamTable({
               side='bottom'
               align='start'
             >
-              <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
                 수강학기 ▼
               </TableHead>
             </MultiSelect>
@@ -375,10 +508,10 @@ export default function ExamTable({
                 시험종류 ▼
               </TableHead>
             </MultiSelect>
-            <TableHead className='min-w-[150px]'>시험 유형 및 문항수</TableHead>
+            <TableHead className='w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[110px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
-            <TableHead className='min-w-[160px]'>기타 논의사항</TableHead>
+            <TableHead className='w-[160px]'>기타 논의사항</TableHead>
             <MultiSelect
               value={headerFilters.manager}
               onValueChange={(value) =>
@@ -394,7 +527,7 @@ export default function ExamTable({
               </TableHead>
             </MultiSelect>
             <TableHead
-              className='w-[20px] cursor-pointer text-center'
+              className='w-[40px] cursor-pointer text-center'
               onClick={() => {
                 const allCurrentPageSelected = currentPageData.every((review) =>
                   selectedItems.includes(review.id)
@@ -421,198 +554,251 @@ export default function ExamTable({
 
         {/* Table Body */}
         <TableBody>
-          {currentPageData.map((review, index) => {
-            const isRowActive =
-              openStatusSelect[review.id] ||
-              openManagerSelect[review.id] ||
-              clickedRow === review.id;
-            return (
-              <TableRow
-                key={review.id}
-                className={`hover:cursor-pointer [&_td]:h-[24px] ${
-                  isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
-                }`}
-                onClick={() => {
-                  setClickedRow(review.id);
-                  onRowSelect?.(review);
-                }}
+          {currentPageData.length === 0 && !isLoading ? (
+            <TableRow>
+              <TableCell
+                colSpan={13}
+                className='py-8 text-center text-gray-500'
               >
-                <TableCell className='text-center text-gray-600'>
-                  {startIndex + index + 1}
-                </TableCell>
-                <TableCell className='relative cursor-pointer p-0 text-center'>
-                  <Select
-                    value={selectedStatus[review.id] || review.status}
-                    onValueChange={(value) => {
-                      const statusOption = STATUS_COLOR.find(
-                        (s) => s.code === value
-                      );
-                      if (statusOption) {
-                        handleStatusSelect(
-                          review.id,
-                          statusOption.code,
-                          statusOption.name
-                        );
-                      }
-                      setOpenStatusSelect((prev) => ({
-                        ...prev,
-                        [review.id]: false,
-                      }));
-                    }}
-                    open={openStatusSelect[review.id] || false}
-                    onOpenChange={(open) =>
-                      setOpenStatusSelect((prev) => ({
-                        ...prev,
-                        [review.id]: open,
-                      }))
-                    }
-                  >
-                    <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent [&>svg]:!hidden'>
-                      <SelectValue className='!flex !items-center !justify-center'>
-                        <StatusDot
-                          status={selectedStatus[review.id] || review.status}
-                        />
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent
-                      align='start'
-                      className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
-                    >
-                      {STATUS_COLOR.map((statusOption) => (
-                        <SelectItem
-                          key={statusOption.id}
-                          value={statusOption.code}
-                          className='text-[12px] font-medium'
-                        >
-                          <div className='flex items-center gap-2'>
-                            <div
-                              className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                            />
-                            <span>{statusOption.name}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <div
-                    className='max-w-[200px] truncate'
-                    title={review.reviewTitle}
-                  >
-                    {review.reviewTitle}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div
-                    className='max-w-[120px] truncate'
-                    title={review.courseName}
-                  >
-                    {review.courseName}
-                  </div>
-                </TableCell>
-                <TableCell>{review.professor}</TableCell>
-                <TableCell>{review.semester}</TableCell>
-                <TableCell>{review.examType}</TableCell>
-                <TableCell>
-                  <div
-                    className='max-w-[150px] truncate'
-                    title={review.examFormat}
-                  >
-                    {review.examFormat}
-                  </div>
-                </TableCell>
-                <TableCell className='text-gray-600'>
-                  {review.uploadTime}
-                </TableCell>
-                <TableCell>{review.author}</TableCell>
-                <TableCell>
-                  <div
-                    className='max-w-[60px] truncate'
-                    title={review.discussion}
-                  >
-                    {review.discussion}
-                  </div>
-                </TableCell>
-                <TableCell className='relative cursor-pointer overflow-hidden text-center'>
-                  <Select
-                    value={selectedManager[review.id] || review.manager}
-                    onValueChange={(value) => {
-                      handleManagerSelect(review.id, value);
-                      setOpenManagerSelect((prev) => ({
-                        ...prev,
-                        [review.id]: false,
-                      }));
-                    }}
-                    open={openManagerSelect[review.id] || false}
-                    onOpenChange={(open) =>
-                      setOpenManagerSelect((prev) => ({
-                        ...prev,
-                        [review.id]: open,
-                      }))
-                    }
-                  >
-                    <SelectTrigger className='!h-full !w-full !justify-center !border-0 !bg-transparent !p-0 !text-[11px] !font-medium !shadow-none !ring-0 !outline-none focus:!ring-0 focus:!ring-offset-0 focus-visible:!border-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 [&>svg]:!hidden'>
-                      <SelectValue className='!truncate !text-center !text-[10px] !text-inherit [&>span]:!truncate [&>span]:!text-center [&>span]:!text-[10px] [&>span]:!font-normal [&>span]:!text-inherit' />
-                    </SelectTrigger>
-                    <SelectContent
-                      align='start'
-                      className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
-                    >
-                      {MANAGER_LIST.map((manager) => (
-                        <SelectItem
-                          key={manager}
-                          value={manager}
-                          className='text-[10px]'
-                        >
-                          {manager}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell
-                  className='max-w-[20px] cursor-pointer text-center'
-                  onClick={() =>
-                    handleSelectItem(
-                      review.id,
-                      !selectedItems.includes(review.id)
-                    )
-                  }
+                데이터가 없습니다.
+              </TableCell>
+            </TableRow>
+          ) : (
+            currentPageData.map((review) => {
+              const isRowActive =
+                openStatusSelect[review.id] ||
+                openManagerSelect[review.id] ||
+                clickedRow === review.id;
+              return (
+                <TableRow
+                  key={review.id}
+                  className={`hover:cursor-pointer [&_td]:h-[24px] ${
+                    isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
+                  }`}
+                  onClick={() => {
+                    setClickedRow(review.id);
+                    onRowSelect?.(review);
+                  }}
                 >
-                  <div className='flex h-full items-center justify-center'>
-                    <input
-                      type='checkbox'
-                      checked={selectedItems.includes(review.id)}
-                      onChange={(e) =>
-                        handleSelectItem(review.id, e.target.checked)
-                      }
-                      className='pointer-events-none relative h-4 w-4 appearance-none rounded border-2 border-gray-300 bg-white checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-xs checked:before:text-white checked:before:content-["✓"] focus:ring-2 focus:ring-blue-200'
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-          {/* 빈 행 추가하여 항상 15개 행 표시 */}
+                  <TableCell className='w-[70px] text-center text-gray-600'>
+                    {review.id}
+                  </TableCell>
+                  <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
+                    <Select
+                      value={selectedStatus[review.id] || review.status}
+                      onValueChange={(value) => {
+                        const statusOption = STATUS_COLOR.find(
+                          (s) => s.code === value
+                        );
+                        if (statusOption) {
+                          handleStatusSelect(
+                            review.id,
+                            statusOption.code,
+                            statusOption.name
+                          );
+                        }
+                        setOpenStatusSelect((prev) => ({
+                          ...prev,
+                          [review.id]: false,
+                        }));
+                        // 포커스 제거
+                        setTimeout(() => {
+                          const activeElement =
+                            document.activeElement as HTMLElement;
+                          if (activeElement) {
+                            activeElement.blur();
+                          }
+                        }, 0);
+                      }}
+                      open={openStatusSelect[review.id] || false}
+                      onOpenChange={(open) => {
+                        setOpenStatusSelect((prev) => ({
+                          ...prev,
+                          [review.id]: open,
+                        }));
+                        if (!open) {
+                          // 닫힐 때 포커스 제거
+                          setTimeout(() => {
+                            const activeElement =
+                              document.activeElement as HTMLElement;
+                            if (activeElement) {
+                              activeElement.blur();
+                            }
+                          }, 0);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
+                        <SelectValue className='!flex !items-center !justify-center'>
+                          <StatusDot
+                            status={selectedStatus[review.id] || review.status}
+                          />
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+                      >
+                        {STATUS_COLOR.map((statusOption) => (
+                          <SelectItem
+                            key={statusOption.id}
+                            value={statusOption.code}
+                            className='text-[12px] font-medium'
+                          >
+                            <div className='flex items-center gap-2'>
+                              <div
+                                className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
+                              />
+                              <span>{statusOption.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className='w-[200px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.reviewTitle}>
+                      {review.reviewTitle}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[120px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.courseName}>
+                      {review.courseName}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[60px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.professor}>
+                      {review.professor}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[84px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.semester}>
+                      {review.semester}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[60px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.examType}>
+                      {review.examType}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[150px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.examFormat}>
+                      {review.examFormat}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[110px] overflow-hidden text-gray-600'>
+                    <div className='w-full truncate' title={review.uploadTime}>
+                      {review.uploadTime}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[80px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.author}>
+                      {review.author}
+                    </div>
+                  </TableCell>
+                  <TableCell className='w-[160px] overflow-hidden'>
+                    <div className='w-full truncate' title={review.discussion}>
+                      {review.discussion}
+                    </div>
+                  </TableCell>
+                  <TableCell className='relative w-[70px] cursor-pointer overflow-hidden text-center'>
+                    <Select
+                      value={selectedManager[review.id] || review.manager}
+                      onValueChange={(value) => {
+                        handleManagerSelect(review.id, value);
+                        setOpenManagerSelect((prev) => ({
+                          ...prev,
+                          [review.id]: false,
+                        }));
+                        // 포커스 제거
+                        setTimeout(() => {
+                          const activeElement =
+                            document.activeElement as HTMLElement;
+                          if (activeElement) {
+                            activeElement.blur();
+                          }
+                        }, 0);
+                      }}
+                      open={openManagerSelect[review.id] || false}
+                      onOpenChange={(open) => {
+                        setOpenManagerSelect((prev) => ({
+                          ...prev,
+                          [review.id]: open,
+                        }));
+                        if (!open) {
+                          // 닫힐 때 포커스 제거
+                          setTimeout(() => {
+                            const activeElement =
+                              document.activeElement as HTMLElement;
+                            if (activeElement) {
+                              activeElement.blur();
+                            }
+                          }, 0);
+                        }
+                      }}
+                    >
+                      <SelectTrigger className='!h-full !w-full !justify-center !border-0 !bg-transparent !p-0 !text-[11px] !font-medium !shadow-none !ring-0 !outline-none focus:!ring-0 focus:!ring-offset-0 focus:!outline-none focus-visible:!border-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
+                        <SelectValue className='!truncate !text-center !text-[10px] !text-inherit [&>span]:!truncate [&>span]:!text-center [&>span]:!text-[10px] [&>span]:!font-normal [&>span]:!text-inherit' />
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+                      >
+                        {MANAGER_LIST.map((manager) => (
+                          <SelectItem
+                            key={manager}
+                            value={manager}
+                            className='text-[10px]'
+                          >
+                            {manager}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell
+                    className='w-[20px] cursor-pointer text-center'
+                    onClick={() =>
+                      handleSelectItem(
+                        review.id,
+                        !selectedItems.includes(review.id)
+                      )
+                    }
+                  >
+                    <div className='flex h-full items-center justify-center'>
+                      <input
+                        type='checkbox'
+                        checked={selectedItems.includes(review.id)}
+                        onChange={(e) =>
+                          handleSelectItem(review.id, e.target.checked)
+                        }
+                        className='pointer-events-none relative h-4 w-4 appearance-none rounded border-2 border-gray-300 bg-white checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-xs checked:before:text-white checked:before:content-["✓"] focus:ring-2 focus:ring-blue-200'
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
+          )}
+          {/* 빈 행 추가하여 항상 10개 행 표시 */}
           {Array.from({ length: ITEMS_PER_PAGE - currentPageData.length }).map(
             (_, index) => (
               <TableRow key={`empty-${index}`} className='[&_td]:h-[24px]'>
-                <TableCell className='text-center text-gray-600'>
+                <TableCell className='w-[70px] text-center text-gray-600'>
                   &nbsp;
                 </TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
-                <TableCell>&nbsp;</TableCell>
+                <TableCell className='w-[50px]'>&nbsp;</TableCell>
+                <TableCell className='w-[200px]'>&nbsp;</TableCell>
+                <TableCell className='w-[120px]'>&nbsp;</TableCell>
+                <TableCell className='w-[60px]'>&nbsp;</TableCell>
+                <TableCell className='w-[84px]'>&nbsp;</TableCell>
+                <TableCell className='w-[60px]'>&nbsp;</TableCell>
+                <TableCell className='w-[150px]'>&nbsp;</TableCell>
+                <TableCell className='w-[110px]'>&nbsp;</TableCell>
+                <TableCell className='w-[80px]'>&nbsp;</TableCell>
+                <TableCell className='w-[160px]'>&nbsp;</TableCell>
+                <TableCell className='w-[70px]'>&nbsp;</TableCell>
+                <TableCell className='w-[20px]'>&nbsp;</TableCell>
               </TableRow>
             )
           )}
@@ -620,48 +806,60 @@ export default function ExamTable({
       </Table>
 
       {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className='relative flex flex-col items-center gap-3 px-4 py-4'>
-          <div className='flex items-center gap-2'>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className='rounded bg-gray-100 px-3 py-1 text-xs text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
-            >
-              이전
-            </button>
-            <div className='flex items-center gap-1'>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+      <div className='relative flex flex-col items-center gap-3 px-4 py-4'>
+        <div className='flex items-center gap-2'>
+          <button
+            onClick={() => {
+              const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+              const prevRangeStart = Math.max(1, startPage - 10);
+              setCurrentPage(prevRangeStart);
+            }}
+            disabled={currentPage <= 10 || isLoading}
+            className='rounded bg-gray-100 px-3 py-1 text-xs text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
+          >
+            이전
+          </button>
+          <div className='flex items-center gap-1'>
+            {(() => {
+              const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+              return Array.from({ length: 10 }, (_, i) => startPage + i).map(
                 (page) => (
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
+                    disabled={isLoading}
                     className={`rounded px-3 py-1 text-xs ${
                       currentPage === page
-                        ? 'bg-gray-300 text-gray-900'
+                        ? 'bg-gray-600 text-white'
                         : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                    }`}
+                    } disabled:cursor-not-allowed disabled:opacity-50`}
                   >
                     {page}
                   </button>
                 )
-              )}
-            </div>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-              }
-              disabled={currentPage === totalPages}
-              className='rounded bg-gray-100 px-3 py-1 text-xs text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
-            >
-              다음
-            </button>
+              );
+            })()}
           </div>
-          <div className='absolute right-0 text-xs text-gray-600'>
-            {startIndex + 1}-{Math.min(endIndex, data.length)} / {data.length}개
-          </div>
+          <button
+            onClick={() => {
+              const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+              const nextRangeStart = startPage + 10;
+              setCurrentPage(nextRangeStart);
+            }}
+            disabled={!hasNext || isLoading}
+            className='rounded bg-gray-100 px-3 py-1 text-xs text-gray-800 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
+          >
+            다음
+          </button>
         </div>
-      )}
+        {/* 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제 */}
+        {/* <div className='absolute right-0 text-xs text-gray-600'>
+            {data.length > 0
+              ? `${(currentPage - 1) * ITEMS_PER_PAGE + 1}-${(currentPage - 1) * ITEMS_PER_PAGE + data.length}`
+              : '0'}{' '}
+            / 총 {totalCount}개
+          </div> */}
+      </div>
     </div>
   );
 }
