@@ -21,6 +21,7 @@ import {
   getFreezingPointsAPI,
   postFreezingPointAPI,
   patchFreezingPointAPI,
+  deleteFreezingPointAPI,
 } from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
@@ -57,13 +58,19 @@ export default function FreezingPointPage() {
     }
   };
 
-  const handleDeleteConfirm = () => {
-    if (selectedItem) {
-      setFreezingPoints(
-        freezingPoints.filter((item) => item.id !== selectedItem.id)
-      );
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteFreezingPointAPI(selectedItem?.id as number);
+      toast.success('미지급 일정 삭제가 완료되었어요.');
       setIsDeleteModalOpen(false);
       setSelectedItem(null);
+      setFreezingPoints(
+        freezingPoints.filter((item) => item.id !== selectedItem?.id)
+      );
+    } catch (error: unknown) {
+      const errorMessage =
+        error?.response?.data?.message || '미지급 일정 삭제에 실패했습니다.';
+      toast.error(errorMessage);
     }
   };
 
