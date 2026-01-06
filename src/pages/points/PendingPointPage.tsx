@@ -9,6 +9,12 @@ import {
   TableRow,
   TableHead,
   TableCell,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui';
 import { useState, useEffect } from 'react';
 import { getPendingPointsAPI } from '@/apis';
@@ -31,6 +37,31 @@ export default function PendingPointPage() {
     startDate: '',
     endDate: '',
   });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<PendingPoint | null>(null);
+
+  const handleDeleteScheduleClick = (id: number) => {
+    const deletedItem = pendingPoints.find((item) => item.id === id);
+    if (deletedItem) {
+      setSelectedItem(deletedItem);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedItem) {
+      setPendingPoints(
+        pendingPoints.filter((item) => item.id !== selectedItem.id)
+      );
+      setIsDeleteModalOpen(false);
+      setSelectedItem(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedItem(null);
+  };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, title: e.target.value });
@@ -140,27 +171,75 @@ export default function PendingPointPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pendingPoints.map(
-                ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
-                  <TableRow key={id}>
-                    <TableCell className='text-center'>{id}</TableCell>
-                    <TableCell className='text-center'>{title}</TableCell>
-                    <TableCell className='text-center'>{startAt}</TableCell>
-                    <TableCell className='text-center'>{endAt}</TableCell>
-                    <TableCell className='text-center'>{createdAt}</TableCell>
-                    <TableCell className='text-center'>{updatedAt}</TableCell>
-                    <TableCell className='items-center justify-center align-middle'>
-                      {endAt > new Date().toISOString() && (
-                        <Trash2 className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800' />
-                      )}
-                    </TableCell>
-                  </TableRow>
+              {pendingPoints.length > 0 ? (
+                pendingPoints.map(
+                  ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
+                    <TableRow key={id}>
+                      <TableCell className='text-center'>{id}</TableCell>
+                      <TableCell className='text-center'>{title}</TableCell>
+                      <TableCell className='text-center'>{startAt}</TableCell>
+                      <TableCell className='text-center'>{endAt}</TableCell>
+                      <TableCell className='text-center'>{createdAt}</TableCell>
+                      <TableCell className='text-center'>{updatedAt}</TableCell>
+                      <TableCell className='items-center justify-center align-middle'>
+                        <Trash2
+                          className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
+                          onClick={() => handleDeleteScheduleClick(id)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
                 )
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className='text-center'>
+                    미지급 일정이 없습니다.
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
         </article>
       </section>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className='max-w-xs sm:max-w-sm'>
+          <DialogHeader>
+            <DialogTitle>일정 삭제</DialogTitle>
+            <DialogDescription>
+              아래 내용으로 포인트 미지급 일정을 삭제하시겠습니까?
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex flex-col gap-3'>
+            <ul className='ml-4 list-outside list-disc'>
+              <li>
+                <span className='text-sm font-semibold'>일정 제목: </span>
+                <span className='text-sm'>{selectedItem?.title}</span>
+              </li>
+              <li>
+                <span className='text-sm font-semibold'>시작 일시: </span>
+                <span className='text-sm'>{selectedItem?.startAt}</span>
+              </li>
+              <li>
+                <span className='text-sm font-semibold'>종료 일시: </span>
+                <span className='text-sm'>{selectedItem?.endAt}</span>
+              </li>
+            </ul>
+          </div>
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => handleDeleteCancel()}
+            >
+              취소
+            </Button>
+            <Button type='button' onClick={handleDeleteConfirm}>
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
