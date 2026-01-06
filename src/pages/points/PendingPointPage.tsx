@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from 'react';
 import { getPendingPointsAPI } from '@/apis';
 import { toast } from 'sonner';
+import { Trash2 } from 'lucide-react';
 
 interface PendingPoint {
   id: number;
@@ -135,6 +136,7 @@ export default function PendingPointPage() {
                 <TableHead className='text-center'>종료 일시</TableHead>
                 <TableHead className='text-center'>생성 일시</TableHead>
                 <TableHead className='text-center'>수정 일시</TableHead>
+                <TableHead className='text-center'>삭제</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -147,6 +149,11 @@ export default function PendingPointPage() {
                     <TableCell className='text-center'>{endAt}</TableCell>
                     <TableCell className='text-center'>{createdAt}</TableCell>
                     <TableCell className='text-center'>{updatedAt}</TableCell>
+                    <TableCell className='items-center justify-center align-middle'>
+                      {endAt > new Date().toISOString() && (
+                        <Trash2 className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800' />
+                      )}
+                    </TableCell>
                   </TableRow>
                 )
               )}
