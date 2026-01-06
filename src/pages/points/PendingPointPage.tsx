@@ -1,8 +1,30 @@
 import { PageHeader } from '@/components';
-import { Label, Input, Button } from '@/components/ui';
-import { useState } from 'react';
+import {
+  Label,
+  Input,
+  Button,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui';
+import { useState, useEffect } from 'react';
+import { getPendingPointsAPI } from '@/apis';
+import { toast } from 'sonner';
+
+interface PendingPoint {
+  id: number;
+  title: string;
+  startAt: string;
+  endAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function PendingPointPage() {
+  const [pendingPoints, setPendingPoints] = useState<PendingPoint[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     startDate: '',
@@ -21,6 +43,19 @@ export default function PendingPointPage() {
     setFormData({ ...formData, endDate: e.target.value });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getPendingPointsAPI();
+        setPendingPoints(data.result as PendingPoint[]);
+      } catch {
+        toast.error('미지급 일정 조회에 실패했습니다.');
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
@@ -28,7 +63,7 @@ export default function PendingPointPage() {
         description='포인트 미지급 일정을 생성, 조회, 수정, 삭제할 수 있어요.'
       />
 
-      <section className='flex gap-4'>
+      <section className='flex flex-col gap-4'>
         <article className='flex w-full flex-col gap-1'>
           <h3 className='text-lg font-bold'>일정 생성</h3>
           <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
@@ -39,7 +74,7 @@ export default function PendingPointPage() {
               <Input
                 type='text'
                 id='title'
-                placeholder='예: 2026년 1학기 중간고사'
+                placeholder='예: 2026-1학기 중간고사'
                 value={formData.title}
                 onChange={handleTitleChange}
               />
@@ -91,6 +126,32 @@ export default function PendingPointPage() {
 
         <article className='flex w-full flex-col gap-1'>
           <h3 className='text-lg font-bold'>일정 조회</h3>
+          <Table className='w-full'>
+            <TableHeader>
+              <TableRow className='text-center'>
+                <TableHead className='text-center'>ID</TableHead>
+                <TableHead className='text-center'>미지급 일정 제목</TableHead>
+                <TableHead className='text-center'>시작 일시</TableHead>
+                <TableHead className='text-center'>종료 일시</TableHead>
+                <TableHead className='text-center'>생성 일시</TableHead>
+                <TableHead className='text-center'>수정 일시</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pendingPoints.map(
+                ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
+                  <TableRow key={id}>
+                    <TableCell className='text-center'>{id}</TableCell>
+                    <TableCell className='text-center'>{title}</TableCell>
+                    <TableCell className='text-center'>{startAt}</TableCell>
+                    <TableCell className='text-center'>{endAt}</TableCell>
+                    <TableCell className='text-center'>{createdAt}</TableCell>
+                    <TableCell className='text-center'>{updatedAt}</TableCell>
+                  </TableRow>
+                )
+              )}
+            </TableBody>
+          </Table>
         </article>
       </section>
     </div>

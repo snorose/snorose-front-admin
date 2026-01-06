@@ -88,3 +88,11 @@ export {
   DialogPortal,
   DialogOverlay,
 } from './dialog';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from './table';
