@@ -7,8 +7,11 @@ export interface AdjustSinglePoint {
   memo?: string;
 }
 
-export interface FreezingPoint {
+export interface PointFreeze {
+  id: number;
   title: string;
   startAt: string;
   endAt: string;
+  createdAt: string;
+  updatedAt: string;
 }

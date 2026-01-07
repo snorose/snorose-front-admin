@@ -18,25 +18,17 @@ import {
 } from '@/components/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  getFreezingPointsAPI,
-  postFreezingPointAPI,
-  patchFreezingPointAPI,
-  deleteFreezingPointAPI,
+  getPointFreezesAPI,
+  postPointFreezeAPI,
+  patchPointFreezeAPI,
+  deletePointFreezeAPI,
 } from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
+import type { PointFreeze } from '@/types';
 
-interface FreezingPoint {
-  id: number;
-  title: string;
-  startAt: string;
-  endAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export default function FreezingPointPage() {
-  const [freezingPoints, setFreezingPoints] = useState<FreezingPoint[]>([]);
+export default function PointFreezePage() {
+  const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     startAt: '',
@@ -48,10 +40,10 @@ export default function FreezingPointPage() {
     endAt: '',
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<FreezingPoint | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PointFreeze | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const handleDeleteScheduleClick = (id: number) => {
-    const deletedItem = freezingPoints.find((item) => item.id === id);
+    const deletedItem = pointFreezes.find((item) => item.id === id);
     if (deletedItem) {
       setSelectedItem(deletedItem);
       setIsDeleteModalOpen(true);
@@ -60,14 +52,14 @@ export default function FreezingPointPage() {
 
   const isFetchingRef = useRef(false);
 
-  const getFreezingPoints = useCallback(async () => {
+  const getPointFreezes = useCallback(async () => {
     if (isFetchingRef.current) return;
 
     isFetchingRef.current = true;
 
     try {
-      const data = await getFreezingPointsAPI();
-      setFreezingPoints(data.result as FreezingPoint[]);
+      const data = await getPointFreezesAPI();
+      setPointFreezes(data.result as PointFreeze[]);
     } catch {
       toast.error('미지급 일정 조회에 실패했습니다.');
     } finally {
@@ -77,11 +69,11 @@ export default function FreezingPointPage() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await deleteFreezingPointAPI(selectedItem?.id as number);
+      await deletePointFreezeAPI(selectedItem?.id as number);
       toast.success('미지급 일정 삭제가 완료되었어요.');
       setIsDeleteModalOpen(false);
       setSelectedItem(null);
-      await getFreezingPoints();
+      await getPointFreezes();
     } catch (error: unknown) {
       const errorMessage =
         error?.response?.data?.message || '미지급 일정 삭제에 실패했습니다.';
@@ -124,7 +116,7 @@ export default function FreezingPointPage() {
 
   const handleUpdateScheduleButtonClick = (id: number) => {
     setIsUpdateModalOpen(true);
-    const updatedItem = freezingPoints.find((item) => item.id === id);
+    const updatedItem = pointFreezes.find((item) => item.id === id);
 
     if (updatedItem) {
       setSelectedItem(updatedItem);
@@ -152,14 +144,14 @@ export default function FreezingPointPage() {
     };
 
     try {
-      await patchFreezingPointAPI(selectedItem?.id as number, {
+      await patchPointFreezeAPI(selectedItem?.id as number, {
         title: updateFormData.title,
         startAt: formatDateTime(updateFormData.startAt),
         endAt: formatDateTime(updateFormData.endAt),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       handleUpdateCancel();
-      await getFreezingPoints();
+      await getPointFreezes();
     } catch (error: unknown) {
       const errorMessage =
         error?.response?.data?.message || '미지급 일정 수정에 실패했습니다.';
@@ -189,14 +181,14 @@ export default function FreezingPointPage() {
       return dateTimeString.replace('T', ' ') + ':00';
     };
     try {
-      await postFreezingPointAPI({
+      await postPointFreezeAPI({
         title: formData.title,
         startAt: formatDateTime(formData.startAt),
         endAt: formatDateTime(formData.endAt),
       });
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
-      await getFreezingPoints();
+      await getPointFreezes();
     } catch (error: unknown) {
       const errorMessage =
         error?.response?.data?.message || '미지급 일정 생성에 실패했습니다.';
@@ -205,7 +197,7 @@ export default function FreezingPointPage() {
   };
 
   useEffect(() => {
-    getFreezingPoints();
+    getPointFreezes();
   }, []);
 
   return (
@@ -294,8 +286,8 @@ export default function FreezingPointPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {freezingPoints.length > 0 ? (
-                freezingPoints.map(
+              {pointFreezes.length > 0 ? (
+                pointFreezes.map(
                   ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
                     <TableRow key={id}>
                       <TableCell className='text-center'>{id}</TableCell>

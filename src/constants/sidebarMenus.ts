@@ -66,7 +66,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       },
       {
         title: '미지급 일정 관리',
-        url: '/points/freezing',
+        url: '/points/freeze',
       },
     ],
   },

@@ -6,7 +6,7 @@ export const postSinglePointAPI = async (data: AdjustSinglePoint) => {
   return response.data;
 };
 
-export const postFreezingPointAPI = async (data: FreezingPoint) => {
+export const postPointFreezeAPI = async (data: FreezingPoint) => {
   const response = await axiosInstance.post(
     '/v1/admin/points/point-freeze',
     data
@@ -14,15 +14,12 @@ export const postFreezingPointAPI = async (data: FreezingPoint) => {
   return response.data;
 };
 
-export const getFreezingPointsAPI = async () => {
+export const getPointFreezesAPI = async () => {
   const response = await axiosInstance.get('/v1/admin/points/point-freeze');
   return response.data;
 };
 
-export const patchFreezingPointAPI = async (
-  id: number,
-  data: FreezingPoint
-) => {
+export const patchPointFreezeAPI = async (id: number, data: FreezingPoint) => {
   const response = await axiosInstance.patch(
     `/v1/admin/points/point-freeze/${id}`,
     data
@@ -30,7 +27,7 @@ export const patchFreezingPointAPI = async (
   return response.data;
 };
 
-export const deleteFreezingPointAPI = async (id: number) => {
+export const deletePointFreezeAPI = async (id: number) => {
   const response = await axiosInstance.delete(
     `/v1/admin/points/point-freeze/${id}`
   );
