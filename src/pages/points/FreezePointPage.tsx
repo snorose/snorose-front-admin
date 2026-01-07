@@ -58,15 +58,22 @@ export default function FreezingPointPage() {
     }
   };
 
+  const getFreezingPoints = async () => {
+    try {
+      const data = await getFreezingPointsAPI();
+      setFreezingPoints(data.result as FreezingPoint[]);
+    } catch {
+      toast.error('미지급 일정 조회에 실패했습니다.');
+    }
+  };
+
   const handleDeleteConfirm = async () => {
     try {
       await deleteFreezingPointAPI(selectedItem?.id as number);
       toast.success('미지급 일정 삭제가 완료되었어요.');
       setIsDeleteModalOpen(false);
       setSelectedItem(null);
-      setFreezingPoints(
-        freezingPoints.filter((item) => item.id !== selectedItem?.id)
-      );
+      await getFreezingPoints();
     } catch (error: unknown) {
       const errorMessage =
         error?.response?.data?.message || '미지급 일정 삭제에 실패했습니다.';
@@ -144,6 +151,7 @@ export default function FreezingPointPage() {
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       handleUpdateCancel();
+      await getFreezingPoints();
     } catch (error: unknown) {
       const errorMessage =
         error?.response?.data?.message || '미지급 일정 수정에 실패했습니다.';
@@ -180,6 +188,7 @@ export default function FreezingPointPage() {
       });
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
+      await getFreezingPoints();
     } catch (error: unknown) {
       const errorMessage =
         error?.response?.data?.message || '미지급 일정 생성에 실패했습니다.';
@@ -188,16 +197,7 @@ export default function FreezingPointPage() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getFreezingPointsAPI();
-        setFreezingPoints(data.result as FreezingPoint[]);
-      } catch {
-        toast.error('미지급 일정 조회에 실패했습니다.');
-      }
-    };
-
-    fetchData();
+    getFreezingPoints();
   }, []);
 
   return (
