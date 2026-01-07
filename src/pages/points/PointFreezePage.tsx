@@ -5,7 +5,7 @@ import { getPointFreezesAPI, postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
 import { PointFreezeListSection } from '@/domains/Points';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
 
 export default function PointFreezePage() {
   const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);
@@ -32,16 +32,14 @@ export default function PointFreezePage() {
     }
   }, []);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, title: e.target.value });
-  };
-
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, startAt: e.target.value });
-  };
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, endAt: e.target.value });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    if (id in formData) {
+      setFormData((prev) => ({
+        ...prev,
+        [id]: value,
+      }));
+    }
   };
 
   const handleResetButtonClick = () => {
@@ -62,14 +60,11 @@ export default function PointFreezePage() {
       return;
     }
 
-    const formatDateTime = (dateTimeString: string) => {
-      return dateTimeString.replace('T', ' ') + ':00';
-    };
     try {
       await postPointFreezeAPI({
         title: formData.title,
-        startAt: formatDateTime(formData.startAt),
-        endAt: formatDateTime(formData.endAt),
+        startAt: formatDateTimeForAPI(formData.startAt),
+        endAt: formatDateTimeForAPI(formData.endAt),
       });
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
@@ -103,30 +98,30 @@ export default function PointFreezePage() {
                 id='title'
                 placeholder='예: 2026-1학기 중간고사'
                 value={formData.title}
-                onChange={handleTitleChange}
+                onChange={handleInputChange}
               />
             </div>
             <div className='flex gap-1'>
               <div className='flex w-1/2 flex-col gap-1'>
-                <Label htmlFor='startDate' required>
+                <Label htmlFor='startAt' required>
                   시작 일시
                 </Label>
                 <Input
                   type='datetime-local'
-                  id='startDate'
+                  id='startAt'
                   value={formData.startAt}
-                  onChange={handleStartDateChange}
+                  onChange={handleInputChange}
                 />
               </div>
               <div className='flex w-1/2 flex-col gap-1'>
-                <Label htmlFor='endDate' required>
+                <Label htmlFor='endAt' required>
                   종료 일시
                 </Label>
                 <Input
                   type='datetime-local'
-                  id='endDate'
+                  id='endAt'
                   value={formData.endAt}
-                  onChange={handleEndDateChange}
+                  onChange={handleInputChange}
                 />
               </div>
             </div>
