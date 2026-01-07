@@ -6,9 +6,9 @@ export default function ExamIconInfo() {
       <ul>
         {/* 상태 리스트 */}
         {STATUS_COLOR.map((status) => (
-          <li key={status.id} className='text-[8px] font-medium text-gray-800'>
+          <li key={status.id} className='text-[12px] font-medium text-gray-800'>
             <span
-              className={`inline-block h-2 w-2 rounded-full ${status.color} mr-2 align-middle`}
+              className={`inline-block h-3 w-3 rounded-full ${status.color} mr-2 align-middle`}
             />
             {status.name}
           </li>

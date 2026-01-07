@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import {
   ExamEditPanel,
-  ExamDiscussionPanel,
-  ExamWarningPanel,
-  ExamDeletePanel,
-  ExamDegradePanel,
+  // ExamDiscussionPanel,
+  // ExamWarningPanel,
+  // ExamDeletePanel,
+  // ExamDegradePanel,
 } from './index';
 import type { ExamReview } from './ExamTable';
+import type { ExamReviewDetailResult } from '@/apis/exam';
 
 type Tab = 'edit' | 'warning' | 'delete' | 'demotion' | 'discussion';
 
@@ -24,12 +25,16 @@ const TABS: { value: Tab; label: string }[] = [
 
 interface ExamPanelProps {
   selectedExamReview?: ExamReview | null;
+  selectedExamReviewDetail?: ExamReviewDetailResult | null;
+  isLoadingDetail?: boolean;
   onSaveSuccess?: () => void;
   onDeleteSuccess?: () => void;
 }
 
 export default function ExamPanel({
   selectedExamReview,
+  selectedExamReviewDetail,
+  isLoadingDetail,
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamPanelProps = {}) {
@@ -61,18 +66,24 @@ export default function ExamPanel({
 
       {/* 테이블 영역 */}
       <div className='flex-1'>
+        {/* 편집 */}
         {activeTab === 'edit' && (
           <ExamEditPanel
             selectedExamReview={selectedExamReview}
+            selectedExamReviewDetail={selectedExamReviewDetail}
+            isLoadingDetail={isLoadingDetail}
             onSaveSuccess={onSaveSuccess}
             onDeleteSuccess={onDeleteSuccess}
           />
         )}{' '}
-        {/* 편집 */}
-        {activeTab === 'discussion' && <ExamDiscussionPanel />} {/* 논의사항 */}
-        {activeTab === 'delete' && <ExamDeletePanel />} {/* 삭제 */}
-        {activeTab === 'warning' && <ExamWarningPanel />} {/* 경고 */}
-        {activeTab === 'demotion' && <ExamDegradePanel />} {/* 강등 */}
+        {/* 논의사항 */}
+        {/* {activeTab === 'discussion' && <ExamDiscussionPanel />} */}
+        {/* 삭제 */}
+        {/* {activeTab === 'delete' && <ExamDeletePanel />} */}
+        {/* 경고 */}
+        {/* {activeTab === 'warning' && <ExamWarningPanel />} */}
+        {/* 강등 */}
+        {/* {activeTab === 'demotion' && <ExamDegradePanel />}  */}
       </div>
     </div>
   );

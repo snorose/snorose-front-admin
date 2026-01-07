@@ -71,6 +71,46 @@ export interface DeleteExamReviewResponse {
   };
 }
 
+export interface ExamReviewDetailResult {
+  userId: string;
+  userDisplay: string;
+  isWriter: boolean;
+  isWriterWithdrawn: boolean;
+  postId: number;
+  title: string;
+  commentCount: number;
+  scrapCount: number;
+  isScrapped: boolean;
+  createdAt: string;
+  isNotice: boolean;
+  isEdited: boolean;
+  lectureName: string;
+  professor: string;
+  classNumber: number;
+  lectureYear: number;
+  semester: 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER';
+  lectureType:
+    | 'MAJOR_REQUIRED'
+    | 'MAJOR_ELECTIVE'
+    | 'GENERAL_REQUIRED'
+    | 'GENERAL_ELECTIVE'
+    | 'OTHER';
+  isPF: boolean;
+  isOnline: boolean;
+  examType: 'MIDTERM' | 'FINALTERM';
+  isConfirmed: boolean;
+  fileName: string;
+  questionDetail: string;
+  isDownloaded: boolean;
+}
+
+export interface ExamReviewDetailResponse {
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  result: ExamReviewDetailResult;
+}
+
 // api 함수
 export const getExamReviews = async (params: {
   page: number;
@@ -107,14 +147,16 @@ export const updateExamReview = async (
     formData.append('file', data.file);
   }
 
-  // post 객체를 JSON 문자열로 변환하여 추가
-  // API 스펙에 따라 JSON 문자열로 직접 전송
   formData.append('post', JSON.stringify(data.post));
 
-  // FormData를 사용하면 request interceptor에서 자동으로 Content-Type이 제거됨
   const response = await axiosInstance.patch(
     `/v1/admin/reviews/${postId}`,
-    formData
+    formData,
+    {
+      headers: {
+        'Content-Type': false,
+      },
+    }
   );
   return response.data;
 };
@@ -123,5 +165,25 @@ export const deleteExamReview = async (
   postId: number
 ): Promise<DeleteExamReviewResponse> => {
   const response = await axiosInstance.delete(`/v1/admin/reviews/${postId}`);
+  return response.data;
+};
+
+export const getExamReviewDetail = async (
+  postId: number
+): Promise<ExamReviewDetailResponse> => {
+  const response = await axiosInstance.get(`/v1/reviews/${postId}`);
+  return response.data;
+};
+
+export const downloadExamReviewFile = async (
+  postId: number,
+  fileName: string
+): Promise<Blob> => {
+  const response = await axiosInstance.get(
+    `/v1/reviews/files/${postId}/download/${fileName}`,
+    {
+      responseType: 'blob',
+    }
+  );
   return response.data;
 };

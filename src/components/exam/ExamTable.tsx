@@ -18,7 +18,6 @@ import {
   STATUS_COLOR,
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
-  MANAGER_LIST,
 } from '@/constants/exam-table-options';
 import { useState, useEffect, useCallback } from 'react';
 import { getExamReviews, confirmExamReview } from '@/apis/exam';
@@ -34,11 +33,10 @@ export interface ExamReview {
   professor: string;
   semester: string;
   examType: string;
+  classNumber: string;
   questionDetail: string;
   uploadTime: string;
   userDisplay: string;
-  discussion: string;
-  manager: string;
 }
 
 // API 응답을 ExamReview로 변환하는 함수
@@ -51,6 +49,7 @@ const transformApiResponseToExamReview = (
   const examType = titleParts[1] || '';
   const courseName = titleParts[2] || '';
   const professor = titleParts[3] || '';
+  const classNumber = titleParts[4] || '';
   const reviewTitle = apiData.title;
 
   // createdAt 포맷 변환: "2026-01-06T13:12:37.886Z" -> "2026-01-06 13:12"
@@ -68,11 +67,10 @@ const transformApiResponseToExamReview = (
     professor,
     semester,
     examType,
+    classNumber,
     questionDetail: apiData.questionDetail,
     uploadTime,
     userDisplay: apiData.userDisplay,
-    discussion: '', // 추후 api에 추가
-    manager: '', // 추후 api에 추가
   };
 };
 
@@ -249,7 +247,6 @@ export default function ExamTable({
   const [apiData, setApiData] = useState<ExamReview[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(false);
-  // const [totalCount, setTotalCount] = useState(0); // 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제
 
   // 페이지네이션 설정
   const ITEMS_PER_PAGE = 10;
@@ -274,16 +271,6 @@ export default function ExamTable({
   const [openStatusSelect, setOpenStatusSelect] = useState<{
     [key: number]: boolean;
   }>({});
-
-  // 추후 기능 생기면 사용
-  // const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  // const [selectedManager, setSelectedManager] = useState<{
-  //   [key: number]: string;
-  // }>({});
-  // const [openManagerSelect, setOpenManagerSelect] = useState<{
-  //   [key: number]: boolean;
-  // }>({});
-
   // 상태 리스트 생성
   const STATUS_LIST = STATUS_COLOR.map((status) => status.name);
 
@@ -292,12 +279,10 @@ export default function ExamTable({
     status: string[];
     semester: string[];
     examType: string[];
-    manager: string[];
   }>({
     status: STATUS_LIST,
     semester: SEMESTER_LIST,
     examType: EXAM_TYPE_LIST,
-    manager: MANAGER_LIST,
   });
 
   // propData가 제공되면 사용, 없으면 API 데이터 사용
@@ -306,37 +291,6 @@ export default function ExamTable({
   // 페이지네이션 계산
   // API 기반이므로 현재 페이지 데이터는 이미 API에서 받아온 데이터
   const currentPageData = data;
-
-  // 추후 기능 생기면 사용
-  // // 페이지 변경 시 체크박스 선택 해제
-  // useEffect(() => {
-  //   setSelectedItems([]);
-  // }, [currentPage]);
-
-  // // 전체 선택/해제 함수 (현재 페이지의 데이터만)
-  // const handleSelectAll = (checked: boolean) => {
-  //   if (checked) {
-  //     setSelectedItems((prev) => [
-  //       ...prev,
-  //       ...currentPageData
-  //         .map((review) => review.id)
-  //         .filter((id) => !prev.includes(id)),
-  //     ]);
-  //   } else {
-  //     setSelectedItems((prev) =>
-  //       prev.filter((id) => !currentPageData.some((review) => review.id === id))
-  //     );
-  //   }
-  // };
-
-  // // 개별 아이템 선택/해제 함수
-  // const handleSelectItem = (id: number, checked: boolean) => {
-  //   if (checked) {
-  //     setSelectedItems((prev) => [...prev, id]);
-  //   } else {
-  //     setSelectedItems((prev) => prev.filter((itemId) => itemId !== id));
-  //   }
-  // };
 
   // 상태 선택 함수
   const handleStatusSelect = async (
@@ -437,7 +391,6 @@ export default function ExamTable({
         );
         setApiData(transformedData);
         setHasNext(response.result.hasNext);
-        // setTotalCount(transformedData.length); // 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제
       } else {
         toast.error(
           response.message || '시험 후기 목록을 불러오는데 실패했습니다.'
@@ -543,110 +496,76 @@ export default function ExamTable({
                 시험종류 ▼
               </TableHead>
             </MultiSelect>
+            <TableHead className='w-[60px]'>분반</TableHead>
             <TableHead className='w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[110px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
-            {/* 추후 api값 추가되면 사용 */}
-            {/* <TableHead className='w-[160px]'>기타 논의사항</TableHead>
-            <MultiSelect
-              value={headerFilters.manager}
-              onValueChange={(value) =>
-                handleHeaderFilterSelect('manager', value)
-              }
-              options={MANAGER_LIST}
-              contentClassName='w-32'
-              side='left'
-              align='start'
-            >
-              <TableHead className='relative w-[70px] cursor-pointer overflow-hidden hover:bg-gray-200'>
-                담당리자 ▼
-              </TableHead>
-            </MultiSelect> */}
-            {/* 추후 기능 생기면 사용 */}
-            {/* <TableHead
-              className='w-[40px] cursor-pointer text-center'
-              onClick={() => {
-                const allCurrentPageSelected = currentPageData.every((review) =>
-                  selectedItems.includes(review.id)
-                );
-                handleSelectAll(!allCurrentPageSelected);
-              }}
-            >
-              <div className='flex h-full items-center justify-center'>
-                <input
-                  type='checkbox'
-                  checked={
-                    currentPageData.length > 0 &&
-                    currentPageData.every((review) =>
-                      selectedItems.includes(review.id)
-                    )
-                  }
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className='pointer-events-none relative h-4 w-4 appearance-none rounded border-2 border-gray-300 bg-white checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-xs checked:before:text-white checked:before:content-["✓"] focus:ring-2 focus:ring-blue-200'
-                />
-              </div>
-            </TableHead> */}
           </TableRow>
         </TableHeader>
 
         {/* Table Body */}
         <TableBody>
-          {currentPageData.length === 0 && !isLoading ? (
-            <TableRow>
-              <TableCell
-                colSpan={10}
-                className='py-8 text-center text-gray-500'
+          {currentPageData.map((review) => {
+            // Select가 열린 행이 있는지 확인
+            const hasOpenSelect = Object.values(openStatusSelect).some(Boolean);
+            // Select가 열린 행이 있으면 그 행만 active, 없으면 selectedId와 일치하는 행만 active
+            const isRowActive = hasOpenSelect
+              ? openStatusSelect[review.id]
+              : selectedId === review.id;
+            return (
+              <TableRow
+                key={review.id}
+                className={`hover:cursor-pointer [&_td]:h-[24px] ${
+                  isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // 토글 방식: 선택된 행을 다시 클릭하면 해제, 다른 행 클릭하면 선택
+                  if (selectedId === review.id) {
+                    onRowSelect?.(null);
+                  } else {
+                    onRowSelect?.(review);
+                  }
+                }}
               >
-                데이터가 없습니다.
-              </TableCell>
-            </TableRow>
-          ) : (
-            currentPageData.map((review) => {
-              // Select가 열린 행이 있는지 확인
-              const hasOpenSelect =
-                Object.values(openStatusSelect).some(Boolean);
-              // Select가 열린 행이 있으면 그 행만 active, 없으면 selectedId와 일치하는 행만 active
-              const isRowActive = hasOpenSelect
-                ? openStatusSelect[review.id]
-                : selectedId === review.id;
-              return (
-                <TableRow
-                  key={review.id}
-                  className={`hover:cursor-pointer [&_td]:h-[24px] ${
-                    isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // 토글 방식: 선택된 행을 다시 클릭하면 해제, 다른 행 클릭하면 선택
-                    if (selectedId === review.id) {
-                      onRowSelect?.(null);
-                    } else {
-                      onRowSelect?.(review);
-                    }
-                  }}
-                >
-                  <TableCell className='w-[70px] text-center text-gray-600'>
-                    {review.id}
-                  </TableCell>
-                  <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
-                    <Select
-                      value={selectedStatus[review.id] || review.status}
-                      onValueChange={async (value) => {
-                        const statusOption = STATUS_COLOR.find(
-                          (s) => s.code === value
+                <TableCell className='w-[70px] text-center text-gray-600'>
+                  {review.id}
+                </TableCell>
+                <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
+                  <Select
+                    value={selectedStatus[review.id] || review.status}
+                    onValueChange={async (value) => {
+                      const statusOption = STATUS_COLOR.find(
+                        (s) => s.code === value
+                      );
+                      if (statusOption) {
+                        await handleStatusSelect(
+                          review.id,
+                          statusOption.code,
+                          statusOption.name
                         );
-                        if (statusOption) {
-                          await handleStatusSelect(
-                            review.id,
-                            statusOption.code,
-                            statusOption.name
-                          );
+                      }
+                      setOpenStatusSelect((prev) => ({
+                        ...prev,
+                        [review.id]: false,
+                      }));
+                      // 포커스 제거
+                      setTimeout(() => {
+                        const activeElement =
+                          document.activeElement as HTMLElement;
+                        if (activeElement) {
+                          activeElement.blur();
                         }
-                        setOpenStatusSelect((prev) => ({
-                          ...prev,
-                          [review.id]: false,
-                        }));
-                        // 포커스 제거
+                      }, 0);
+                    }}
+                    open={openStatusSelect[review.id] || false}
+                    onOpenChange={(open) => {
+                      setOpenStatusSelect((prev) => ({
+                        ...prev,
+                        [review.id]: open,
+                      }));
+                      if (!open) {
+                        // 닫힐 때 포커스 제거
                         setTimeout(() => {
                           const activeElement =
                             document.activeElement as HTMLElement;
@@ -654,182 +573,88 @@ export default function ExamTable({
                             activeElement.blur();
                           }
                         }, 0);
-                      }}
-                      open={openStatusSelect[review.id] || false}
-                      onOpenChange={(open) => {
-                        setOpenStatusSelect((prev) => ({
-                          ...prev,
-                          [review.id]: open,
-                        }));
-                        if (!open) {
-                          // 닫힐 때 포커스 제거
-                          setTimeout(() => {
-                            const activeElement =
-                              document.activeElement as HTMLElement;
-                            if (activeElement) {
-                              activeElement.blur();
-                            }
-                          }, 0);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
-                        <SelectValue className='!flex !items-center !justify-center'>
-                          <StatusDot
-                            status={selectedStatus[review.id] || review.status}
-                          />
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
-                        align='start'
-                        className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
-                      >
-                        {STATUS_COLOR.map((statusOption) => (
-                          <SelectItem
-                            key={statusOption.id}
-                            value={statusOption.code}
-                            className='text-[12px] font-medium'
-                          >
-                            <div className='flex items-center gap-2'>
-                              <div
-                                className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                              />
-                              <span>{statusOption.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className='w-[200px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.reviewTitle}>
-                      {review.reviewTitle}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[120px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.courseName}>
-                      {review.courseName}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[60px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.professor}>
-                      {review.professor}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[84px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.semester}>
-                      {review.semester}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[60px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.examType}>
-                      {review.examType}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[150px] overflow-hidden'>
-                    <div
-                      className='w-full truncate'
-                      title={review.questionDetail}
-                    >
-                      {review.questionDetail}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[110px] overflow-hidden text-gray-600'>
-                    <div className='w-full truncate' title={review.uploadTime}>
-                      {review.uploadTime}
-                    </div>
-                  </TableCell>
-                  <TableCell className='w-[80px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.userDisplay}>
-                      {review.userDisplay}
-                    </div>
-                  </TableCell>
-                  {/* 추후 api값 추가되면 사용 */}
-                  {/* <TableCell className='w-[160px] overflow-hidden'>
-                    <div className='w-full truncate' title={review.discussion}>
-                      {review.discussion}
-                    </div>
-                  </TableCell>
-                  <TableCell className='relative w-[70px] cursor-pointer overflow-hidden text-center'>
-                    <Select
-                      value={selectedManager[review.id] || review.manager}
-                      onValueChange={(value) => {
-                        handleManagerSelect(review.id, value);
-                        setOpenManagerSelect((prev) => ({
-                          ...prev,
-                          [review.id]: false,
-                        }));
-                        // 포커스 제거
-                        setTimeout(() => {
-                          const activeElement =
-                            document.activeElement as HTMLElement;
-                          if (activeElement) {
-                            activeElement.blur();
-                          }
-                        }, 0);
-                      }}
-                      open={openManagerSelect[review.id] || false}
-                      onOpenChange={(open) => {
-                        setOpenManagerSelect((prev) => ({
-                          ...prev,
-                          [review.id]: open,
-                        }));
-                        if (!open) {
-                          // 닫힐 때 포커스 제거
-                          setTimeout(() => {
-                            const activeElement =
-                              document.activeElement as HTMLElement;
-                            if (activeElement) {
-                              activeElement.blur();
-                            }
-                          }, 0);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className='!h-full !w-full !justify-center !border-0 !bg-transparent !p-0 !text-[11px] !font-medium !shadow-none !ring-0 !outline-none focus:!ring-0 focus:!ring-offset-0 focus:!outline-none focus-visible:!border-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
-                        <SelectValue className='!truncate !text-center !text-[10px] !text-inherit [&>span]:!truncate [&>span]:!text-center [&>span]:!text-[10px] [&>span]:!font-normal [&>span]:!text-inherit' />
-                      </SelectTrigger>
-                      <SelectContent
-                        align='start'
-                        className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
-                      >
-                        {MANAGER_LIST.map((manager) => (
-                          <SelectItem
-                            key={manager}
-                            value={manager}
-                            className='text-[10px]'
-                          >
-                            {manager}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell> */}
-                  {/* 추후 기능 생기면 사용 */}
-                  {/* <TableCell
-                    className='w-[20px] cursor-pointer text-center'
-                    onClick={() =>
-                      handleSelectItem(
-                        review.id,
-                        !selectedItems.includes(review.id)
-                      )
-                    }
+                      }
+                    }}
                   >
-                    <div className='flex h-full items-center justify-center'>
-                      <input
-                        type='checkbox'
-                        checked={selectedItems.includes(review.id)}
-                        onChange={(e) =>
-                          handleSelectItem(review.id, e.target.checked)
-                        }
-                        className='pointer-events-none relative h-4 w-4 appearance-none rounded border-2 border-gray-300 bg-white checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-xs checked:before:text-white checked:before:content-["✓"] focus:ring-2 focus:ring-blue-200'
-                      />
-                    </div>
-                  </TableCell> */}
-                </TableRow>
-              );
-            })
-          )}
+                    <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
+                      <SelectValue className='!flex !items-center !justify-center'>
+                        <StatusDot
+                          status={selectedStatus[review.id] || review.status}
+                        />
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent
+                      align='start'
+                      className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+                    >
+                      {STATUS_COLOR.map((statusOption) => (
+                        <SelectItem
+                          key={statusOption.id}
+                          value={statusOption.code}
+                          className='text-[12px] font-medium'
+                        >
+                          <div className='flex items-center gap-2'>
+                            <div
+                              className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
+                            />
+                            <span>{statusOption.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell className='w-[200px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.reviewTitle}>
+                    {review.reviewTitle}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[120px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.courseName}>
+                    {review.courseName}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[60px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.professor}>
+                    {review.professor}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[84px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.semester}>
+                    {review.semester}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[60px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.examType}>
+                    {review.examType}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[60px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.classNumber}>
+                    {review.classNumber}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[150px] overflow-hidden'>
+                  <div
+                    className='w-full truncate'
+                    title={review.questionDetail}
+                  >
+                    {review.questionDetail}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[110px] overflow-hidden text-gray-600'>
+                  <div className='w-full truncate' title={review.uploadTime}>
+                    {review.uploadTime}
+                  </div>
+                </TableCell>
+                <TableCell className='w-[80px] overflow-hidden'>
+                  <div className='w-full truncate' title={review.userDisplay}>
+                    {review.userDisplay}
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
           {/* 빈 행 추가하여 항상 10개 행 표시 */}
           {Array.from({ length: ITEMS_PER_PAGE - currentPageData.length }).map(
             (_, index) => (
@@ -843,14 +668,10 @@ export default function ExamTable({
                 <TableCell className='w-[60px]'>&nbsp;</TableCell>
                 <TableCell className='w-[84px]'>&nbsp;</TableCell>
                 <TableCell className='w-[60px]'>&nbsp;</TableCell>
+                <TableCell className='w-[60px]'>&nbsp;</TableCell>
                 <TableCell className='w-[150px]'>&nbsp;</TableCell>
                 <TableCell className='w-[110px]'>&nbsp;</TableCell>
                 <TableCell className='w-[80px]'>&nbsp;</TableCell>
-                {/* 추후 api값 추가되면 사용 */}
-                {/* <TableCell className='w-[160px]'>&nbsp;</TableCell>
-                <TableCell className='w-[70px]'>&nbsp;</TableCell> */}
-                {/* 추후 기능 생기면 사용 */}
-                {/* <TableCell className='w-[20px]'>&nbsp;</TableCell> */}
               </TableRow>
             )
           )}
@@ -896,13 +717,6 @@ export default function ExamTable({
             다음
           </button>
         </div>
-        {/* 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제 */}
-        {/* <div className='absolute right-0 text-xs text-gray-600'>
-            {data.length > 0
-              ? `${(currentPage - 1) * ITEMS_PER_PAGE + 1}-${(currentPage - 1) * ITEMS_PER_PAGE + data.length}`
-              : '0'}{' '}
-            / 총 {totalCount}개
-          </div> */}
       </div>
     </div>
   );
