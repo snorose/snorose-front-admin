@@ -38,7 +38,7 @@ export default function MemberInfoSection({
   return (
     <article className='flex flex-col gap-1'>
       <h3 className='text-lg font-bold'>회원 정보 상세</h3>
-      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4'>
+      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
         {MEMBER_INFO.map(({ label, id, value }) => (
           <div className='flex flex-col gap-1' key={id}>
             <Label htmlFor={id} required>

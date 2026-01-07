@@ -50,10 +50,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     ],
   },
   {
-    title: '포인트 지급/차감',
+    title: '포인트 관리',
     items: [
       {
-        title: '단일 지급',
+        title: '단일건 증감',
         url: '/points/single',
       },
       // {
@@ -61,8 +61,12 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       //   url: '/points/multiple',
       // },
       {
-        title: '정회원 전체',
+        title: '정회원 전체 증감',
         url: '/points/all',
+      },
+      {
+        title: '미지급 일정 관리',
+        url: '/points/freeze',
       },
     ],
   },
