@@ -48,20 +48,12 @@ export default function PointFreezeUpdateConfirmModal({
     }
   }, [selectedItem, isUpdateModalOpen]);
 
-  const handleTitleUpdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUpdateFormData({ ...updateFormData, title: e.target.value });
-  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
 
-  const handleStartDateUpdateChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setUpdateFormData({ ...updateFormData, startAt: e.target.value });
-  };
-
-  const handleEndDateUpdateChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setUpdateFormData({ ...updateFormData, endAt: e.target.value });
+    if (id in updateFormData) {
+      setUpdateFormData((prev) => ({ ...prev, [id]: value }));
+    }
   };
 
   const handleUpdateConfirm = async () => {
@@ -104,25 +96,25 @@ export default function PointFreezeUpdateConfirmModal({
             type='text'
             id='title'
             value={updateFormData.title}
-            onChange={handleTitleUpdateChange}
+            onChange={handleInputChange}
           />
         </div>
         <div className='flex flex-col gap-1'>
           <Label className='text-sm font-semibold'>시작 일시: </Label>
           <Input
             type='datetime-local'
-            id='startDate'
+            id='startAt'
             value={updateFormData.startAt}
-            onChange={handleStartDateUpdateChange}
+            onChange={handleInputChange}
           />
         </div>
         <div className='flex flex-col gap-1'>
           <Label className='text-sm font-semibold'>종료 일시: </Label>
           <Input
             type='datetime-local'
-            id='endDate'
+            id='endAt'
             value={updateFormData.endAt}
-            onChange={handleEndDateUpdateChange}
+            onChange={handleInputChange}
           />
         </div>
         <DialogFooter>
