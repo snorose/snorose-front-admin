@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   getFreezingPointsAPI,
   postFreezingPointAPI,
@@ -58,14 +58,22 @@ export default function FreezingPointPage() {
     }
   };
 
-  const getFreezingPoints = async () => {
+  const isFetchingRef = useRef(false);
+
+  const getFreezingPoints = useCallback(async () => {
+    if (isFetchingRef.current) return;
+
+    isFetchingRef.current = true;
+
     try {
       const data = await getFreezingPointsAPI();
       setFreezingPoints(data.result as FreezingPoint[]);
     } catch {
       toast.error('미지급 일정 조회에 실패했습니다.');
+    } finally {
+      isFetchingRef.current = false;
     }
-  };
+  }, []);
 
   const handleDeleteConfirm = async () => {
     try {
