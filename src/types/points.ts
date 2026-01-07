@@ -7,23 +7,17 @@ export interface AdjustSinglePoint {
   memo?: string;
 }
 
-export interface PointFreeze {
-  id: number;
+export interface PointFreezeBase {
   title: string;
   startAt: string;
   endAt: string;
+}
+
+export interface PointFreeze extends PointFreezeBase {
+  id: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface CreatePointFreeze {
-  title: string;
-  startAt: string;
-  endAt: string;
-}
-
-export interface UpdatePointFreeze {
-  title: string;
-  startAt: string;
-  endAt: string;
-}
+export type CreatePointFreeze = PointFreezeBase;
+export type UpdatePointFreeze = PointFreezeBase;
