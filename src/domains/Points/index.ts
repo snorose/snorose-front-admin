@@ -3,3 +3,4 @@ export { default as MemberInfoSection } from './components/MemberInfoSection';
 export { default as PointDetailSection } from './components/PointDetailSection';
 export { default as PointActionButtons } from './components/PointActionButtons';
 export { default as PointFreezeDeleteConfirmModal } from './components/PointFreezeDeleteConfirmModal';
+export { default as PointFreezeUpdateConfirmModal } from './components/PointFreezeUpdateConfirmModal';

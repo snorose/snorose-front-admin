@@ -9,33 +9,24 @@ import {
   TableRow,
   TableHead,
   TableCell,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
 } from '@/components/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   getPointFreezesAPI,
   postPointFreezeAPI,
-  patchPointFreezeAPI,
   deletePointFreezeAPI,
 } from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
 import type { PointFreeze } from '@/types';
-import { PointFreezeDeleteConfirmModal } from '@/domains/Points';
+import {
+  PointFreezeDeleteConfirmModal,
+  PointFreezeUpdateConfirmModal,
+} from '@/domains/Points';
 
 export default function PointFreezePage() {
   const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);
   const [formData, setFormData] = useState({
-    title: '',
-    startAt: '',
-    endAt: '',
-  });
-  const [updateFormData, setUpdateFormData] = useState({
     title: '',
     startAt: '',
     endAt: '',
@@ -99,67 +90,6 @@ export default function PointFreezePage() {
     setFormData({ ...formData, endAt: e.target.value });
   };
 
-  const handleTitleUpdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUpdateFormData({ ...updateFormData, title: e.target.value });
-  };
-
-  const handleStartDateUpdateChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setUpdateFormData({ ...updateFormData, startAt: e.target.value });
-  };
-
-  const handleEndDateUpdateChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setUpdateFormData({ ...updateFormData, endAt: e.target.value });
-  };
-
-  const handleUpdateScheduleButtonClick = (id: number) => {
-    setIsUpdateModalOpen(true);
-    const updatedItem = pointFreezes.find((item) => item.id === id);
-
-    if (updatedItem) {
-      setSelectedItem(updatedItem);
-
-      const formatDateTime = (dateTimeString: string) => {
-        return dateTimeString.replace(' ', 'T').slice(0, 16);
-      };
-
-      setUpdateFormData({
-        ...updatedItem,
-        startAt: formatDateTime(updatedItem.startAt),
-        endAt: formatDateTime(updatedItem.endAt),
-      });
-    }
-  };
-
-  const handleUpdateCancel = () => {
-    setIsUpdateModalOpen(false);
-    setSelectedItem(null);
-  };
-
-  const handleUpdateConfirm = async () => {
-    const formatDateTime = (dateTimeString: string) => {
-      return dateTimeString.replace('T', ' ') + ':00';
-    };
-
-    try {
-      await patchPointFreezeAPI(selectedItem?.id as number, {
-        title: updateFormData.title,
-        startAt: formatDateTime(updateFormData.startAt),
-        endAt: formatDateTime(updateFormData.endAt),
-      });
-      toast.success('미지급 일정 수정이 완료되었어요.');
-      handleUpdateCancel();
-      await getPointFreezes();
-    } catch (error: unknown) {
-      const errorMessage =
-        error?.response?.data?.message || '미지급 일정 수정에 실패했습니다.';
-      toast.error(errorMessage);
-    }
-  };
-
   const handleResetButtonClick = () => {
     setFormData({
       title: '',
@@ -197,9 +127,17 @@ export default function PointFreezePage() {
     }
   };
 
+  const handleUpdateScheduleButtonClick = (id: number) => {
+    const updatedItem = pointFreezes.find((item) => item.id === id);
+    if (updatedItem) {
+      setSelectedItem(updatedItem);
+      setIsUpdateModalOpen(true);
+    }
+  };
+
   useEffect(() => {
     getPointFreezes();
-  }, []);
+  }, [getPointFreezes]);
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -331,55 +269,15 @@ export default function PointFreezePage() {
         handleDeleteCancel={handleDeleteCancel}
       />
 
-      <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
-        <DialogContent className='max-w-xs sm:max-w-sm'>
-          <DialogHeader>
-            <DialogTitle>일정 수정</DialogTitle>
-            <DialogDescription>
-              포인트 미지급 일정을 수정하시겠습니까?
-            </DialogDescription>
-          </DialogHeader>
-          <div className='flex flex-col gap-1'>
-            <Label className='text-sm font-semibold'>일정 제목: </Label>
-            <Input
-              type='text'
-              id='title'
-              value={updateFormData.title}
-              onChange={handleTitleUpdateChange}
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label className='text-sm font-semibold'>시작 일시: </Label>
-            <Input
-              type='datetime-local'
-              id='startDate'
-              value={updateFormData.startAt}
-              onChange={handleStartDateUpdateChange}
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label className='text-sm font-semibold'>종료 일시: </Label>
-            <Input
-              type='datetime-local'
-              id='endDate'
-              value={updateFormData.endAt}
-              onChange={handleEndDateUpdateChange}
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => handleUpdateCancel()}
-            >
-              취소
-            </Button>
-            <Button type='button' onClick={() => handleUpdateConfirm()}>
-              수정
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PointFreezeUpdateConfirmModal
+        isUpdateModalOpen={isUpdateModalOpen}
+        selectedItem={selectedItem as PointFreeze}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedItem(null);
+        }}
+        onSuccess={() => getPointFreezes()}
+      />
     </div>
   );
 }
