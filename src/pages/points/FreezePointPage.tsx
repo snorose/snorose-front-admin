@@ -336,11 +336,11 @@ export default function FreezingPointPage() {
           <DialogHeader>
             <DialogTitle>일정 삭제</DialogTitle>
             <DialogDescription>
-              아래 내용으로 포인트 미지급 일정을 삭제하시겠습니까?
+              포인트 미지급 일정을 삭제하시겠습니까?
             </DialogDescription>
           </DialogHeader>
           <div className='flex flex-col gap-3'>
-            <ul className='ml-4 list-outside list-disc'>
+            <ul className='ml-4 flex list-outside list-disc flex-col gap-1'>
               <li>
                 <span className='text-sm font-semibold'>일정 제목: </span>
                 <span className='text-sm'>{selectedItem?.title}</span>
@@ -375,10 +375,10 @@ export default function FreezingPointPage() {
           <DialogHeader>
             <DialogTitle>일정 수정</DialogTitle>
             <DialogDescription>
-              아래 내용으로 포인트 미지급 일정을 수정하시겠습니까?
+              포인트 미지급 일정을 수정하시겠습니까?
             </DialogDescription>
           </DialogHeader>
-          <div className='flex flex-col gap-3'>
+          <div className='flex flex-col gap-1'>
             <Label className='text-sm font-semibold'>일정 제목: </Label>
             <Input
               type='text'
@@ -386,6 +386,8 @@ export default function FreezingPointPage() {
               value={updateFormData.title}
               onChange={handleTitleUpdateChange}
             />
+          </div>
+          <div className='flex flex-col gap-1'>
             <Label className='text-sm font-semibold'>시작 일시: </Label>
             <Input
               type='datetime-local'
@@ -394,7 +396,7 @@ export default function FreezingPointPage() {
               onChange={handleStartDateUpdateChange}
             />
           </div>
-          <div className='flex flex-col gap-3'>
+          <div className='flex flex-col gap-1'>
             <Label className='text-sm font-semibold'>종료 일시: </Label>
             <Input
               type='datetime-local'
