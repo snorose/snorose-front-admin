@@ -105,8 +105,6 @@ export default function PointFreezeListSection({
         selectedItem={selectedItem as PointFreeze}
         onSuccess={() => {
           getPointFreezes();
-          setIsDeleteModalOpen(false);
-          setSelectedItem(null);
         }}
         onClose={() => {
           setIsDeleteModalOpen(false);
@@ -119,8 +117,6 @@ export default function PointFreezeListSection({
         selectedItem={selectedItem as PointFreeze}
         onSuccess={() => {
           getPointFreezes();
-          setIsUpdateModalOpen(false);
-          setSelectedItem(null);
         }}
         onClose={() => {
           setIsUpdateModalOpen(false);
