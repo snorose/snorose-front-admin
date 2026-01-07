@@ -100,29 +100,33 @@ export default function PointFreezeListSection({
         </Table>
       </article>
 
-      <PointFreezeDeleteConfirmModal
-        isDeleteModalOpen={isDeleteModalOpen}
-        selectedItem={selectedItem as PointFreeze}
-        onSuccess={() => {
-          getPointFreezes();
-        }}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedItem(null);
-        }}
-      />
+      {isDeleteModalOpen && selectedItem && (
+        <PointFreezeDeleteConfirmModal
+          isDeleteModalOpen={isDeleteModalOpen}
+          selectedItem={selectedItem as PointFreeze}
+          onSuccess={() => {
+            getPointFreezes();
+          }}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedItem(null);
+          }}
+        />
+      )}
 
-      <PointFreezeUpdateConfirmModal
-        isUpdateModalOpen={isUpdateModalOpen}
-        selectedItem={selectedItem as PointFreeze}
-        onSuccess={() => {
-          getPointFreezes();
-        }}
-        onClose={() => {
-          setIsUpdateModalOpen(false);
-          setSelectedItem(null);
-        }}
-      />
+      {isUpdateModalOpen && selectedItem && (
+        <PointFreezeUpdateConfirmModal
+          isUpdateModalOpen={isUpdateModalOpen}
+          selectedItem={selectedItem as PointFreeze}
+          onSuccess={() => {
+            getPointFreezes();
+          }}
+          onClose={() => {
+            setIsUpdateModalOpen(false);
+            setSelectedItem(null);
+          }}
+        />
+      )}
     </>
   );
 }
