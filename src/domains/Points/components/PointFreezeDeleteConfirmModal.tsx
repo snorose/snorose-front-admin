@@ -54,15 +54,15 @@ export default function PointFreezeDeleteConfirmModal({
           <ul className='ml-4 flex list-outside list-disc flex-col gap-1'>
             <li>
               <span className='text-sm font-semibold'>일정 제목: </span>
-              <span className='text-sm'>{selectedItem?.title}</span>
+              <span className='text-sm'>{selectedItem.title}</span>
             </li>
             <li>
               <span className='text-sm font-semibold'>시작 일시: </span>
-              <span className='text-sm'>{selectedItem?.startAt}</span>
+              <span className='text-sm'>{selectedItem.startAt}</span>
             </li>
             <li>
               <span className='text-sm font-semibold'>종료 일시: </span>
-              <span className='text-sm'>{selectedItem?.endAt}</span>
+              <span className='text-sm'>{selectedItem.endAt}</span>
             </li>
           </ul>
         </div>
