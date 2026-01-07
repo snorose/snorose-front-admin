@@ -70,17 +70,21 @@ export default function PointFreezeListSection({
                     <TableCell className='text-center'>{endAt}</TableCell>
                     <TableCell className='text-center'>{createdAt}</TableCell>
                     <TableCell className='text-center'>{updatedAt}</TableCell>
-                    <TableCell className='items-center justify-center align-middle'>
-                      <Trash2
-                        className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
-                        onClick={() => handleDeleteScheduleClick(id)}
-                      />
+                    <TableCell className='text-center'>
+                      <div className='flex items-center justify-center'>
+                        <Trash2
+                          className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
+                          onClick={() => handleDeleteScheduleClick(id)}
+                        />
+                      </div>
                     </TableCell>
-                    <TableCell className='items-center justify-center align-middle'>
-                      <PencilIcon
-                        className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
-                        onClick={() => handleUpdateScheduleButtonClick(id)}
-                      />
+                    <TableCell className='text-center'>
+                      <div className='flex items-center justify-center'>
+                        <PencilIcon
+                          className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
+                          onClick={() => handleUpdateScheduleButtonClick(id)}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
