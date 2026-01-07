@@ -25,11 +25,13 @@ const TABS: { value: Tab; label: string }[] = [
 interface ExamPanelProps {
   selectedExamReview?: ExamReview | null;
   onSaveSuccess?: () => void;
+  onDeleteSuccess?: () => void;
 }
 
 export default function ExamPanel({
   selectedExamReview,
   onSaveSuccess,
+  onDeleteSuccess,
 }: ExamPanelProps = {}) {
   const [activeTab, setActiveTab] = useState<Tab>('edit');
 
@@ -63,6 +65,7 @@ export default function ExamPanel({
           <ExamEditPanel
             selectedExamReview={selectedExamReview}
             onSaveSuccess={onSaveSuccess}
+            onDeleteSuccess={onDeleteSuccess}
           />
         )}{' '}
         {/* 편집 */}

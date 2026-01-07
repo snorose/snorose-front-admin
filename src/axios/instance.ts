@@ -50,6 +50,13 @@ class AxiosInstanceManager {
             config.headers.Authorization = `Bearer ${accessToken}`;
           }
 
+          // FormData를 사용하는 경우 Content-Type을 제거하여
+          // axios가 자동으로 multipart/form-data와 boundary를 설정하도록 함
+          if (config.data instanceof FormData && config.headers) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            delete (config.headers as any)['Content-Type'];
+          }
+
           return config;
         },
         (error: AxiosError) => {

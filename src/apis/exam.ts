@@ -62,6 +62,15 @@ export interface UpdateExamReviewResponse {
   };
 }
 
+export interface DeleteExamReviewResponse {
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  result: {
+    postId: number;
+  };
+}
+
 // api 함수
 export const getExamReviews = async (params: {
   page: number;
@@ -99,15 +108,20 @@ export const updateExamReview = async (
   }
 
   // post 객체를 JSON 문자열로 변환하여 추가
-  // Content-Type을 application/json으로 설정하기 위해 Blob 사용
-  const postBlob = new Blob([JSON.stringify(data.post)], {
-    type: 'application/json',
-  });
-  formData.append('post', postBlob);
+  // API 스펙에 따라 JSON 문자열로 직접 전송
+  formData.append('post', JSON.stringify(data.post));
 
+  // FormData를 사용하면 request interceptor에서 자동으로 Content-Type이 제거됨
   const response = await axiosInstance.patch(
     `/v1/admin/reviews/${postId}`,
     formData
   );
+  return response.data;
+};
+
+export const deleteExamReview = async (
+  postId: number
+): Promise<DeleteExamReviewResponse> => {
+  const response = await axiosInstance.delete(`/v1/admin/reviews/${postId}`);
   return response.data;
 };

@@ -310,36 +310,29 @@ export const STATUS_COLOR = [
   { id: 6, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-300' },
 ];
 
+// 수강 학기 자동 생성 함수
+const generateSemesterList = (): string[] => {
+  const currentYear = new Date().getFullYear();
+  const startYear = 2007;
+  const semesterList: string[] = [];
+
+  // 올해부터 2000년까지 역순으로 생성
+  for (let year = currentYear; year >= startYear; year--) {
+    // 각 연도마다 겨울계절 -> 2학기 -> 여름계절 -> 1학기 순서로 추가
+    semesterList.push(`${year}-겨울계절`);
+    semesterList.push(`${year}-2`);
+    semesterList.push(`${year}-여름계절`);
+    semesterList.push(`${year}-1`);
+  }
+
+  return semesterList;
+};
+
 // 수강 학기
-export const SEMESTER_LIST = [
-  '2025-1',
-  '2025-여름',
-  '2025-2',
-  '2025-겨울',
-  '2024-1',
-  '2024-여름',
-  '2024-2',
-  '2024-겨울',
-  '2023-1',
-  '2023-여름',
-  '2023-2',
-  '2023-겨울',
-  '2022-1',
-  '2022-여름',
-  '2022-2',
-  '2022-겨울',
-  '2021-1',
-  '2021-여름',
-  '2021-2',
-  '2021-겨울',
-  '2020-1',
-  '2020-여름',
-  '2020-2',
-  '2020-겨울',
-];
+export const SEMESTER_LIST = generateSemesterList();
 
 // 시험 종류 리스트
-export const EXAM_TYPE_LIST = ['중간고사', '기말고사'];
+export const EXAM_TYPE_LIST = ['중간', '기말'];
 
 // 담당자 리스트
 export const MANAGER_LIST = [

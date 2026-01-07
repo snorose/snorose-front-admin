@@ -14,10 +14,12 @@ import {
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
 } from '@/constants/exam-table-options';
-import { updateExamReview } from '@/apis/exam';
+import { deleteExamReview, updateExamReview } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
+import { Trash2 } from 'lucide-react';
 import type { ExamReview } from './ExamTable';
+import ConfirmModal from '../ui/confirm-modal';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[10px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;
@@ -48,52 +50,49 @@ const StatusDot = ({ status }: { status: string }) => {
 interface ExamEditPanelProps {
   selectedExamReview?: ExamReview | null;
   onSaveSuccess?: () => void;
+  onDeleteSuccess?: () => void;
 }
 
 export default function ExamEditPanel({
   selectedExamReview,
   onSaveSuccess,
+  onDeleteSuccess,
 }: ExamEditPanelProps = {}) {
   // 초기값 상수
-  const INITIAL_VALUES = {
-    status: 'CONFIRMED',
-    examReviewName: '수학 중간고사 후기 - 난이도 적절',
-    lectureName: '미적분학 I',
-    professorName: '김교수',
-    semester: '2024-1',
-    examType: '중간고사',
-    examTypeAndQuestions: '객관식 5문항',
-    // 추후 api값 추가되면 사용
-    // discussionNotes: '',
-    // manager: '관리자1',
-    uploadTime: '2024-06-01 12:00',
-    author: '홍길동',
-  };
 
-  const [status, setStatus] = useState<string>(INITIAL_VALUES.status);
-  const [examReviewName, setExamReviewName] = useState(
-    INITIAL_VALUES.examReviewName
-  );
-  const [lectureName, setLectureName] = useState(INITIAL_VALUES.lectureName);
-  const [professorName, setProfessorName] = useState(
-    INITIAL_VALUES.professorName
-  );
-  const [examTypeAndQuestions, setExamTypeAndQuestions] = useState(
-    INITIAL_VALUES.examTypeAndQuestions
-  );
+  const [status, setStatus] = useState<string>('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [examReviewName, setExamReviewName] = useState('');
+  const [lectureName, setLectureName] = useState('');
+  const [professorName, setProfessorName] = useState('');
+  const [examTypeAndQuestions, setExamTypeAndQuestions] = useState('');
   // 추후 api값 추가되면 사용
   // const [discussionNotes, setDiscussionNotes] = useState(
   //   INITIAL_VALUES.discussionNotes
   // );
-  const [semester, setSemester] = useState(INITIAL_VALUES.semester);
-  const [examType, setExamType] = useState(INITIAL_VALUES.examType);
+  const [semester, setSemester] = useState('');
+  const [examType, setExamType] = useState('');
   // 추후 api값 추가되면 사용
   // const [manager, setManager] = useState(INITIAL_VALUES.manager);
-  const [uploadTime, setUploadTime] = useState(INITIAL_VALUES.uploadTime);
-  const [author, setAuthor] = useState(INITIAL_VALUES.author);
+  const [uploadTime, setUploadTime] = useState('');
+  const [author, setAuthor] = useState('');
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
-  // selectedExamReview가 변경되면 폼 값 업데이트
+  // 폼 리셋 함수
+  const resetForm = () => {
+    setStatus('');
+    setExamReviewName('');
+    setLectureName('');
+    setProfessorName('');
+    setExamTypeAndQuestions('');
+    setSemester('');
+    setExamType('');
+    setUploadTime('');
+    setAuthor('');
+    setFocusedInput(null);
+  };
+
+  // selectedExamReview가 변경되면 폼 값 업데이트 또는 리셋
   useEffect(() => {
     if (selectedExamReview) {
       setStatus(selectedExamReview.status);
@@ -108,6 +107,9 @@ export default function ExamEditPanel({
       // setManager(selectedExamReview.manager);
       setUploadTime(selectedExamReview.uploadTime);
       setAuthor(selectedExamReview.userDisplay);
+    } else {
+      // 선택 해제 시 폼 리셋
+      resetForm();
     }
   }, [selectedExamReview]);
 
@@ -166,6 +168,13 @@ export default function ExamEditPanel({
       const yearMatch = semester.match(/^(\d{4})/);
       const lectureYear = yearMatch ? parseInt(yearMatch[1], 10) : undefined;
 
+      // title에서 분반 번호 추출 (예: "2023-1/기말/프로그래밍입문/이종우/001" -> 1)
+      const titleParts = selectedExamReview.reviewTitle.split('/');
+      const classNumberStr = titleParts[4]; // 마지막 부분이 분반 번호
+      const classNumber = classNumberStr
+        ? parseInt(classNumberStr, 10)
+        : undefined;
+
       // semester enum 변환
       const semesterEnum = convertSemesterToEnum(semester);
 
@@ -184,6 +193,11 @@ export default function ExamEditPanel({
           isConfirmed,
           examType: examTypeEnum,
           questionDetail: examTypeAndQuestions,
+          // API 스펙에 필요한 필드들 추가 (현재 UI에 없으므로 기본값 또는 undefined)
+          classNumber,
+          isPF: false, // 기본값 설정 (필요시 UI에서 입력받도록 수정 가능)
+          lectureType: 'MAJOR_ELECTIVE', // 기본값 설정 (필요시 UI에서 입력받도록 수정 가능)
+          isOnline: false, // 기본값 설정 (필요시 UI에서 입력받도록 수정 가능)
         },
       });
 
@@ -197,6 +211,31 @@ export default function ExamEditPanel({
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||
         '시험 후기 수정에 실패했습니다.';
+      toast.error(errorMessage);
+    }
+  };
+
+  // 삭제 핸들러
+  const handleDeleteClick = async () => {
+    try {
+      console.log(selectedExamReview?.id);
+      if (!selectedExamReview?.id) {
+        toast.error('선택된 시험 후기가 없습니다.');
+        return;
+      }
+      const response = await deleteExamReview(selectedExamReview.id);
+      if (response.isSuccess) {
+        toast.success('시험 후기가 성공적으로 삭제되었습니다.');
+        setIsDeleteModalOpen(false);
+        resetForm();
+        onDeleteSuccess?.();
+      } else {
+        toast.error(response.message || '시험 후기 삭제에 실패했습니다.');
+      }
+    } catch (error: unknown) {
+      const errorMessage =
+        (isAxiosError(error) && error.response?.data?.message) ||
+        '시험 후기 삭제에 실패했습니다.';
       toast.error(errorMessage);
     }
   };
@@ -221,13 +260,25 @@ export default function ExamEditPanel({
     <div className='flex w-full flex-col gap-2 px-4 py-2'>
       <div className='w-full overflow-auto'>
         {/* 선택된 row 정보 - table */}
-        <p className='px-1 py-1 text-[14px] font-semibold'># 시험후기 편집</p>
+        <div className='flex items-center justify-between py-1'>
+          <p className='text-[14px] font-semibold'># 시험후기 편집</p>
+          <div
+            className='cursor-pointer rounded-sm bg-red-100 p-1 hover:bg-red-200'
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
+            <Trash2 className='h-4 w-4 text-red-500' />
+          </div>
+        </div>
         <table className='w-full border-collapse'>
           <tbody>
             <tr>
               <th className={TABLE_HEADER_STYLE}>상태</th>
               <td className={TABLE_DATA_STYLE}>
-                <Select value={status} onValueChange={setStatus}>
+                <Select
+                  value={status}
+                  onValueChange={setStatus}
+                  disabled={!selectedExamReview}
+                >
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <div className='flex items-center gap-2'>
                       <StatusDot status={status} />
@@ -253,21 +304,8 @@ export default function ExamEditPanel({
             </tr>
             <tr>
               <th className={TABLE_HEADER_STYLE}>시험후기명</th>
-              <td
-                className={`border p-0 text-left text-[10px] font-medium ${
-                  focusedInput === 'examReviewName'
-                    ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
-                    : 'border-gray-300'
-                }`}
-              >
-                <input
-                  type='text'
-                  value={examReviewName}
-                  onChange={(e) => setExamReviewName(e.target.value)}
-                  onFocus={() => setFocusedInput('examReviewName')}
-                  onBlur={() => setFocusedInput(null)}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none'
-                />
+              <td className={TABLE_DATA_READONLY_STYLE}>
+                <div className='px-2 py-1'>{examReviewName}</div>
               </td>
             </tr>
             <tr>
@@ -285,7 +323,8 @@ export default function ExamEditPanel({
                   onChange={(e) => setLectureName(e.target.value)}
                   onFocus={() => setFocusedInput('lectureName')}
                   onBlur={() => setFocusedInput(null)}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none'
+                  disabled={!selectedExamReview}
+                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
                 />
               </td>
             </tr>
@@ -304,14 +343,19 @@ export default function ExamEditPanel({
                   onChange={(e) => setProfessorName(e.target.value)}
                   onFocus={() => setFocusedInput('professorName')}
                   onBlur={() => setFocusedInput(null)}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none'
+                  disabled={!selectedExamReview}
+                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
                 />
               </td>
             </tr>
             <tr>
               <th className={TABLE_HEADER_STYLE}>수강학기</th>
               <td className={TABLE_DATA_STYLE}>
-                <Select value={semester} onValueChange={setSemester}>
+                <Select
+                  value={semester}
+                  onValueChange={setSemester}
+                  disabled={!selectedExamReview}
+                >
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <SelectValue>{semester}</SelectValue>
                   </SelectTrigger>
@@ -332,7 +376,11 @@ export default function ExamEditPanel({
             <tr>
               <th className={TABLE_HEADER_STYLE}>시험종류</th>
               <td className={TABLE_DATA_STYLE}>
-                <Select value={examType} onValueChange={setExamType}>
+                <Select
+                  value={examType}
+                  onValueChange={setExamType}
+                  disabled={!selectedExamReview}
+                >
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <SelectValue>{examType}</SelectValue>
                   </SelectTrigger>
@@ -365,7 +413,8 @@ export default function ExamEditPanel({
                   onChange={(e) => setExamTypeAndQuestions(e.target.value)}
                   onFocus={() => setFocusedInput('examTypeAndQuestions')}
                   onBlur={() => setFocusedInput(null)}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none'
+                  disabled={!selectedExamReview}
+                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
                 />
               </td>
             </tr>
@@ -404,7 +453,7 @@ export default function ExamEditPanel({
             <tr>
               <th className={TABLE_HEADER_STYLE}>담당리자</th>
               <td className={TABLE_DATA_STYLE}>
-                <Select value={manager} onValueChange={setManager}>
+                <Select value={manager} onValueChange={setManager} disabled={!selectedExamReview}>
                   <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                     <SelectValue>{manager}</SelectValue>
                   </SelectTrigger>
@@ -443,9 +492,18 @@ export default function ExamEditPanel({
           onClick={handleSave}
           disabled={!selectedExamReview}
         >
-          저장
+          수정
         </Button>
       </div>
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        confirmText='삭제'
+        closeText='취소'
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteClick}
+        title='시험 후기 삭제'
+        description='시험 후기를 삭제하시겠습니까?'
+      />
     </div>
   );
 }

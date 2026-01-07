@@ -284,9 +284,6 @@ export default function ExamTable({
   //   [key: number]: boolean;
   // }>({});
 
-  // 클릭된 행 추적
-  const [clickedRow, setClickedRow] = useState<number | null>(null);
-
   // 상태 리스트 생성
   const STATUS_LIST = STATUS_COLOR.map((status) => status.name);
 
@@ -441,16 +438,6 @@ export default function ExamTable({
         setApiData(transformedData);
         setHasNext(response.result.hasNext);
         // setTotalCount(transformedData.length); // 추후 시험후기 목록 조회 api에 total값 생기면 주석 해제
-
-        // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
-        if (selectedId && onRowSelect) {
-          const updatedReview = transformedData.find(
-            (review: ExamReview) => review.id === selectedId
-          );
-          if (updatedReview) {
-            onRowSelect(updatedReview);
-          }
-        }
       } else {
         toast.error(
           response.message || '시험 후기 목록을 불러오는데 실패했습니다.'
@@ -472,8 +459,6 @@ export default function ExamTable({
     lectureYear,
     selectedSemester,
     selectedExamType,
-    onRowSelect,
-    selectedId,
   ]);
 
   // 초기 로드 및 필터/페이지 변경 시 재로드
@@ -487,6 +472,18 @@ export default function ExamTable({
       loadExamReviews();
     }
   }, [refreshKey, loadExamReviews]);
+
+  // 선택된 행이 있으면 업데이트된 데이터로 자동 선택 (무한 루프 방지를 위해 별도 useEffect로 분리)
+  useEffect(() => {
+    if (selectedId && onRowSelect && apiData.length > 0) {
+      const updatedReview = apiData.find(
+        (review: ExamReview) => review.id === selectedId
+      );
+      if (updatedReview) {
+        onRowSelect(updatedReview);
+      }
+    }
+  }, [selectedId, apiData, onRowSelect]);
 
   // 선택된 필터 상태 디버깅
   useEffect(() => {
@@ -608,19 +605,24 @@ export default function ExamTable({
               // Select가 열린 행이 있는지 확인
               const hasOpenSelect =
                 Object.values(openStatusSelect).some(Boolean);
-              // Select가 열린 행이 있으면 그 행만 active, 없으면 clickedRow만 active
+              // Select가 열린 행이 있으면 그 행만 active, 없으면 selectedId와 일치하는 행만 active
               const isRowActive = hasOpenSelect
                 ? openStatusSelect[review.id]
-                : clickedRow === review.id;
+                : selectedId === review.id;
               return (
                 <TableRow
                   key={review.id}
                   className={`hover:cursor-pointer [&_td]:h-[24px] ${
                     isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
                   }`}
-                  onClick={() => {
-                    setClickedRow(review.id);
-                    onRowSelect?.(review);
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // 토글 방식: 선택된 행을 다시 클릭하면 해제, 다른 행 클릭하면 선택
+                    if (selectedId === review.id) {
+                      onRowSelect?.(null);
+                    } else {
+                      onRowSelect?.(review);
+                    }
                   }}
                 >
                   <TableCell className='w-[70px] text-center text-gray-600'>

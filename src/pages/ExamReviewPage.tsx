@@ -16,6 +16,12 @@ export default function ExamReviewPage() {
     setRefreshKey((prev) => prev + 1);
   };
 
+  const handleDeleteSuccess = () => {
+    // 삭제 후 선택 해제 및 테이블 새로고침
+    setSelectedExamReview(null);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <div className='box-border w-full max-w-full'>
       {/* 검색 + 아이콘 정보*/}
@@ -42,6 +48,7 @@ export default function ExamReviewPage() {
       <ExamPanel
         selectedExamReview={selectedExamReview}
         onSaveSuccess={handleSaveSuccess}
+        onDeleteSuccess={handleDeleteSuccess}
       />
     </div>
   );
