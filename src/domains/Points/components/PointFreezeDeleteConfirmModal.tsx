@@ -10,6 +10,7 @@ import {
 import type { PointFreeze } from '@/types';
 import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/utils';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;
@@ -32,9 +33,7 @@ export default function PointFreezeDeleteConfirmModal({
       onClose();
       await onSuccess();
     } catch (error: unknown) {
-      const errorMessage =
-        error?.response?.data?.message || '미지급 일정 삭제에 실패했습니다.';
-      toast.error(errorMessage);
+      toast.error(getErrorMessage(error, '미지급 일정 삭제에 실패했습니다.'));
     }
   };
 

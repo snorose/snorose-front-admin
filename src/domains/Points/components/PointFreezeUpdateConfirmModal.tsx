@@ -13,6 +13,7 @@ import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
 import { useState, useEffect } from 'react';
+import { getErrorMessage } from '@/utils';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -80,8 +81,10 @@ export default function PointFreezeUpdateConfirmModal({
       onClose();
       onSuccess();
     } catch (error: unknown) {
-      const errorMessage =
-        error?.response?.data?.message || '미지급 일정 수정에 실패했습니다.';
+      const errorMessage = getErrorMessage(
+        error,
+        '미지급 일정 수정에 실패했습니다.'
+      );
       toast.error(errorMessage);
     }
   };

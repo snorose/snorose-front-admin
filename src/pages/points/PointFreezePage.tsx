@@ -5,6 +5,7 @@ import { getPointFreezesAPI, postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
 import { PointFreezeListSection } from '@/domains/Points';
+import { getErrorMessage } from '@/utils';
 
 export default function PointFreezePage() {
   const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);
@@ -74,9 +75,7 @@ export default function PointFreezePage() {
       handleResetButtonClick();
       await getPointFreezes();
     } catch (error: unknown) {
-      const errorMessage =
-        error?.response?.data?.message || '미지급 일정 생성에 실패했습니다.';
-      toast.error(errorMessage);
+      toast.error(getErrorMessage(error, '미지급 일정 생성에 실패했습니다.'));
     }
   };
 
