@@ -1,12 +1,12 @@
 import { axiosInstance } from '@/axios/instance';
-import type { AdjustSinglePoint, FreezingPoint } from '@/types';
+import type { AdjustSinglePoint, PointFreeze } from '@/types';
 
 export const postSinglePointAPI = async (data: AdjustSinglePoint) => {
   const response = await axiosInstance.post('/v1/points', data);
   return response.data;
 };
 
-export const postPointFreezeAPI = async (data: FreezingPoint) => {
+export const postPointFreezeAPI = async (data: PointFreeze) => {
   const response = await axiosInstance.post(
     '/v1/admin/points/point-freeze',
     data
@@ -19,7 +19,7 @@ export const getPointFreezesAPI = async () => {
   return response.data;
 };
 
-export const patchPointFreezeAPI = async (id: number, data: FreezingPoint) => {
+export const patchPointFreezeAPI = async (id: number, data: PointFreeze) => {
   const response = await axiosInstance.patch(
     `/v1/admin/points/point-freeze/${id}`,
     data
