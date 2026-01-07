@@ -8,19 +8,40 @@ import {
   Button,
 } from '@/components/ui';
 import type { PointFreeze } from '@/types';
+import { deletePointFreezeAPI } from '@/apis';
+import { toast } from 'sonner';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;
   selectedItem: PointFreeze;
-  handleDeleteConfirm: () => void;
-  handleDeleteCancel: () => void;
+  onSuccess: () => void;
+  onClose: () => void;
 }
 export default function PointFreezeDeleteConfirmModal({
   isDeleteModalOpen,
   selectedItem,
-  handleDeleteConfirm,
-  handleDeleteCancel,
+  onSuccess,
+  onClose,
 }: PointFreezeDeleteConfirmModalProps) {
+  const handleDeleteConfirm = async () => {
+    if (!selectedItem) return;
+
+    try {
+      await deletePointFreezeAPI(selectedItem.id);
+      toast.success('미지급 일정 삭제가 완료되었어요.');
+      onClose();
+      await onSuccess();
+    } catch (error: unknown) {
+      const errorMessage =
+        error?.response?.data?.message || '미지급 일정 삭제에 실패했습니다.';
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    onClose();
+  };
+
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={handleDeleteCancel}>
       <DialogContent className='max-w-xs sm:max-w-sm'>
@@ -47,11 +68,7 @@ export default function PointFreezeDeleteConfirmModal({
           </ul>
         </div>
         <DialogFooter>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={() => handleDeleteCancel()}
-          >
+          <Button type='button' variant='outline' onClick={handleDeleteCancel}>
             취소
           </Button>
           <Button type='button' onClick={handleDeleteConfirm}>

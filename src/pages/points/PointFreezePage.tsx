@@ -11,11 +11,7 @@ import {
   TableCell,
 } from '@/components/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  getPointFreezesAPI,
-  postPointFreezeAPI,
-  deletePointFreezeAPI,
-} from '@/apis';
+import { getPointFreezesAPI, postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { PencilIcon, Trash2 } from 'lucide-react';
 import type { PointFreeze } from '@/types';
@@ -31,9 +27,10 @@ export default function PointFreezePage() {
     startAt: '',
     endAt: '',
   });
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PointFreeze | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
   const handleDeleteScheduleClick = (id: number) => {
     const deletedItem = pointFreezes.find((item) => item.id === id);
     if (deletedItem) {
@@ -58,25 +55,6 @@ export default function PointFreezePage() {
       isFetchingRef.current = false;
     }
   }, []);
-
-  const handleDeleteConfirm = async () => {
-    try {
-      await deletePointFreezeAPI(selectedItem?.id as number);
-      toast.success('미지급 일정 삭제가 완료되었어요.');
-      setIsDeleteModalOpen(false);
-      setSelectedItem(null);
-      await getPointFreezes();
-    } catch (error: unknown) {
-      const errorMessage =
-        error?.response?.data?.message || '미지급 일정 삭제에 실패했습니다.';
-      toast.error(errorMessage);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setIsDeleteModalOpen(false);
-    setSelectedItem(null);
-  };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, title: e.target.value });
@@ -265,18 +243,29 @@ export default function PointFreezePage() {
       <PointFreezeDeleteConfirmModal
         isDeleteModalOpen={isDeleteModalOpen}
         selectedItem={selectedItem as PointFreeze}
-        handleDeleteConfirm={handleDeleteConfirm}
-        handleDeleteCancel={handleDeleteCancel}
+        onSuccess={() => {
+          getPointFreezes();
+          setIsDeleteModalOpen(false);
+          setSelectedItem(null);
+        }}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedItem(null);
+        }}
       />
 
       <PointFreezeUpdateConfirmModal
         isUpdateModalOpen={isUpdateModalOpen}
         selectedItem={selectedItem as PointFreeze}
+        onSuccess={() => {
+          getPointFreezes();
+          setIsUpdateModalOpen(false);
+          setSelectedItem(null);
+        }}
         onClose={() => {
           setIsUpdateModalOpen(false);
           setSelectedItem(null);
         }}
-        onSuccess={() => getPointFreezes()}
       />
     </div>
   );
