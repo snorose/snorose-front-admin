@@ -13,7 +13,11 @@ import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
 import { useState, useEffect } from 'react';
-import { getErrorMessage } from '@/utils';
+import {
+  getErrorMessage,
+  formatDateTimeForAPI,
+  formatDateTimeForInput,
+} from '@/utils';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -36,14 +40,10 @@ export default function PointFreezeUpdateConfirmModal({
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
-      const formatDateTime = (dateTimeString: string) => {
-        return dateTimeString.replace(' ', 'T').slice(0, 16);
-      };
-
       setUpdateFormData({
         title: selectedItem.title,
-        startAt: formatDateTime(selectedItem.startAt),
-        endAt: formatDateTime(selectedItem.endAt),
+        startAt: formatDateTimeForInput(selectedItem.startAt),
+        endAt: formatDateTimeForInput(selectedItem.endAt),
       });
     }
   }, [selectedItem, isUpdateModalOpen]);
@@ -67,15 +67,11 @@ export default function PointFreezeUpdateConfirmModal({
   const handleUpdateConfirm = async () => {
     if (!selectedItem) return;
 
-    const formatDateTime = (dateTimeString: string) => {
-      return dateTimeString.replace('T', ' ') + ':00';
-    };
-
     try {
       await patchPointFreezeAPI(selectedItem.id, {
         title: updateFormData.title,
-        startAt: formatDateTime(updateFormData.startAt),
-        endAt: formatDateTime(updateFormData.endAt),
+        startAt: formatDateTimeForAPI(updateFormData.startAt),
+        endAt: formatDateTimeForAPI(updateFormData.endAt),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();
