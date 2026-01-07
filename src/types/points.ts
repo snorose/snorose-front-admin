@@ -15,3 +15,15 @@ export interface PointFreeze {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreatePointFreeze {
+  title: string;
+  startAt: string;
+  endAt: string;
+}
+
+export interface UpdatePointFreeze {
+  title: string;
+  startAt: string;
+  endAt: string;
+}
