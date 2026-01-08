@@ -30,21 +30,19 @@ export default function PointDetailSection({
   onMemoChange,
 }: PointDetailSectionProps) {
   useEffect(() => {
-    if (selectedCategory) {
-      const selectedOption = POINT_CATEGORY_OPTIONS.find(
-        (option) => option.value === selectedCategory
-      );
-
-      if (selectedOption && selectedOption.points !== null) {
-        if (difference !== selectedOption.points.toString()) {
-          onDifferenceChange(selectedOption.points.toString());
-        }
-      }
+    if (!selectedCategory) {
+      return;
     }
 
-    if (!selectedCategory) {
-      if (difference) {
-        onDifferenceChange('');
+    const selectedOption = POINT_CATEGORY_OPTIONS.find(
+      (option) => option.value === selectedCategory
+    );
+
+    if (selectedOption && selectedOption.points !== null) {
+      const newValue = selectedOption.points.toString();
+
+      if (difference !== newValue) {
+        onDifferenceChange(newValue);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
