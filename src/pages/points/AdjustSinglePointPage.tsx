@@ -6,6 +6,7 @@ import { POINT_CATEGORY } from '@/constants';
 import { toast } from 'sonner';
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/hooks';
+import { getErrorMessage } from '@/utils';
 import {
   ConfirmPointAdjustmentModal,
   MemberInfoSection,
@@ -37,10 +38,8 @@ export default function AdjustSinglePointPage() {
       const data = await searchUsersAPI(searchQuery.trim());
       setSearchedMember(data.result);
       setUserId(data.result.userId);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message || '회원 조회에 실패했습니다.';
-      toast.error(errorMessage);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '미지급 일정 삭제에 실패했습니다.'));
       setSearchedMember(null);
     } finally {
       setIsSearching(false);
@@ -75,10 +74,8 @@ export default function AdjustSinglePointPage() {
 
       toast.success('포인트 지급/차감이 완료되었어요.');
       handleResetButtonClick();
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message || '포인트 지급/차감에 실패했어요.';
-      toast.error(errorMessage);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '포인트 지급/차감에 실패했어요.'));
     } finally {
       setIsConfirmModalOpen(false);
     }

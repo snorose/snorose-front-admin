@@ -1,5 +1,5 @@
 import { isAxiosError } from 'axios';
-import type { ApiErrorResponse } from '@/types/auth';
+import type { ApiErrorResponse } from '@/types';
 
 /**
  * API 에러에서 메시지를 추출하는 유틸리티 함수
@@ -14,8 +14,10 @@ export function getErrorMessage(
   if (isAxiosError<ApiErrorResponse>(error)) {
     return error.response?.data?.message || defaultMessage;
   }
+
   if (error instanceof Error) {
     return error.message;
   }
+
   return defaultMessage;
 }
