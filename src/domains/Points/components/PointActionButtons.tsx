@@ -1,10 +1,12 @@
 import { Button } from '@/components/ui';
 import { toast } from 'sonner';
-import { POINT_CATEGORY } from '@/constants';
+import { POINT_CATEGORY_OPTIONS } from '@/constants';
+
+type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 interface PointActionButtonsProps {
   userId: number | null;
-  selectedCategory: keyof typeof POINT_CATEGORY | '';
+  selectedCategory: PointCategoryValue | '';
   difference: string;
   onReset: () => void;
   onApply: () => void;

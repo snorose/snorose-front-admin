@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Input } from '@/components/ui';
 import { PageHeader } from '@/components';
 import type { MemberInfo } from '@/types';
-import { POINT_CATEGORY } from '@/constants';
+import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import { toast } from 'sonner';
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/hooks';
@@ -19,7 +19,7 @@ export default function AdjustSinglePointPage() {
   const [searchedMember, setSearchedMember] = useState<MemberInfo | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<
-    keyof typeof POINT_CATEGORY | ''
+    (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
   >('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSearching, setIsSearching] = useState(false);
@@ -37,7 +37,10 @@ export default function AdjustSinglePointPage() {
     try {
       const data = await searchUsersAPI(searchQuery.trim());
       setSearchedMember(data.result);
-      setUserId(data.result.userId);
+
+      if (userId === null) {
+        setUserId(data.result.userId);
+      }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '미지급 일정 삭제에 실패했습니다.'));
       setSearchedMember(null);
@@ -66,7 +69,7 @@ export default function AdjustSinglePointPage() {
       await postSinglePointAPI({
         userId: userId as number,
         difference: numDifference,
-        category: selectedCategory as keyof typeof POINT_CATEGORY,
+        category: selectedCategory,
         sourceId: user?.userId,
         source: 'ADMIN',
         ...(memo && { memo }),
@@ -117,7 +120,7 @@ export default function AdjustSinglePointPage() {
 
       <MemberInfoSection
         searchedMember={searchedMember as MemberInfo}
-        userId={userId as number}
+        userId={userId}
         onUserIdChange={setUserId}
       />
 
@@ -144,7 +147,7 @@ export default function AdjustSinglePointPage() {
           onClose={() => setIsConfirmModalOpen(false)}
           onConfirm={handleConfirmModalButtonClick}
           searchedMember={searchedMember as MemberInfo}
-          selectedCategory={selectedCategory as keyof typeof POINT_CATEGORY}
+          selectedCategory={selectedCategory}
           difference={difference}
           memo={memo}
         />

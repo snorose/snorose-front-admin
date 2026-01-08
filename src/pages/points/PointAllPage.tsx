@@ -14,13 +14,15 @@ import {
   AlertDescription,
 } from '@/components/ui';
 import { PageHeader } from '@/components';
-import { POINT_CATEGORY } from '@/constants';
+import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import { toast } from 'sonner';
+
+type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 export default function PointAllPage() {
   const [selectedCategory, setSelectedCategory] = useState<
-    keyof typeof POINT_CATEGORY | ''
-  >('');
+    (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
+  >('POINT_REWARD_REPORT_GENERAL');
   const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
 
@@ -74,7 +76,7 @@ export default function PointAllPage() {
               포인트 유형
             </Label>
             <Select
-              onValueChange={(value: keyof typeof POINT_CATEGORY | '') =>
+              onValueChange={(value: PointCategoryValue | '') =>
                 setSelectedCategory(value)
               }
               value={selectedCategory}
@@ -83,8 +85,8 @@ export default function PointAllPage() {
                 <SelectValue placeholder='포인트 유형을 선택해주세요' />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(POINT_CATEGORY).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
+                {POINT_CATEGORY_OPTIONS.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
                     {label}
                   </SelectItem>
                 ))}
