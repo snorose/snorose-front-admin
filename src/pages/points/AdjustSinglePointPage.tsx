@@ -42,7 +42,7 @@ export default function AdjustSinglePointPage() {
         setUserId(data.result.userId);
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, '미지급 일정 삭제에 실패했습니다.'));
+      toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
       setSearchedMember(null);
     } finally {
       setIsSearching(false);
