@@ -8,15 +8,17 @@ import {
   Button,
 } from '@/components/ui';
 import { cn } from '@/utils';
-import { POINT_CATEGORY } from '@/constants';
+import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import type { MemberInfo } from '@/types';
+
+type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 interface ConfirmPointAdjustmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   searchedMember: MemberInfo;
-  selectedCategory: keyof typeof POINT_CATEGORY;
+  selectedCategory: PointCategoryValue | '';
   difference: string;
   memo: string;
 }
@@ -35,7 +37,14 @@ export default function ConfirmPointAdjustmentModal({
     { label: '이름', value: searchedMember.userName },
     { label: '학과', value: searchedMember.major },
     { label: '학번', value: searchedMember.studentNumber },
-    { label: '포인트 유형', value: POINT_CATEGORY[selectedCategory] },
+    {
+      label: '포인트 유형',
+      value: selectedCategory
+        ? (POINT_CATEGORY_OPTIONS.find(
+            (option) => option.value === selectedCategory
+          )?.label ?? '')
+        : '',
+    },
   ];
 
   return (

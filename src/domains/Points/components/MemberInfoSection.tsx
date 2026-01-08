@@ -3,7 +3,7 @@ import type { MemberInfo } from '@/types';
 
 interface MemberInfoSectionProps {
   searchedMember: MemberInfo;
-  userId: number;
+  userId: number | null;
   onUserIdChange: (value: number) => void;
 }
 
@@ -49,7 +49,7 @@ export default function MemberInfoSection({
               id={id}
               value={value ?? ''}
               readOnly
-              className='bg-gray-50'
+              className='cursor-not-allowed bg-gray-100'
               placeholder='회원을 검색해 주세요.'
             />
           </div>
@@ -63,7 +63,7 @@ export default function MemberInfoSection({
             type='text'
             id='userId'
             placeholder='직접 입력해 주세요.'
-            value={userId}
+            value={userId ?? ''}
             onChange={(e) => onUserIdChange(Number(e.target.value))}
           />
         </div>

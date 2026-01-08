@@ -7,11 +7,14 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui';
-import { POINT_CATEGORY } from '@/constants';
+import { POINT_CATEGORY_OPTIONS } from '@/constants';
+import { useEffect } from 'react';
+
+type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 interface PointDetailSectionProps {
-  selectedCategory: keyof typeof POINT_CATEGORY | '';
-  onCategoryChange: (category: keyof typeof POINT_CATEGORY | '') => void;
+  selectedCategory: PointCategoryValue | '';
+  onCategoryChange: (category: PointCategoryValue | '') => void;
   difference: string;
   onDifferenceChange: (value: string) => void;
   memo: string;
@@ -26,6 +29,35 @@ export default function PointDetailSection({
   memo,
   onMemoChange,
 }: PointDetailSectionProps) {
+  const selectedOption = selectedCategory
+    ? POINT_CATEGORY_OPTIONS.find((option) => option.value === selectedCategory)
+    : undefined;
+
+  const isAutoFilled = selectedOption?.points !== null;
+
+  useEffect(() => {
+    if (!selectedCategory) {
+      return;
+    }
+
+    const selectedOption = POINT_CATEGORY_OPTIONS.find(
+      (option) => option.value === selectedCategory
+    );
+
+    if (selectedOption && selectedOption.points !== null) {
+      const newValue = selectedOption.points.toString();
+
+      if (difference !== newValue) {
+        onDifferenceChange(newValue);
+      }
+    } else {
+      if (difference) {
+        onDifferenceChange('');
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory]);
+
   return (
     <article className='flex flex-col gap-1'>
       <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
@@ -35,7 +67,7 @@ export default function PointDetailSection({
             포인트 유형
           </Label>
           <Select
-            onValueChange={(selectedKey: keyof typeof POINT_CATEGORY | '') =>
+            onValueChange={(selectedKey: PointCategoryValue | '') =>
               onCategoryChange(selectedKey)
             }
             value={selectedCategory ?? undefined}
@@ -44,8 +76,8 @@ export default function PointDetailSection({
               <SelectValue placeholder='포인트 유형을 선택해주세요' />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(POINT_CATEGORY).map(([key, label]) => (
-                <SelectItem key={key} value={key}>
+              {POINT_CATEGORY_OPTIONS.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
                   {label}
                 </SelectItem>
               ))}
@@ -63,6 +95,8 @@ export default function PointDetailSection({
             value={difference}
             placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
             onChange={(e) => onDifferenceChange(e.target.value)}
+            readOnly={isAutoFilled}
+            className={isAutoFilled ? 'cursor-not-allowed bg-gray-100' : ''}
           />
         </div>
 
