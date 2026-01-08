@@ -29,6 +29,12 @@ export default function PointDetailSection({
   memo,
   onMemoChange,
 }: PointDetailSectionProps) {
+  const selectedOption = selectedCategory
+    ? POINT_CATEGORY_OPTIONS.find((option) => option.value === selectedCategory)
+    : undefined;
+
+  const isAutoFilled = selectedOption?.points !== null;
+
   useEffect(() => {
     if (!selectedCategory) {
       return;
@@ -43,6 +49,10 @@ export default function PointDetailSection({
 
       if (difference !== newValue) {
         onDifferenceChange(newValue);
+      }
+    } else {
+      if (difference) {
+        onDifferenceChange('');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,21 +95,8 @@ export default function PointDetailSection({
             value={difference}
             placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
             onChange={(e) => onDifferenceChange(e.target.value)}
-            readOnly={
-              selectedCategory
-                ? POINT_CATEGORY_OPTIONS.find(
-                    (option) => option.value === selectedCategory
-                  )?.points !== null
-                : false
-            }
-            className={
-              selectedCategory &&
-              POINT_CATEGORY_OPTIONS.find(
-                (option) => option.value === selectedCategory
-              )?.points !== null
-                ? 'cursor-not-allowed bg-gray-100'
-                : ''
-            }
+            readOnly={isAutoFilled}
+            className={isAutoFilled ? 'cursor-not-allowed bg-gray-100' : ''}
           />
         </div>
 
