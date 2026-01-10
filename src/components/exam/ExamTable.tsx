@@ -80,6 +80,12 @@ interface ExamTableProps {
   onRowSelect?: (review: ExamReview | null) => void;
   refreshKey?: number;
   selectedId?: number | null;
+  searchParams?: {
+    keyword?: string;
+    lectureYear?: number;
+    semester?: string;
+    examType?: string;
+  };
 }
 
 // 상태 점 컴포넌트
@@ -243,6 +249,7 @@ export default function ExamTable({
   onRowSelect,
   refreshKey,
   selectedId,
+  searchParams = {},
 }: ExamTableProps) {
   // API 데이터 상태 관리
   const [apiData, setApiData] = useState<ExamReview[]>([]);
@@ -253,16 +260,6 @@ export default function ExamTable({
   // 페이지네이션 설정
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
-
-  // 검색 및 필터 상태
-  const [searchKeyword] = useState<string>('');
-  const [lectureYear] = useState<number | undefined>();
-  const [selectedSemester, setSelectedSemester] = useState<
-    string | undefined
-  >();
-  const [selectedExamType, setSelectedExamType] = useState<
-    string | undefined
-  >();
 
   // 상태 선택 상태 관리
   const [selectedStatus, setSelectedStatus] = useState<{
@@ -346,23 +343,8 @@ export default function ExamTable({
     }));
     console.log(`Filter Type: ${filterType}, Selected Values:`, value);
 
-    // 필터 변경 시 API 파라미터 업데이트
-    if (filterType === 'semester' && value.length === 1) {
-      setSelectedSemester(value[0]);
-      setCurrentPage(1); // 필터 변경 시 첫 페이지로
-    } else if (filterType === 'semester' && value.length === 0) {
-      setSelectedSemester(undefined);
-      setCurrentPage(1);
-    }
-
-    if (filterType === 'examType' && value.length === 1) {
-      // "중간고사" -> "MIDTERM", "기말고사" -> "FINAL" 변환 필요할 수 있음
-      setSelectedExamType(value[0]);
-      setCurrentPage(1);
-    } else if (filterType === 'examType' && value.length === 0) {
-      setSelectedExamType(undefined);
-      setCurrentPage(1);
-    }
+    // 필터 변경 시 첫 페이지로 이동
+    setCurrentPage(1);
   };
 
   // API 데이터 로드 함수
@@ -371,10 +353,10 @@ export default function ExamTable({
     try {
       const response = await getExamReviews({
         page: currentPage - 1, // API는 0부터 시작
-        keyword: searchKeyword || undefined,
-        lectureYear,
-        semester: selectedSemester,
-        examType: selectedExamType,
+        keyword: searchParams.keyword,
+        lectureYear: searchParams.lectureYear,
+        semester: searchParams.semester,
+        examType: searchParams.examType,
       });
 
       if (response.isSuccess && response.result) {
@@ -398,13 +380,7 @@ export default function ExamTable({
     } finally {
       setIsLoading(false);
     }
-  }, [
-    currentPage,
-    searchKeyword,
-    lectureYear,
-    selectedSemester,
-    selectedExamType,
-  ]);
+  }, [currentPage, searchParams]);
 
   // 초기 로드 및 필터/페이지 변경 시 재로드
   useEffect(() => {
@@ -417,6 +393,11 @@ export default function ExamTable({
       loadExamReviews();
     }
   }, [refreshKey, loadExamReviews]);
+
+  // 검색 파라미터 변경 시 첫 페이지로 이동하고 데이터 다시 로드
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchParams]);
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택 (무한 루프 방지를 위해 별도 useEffect로 분리)
   useEffect(() => {
@@ -444,9 +425,17 @@ export default function ExamTable({
     console.log('Header Filters:', headerFilters);
   }, [headerFilters]);
 
+  const isEmpty = !isLoading && currentPageData.length === 0;
+
   return (
-    <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
-      <Table className='table-fixed rounded-lg bg-white shadow'>
+    <div
+      className={`no-scrollbar scroll-hidden ${
+        isEmpty ? 'overflow-hidden' : 'overflow-x-scroll'
+      }`}
+    >
+      <Table
+        className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
+      >
         {/* Table Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow className='hover:bg-gray-100'>
@@ -545,6 +534,15 @@ export default function ExamTable({
                 </TableCell>
               </TableRow>
             ))
+          ) : currentPageData.length === 0 ? (
+            // 데이터가 없을 때 - 10개 행 높이를 모두 차지하며 중앙 정렬
+            <TableRow>
+              <TableCell colSpan={11} className='h-[240px] p-0 text-gray-500'>
+                <div className='flex h-full items-center justify-center'>
+                  해당하는 데이터가 없습니다
+                </div>
+              </TableCell>
+            </TableRow>
           ) : (
             <>
               {currentPageData.map((review) => {

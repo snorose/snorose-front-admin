@@ -25,13 +25,14 @@ import { isAxiosError } from 'axios';
 import { Trash2, Loader2 } from 'lucide-react';
 import type { ExamReview } from './ExamTable';
 import ConfirmModal from '../ui/confirm-modal';
+import { Skeleton } from '../ui/skeleton';
 
-const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[10px]';
+const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[12px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;
 const TABLE_DATA_STYLE = `${TABLE_CELL_BASE_STYLE} p-0 font-medium`;
 const TABLE_DATA_READONLY_STYLE = `${TABLE_DATA_STYLE} bg-gray-50 text-gray-400`;
 const SELECT_TRIGGER_STYLE =
-  'm-1 !h-5 border-0 bg-transparent px-2 py-0.5 text-[10px] shadow-none hover:bg-transparent data-[size=default]:!h-5 data-[size=sm]:!h-5';
+  'm-1 !h-5 border-0 bg-transparent px-2 py-0.5 text-[11px] shadow-none hover:bg-transparent data-[size=default]:!h-5 data-[size=sm]:!h-5';
 const SELECT_CONTENT_STYLE =
   'text-[10px] max-h-[200px] overflow-y-auto bg-blue-50 [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-highlighted]]:bg-blue-100/50 [&_[data-state=checked]]:bg-blue-100';
 
@@ -501,6 +502,108 @@ export default function ExamEditPanel({
     }
   };
 
+  // 스켈레톤 테이블 렌더링
+  const renderSkeletonTable = () => (
+    <>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>상태</th>
+        <td className={TABLE_DATA_STYLE}>
+          <Skeleton className='m-1 h-5 w-24' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>id</th>
+        <td className={TABLE_DATA_READONLY_STYLE}>
+          <Skeleton className='mx-2 my-1 h-4 w-16' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>게시자</th>
+        <td className={TABLE_DATA_READONLY_STYLE}>
+          <Skeleton className='mx-2 my-1 h-4 w-20' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>시험후기명</th>
+        <td className={TABLE_DATA_READONLY_STYLE}>
+          <Skeleton className='mx-2 my-1 h-4 w-32' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>업로드시간</th>
+        <td className={TABLE_DATA_READONLY_STYLE}>
+          <Skeleton className='mx-2 my-1 h-4 w-28' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>업로드 파일</th>
+        <td className={`${TABLE_DATA_READONLY_STYLE} bg-white`}>
+          <div className='flex items-center justify-between px-2 py-1'>
+            <Skeleton className='h-4 w-32' />
+            <div className='flex items-center gap-1'>
+              <Skeleton className='h-5 w-16' />
+              <Skeleton className='h-5 w-16' />
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>강의명</th>
+        <td className='border border-gray-300 p-0 text-left text-[10px] font-medium'>
+          <Skeleton className='mx-2 my-1 h-4 w-32' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>교수</th>
+        <td className='border border-gray-300 p-0 text-left text-[10px] font-medium'>
+          <Skeleton className='mx-2 my-1 h-4 w-24' />
+        </td>
+      </tr>
+      <tr>
+        <th className={TABLE_HEADER_STYLE}>학기</th>
+        <td className={TABLE_DATA_STYLE}>
+          <Skeleton className='m-1 h-5 w-20' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>시험 종류</th>
+        <td className={TABLE_DATA_STYLE}>
+          <Skeleton className='m-1 h-5 w-20' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>강의 종류</th>
+        <td className={TABLE_DATA_STYLE}>
+          <Skeleton className='m-1 h-5 w-20' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>분반</th>
+        <td className='border border-gray-300 p-0 text-left text-[10px] font-medium'>
+          <Skeleton className='mx-2 my-1 h-4 w-12' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>P/F</th>
+        <td className={TABLE_DATA_STYLE}>
+          <Skeleton className='m-1 h-5 w-8' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>온라인 수업</th>
+        <td className={TABLE_DATA_STYLE}>
+          <Skeleton className='m-1 h-5 w-8' />
+        </td>
+      </tr>
+      <tr className='h-[30px]'>
+        <th className={TABLE_HEADER_STYLE}>시험 유형 및 문항수</th>
+        <td className='border border-gray-300 p-0 text-left text-[10px] font-medium'>
+          <Skeleton className='mx-2 my-1 h-4 w-40' />
+        </td>
+      </tr>
+    </>
+  );
+
   return (
     <div className='flex w-full flex-col gap-2 px-4 py-2'>
       <div className='w-full overflow-auto'>
@@ -517,340 +620,382 @@ export default function ExamEditPanel({
         </div>
         <table className='w-full border-collapse'>
           <tbody>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>상태</th>
-              <td className={TABLE_DATA_STYLE}>
-                <Select
-                  value={status}
-                  onValueChange={setStatus}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                >
-                  <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                    <div className='flex items-center gap-2'>
-                      <StatusDot status={status} />
-                      <span>{getStatusName(status)}</span>
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
-                    {STATUS_COLOR.map((statusOption) => (
-                      <SelectItem
-                        key={statusOption.code}
-                        value={statusOption.code}
-                        className='text-[12px] font-medium'
-                      >
-                        <div className='flex items-center gap-2'>
-                          <StatusDot status={statusOption.code} />
-                          <span>{statusOption.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>id</th>
-              <td className={TABLE_DATA_READONLY_STYLE}>
-                <div className='px-2 py-1'>{postId ?? ''}</div>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>게시자</th>
-              <td className={TABLE_DATA_READONLY_STYLE}>
-                <div className='px-2 py-1'>{author}</div>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>시험후기명</th>
-              <td className={TABLE_DATA_READONLY_STYLE}>
-                <div className='px-2 py-1'>{examReviewName}</div>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>업로드시간</th>
-              <td className={TABLE_DATA_READONLY_STYLE}>
-                <div className='px-2 py-1'>{uploadTime}</div>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>업로드 파일</th>
-              <td className={`${TABLE_DATA_READONLY_STYLE} bg-white`}>
-                <div className='flex items-center justify-between px-2 py-1'>
-                  {selectedFile ? (
-                    <div
-                      className='flex-1 cursor-pointer text-blue-500 underline hover:text-blue-700'
-                      onClick={() => fileInputRef.current?.click()}
-                      title='클릭하여 파일 선택'
-                    >
-                      {selectedFile.name}
-                    </div>
-                  ) : isFileDeleted ? (
-                    <div className='flex-1 text-gray-400 italic'>파일 없음</div>
-                  ) : fileName ? (
-                    <div className='flex-1'>
-                      <span
-                        className='cursor-pointer text-blue-500 underline hover:text-blue-700'
-                        onClick={handleFileDownload}
-                        title='클릭하여 다운로드'
-                      >
-                        {fileName}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className='flex-1'>{fileName}</div>
-                  )}
-                  <div className='flex items-center gap-1'>
-                    <button
-                      type='button'
-                      onClick={() => fileInputRef.current?.click()}
+            {isLoadingDetail ? (
+              renderSkeletonTable()
+            ) : (
+              <>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>상태</th>
+                  <td className={TABLE_DATA_STYLE}>
+                    <Select
+                      value={status}
+                      onValueChange={setStatus}
                       disabled={!selectedExamReview || isLoadingDetail}
-                      className='rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
                     >
-                      {fileName || selectedFile ? '파일 변경' : '파일 업로드'}
-                    </button>
-                    <button
-                      type='button'
-                      onClick={handleFileDelete}
-                      disabled={
-                        !selectedExamReview ||
-                        isLoadingDetail ||
-                        (!selectedFile && !fileName && !isFileDeleted)
-                      }
-                      className='rounded bg-gray-500 px-2 py-0.5 text-[10px] text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50'
+                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                        <div className='flex items-center gap-2'>
+                          <StatusDot status={status} />
+                          <span>{getStatusName(status)}</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className={SELECT_CONTENT_STYLE}
+                      >
+                        {STATUS_COLOR.map((statusOption) => (
+                          <SelectItem
+                            key={statusOption.code}
+                            value={statusOption.code}
+                            className='text-[12px] font-medium'
+                          >
+                            <div className='flex items-center gap-2'>
+                              <StatusDot status={statusOption.code} />
+                              <span>{statusOption.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>id</th>
+                  <td className={TABLE_DATA_READONLY_STYLE}>
+                    <div className='px-2 py-1'>{postId ?? ''}</div>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>게시자</th>
+                  <td className={TABLE_DATA_READONLY_STYLE}>
+                    <div className='px-2 py-1'>{author}</div>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>시험후기명</th>
+                  <td className={TABLE_DATA_READONLY_STYLE}>
+                    <div className='px-2 py-1'>{examReviewName}</div>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>업로드시간</th>
+                  <td className={TABLE_DATA_READONLY_STYLE}>
+                    <div className='px-2 py-1'>{uploadTime}</div>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>업로드 파일</th>
+                  <td className={`${TABLE_DATA_READONLY_STYLE} bg-white`}>
+                    <div className='flex items-center justify-between px-2 py-1'>
+                      {selectedFile ? (
+                        <div
+                          className='flex-1 cursor-pointer text-blue-500 underline hover:text-blue-700'
+                          onClick={() => fileInputRef.current?.click()}
+                          title='클릭하여 파일 선택'
+                        >
+                          {selectedFile.name}
+                        </div>
+                      ) : isFileDeleted ? (
+                        <div className='flex-1 text-gray-400 italic'>
+                          파일 없음
+                        </div>
+                      ) : fileName ? (
+                        <div className='flex-1'>
+                          <span
+                            className='cursor-pointer text-blue-500 underline hover:text-blue-700'
+                            onClick={handleFileDownload}
+                            title='클릭하여 다운로드'
+                          >
+                            {fileName}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className='flex-1'>{fileName}</div>
+                      )}
+                      <div className='flex items-center gap-1'>
+                        <button
+                          type='button'
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={!selectedExamReview || isLoadingDetail}
+                          className='rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
+                        >
+                          {fileName || selectedFile
+                            ? '파일 변경'
+                            : '파일 업로드'}
+                        </button>
+                        <button
+                          type='button'
+                          onClick={handleFileDelete}
+                          disabled={
+                            !selectedExamReview ||
+                            isLoadingDetail ||
+                            (!selectedFile && !fileName && !isFileDeleted)
+                          }
+                          className='rounded bg-gray-500 px-2 py-0.5 text-[10px] text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50'
+                        >
+                          파일 제거
+                        </button>
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type='file'
+                        className='hidden'
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setSelectedFile(file);
+                            setFileName(file.name);
+                            setIsFileDeleted(false); // 새 파일 선택 시 삭제 플래그 해제
+                          }
+                          // 같은 파일을 다시 선택할 수 있도록 value 리셋
+                          if (e.target) {
+                            e.target.value = '';
+                          }
+                        }}
+                        accept='.pdf,.doc,.docx,.hwp'
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>강의명</th>
+                  <td
+                    className={`${TABLE_CELL_BASE_STYLE} ${
+                      focusedInput === 'lectureName'
+                        ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type='text'
+                      value={lectureName}
+                      onChange={(e) => setLectureName(e.target.value)}
+                      onFocus={() => setFocusedInput('lectureName')}
+                      onBlur={() => setFocusedInput(null)}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                      className='w-full bg-transparent px-2 py-1 outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                    />
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>교수</th>
+                  <td
+                    className={`${TABLE_CELL_BASE_STYLE} ${
+                      focusedInput === 'professorName'
+                        ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type='text'
+                      value={professorName}
+                      onChange={(e) => setProfessorName(e.target.value)}
+                      onFocus={() => setFocusedInput('professorName')}
+                      onBlur={() => setFocusedInput(null)}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                      className='w-full bg-transparent px-2 py-1 outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th className={TABLE_HEADER_STYLE}>학기</th>
+                  <td className={TABLE_DATA_STYLE}>
+                    <Select
+                      value={semester}
+                      onValueChange={setSemester}
+                      disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      파일 제거
-                    </button>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type='file'
-                    className='hidden'
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setSelectedFile(file);
-                        setFileName(file.name);
-                        setIsFileDeleted(false); // 새 파일 선택 시 삭제 플래그 해제
+                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                        <SelectValue>{semester}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className={SELECT_CONTENT_STYLE}
+                      >
+                        {SEMESTER_LIST.map((semesterOption) => (
+                          <SelectItem
+                            key={semesterOption}
+                            value={semesterOption}
+                            className='text-[12px] font-medium'
+                          >
+                            {semesterOption}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>시험 종류</th>
+                  <td className={TABLE_DATA_STYLE}>
+                    <Select
+                      value={examType}
+                      onValueChange={setExamType}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                    >
+                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                        <SelectValue>{examType}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className={SELECT_CONTENT_STYLE}
+                      >
+                        {EXAM_TYPE_LIST.map((examTypeOption) => (
+                          <SelectItem
+                            key={examTypeOption}
+                            value={examTypeOption}
+                            className='text-[12px] font-medium'
+                          >
+                            {examTypeOption}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>강의 종류</th>
+                  <td className={TABLE_DATA_STYLE}>
+                    <Select
+                      value={lectureType}
+                      onValueChange={(value) =>
+                        setLectureType(
+                          value as (typeof LECTURE_TYPE_OPTIONS)[number]['value']
+                        )
                       }
-                      // 같은 파일을 다시 선택할 수 있도록 value 리셋
-                      if (e.target) {
-                        e.target.value = '';
-                      }
-                    }}
-                    accept='.pdf,.doc,.docx,.hwp'
-                  />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>강의명</th>
-              <td
-                className={`border p-0 text-left text-[10px] font-medium ${
-                  focusedInput === 'lectureName'
-                    ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
-                    : 'border-gray-300'
-                }`}
-              >
-                <input
-                  type='text'
-                  value={lectureName}
-                  onChange={(e) => setLectureName(e.target.value)}
-                  onFocus={() => setFocusedInput('lectureName')}
-                  onBlur={() => setFocusedInput(null)}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>교수</th>
-              <td
-                className={`border p-0 text-left text-[10px] font-medium ${
-                  focusedInput === 'professorName'
-                    ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
-                    : 'border-gray-300'
-                }`}
-              >
-                <input
-                  type='text'
-                  value={professorName}
-                  onChange={(e) => setProfessorName(e.target.value)}
-                  onFocus={() => setFocusedInput('professorName')}
-                  onBlur={() => setFocusedInput(null)}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>학기</th>
-              <td className={TABLE_DATA_STYLE}>
-                <Select
-                  value={semester}
-                  onValueChange={setSemester}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                >
-                  <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                    <SelectValue>{semester}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
-                    {SEMESTER_LIST.map((semesterOption) => (
-                      <SelectItem
-                        key={semesterOption}
-                        value={semesterOption}
-                        className='text-[12px] font-medium'
+                      disabled={!selectedExamReview || isLoadingDetail}
+                    >
+                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                        <SelectValue>
+                          {convertLectureTypeToString(lectureType)}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className={SELECT_CONTENT_STYLE}
                       >
-                        {semesterOption}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>시험 종류</th>
-              <td className={TABLE_DATA_STYLE}>
-                <Select
-                  value={examType}
-                  onValueChange={setExamType}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                >
-                  <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                    <SelectValue>{examType}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
-                    {EXAM_TYPE_LIST.map((examTypeOption) => (
-                      <SelectItem
-                        key={examTypeOption}
-                        value={examTypeOption}
-                        className='text-[12px] font-medium'
+                        {LECTURE_TYPE_OPTIONS.map((option) => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            className='text-[12px] font-medium'
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>분반</th>
+                  <td
+                    className={`$${TABLE_CELL_BASE_STYLE} ${
+                      focusedInput === 'classNumber'
+                        ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type='number'
+                      value={classNumber ?? ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setClassNumber(
+                          value === '' ? null : parseInt(value, 10)
+                        );
+                      }}
+                      onFocus={() => setFocusedInput('classNumber')}
+                      onBlur={() => setFocusedInput(null)}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                      className='w-full bg-transparent px-2 py-1 outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                      min='1'
+                    />
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>P/F</th>
+                  <td className={TABLE_DATA_STYLE}>
+                    <Select
+                      value={isPF}
+                      onValueChange={setIsPF}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                    >
+                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                        <SelectValue>{isPF}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className={SELECT_CONTENT_STYLE}
                       >
-                        {examTypeOption}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>강의 종류</th>
-              <td className={TABLE_DATA_STYLE}>
-                <Select
-                  value={lectureType}
-                  onValueChange={(value) =>
-                    setLectureType(
-                      value as (typeof LECTURE_TYPE_OPTIONS)[number]['value']
-                    )
-                  }
-                  disabled={!selectedExamReview || isLoadingDetail}
-                >
-                  <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                    <SelectValue>
-                      {convertLectureTypeToString(lectureType)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
-                    {LECTURE_TYPE_OPTIONS.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        className='text-[12px] font-medium'
+                        <SelectItem
+                          value='O'
+                          className='text-[12px] font-medium'
+                        >
+                          O
+                        </SelectItem>
+                        <SelectItem
+                          value='X'
+                          className='text-[12px] font-medium'
+                        >
+                          X
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>온라인 수업</th>
+                  <td className={TABLE_DATA_STYLE}>
+                    <Select
+                      value={isOnline}
+                      onValueChange={setIsOnline}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                    >
+                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                        <SelectValue>{isOnline}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent
+                        align='start'
+                        className={SELECT_CONTENT_STYLE}
                       >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>분반</th>
-              <td
-                className={`border p-0 text-left text-[10px] font-medium ${
-                  focusedInput === 'classNumber'
-                    ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
-                    : 'border-gray-300'
-                }`}
-              >
-                <input
-                  type='number'
-                  value={classNumber ?? ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setClassNumber(value === '' ? null : parseInt(value, 10));
-                  }}
-                  onFocus={() => setFocusedInput('classNumber')}
-                  onBlur={() => setFocusedInput(null)}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                  min='1'
-                />
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>P/F</th>
-              <td className={TABLE_DATA_STYLE}>
-                <Select
-                  value={isPF}
-                  onValueChange={setIsPF}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                >
-                  <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                    <SelectValue>{isPF}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
-                    <SelectItem value='O' className='text-[12px] font-medium'>
-                      O
-                    </SelectItem>
-                    <SelectItem value='X' className='text-[12px] font-medium'>
-                      X
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>온라인 수업</th>
-              <td className={TABLE_DATA_STYLE}>
-                <Select
-                  value={isOnline}
-                  onValueChange={setIsOnline}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                >
-                  <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                    <SelectValue>{isOnline}</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent align='start' className={SELECT_CONTENT_STYLE}>
-                    <SelectItem value='O' className='text-[12px] font-medium'>
-                      O
-                    </SelectItem>
-                    <SelectItem value='X' className='text-[12px] font-medium'>
-                      X
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </td>
-            </tr>
-            <tr>
-              <th className={TABLE_HEADER_STYLE}>시험 유형 및 문항수</th>
-              <td
-                className={`border p-0 text-left text-[10px] font-medium ${
-                  focusedInput === 'examTypeAndQuestions'
-                    ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
-                    : 'border-gray-300'
-                }`}
-              >
-                <input
-                  type='text'
-                  value={examTypeAndQuestions}
-                  onChange={(e) => setExamTypeAndQuestions(e.target.value)}
-                  onFocus={() => setFocusedInput('examTypeAndQuestions')}
-                  onBlur={() => setFocusedInput(null)}
-                  disabled={!selectedExamReview || isLoadingDetail}
-                  className='w-full bg-transparent px-2 py-1 text-[10px] outline-none disabled:cursor-not-allowed disabled:opacity-50'
-                />
-              </td>
-            </tr>
+                        <SelectItem
+                          value='O'
+                          className='text-[12px] font-medium'
+                        >
+                          O
+                        </SelectItem>
+                        <SelectItem
+                          value='X'
+                          className='text-[12px] font-medium'
+                        >
+                          X
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+                <tr className='h-[30px]'>
+                  <th className={TABLE_HEADER_STYLE}>시험 유형 및 문항수</th>
+                  <td
+                    className={`${TABLE_CELL_BASE_STYLE} ${
+                      focusedInput === 'examTypeAndQuestions'
+                        ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    <input
+                      type='text'
+                      value={examTypeAndQuestions}
+                      onChange={(e) => setExamTypeAndQuestions(e.target.value)}
+                      onFocus={() => setFocusedInput('examTypeAndQuestions')}
+                      onBlur={() => setFocusedInput(null)}
+                      disabled={!selectedExamReview || isLoadingDetail}
+                      className='w-full bg-transparent px-2 py-1 outline-none disabled:cursor-not-allowed disabled:opacity-50'
+                    />
+                  </td>
+                </tr>
+              </>
+            )}
           </tbody>
         </table>
       </div>

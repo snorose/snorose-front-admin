@@ -17,6 +17,12 @@ export default function ExamReviewPage() {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const fetchingIdRef = useRef<number | null>(null);
+  const [searchParams, setSearchParams] = useState<{
+    keyword?: string;
+    lectureYear?: number;
+    semester?: string;
+    examType?: string;
+  }>({});
 
   const handleSaveSuccess = () => {
     // Table과 Panel을 새로고침하기 위해 refreshKey 증가
@@ -94,7 +100,7 @@ export default function ExamReviewPage() {
             title='시험후기 관리'
             description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
           />
-          <ExamSearch />
+          <ExamSearch onSearchChange={setSearchParams} />
         </div>
 
         <ExamIconInfo />
@@ -105,6 +111,7 @@ export default function ExamReviewPage() {
         onRowSelect={setSelectedExamReview}
         refreshKey={refreshKey}
         selectedId={selectedExamReview?.id}
+        searchParams={searchParams}
       />
 
       {/* 시험후기 패널 - 편집, 삭제, 경고, 메모, 강등... */}
