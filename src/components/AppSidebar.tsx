@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { ChevronRight, Rose } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import {
   Collapsible,
   CollapsibleContent,
@@ -9,7 +9,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarMenuButton,
   SidebarRail,
   SidebarFooter,
   SidebarMenuSub,
@@ -18,6 +17,7 @@ import {
 } from '@/components/ui';
 import { snoroseLogo } from '@/assets';
 import { SIDEBAR_MENUS } from '@/constants';
+import { NavUser } from '@/components';
 
 export const AppSidebar = ({
   ...props
@@ -25,8 +25,6 @@ export const AppSidebar = ({
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const location = useLocation();
   const isActive = (url: string) => location.pathname.startsWith(url);
-
-  const ICON_SIZE = 16;
 
   useEffect(() => {
     const storedStates = localStorage.getItem('sidebar-open-states');
@@ -94,14 +92,8 @@ export const AppSidebar = ({
         ))}
       </SidebarContent>
       <SidebarRail />
-
       <SidebarFooter>
-        <SidebarMenuButton asChild>
-          <div className='flex items-center'>
-            <Rose size={ICON_SIZE} className='mr-2 text-red-400' />
-            <span>리자 이름</span>
-          </div>
-        </SidebarMenuButton>
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );

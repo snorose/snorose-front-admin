@@ -65,3 +65,34 @@ export { Skeleton } from './skeleton';
 export { Textarea } from './textarea';
 export { Switch } from './switch';
 export { Label } from './label';
+export { Alert, AlertTitle, AlertDescription } from './alert';
+export { Toaster } from 'sonner';
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+} from './dropdown-menu';
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogPortal,
+  DialogOverlay,
+} from './dialog';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from './table';

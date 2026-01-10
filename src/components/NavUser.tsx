@@ -1,0 +1,89 @@
+import {
+  ExternalLink,
+  ChevronsUpDown,
+  LogOut,
+  Rose,
+  Instagram,
+  NotebookPen,
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/components/ui';
+import { useAuth } from '@/hooks';
+
+const EXTERNAL_LINKS = [
+  {
+    icon: ExternalLink,
+    label: '스노로즈',
+    url: 'https://snorose.com',
+  },
+  {
+    icon: NotebookPen,
+    label: '스노로즈 블로그',
+    url: 'https://snorose.notion.site/1a37ef0aa3bf8071bcd0cb35c035636e',
+  },
+  {
+    icon: Instagram,
+    label: '인스타그램',
+    url: 'https://www.instagram.com/snorose1906',
+  },
+] as const;
+
+const ICON_SIZE = 16;
+
+export function NavUser() {
+  const { isMobile } = useSidebar();
+  const { user, logout } = useAuth();
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size='lg'
+              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+            >
+              <div className='flex items-center'>
+                <Rose size={ICON_SIZE} className='mr-2 text-red-400' />
+                <span>{user?.nickname || '리자'}</span>
+              </div>
+              <ChevronsUpDown className='ml-auto size-4' />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className='w-[var(--radix-dropdown-menu-trigger-width)] min-w-42 rounded-lg'
+            side={isMobile ? 'bottom' : 'right'}
+            align='end'
+            sideOffset={4}
+          >
+            <DropdownMenuGroup>
+              {EXTERNAL_LINKS.map(({ icon: Icon, label, url }) => (
+                <DropdownMenuItem key={label} asChild>
+                  <a href={url} target='_blank' rel='noopener noreferrer'>
+                    <Icon />
+                    {label}
+                  </a>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout}>
+              <LogOut />
+              로그아웃
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}

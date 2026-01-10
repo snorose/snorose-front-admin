@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Input, Label, Switch, Textarea } from '@/components/ui';
+import { PageHeader } from '@/components';
 
 export default function PushNotificationPage() {
   const [formData, setFormData] = useState({
@@ -39,11 +40,14 @@ export default function PushNotificationPage() {
 
   return (
     <div className='flex w-full flex-col gap-6'>
-      <h1 className='text-2xl font-bold'>푸시 알림 전송</h1>
+      <PageHeader
+        title='푸시 알림 전송'
+        description='푸시 알림을 허용한 회원을 대상으로 전송할 수 있어요.'
+      />
       <section className='flex gap-4'>
         <article className='flex w-full flex-col gap-1'>
           <h3 className='text-lg font-bold'>필수 정보</h3>
-          <div className='flex w-full flex-col gap-4 rounded-md border p-4'>
+          <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
             <div className='flex flex-col gap-1'>
               <Label htmlFor='name' required>
                 알림명

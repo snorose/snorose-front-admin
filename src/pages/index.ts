@@ -1,7 +1,11 @@
 export { default as CommentPage } from './CommentPage';
 export { default as ExamReviewPage } from './ExamReviewPage';
-export { default as MemberInfoPage } from './MemberInfoPage';
-export { default as PointAdjustmentPage } from './PointAdjustmentPage';
+export { default as MemberInfoPage } from './member/MemberInfoPage';
+export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
+export { default as AdjustSinglePointPage } from './points/AdjustSinglePointPage';
+export { default as PointMultiplePage } from './points/PointMultiplePage';
+export { default as PointAllPage } from './points/PointAllPage';
+export { default as PointFreezePage } from './points/PointFreezePage';
 export { default as LogInPage } from './LogInPage';
 export { default as PostPage } from './PostPage';
 export { default as PushNotificationPage } from './PushNotificationPage';
