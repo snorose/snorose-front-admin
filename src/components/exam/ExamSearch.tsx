@@ -1,6 +1,6 @@
 export default function ExamSearch() {
   return (
-    <div className='flex flex-col py-3 gap-2'>
+    <div className='flex flex-col gap-2 py-3'>
       {/* 검색 input + 조회 버튼 */}
       <div className='flex items-center gap-2'>
         <input
@@ -14,7 +14,7 @@ export default function ExamSearch() {
       </div>
 
       {/* 조회기간 */}
-      <div className='flex items-center gap-4'>
+      {/* <div className='flex items-center gap-4'>
         <span className='text-xs font-medium'>조회기간</span>
         <label className='flex items-center gap-1 text-[10px] whitespace-nowrap'>
           <input
@@ -36,7 +36,7 @@ export default function ExamSearch() {
           />
           까지
         </label>
-      </div>
+      </div> */}
     </div>
   );
 }

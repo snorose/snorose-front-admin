@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ExamTable from '@/components/exam/ExamTable';
 import ExamSearch from '@/components/exam/ExamSearch';
 import ExamIconInfo from '@/components/exam/ExamIconInfo';
@@ -16,6 +16,7 @@ export default function ExamReviewPage() {
     useState<ExamReviewDetailResult | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const fetchingIdRef = useRef<number | null>(null);
 
   const handleSaveSuccess = () => {
     // Table과 Panel을 새로고침하기 위해 refreshKey 증가
@@ -34,28 +35,50 @@ export default function ExamReviewPage() {
     const fetchExamReviewDetail = async () => {
       if (!selectedExamReview) {
         setSelectedExamReviewDetail(null);
+        fetchingIdRef.current = null;
         return;
       }
 
+      const examId = selectedExamReview.id;
+
+      // 이미 같은 ID에 대한 요청이 진행 중이면 중복 호출 방지
+      if (fetchingIdRef.current === examId) {
+        return;
+      }
+
+      fetchingIdRef.current = examId;
       setIsLoadingDetail(true);
+
       try {
-        const response = await getExamReviewDetail(selectedExamReview.id);
-        if (response.isSuccess && response.result) {
-          setSelectedExamReviewDetail(response.result);
-        } else {
-          toast.error(
-            response.message || '시험 후기 상세 정보를 불러오는데 실패했습니다.'
-          );
-          setSelectedExamReviewDetail(null);
+        const response = await getExamReviewDetail(examId);
+
+        // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
+        if (fetchingIdRef.current === examId) {
+          if (response.isSuccess && response.result) {
+            setSelectedExamReviewDetail(response.result);
+          } else {
+            toast.error(
+              response.message ||
+                '시험 후기 상세 정보를 불러오는데 실패했습니다.'
+            );
+            setSelectedExamReviewDetail(null);
+          }
         }
       } catch (error: unknown) {
-        const errorMessage =
-          (isAxiosError(error) && error.response?.data?.message) ||
-          '시험 후기 상세 정보를 불러오는데 실패했습니다.';
-        toast.error(errorMessage);
-        setSelectedExamReviewDetail(null);
+        // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
+        if (fetchingIdRef.current === examId) {
+          const errorMessage =
+            (isAxiosError(error) && error.response?.data?.message) ||
+            '시험 후기 상세 정보를 불러오는데 실패했습니다.';
+          toast.error(errorMessage);
+          setSelectedExamReviewDetail(null);
+        }
       } finally {
-        setIsLoadingDetail(false);
+        // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
+        if (fetchingIdRef.current === examId) {
+          setIsLoadingDetail(false);
+          fetchingIdRef.current = null;
+        }
       }
     };
 

@@ -19,7 +19,7 @@ import {
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
 } from '@/constants/exam-table-options';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getExamReviews, confirmExamReview } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
@@ -247,6 +247,7 @@ export default function ExamTable({
   const [apiData, setApiData] = useState<ExamReview[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(false);
+  const lastSelectedIdRef = useRef<number | null>(null);
 
   // 페이지네이션 설정
   const ITEMS_PER_PAGE = 10;
@@ -332,16 +333,6 @@ export default function ExamTable({
       toast.error(errorMessage);
     }
   };
-
-  // 추후 api값 추가되면 사용
-  // // 담당자 선택 함수
-  // const handleManagerSelect = (reviewId: number, managerName: string) => {
-  //   setSelectedManager((prev) => ({
-  //     ...prev,
-  //     [reviewId]: managerName,
-  //   }));
-  //   console.log(`Review ID: ${reviewId}, Selected Manager: ${managerName}`);
-  // };
 
   // 헤더 필터 다중 선택 함수
   const handleHeaderFilterSelect = (
@@ -429,12 +420,21 @@ export default function ExamTable({
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택 (무한 루프 방지를 위해 별도 useEffect로 분리)
   useEffect(() => {
     if (selectedId && onRowSelect && apiData.length > 0) {
+      // 이미 같은 ID를 선택했으면 중복 호출 방지
+      if (lastSelectedIdRef.current === selectedId) {
+        return;
+      }
+
       const updatedReview = apiData.find(
         (review: ExamReview) => review.id === selectedId
       );
       if (updatedReview) {
+        lastSelectedIdRef.current = selectedId;
         onRowSelect(updatedReview);
       }
+    } else if (!selectedId) {
+      // 선택 해제 시 ref 초기화
+      lastSelectedIdRef.current = null;
     }
   }, [selectedId, apiData, onRowSelect]);
 

@@ -22,7 +22,7 @@ import {
 } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react';
 import type { ExamReview } from './ExamTable';
 import ConfirmModal from '../ui/confirm-modal';
 
@@ -94,6 +94,7 @@ export default function ExamEditPanel({
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileDeleted, setIsFileDeleted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 초기값 저장 (변경사항 비교용)
@@ -135,6 +136,7 @@ export default function ExamEditPanel({
     setFocusedInput(null);
     setSelectedFile(null);
     setIsFileDeleted(false);
+    setIsSaving(false);
   };
 
   // lectureType enum을 문자열로 변환
@@ -291,11 +293,16 @@ export default function ExamEditPanel({
 
   // 저장 핸들러
   const handleSave = async () => {
+    if (isSaving) {
+      return; // 이미 저장 중이면 중복 호출 방지
+    }
+
     if (!selectedExamReview || !selectedExamReviewDetail || !initialValues) {
       toast.error('선택된 시험 후기가 없습니다.');
       return;
     }
 
+    setIsSaving(true);
     try {
       // 변경된 필드만 포함하는 post 객체 생성
       const post: UpdateExamReviewRequest['post'] = {};
@@ -382,6 +389,8 @@ export default function ExamEditPanel({
         (isAxiosError(error) && error.response?.data?.message) ||
         '시험 후기 수정에 실패했습니다.';
       toast.error(errorMessage);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -861,9 +870,18 @@ export default function ExamEditPanel({
           size='sm'
           className='h-6 w-20 bg-gray-700 text-sm'
           onClick={handleSave}
-          disabled={!selectedExamReview || isLoadingDetail || !hasChanges()}
+          disabled={
+            !selectedExamReview || isLoadingDetail || !hasChanges() || isSaving
+          }
         >
-          수정
+          {isSaving ? (
+            <div className='flex items-center gap-1'>
+              <Loader2 className='h-3 w-3 animate-spin' />
+              <span>수정 중</span>
+            </div>
+          ) : (
+            '수정'
+          )}
         </Button>
       </div>
       <ConfirmModal
