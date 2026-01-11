@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import ExamTable from '@/components/exam/ExamTable';
-import ExamSearch from '@/components/exam/ExamSearch';
-import ExamIconInfo from '@/components/exam/ExamIconInfo';
-import ExamPanel from '@/components/exam/ExamPanel';
+import {
+  ExamTable,
+  ExamSearch,
+  ExamIconInfo,
+  ExamPanel,
+} from '@/domains/Exams/components';
+import type { ExamReview } from '@/domains/Exams/components/ExamTable';
 import PageHeader from '@/components/PageHeader';
-import type { ExamReview } from '@/components/exam/ExamTable';
 import { getExamReviewDetail, type ExamReviewDetailResult } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
@@ -60,7 +62,7 @@ export default function ExamReviewPage() {
     if (pageFromUrl !== currentPage) {
       setCurrentPage(pageFromUrl);
     }
-  }, [searchParamsFromUrl]);
+  }, [searchParamsFromUrl, currentPage]);
 
   // URL 쿼리 파라미터를 searchParams로 변환 (검색 파라미터만, page 제외)
   useEffect(() => {

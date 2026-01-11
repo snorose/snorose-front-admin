@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui';
+} from '@/components/ui';
 import {
   STATUS_COLOR,
   SEMESTER_LIST,
@@ -24,8 +24,8 @@ import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { Trash2, Loader2 } from 'lucide-react';
 import type { ExamReview } from './ExamTable';
-import ConfirmModal from '../ui/confirm-modal';
-import { Skeleton } from '../ui/skeleton';
+import ConfirmModal from '@/components/ui/confirm-modal';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[12px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;

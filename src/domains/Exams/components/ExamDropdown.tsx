@@ -1,4 +1,4 @@
-import { STATUS_COLOR, MANAGER_LIST } from '@/constants/exam-table-options';
+import { STATUS_COLOR } from '@/constants/exam-table-options';
 import * as Popover from '@radix-ui/react-popover';
 import { useEffect } from 'react';
 import React from 'react';
@@ -119,7 +119,7 @@ export const TextDropdown = ({
   isOpen,
   onSelect,
   onClose,
-  options = MANAGER_LIST,
+  options = [],
   position = 'bottom',
   width = 'w-24',
   selectedValues = [],
