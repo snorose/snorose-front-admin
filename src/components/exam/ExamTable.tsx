@@ -14,12 +14,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-// import * as Popover from '@radix-ui/react-popover';
-import {
-  STATUS_COLOR,
-  // SEMESTER_LIST,
-  // EXAM_TYPE_LIST,
-} from '@/constants/exam-table-options';
+import { STATUS_COLOR } from '@/constants/exam-table-options';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getExamReviews, confirmExamReview } from '@/apis/exam';
 import { toast } from 'sonner';
@@ -107,145 +102,6 @@ const StatusDot = ({ status }: { status: string }) => {
   );
 };
 
-// // 다중 선택 Select 컴포넌트
-// interface MultiSelectProps {
-//   value: string[];
-//   onValueChange: (value: string[]) => void;
-//   options: string[];
-//   contentClassName?: string;
-//   side?: 'top' | 'bottom' | 'left' | 'right';
-//   align?: 'start' | 'center' | 'end';
-//   showStatusDot?: boolean;
-//   children: React.ReactNode;
-// }
-
-// const MultiSelect = ({
-//   value,
-//   onValueChange,
-//   options,
-//   contentClassName = '',
-//   side = 'bottom',
-//   align = 'start',
-//   showStatusDot = false,
-//   children,
-// }: MultiSelectProps) => {
-//   const [open, setOpen] = useState(false);
-
-//   // 드롭다운이 열려있을 때 body 스크롤 막기
-//   useEffect(() => {
-//     if (open) {
-//       document.body.style.overflow = 'hidden';
-//     } else {
-//       document.body.style.overflow = '';
-//     }
-//     return () => {
-//       document.body.style.overflow = '';
-//     };
-//   }, [open]);
-
-//   const handleToggle = (optionValue: string) => {
-//     const isSelected = value.includes(optionValue);
-//     if (isSelected) {
-//       onValueChange(value.filter((v) => v !== optionValue));
-//     } else {
-//       onValueChange([...value, optionValue]);
-//     }
-//   };
-
-//   const allSelected =
-//     options.length > 0 && options.every((opt) => value.includes(opt));
-//   const handleSelectAll = () => {
-//     if (allSelected) {
-//       onValueChange([]);
-//     } else {
-//       onValueChange([...options]);
-//     }
-//   };
-
-//   return (
-//     <Popover.Root open={open} onOpenChange={setOpen}>
-//       <Popover.Trigger asChild>{children}</Popover.Trigger>
-//       <Popover.Portal>
-//         <Popover.Content
-//           side={side}
-//           align={align}
-//           sideOffset={4}
-//           className={`text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[200px] min-w-[8rem] origin-[var(--radix-select-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md border bg-blue-50 shadow-md ${contentClassName}`}
-//         >
-//           <div className='p-1'>
-//             {/* 전체 선택/해제 체크박스 */}
-//             <div
-//               className='relative mb-1 flex w-full cursor-default items-center rounded-sm border-b border-gray-200 px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
-//               onClick={handleSelectAll}
-//               onKeyDown={(e) => {
-//                 if (e.key === 'Enter' || e.key === ' ') {
-//                   e.preventDefault();
-//                   handleSelectAll();
-//                 }
-//               }}
-//               role='option'
-//               tabIndex={0}
-//             >
-//               <input
-//                 type='checkbox'
-//                 checked={allSelected}
-//                 onChange={() => {}}
-//                 className={`relative mr-2 h-3 w-3 shrink-0 cursor-pointer appearance-none rounded border-2 ${
-//                   allSelected
-//                     ? 'border-blue-500 bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[8px] checked:before:text-white checked:before:content-["✓"]'
-//                     : 'border-gray-300 bg-transparent'
-//                 }`}
-//                 tabIndex={-1}
-//               />
-//               <span className='flex-1 font-medium'>전체 선택</span>
-//             </div>
-//             {options.map((option) => {
-//               const isSelected = value.includes(option);
-//               const statusOption = showStatusDot
-//                 ? STATUS_COLOR.find((s) => s.name === option)
-//                 : null;
-//               return (
-//                 <div
-//                   key={option}
-//                   className='relative flex w-full cursor-default items-center rounded-sm px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
-//                   onClick={() => handleToggle(option)}
-//                   onKeyDown={(e) => {
-//                     if (e.key === 'Enter' || e.key === ' ') {
-//                       e.preventDefault();
-//                       handleToggle(option);
-//                     }
-//                   }}
-//                   role='option'
-//                   aria-selected={isSelected}
-//                   tabIndex={0}
-//                 >
-//                   <input
-//                     type='checkbox'
-//                     checked={isSelected}
-//                     onChange={() => {}}
-//                     className={`relative mr-2 h-3 w-3 shrink-0 cursor-pointer appearance-none rounded border-2 ${
-//                       isSelected
-//                         ? 'border-blue-500 bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[8px] checked:before:text-white checked:before:content-["✓"]'
-//                         : 'border-gray-300 bg-transparent'
-//                     }`}
-//                     tabIndex={-1}
-//                   />
-//                   <span className='flex-1'>{option}</span>
-//                   {showStatusDot && statusOption && (
-//                     <div
-//                       className={`ml-2 h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-//                     />
-//                   )}
-//                 </div>
-//               );
-//             })}
-//           </div>
-//         </Popover.Content>
-//       </Popover.Portal>
-//     </Popover.Root>
-//   );
-// };
-
 export default function ExamTable({
   data: propData,
   onRowSelect,
@@ -295,20 +151,6 @@ export default function ExamTable({
     [key: number]: boolean;
   }>({});
 
-  // 상태 리스트 생성
-  // const STATUS_LIST = STATUS_COLOR.map((status) => status.name);
-
-  // // 헤더 필터 선택 상태 관리 (다중 선택)
-  // const [headerFilters, setHeaderFilters] = useState<{
-  //   status: string[];
-  //   semester: string[];
-  //   examType: string[];
-  // }>({
-  //   status: STATUS_LIST,
-  //   semester: SEMESTER_LIST,
-  //   examType: EXAM_TYPE_LIST,
-  // });
-
   // propData가 제공되면 사용, 없으면 API 데이터 사용
   const data = propData || apiData;
 
@@ -356,21 +198,6 @@ export default function ExamTable({
       toast.error(errorMessage);
     }
   };
-
-  // // 헤더 필터 다중 선택 함수
-  // const handleHeaderFilterSelect = (
-  //   filterType: 'status' | 'semester' | 'examType' | 'manager',
-  //   value: string[]
-  // ) => {
-  //   setHeaderFilters((prev) => ({
-  //     ...prev,
-  //     [filterType]: value,
-  //   }));
-  //   console.log(`Filter Type: ${filterType}, Selected Values:`, value);
-
-  //   // 필터 변경 시 첫 페이지로 이동
-  //   setCurrentPage(1);
-  // };
 
   // 쿼리가 변경되었는지 확인하는 함수
   const hasQueryChanged = (
@@ -483,11 +310,6 @@ export default function ExamTable({
     }
   }, [selectedId, apiData, onRowSelect]);
 
-  // // 선택된 필터 상태 디버깅
-  // useEffect(() => {
-  //   console.log('Header Filters:', headerFilters);
-  // }, [headerFilters]);
-
   const isEmpty = !isLoading && currentPageData.length === 0;
 
   return (
@@ -506,58 +328,15 @@ export default function ExamTable({
             <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
               상태
             </TableHead>
-            {/* <MultiSelect
-              value={headerFilters.status}
-              onValueChange={(value) =>
-                handleHeaderFilterSelect('status', value)
-              }
-              options={STATUS_LIST}
-              contentClassName='w-32 max-h-[300px]'
-              side='bottom'
-              align='start'
-              showStatusDot={true}
-            >
-              <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
-                상태 ▼
-              </TableHead>
-            </MultiSelect> */}
             <TableHead className='w-[200px]'>시험후기명</TableHead>
             <TableHead className='w-[120px]'>강의명</TableHead>
             <TableHead className='w-[60px]'>교수</TableHead>
             <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
               수강학기
             </TableHead>
-            {/* <MultiSelect
-              value={headerFilters.semester}
-              onValueChange={(value) =>
-                handleHeaderFilterSelect('semester', value)
-              }
-              options={SEMESTER_LIST}
-              contentClassName='w-32'
-              side='bottom'
-              align='start'
-            >
-              <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
-                수강학기 ▼
-              </TableHead>
-            </MultiSelect> */}
             <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
               시험종류
             </TableHead>
-            {/* <MultiSelect
-              value={headerFilters.examType}
-              onValueChange={(value) =>
-                handleHeaderFilterSelect('examType', value)
-              }
-              options={EXAM_TYPE_LIST}
-              contentClassName='w-28'
-              side='bottom'
-              align='start'
-            >
-              <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
-                시험종류 ▼
-              </TableHead>
-            </MultiSelect> */}
             <TableHead className='w-[60px]'>분반</TableHead>
             <TableHead className='w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[110px]'>업로드 시간</TableHead>
