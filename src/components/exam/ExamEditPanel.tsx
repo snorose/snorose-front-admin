@@ -381,6 +381,21 @@ export default function ExamEditPanel({
         toast.success('시험 후기가 성공적으로 수정되었습니다.');
         setIsFileDeleted(false);
         setSelectedFile(null);
+
+        // 저장 성공 후 현재 상태를 initialValues로 업데이트
+        setInitialValues({
+          status,
+          lectureName,
+          professorName,
+          classNumber,
+          semester,
+          lectureType,
+          isPF,
+          isOnline,
+          examType,
+          questionDetail: examTypeAndQuestions,
+        });
+
         onSaveSuccess?.();
       } else {
         toast.error(response.message || '시험 후기 수정에 실패했습니다.');

@@ -14,11 +14,11 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import * as Popover from '@radix-ui/react-popover';
+// import * as Popover from '@radix-ui/react-popover';
 import {
   STATUS_COLOR,
-  SEMESTER_LIST,
-  EXAM_TYPE_LIST,
+  // SEMESTER_LIST,
+  // EXAM_TYPE_LIST,
 } from '@/constants/exam-table-options';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getExamReviews, confirmExamReview } from '@/apis/exam';
@@ -86,6 +86,8 @@ interface ExamTableProps {
     semester?: string;
     examType?: string;
   };
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
 }
 
 // 상태 점 컴포넌트
@@ -105,144 +107,144 @@ const StatusDot = ({ status }: { status: string }) => {
   );
 };
 
-// 다중 선택 Select 컴포넌트
-interface MultiSelectProps {
-  value: string[];
-  onValueChange: (value: string[]) => void;
-  options: string[];
-  contentClassName?: string;
-  side?: 'top' | 'bottom' | 'left' | 'right';
-  align?: 'start' | 'center' | 'end';
-  showStatusDot?: boolean;
-  children: React.ReactNode;
-}
+// // 다중 선택 Select 컴포넌트
+// interface MultiSelectProps {
+//   value: string[];
+//   onValueChange: (value: string[]) => void;
+//   options: string[];
+//   contentClassName?: string;
+//   side?: 'top' | 'bottom' | 'left' | 'right';
+//   align?: 'start' | 'center' | 'end';
+//   showStatusDot?: boolean;
+//   children: React.ReactNode;
+// }
 
-const MultiSelect = ({
-  value,
-  onValueChange,
-  options,
-  contentClassName = '',
-  side = 'bottom',
-  align = 'start',
-  showStatusDot = false,
-  children,
-}: MultiSelectProps) => {
-  const [open, setOpen] = useState(false);
+// const MultiSelect = ({
+//   value,
+//   onValueChange,
+//   options,
+//   contentClassName = '',
+//   side = 'bottom',
+//   align = 'start',
+//   showStatusDot = false,
+//   children,
+// }: MultiSelectProps) => {
+//   const [open, setOpen] = useState(false);
 
-  // 드롭다운이 열려있을 때 body 스크롤 막기
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
+//   // 드롭다운이 열려있을 때 body 스크롤 막기
+//   useEffect(() => {
+//     if (open) {
+//       document.body.style.overflow = 'hidden';
+//     } else {
+//       document.body.style.overflow = '';
+//     }
+//     return () => {
+//       document.body.style.overflow = '';
+//     };
+//   }, [open]);
 
-  const handleToggle = (optionValue: string) => {
-    const isSelected = value.includes(optionValue);
-    if (isSelected) {
-      onValueChange(value.filter((v) => v !== optionValue));
-    } else {
-      onValueChange([...value, optionValue]);
-    }
-  };
+//   const handleToggle = (optionValue: string) => {
+//     const isSelected = value.includes(optionValue);
+//     if (isSelected) {
+//       onValueChange(value.filter((v) => v !== optionValue));
+//     } else {
+//       onValueChange([...value, optionValue]);
+//     }
+//   };
 
-  const allSelected =
-    options.length > 0 && options.every((opt) => value.includes(opt));
-  const handleSelectAll = () => {
-    if (allSelected) {
-      onValueChange([]);
-    } else {
-      onValueChange([...options]);
-    }
-  };
+//   const allSelected =
+//     options.length > 0 && options.every((opt) => value.includes(opt));
+//   const handleSelectAll = () => {
+//     if (allSelected) {
+//       onValueChange([]);
+//     } else {
+//       onValueChange([...options]);
+//     }
+//   };
 
-  return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>{children}</Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          side={side}
-          align={align}
-          sideOffset={4}
-          className={`text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[200px] min-w-[8rem] origin-[var(--radix-select-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md border bg-blue-50 shadow-md ${contentClassName}`}
-        >
-          <div className='p-1'>
-            {/* 전체 선택/해제 체크박스 */}
-            <div
-              className='relative mb-1 flex w-full cursor-default items-center rounded-sm border-b border-gray-200 px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
-              onClick={handleSelectAll}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleSelectAll();
-                }
-              }}
-              role='option'
-              tabIndex={0}
-            >
-              <input
-                type='checkbox'
-                checked={allSelected}
-                onChange={() => {}}
-                className={`relative mr-2 h-3 w-3 shrink-0 cursor-pointer appearance-none rounded border-2 ${
-                  allSelected
-                    ? 'border-blue-500 bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[8px] checked:before:text-white checked:before:content-["✓"]'
-                    : 'border-gray-300 bg-transparent'
-                }`}
-                tabIndex={-1}
-              />
-              <span className='flex-1 font-medium'>전체 선택</span>
-            </div>
-            {options.map((option) => {
-              const isSelected = value.includes(option);
-              const statusOption = showStatusDot
-                ? STATUS_COLOR.find((s) => s.name === option)
-                : null;
-              return (
-                <div
-                  key={option}
-                  className='relative flex w-full cursor-default items-center rounded-sm px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
-                  onClick={() => handleToggle(option)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleToggle(option);
-                    }
-                  }}
-                  role='option'
-                  aria-selected={isSelected}
-                  tabIndex={0}
-                >
-                  <input
-                    type='checkbox'
-                    checked={isSelected}
-                    onChange={() => {}}
-                    className={`relative mr-2 h-3 w-3 shrink-0 cursor-pointer appearance-none rounded border-2 ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[8px] checked:before:text-white checked:before:content-["✓"]'
-                        : 'border-gray-300 bg-transparent'
-                    }`}
-                    tabIndex={-1}
-                  />
-                  <span className='flex-1'>{option}</span>
-                  {showStatusDot && statusOption && (
-                    <div
-                      className={`ml-2 h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
-  );
-};
+//   return (
+//     <Popover.Root open={open} onOpenChange={setOpen}>
+//       <Popover.Trigger asChild>{children}</Popover.Trigger>
+//       <Popover.Portal>
+//         <Popover.Content
+//           side={side}
+//           align={align}
+//           sideOffset={4}
+//           className={`text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[200px] min-w-[8rem] origin-[var(--radix-select-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md border bg-blue-50 shadow-md ${contentClassName}`}
+//         >
+//           <div className='p-1'>
+//             {/* 전체 선택/해제 체크박스 */}
+//             <div
+//               className='relative mb-1 flex w-full cursor-default items-center rounded-sm border-b border-gray-200 px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
+//               onClick={handleSelectAll}
+//               onKeyDown={(e) => {
+//                 if (e.key === 'Enter' || e.key === ' ') {
+//                   e.preventDefault();
+//                   handleSelectAll();
+//                 }
+//               }}
+//               role='option'
+//               tabIndex={0}
+//             >
+//               <input
+//                 type='checkbox'
+//                 checked={allSelected}
+//                 onChange={() => {}}
+//                 className={`relative mr-2 h-3 w-3 shrink-0 cursor-pointer appearance-none rounded border-2 ${
+//                   allSelected
+//                     ? 'border-blue-500 bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[8px] checked:before:text-white checked:before:content-["✓"]'
+//                     : 'border-gray-300 bg-transparent'
+//                 }`}
+//                 tabIndex={-1}
+//               />
+//               <span className='flex-1 font-medium'>전체 선택</span>
+//             </div>
+//             {options.map((option) => {
+//               const isSelected = value.includes(option);
+//               const statusOption = showStatusDot
+//                 ? STATUS_COLOR.find((s) => s.name === option)
+//                 : null;
+//               return (
+//                 <div
+//                   key={option}
+//                   className='relative flex w-full cursor-default items-center rounded-sm px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
+//                   onClick={() => handleToggle(option)}
+//                   onKeyDown={(e) => {
+//                     if (e.key === 'Enter' || e.key === ' ') {
+//                       e.preventDefault();
+//                       handleToggle(option);
+//                     }
+//                   }}
+//                   role='option'
+//                   aria-selected={isSelected}
+//                   tabIndex={0}
+//                 >
+//                   <input
+//                     type='checkbox'
+//                     checked={isSelected}
+//                     onChange={() => {}}
+//                     className={`relative mr-2 h-3 w-3 shrink-0 cursor-pointer appearance-none rounded border-2 ${
+//                       isSelected
+//                         ? 'border-blue-500 bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[8px] checked:before:text-white checked:before:content-["✓"]'
+//                         : 'border-gray-300 bg-transparent'
+//                     }`}
+//                     tabIndex={-1}
+//                   />
+//                   <span className='flex-1'>{option}</span>
+//                   {showStatusDot && statusOption && (
+//                     <div
+//                       className={`ml-2 h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
+//                     />
+//                   )}
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </Popover.Content>
+//       </Popover.Portal>
+//     </Popover.Root>
+//   );
+// };
 
 export default function ExamTable({
   data: propData,
@@ -250,16 +252,38 @@ export default function ExamTable({
   refreshKey,
   selectedId,
   searchParams = {},
+  currentPage: propCurrentPage,
+  onPageChange,
 }: ExamTableProps) {
   // API 데이터 상태 관리
   const [apiData, setApiData] = useState<ExamReview[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasNext, setHasNext] = useState(false);
   const lastSelectedIdRef = useRef<number | null>(null);
+  // 이전 쿼리 파라미터 추적 (스켈레톤 표시 여부 판단용)
+  const previousQueryRef = useRef<{
+    page: number;
+    keyword?: string;
+    lectureYear?: number;
+    semester?: string;
+    examType?: string;
+  } | null>(null);
 
   // 페이지네이션 설정
   const ITEMS_PER_PAGE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
+
+  // prop으로 전달된 currentPage가 있으면 사용, 없으면 내부 state 사용
+  const currentPage = propCurrentPage ?? internalCurrentPage;
+
+  const setCurrentPage = (page: number | ((prev: number) => number)) => {
+    const newPage = typeof page === 'function' ? page(currentPage) : page;
+    if (onPageChange) {
+      onPageChange(newPage);
+    } else {
+      setInternalCurrentPage(newPage);
+    }
+  };
 
   // 상태 선택 상태 관리
   const [selectedStatus, setSelectedStatus] = useState<{
@@ -270,19 +294,20 @@ export default function ExamTable({
   const [openStatusSelect, setOpenStatusSelect] = useState<{
     [key: number]: boolean;
   }>({});
-  // 상태 리스트 생성
-  const STATUS_LIST = STATUS_COLOR.map((status) => status.name);
 
-  // 헤더 필터 선택 상태 관리 (다중 선택)
-  const [headerFilters, setHeaderFilters] = useState<{
-    status: string[];
-    semester: string[];
-    examType: string[];
-  }>({
-    status: STATUS_LIST,
-    semester: SEMESTER_LIST,
-    examType: EXAM_TYPE_LIST,
-  });
+  // 상태 리스트 생성
+  // const STATUS_LIST = STATUS_COLOR.map((status) => status.name);
+
+  // // 헤더 필터 선택 상태 관리 (다중 선택)
+  // const [headerFilters, setHeaderFilters] = useState<{
+  //   status: string[];
+  //   semester: string[];
+  //   examType: string[];
+  // }>({
+  //   status: STATUS_LIST,
+  //   semester: SEMESTER_LIST,
+  //   examType: EXAM_TYPE_LIST,
+  // });
 
   // propData가 제공되면 사용, 없으면 API 데이터 사용
   const data = propData || apiData;
@@ -332,24 +357,62 @@ export default function ExamTable({
     }
   };
 
-  // 헤더 필터 다중 선택 함수
-  const handleHeaderFilterSelect = (
-    filterType: 'status' | 'semester' | 'examType' | 'manager',
-    value: string[]
-  ) => {
-    setHeaderFilters((prev) => ({
-      ...prev,
-      [filterType]: value,
-    }));
-    console.log(`Filter Type: ${filterType}, Selected Values:`, value);
+  // // 헤더 필터 다중 선택 함수
+  // const handleHeaderFilterSelect = (
+  //   filterType: 'status' | 'semester' | 'examType' | 'manager',
+  //   value: string[]
+  // ) => {
+  //   setHeaderFilters((prev) => ({
+  //     ...prev,
+  //     [filterType]: value,
+  //   }));
+  //   console.log(`Filter Type: ${filterType}, Selected Values:`, value);
 
-    // 필터 변경 시 첫 페이지로 이동
-    setCurrentPage(1);
+  //   // 필터 변경 시 첫 페이지로 이동
+  //   setCurrentPage(1);
+  // };
+
+  // 쿼리가 변경되었는지 확인하는 함수
+  const hasQueryChanged = (
+    prev: typeof previousQueryRef.current,
+    current: {
+      page: number;
+      keyword?: string;
+      lectureYear?: number;
+      semester?: string;
+      examType?: string;
+    }
+  ): boolean => {
+    if (!prev) return true; // 첫 로드일 때는 변경된 것으로 간주
+
+    return (
+      prev.page !== current.page ||
+      prev.keyword !== current.keyword ||
+      prev.lectureYear !== current.lectureYear ||
+      prev.semester !== current.semester ||
+      prev.examType !== current.examType
+    );
   };
 
   // API 데이터 로드 함수
   const loadExamReviews = useCallback(async () => {
-    setIsLoading(true);
+    const currentQuery = {
+      page: currentPage,
+      keyword: searchParams.keyword,
+      lectureYear: searchParams.lectureYear,
+      semester: searchParams.semester,
+      examType: searchParams.examType,
+    };
+
+    // 쿼리가 변경되었을 때만 스켈레톤 표시
+    const queryChanged = hasQueryChanged(
+      previousQueryRef.current,
+      currentQuery
+    );
+    if (queryChanged) {
+      setIsLoading(true);
+    }
+
     try {
       const response = await getExamReviews({
         page: currentPage - 1, // API는 0부터 시작
@@ -378,7 +441,12 @@ export default function ExamTable({
       toast.error(errorMessage);
       setApiData([]);
     } finally {
-      setIsLoading(false);
+      // 쿼리가 변경되었을 때만 로딩 상태 해제
+      if (queryChanged) {
+        setIsLoading(false);
+      }
+      // 현재 쿼리를 이전 쿼리로 저장
+      previousQueryRef.current = currentQuery;
     }
   }, [currentPage, searchParams]);
 
@@ -393,11 +461,6 @@ export default function ExamTable({
       loadExamReviews();
     }
   }, [refreshKey, loadExamReviews]);
-
-  // 검색 파라미터 변경 시 첫 페이지로 이동하고 데이터 다시 로드
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchParams]);
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택 (무한 루프 방지를 위해 별도 useEffect로 분리)
   useEffect(() => {
@@ -420,10 +483,10 @@ export default function ExamTable({
     }
   }, [selectedId, apiData, onRowSelect]);
 
-  // 선택된 필터 상태 디버깅
-  useEffect(() => {
-    console.log('Header Filters:', headerFilters);
-  }, [headerFilters]);
+  // // 선택된 필터 상태 디버깅
+  // useEffect(() => {
+  //   console.log('Header Filters:', headerFilters);
+  // }, [headerFilters]);
 
   const isEmpty = !isLoading && currentPageData.length === 0;
 
@@ -440,7 +503,10 @@ export default function ExamTable({
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow className='hover:bg-gray-100'>
             <TableHead className='w-[70px] text-center'>id</TableHead>
-            <MultiSelect
+            <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+              상태
+            </TableHead>
+            {/* <MultiSelect
               value={headerFilters.status}
               onValueChange={(value) =>
                 handleHeaderFilterSelect('status', value)
@@ -454,11 +520,14 @@ export default function ExamTable({
               <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
                 상태 ▼
               </TableHead>
-            </MultiSelect>
+            </MultiSelect> */}
             <TableHead className='w-[200px]'>시험후기명</TableHead>
             <TableHead className='w-[120px]'>강의명</TableHead>
             <TableHead className='w-[60px]'>교수</TableHead>
-            <MultiSelect
+            <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              수강학기
+            </TableHead>
+            {/* <MultiSelect
               value={headerFilters.semester}
               onValueChange={(value) =>
                 handleHeaderFilterSelect('semester', value)
@@ -471,8 +540,11 @@ export default function ExamTable({
               <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
                 수강학기 ▼
               </TableHead>
-            </MultiSelect>
-            <MultiSelect
+            </MultiSelect> */}
+            <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              시험종류
+            </TableHead>
+            {/* <MultiSelect
               value={headerFilters.examType}
               onValueChange={(value) =>
                 handleHeaderFilterSelect('examType', value)
@@ -485,7 +557,7 @@ export default function ExamTable({
               <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
                 시험종류 ▼
               </TableHead>
-            </MultiSelect>
+            </MultiSelect> */}
             <TableHead className='w-[60px]'>분반</TableHead>
             <TableHead className='w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[110px]'>업로드 시간</TableHead>

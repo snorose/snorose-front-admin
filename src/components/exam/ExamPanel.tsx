@@ -17,10 +17,10 @@ const TAB_INACTIVE_STYLE = 'border-transparent text-gray-500';
 
 const TABS: { value: Tab; label: string }[] = [
   { value: 'edit', label: '편집' },
-  { value: 'discussion', label: '논의사항' },
-  { value: 'delete', label: '삭제' },
-  { value: 'warning', label: '경고' },
-  { value: 'demotion', label: '강등' },
+  // { value: 'discussion', label: '논의사항' },
+  // { value: 'delete', label: '삭제' },
+  // { value: 'warning', label: '경고' },
+  // { value: 'demotion', label: '강등' },
 ];
 
 interface ExamPanelProps {

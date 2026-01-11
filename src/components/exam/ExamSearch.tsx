@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import {
   Select,
   SelectTrigger,
@@ -15,6 +16,9 @@ interface ExamSearchProps {
     semester?: string;
     examType?: string;
   }) => void;
+  initialKeyword?: string;
+  initialSemester?: string;
+  initialExamType?: string;
 }
 
 // semester 문자열을 enum으로 변환: "2024-1" -> "FIRST", "2024-2" -> "SECOND" 등
@@ -60,10 +64,28 @@ const extractYearFromSemester = (semesterStr: string): number | undefined => {
   return match ? parseInt(match[1], 10) : undefined;
 };
 
-export default function ExamSearch({ onSearchChange }: ExamSearchProps) {
-  const [keyword, setKeyword] = useState<string>('');
-  const [semester, setSemester] = useState<string | undefined>(undefined);
-  const [examType, setExamType] = useState<string | undefined>(undefined);
+export default function ExamSearch({
+  onSearchChange,
+  initialKeyword = '',
+  initialSemester,
+  initialExamType,
+}: ExamSearchProps) {
+  const [keyword, setKeyword] = useState<string>(initialKeyword);
+  const [semester, setSemester] = useState<string | undefined>(initialSemester);
+  const [examType, setExamType] = useState<string | undefined>(initialExamType);
+
+  // 초기값이 변경되면 상태 업데이트 (URL에서 읽은 값으로 동기화)
+  useEffect(() => {
+    setKeyword(initialKeyword);
+  }, [initialKeyword]);
+
+  useEffect(() => {
+    setSemester(initialSemester);
+  }, [initialSemester]);
+
+  useEffect(() => {
+    setExamType(initialExamType);
+  }, [initialExamType]);
 
   // 검색 실행 함수 (현재 상태 기반)
   const handleSearch = () => {
@@ -96,8 +118,8 @@ export default function ExamSearch({ onSearchChange }: ExamSearchProps) {
 
   // 검색 실행 함수 (파라미터로 새 값 받기)
   const handleSearchWithParams = (
-    newSemester?: string | undefined,
-    newExamType?: string | undefined
+    newSemester?: string | undefined | null,
+    newExamType?: string | undefined | null
   ) => {
     const params: {
       keyword?: string;
@@ -111,8 +133,13 @@ export default function ExamSearch({ onSearchChange }: ExamSearchProps) {
       params.keyword = keyword.trim();
     }
 
-    // 새 semester 값 사용 (없으면 현재 값)
-    const currentSemester = newSemester !== undefined ? newSemester : semester;
+    // 새 semester 값 사용 (null이면 리셋, undefined면 현재 값 유지)
+    const currentSemester =
+      newSemester === null
+        ? undefined
+        : newSemester !== undefined
+          ? newSemester
+          : semester;
     if (currentSemester) {
       params.semester = convertSemesterToEnum(currentSemester);
       const year = extractYearFromSemester(currentSemester);
@@ -121,13 +148,36 @@ export default function ExamSearch({ onSearchChange }: ExamSearchProps) {
       }
     }
 
-    // 새 examType 값 사용 (없으면 현재 값)
-    const currentExamType = newExamType !== undefined ? newExamType : examType;
+    // 새 examType 값 사용 (null이면 리셋, undefined면 현재 값 유지)
+    const currentExamType =
+      newExamType === null
+        ? undefined
+        : newExamType !== undefined
+          ? newExamType
+          : examType;
     if (currentExamType) {
       params.examType = convertExamTypeToEnum(currentExamType);
     }
 
     onSearchChange(params);
+  };
+
+  // semester 리셋 핸들러
+  const handleSemesterReset = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const newSemester = undefined;
+    setSemester(newSemester);
+    handleSearchWithParams(null, undefined);
+  };
+
+  // examType 리셋 핸들러
+  const handleExamTypeReset = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const newExamType = undefined;
+    setExamType(newExamType);
+    handleSearchWithParams(undefined, null);
   };
 
   // Enter 키 처리
@@ -160,14 +210,32 @@ export default function ExamSearch({ onSearchChange }: ExamSearchProps) {
       {/* 필터 Select들 */}
       <div className='flex items-center gap-2'>
         <Select
-          value={semester}
+          key={semester || 'empty-semester'}
+          value={semester || undefined}
           onValueChange={(value) => {
             setSemester(value);
             handleSearchWithParams(value, undefined);
           }}
         >
-          <SelectTrigger className='h-7 w-[130px] text-xs'>
+          <SelectTrigger
+            className={`relative h-7 w-[130px] text-xs focus-visible:border focus-visible:ring-0 ${
+              semester ? '[&>svg]:hidden' : ''
+            }`}
+          >
             <SelectValue placeholder='학기 선택' />
+            {semester && (
+              <button
+                onClick={handleSemesterReset}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className='pointer-events-auto absolute right-2 z-10 flex items-center justify-center rounded-sm p-0.5 hover:bg-gray-200'
+                type='button'
+              >
+                <X className='pointer-events-none h-3 w-3 text-gray-600' />
+              </button>
+            )}
           </SelectTrigger>
           <SelectContent
             align='start'
@@ -186,14 +254,32 @@ export default function ExamSearch({ onSearchChange }: ExamSearchProps) {
         </Select>
 
         <Select
-          value={examType}
+          key={examType || 'empty-examtype'}
+          value={examType || undefined}
           onValueChange={(value) => {
             setExamType(value);
             handleSearchWithParams(undefined, value);
           }}
         >
-          <SelectTrigger className='h-7 w-[100px] text-xs'>
+          <SelectTrigger
+            className={`relative h-7 w-[100px] text-xs focus-visible:border focus-visible:ring-0 ${
+              examType ? '[&>svg]:hidden' : ''
+            }`}
+          >
             <SelectValue placeholder='시험 종류' />
+            {examType && (
+              <button
+                onClick={handleExamTypeReset}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className='pointer-events-auto absolute right-2 z-10 flex items-center justify-center rounded-sm p-0.5 hover:bg-gray-200'
+                type='button'
+              >
+                <X className='pointer-events-none h-3 w-3 text-gray-600' />
+              </button>
+            )}
           </SelectTrigger>
           <SelectContent
             align='start'
