@@ -10,30 +10,13 @@ import {
 import type {
   ExamReview,
   ExamReviewDetailResult,
+  Semester,
 } from '@/domains/Exams/types/exam';
 import PageHeader from '@/components/PageHeader';
 import { getExamReviewDetail } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
-
-// semester enum을 문자열로 변환: "FIRST" + 2024 -> "2024-1"
-const convertSemesterEnumToString = (
-  semesterEnum: string,
-  year: number
-): string => {
-  switch (semesterEnum) {
-    case 'FIRST':
-      return `${year}-1`;
-    case 'SECOND':
-      return `${year}-2`;
-    case 'SUMMER':
-      return `${year}-여름계절`;
-    case 'WINTER':
-      return `${year}-겨울계절`;
-    default:
-      return `${year}-1`;
-  }
-};
+import { convertSemesterEnumToString } from '@/domains/Exams/utils/examFormatters';
 
 export default function ExamReviewPage() {
   const queryClient = useQueryClient();
@@ -310,7 +293,7 @@ export default function ExamReviewPage() {
               searchParamsFromUrl.get('semester') &&
               searchParamsFromUrl.get('lectureYear')
                 ? convertSemesterEnumToString(
-                    searchParamsFromUrl.get('semester')!,
+                    searchParamsFromUrl.get('semester')! as Semester,
                     parseInt(searchParamsFromUrl.get('lectureYear')!, 10)
                   )
                 : undefined

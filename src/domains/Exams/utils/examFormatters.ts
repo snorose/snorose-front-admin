@@ -40,10 +40,10 @@ export const convertSemesterEnumToString = (
     return `${year}-2`;
   }
   if (semesterEnum === 'SUMMER') {
-    return `${year} 여름`;
+    return `${year}-여름계절`;
   }
   if (semesterEnum === 'WINTER') {
-    return `${year} 겨울`;
+    return `${year}-겨울계절`;
   }
   if (semesterEnum === 'OTHER') {
     return `${year} 기타`;
