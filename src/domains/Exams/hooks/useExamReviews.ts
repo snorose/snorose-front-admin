@@ -1,9 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getExamReviews } from '@/apis/exam';
-import type {
-  ExamReview,
-  ExamReviewApiResponse,
-} from '@/domains/Exams/types/exam';
+import type { ExamReview, ExamReviews } from '@/domains/Exams/types/exam';
 
 // types
 interface UseExamReviewsParams {
@@ -16,21 +13,8 @@ interface UseExamReviewsParams {
   refreshKey?: number;
 }
 
-interface ExamReviewsResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    data: ExamReviewApiResponse[];
-    hasNext: boolean;
-  };
-}
-
 // functions
-// API 응답을 ExamReview로 변환하는 함수
-const transformApiResponseToExamReview = (
-  apiData: ExamReviewApiResponse
-): ExamReview => {
+const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
   // title 파싱: "2023-1/기말/프로그래밍입문/이종우/001"
   const titleParts = apiData.title.split('/');
   const semester = titleParts[0] || '';
@@ -81,13 +65,13 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       refreshKey,
     ],
     queryFn: async () => {
-      const response = (await getExamReviews({
+      const response = await getExamReviews({
         page: page - 1, // API는 0부터 시작
         keyword,
         lectureYear,
         semester,
         examType,
-      })) as ExamReviewsResponse;
+      });
 
       if (!response.isSuccess || !response.result) {
         throw new Error(

@@ -225,7 +225,7 @@ export default function ExamEditPanel({
       const post: UpdateExamReviewRequest['post'] = {}; // 변경된 필드만 포함하는 post 객체 생성
 
       if (formData.lectureName !== initialValues.lectureName) {
-        post.lectureName = formData.lectureName || undefined;
+        post.lectureName = formData.lectureName;
       }
 
       if (formData.professorName !== initialValues.professorName) {
@@ -266,7 +266,7 @@ export default function ExamEditPanel({
       }
 
       if (formData.examTypeAndQuestions !== initialValues.questionDetail) {
-        post.questionDetail = formData.examTypeAndQuestions || undefined;
+        post.questionDetail = formData.examTypeAndQuestions;
       }
 
       let file: File | undefined | null = null; // 파일 선택 로직 (파일 없으면 안 보냄)
@@ -321,7 +321,6 @@ export default function ExamEditPanel({
   // 삭제 핸들러
   const handleDeleteClick = async () => {
     try {
-      console.log(selectedExamReview?.id);
       if (!selectedExamReview?.id) {
         toast.error('선택된 시험 후기가 없습니다.');
         return;

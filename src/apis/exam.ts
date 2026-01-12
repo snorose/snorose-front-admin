@@ -6,6 +6,7 @@ import type {
   UpdateExamReviewResponse,
   DeleteExamReviewResponse,
   ExamReviewDetailResponse,
+  ExamReviewsResponse,
 } from '@/domains/Exams/types/exam';
 
 // 시험후기 목록 조회 api
@@ -15,7 +16,7 @@ export const getExamReviews = async (params: {
   lectureYear?: number;
   semester?: string;
   examType?: string;
-}) => {
+}): Promise<ExamReviewsResponse> => {
   const response = await axiosInstance.get(`/v1/reviews`, {
     params,
   });

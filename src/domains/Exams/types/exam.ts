@@ -28,7 +28,7 @@ export interface ExamReview {
   userDisplay: string;
 }
 
-export interface ExamReviewApiResponse {
+export interface ExamReviews {
   userDisplay: string;
   isWriterWithdrawn: boolean;
   postId: number;
@@ -126,4 +126,14 @@ export interface ExamReviewDetailResponse {
   code: number;
   message: string;
   result: ExamReviewDetailResult;
+}
+
+export interface ExamReviewsResponse {
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  result: {
+    data: ExamReviews[];
+    hasNext: boolean;
+  };
 }
