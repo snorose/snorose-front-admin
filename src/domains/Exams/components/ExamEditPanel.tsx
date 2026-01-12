@@ -393,13 +393,6 @@ export default function ExamEditPanel({
     }
   };
 
-  // 파일 삭제 핸들러
-  const handleFileDelete = () => {
-    setSelectedFile(null);
-    setIsFileDeleted(true);
-    setFormData((prev) => ({ ...prev, fileName: '' }));
-  };
-
   // 취소 핸들러
   const handleCancel = () => {
     if (selectedExamReviewDetail && initialValues) {
@@ -462,10 +455,6 @@ export default function ExamEditPanel({
         <td className={`${TABLE_DATA_READONLY_STYLE} bg-white`}>
           <div className='flex items-center justify-between px-2 py-1'>
             <Skeleton className='h-4 w-32' />
-            <div className='flex items-center gap-1'>
-              <Skeleton className='h-5 w-16' />
-              <Skeleton className='h-5 w-16' />
-            </div>
           </div>
         </td>
       </tr>
@@ -640,25 +629,9 @@ export default function ExamEditPanel({
                           type='button'
                           onClick={() => fileInputRef.current?.click()}
                           disabled={!selectedExamReview || isLoadingDetail}
-                          className='rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
-                        >
-                          {formData.fileName || selectedFile
-                            ? '파일 변경'
-                            : '파일 업로드'}
-                        </button>
-                        <button
-                          type='button'
-                          onClick={handleFileDelete}
-                          disabled={
-                            !selectedExamReview ||
-                            isLoadingDetail ||
-                            (!selectedFile &&
-                              !formData.fileName &&
-                              !isFileDeleted)
-                          }
                           className='rounded bg-gray-500 px-2 py-0.5 text-[10px] text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50'
                         >
-                          파일 제거
+                          파일 변경
                         </button>
                       </div>
                       <input
