@@ -46,31 +46,59 @@ export default function PointFreezeListSection({
     <>
       <article className='flex w-full flex-col gap-1'>
         <h3 className='text-lg font-bold'>미지급 일정 조회</h3>
-        <Table className='w-full'>
-          <TableHeader>
-            <TableRow className='text-center'>
-              <TableHead className='text-center'>ID</TableHead>
-              <TableHead className='text-center'>일정 제목</TableHead>
-              <TableHead className='text-center'>시작 일시</TableHead>
-              <TableHead className='text-center'>종료 일시</TableHead>
-              <TableHead className='text-center'>생성 일시</TableHead>
-              <TableHead className='text-center'>수정 일시</TableHead>
-              <TableHead className='text-center'>삭제</TableHead>
-              <TableHead className='text-center'>수정</TableHead>
+        <Table size='sm' className='w-full'>
+          <TableHeader size='sm'>
+            <TableRow size='sm' className='text-center'>
+              <TableHead size='sm' className='text-center'>
+                ID
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                일정 제목
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                시작 일시
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                종료 일시
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                생성 일시
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                수정 일시
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                삭제
+              </TableHead>
+              <TableHead size='sm' className='text-center'>
+                수정
+              </TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody size='sm'>
             {pointFreezes.length > 0 ? (
               pointFreezes.map(
                 ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
-                  <TableRow key={id}>
-                    <TableCell className='text-center'>{id}</TableCell>
-                    <TableCell className='text-center'>{title}</TableCell>
-                    <TableCell className='text-center'>{startAt}</TableCell>
-                    <TableCell className='text-center'>{endAt}</TableCell>
-                    <TableCell className='text-center'>{createdAt}</TableCell>
-                    <TableCell className='text-center'>{updatedAt}</TableCell>
-                    <TableCell className='text-center'>
+                  <TableRow key={id} size='sm'>
+                    <TableCell size='sm' className='text-center'>
+                      {id}
+                    </TableCell>
+                    <TableCell size='sm' className='text-center'>
+                      {title}
+                    </TableCell>
+                    <TableCell size='sm' className='text-center'>
+                      {startAt}
+                    </TableCell>
+                    <TableCell size='sm' className='text-center'>
+                      {endAt}
+                    </TableCell>
+                    <TableCell size='sm' className='text-center'>
+                      {createdAt}
+                    </TableCell>
+                    <TableCell size='sm' className='text-center'>
+                      {updatedAt}
+                    </TableCell>
+                    <TableCell size='sm' className='text-center'>
                       <div className='flex items-center justify-center'>
                         <Trash2
                           className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
@@ -78,7 +106,7 @@ export default function PointFreezeListSection({
                         />
                       </div>
                     </TableCell>
-                    <TableCell className='text-center'>
+                    <TableCell size='sm' className='text-center'>
                       <div className='flex items-center justify-center'>
                         <PencilIcon
                           className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
@@ -90,8 +118,8 @@ export default function PointFreezeListSection({
                 )
               )
             ) : (
-              <TableRow>
-                <TableCell colSpan={8} className='text-center'>
+              <TableRow size='sm'>
+                <TableCell size='sm' colSpan={8} className='text-center'>
                   등록된 일정이 없습니다.
                 </TableCell>
               </TableRow>

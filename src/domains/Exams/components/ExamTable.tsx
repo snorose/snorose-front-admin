@@ -184,33 +184,62 @@ export default function ExamTable({
       }`}
     >
       <Table
+        size='sm'
         className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
       >
         {/* Table Header */}
-        <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
-          <TableRow className='hover:bg-gray-100'>
-            <TableHead className='w-[70px] text-center'>id</TableHead>
-            <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+        <TableHeader
+          size='sm'
+          className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'
+        >
+          <TableRow size='sm' className='hover:bg-gray-100'>
+            <TableHead size='sm' className='w-[70px] text-center'>
+              id
+            </TableHead>
+            <TableHead
+              size='sm'
+              className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'
+            >
               상태
             </TableHead>
-            <TableHead className='w-[200px]'>시험후기명</TableHead>
-            <TableHead className='w-[120px]'>강의명</TableHead>
-            <TableHead className='w-[60px]'>교수</TableHead>
-            <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+            <TableHead size='sm' className='w-[200px]'>
+              시험후기명
+            </TableHead>
+            <TableHead size='sm' className='w-[120px]'>
+              강의명
+            </TableHead>
+            <TableHead size='sm' className='w-[60px]'>
+              교수
+            </TableHead>
+            <TableHead
+              size='sm'
+              className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'
+            >
               수강학기
             </TableHead>
-            <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+            <TableHead
+              size='sm'
+              className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'
+            >
               시험종류
             </TableHead>
-            <TableHead className='w-[60px]'>분반</TableHead>
-            <TableHead className='w-[150px]'>시험 유형 및 문항수</TableHead>
-            <TableHead className='w-[110px]'>업로드 시간</TableHead>
-            <TableHead className='w-[80px]'>게시자</TableHead>
+            <TableHead size='sm' className='w-[60px]'>
+              분반
+            </TableHead>
+            <TableHead size='sm' className='w-[150px]'>
+              시험 유형 및 문항수
+            </TableHead>
+            <TableHead size='sm' className='w-[110px]'>
+              업로드 시간
+            </TableHead>
+            <TableHead size='sm' className='w-[80px]'>
+              게시자
+            </TableHead>
           </TableRow>
         </TableHeader>
 
         {/* Table Body */}
-        <TableBody>
+        <TableBody size='sm'>
           {isLoading ? (
             <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
           ) : currentPageData.length === 0 ? (
@@ -226,6 +255,7 @@ export default function ExamTable({
                 return (
                   <TableRow
                     key={review.id}
+                    size='sm'
                     className={`hover:cursor-pointer [&_td]:h-[24px] ${
                       isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
                     }`}
@@ -238,10 +268,16 @@ export default function ExamTable({
                       }
                     }}
                   >
-                    <TableCell className='w-[70px] text-center text-gray-600'>
+                    <TableCell
+                      size='sm'
+                      className='w-[70px] text-center text-gray-600'
+                    >
                       {review.id}
                     </TableCell>
-                    <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
+                    <TableCell
+                      size='sm'
+                      className='relative w-[50px] cursor-pointer p-0 text-center'
+                    >
                       <Select
                         value={selectedStatus[review.id] || review.status}
                         onValueChange={async (value) => {
@@ -320,7 +356,7 @@ export default function ExamTable({
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className='w-[200px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[200px] overflow-hidden'>
                       <div
                         className='w-full truncate'
                         title={review.reviewTitle}
@@ -328,7 +364,7 @@ export default function ExamTable({
                         {review.reviewTitle}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[120px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[120px] overflow-hidden'>
                       <div
                         className='w-full truncate'
                         title={review.courseName}
@@ -336,22 +372,22 @@ export default function ExamTable({
                         {review.courseName}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[60px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[60px] overflow-hidden'>
                       <div className='w-full truncate' title={review.professor}>
                         {review.professor}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[84px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[84px] overflow-hidden'>
                       <div className='w-full truncate' title={review.semester}>
                         {review.semester}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[60px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[60px] overflow-hidden'>
                       <div className='w-full truncate' title={review.examType}>
                         {review.examType}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[60px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[60px] overflow-hidden'>
                       <div
                         className='w-full truncate'
                         title={review.classNumber}
@@ -359,7 +395,7 @@ export default function ExamTable({
                         {review.classNumber}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[150px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[150px] overflow-hidden'>
                       <div
                         className='w-full truncate'
                         title={review.questionDetail}
@@ -367,7 +403,10 @@ export default function ExamTable({
                         {review.questionDetail}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[110px] overflow-hidden text-gray-600'>
+                    <TableCell
+                      size='sm'
+                      className='w-[110px] overflow-hidden text-gray-600'
+                    >
                       <div
                         className='w-full truncate'
                         title={review.uploadTime}
@@ -375,7 +414,7 @@ export default function ExamTable({
                         {review.uploadTime}
                       </div>
                     </TableCell>
-                    <TableCell className='w-[80px] overflow-hidden'>
+                    <TableCell size='sm' className='w-[80px] overflow-hidden'>
                       <div
                         className='w-full truncate'
                         title={review.userDisplay}
