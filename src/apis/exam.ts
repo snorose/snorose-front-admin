@@ -1,117 +1,14 @@
 import { axiosInstance } from '@/axios/instance';
+import type {
+  ConfirmExamReviewRequest,
+  ConfirmExamReviewResponse,
+  UpdateExamReviewRequest,
+  UpdateExamReviewResponse,
+  DeleteExamReviewResponse,
+  ExamReviewDetailResponse,
+} from '@/domains/Exams/types/exam';
 
-// type 정의
-export interface ExamReviewApiResponse {
-  userDisplay: string;
-  isWriterWithdrawn: boolean;
-  postId: number;
-  title: string;
-  questionDetail: string;
-  isConfirmed: boolean;
-  commentCount: number;
-  scrapCount: number;
-  isScrapped: boolean;
-  createdAt: string;
-  isEdited: boolean;
-}
-
-export interface ConfirmExamReviewRequest {
-  isConfirmed: boolean;
-}
-
-export interface ConfirmExamReviewResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    postId: number;
-    isConfirmed: boolean;
-  };
-}
-
-export interface UpdateExamReviewPost {
-  lectureName?: string;
-  professor?: string;
-  classNumber?: number;
-  lectureYear?: number;
-  semester?: 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER';
-  lectureType?:
-    | 'MAJOR_REQUIRED'
-    | 'MAJOR_ELECTIVE'
-    | 'GENERAL_REQUIRED'
-    | 'GENERAL_ELECTIVE'
-    | 'OTHER';
-  isPF?: boolean;
-  isOnline?: boolean;
-  isConfirmed?: boolean;
-  examType?: 'MIDTERM' | 'FINALTERM';
-  questionDetail?: string;
-}
-
-export interface UpdateExamReviewRequest {
-  file?: File;
-  post: UpdateExamReviewPost;
-}
-
-export interface UpdateExamReviewResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    postId: number;
-  };
-}
-
-export interface DeleteExamReviewResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    postId: number;
-  };
-}
-
-export interface ExamReviewDetailResult {
-  userId: string;
-  userDisplay: string;
-  isWriter: boolean;
-  isWriterWithdrawn: boolean;
-  postId: number;
-  title: string;
-  commentCount: number;
-  scrapCount: number;
-  isScrapped: boolean;
-  createdAt: string;
-  isNotice: boolean;
-  isEdited: boolean;
-  lectureName: string;
-  professor: string;
-  classNumber: number;
-  lectureYear: number;
-  semester: 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER';
-  lectureType:
-    | 'MAJOR_REQUIRED'
-    | 'MAJOR_ELECTIVE'
-    | 'GENERAL_REQUIRED'
-    | 'GENERAL_ELECTIVE'
-    | 'OTHER';
-  isPF: boolean;
-  isOnline: boolean;
-  examType: 'MIDTERM' | 'FINALTERM';
-  isConfirmed: boolean;
-  fileName: string;
-  questionDetail: string;
-  isDownloaded: boolean;
-}
-
-export interface ExamReviewDetailResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: ExamReviewDetailResult;
-}
-
-// api 함수
+// 시험후기 목록 조회 api
 export const getExamReviews = async (params: {
   page: number;
   keyword?: string;
@@ -125,6 +22,7 @@ export const getExamReviews = async (params: {
   return response.data;
 };
 
+// 시험후기 확인 처리 (isConfirmed 변경) api
 export const confirmExamReview = async (
   postId: number,
   data: ConfirmExamReviewRequest
@@ -136,15 +34,15 @@ export const confirmExamReview = async (
   return response.data;
 };
 
+// 시험후기 상세 수정 api
 export const updateExamReview = async (
   postId: number,
   data: UpdateExamReviewRequest
 ): Promise<UpdateExamReviewResponse> => {
   const formData = new FormData();
 
-  // 파일이 있으면 추가
   if (data.file) {
-    formData.append('file', data.file);
+    formData.append('file', data.file); // 파일이 있으면 추가
   }
 
   formData.append('post', JSON.stringify(data.post));
@@ -161,6 +59,7 @@ export const updateExamReview = async (
   return response.data;
 };
 
+// 시험후기 삭제 api
 export const deleteExamReview = async (
   postId: number
 ): Promise<DeleteExamReviewResponse> => {
@@ -168,6 +67,7 @@ export const deleteExamReview = async (
   return response.data;
 };
 
+// 시험후기 상세 조회 api
 export const getExamReviewDetail = async (
   postId: number
 ): Promise<ExamReviewDetailResponse> => {
@@ -175,6 +75,7 @@ export const getExamReviewDetail = async (
   return response.data;
 };
 
+// 시험후기 파일 다운로드 api
 export const downloadExamReviewFile = async (
   postId: number,
   fileName: string

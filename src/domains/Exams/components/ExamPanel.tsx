@@ -6,22 +6,16 @@ import {
   // ExamDeletePanel,
   // ExamDegradePanel,
 } from './index';
-import type { ExamReview } from './ExamTable';
-import type { ExamReviewDetailResult } from '@/apis/exam';
+import type {
+  ExamReview,
+  ExamReviewDetailResult,
+} from '@/domains/Exams/types/exam';
 
 type Tab = 'edit' | 'warning' | 'delete' | 'demotion' | 'discussion';
 
 const TAB_BASE_STYLE = 'text-xs py-2 px-4 font-semibold text-left w-full';
 const TAB_ACTIVE_STYLE = 'border-blue-500 text-blue-500 bg-blue-50';
 const TAB_INACTIVE_STYLE = 'border-transparent text-gray-500';
-
-const TABS: { value: Tab; label: string }[] = [
-  { value: 'edit', label: '편집' },
-  // { value: 'discussion', label: '논의사항' },
-  // { value: 'delete', label: '삭제' },
-  // { value: 'warning', label: '경고' },
-  // { value: 'demotion', label: '강등' },
-];
 
 interface ExamPanelProps {
   selectedExamReview?: ExamReview | null;
@@ -30,6 +24,14 @@ interface ExamPanelProps {
   onSaveSuccess?: () => void;
   onDeleteSuccess?: () => void;
 }
+
+const TABS: { value: Tab; label: string }[] = [
+  { value: 'edit', label: '편집' },
+  // { value: 'discussion', label: '논의사항' },
+  // { value: 'delete', label: '삭제' },
+  // { value: 'warning', label: '경고' },
+  // { value: 'demotion', label: '강등' },
+];
 
 export default function ExamPanel({
   selectedExamReview,

@@ -14,7 +14,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { STATUS_COLOR } from '@/constants/exam-table-options';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import {
   ExamTableSkeleton,
   ExamTableEmptyRows,
@@ -22,20 +22,11 @@ import {
 } from './ExamTableFallback';
 import ExamTablePagination from './ExamTablePagination';
 import { useExamReviews, useConfirmExamReview } from '@/domains/Exams/hooks';
+import { ExamStatusDot } from '@/domains/Exams/components';
+import type { ExamReview } from '@/domains/Exams/types/exam';
 
-export interface ExamReview {
-  id: number;
-  status: string;
-  reviewTitle: string;
-  courseName: string;
-  professor: string;
-  semester: string;
-  examType: string;
-  classNumber: string;
-  questionDetail: string;
-  uploadTime: string;
-  userDisplay: string;
-}
+// 페이지네이션 설정
+const ITEMS_PER_PAGE = 10;
 
 interface ExamTableProps {
   data?: ExamReview[];
@@ -52,23 +43,6 @@ interface ExamTableProps {
   onPageChange?: (page: number) => void;
 }
 
-// 상태 점 컴포넌트
-const StatusDot = ({ status }: { status: string }) => {
-  const getStatusColor = (status: string) => {
-    const statusColor = STATUS_COLOR.find((color) => color.code === status);
-    return statusColor?.color || 'bg-white';
-  };
-
-  return (
-    <div className='flex items-center justify-center'>
-      <div
-        className={`h-2 w-2 rounded-full ${getStatusColor(status)}`}
-        title={status}
-      />
-    </div>
-  );
-};
-
 export default function ExamTable({
   data: propData,
   onRowSelect,
@@ -80,8 +54,6 @@ export default function ExamTable({
 }: ExamTableProps) {
   const lastSelectedIdRef = useRef<number | null>(null);
 
-  // 페이지네이션 설정
-  const ITEMS_PER_PAGE = 10;
   const [internalCurrentPage, setInternalCurrentPage] = useState(1);
 
   // prop으로 전달된 currentPage가 있으면 사용, 없으면 내부 state 사용
@@ -106,32 +78,44 @@ export default function ExamTable({
     [key: number]: boolean;
   }>({});
 
-  // React Query 훅 사용
-  const {
-    data: queryData,
-    isLoading,
-    refetch,
-  } = useExamReviews({
+  const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
     keyword: searchParams.keyword,
     lectureYear: searchParams.lectureYear,
     semester: searchParams.semester,
     examType: searchParams.examType,
-    enabled: !propData, // propData가 제공되면 쿼리 비활성화
+    enabled: !propData,
+    refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
 
   const confirmMutation = useConfirmExamReview();
 
   // propData가 제공되면 사용, 없으면 API 데이터 사용
-  const data = useMemo(
+  const currentPageData = useMemo(
     () => propData || queryData?.data || [],
     [propData, queryData?.data]
   );
+
   const hasNext = queryData?.hasNext || false;
 
-  // 페이지네이션 계산
-  // API 기반이므로 현재 페이지 데이터는 이미 API에서 받아온 데이터
-  const currentPageData = data;
+  // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
+  useEffect(() => {
+    if (selectedId && onRowSelect && currentPageData.length > 0) {
+      if (lastSelectedIdRef.current === selectedId) {
+        return;
+      }
+
+      const updatedReview = currentPageData.find(
+        (review: ExamReview) => review.id === selectedId
+      );
+      if (updatedReview) {
+        lastSelectedIdRef.current = selectedId;
+        onRowSelect(updatedReview);
+      }
+    } else if (!selectedId) {
+      lastSelectedIdRef.current = null;
+    }
+  }, [selectedId, currentPageData, onRowSelect]);
 
   // 상태 선택 함수
   const handleStatusSelect = async (reviewId: number, statusCode: string) => {
@@ -140,7 +124,8 @@ export default function ExamTable({
 
     // 현재 상태 저장 (롤백용)
     const previousStatus =
-      selectedStatus[reviewId] || data.find((r) => r.id === reviewId)?.status;
+      selectedStatus[reviewId] ||
+      currentPageData.find((r) => r.id === reviewId)?.status;
 
     // 로컬 상태 먼저 업데이트 (낙관적 업데이트)
     setSelectedStatus((prev) => ({
@@ -155,6 +140,22 @@ export default function ExamTable({
         isConfirmed,
       },
       {
+        onSuccess: () => {
+          // 성공 시 선택된 review가 현재 변경된 review이면 상태 업데이트
+          if (selectedId === reviewId && onRowSelect) {
+            const updatedReview = currentPageData.find(
+              (r) => r.id === reviewId
+            );
+            if (updatedReview) {
+              // 상태가 업데이트된 review 객체 생성
+              const reviewWithUpdatedStatus: ExamReview = {
+                ...updatedReview,
+                status: statusCode,
+              };
+              onRowSelect(reviewWithUpdatedStatus);
+            }
+          }
+        },
         onError: () => {
           // 실패 시 롤백
           if (previousStatus) {
@@ -173,34 +174,6 @@ export default function ExamTable({
       }
     );
   };
-
-  // refreshKey가 변경되면 데이터 다시 로드
-  useEffect(() => {
-    if (refreshKey !== undefined && refreshKey > 0 && !propData) {
-      refetch();
-    }
-  }, [refreshKey, refetch, propData]);
-
-  // 선택된 행이 있으면 업데이트된 데이터로 자동 선택 (무한 루프 방지를 위해 별도 useEffect로 분리)
-  useEffect(() => {
-    if (selectedId && onRowSelect && data.length > 0) {
-      // 이미 같은 ID를 선택했으면 중복 호출 방지
-      if (lastSelectedIdRef.current === selectedId) {
-        return;
-      }
-
-      const updatedReview = data.find(
-        (review: ExamReview) => review.id === selectedId
-      );
-      if (updatedReview) {
-        lastSelectedIdRef.current = selectedId;
-        onRowSelect(updatedReview);
-      }
-    } else if (!selectedId) {
-      // 선택 해제 시 ref 초기화
-      lastSelectedIdRef.current = null;
-    }
-  }, [selectedId, data, onRowSelect]);
 
   const isEmpty = !isLoading && currentPageData.length === 0;
 
@@ -245,10 +218,8 @@ export default function ExamTable({
           ) : (
             <>
               {currentPageData.map((review) => {
-                // Select가 열린 행이 있는지 확인
                 const hasOpenSelect =
                   Object.values(openStatusSelect).some(Boolean);
-                // Select가 열린 행이 있으면 그 행만 active, 없으면 selectedId와 일치하는 행만 active
                 const isRowActive = hasOpenSelect
                   ? openStatusSelect[review.id]
                   : selectedId === review.id;
@@ -260,7 +231,6 @@ export default function ExamTable({
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      // 토글 방식: 선택된 행을 다시 클릭하면 해제, 다른 행 클릭하면 선택
                       if (selectedId === review.id) {
                         onRowSelect?.(null);
                       } else {
@@ -303,7 +273,12 @@ export default function ExamTable({
                             ...prev,
                             [review.id]: open,
                           }));
-                          if (!open) {
+                          if (open) {
+                            // Select가 열릴 때 해당 행 선택
+                            if (selectedId !== review.id && onRowSelect) {
+                              onRowSelect(review);
+                            }
+                          } else {
                             // 닫힐 때 포커스 제거
                             setTimeout(() => {
                               const activeElement =
@@ -317,7 +292,7 @@ export default function ExamTable({
                       >
                         <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
                           <SelectValue className='!flex !items-center !justify-center'>
-                            <StatusDot
+                            <ExamStatusDot
                               status={
                                 selectedStatus[review.id] || review.status
                               }

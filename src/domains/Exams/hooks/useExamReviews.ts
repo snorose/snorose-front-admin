@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { getExamReviews } from '@/apis/exam';
-import type { ExamReviewApiResponse } from '@/apis/exam';
-import type { ExamReview } from '@/domains/Exams/components/ExamTable';
+import type {
+  ExamReview,
+  ExamReviewApiResponse,
+} from '@/domains/Exams/types/exam';
 
 // types
 interface UseExamReviewsParams {
@@ -11,6 +13,7 @@ interface UseExamReviewsParams {
   semester?: string;
   examType?: string;
   enabled?: boolean;
+  refreshKey?: number;
 }
 
 interface ExamReviewsResponse {
@@ -64,10 +67,19 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     semester,
     examType,
     enabled = true,
+    refreshKey,
   } = params;
 
   return useQuery({
-    queryKey: ['examReviews', page, keyword, lectureYear, semester, examType],
+    queryKey: [
+      'examReviews',
+      page,
+      keyword,
+      lectureYear,
+      semester,
+      examType,
+      refreshKey,
+    ],
     queryFn: async () => {
       const response = (await getExamReviews({
         page: page - 1, // API는 0부터 시작

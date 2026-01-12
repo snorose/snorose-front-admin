@@ -1,14 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   ExamTable,
   ExamSearch,
   ExamIconInfo,
   ExamPanel,
 } from '@/domains/Exams/components';
-import type { ExamReview } from '@/domains/Exams/components/ExamTable';
+import type {
+  ExamReview,
+  ExamReviewDetailResult,
+} from '@/domains/Exams/types/exam';
 import PageHeader from '@/components/PageHeader';
-import { getExamReviewDetail, type ExamReviewDetailResult } from '@/apis/exam';
+import { getExamReviewDetail } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 
@@ -32,6 +36,7 @@ const convertSemesterEnumToString = (
 };
 
 export default function ExamReviewPage() {
+  const queryClient = useQueryClient();
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
   const [selectedExamReview, setSelectedExamReview] =
     useState<ExamReview | null>(null);
@@ -141,9 +146,90 @@ export default function ExamReviewPage() {
     setCurrentPage(page);
   };
 
-  const handleSaveSuccess = () => {
-    // Table과 Panel을 새로고침하기 위해 refreshKey 증가
-    setRefreshKey((prev) => prev + 1);
+  const handleSaveSuccess = async () => {
+    // 쿼리 캐시를 직접 업데이트하여 스켈레톤 없이 즉시 반영
+    if (selectedExamReview && selectedExamReviewDetail) {
+      // 저장 후 최신 상세 정보 가져오기 (백그라운드)
+      try {
+        const response = await getExamReviewDetail(selectedExamReview.id);
+        if (response.isSuccess && response.result) {
+          const updatedDetail = response.result;
+
+          // 현재 검색 파라미터로 쿼리 키 생성
+          const queryKey = [
+            'examReviews',
+            currentPage,
+            searchParams.keyword,
+            searchParams.lectureYear,
+            searchParams.semester,
+            searchParams.examType,
+            refreshKey,
+          ];
+
+          // 캐시에서 현재 데이터 가져오기
+          const cachedData = queryClient.getQueryData<{
+            data: ExamReview[];
+            hasNext: boolean;
+          }>(queryKey);
+
+          if (cachedData) {
+            // 선택된 항목의 인덱스 찾기
+            const itemIndex = cachedData.data.findIndex(
+              (item) => item.id === selectedExamReview.id
+            );
+
+            if (itemIndex !== -1) {
+              // 선택된 항목의 상태를 업데이트된 상태로 변경
+              const updatedData = [...cachedData.data];
+
+              // title 파싱: "2023-1/기말/프로그래밍입문/이종우/001"
+              const titleParts = updatedDetail.title.split('/');
+              const semester = titleParts[0] || '';
+              const examType = titleParts[1] || '';
+              const courseName = titleParts[2] || '';
+              const professor = titleParts[3] || '';
+              const classNumber = titleParts[4] || '';
+
+              const date = new Date(updatedDetail.createdAt);
+              const uploadTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+              const updatedItem: ExamReview = {
+                id: updatedDetail.postId,
+                status: updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
+                reviewTitle: updatedDetail.title,
+                courseName,
+                professor,
+                semester,
+                examType,
+                classNumber,
+                questionDetail: updatedDetail.questionDetail,
+                uploadTime,
+                userDisplay: updatedDetail.userDisplay,
+              };
+
+              updatedData[itemIndex] = updatedItem;
+
+              // 캐시 업데이트 (스켈레톤 없이 즉시 반영)
+              queryClient.setQueryData(queryKey, {
+                ...cachedData,
+                data: updatedData,
+              });
+
+              // 선택된 항목도 업데이트
+              setSelectedExamReview(updatedItem);
+              setSelectedExamReviewDetail(updatedDetail);
+            }
+          }
+        }
+      } catch (error) {
+        // 에러 발생 시 기존 방식으로 fallback
+        console.error('Failed to update cache:', error);
+        setRefreshKey((prev) => prev + 1);
+      }
+    } else {
+      // 선택된 항목이 없으면 기존 방식으로 처리
+      setRefreshKey((prev) => prev + 1);
+    }
   };
 
   const handleDeleteSuccess = () => {

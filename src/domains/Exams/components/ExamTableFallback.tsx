@@ -1,7 +1,7 @@
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// types
+// ======= types =======
 interface ExamTableSkeletonProps {
   itemsPerPage?: number;
 }
@@ -10,6 +10,7 @@ interface ExamTableEmptyRowsProps {
   count: number;
 }
 
+// ======= components =======
 export function ExamTableSkeleton({
   itemsPerPage = 10,
 }: ExamTableSkeletonProps) {

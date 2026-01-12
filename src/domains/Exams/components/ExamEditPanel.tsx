@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import {
   Button,
   Select,
@@ -17,15 +17,27 @@ import {
   deleteExamReview,
   updateExamReview,
   downloadExamReviewFile,
-  type ExamReviewDetailResult,
-  type UpdateExamReviewRequest,
 } from '@/apis/exam';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { Trash2, Loader2 } from 'lucide-react';
-import type { ExamReview } from './ExamTable';
+import type {
+  LectureType,
+  ExamReview,
+  ExamReviewDetailResult,
+  UpdateExamReviewRequest,
+} from '@/domains/Exams/types/exam';
 import ConfirmModal from '@/components/ui/confirm-modal';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  convertLectureTypeToString,
+  convertSemesterEnumToString,
+  convertExamTypeEnumToString,
+  convertSemesterToEnum,
+  convertExamTypeToEnum,
+  getStatusName,
+} from '@/domains/Exams/utils/examFormatters';
+import { ExamStatusDot } from '@/domains/Exams/components';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[12px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;
@@ -36,23 +48,6 @@ const SELECT_TRIGGER_STYLE =
 const SELECT_CONTENT_STYLE =
   'text-[10px] max-h-[200px] overflow-y-auto bg-blue-50 [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-highlighted]]:bg-blue-100/50 [&_[data-state=checked]]:bg-blue-100';
 
-// 상태 점 컴포넌트
-const StatusDot = ({ status }: { status: string }) => {
-  const getStatusColor = (status: string) => {
-    const statusColor = STATUS_COLOR.find((color) => color.code === status);
-    return statusColor?.color || 'bg-white';
-  };
-
-  return (
-    <div className='flex items-center justify-center'>
-      <div
-        className={`h-2 w-2 rounded-full ${getStatusColor(status)}`}
-        title={status}
-      />
-    </div>
-  );
-};
-
 interface ExamEditPanelProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
@@ -61,6 +56,55 @@ interface ExamEditPanelProps {
   onDeleteSuccess?: () => void;
 }
 
+interface FormData {
+  postId: number | null;
+  status: string;
+  examReviewName: string;
+  uploadTime: string;
+  lectureName: string;
+  professorName: string;
+  classNumber: number | null;
+  semester: string;
+  lectureType: LectureType;
+  isPF: string;
+  isOnline: string;
+  examType: string;
+  fileName: string;
+  examTypeAndQuestions: string;
+  author: string;
+}
+
+interface InitialValues {
+  status: string;
+  lectureName: string;
+  professorName: string;
+  classNumber: number | null;
+  semester: string;
+  lectureType: LectureType;
+  isPF: string;
+  isOnline: string;
+  examType: string;
+  questionDetail: string;
+}
+
+const DEFAULT_FORM_DATA: FormData = {
+  postId: null,
+  status: '',
+  examReviewName: '',
+  uploadTime: '',
+  lectureName: '',
+  professorName: '',
+  classNumber: null,
+  semester: '',
+  lectureType: 'MAJOR_ELECTIVE',
+  isPF: 'X',
+  isOnline: 'X',
+  examType: '',
+  fileName: '',
+  examTypeAndQuestions: '',
+  author: '',
+};
+
 export default function ExamEditPanel({
   selectedExamReview,
   selectedExamReviewDetail,
@@ -68,137 +112,46 @@ export default function ExamEditPanel({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamEditPanelProps = {}) {
-  // 초기값 상수
-
-  const [status, setStatus] = useState<string>('');
+  const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [postId, setPostId] = useState<number | null>(null);
-  const [examReviewName, setExamReviewName] = useState('');
-  const [uploadTime, setUploadTime] = useState('');
-  const [lectureName, setLectureName] = useState('');
-  const [professorName, setProfessorName] = useState('');
-  const [classNumber, setClassNumber] = useState<number | null>(null);
-  const [semester, setSemester] = useState('');
-  const [lectureType, setLectureType] = useState<
-    | 'MAJOR_REQUIRED'
-    | 'MAJOR_ELECTIVE'
-    | 'GENERAL_REQUIRED'
-    | 'GENERAL_ELECTIVE'
-    | 'OTHER'
-  >('MAJOR_ELECTIVE');
-  const [isPF, setIsPF] = useState<string>('X');
-  const [isOnline, setIsOnline] = useState<string>('X');
-  const [examType, setExamType] = useState('');
-  const [fileName, setFileName] = useState('');
-  const [examTypeAndQuestions, setExamTypeAndQuestions] = useState('');
-  const [author, setAuthor] = useState('');
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isFileDeleted, setIsFileDeleted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 초기값 저장 (변경사항 비교용)
-  const [initialValues, setInitialValues] = useState<{
-    status: string;
-    lectureName: string;
-    professorName: string;
-    classNumber: number | null;
-    semester: string;
-    lectureType:
-      | 'MAJOR_REQUIRED'
-      | 'MAJOR_ELECTIVE'
-      | 'GENERAL_REQUIRED'
-      | 'GENERAL_ELECTIVE'
-      | 'OTHER';
-    isPF: string;
-    isOnline: string;
-    examType: string;
-    questionDetail: string;
-  } | null>(null);
+  const [initialValues, setInitialValues] = useState<InitialValues | null>(
+    null
+  );
 
   // 폼 리셋 함수
   const resetForm = () => {
-    setStatus('');
-    setPostId(null);
-    setExamReviewName('');
-    setUploadTime('');
-    setLectureName('');
-    setProfessorName('');
-    setClassNumber(null);
-    setSemester('');
-    setLectureType('MAJOR_ELECTIVE');
-    setIsPF('X');
-    setIsOnline('X');
-    setExamType('');
-    setFileName('');
-    setExamTypeAndQuestions('');
-    setAuthor('');
+    setFormData(DEFAULT_FORM_DATA);
     setFocusedInput(null);
     setSelectedFile(null);
     setIsFileDeleted(false);
     setIsSaving(false);
   };
 
-  // lectureType enum을 문자열로 변환
-  const convertLectureTypeToString = (
-    lectureTypeEnum:
-      | 'MAJOR_REQUIRED'
-      | 'MAJOR_ELECTIVE'
-      | 'GENERAL_REQUIRED'
-      | 'GENERAL_ELECTIVE'
-      | 'OTHER'
-  ): string => {
-    const typeMap: Record<string, string> = {
-      MAJOR_REQUIRED: '전공필수',
-      MAJOR_ELECTIVE: '전공선택',
-      GENERAL_REQUIRED: '교양필수',
-      GENERAL_ELECTIVE: '교양선택',
-      OTHER: '기타',
-    };
-    return typeMap[lectureTypeEnum] || lectureTypeEnum;
-  };
-
-  // selectedExamReviewDetail이 변경되면 폼 값 업데이트 또는 리셋
-  useEffect(() => {
+  const formInitialValues = useMemo(() => {
     if (selectedExamReviewDetail) {
-      setPostId(selectedExamReviewDetail.postId);
-      setStatus(
-        selectedExamReviewDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'
-      );
-      setExamReviewName(selectedExamReviewDetail.title);
-      // createdAt 포맷 변환: "2024-12-21T01:42:16.596374" -> "2024-12-21 01:42"
       const date = new Date(selectedExamReviewDetail.createdAt);
       const uploadTimeStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-      setUploadTime(uploadTimeStr);
-      setLectureName(selectedExamReviewDetail.lectureName);
-      setProfessorName(selectedExamReviewDetail.professor);
-      setClassNumber(selectedExamReviewDetail.classNumber);
-      // semester enum을 문자열로 변환
       const semesterStr = convertSemesterEnumToString(
         selectedExamReviewDetail.semester,
         selectedExamReviewDetail.lectureYear
       );
-      setSemester(semesterStr);
-      setLectureType(selectedExamReviewDetail.lectureType);
-      setIsPF(selectedExamReviewDetail.isPF ? 'O' : 'X');
-      setIsOnline(selectedExamReviewDetail.isOnline ? 'O' : 'X');
-      // examType enum을 문자열로 변환
       const examTypeStr = convertExamTypeEnumToString(
         selectedExamReviewDetail.examType
       );
-      setExamType(examTypeStr);
-      setFileName(selectedExamReviewDetail.fileName);
-      setExamTypeAndQuestions(selectedExamReviewDetail.questionDetail);
-      setAuthor(selectedExamReviewDetail.userDisplay);
-      setSelectedFile(null);
-      setIsFileDeleted(false);
+      const statusValue =
+        selectedExamReview?.status ||
+        (selectedExamReviewDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED');
 
-      // 초기값 저장
-      setInitialValues({
-        status: selectedExamReviewDetail.isConfirmed
-          ? 'CONFIRMED'
-          : 'UNCONFIRMED',
+      return {
+        postId: selectedExamReviewDetail.postId,
+        status: statusValue,
+        examReviewName: selectedExamReviewDetail.title,
+        uploadTime: uploadTimeStr,
         lectureName: selectedExamReviewDetail.lectureName,
         professorName: selectedExamReviewDetail.professor,
         classNumber: selectedExamReviewDetail.classNumber,
@@ -207,95 +160,59 @@ export default function ExamEditPanel({
         isPF: selectedExamReviewDetail.isPF ? 'O' : 'X',
         isOnline: selectedExamReviewDetail.isOnline ? 'O' : 'X',
         examType: examTypeStr,
-        questionDetail: selectedExamReviewDetail.questionDetail,
+        fileName: selectedExamReviewDetail.fileName,
+        examTypeAndQuestions: selectedExamReviewDetail.questionDetail,
+        author: selectedExamReviewDetail.userDisplay,
+        initialValues: {
+          status: statusValue,
+          lectureName: selectedExamReviewDetail.lectureName,
+          professorName: selectedExamReviewDetail.professor,
+          classNumber: selectedExamReviewDetail.classNumber,
+          semester: semesterStr,
+          lectureType: selectedExamReviewDetail.lectureType,
+          isPF: selectedExamReviewDetail.isPF ? 'O' : 'X',
+          isOnline: selectedExamReviewDetail.isOnline ? 'O' : 'X',
+          examType: examTypeStr,
+          questionDetail: selectedExamReviewDetail.questionDetail,
+        },
+      };
+    }
+    return null;
+  }, [selectedExamReviewDetail, selectedExamReview?.status]);
+
+  // formInitialValues가 변경되면 상태 업데이트
+  useEffect(() => {
+    if (formInitialValues) {
+      setFormData({
+        postId: formInitialValues.postId,
+        status: formInitialValues.status,
+        examReviewName: formInitialValues.examReviewName,
+        uploadTime: formInitialValues.uploadTime,
+        lectureName: formInitialValues.lectureName,
+        professorName: formInitialValues.professorName,
+        classNumber: formInitialValues.classNumber,
+        semester: formInitialValues.semester,
+        lectureType: formInitialValues.lectureType,
+        isPF: formInitialValues.isPF,
+        isOnline: formInitialValues.isOnline,
+        examType: formInitialValues.examType,
+        fileName: formInitialValues.fileName,
+        examTypeAndQuestions: formInitialValues.examTypeAndQuestions,
+        author: formInitialValues.author,
       });
+      setSelectedFile(null);
+      setIsFileDeleted(false);
+      setInitialValues(formInitialValues.initialValues);
     } else {
-      // 선택 해제 시 폼 리셋
       resetForm();
       setInitialValues(null);
     }
-  }, [selectedExamReviewDetail]);
+  }, [formInitialValues]);
 
-  // 상태 이름 가져오기
-  const getStatusName = (statusCode: string) => {
-    const statusOption = STATUS_COLOR.find((s) => s.code === statusCode);
-    return statusOption?.name || '확인';
-  };
-
-  // semester enum을 문자열로 변환: "FIRST" -> "2024-1" 형식
-  const convertSemesterEnumToString = (
-    semesterEnum: 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER',
-    year: number
-  ): string => {
-    if (semesterEnum === 'FIRST') {
-      return `${year}-1`;
-    }
-    if (semesterEnum === 'SECOND') {
-      return `${year}-2`;
-    }
-    if (semesterEnum === 'SUMMER') {
-      return `${year} 여름`;
-    }
-    if (semesterEnum === 'WINTER') {
-      return `${year} 겨울`;
-    }
-    if (semesterEnum === 'OTHER') {
-      return `${year} 기타`;
-    }
-    return '';
-  };
-
-  // semester 문자열을 enum으로 변환: "2024-1" -> "FIRST", "2024-2" -> "SECOND" 등
-  const convertSemesterToEnum = (
-    semesterStr: string
-  ): 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER' => {
-    if (
-      semesterStr.includes('1') &&
-      !semesterStr.includes('여름') &&
-      !semesterStr.includes('겨울')
-    ) {
-      return 'FIRST';
-    }
-    if (
-      semesterStr.includes('2') &&
-      !semesterStr.includes('여름') &&
-      !semesterStr.includes('겨울')
-    ) {
-      return 'SECOND';
-    }
-    if (semesterStr.includes('여름')) {
-      return 'SUMMER';
-    }
-    if (semesterStr.includes('겨울')) {
-      return 'WINTER';
-    }
-    return 'OTHER';
-  };
-
-  // examType enum을 문자열로 변환: "MIDTERM" -> "중간고사", "FINALTERM" -> "기말고사"
-  const convertExamTypeEnumToString = (
-    examTypeEnum: 'MIDTERM' | 'FINALTERM'
-  ): string => {
-    if (examTypeEnum === 'MIDTERM') {
-      return '중간고사';
-    }
-    return '기말고사';
-  };
-
-  // examType 문자열을 enum으로 변환: "중간고사" -> "MIDTERM", "기말고사" -> "FINALTERM"
-  const convertExamTypeToEnum = (
-    examTypeStr: string
-  ): 'MIDTERM' | 'FINALTERM' => {
-    if (examTypeStr === '중간고사') {
-      return 'MIDTERM';
-    }
-    return 'FINALTERM';
-  };
-
-  // 저장 핸들러
+  // 편집 내용 저장 핸들러
   const handleSave = async () => {
     if (isSaving) {
-      return; // 이미 저장 중이면 중복 호출 방지
+      return;
     }
 
     if (!selectedExamReview || !selectedExamReviewDetail || !initialValues) {
@@ -305,70 +222,62 @@ export default function ExamEditPanel({
 
     setIsSaving(true);
     try {
-      // 변경된 필드만 포함하는 post 객체 생성
-      const post: UpdateExamReviewRequest['post'] = {};
+      const post: UpdateExamReviewRequest['post'] = {}; // 변경된 필드만 포함하는 post 객체 생성
 
-      // 각 필드가 변경되었는지 확인하고 변경된 것만 추가
-      if (lectureName !== initialValues.lectureName) {
-        post.lectureName = lectureName || undefined;
+      if (formData.lectureName !== initialValues.lectureName) {
+        post.lectureName = formData.lectureName || undefined;
       }
 
-      if (professorName !== initialValues.professorName) {
-        post.professor = professorName || undefined;
+      if (formData.professorName !== initialValues.professorName) {
+        post.professor = formData.professorName || undefined;
       }
 
-      if (classNumber !== initialValues.classNumber) {
-        post.classNumber = classNumber ?? undefined;
+      if (formData.classNumber !== initialValues.classNumber) {
+        post.classNumber = formData.classNumber ?? undefined;
       }
 
-      if (semester !== initialValues.semester) {
-        // semester에서 연도 추출 (예: "2024-1" -> 2024)
-        const yearMatch = semester.match(/^(\d{4})/);
+      if (formData.semester !== initialValues.semester) {
+        const yearMatch = formData.semester.match(/^(\d{4})/);
         const lectureYear = yearMatch
           ? parseInt(yearMatch[1], 10)
           : selectedExamReviewDetail.lectureYear;
         post.lectureYear = lectureYear;
-        post.semester = convertSemesterToEnum(semester);
+        post.semester = convertSemesterToEnum(formData.semester);
       }
 
-      if (lectureType !== initialValues.lectureType) {
-        post.lectureType = lectureType;
+      if (formData.lectureType !== initialValues.lectureType) {
+        post.lectureType = formData.lectureType;
       }
 
-      if (isPF !== initialValues.isPF) {
-        post.isPF = isPF === 'O';
+      if (formData.isPF !== initialValues.isPF) {
+        post.isPF = formData.isPF === 'O';
       }
 
-      if (isOnline !== initialValues.isOnline) {
-        post.isOnline = isOnline === 'O';
+      if (formData.isOnline !== initialValues.isOnline) {
+        post.isOnline = formData.isOnline === 'O';
       }
 
-      if (examType !== initialValues.examType) {
-        post.examType = convertExamTypeToEnum(examType);
+      if (formData.examType !== initialValues.examType) {
+        post.examType = convertExamTypeToEnum(formData.examType);
       }
 
-      if (status !== initialValues.status) {
-        post.isConfirmed = status === 'CONFIRMED';
+      if (formData.status !== initialValues.status) {
+        post.isConfirmed = formData.status === 'CONFIRMED';
       }
 
-      if (examTypeAndQuestions !== initialValues.questionDetail) {
-        post.questionDetail = examTypeAndQuestions || undefined;
+      if (formData.examTypeAndQuestions !== initialValues.questionDetail) {
+        post.questionDetail = formData.examTypeAndQuestions || undefined;
       }
 
-      // 파일 처리 로직:
-      // 1. 새 파일이 선택되었으면 (selectedFile이 있으면) → 새 파일 업로드
-      // 2. 파일이 삭제되었고 새 파일이 없으면 → undefined (파일 삭제)
-      // 3. 둘 다 없으면 → 파일 필드 자체를 보내지 않음 (기존 파일 유지)
-      let file: File | undefined | null = null;
+      let file: File | undefined | null = null; // 파일 선택 로직 (파일 없으면 안 보냄)
       if (selectedFile) {
         file = selectedFile;
       } else if (isFileDeleted) {
         file = undefined;
       }
-      // 둘 다 없으면 file은 null로 유지 (필드 자체를 보내지 않음)
 
       const updateData: UpdateExamReviewRequest = {
-        ...(file !== null && { file }), // file이 null이 아니면 포함
+        ...(file !== null && { file }),
         post,
       };
 
@@ -382,18 +291,17 @@ export default function ExamEditPanel({
         setIsFileDeleted(false);
         setSelectedFile(null);
 
-        // 저장 성공 후 현재 상태를 initialValues로 업데이트
         setInitialValues({
-          status,
-          lectureName,
-          professorName,
-          classNumber,
-          semester,
-          lectureType,
-          isPF,
-          isOnline,
-          examType,
-          questionDetail: examTypeAndQuestions,
+          status: formData.status,
+          lectureName: formData.lectureName,
+          professorName: formData.professorName,
+          classNumber: formData.classNumber,
+          semester: formData.semester,
+          lectureType: formData.lectureType,
+          isPF: formData.isPF,
+          isOnline: formData.isOnline,
+          examType: formData.examType,
+          questionDetail: formData.examTypeAndQuestions,
         });
 
         onSaveSuccess?.();
@@ -440,16 +348,16 @@ export default function ExamEditPanel({
     if (!initialValues) return false;
 
     return (
-      status !== initialValues.status ||
-      lectureName !== initialValues.lectureName ||
-      professorName !== initialValues.professorName ||
-      classNumber !== initialValues.classNumber ||
-      semester !== initialValues.semester ||
-      lectureType !== initialValues.lectureType ||
-      isPF !== initialValues.isPF ||
-      isOnline !== initialValues.isOnline ||
-      examType !== initialValues.examType ||
-      examTypeAndQuestions !== initialValues.questionDetail ||
+      formData.status !== initialValues.status ||
+      formData.lectureName !== initialValues.lectureName ||
+      formData.professorName !== initialValues.professorName ||
+      formData.classNumber !== initialValues.classNumber ||
+      formData.semester !== initialValues.semester ||
+      formData.lectureType !== initialValues.lectureType ||
+      formData.isPF !== initialValues.isPF ||
+      formData.isOnline !== initialValues.isOnline ||
+      formData.examType !== initialValues.examType ||
+      formData.examTypeAndQuestions !== initialValues.questionDetail ||
       selectedFile !== null || // 새 파일이 선택되었는지
       isFileDeleted // 파일이 삭제되었는지
     );
@@ -457,7 +365,7 @@ export default function ExamEditPanel({
 
   // 파일 다운로드 핸들러
   const handleFileDownload = async () => {
-    if (!selectedExamReview || !fileName) {
+    if (!selectedExamReview || !formData.fileName) {
       toast.error('다운로드할 파일이 없습니다.');
       return;
     }
@@ -465,14 +373,13 @@ export default function ExamEditPanel({
     try {
       const blob = await downloadExamReviewFile(
         selectedExamReview.id,
-        fileName
+        formData.fileName
       );
 
-      // Blob을 URL로 변환하여 다운로드
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = fileName;
+      link.download = formData.fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -491,29 +398,30 @@ export default function ExamEditPanel({
   const handleFileDelete = () => {
     setSelectedFile(null);
     setIsFileDeleted(true);
-    setFileName('');
+    setFormData((prev) => ({ ...prev, fileName: '' }));
   };
 
   // 취소 핸들러
   const handleCancel = () => {
     if (selectedExamReviewDetail && initialValues) {
       // 원래 값으로 복원
-      setPostId(selectedExamReviewDetail.postId);
-      setStatus(initialValues.status);
-      setLectureName(initialValues.lectureName);
-      setProfessorName(initialValues.professorName);
-      setClassNumber(initialValues.classNumber);
-      setSemester(initialValues.semester);
-      setLectureType(initialValues.lectureType);
-      setIsPF(initialValues.isPF);
-      setIsOnline(initialValues.isOnline);
-      setExamType(initialValues.examType);
-      setExamTypeAndQuestions(initialValues.questionDetail);
+      setFormData((prev) => ({
+        ...prev,
+        postId: selectedExamReviewDetail.postId,
+        status: initialValues.status,
+        lectureName: initialValues.lectureName,
+        professorName: initialValues.professorName,
+        classNumber: initialValues.classNumber,
+        semester: initialValues.semester,
+        lectureType: initialValues.lectureType,
+        isPF: initialValues.isPF,
+        isOnline: initialValues.isOnline,
+        examType: initialValues.examType,
+        examTypeAndQuestions: initialValues.questionDetail,
+        fileName: selectedExamReviewDetail.fileName,
+      }));
       setSelectedFile(null);
       setIsFileDeleted(false);
-      if (selectedExamReviewDetail) {
-        setFileName(selectedExamReviewDetail.fileName);
-      }
     }
   };
 
@@ -643,14 +551,16 @@ export default function ExamEditPanel({
                   <th className={TABLE_HEADER_STYLE}>상태</th>
                   <td className={TABLE_DATA_STYLE}>
                     <Select
-                      value={status}
-                      onValueChange={setStatus}
+                      value={formData.status}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, status: value }))
+                      }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
                       <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                         <div className='flex items-center gap-2'>
-                          <StatusDot status={status} />
-                          <span>{getStatusName(status)}</span>
+                          <ExamStatusDot status={formData.status} />
+                          <span>{getStatusName(formData.status)}</span>
                         </div>
                       </SelectTrigger>
                       <SelectContent
@@ -664,7 +574,7 @@ export default function ExamEditPanel({
                             className='text-[12px] font-medium'
                           >
                             <div className='flex items-center gap-2'>
-                              <StatusDot status={statusOption.code} />
+                              <ExamStatusDot status={statusOption.code} />
                               <span>{statusOption.name}</span>
                             </div>
                           </SelectItem>
@@ -676,25 +586,25 @@ export default function ExamEditPanel({
                 <tr className='h-[30px]'>
                   <th className={TABLE_HEADER_STYLE}>id</th>
                   <td className={TABLE_DATA_READONLY_STYLE}>
-                    <div className='px-2 py-1'>{postId ?? ''}</div>
+                    <div className='px-2 py-1'>{formData.postId ?? ''}</div>
                   </td>
                 </tr>
                 <tr className='h-[30px]'>
                   <th className={TABLE_HEADER_STYLE}>게시자</th>
                   <td className={TABLE_DATA_READONLY_STYLE}>
-                    <div className='px-2 py-1'>{author}</div>
+                    <div className='px-2 py-1'>{formData.author}</div>
                   </td>
                 </tr>
                 <tr className='h-[30px]'>
                   <th className={TABLE_HEADER_STYLE}>시험후기명</th>
                   <td className={TABLE_DATA_READONLY_STYLE}>
-                    <div className='px-2 py-1'>{examReviewName}</div>
+                    <div className='px-2 py-1'>{formData.examReviewName}</div>
                   </td>
                 </tr>
                 <tr className='h-[30px]'>
                   <th className={TABLE_HEADER_STYLE}>업로드시간</th>
                   <td className={TABLE_DATA_READONLY_STYLE}>
-                    <div className='px-2 py-1'>{uploadTime}</div>
+                    <div className='px-2 py-1'>{formData.uploadTime}</div>
                   </td>
                 </tr>
                 <tr className='h-[30px]'>
@@ -713,18 +623,18 @@ export default function ExamEditPanel({
                         <div className='flex-1 text-gray-400 italic'>
                           파일 없음
                         </div>
-                      ) : fileName ? (
+                      ) : formData.fileName ? (
                         <div className='flex-1'>
                           <span
                             className='cursor-pointer text-blue-500 underline hover:text-blue-700'
                             onClick={handleFileDownload}
                             title='클릭하여 다운로드'
                           >
-                            {fileName}
+                            {formData.fileName}
                           </span>
                         </div>
                       ) : (
-                        <div className='flex-1'>{fileName}</div>
+                        <div className='flex-1'>{formData.fileName}</div>
                       )}
                       <div className='flex items-center gap-1'>
                         <button
@@ -733,7 +643,7 @@ export default function ExamEditPanel({
                           disabled={!selectedExamReview || isLoadingDetail}
                           className='rounded bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50'
                         >
-                          {fileName || selectedFile
+                          {formData.fileName || selectedFile
                             ? '파일 변경'
                             : '파일 업로드'}
                         </button>
@@ -743,7 +653,9 @@ export default function ExamEditPanel({
                           disabled={
                             !selectedExamReview ||
                             isLoadingDetail ||
-                            (!selectedFile && !fileName && !isFileDeleted)
+                            (!selectedFile &&
+                              !formData.fileName &&
+                              !isFileDeleted)
                           }
                           className='rounded bg-gray-500 px-2 py-0.5 text-[10px] text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50'
                         >
@@ -758,7 +670,10 @@ export default function ExamEditPanel({
                           const file = e.target.files?.[0];
                           if (file) {
                             setSelectedFile(file);
-                            setFileName(file.name);
+                            setFormData((prev) => ({
+                              ...prev,
+                              fileName: file.name,
+                            }));
                             setIsFileDeleted(false); // 새 파일 선택 시 삭제 플래그 해제
                           }
                           // 같은 파일을 다시 선택할 수 있도록 value 리셋
@@ -782,8 +697,13 @@ export default function ExamEditPanel({
                   >
                     <input
                       type='text'
-                      value={lectureName}
-                      onChange={(e) => setLectureName(e.target.value)}
+                      value={formData.lectureName}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          lectureName: e.target.value,
+                        }))
+                      }
                       onFocus={() => setFocusedInput('lectureName')}
                       onBlur={() => setFocusedInput(null)}
                       disabled={!selectedExamReview || isLoadingDetail}
@@ -802,8 +722,13 @@ export default function ExamEditPanel({
                   >
                     <input
                       type='text'
-                      value={professorName}
-                      onChange={(e) => setProfessorName(e.target.value)}
+                      value={formData.professorName}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          professorName: e.target.value,
+                        }))
+                      }
                       onFocus={() => setFocusedInput('professorName')}
                       onBlur={() => setFocusedInput(null)}
                       disabled={!selectedExamReview || isLoadingDetail}
@@ -815,12 +740,14 @@ export default function ExamEditPanel({
                   <th className={TABLE_HEADER_STYLE}>학기</th>
                   <td className={TABLE_DATA_STYLE}>
                     <Select
-                      value={semester}
-                      onValueChange={setSemester}
+                      value={formData.semester}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, semester: value }))
+                      }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
                       <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{semester}</SelectValue>
+                        <SelectValue>{formData.semester}</SelectValue>
                       </SelectTrigger>
                       <SelectContent
                         align='start'
@@ -843,12 +770,14 @@ export default function ExamEditPanel({
                   <th className={TABLE_HEADER_STYLE}>시험 종류</th>
                   <td className={TABLE_DATA_STYLE}>
                     <Select
-                      value={examType}
-                      onValueChange={setExamType}
+                      value={formData.examType}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, examType: value }))
+                      }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
                       <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{examType}</SelectValue>
+                        <SelectValue>{formData.examType}</SelectValue>
                       </SelectTrigger>
                       <SelectContent
                         align='start'
@@ -871,17 +800,19 @@ export default function ExamEditPanel({
                   <th className={TABLE_HEADER_STYLE}>강의 종류</th>
                   <td className={TABLE_DATA_STYLE}>
                     <Select
-                      value={lectureType}
+                      value={formData.lectureType}
                       onValueChange={(value) =>
-                        setLectureType(
-                          value as (typeof LECTURE_TYPE_OPTIONS)[number]['value']
-                        )
+                        setFormData((prev) => ({
+                          ...prev,
+                          lectureType:
+                            value as (typeof LECTURE_TYPE_OPTIONS)[number]['value'],
+                        }))
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
                       <SelectTrigger className={SELECT_TRIGGER_STYLE}>
                         <SelectValue>
-                          {convertLectureTypeToString(lectureType)}
+                          {convertLectureTypeToString(formData.lectureType)}
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent
@@ -904,7 +835,7 @@ export default function ExamEditPanel({
                 <tr className='h-[30px]'>
                   <th className={TABLE_HEADER_STYLE}>분반</th>
                   <td
-                    className={`$${TABLE_CELL_BASE_STYLE} ${
+                    className={`${TABLE_CELL_BASE_STYLE} ${
                       focusedInput === 'classNumber'
                         ? 'border-blue-500 outline-1 outline-offset-[-1px] outline-blue-500'
                         : 'border-gray-300'
@@ -912,12 +843,14 @@ export default function ExamEditPanel({
                   >
                     <input
                       type='number'
-                      value={classNumber ?? ''}
+                      value={formData.classNumber ?? ''}
                       onChange={(e) => {
                         const value = e.target.value;
-                        setClassNumber(
-                          value === '' ? null : parseInt(value, 10)
-                        );
+                        setFormData((prev) => ({
+                          ...prev,
+                          classNumber:
+                            value === '' ? null : parseInt(value, 10),
+                        }));
                       }}
                       onFocus={() => setFocusedInput('classNumber')}
                       onBlur={() => setFocusedInput(null)}
@@ -931,12 +864,14 @@ export default function ExamEditPanel({
                   <th className={TABLE_HEADER_STYLE}>P/F</th>
                   <td className={TABLE_DATA_STYLE}>
                     <Select
-                      value={isPF}
-                      onValueChange={setIsPF}
+                      value={formData.isPF}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, isPF: value }))
+                      }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
                       <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{isPF}</SelectValue>
+                        <SelectValue>{formData.isPF}</SelectValue>
                       </SelectTrigger>
                       <SelectContent
                         align='start'
@@ -962,12 +897,14 @@ export default function ExamEditPanel({
                   <th className={TABLE_HEADER_STYLE}>온라인 수업</th>
                   <td className={TABLE_DATA_STYLE}>
                     <Select
-                      value={isOnline}
-                      onValueChange={setIsOnline}
+                      value={formData.isOnline}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, isOnline: value }))
+                      }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
                       <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{isOnline}</SelectValue>
+                        <SelectValue>{formData.isOnline}</SelectValue>
                       </SelectTrigger>
                       <SelectContent
                         align='start'
@@ -1000,8 +937,13 @@ export default function ExamEditPanel({
                   >
                     <input
                       type='text'
-                      value={examTypeAndQuestions}
-                      onChange={(e) => setExamTypeAndQuestions(e.target.value)}
+                      value={formData.examTypeAndQuestions}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          examTypeAndQuestions: e.target.value,
+                        }))
+                      }
                       onFocus={() => setFocusedInput('examTypeAndQuestions')}
                       onBlur={() => setFocusedInput(null)}
                       disabled={!selectedExamReview || isLoadingDetail}
