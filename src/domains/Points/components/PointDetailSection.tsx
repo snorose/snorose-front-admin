@@ -67,6 +67,7 @@ export default function PointDetailSection({
             포인트 유형
           </Label>
           <Select
+            key={selectedCategory || 'empty'}
             onValueChange={(selectedKey: PointCategoryValue | '') =>
               onCategoryChange(selectedKey)
             }
