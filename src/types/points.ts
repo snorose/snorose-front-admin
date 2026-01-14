@@ -21,3 +21,9 @@ export interface PointFreeze extends PointFreezeBase {
 
 export type CreatePointFreeze = PointFreezeBase;
 export type UpdatePointFreeze = PointFreezeBase;
+
+export interface AdjustAllMemberPoint {
+  category: string;
+  memo: string;
+  difference: number;
+}

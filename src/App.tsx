@@ -5,7 +5,7 @@ import {
   MemberInfoPage,
   MemberPenaltyManagementPage,
   AdjustSinglePointPage,
-  PointAllPage,
+  AdjustAllMemberPointPage,
   PointFreezePage,
   LogInPage,
   PostPage,
@@ -51,7 +51,7 @@ function App() {
                           />
                           <Route
                             path='/points/all'
-                            element={<PointAllPage />}
+                            element={<AdjustAllMemberPointPage />}
                           />
                           <Route
                             path='/points/freeze'

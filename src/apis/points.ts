@@ -3,6 +3,7 @@ import type {
   AdjustSinglePoint,
   CreatePointFreeze,
   UpdatePointFreeze,
+  AdjustAllMemberPoint,
 } from '@/types';
 
 export const postSinglePointAPI = async (data: AdjustSinglePoint) => {
@@ -37,6 +38,14 @@ export const patchPointFreezeAPI = async (
 export const deletePointFreezeAPI = async (id: number) => {
   const response = await axiosInstance.delete(
     `/v1/admin/points/point-freeze/${id}`
+  );
+  return response.data;
+};
+
+export const postAllMemberPointAPI = async (data: AdjustAllMemberPoint) => {
+  const response = await axiosInstance.post(
+    '/v1/admin/points/point-freeze/insert-bulk-logs',
+    data
   );
   return response.data;
 };

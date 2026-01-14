@@ -15,11 +15,13 @@ import {
 } from '@/components/ui';
 import { PageHeader } from '@/components';
 import { POINT_CATEGORY_OPTIONS } from '@/constants';
+import { postAllMemberPointAPI } from '@/apis/points';
+import { getErrorMessage } from '@/utils';
 import { toast } from 'sonner';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
-export default function PointAllPage() {
+export default function AdjustAllMemberPointPage() {
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
   >('POINT_REWARD_REPORT_GENERAL');
@@ -32,21 +34,30 @@ export default function PointAllPage() {
     setMemo('');
   };
 
-  const handleApplyButtonClick = () => {
+  const handleApplyButtonClick = async () => {
+    if (!selectedCategory || !difference || !memo) {
+      toast.info('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    const numDifference = Number(difference);
+
+    if (isNaN(numDifference) || numDifference === 0) {
+      toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
+      return;
+    }
+
     try {
-      if (!selectedCategory || !difference || !memo) {
-        toast.info('모든 필수 항목을 입력해주세요.');
-        return;
-      }
+      await postAllMemberPointAPI({
+        category: selectedCategory as PointCategoryValue,
+        memo: memo,
+        difference: numDifference,
+      });
 
-      const numDifference = Number(difference);
-
-      if (isNaN(numDifference) || numDifference === 0) {
-        toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
-        return;
-      }
-    } catch {
-      toast.error('포인트 지급/차감에 실패했습니다.');
+      toast.success('포인트 지급/차감이 완료되었어요.');
+      handleResetButtonClick();
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '포인트 지급/차감에 실패했습니다.'));
     }
   };
 
@@ -79,7 +90,7 @@ export default function PointAllPage() {
               onValueChange={(value: PointCategoryValue | '') =>
                 setSelectedCategory(value)
               }
-              value={selectedCategory}
+              value={selectedCategory ?? undefined}
             >
               <SelectTrigger className='w-full'>
                 <SelectValue placeholder='포인트 유형을 선택해주세요' />
