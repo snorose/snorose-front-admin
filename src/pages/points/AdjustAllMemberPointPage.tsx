@@ -6,7 +6,10 @@ import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import { postAllMemberPointAPI } from '@/apis/points';
 import { getErrorMessage } from '@/utils';
 import { toast } from 'sonner';
-import { PointDetailSection } from '@/domains/Points';
+import {
+  PointDetailSection,
+  ConfirmAllMemberPointAdjustmentModal,
+} from '@/domains/Points';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -23,6 +26,8 @@ export default function AdjustAllMemberPointPage() {
     setMemo('');
   };
 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
   const handleApplyButtonClick = async () => {
     if (!selectedCategory || !difference || !memo) {
       toast.info('모든 필수 항목을 입력해주세요.');
@@ -36,11 +41,15 @@ export default function AdjustAllMemberPointPage() {
       return;
     }
 
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmModalButtonClick = async () => {
     try {
       await postAllMemberPointAPI({
         category: selectedCategory as PointCategoryValue,
         memo: memo,
-        difference: numDifference,
+        difference: Number(difference),
       });
 
       toast.success('포인트 지급/차감이 완료되었어요.');
@@ -97,6 +106,15 @@ export default function AdjustAllMemberPointPage() {
           적용
         </Button>
       </div>
+
+      <ConfirmAllMemberPointAdjustmentModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmModalButtonClick}
+        selectedCategory={selectedCategory}
+        difference={difference}
+        memo={memo}
+      />
     </div>
   );
 }
