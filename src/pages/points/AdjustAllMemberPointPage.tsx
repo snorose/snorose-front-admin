@@ -1,30 +1,19 @@
 import { useState } from 'react';
 import { Megaphone } from 'lucide-react';
-import {
-  Button,
-  Input,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Label,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-} from '@/components/ui';
+import { Button, Alert, AlertTitle, AlertDescription } from '@/components/ui';
 import { PageHeader } from '@/components';
 import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import { postAllMemberPointAPI } from '@/apis/points';
 import { getErrorMessage } from '@/utils';
 import { toast } from 'sonner';
+import { PointDetailSection } from '@/domains/Points';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 export default function AdjustAllMemberPointPage() {
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
-  >('POINT_REWARD_REPORT_GENERAL');
+  >('');
   const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
 
@@ -79,57 +68,14 @@ export default function AdjustAllMemberPointPage() {
         </AlertDescription>
       </Alert>
 
-      <article className='flex flex-col gap-1'>
-        <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
-        <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='category' required>
-              포인트 유형
-            </Label>
-            <Select
-              onValueChange={(value: PointCategoryValue | '') =>
-                setSelectedCategory(value)
-              }
-              value={selectedCategory ?? undefined}
-            >
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='포인트 유형을 선택해주세요' />
-              </SelectTrigger>
-              <SelectContent>
-                {POINT_CATEGORY_OPTIONS.map(({ value, label }) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='difference' required>
-              포인트 지급/차감량
-            </Label>
-            <Input
-              type='number'
-              id='difference'
-              value={difference}
-              placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
-              onChange={(e) => setDifference(e.target.value)}
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='memo' required>
-              메모
-            </Label>
-            <Input
-              type='text'
-              id='memo'
-              placeholder='스노로즈 후원금 모금 이벤트 보상 등'
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-            />
-          </div>
-        </div>
-      </article>
+      <PointDetailSection
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        difference={difference}
+        onDifferenceChange={setDifference}
+        memo={memo}
+        onMemoChange={setMemo}
+      />
 
       <div className='flex justify-end gap-2'>
         <Button
