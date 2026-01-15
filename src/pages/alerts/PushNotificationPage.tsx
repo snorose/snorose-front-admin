@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { Button, Input, Label, Switch, Textarea } from '@/components/ui';
 import { PageHeader } from '@/components';
+import { PushNotificationConfirmModal } from '@/domains/Alerts';
+import { postPushNotificationAPI } from '@/apis';
+import { getErrorMessage } from '@/utils';
+import { toast } from 'sonner';
+import type { PushNotification } from '@/types';
 
 export default function PushNotificationPage() {
-  const [formData, setFormData] = useState({
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState<PushNotification>({
     name: '',
     title: '',
     body: '',
@@ -36,6 +42,27 @@ export default function PushNotificationPage() {
       isMarketing: false,
       isTest: true,
     });
+  };
+
+  const handleApplyButtonClick = () => {
+    if (!formData.name || !formData.title || !formData.body) {
+      toast.info('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    setIsOpen(true);
+  };
+
+  const handleConfirmModalButtonClick = async () => {
+    try {
+      await postPushNotificationAPI(formData);
+      toast.success('푸시 알림 전송이 완료되었어요.');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '푸시 알림 전송에 실패했어요.'));
+    } finally {
+      setIsOpen(false);
+      handleResetButtonClick();
+    }
   };
 
   return (
@@ -175,9 +202,16 @@ export default function PushNotificationPage() {
         </article>
       </section>
 
+      <PushNotificationConfirmModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={handleConfirmModalButtonClick}
+        data={formData as PushNotification}
+      />
+
       <div className='flex justify-end gap-2'>
         <Button
-          type='submit'
+          type='button'
           size='lg'
           variant='outline'
           onClick={handleResetButtonClick}
@@ -190,6 +224,7 @@ export default function PushNotificationPage() {
           size='lg'
           variant='outline'
           className='text-md h-10 w-32 cursor-pointer font-bold'
+          onClick={handleApplyButtonClick}
         >
           알림 전송
         </Button>
