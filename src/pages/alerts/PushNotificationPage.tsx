@@ -181,14 +181,20 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='true' id='r1' />
-                    <Label htmlFor='r1' className='cursor-pointer font-normal'>
+                    <RadioGroupItem value='true' id='marketing-true' />
+                    <Label
+                      htmlFor='marketing-true'
+                      className='cursor-pointer font-normal'
+                    >
                       광고성
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='false' id='r2' />
-                    <Label htmlFor='r2' className='cursor-pointer font-normal'>
+                    <RadioGroupItem value='false' id='marketing-false' />
+                    <Label
+                      htmlFor='marketing-false'
+                      className='cursor-pointer font-normal'
+                    >
                       정보성
                     </Label>
                   </div>
@@ -208,14 +214,20 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='true' id='r3' />
-                    <Label htmlFor='r3' className='cursor-pointer font-normal'>
+                    <RadioGroupItem value='true' id='test-true' />
+                    <Label
+                      htmlFor='test-true'
+                      className='cursor-pointer font-normal'
+                    >
                       관리자에게만 발송
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='false' id='r4' />
-                    <Label htmlFor='r4' className='cursor-pointer font-normal'>
+                    <RadioGroupItem value='false' id='test-false' />
+                    <Label
+                      htmlFor='test-false'
+                      className='cursor-pointer font-normal'
+                    >
                       전체 회원 발송
                     </Label>
                   </div>
