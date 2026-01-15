@@ -14,16 +14,18 @@ import { getErrorMessage } from '@/utils';
 import { toast } from 'sonner';
 import type { PushNotification } from '@/types';
 
+const INITIAL_FORM_DATA: PushNotification = {
+  name: '',
+  title: '',
+  body: '',
+  url: '/',
+  isMarketing: true,
+  isTest: true,
+};
+
 export default function PushNotificationPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState<PushNotification>({
-    name: '',
-    title: '',
-    body: '',
-    url: '/',
-    isMarketing: true,
-    isTest: true,
-  });
+  const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -40,15 +42,7 @@ export default function PushNotificationPage() {
   };
 
   const handleResetButtonClick = () => {
-    setFormData({
-      ...formData,
-      name: '',
-      title: '',
-      body: '',
-      url: '/',
-      isMarketing: true,
-      isTest: true,
-    });
+    setFormData(INITIAL_FORM_DATA);
   };
 
   const handleApplyButtonClick = () => {
