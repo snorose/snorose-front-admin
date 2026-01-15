@@ -48,9 +48,11 @@ export default function PushNotificationConfirmModal({
         </DialogHeader>
         <div className='flex flex-col gap-3 py-4'>
           {CONFIRMATION_DATA.map((data) => (
-            <div className='flex items-center gap-2' key={data.label}>
-              <span className='w-24 text-sm font-semibold'>{data.label}:</span>
-              <span className='text-sm'>{data.value}</span>
+            <div className='flex items-start gap-2' key={data.label}>
+              <span className='flex-shrink-0 text-sm font-semibold'>
+                {data.label}:
+              </span>
+              <span className='text-sm break-all'>{data.value}</span>
             </div>
           ))}
         </div>
