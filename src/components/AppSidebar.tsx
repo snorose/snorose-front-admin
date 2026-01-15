@@ -49,7 +49,7 @@ export const AppSidebar = ({
   return (
     <Sidebar {...props}>
       <SidebarContent className='gap-0'>
-        <div className='flex items-center justify-start p-4'>
+        <div className='flex items-center justify-start px-4 pt-4 pb-2'>
           <img src={snoroseLogo} alt='logo' className='box-content h-5' />
         </div>
 
