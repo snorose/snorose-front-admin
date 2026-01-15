@@ -58,11 +58,11 @@ export default function PushNotificationPage() {
     try {
       await postPushNotificationAPI(formData);
       toast.success('푸시 알림 전송이 완료되었어요.');
+      handleResetButtonClick();
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '푸시 알림 전송에 실패했어요.'));
     } finally {
       setIsOpen(false);
-      handleResetButtonClick();
     }
   };
 
