@@ -85,11 +85,11 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   //   ],
   // },
   {
-    title: '운영',
+    title: '알림',
     items: [
       {
         title: '푸시 알림 전송',
-        url: '/operation/push',
+        url: '/alerts',
       },
       // {
       //   title: '이벤트 관리',

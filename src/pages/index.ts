@@ -8,4 +8,4 @@ export { default as PointAllPage } from './points/PointAllPage';
 export { default as PointFreezePage } from './points/PointFreezePage';
 export { default as LogInPage } from './LogInPage';
 export { default as PostPage } from './PostPage';
-export { default as PushNotificationPage } from './PushNotificationPage';
+export { default as PushNotificationPage } from './alerts/PushNotificationPage';
