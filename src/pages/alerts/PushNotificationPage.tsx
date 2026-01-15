@@ -1,16 +1,31 @@
 import { useState } from 'react';
-import { Button, Input, Label, Switch, Textarea } from '@/components/ui';
+import {
+  Button,
+  Input,
+  Label,
+  RadioGroup,
+  RadioGroupItem,
+  Textarea,
+} from '@/components/ui';
 import { PageHeader } from '@/components';
+import { PushNotificationConfirmModal } from '@/domains/Alerts';
+import { postPushNotificationAPI } from '@/apis';
+import { getErrorMessage } from '@/utils';
+import { toast } from 'sonner';
+import type { PushNotification } from '@/types';
+
+const INITIAL_FORM_DATA: PushNotification = {
+  name: '',
+  title: '',
+  body: '',
+  url: '/',
+  isMarketing: true,
+  isTest: true,
+};
 
 export default function PushNotificationPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    title: '',
-    body: '',
-    url: '/',
-    isMarketing: false,
-    isTest: true,
-  });
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -27,15 +42,28 @@ export default function PushNotificationPage() {
   };
 
   const handleResetButtonClick = () => {
-    setFormData({
-      ...formData,
-      name: '',
-      title: '',
-      body: '',
-      url: '/',
-      isMarketing: false,
-      isTest: true,
-    });
+    setFormData(INITIAL_FORM_DATA);
+  };
+
+  const handleApplyButtonClick = () => {
+    if (!formData.name || !formData.title || !formData.body) {
+      toast.info('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    setIsOpen(true);
+  };
+
+  const handleConfirmModalButtonClick = async () => {
+    try {
+      await postPushNotificationAPI(formData);
+      toast.success('푸시 알림 전송이 완료되었어요.');
+      handleResetButtonClick();
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '푸시 알림 전송에 실패했어요.'));
+    } finally {
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -95,7 +123,7 @@ export default function PushNotificationPage() {
                 placeholder='예: 모든 정회원 여러분께 10포인트 선물이 도착했습니다! 지급 내역은 [내정보 &gt; 포인트 내역 보기] 에서 확인하실 수 있습니다. (2025.10.12 19시 기준 정회원 대상)'
                 value={formData.body}
                 onChange={handleBodyChange}
-                className='h-24'
+                className='h-28'
               />
               <div className='flex justify-end px-1'>
                 <p className='text-xs text-gray-500'>
@@ -138,46 +166,88 @@ export default function PushNotificationPage() {
           <h3 className='text-lg font-bold'>발송 옵션</h3>
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-2'>
                 <Label htmlFor='isMarketing' required>
                   광고성 알림 여부
                 </Label>
-                <p className='text-sm text-gray-500'>
-                  true: 광고성 / false: 정보성
-                </p>
+                <RadioGroup
+                  value={formData.isMarketing ? 'true' : 'false'}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      isMarketing: value === 'true',
+                    })
+                  }
+                  className='flex flex-col gap-1'
+                >
+                  <div className='flex items-center gap-3'>
+                    <RadioGroupItem value='true' id='marketing-true' />
+                    <Label
+                      htmlFor='marketing-true'
+                      className='cursor-pointer font-normal'
+                    >
+                      광고성
+                    </Label>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    <RadioGroupItem value='false' id='marketing-false' />
+                    <Label
+                      htmlFor='marketing-false'
+                      className='cursor-pointer font-normal'
+                    >
+                      정보성
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
-              <Switch
-                id='isMarketing'
-                checked={formData.isMarketing}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, isMarketing: checked })
-                }
-              />
             </div>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
                 <Label htmlFor='isTest' required>
                   테스트 발송 여부
                 </Label>
-                <p className='text-sm text-gray-500'>
-                  true: 관리자에게만 / false: 전체 발송
-                </p>
+                <RadioGroup
+                  value={formData.isTest ? 'true' : 'false'}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, isTest: value === 'true' })
+                  }
+                  className='flex flex-col gap-1'
+                >
+                  <div className='flex items-center gap-3'>
+                    <RadioGroupItem value='true' id='test-true' />
+                    <Label
+                      htmlFor='test-true'
+                      className='cursor-pointer font-normal'
+                    >
+                      관리자에게만 발송
+                    </Label>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    <RadioGroupItem value='false' id='test-false' />
+                    <Label
+                      htmlFor='test-false'
+                      className='cursor-pointer font-normal'
+                    >
+                      전체 회원 발송
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
-              <Switch
-                id='isTest'
-                checked={formData.isTest}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, isTest: checked })
-                }
-              />
             </div>
           </div>
         </article>
       </section>
 
+      <PushNotificationConfirmModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={handleConfirmModalButtonClick}
+        data={formData as PushNotification}
+      />
+
       <div className='flex justify-end gap-2'>
         <Button
-          type='submit'
+          type='button'
           size='lg'
           variant='outline'
           onClick={handleResetButtonClick}
@@ -190,6 +260,7 @@ export default function PushNotificationPage() {
           size='lg'
           variant='outline'
           className='text-md h-10 w-32 cursor-pointer font-bold'
+          onClick={handleApplyButtonClick}
         >
           알림 전송
         </Button>

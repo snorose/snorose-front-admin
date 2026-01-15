@@ -73,7 +73,7 @@ function App() {
                             <Route path='/post' element={<PostPage />} />
                             <Route path='/comment' element={<CommentPage />} />
                             <Route
-                              path='/operation/push'
+                              path='/alerts'
                               element={<PushNotificationPage />}
                             />
                           </Routes>
