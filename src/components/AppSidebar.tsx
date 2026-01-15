@@ -51,7 +51,7 @@ export const AppSidebar = ({
           <img src={snoroseLogo} alt='logo' className='box-content h-5' />
         </div>
 
-        {SIDEBAR_MENUS.map(({ title, items }) => (
+        {SIDEBAR_MENUS.map(({ title, icon: Icon, items }) => (
           <Collapsible
             key={title}
             title={title}
@@ -67,6 +67,7 @@ export const AppSidebar = ({
                 className='group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm'
               >
                 <CollapsibleTrigger>
+                  <Icon className='mr-2 size-4' />
                   {title}
                   <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90' />
                 </CollapsibleTrigger>
