@@ -6,14 +6,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui';
-import { DEGRADE_REASON_LIST } from '../../constants/exam-table-options';
+} from '@/components/ui';
+import { WARNING_REASON_LIST } from '../../../constants/exam-table-options';
 
 const SELECT_CONTENT_STYLE =
   'text-[10px] max-h-[200px] overflow-y-auto bg-blue-50 [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-highlighted]]:bg-blue-100/50 [&_[data-state=checked]]:bg-blue-100';
 
-// 시험후기 패널 - 강등 입력 컴포넌트
-export default function ExamDegradePanel() {
+// 시험후기 패널 - 경고 입력 컴포넌트
+export default function ExamWarningPanel() {
   const [warningCount, setWarningCount] = useState(1);
   const [selectedReason, setSelectedReason] = useState<string>('');
   const [discussionNotes, setDiscussionNotes] = useState('');
@@ -25,15 +25,15 @@ export default function ExamDegradePanel() {
   return (
     <div className='flex w-full flex-col gap-2 px-4 py-2'>
       <div className='w-full max-w-[600px] overflow-auto'>
-        <p className='mb-3 px-1 py-1 text-[14px] font-semibold'># 유저 강등</p>
+        <p className='mb-3 px-1 py-1 text-[14px] font-semibold'># 유저 경고</p>
         <div>
-          <p className='w-full py-1 text-xs font-semibold'>강등 사유</p>
+          <p className='w-full py-1 text-xs font-semibold'>경고 사유</p>
           <Select value={selectedReason} onValueChange={setSelectedReason}>
             <SelectTrigger className='w-full'>
-              <SelectValue placeholder='강등 사유를 선택해주세요.' />
+              <SelectValue placeholder='경고 사유를 선택해주세요.' />
             </SelectTrigger>
             <SelectContent className={SELECT_CONTENT_STYLE}>
-              {DEGRADE_REASON_LIST.map((reason) => (
+              {WARNING_REASON_LIST.map((reason) => (
                 <SelectItem key={reason.code} value={reason.code}>
                   {reason.label}
                 </SelectItem>
@@ -43,7 +43,7 @@ export default function ExamDegradePanel() {
           {isEtcSelected && (
             <>
               <p className='mt-2 w-full py-1 text-xs font-semibold'>
-                강등 기간(개월)
+                부여할 경고 횟수
               </p>
               <input
                 type='number'
@@ -59,7 +59,7 @@ export default function ExamDegradePanel() {
                 }}
               />
               <textarea
-                placeholder='유저 강등 사유를 입력해주세요.'
+                placeholder='유저 경고 사유를 입력해주세요.'
                 value={discussionNotes}
                 onChange={(e) => {
                   setDiscussionNotes(e.target.value);
@@ -95,7 +95,7 @@ export default function ExamDegradePanel() {
             className='h-6 w-20 bg-gray-700 text-sm'
             disabled={!isFormValid}
           >
-            강등
+            경고
           </Button>
         </div>
       </div>

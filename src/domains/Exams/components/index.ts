@@ -7,3 +7,4 @@ export { default as ExamPanel } from './ExamPanel';
 export { default as ExamTable } from './ExamTable';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamIconInfo } from './ExamIconInfo';
+export { default as ExamStatusDot } from './ExamStatusDot';
