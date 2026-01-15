@@ -96,3 +96,4 @@ export {
   TableHead,
   TableCell,
 } from './table';
+export { RadioGroup, RadioGroupItem } from './radio-group';
