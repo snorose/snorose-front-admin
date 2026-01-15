@@ -1,5 +1,8 @@
+import { User, BookOpen, HandCoins, Bell, type LucideIcon } from 'lucide-react';
+
 export type SidebarMenu = {
   title: string;
+  icon: LucideIcon;
   items: SidebarSubMenu[];
 };
 
@@ -11,6 +14,7 @@ export type SidebarSubMenu = {
 export const SIDEBAR_MENUS: SidebarMenu[] = [
   {
     title: '회원',
+    icon: User,
     items: [
       {
         title: '회원 관리',
@@ -38,6 +42,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   // },
   {
     title: '시험 후기',
+    icon: BookOpen,
     items: [
       {
         title: '시험 후기 관리',
@@ -51,6 +56,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   },
   {
     title: '포인트 관리',
+    icon: HandCoins,
     items: [
       {
         title: '단일건 증감',
@@ -86,6 +92,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   // },
   {
     title: '알림',
+    icon: Bell,
     items: [
       {
         title: '푸시 알림 전송',
