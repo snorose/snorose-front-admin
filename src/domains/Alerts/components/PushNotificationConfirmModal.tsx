@@ -8,6 +8,7 @@ import {
   Button,
 } from '@/components/ui';
 import type { PushNotification } from '@/types';
+import { useMemo } from 'react';
 
 interface PushNotificationConfirmModalProps {
   isOpen: boolean;
@@ -22,20 +23,23 @@ export default function PushNotificationConfirmModal({
   onConfirm,
   data,
 }: PushNotificationConfirmModalProps) {
-  const CONFIRMATION_DATA = [
-    { label: '알림명', value: data.name },
-    { label: '알림 제목', value: data.title },
-    { label: '알림 내용', value: data.body },
-    { label: 'URL', value: data.url },
-    {
-      label: '광고성 알림 여부',
-      value: data.isMarketing ? '광고성' : '정보성',
-    },
-    {
-      label: '테스트 발송 여부',
-      value: data.isTest ? '관리자에게만' : '전체 발송',
-    },
-  ];
+  const CONFIRMATION_DATA = useMemo(
+    () => [
+      { label: '알림명', value: data.name },
+      { label: '알림 제목', value: data.title },
+      { label: '알림 내용', value: data.body },
+      { label: 'URL', value: data.url },
+      {
+        label: '광고성 알림 여부',
+        value: data.isMarketing ? '광고성' : '정보성',
+      },
+      {
+        label: '테스트 발송 여부',
+        value: data.isTest ? '관리자에게만' : '전체 발송',
+      },
+    ],
+    [data]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
