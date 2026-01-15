@@ -8,12 +8,14 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarRail,
   SidebarFooter,
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenu,
 } from '@/components/ui';
 import { snoroseLogo } from '@/assets';
 import { SIDEBAR_MENUS } from '@/constants';
@@ -24,24 +26,24 @@ export const AppSidebar = ({
 }: React.ComponentProps<typeof Sidebar>) => {
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const location = useLocation();
+
   const isActive = (url: string) => location.pathname.startsWith(url);
 
   useEffect(() => {
-    const storedStates = localStorage.getItem('sidebar-open-states');
-    if (storedStates) {
+    const stored = sessionStorage.getItem('sidebar-open-states');
+    if (stored) {
       try {
-        setOpenStates(JSON.parse(storedStates));
-      } catch (error) {
-        console.error('Error parsing sidebar open states:', error);
-        localStorage.removeItem('sidebar-open-states');
+        setOpenStates(JSON.parse(stored));
+      } catch {
+        sessionStorage.removeItem('sidebar-open-states');
       }
     }
   }, []);
 
-  const handleOpenChange = (itemTitle: string, open: boolean) => {
-    const updated = { ...openStates, [itemTitle]: open };
+  const handleOpenChange = (title: string, open: boolean) => {
+    const updated = { ...openStates, [title]: open };
     setOpenStates(updated);
-    localStorage.setItem('sidebar-open-states', JSON.stringify(updated));
+    sessionStorage.setItem('sidebar-open-states', JSON.stringify(updated));
   };
 
   return (
@@ -51,46 +53,45 @@ export const AppSidebar = ({
           <img src={snoroseLogo} alt='logo' className='box-content h-5' />
         </div>
 
-        {SIDEBAR_MENUS.map(({ title, icon: Icon, items }) => (
-          <Collapsible
-            key={title}
-            title={title}
-            className='group/collapsible'
-            open={openStates[title] ?? false}
-            onOpenChange={(open) => {
-              handleOpenChange(title, open);
-            }}
-          >
-            <SidebarGroup>
-              <SidebarGroupLabel
+        <SidebarGroup>
+          <SidebarMenu className='p-2'>
+            {SIDEBAR_MENUS.map((menu) => (
+              <Collapsible
+                key={menu.title}
                 asChild
-                className='group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm'
+                open={openStates[menu.title] ?? false}
+                onOpenChange={(open) => handleOpenChange(menu.title, open)}
+                className='group/collapsible'
               >
-                <CollapsibleTrigger>
-                  <Icon className='mr-2 size-4' />
-                  {title}
-                  <ChevronRight className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90' />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              {items?.length ? (
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {items.map(({ title: subMenuTitle, url: subMenuUrl }) => (
-                      <SidebarMenuSubItem key={subMenuTitle}>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive(subMenuUrl)}
-                        >
-                          <NavLink to={subMenuUrl}> {subMenuTitle}</NavLink>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              ) : null}
-            </SidebarGroup>
-          </Collapsible>
-        ))}
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton tooltip={menu.title}>
+                      {menu.icon && <menu.icon />}
+                      <span>{menu.title}</span>
+                      <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {menu.items?.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={isActive(subItem.url)}
+                          >
+                            <NavLink to={subItem.url}>
+                              <span>{subItem.title}</span>
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter>
