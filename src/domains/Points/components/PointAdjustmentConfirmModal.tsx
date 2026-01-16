@@ -32,6 +32,8 @@ export default function PointAdjustmentConfirmModal({
   difference,
   memo,
 }: PointAdjustmentConfirmModalProps) {
+  const isPositiveDifference = Number(difference) > 0;
+
   const CONFIRMATION_DATA = [
     { label: '아이디', value: searchedMember?.loginId },
     { label: '이름', value: searchedMember.userName },
@@ -68,10 +70,10 @@ export default function PointAdjustmentConfirmModal({
             <span
               className={cn(
                 'text-sm',
-                Number(difference) > 0 ? 'text-blue-600' : 'text-red-600'
+                isPositiveDifference ? 'text-blue-600' : 'text-red-600'
               )}
             >
-              {Number(difference) > 0 ? '+' : ''}
+              {isPositiveDifference ? '+' : ''}
               {difference}
             </span>
           </div>

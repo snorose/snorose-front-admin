@@ -29,6 +29,8 @@ export default function AllMemberPointAdjustmentConfirmModal({
   difference,
   memo,
 }: AllMemberPointAdjustmentConfirmModalProps) {
+  const isPositiveDifference = Number(difference) > 0;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
@@ -54,10 +56,10 @@ export default function AllMemberPointAdjustmentConfirmModal({
             <span
               className={cn(
                 'text-sm',
-                Number(difference) > 0 ? 'text-blue-600' : 'text-red-600'
+                isPositiveDifference ? 'text-blue-600' : 'text-red-600'
               )}
             >
-              {Number(difference) > 0 ? '+' : ''}
+              {isPositiveDifference ? '+' : ''}
               {difference}
             </span>
           </div>
