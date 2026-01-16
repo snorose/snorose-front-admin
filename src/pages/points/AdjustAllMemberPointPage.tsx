@@ -8,7 +8,7 @@ import { getErrorMessage } from '@/utils';
 import { toast } from 'sonner';
 import {
   PointDetailSection,
-  ConfirmAllMemberPointAdjustmentModal,
+  AllMemberPointAdjustmentConfirmModal,
 } from '@/domains/Points';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
@@ -110,7 +110,7 @@ export default function AdjustAllMemberPointPage() {
         </Button>
       </div>
 
-      <ConfirmAllMemberPointAdjustmentModal
+      <AllMemberPointAdjustmentConfirmModal
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmModalButtonClick}
