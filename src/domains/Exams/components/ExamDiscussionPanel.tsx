@@ -1,18 +1,18 @@
 import { useState } from 'react';
-import { Button } from '../ui';
+import { Button } from '@/components/ui';
 
-// 시험후기 패널 - 삭제 컴포넌트
-export default function ExamDeletePanel() {
+// 시험후기 패널 - 논의사항 입력 컴포넌트
+export default function ExamDiscussionPanel() {
   const [discussionNotes, setDiscussionNotes] = useState('');
 
   return (
     <div className='flex w-full flex-col gap-2 px-4 py-2'>
-      {/* 버튼 영역 */}
-
       <div className='w-full max-w-[600px] overflow-auto'>
-        <p className='px-1 py-1 text-[14px] font-semibold'># 시험후기 삭제</p>
+        <p className='px-1 py-1 text-[14px] font-semibold'>
+          # 시험후기 논의사항
+        </p>
         <textarea
-          placeholder='시험후기 삭제 사유를 입력해주세요.'
+          placeholder='논의사항을 입력해주세요.'
           value={discussionNotes}
           onChange={(e) => {
             setDiscussionNotes(e.target.value);
@@ -25,6 +25,7 @@ export default function ExamDeletePanel() {
           rows={1}
           style={{ overflow: 'hidden' }}
         />
+        {/* 버튼 영역 */}
         <div className='flex justify-end gap-2 pt-2'>
           <Button
             variant='secondary'
@@ -41,7 +42,7 @@ export default function ExamDeletePanel() {
             className='h-6 w-20 bg-gray-700 text-sm'
             disabled={!discussionNotes}
           >
-            삭제
+            저장
           </Button>
         </div>
       </div>
