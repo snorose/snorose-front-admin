@@ -8,6 +8,7 @@ interface PointActionButtonsProps {
   userId: number | null;
   selectedCategory: PointCategoryValue | '';
   difference: string;
+  memo: string;
   onReset: () => void;
   onApply: () => void;
 }
@@ -16,11 +17,12 @@ export default function PointActionButtons({
   userId,
   selectedCategory,
   difference,
+  memo,
   onReset,
   onApply,
 }: PointActionButtonsProps) {
   const handleApplyClick = () => {
-    if (!userId || !selectedCategory || !difference) {
+    if (!userId || !selectedCategory || !difference || !memo) {
       toast.info('모든 필수 항목을 입력해주세요.');
       return;
     }

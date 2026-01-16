@@ -138,6 +138,7 @@ export default function AdjustSinglePointPage() {
         userId={userId}
         selectedCategory={selectedCategory}
         difference={difference}
+        memo={memo}
         onReset={handleResetButtonClick}
         onApply={() => setIsConfirmModalOpen(true)}
       />
