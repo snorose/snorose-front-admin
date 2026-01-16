@@ -58,7 +58,6 @@ export default function AdjustAllMemberPointPage() {
       toast.error(getErrorMessage(error, '포인트 지급/차감에 실패했습니다.'));
     } finally {
       setIsConfirmModalOpen(false);
-      handleResetButtonClick();
     }
   };
 
