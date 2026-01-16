@@ -13,7 +13,7 @@ import type { MemberInfo } from '@/types';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
-interface ConfirmPointAdjustmentModalProps {
+interface PointAdjustmentConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -23,7 +23,7 @@ interface ConfirmPointAdjustmentModalProps {
   memo: string;
 }
 
-export default function ConfirmPointAdjustmentModal({
+export default function PointAdjustmentConfirmModal({
   isOpen,
   onClose,
   onConfirm,
@@ -31,7 +31,9 @@ export default function ConfirmPointAdjustmentModal({
   selectedCategory,
   difference,
   memo,
-}: ConfirmPointAdjustmentModalProps) {
+}: PointAdjustmentConfirmModalProps) {
+  const isPositiveDifference = Number(difference) > 0;
+
   const CONFIRMATION_DATA = [
     { label: '아이디', value: searchedMember?.loginId },
     { label: '이름', value: searchedMember.userName },
@@ -59,26 +61,26 @@ export default function ConfirmPointAdjustmentModal({
         <div className='flex flex-col gap-3 py-4'>
           {CONFIRMATION_DATA.map((data) => (
             <div className='flex items-center gap-2' key={data.label}>
-              <span className='w-24 text-sm font-semibold'>{data.label}:</span>
+              <span className='text-sm font-semibold'>{data.label}:</span>
               <span className='text-sm'>{data.value}</span>
             </div>
           ))}
           <div className='flex items-center gap-2'>
-            <span className='w-24 text-sm font-semibold'>포인트:</span>
+            <span className='text-sm font-semibold'>포인트 지급/차감량:</span>
             <span
               className={cn(
                 'text-sm',
-                Number(difference) > 0 ? 'text-blue-600' : 'text-red-600'
+                isPositiveDifference ? 'text-blue-600' : 'text-red-600'
               )}
             >
-              {Number(difference) > 0 ? '+' : ''}
+              {isPositiveDifference ? '+' : ''}
               {difference}
             </span>
           </div>
           {memo && (
-            <div className='flex items-center gap-2'>
-              <span className='w-24 text-sm font-semibold'>메모:</span>
-              <span className='text-sm'>{memo}</span>
+            <div className='flex items-start gap-2'>
+              <span className='flex-shrink-0 text-sm font-semibold'>메모:</span>
+              <span className='text-sm break-keep'>{memo}</span>
             </div>
           )}
         </div>

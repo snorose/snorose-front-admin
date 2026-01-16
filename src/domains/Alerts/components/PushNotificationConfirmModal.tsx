@@ -56,7 +56,7 @@ export default function PushNotificationConfirmModal({
               <span className='flex-shrink-0 text-sm font-semibold'>
                 {data.label}:
               </span>
-              <span className='text-sm break-all'>{data.value}</span>
+              <span className='text-sm break-keep'>{data.value}</span>
             </div>
           ))}
         </div>

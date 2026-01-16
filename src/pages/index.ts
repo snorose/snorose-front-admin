@@ -4,7 +4,7 @@ export { default as MemberInfoPage } from './member/MemberInfoPage';
 export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
 export { default as AdjustSinglePointPage } from './points/AdjustSinglePointPage';
 export { default as PointMultiplePage } from './points/PointMultiplePage';
-export { default as PointAllPage } from './points/PointAllPage';
+export { default as AdjustAllMemberPointPage } from './points/AdjustAllMemberPointPage';
 export { default as PointFreezePage } from './points/PointFreezePage';
 export { default as LogInPage } from './LogInPage';
 export { default as PostPage } from './PostPage';

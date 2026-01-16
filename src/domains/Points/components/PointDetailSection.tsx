@@ -67,10 +67,11 @@ export default function PointDetailSection({
             포인트 유형
           </Label>
           <Select
+            key={selectedCategory || 'empty'}
             onValueChange={(selectedKey: PointCategoryValue | '') =>
               onCategoryChange(selectedKey)
             }
-            value={selectedCategory ?? undefined}
+            value={selectedCategory || undefined}
           >
             <SelectTrigger className='w-full'>
               <SelectValue placeholder='포인트 유형을 선택해주세요' />
@@ -101,11 +102,13 @@ export default function PointDetailSection({
         </div>
 
         <div className='flex flex-col gap-1'>
-          <Label htmlFor='memo'>메모</Label>
+          <Label htmlFor='memo' required>
+            메모
+          </Label>
           <Input
             type='text'
             id='memo'
-            placeholder='이벤트 당첨 포인트 지급, 시험 후기 오류 제보 등'
+            placeholder='이벤트 참여 포인트 지급, 시험 후기 오류 제보 등'
             value={memo}
             onChange={(e) => onMemoChange(e.target.value)}
           />
