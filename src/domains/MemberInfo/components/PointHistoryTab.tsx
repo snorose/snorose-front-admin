@@ -114,16 +114,19 @@ export default function PointHistoryTab({
 
                 <TableCell
                   className={`text-center font-bold ${
-                    history.balance === null ? 'bg-gray-50' : ''
+                    history.pointBalance === null ? 'bg-gray-50' : ''
                   } `}
                 >
-                  {history.balance}
+                  {history.pointBalance}
                 </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={8} className='py-6 text-center text-gray-500'>
+              <TableCell
+                colSpan={8}
+                className='bg-white py-6 text-center text-gray-500'
+              >
                 포인트 적립 내역이 없습니다.
               </TableCell>
             </TableRow>
@@ -132,11 +135,15 @@ export default function PointHistoryTab({
       </Table>
 
       {/* Pagination */}
-      <MemberInfoPagination
-        currentPage={currentPage}
-        totalPages={Math.ceil(filteredData.length / PAGE_SIZE)}
-        onPageChange={setCurrentPage}
-      />
+      {paginatedData.length > 0 ? (
+        <MemberInfoPagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(filteredData.length / PAGE_SIZE)}
+          onPageChange={setCurrentPage}
+        />
+      ) : (
+        ''
+      )}
     </div>
   );
 }
