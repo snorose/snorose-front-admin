@@ -1,56 +1,176 @@
 import { useCallback, useState, useMemo } from 'react';
-import { Button, Input, Label } from '@/components/ui';
+import { Button, Input } from '@/components/ui';
 import { PageHeader } from '@/components';
-import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
-import type { MemberInfo } from '@/types';
-import { TabList, getMemberInfoTabs } from '@/domains/MemberInfo';
 
-const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
-  { label: '이름', key: 'userName' },
-  { label: '회원 ID', key: 'userId' },
-  { label: '학번', key: 'studentNumber' },
-  { label: '회원 등급', key: 'userRoleId' },
-  { label: '전공', key: 'major' },
-  { label: '이메일', key: 'email' },
-  { label: '아이디', key: 'loginId' },
-  { label: '닉네임', key: 'nickname' },
-  { label: '생년월일', key: 'birthday' },
-  { label: '경고 횟수', key: 'warningCount' },
-  { label: '가입일', key: 'joinedAt' },
-  { label: '강등여부', key: 'blacklistType' },
-  { label: '등업일', key: 'upgradedAt' },
-  { label: '강등 날짜', key: 'blacklistCreatedAt' },
-  { label: '현재 포인트', key: 'balance' },
-  { label: '강등 종료 날짜', key: 'blacklistDeadline' },
-];
+import type { MemberInfo, EditMemberInfo } from '@/types';
+import {
+  TabList,
+  getMemberInfoTabs,
+  MemberInfoView,
+  MemberInfoEditForm,
+} from '@/domains/MemberInfo';
+
+import { searchUsersAPI, editUsersAPI } from '@/apis';
+import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
+import { formatDateTime } from '@/domains/MemberInfo/utils/formatDateTime';
+
+import { PencilIcon } from 'lucide-react';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/utils';
 
 export default function MemberInfoPage() {
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isEdit, setIsEdit] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSearch = useCallback(() => {
+  const handleCopy = async (sourceId: string) => {
+    await navigator.clipboard.writeText(String(sourceId));
+    setCopiedId(sourceId);
+    setTimeout(() => setCopiedId(null), 1500);
+  };
+
+  const handleSearch = useCallback(async () => {
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) {
       setSelectedMember(null);
       setErrorMessage('');
+      toast.info('검색어를 입력해주세요.');
       return;
     }
-    const found = MEMBER_SAMPLE_DATA.find((member) => {
-      const loginId = member.loginId?.toLowerCase() ?? '';
-      const studentNumber = member.studentNumber?.toLowerCase() ?? '';
 
-      return loginId === query || studentNumber === query;
-    });
-    if (found) {
-      setSelectedMember(found);
-      setErrorMessage('');
-    } else {
+    try {
+      const data = await searchUsersAPI(query);
+
+      if (data?.result) {
+        setSelectedMember(data.result);
+        setIsEdit(false);
+        setErrorMessage('');
+        return;
+      }
+
+      // mock fallback
+      const mock = MEMBER_SAMPLE_DATA.find(
+        (dummy) =>
+          dummy.loginId.toLowerCase() === query ||
+          dummy.studentNumber.toLowerCase() === query
+      );
+
+      if (mock) {
+        setSelectedMember(mock);
+        setIsEdit(false);
+        setErrorMessage('(MOCK) mock 데이터를 사용했어요.');
+        return;
+      }
+
       setSelectedMember(null);
-      setErrorMessage('사용자가 존재하지 않아요');
+      setErrorMessage('사용자가 존재하지 않아요.');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
+
+      const mock = MEMBER_SAMPLE_DATA.find(
+        (dummy) =>
+          dummy.loginId.toLowerCase() === query ||
+          dummy.studentNumber.toLowerCase() === query
+      );
+
+      if (mock) {
+        setSelectedMember(mock);
+        setIsEdit(false);
+        setErrorMessage('(MOCK) API 에러로 mock 데이터를 사용했어요.');
+        return;
+      }
+
+      setSelectedMember(null);
+      setErrorMessage('사용자가 존재하지 않아요.');
     }
+
+    setIsEdit(false);
   }, [searchQuery]);
+
+  // 수정시 변경된 필드만 추출
+  const EDIT_KEYS: (keyof EditMemberInfo)[] = [
+    'userName',
+    'studentNumber',
+    'major',
+    'userRoleId',
+    'email',
+    'birthday',
+    'authenticatedAt',
+  ];
+
+  const createDiffPayload = (
+    original: MemberInfo,
+    updated: MemberInfo
+  ): Partial<EditMemberInfo> => {
+    const diff: Partial<EditMemberInfo> = {};
+
+    EDIT_KEYS.forEach((key) => {
+      const oldValue = original[key];
+      const newValue = updated[key];
+
+      if (oldValue === newValue) return;
+
+      switch (key) {
+        case 'userName':
+        case 'email':
+        case 'studentNumber':
+        case 'major':
+          if (typeof newValue === 'string') diff[key] = newValue;
+          break;
+
+        case 'birthday':
+          if (newValue) diff[key] = String(newValue).substring(0, 10);
+          break;
+
+        case 'userRoleId':
+          if (typeof newValue === 'number') diff[key] = newValue;
+          break;
+
+        case 'authenticatedAt':
+          // null 허용
+          diff[key] =
+            newValue === null ? null : formatDateTime(String(newValue)); // YYYY-MM-DD HH:mm:ss 변환
+          break;
+      }
+    });
+
+    return diff;
+  };
+
+  const handleSaveEdit = async (updated: MemberInfo) => {
+    if (!selectedMember) return;
+
+    try {
+      const diffPayload = createDiffPayload(selectedMember, updated);
+
+      if (Object.keys(diffPayload).length === 0) {
+        toast.info('변경 사항이 없습니다.');
+        return;
+      }
+
+      // 날짜 변환
+      if (diffPayload.birthday) {
+        diffPayload.birthday = String(diffPayload.birthday).substring(0, 10);
+      }
+      if (diffPayload.authenticatedAt) {
+        diffPayload.authenticatedAt = formatDateTime(
+          diffPayload.authenticatedAt as string
+        );
+      }
+
+      await editUsersAPI(selectedMember.encryptedUserId, diffPayload);
+
+      toast.success('회원 정보가 수정되었습니다.');
+
+      setSelectedMember({ ...selectedMember, ...diffPayload });
+      setIsEdit(false);
+    } catch (error) {
+      toast.error(getErrorMessage(error, '회원 정보 수정에 실패했습니다.'));
+    }
+  };
 
   const tabs = useMemo(() => {
     if (!selectedMember) return [];
@@ -66,6 +186,7 @@ export default function MemberInfoPage() {
         title='회원 상세 조회'
         description='회원 정보를 조회할 수 있어요.'
       />
+
       <div className='flex gap-2'>
         <Input
           type='text'
@@ -76,10 +197,9 @@ export default function MemberInfoPage() {
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
         <Button
-          type='button'
           size='sm'
           variant='outline'
-          className='h-auto w-20 cursor-pointer text-black'
+          className='h-auto w-20 text-black'
           onClick={handleSearch}
         >
           검색
@@ -88,40 +208,45 @@ export default function MemberInfoPage() {
 
       {selectedMember && (
         <>
-          <div className='flex items-center gap-4'>
-            <div className='flex flex-row'>
-              <span className='text-2xl font-bold'>
-                {selectedMember.loginId}
-              </span>
-              <span className='text-lg font-medium text-gray-600'>
-                ({selectedMember.userId})
-              </span>
-            </div>
+          <div className='flex items-center gap-2'>
+            <span className='text-2xl font-bold'>{selectedMember.loginId}</span>
+
+            <span
+              className={`cursor-pointer underline ${
+                copiedId === selectedMember.studentNumber
+                  ? 'text-purple-600'
+                  : 'text-gray-600 hover:text-blue-800'
+              }`}
+              onClick={() => handleCopy(selectedMember.studentNumber)}
+            >
+              ({selectedMember.studentNumber})
+            </span>
           </div>
 
-          <article>
-            <h3 className='mb-2 text-lg font-bold'>회원정보</h3>
+          <div className='flex items-center gap-2'>
+            <h3 className='text-lg font-bold'>회원정보</h3>
+            <PencilIcon
+              onClick={() => setIsEdit(true)}
+              className='h-6 w-6 cursor-pointer rounded-sm bg-black p-1 text-white'
+            />
+          </div>
 
-            <div className='grid grid-cols-2 gap-x-5 gap-y-1'>
-              {MEMBER_INFO.map(({ label, key }) => (
-                <div key={key} className='flex gap-4'>
-                  <Label className='w-32 text-gray-700'>{label}</Label>
-                  <Input
-                    className={`w-60 ${!selectedMember[key] ? 'bg-gray-100 text-gray-500' : ''}`}
-                    value={selectedMember[key] ?? ''}
-                    readOnly
-                  />
-                </div>
-              ))}
-            </div>
+          {!isEdit ? (
+            <MemberInfoView member={selectedMember} />
+          ) : (
+            <MemberInfoEditForm
+              member={selectedMember}
+              onSubmit={handleSaveEdit}
+              onCancel={() => setIsEdit(false)}
+            />
+          )}
+
+          <article className='rounded-md bg-blue-50 p-2'>
+            <TabList defaultTab='point' tabs={tabs} />
           </article>
         </>
       )}
-      {selectedMember && (
-        <article className='rounded-md bg-blue-50 p-2'>
-          <TabList defaultTab='point' tabs={tabs} />
-        </article>
-      )}
+
       {errorMessage && <p className='font-medium'>{errorMessage}</p>}
     </div>
   );
