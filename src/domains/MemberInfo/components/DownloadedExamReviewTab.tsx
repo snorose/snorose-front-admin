@@ -98,7 +98,7 @@ export default function DownloadedExamReviewTab({
       {downloadedData.length > 0 && (
         <MemberInfoPagination
           currentPage={currentPage}
-          totalPages={Math.ceil(downloadedData.length / 10)}
+          totalPages={Math.ceil(downloadedData.length / PAGE_SIZE)}
           onPageChange={setCurrentPage}
         />
       )}
