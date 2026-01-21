@@ -135,14 +135,12 @@ export default function PointHistoryTab({
       </Table>
 
       {/* Pagination */}
-      {paginatedData.length > 0 ? (
+      {paginatedData.length > 0 && (
         <MemberInfoPagination
           currentPage={currentPage}
           totalPages={Math.ceil(filteredData.length / PAGE_SIZE)}
           onPageChange={setCurrentPage}
         />
-      ) : (
-        ''
       )}
     </div>
   );

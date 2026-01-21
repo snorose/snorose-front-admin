@@ -85,14 +85,12 @@ export default function BlacklistHistoryTab({
           )}
         </TableBody>
       </Table>
-      {pageData.length > 0 ? (
+      {pageData.length > 0 && (
         <MemberInfoPagination
           currentPage={currentPage}
           totalPages={Math.ceil(downloadedData.length / PAGE_SIZE)}
           onPageChange={setCurrentPage}
         />
-      ) : (
-        ''
       )}
     </div>
   );
