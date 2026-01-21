@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepare": "husky",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watchAll"
   },
   "lint-staged": {
     "**/*.{ts,tsx}": [
