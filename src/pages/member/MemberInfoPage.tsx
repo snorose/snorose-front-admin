@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { Button, Input, Label } from '@/components/ui';
 import { PageHeader } from '@/components';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import type { MemberInfo } from '@/types';
+import { TabList, getMemberInfoTabs } from '@/domains/MemberInfo';
 
 const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
   { label: '이름', key: 'userName' },
@@ -50,6 +51,14 @@ export default function MemberInfoPage() {
       setErrorMessage('사용자가 존재하지 않아요');
     }
   }, [searchQuery]);
+
+  const tabs = useMemo(() => {
+    if (!selectedMember) return [];
+    return getMemberInfoTabs(
+      selectedMember.loginId,
+      selectedMember.studentNumber
+    );
+  }, [selectedMember]);
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -107,6 +116,11 @@ export default function MemberInfoPage() {
             </div>
           </article>
         </>
+      )}
+      {selectedMember && (
+        <article className='rounded-md bg-blue-50 p-2'>
+          <TabList defaultTab='point' tabs={tabs} />
+        </article>
       )}
       {errorMessage && <p className='font-medium'>{errorMessage}</p>}
     </div>
