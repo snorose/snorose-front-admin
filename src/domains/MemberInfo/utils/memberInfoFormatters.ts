@@ -1,18 +1,59 @@
+import type { MemberInfo } from '@/types';
+
+// memberInfo
+/**
+ * isBlacklist 숫자를 Enum으로 반환
+ * @param userRoleId - 변환할 isBlacklist 숫자 값
+ * @return enum 문자열
+ */
+
+export const convertUserRoleIdToEnum = (userRoleId: number): string => {
+  const userRoleIdMap: Record<number, string> = {
+    1: '준회원',
+    2: '정회원',
+    4: '리자',
+    5: '공식 계정',
+    6: '강등 회원',
+    7: '기업',
+  };
+
+  return userRoleIdMap[userRoleId] ?? String(userRoleId);
+};
+
+export const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
+  { label: '이름', key: 'userName' },
+  { label: '회원 ID', key: 'encryptedUserId' },
+  { label: '학번', key: 'studentNumber' },
+  { label: '회원 등급', key: 'userRoleId' },
+  { label: '전공', key: 'major' },
+  { label: '이메일', key: 'email' },
+  { label: '아이디', key: 'loginId' },
+  { label: '닉네임', key: 'nickname' },
+  { label: '생년월일', key: 'birthday' },
+  { label: '경고 횟수', key: 'totalWarningCount' },
+  { label: '가입일', key: 'createdAt' },
+  { label: '강등여부', key: 'isBlacklist' },
+  { label: '등업일', key: 'authenticatedAt' },
+  { label: '강등 날짜', key: 'blacklistStartDate' },
+  { label: '현재 포인트', key: 'pointBalance' },
+  { label: '강등 종료 날짜', key: 'blacklistEndDate' },
+];
+
 // BlacklistHistory Tab
 
 /**
- * BlacklistType 문자열을 enum으로 변환
- * @param blacklistType - 변환할 blacklistType 문자열 값
+ * isBlacklist 문자열을 enum으로 변환
+ * @param isBlacklist - 변환할 isBlacklist 문자열 값
  * @return enum 값
  */
 
-export const convertBlackTypeToEnum = (blacklistType: string): string => {
+export const convertBlackTypeToEnum = (isBlacklist: string): string => {
   const blacklistMap: Record<string, string> = {
     경고: 'WARNING',
     '일반 강등': 'RELEGATION',
     '영구 강등': 'BLACKLIST',
   };
-  return blacklistMap[blacklistType] || blacklistType;
+  return blacklistMap[isBlacklist] || isBlacklist;
 };
 
 // PointHistoryTab
