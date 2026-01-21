@@ -74,7 +74,7 @@ export default function MemberInfoPagination({
         {/* 이후 그룹으로 이동 */}
         <button
           onClick={() =>
-            onPageChange(Math.min(totalPages, startPage - groupSize))
+            onPageChange(Math.min(totalPages, startPage + groupSize))
           }
           disabled={endPage === totalPages}
           className={BUTTON_BASE_CLASSNAME}
