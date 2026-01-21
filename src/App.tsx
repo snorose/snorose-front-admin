@@ -70,8 +70,11 @@ function App() {
                               path='/points/freeze'
                               element={<PointFreezePage />}
                             />
-                            <Route path='/post' element={<PostPage />} />
-                            <Route path='/comment' element={<CommentPage />} />
+                            <Route path='/posts' element={<PostPage />} />
+                            <Route
+                              path='/posts/comments'
+                              element={<CommentPage />}
+                            />
                             <Route
                               path='/alerts'
                               element={<PushNotificationPage />}
