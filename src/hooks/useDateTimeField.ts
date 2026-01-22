@@ -43,13 +43,20 @@ export function useDateTimeField({
   const [date, setDate] = useState<Date | undefined>(initial.date);
   const [time, setTime] = useState<string>(initial.time);
 
+  const dateTime = useMemo(() => {
+    if (!date) return '';
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return `${dateStr}T${time}`;
+  }, [date, time]);
+
   const updateDateTime = useCallback(
     (newDate: Date | undefined, newTime: string) => {
-      if (newDate && onDateTimeChange) {
+      if (newDate) {
         const dateStr = format(newDate, 'yyyy-MM-dd');
-        onDateTimeChange(`${dateStr}T${newTime}`);
-      } else if (onDateTimeChange) {
-        onDateTimeChange('');
+        const newDateTime = `${dateStr}T${newTime}`;
+        onDateTimeChange?.(newDateTime);
+      } else {
+        onDateTimeChange?.('');
       }
     },
     [onDateTimeChange]
@@ -72,8 +79,8 @@ export function useDateTimeField({
     [date, updateDateTime]
   );
 
-  const setDateTime = useCallback((dateTime: string) => {
-    const parsed = parseDateTime(dateTime);
+  const setDateTime = useCallback((dateTimeString: string) => {
+    const parsed = parseDateTime(dateTimeString);
     setDate(parsed.date);
     setTime(parsed.time);
   }, []);
@@ -81,16 +88,8 @@ export function useDateTimeField({
   const reset = useCallback(() => {
     setDate(undefined);
     setTime('00:00');
-    if (onDateTimeChange) {
-      onDateTimeChange('');
-    }
+    onDateTimeChange?.('');
   }, [onDateTimeChange]);
-
-  const dateTime = useMemo(() => {
-    if (!date) return '';
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return `${dateStr}T${time}`;
-  }, [date, time]);
 
   return {
     date,
