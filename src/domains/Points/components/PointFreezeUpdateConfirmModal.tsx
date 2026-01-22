@@ -20,6 +20,7 @@ import {
   formatDateTimeForInput,
 } from '@/utils';
 import { useDateTimeField } from '@/hooks';
+import { format } from 'date-fns';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -34,23 +35,16 @@ export default function PointFreezeUpdateConfirmModal({
   onClose,
   onSuccess,
 }: PointFreezeUpdateConfirmModalProps) {
-  const [updateFormData, setUpdateFormData] = useState({
-    title: '',
-    startAt: '',
-    endAt: '',
-  });
+  const [title, setTitle] = useState('');
 
-  const startDateTime = useDateTimeField({
-    onDateTimeChange: (dateTime) => {
-      setUpdateFormData((prev) => ({ ...prev, startAt: dateTime }));
-    },
-  });
+  const startDateTime = useDateTimeField();
+  const endDateTime = useDateTimeField();
 
-  const endDateTime = useDateTimeField({
-    onDateTimeChange: (dateTime) => {
-      setUpdateFormData((prev) => ({ ...prev, endAt: dateTime }));
-    },
-  });
+  const getDateTimeString = (date: Date | undefined, time: string): string => {
+    if (!date) return '';
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return `${dateStr}T${time}`;
+  };
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
@@ -68,34 +62,35 @@ export default function PointFreezeUpdateConfirmModal({
         ? new Date(endDateTimeParts[0])
         : undefined;
 
-      setUpdateFormData({
-        title: selectedItem.title,
-        startAt: startAtInput,
-        endAt: endAtInput,
-      });
+      setTitle(selectedItem.title);
       startDateTime.setDate(startDateValue);
       startDateTime.setTime(startDateTimeParts[1] || '00:00');
       endDateTime.setDate(endDateValue);
       endDateTime.setTime(endDateTimeParts[1] || '00:00');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem, isUpdateModalOpen]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-
-    if (id in updateFormData) {
-      setUpdateFormData((prev) => ({ ...prev, [id]: value }));
-    }
+    setTitle(e.target.value);
   };
 
   const handleUpdateConfirm = async () => {
     if (!selectedItem) return;
 
+    const startAt = getDateTimeString(startDateTime.date, startDateTime.time);
+    const endAt = getDateTimeString(endDateTime.date, endDateTime.time);
+
+    if (title === '' || startAt === '' || endAt === '') {
+      toast.error('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
     try {
       await patchPointFreezeAPI(selectedItem.id, {
-        title: updateFormData.title,
-        startAt: formatDateTimeForAPI(updateFormData.startAt),
-        endAt: formatDateTimeForAPI(updateFormData.endAt),
+        title,
+        startAt: formatDateTimeForAPI(startAt),
+        endAt: formatDateTimeForAPI(endAt),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();
@@ -127,7 +122,7 @@ export default function PointFreezeUpdateConfirmModal({
           <Input
             type='text'
             id='title'
-            value={updateFormData.title}
+            value={title}
             onChange={handleInputChange}
           />
         </div>

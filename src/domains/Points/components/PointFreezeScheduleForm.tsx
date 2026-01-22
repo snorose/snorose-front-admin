@@ -5,6 +5,7 @@ import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
 import { useDateTimeField } from '@/hooks';
+import { format } from 'date-fns';
 
 interface PointFreezeScheduleFormProps {
   onSuccess: () => void;
@@ -13,59 +14,41 @@ interface PointFreezeScheduleFormProps {
 export default function PointFreezeScheduleForm({
   onSuccess,
 }: PointFreezeScheduleFormProps) {
-  const [formData, setFormData] = useState({
-    title: '',
-    startAt: '',
-    endAt: '',
-  });
+  const [title, setTitle] = useState('');
 
-  const startDateTime = useDateTimeField({
-    onDateTimeChange: (dateTime) => {
-      setFormData((prev) => ({ ...prev, startAt: dateTime }));
-    },
-  });
-
-  const endDateTime = useDateTimeField({
-    onDateTimeChange: (dateTime) => {
-      setFormData((prev) => ({ ...prev, endAt: dateTime }));
-    },
-  });
+  const startDateTime = useDateTimeField();
+  const endDateTime = useDateTimeField();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    if (id in formData) {
-      setFormData((prev) => ({
-        ...prev,
-        [id]: value,
-      }));
-    }
+    setTitle(e.target.value);
+  };
+
+  const getDateTimeString = (date: Date | undefined, time: string): string => {
+    if (!date) return '';
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return `${dateStr}T${time}`;
   };
 
   const handleResetButtonClick = () => {
-    setFormData({
-      title: '',
-      startAt: '',
-      endAt: '',
-    });
+    setTitle('');
     startDateTime.reset();
     endDateTime.reset();
   };
 
   const handleCreateButtonClick = async () => {
-    if (
-      formData.title === '' ||
-      formData.startAt === '' ||
-      formData.endAt === ''
-    ) {
+    const startAt = getDateTimeString(startDateTime.date, startDateTime.time);
+    const endAt = getDateTimeString(endDateTime.date, endDateTime.time);
+
+    if (title === '' || startAt === '' || endAt === '') {
       toast.error('모든 필수 항목을 입력해주세요.');
       return;
     }
 
     try {
       await postPointFreezeAPI({
-        title: formData.title,
-        startAt: formatDateTimeForAPI(formData.startAt),
-        endAt: formatDateTimeForAPI(formData.endAt),
+        title,
+        startAt: formatDateTimeForAPI(startAt),
+        endAt: formatDateTimeForAPI(endAt),
       });
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
@@ -108,7 +91,7 @@ export default function PointFreezeScheduleForm({
               type='text'
               id='title'
               placeholder='예: 2026-1학기 중간고사'
-              value={formData.title}
+              value={title}
               onChange={handleInputChange}
             />
           </div>
