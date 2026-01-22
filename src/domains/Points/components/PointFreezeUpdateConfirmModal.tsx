@@ -20,7 +20,6 @@ import {
   formatDateTimeForInput,
 } from '@/utils';
 import { useDateTimeField } from '@/hooks';
-import { format } from 'date-fns';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -39,12 +38,6 @@ export default function PointFreezeUpdateConfirmModal({
 
   const startDateTime = useDateTimeField();
   const endDateTime = useDateTimeField();
-
-  const getDateTimeString = (date: Date | undefined, time: string): string => {
-    if (!date) return '';
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return `${dateStr}T${time}`;
-  };
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
@@ -78,10 +71,11 @@ export default function PointFreezeUpdateConfirmModal({
   const handleUpdateConfirm = async () => {
     if (!selectedItem) return;
 
-    const startAt = getDateTimeString(startDateTime.date, startDateTime.time);
-    const endAt = getDateTimeString(endDateTime.date, endDateTime.time);
-
-    if (title === '' || startAt === '' || endAt === '') {
+    if (
+      title === '' ||
+      startDateTime.dateTime === '' ||
+      endDateTime.dateTime === ''
+    ) {
       toast.error('모든 필수 항목을 입력해주세요.');
       return;
     }
@@ -89,8 +83,8 @@ export default function PointFreezeUpdateConfirmModal({
     try {
       await patchPointFreezeAPI(selectedItem.id, {
         title,
-        startAt: formatDateTimeForAPI(startAt),
-        endAt: formatDateTimeForAPI(endAt),
+        startAt: formatDateTimeForAPI(startDateTime.dateTime),
+        endAt: formatDateTimeForAPI(endDateTime.dateTime),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();

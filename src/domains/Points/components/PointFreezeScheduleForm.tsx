@@ -5,7 +5,6 @@ import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
 import { useDateTimeField } from '@/hooks';
-import { format } from 'date-fns';
 
 interface PointFreezeScheduleFormProps {
   onSuccess: () => void;
@@ -23,12 +22,6 @@ export default function PointFreezeScheduleForm({
     setTitle(e.target.value);
   };
 
-  const getDateTimeString = (date: Date | undefined, time: string): string => {
-    if (!date) return '';
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return `${dateStr}T${time}`;
-  };
-
   const handleResetButtonClick = () => {
     setTitle('');
     startDateTime.reset();
@@ -36,10 +29,11 @@ export default function PointFreezeScheduleForm({
   };
 
   const handleCreateButtonClick = async () => {
-    const startAt = getDateTimeString(startDateTime.date, startDateTime.time);
-    const endAt = getDateTimeString(endDateTime.date, endDateTime.time);
-
-    if (title === '' || startAt === '' || endAt === '') {
+    if (
+      title === '' ||
+      startDateTime.dateTime === '' ||
+      endDateTime.dateTime === ''
+    ) {
       toast.error('모든 필수 항목을 입력해주세요.');
       return;
     }
@@ -47,8 +41,8 @@ export default function PointFreezeScheduleForm({
     try {
       await postPointFreezeAPI({
         title,
-        startAt: formatDateTimeForAPI(startAt),
-        endAt: formatDateTimeForAPI(endAt),
+        startAt: formatDateTimeForAPI(startDateTime.dateTime),
+        endAt: formatDateTimeForAPI(endDateTime.dateTime),
       });
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();

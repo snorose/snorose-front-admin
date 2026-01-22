@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
 
 interface UseDateTimeFieldOptions {
@@ -10,6 +10,7 @@ interface UseDateTimeFieldOptions {
 interface UseDateTimeFieldReturn {
   date: Date | undefined;
   time: string;
+  dateTime: string;
   onDateSelect: (date: Date | undefined) => void;
   onTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setDate: (date: Date | undefined) => void;
@@ -62,9 +63,16 @@ export function useDateTimeField({
     }
   }, [onDateTimeChange]);
 
+  const dateTime = useMemo(() => {
+    if (!date) return '';
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return `${dateStr}T${time}`;
+  }, [date, time]);
+
   return {
     date,
     time,
+    dateTime,
     onDateSelect: handleDateSelect,
     onTimeChange: handleTimeChange,
     setDate,
