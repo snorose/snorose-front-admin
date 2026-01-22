@@ -9,6 +9,7 @@ import {
   Label,
   Input,
 } from '@/components/ui';
+import { DateTimePicker } from '@/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
@@ -18,6 +19,7 @@ import {
   formatDateTimeForAPI,
   formatDateTimeForInput,
 } from '@/utils';
+import { useDateTimeField } from '@/hooks';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -38,13 +40,43 @@ export default function PointFreezeUpdateConfirmModal({
     endAt: '',
   });
 
+  const startDateTime = useDateTimeField({
+    onDateTimeChange: (dateTime) => {
+      setUpdateFormData((prev) => ({ ...prev, startAt: dateTime }));
+    },
+  });
+
+  const endDateTime = useDateTimeField({
+    onDateTimeChange: (dateTime) => {
+      setUpdateFormData((prev) => ({ ...prev, endAt: dateTime }));
+    },
+  });
+
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
+      const startAtInput = formatDateTimeForInput(selectedItem.startAt);
+      const endAtInput = formatDateTimeForInput(selectedItem.endAt);
+
+      // '2024-01-01T12:00' 형식을 파싱
+      const startDateTimeParts = startAtInput.split('T');
+      const endDateTimeParts = endAtInput.split('T');
+
+      const startDateValue = startDateTimeParts[0]
+        ? new Date(startDateTimeParts[0])
+        : undefined;
+      const endDateValue = endDateTimeParts[0]
+        ? new Date(endDateTimeParts[0])
+        : undefined;
+
       setUpdateFormData({
         title: selectedItem.title,
-        startAt: formatDateTimeForInput(selectedItem.startAt),
-        endAt: formatDateTimeForInput(selectedItem.endAt),
+        startAt: startAtInput,
+        endAt: endAtInput,
       });
+      startDateTime.setDate(startDateValue);
+      startDateTime.setTime(startDateTimeParts[1] || '00:00');
+      endDateTime.setDate(endDateValue);
+      endDateTime.setTime(endDateTimeParts[1] || '00:00');
     }
   }, [selectedItem, isUpdateModalOpen]);
 
@@ -99,24 +131,22 @@ export default function PointFreezeUpdateConfirmModal({
             onChange={handleInputChange}
           />
         </div>
-        <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>시작 일시: </Label>
-          <Input
-            type='datetime-local'
-            id='startAt'
-            value={updateFormData.startAt}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>종료 일시: </Label>
-          <Input
-            type='datetime-local'
-            id='endAt'
-            value={updateFormData.endAt}
-            onChange={handleInputChange}
-          />
-        </div>
+        <DateTimePicker
+          label='시작 일시'
+          date={startDateTime.date}
+          time={startDateTime.time}
+          onDateSelect={startDateTime.onDateSelect}
+          onTimeChange={startDateTime.onTimeChange}
+          datePlaceholder='시작 날짜 선택'
+        />
+        <DateTimePicker
+          label='종료 일시'
+          date={endDateTime.date}
+          time={endDateTime.time}
+          onDateSelect={endDateTime.onDateSelect}
+          onTimeChange={endDateTime.onTimeChange}
+          datePlaceholder='종료 날짜 선택'
+        />
         <DialogFooter>
           <Button type='button' variant='outline' onClick={handleUpdateCancel}>
             취소

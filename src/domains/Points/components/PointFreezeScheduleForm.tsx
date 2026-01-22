@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
-import { format } from 'date-fns';
+import { useDateTimeField } from '@/hooks';
 
 interface PointFreezeScheduleFormProps {
   onSuccess: () => void;
@@ -18,10 +18,18 @@ export default function PointFreezeScheduleForm({
     startAt: '',
     endAt: '',
   });
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [startTime, setStartTime] = useState('00:00');
-  const [endTime, setEndTime] = useState('00:00');
+
+  const startDateTime = useDateTimeField({
+    onDateTimeChange: (dateTime) => {
+      setFormData((prev) => ({ ...prev, startAt: dateTime }));
+    },
+  });
+
+  const endDateTime = useDateTimeField({
+    onDateTimeChange: (dateTime) => {
+      setFormData((prev) => ({ ...prev, endAt: dateTime }));
+    },
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -33,72 +41,14 @@ export default function PointFreezeScheduleForm({
     }
   };
 
-  const handleStartDateSelect = (date: Date | undefined) => {
-    setStartDate(date);
-    if (date) {
-      const dateStr = format(date, 'yyyy-MM-dd');
-      setFormData((prev) => ({
-        ...prev,
-        startAt: `${dateStr}T${startTime}`,
-      }));
-    }
-  };
-
-  const handleEndDateSelect = (date: Date | undefined) => {
-    setEndDate(date);
-    if (date) {
-      const dateStr = format(date, 'yyyy-MM-dd');
-      setFormData((prev) => ({
-        ...prev,
-        endAt: `${dateStr}T${endTime}`,
-      }));
-    }
-  };
-
-  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = e.target.value;
-    setStartTime(time);
-    if (startDate) {
-      const dateStr = format(startDate, 'yyyy-MM-dd');
-      setFormData((prev) => ({
-        ...prev,
-        startAt: `${dateStr}T${time}`,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        startAt: '',
-      }));
-    }
-  };
-
-  const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = e.target.value;
-    setEndTime(time);
-    if (endDate) {
-      const dateStr = format(endDate, 'yyyy-MM-dd');
-      setFormData((prev) => ({
-        ...prev,
-        endAt: `${dateStr}T${time}`,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        endAt: '',
-      }));
-    }
-  };
-
   const handleResetButtonClick = () => {
     setFormData({
       title: '',
       startAt: '',
       endAt: '',
     });
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setStartTime('00:00');
-    setEndTime('00:00');
+    startDateTime.reset();
+    endDateTime.reset();
   };
 
   const handleCreateButtonClick = async () => {
@@ -129,18 +79,18 @@ export default function PointFreezeScheduleForm({
   const dateTimeFields = [
     {
       label: '시작 일시',
-      date: startDate,
-      time: startTime,
-      onDateSelect: handleStartDateSelect,
-      onTimeChange: handleStartTimeChange,
+      date: startDateTime.date,
+      time: startDateTime.time,
+      onDateSelect: startDateTime.onDateSelect,
+      onTimeChange: startDateTime.onTimeChange,
       datePlaceholder: '시작 날짜 선택',
     },
     {
       label: '종료 일시',
-      date: endDate,
-      time: endTime,
-      onDateSelect: handleEndDateSelect,
-      onTimeChange: handleEndTimeChange,
+      date: endDateTime.date,
+      time: endDateTime.time,
+      onDateSelect: endDateTime.onDateSelect,
+      onTimeChange: endDateTime.onTimeChange,
       datePlaceholder: '종료 날짜 선택',
     },
   ];
