@@ -1,18 +1,10 @@
-import {
-  Label,
-  Input,
-  Button,
-  Calendar,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui';
+import { Label, Input, Button } from '@/components/ui';
+import { DateTimePicker } from '@/components';
 import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
 import { format } from 'date-fns';
-import { ChevronDownIcon } from 'lucide-react';
 
 interface PointFreezeScheduleFormProps {
   onSuccess: () => void;
@@ -173,43 +165,17 @@ export default function PointFreezeScheduleForm({
 
           <div className='flex gap-4'>
             {dateTimeFields.map((field, index) => (
-              <div key={index} className='flex w-1/2 flex-col gap-1'>
-                <Label required>{field.label}</Label>
-                <div className='flex gap-2'>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant='outline'
-                        className='border-input flex-1 justify-between text-left font-normal'
-                      >
-                        {field.date ? (
-                          format(field.date, 'yyyy-MM-dd')
-                        ) : (
-                          <span className='text-muted-foreground'>
-                            {field.datePlaceholder}
-                          </span>
-                        )}
-                        <ChevronDownIcon />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
-                      <Calendar
-                        mode='single'
-                        selected={field.date}
-                        onSelect={field.onDateSelect}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <Input
-                    type='time'
-                    step='1'
-                    value={field.time}
-                    onChange={field.onTimeChange}
-                    className='bg-background flex-1 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
-                  />
-                </div>
-              </div>
+              <DateTimePicker
+                key={index}
+                label={field.label}
+                date={field.date}
+                time={field.time}
+                onDateSelect={field.onDateSelect}
+                onTimeChange={field.onTimeChange}
+                datePlaceholder={field.datePlaceholder}
+                required
+                className='w-1/2'
+              />
             ))}
           </div>
 
