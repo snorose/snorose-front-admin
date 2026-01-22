@@ -71,7 +71,7 @@ export function DateTimePicker({
         </Popover>
         <Input
           type='time'
-          step='1'
+          step='60'
           value={time}
           onChange={onTimeChange}
           className='bg-background flex-1 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
