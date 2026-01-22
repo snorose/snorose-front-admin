@@ -15,15 +15,18 @@ export default function LogInPage() {
     e.preventDefault();
     clearError();
 
-    if (!loginId || !password) {
+    const trimmedLoginId = loginId.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedLoginId || !trimmedPassword) {
       toast.info('아이디와 비밀번호를 입력해 주세요.');
 
       return;
     }
 
     const result = await login({
-      loginId,
-      password,
+      loginId: trimmedLoginId,
+      password: trimmedPassword,
     });
 
     if (!result.success && result.error) {
