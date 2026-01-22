@@ -7,7 +7,7 @@ import type {
   DeleteExamReviewResponse,
   ExamReviewDetailResponse,
   ExamReviewsResponse,
-} from '@/domains/Exams/types/exam';
+} from '@/domains/Reviews/types';
 
 // 시험후기 목록 조회 api
 export const getExamReviews = async (params: {

@@ -99,3 +99,4 @@ export {
 export { RadioGroup, RadioGroupItem } from './radio-group';
 export { Calendar } from './calendar';
 export { Popover, PopoverContent, PopoverTrigger } from './popover';
+export { ConfirmModal } from './confirm-modal';

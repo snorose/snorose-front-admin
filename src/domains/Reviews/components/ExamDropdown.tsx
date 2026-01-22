@@ -1,7 +1,6 @@
-import { STATUS_COLOR } from '@/constants/exam-table-options';
+import { STATUS_COLOR } from '@/constants';
 import * as Popover from '@radix-ui/react-popover';
-import { useEffect } from 'react';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // 상태 드롭다운 컴포넌트 (아이콘 + 텍스트)
 export const StatusDropdown = ({

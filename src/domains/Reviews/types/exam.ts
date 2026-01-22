@@ -3,7 +3,7 @@ import {
   SEMESTER,
   EXAM_TYPE,
   STATUS,
-} from '@/domains/Exams/constants/exam';
+} from '@/domains/Reviews/constants';
 
 // constants/exam.ts에서 정의된 enum 값을 사용
 export type LectureType = (typeof LECTURE_TYPE)[keyof typeof LECTURE_TYPE];
