@@ -1,5 +1,5 @@
 export { default as CommentPage } from './posts/CommentPage';
-export { default as ExamReviewPage } from './ExamReviewPage';
+export { default as ExamReviewPage } from './reviews/ExamReviewPage';
 export { default as MemberInfoPage } from './member/MemberInfoPage';
 export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
 export { default as AdjustSinglePointPage } from './points/AdjustSinglePointPage';

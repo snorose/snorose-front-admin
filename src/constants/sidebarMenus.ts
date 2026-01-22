@@ -22,7 +22,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       },
       {
         title: '경고 및 강등 관리',
-        url: '/member/managePenalty',
+        url: '/member/penalty',
       },
     ],
   },
@@ -46,11 +46,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     items: [
       {
         title: '시험 후기 관리',
-        url: '/exam/list',
-      },
-      {
-        title: '작성 기간 설정',
-        url: '/exam/period',
+        url: '/reviews/exam',
       },
     ],
   },
