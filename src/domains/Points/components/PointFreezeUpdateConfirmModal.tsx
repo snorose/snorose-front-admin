@@ -44,22 +44,9 @@ export default function PointFreezeUpdateConfirmModal({
       const startAtInput = formatDateTimeForInput(selectedItem.startAt);
       const endAtInput = formatDateTimeForInput(selectedItem.endAt);
 
-      // '2024-01-01T12:00' 형식을 파싱
-      const startDateTimeParts = startAtInput.split('T');
-      const endDateTimeParts = endAtInput.split('T');
-
-      const startDateValue = startDateTimeParts[0]
-        ? new Date(startDateTimeParts[0])
-        : undefined;
-      const endDateValue = endDateTimeParts[0]
-        ? new Date(endDateTimeParts[0])
-        : undefined;
-
       setTitle(selectedItem.title);
-      startDateTime.setDate(startDateValue);
-      startDateTime.setTime(startDateTimeParts[1] || '00:00');
-      endDateTime.setDate(endDateValue);
-      endDateTime.setTime(endDateTimeParts[1] || '00:00');
+      startDateTime.setDateTime(startAtInput);
+      endDateTime.setDateTime(endAtInput);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem, isUpdateModalOpen]);

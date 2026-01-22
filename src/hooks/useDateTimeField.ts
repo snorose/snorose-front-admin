@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 interface UseDateTimeFieldOptions {
   initialDate?: Date | undefined;
   initialTime?: string;
+  initialDateTime?: string;
   onDateTimeChange?: (dateTime: string) => void;
 }
 
@@ -15,16 +16,32 @@ interface UseDateTimeFieldReturn {
   onTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setDate: (date: Date | undefined) => void;
   setTime: (time: string) => void;
+  setDateTime: (dateTime: string) => void;
   reset: () => void;
 }
 
 export function useDateTimeField({
   initialDate = undefined,
   initialTime = '00:00',
+  initialDateTime,
   onDateTimeChange,
 }: UseDateTimeFieldOptions = {}): UseDateTimeFieldReturn {
-  const [date, setDate] = useState<Date | undefined>(initialDate);
-  const [time, setTime] = useState<string>(initialTime);
+  // initialDateTime이 제공되면 파싱하여 초기값 설정
+  const parseDateTime = (dateTime: string | undefined) => {
+    if (!dateTime) return { date: undefined, time: '00:00' };
+    const parts = dateTime.split('T');
+    return {
+      date: parts[0] ? new Date(parts[0]) : undefined,
+      time: parts[1] || '00:00',
+    };
+  };
+
+  const initial = initialDateTime
+    ? parseDateTime(initialDateTime)
+    : { date: initialDate, time: initialTime };
+
+  const [date, setDate] = useState<Date | undefined>(initial.date);
+  const [time, setTime] = useState<string>(initial.time);
 
   const updateDateTime = useCallback(
     (newDate: Date | undefined, newTime: string) => {
@@ -55,6 +72,12 @@ export function useDateTimeField({
     [date, updateDateTime]
   );
 
+  const setDateTime = useCallback((dateTime: string) => {
+    const parsed = parseDateTime(dateTime);
+    setDate(parsed.date);
+    setTime(parsed.time);
+  }, []);
+
   const reset = useCallback(() => {
     setDate(undefined);
     setTime('00:00');
@@ -77,6 +100,7 @@ export function useDateTimeField({
     onTimeChange: handleTimeChange,
     setDate,
     setTime,
+    setDateTime,
     reset,
   };
 }
