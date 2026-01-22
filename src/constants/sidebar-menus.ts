@@ -9,6 +9,7 @@ export type SidebarMenu = {
 export type SidebarSubMenu = {
   title: string;
   url: string;
+  beta?: boolean;
 };
 
 export const SIDEBAR_MENUS: SidebarMenu[] = [
