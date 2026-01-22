@@ -1,19 +1,16 @@
 import { PageHeader } from '@/components';
-import { Label, Input, Button } from '@/components/ui';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getPointFreezesAPI, postPointFreezeAPI } from '@/apis';
+import { getPointFreezesAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
-import { PointFreezeListSection } from '@/domains/Points';
-import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
+import {
+  PointFreezeListSection,
+  PointFreezeScheduleForm,
+} from '@/domains/Points';
+import { getErrorMessage } from '@/utils';
 
 export default function PointFreezePage() {
   const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);
-  const [formData, setFormData] = useState({
-    title: '',
-    startAt: '',
-    endAt: '',
-  });
 
   const isFetchingRef = useRef(false);
 
@@ -32,48 +29,6 @@ export default function PointFreezePage() {
     }
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    if (id in formData) {
-      setFormData((prev) => ({
-        ...prev,
-        [id]: value,
-      }));
-    }
-  };
-
-  const handleResetButtonClick = () => {
-    setFormData({
-      title: '',
-      startAt: '',
-      endAt: '',
-    });
-  };
-
-  const handleCreateButtonClick = async () => {
-    if (
-      formData.title === '' ||
-      formData.startAt === '' ||
-      formData.endAt === ''
-    ) {
-      toast.error('모든 필수 항목을 입력해주세요.');
-      return;
-    }
-
-    try {
-      await postPointFreezeAPI({
-        title: formData.title,
-        startAt: formatDateTimeForAPI(formData.startAt),
-        endAt: formatDateTimeForAPI(formData.endAt),
-      });
-      toast.success('미지급 일정 생성이 완료되었어요.');
-      handleResetButtonClick();
-      await getPointFreezes();
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, '미지급 일정 생성에 실패했습니다.'));
-    }
-  };
-
   useEffect(() => {
     getPointFreezes();
   }, [getPointFreezes]);
@@ -85,69 +40,7 @@ export default function PointFreezePage() {
         description='포인트 미지급 일정을 생성, 조회, 수정, 삭제할 수 있어요.'
       />
 
-      <section className='flex flex-col gap-4'>
-        <article className='flex w-full flex-col gap-1'>
-          <h3 className='text-lg font-bold'>미지급 일정 생성</h3>
-          <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
-            <div className='flex flex-col gap-1'>
-              <Label htmlFor='title' required>
-                일정 제목
-              </Label>
-              <Input
-                type='text'
-                id='title'
-                placeholder='예: 2026-1학기 중간고사'
-                value={formData.title}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className='flex gap-1'>
-              <div className='flex w-1/2 flex-col gap-1'>
-                <Label htmlFor='startAt' required>
-                  시작 일시
-                </Label>
-                <Input
-                  type='datetime-local'
-                  id='startAt'
-                  value={formData.startAt}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className='flex w-1/2 flex-col gap-1'>
-                <Label htmlFor='endAt' required>
-                  종료 일시
-                </Label>
-                <Input
-                  type='datetime-local'
-                  id='endAt'
-                  value={formData.endAt}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            <div className='flex justify-end gap-2'>
-              <Button
-                type='button'
-                size='sm'
-                variant='outline'
-                className='w-16 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
-                onClick={handleResetButtonClick}
-              >
-                초기화
-              </Button>
-              <Button
-                type='button'
-                size='sm'
-                variant='outline'
-                className='w-16 cursor-pointer font-bold'
-                onClick={handleCreateButtonClick}
-              >
-                생성
-              </Button>
-            </div>
-          </div>
-        </article>
-      </section>
+      <PointFreezeScheduleForm onSuccess={getPointFreezes} />
 
       <PointFreezeListSection
         pointFreezes={pointFreezes}
