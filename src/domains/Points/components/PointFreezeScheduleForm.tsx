@@ -73,7 +73,6 @@ export default function PointFreezeScheduleForm({
         startAt: `${dateStr}T${time}`,
       }));
     } else {
-      // 날짜가 선택되지 않았을 때는 빈 문자열로 유지
       setFormData((prev) => ({
         ...prev,
         startAt: '',
@@ -91,7 +90,6 @@ export default function PointFreezeScheduleForm({
         endAt: `${dateStr}T${time}`,
       }));
     } else {
-      // 날짜가 선택되지 않았을 때는 빈 문자열로 유지
       setFormData((prev) => ({
         ...prev,
         endAt: '',
@@ -135,6 +133,26 @@ export default function PointFreezeScheduleForm({
     }
   };
 
+  // 날짜/시간 입력 필드 설정
+  const dateTimeFields = [
+    {
+      label: '시작 일시',
+      date: startDate,
+      time: startTime,
+      onDateSelect: handleStartDateSelect,
+      onTimeChange: handleStartTimeChange,
+      datePlaceholder: '시작 날짜 선택',
+    },
+    {
+      label: '종료 일시',
+      date: endDate,
+      time: endTime,
+      onDateSelect: handleEndDateSelect,
+      onTimeChange: handleEndTimeChange,
+      datePlaceholder: '종료 날짜 선택',
+    },
+  ];
+
   return (
     <section className='flex flex-col gap-4'>
       <article className='flex w-full flex-col gap-1'>
@@ -152,85 +170,49 @@ export default function PointFreezeScheduleForm({
               onChange={handleInputChange}
             />
           </div>
-          <div className='flex gap-1'>
-            <div className='flex w-1/2 flex-col gap-1'>
-              <Label htmlFor='startAt' required>
-                시작 일시
-              </Label>
-              <div className='flex gap-2'>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      className='flex-1 justify-between text-left'
-                    >
-                      {startDate ? (
-                        format(startDate, 'yyyy-MM-dd')
-                      ) : (
-                        <span className='text-muted-foreground'>
-                          시작 날짜 선택
-                        </span>
-                      )}
-                      <ChevronDownIcon />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto flex-1 p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={startDate}
-                      onSelect={handleStartDateSelect}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <Input
-                  type='time'
-                  id='time-picker-start'
-                  step='1'
-                  value={startTime}
-                  onChange={handleStartTimeChange}
-                  className='bg-background flex-1 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
-                />
-              </div>
-            </div>
 
-            <div className='flex w-1/2 flex-col gap-1'>
-              <Label htmlFor='endAt' required>
-                종료 일시
-              </Label>
-              <div className='flex gap-2'>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      className='flex-1 justify-between text-left'
-                    >
-                      {endDate
-                        ? format(endDate, 'yyyy-MM-dd')
-                        : '종료 날짜 선택'}
-                      <ChevronDownIcon />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={endDate}
-                      onSelect={handleEndDateSelect}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <Input
-                  type='time'
-                  id='time-picker-end'
-                  step='1'
-                  value={endTime}
-                  onChange={handleEndTimeChange}
-                  className='bg-background flex-1 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
-                />
+          <div className='flex gap-4'>
+            {dateTimeFields.map((field, index) => (
+              <div key={index} className='flex w-1/2 flex-col gap-1'>
+                <Label required>{field.label}</Label>
+                <div className='flex gap-2'>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        className='border-input flex-1 justify-between text-left font-normal'
+                      >
+                        {field.date ? (
+                          format(field.date, 'yyyy-MM-dd')
+                        ) : (
+                          <span className='text-muted-foreground'>
+                            {field.datePlaceholder}
+                          </span>
+                        )}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='start'>
+                      <Calendar
+                        mode='single'
+                        selected={field.date}
+                        onSelect={field.onDateSelect}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Input
+                    type='time'
+                    step='1'
+                    value={field.time}
+                    onChange={field.onTimeChange}
+                    className='bg-background flex-1 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+                  />
+                </div>
               </div>
-            </div>
+            ))}
           </div>
+
           <div className='flex justify-end gap-2'>
             <Button
               type='button'
