@@ -81,7 +81,7 @@ export const AppSidebar = ({
                             isActive={isActive(subItem.url)}
                           >
                             <NavLink to={subItem.url}>
-                              <span>{subItem.title}</span>{' '}
+                              <span>{subItem.title}</span>
                               {subItem.beta && (
                                 <Badge variant='outline'>Beta</Badge>
                               )}
