@@ -1,18 +1,38 @@
+// memberInfo
+/**
+ *  userRoleId 숫자를 Enum으로 반환
+ * @param userRoleId - 변환할 userRoleId 숫자 값
+ * @return enum 문자열
+ */
+
+export const convertUserRoleIdToEnum = (userRoleId: number): string => {
+  const userRoleIdMap: Record<number, string> = {
+    1: '준회원',
+    2: '정회원',
+    4: '리자',
+    5: '공식 계정',
+    6: '강등 회원',
+    7: '기업',
+  };
+
+  return userRoleIdMap[userRoleId] ?? String(userRoleId);
+};
+
 // BlacklistHistory Tab
 
 /**
- * BlacklistType 문자열을 enum으로 변환
- * @param blacklistType - 변환할 blacklistType 문자열 값
+ * isBlacklist 문자열을 enum으로 변환
+ * @param isBlacklist - 변환할 isBlacklist 문자열 값
  * @return enum 값
  */
 
-export const convertBlackTypeToEnum = (blacklistType: string): string => {
+export const convertBlackTypeToEnum = (isBlacklist: string): string => {
   const blacklistMap: Record<string, string> = {
     경고: 'WARNING',
     '일반 강등': 'RELEGATION',
     '영구 강등': 'BLACKLIST',
   };
-  return blacklistMap[blacklistType] || blacklistType;
+  return blacklistMap[isBlacklist] || isBlacklist;
 };
 
 // PointHistoryTab

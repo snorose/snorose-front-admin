@@ -65,14 +65,14 @@ export default function BlacklistHistoryTab({
                 </TableCell>
 
                 <TableCell className='text-center'>
-                  {history.createdAt}
+                  {history.blacklistStartDate}
                 </TableCell>
                 <TableCell
                   className={`text-center ${
-                    history.blacklistDeadline === null ? 'bg-gray-50' : ''
+                    history.blacklistEndDate === null ? 'bg-gray-50' : ''
                   }`}
                 >
-                  {history.blacklistDeadline}
+                  {history.blacklistEndDate}
                 </TableCell>
               </TableRow>
             ))
@@ -85,11 +85,13 @@ export default function BlacklistHistoryTab({
           )}
         </TableBody>
       </Table>
-      <MemberInfoPagination
-        currentPage={currentPage}
-        totalPages={Math.ceil(downloadedData.length / PAGE_SIZE)}
-        onPageChange={setCurrentPage}
-      />
+      {pageData.length > 0 && (
+        <MemberInfoPagination
+          currentPage={currentPage}
+          totalPages={Math.ceil(downloadedData.length / PAGE_SIZE)}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 }
