@@ -8,3 +8,10 @@ export { default as ExamTable } from './ExamTable';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamIconInfo } from './ExamIconInfo';
 export { default as ExamStatusDot } from './ExamStatusDot';
+export {
+  ExamTableSkeleton,
+  ExamTableEmptyRows,
+  ExamTableEmpty,
+} from './ExamTableFallback';
+export { default as ExamTablePagination } from './ExamTablePagination';
+export { StatusDropdown, TextDropdown } from './ExamDropdown';

@@ -1,4 +1,4 @@
-import { STATUS_COLOR } from '@/constants/exam-table-options';
+import { STATUS_COLOR } from '@/constants';
 
 export default function ExamIconInfo() {
   return (

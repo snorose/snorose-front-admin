@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { getExamReviews } from '@/apis/exam';
-import type { ExamReview, ExamReviews } from '@/domains/Exams/types/exam';
+import { getExamReviews } from '@/apis';
+import type { ExamReview, ExamReviews } from '@/domains/Reviews/types';
 
 // types
 interface UseExamReviewsParams {

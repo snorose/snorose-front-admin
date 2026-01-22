@@ -6,17 +6,17 @@ import {
   ExamSearch,
   ExamIconInfo,
   ExamPanel,
-} from '@/domains/Exams/components';
+} from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
   Semester,
-} from '@/domains/Exams/types/exam';
-import PageHeader from '@/components/PageHeader';
-import { getExamReviewDetail } from '@/apis/exam';
+} from '@/domains/Reviews/types';
+import { PageHeader } from '@/components';
+import { getExamReviewDetail } from '@/apis/reviews';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
-import { convertSemesterEnumToString } from '@/domains/Exams/utils/examFormatters';
+import { convertSemesterEnumToString } from '@/domains/Reviews/utils';
 
 export default function ExamReviewPage() {
   const queryClient = useQueryClient();

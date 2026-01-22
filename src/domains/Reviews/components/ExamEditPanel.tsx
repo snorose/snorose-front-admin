@@ -8,16 +8,10 @@ import {
   SelectValue,
 } from '@/components/ui';
 import {
-  STATUS_COLOR,
-  SEMESTER_LIST,
-  EXAM_TYPE_LIST,
-  LECTURE_TYPE_OPTIONS,
-} from '@/constants/exam-table-options';
-import {
   deleteExamReview,
   updateExamReview,
   downloadExamReviewFile,
-} from '@/apis/exam';
+} from '@/apis/reviews';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { Trash2, Loader2 } from 'lucide-react';
@@ -26,7 +20,7 @@ import type {
   ExamReview,
   ExamReviewDetailResult,
   UpdateExamReviewRequest,
-} from '@/domains/Exams/types/exam';
+} from '@/domains/Reviews/types';
 import ConfirmModal from '@/components/ui/confirm-modal';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -36,8 +30,14 @@ import {
   convertSemesterToEnum,
   convertExamTypeToEnum,
   getStatusName,
-} from '@/domains/Exams/utils/examFormatters';
-import { ExamStatusDot } from '@/domains/Exams/components';
+} from '@/domains/Reviews/utils';
+import { ExamStatusDot } from '@/domains/Reviews/components';
+import {
+  STATUS_COLOR,
+  SEMESTER_LIST,
+  EXAM_TYPE_LIST,
+  LECTURE_TYPE_OPTIONS,
+} from '@/constants';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[12px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;
