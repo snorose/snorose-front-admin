@@ -13,7 +13,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { STATUS_COLOR } from '@/constants/exam-table-options';
+import { STATUS_COLOR } from '@/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import {
   ExamTableSkeleton,
@@ -21,9 +21,9 @@ import {
   ExamTableEmpty,
 } from './ExamTableFallback';
 import ExamTablePagination from './ExamTablePagination';
-import { useExamReviews, useConfirmExamReview } from '@/domains/Exams/hooks';
-import { ExamStatusDot } from '@/domains/Exams/components';
-import type { ExamReview } from '@/domains/Exams/types/exam';
+import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
+import { ExamStatusDot } from '@/domains/Reviews/components';
+import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;

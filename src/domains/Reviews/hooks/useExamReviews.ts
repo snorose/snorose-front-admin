@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getExamReviews } from '@/apis/exam';
+import { getExamReviews } from '@/apis/reviews';
 import type { ExamReview, ExamReviews } from '@/domains/Exams/types/exam';
 
 // types

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { confirmExamReview } from '@/apis/exam';
+import { confirmExamReview } from '@/apis/reviews';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 

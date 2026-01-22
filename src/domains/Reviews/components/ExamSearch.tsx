@@ -7,13 +7,13 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/constants/exam-table-options';
+import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/constants';
 import { Button } from '@/components/ui';
 import {
   convertSemesterToEnum,
   convertExamTypeToEnum,
   extractYearFromSemester,
-} from '@/domains/Exams/utils/examFormatters';
+} from '@/domains/Reviews/utils';
 
 interface ExamSearchProps {
   onSearchChange: (params: {
