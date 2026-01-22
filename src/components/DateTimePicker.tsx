@@ -9,6 +9,7 @@ import {
 } from '@/components/ui';
 import { format } from 'date-fns';
 import { ChevronDownIcon } from 'lucide-react';
+import { useState } from 'react';
 
 interface DateTimePickerProps {
   label: string;
@@ -31,11 +32,20 @@ export function DateTimePicker({
   required = false,
   className = '',
 }: DateTimePickerProps) {
+  const [open, setOpen] = useState(false);
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    onDateSelect(selectedDate);
+    if (selectedDate) {
+      setOpen(false);
+    }
+  };
+
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
       <Label required={required}>{label}</Label>
       <div className='flex gap-2'>
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant='outline'
@@ -53,7 +63,7 @@ export function DateTimePicker({
             <Calendar
               mode='single'
               selected={date}
-              onSelect={onDateSelect}
+              onSelect={handleDateSelect}
               initialFocus
             />
           </PopoverContent>
