@@ -15,12 +15,12 @@ import { STATUS_COLOR } from '@/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
 import {
-  ExamStatusDot,
   ExamTableSkeleton,
   ExamTableEmptyRows,
   ExamTableEmpty,
-  ExamTablePagination,
-} from '@/domains/Reviews/components';
+} from './ExamTableFallback';
+import ExamTablePagination from './ExamTablePagination';
+import { ExamStatusDot } from '@/domains/Reviews/components';
 import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정

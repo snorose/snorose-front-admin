@@ -13,7 +13,7 @@ import type {
   Semester,
 } from '@/domains/Reviews/types';
 import { PageHeader } from '@/components';
-import { getExamReviewDetail } from '@/apis/reviews';
+import { getExamReviewDetail } from '@/apis';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
 import { convertSemesterEnumToString } from '@/domains/Reviews/utils';

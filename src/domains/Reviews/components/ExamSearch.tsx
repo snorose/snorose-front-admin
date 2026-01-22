@@ -6,9 +6,9 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-  Button,
-} from '@/components/ui';
+} from '@/components/ui/select';
 import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/constants';
+import { Button } from '@/components/ui';
 import {
   convertSemesterToEnum,
   convertExamTypeToEnum,
