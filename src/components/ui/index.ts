@@ -97,3 +97,4 @@ export {
   TableCell,
 } from './table';
 export { RadioGroup, RadioGroupItem } from './radio-group';
+export { Calendar } from './calendar';
