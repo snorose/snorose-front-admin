@@ -66,7 +66,6 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       {
         title: '정회원 전체 증감',
         url: '/points/all',
-        beta: true,
       },
       {
         title: '미지급 일정 관리',
