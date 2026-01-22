@@ -21,8 +21,7 @@ import type {
   ExamReviewDetailResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
-import ConfirmModal from '@/components/ui/confirm-modal';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ConfirmModal, Skeleton } from '@/components/ui';
 import {
   convertLectureTypeToString,
   convertSemesterEnumToString,

@@ -19,7 +19,7 @@ interface ConfirmModalProps {
   children?: React.ReactNode;
 }
 
-export default function ConfirmModal({
+export function ConfirmModal({
   isOpen,
   title,
   description,
