@@ -25,12 +25,14 @@ export default function MemberInfoPage() {
   const [isEdit, setIsEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // 상단 '학번' 카피
   const handleCopy = async (sourceId: string) => {
     await navigator.clipboard.writeText(String(sourceId));
     setCopiedId(sourceId);
     setTimeout(() => setCopiedId(null), 1500);
   };
 
+  // 회원 검색 API
   const handleSearch = useCallback(async () => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -50,26 +52,10 @@ export default function MemberInfoPage() {
         setErrorMessage('');
         return;
       }
-
-      // mock fallback
-      const mock = MEMBER_SAMPLE_DATA.find(
-        (dummy) =>
-          dummy.loginId.toLowerCase() === query ||
-          dummy.studentNumber.toLowerCase() === query
-      );
-
-      if (mock) {
-        setSelectedMember(mock);
-        setIsEdit(false);
-        setErrorMessage('(MOCK) mock 데이터를 사용했어요.');
-        return;
-      }
-
-      setSelectedMember(null);
-      setErrorMessage('사용자가 존재하지 않아요.');
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
 
+      // 에러면 데이터 없으면 찾기 (미완성 api용 - 추후 삭제)
       const mock = MEMBER_SAMPLE_DATA.find(
         (dummy) =>
           dummy.loginId.toLowerCase() === query ||
@@ -79,10 +65,11 @@ export default function MemberInfoPage() {
       if (mock) {
         setSelectedMember(mock);
         setIsEdit(false);
-        setErrorMessage('(MOCK) API 에러로 mock 데이터를 사용했어요.');
+        setErrorMessage('(MOCK) API 에러로 mock 데이터를 사용함.');
         return;
       }
 
+      // 둘 다 없으면 null (미완성 api용 - 추후 삭제)
       setSelectedMember(null);
       setErrorMessage('사용자가 존재하지 않아요.');
     }
@@ -90,7 +77,7 @@ export default function MemberInfoPage() {
     setIsEdit(false);
   }, [searchQuery]);
 
-  // 수정시 변경된 필드만 추출
+  // 회원 정보 수정 가능 필드
   const EDIT_KEYS: (keyof EditMemberInfo)[] = [
     'userName',
     'studentNumber',
@@ -101,6 +88,7 @@ export default function MemberInfoPage() {
     'authenticatedAt',
   ];
 
+  // 회원 정보 수정시 변경된 필드만 추출
   const createDiffPayload = (
     original: MemberInfo,
     updated: MemberInfo
@@ -129,11 +117,14 @@ export default function MemberInfoPage() {
           if (typeof newValue === 'number') diff[key] = newValue;
           break;
 
-        case 'authenticatedAt':
-          // null 허용
-          diff[key] =
-            newValue === null ? null : formatDateTime(String(newValue)); // YYYY-MM-DD HH:mm:ss 변환
+        case 'authenticatedAt': {
+          if (newValue === null || newValue === '' || newValue === undefined) {
+            diff[key] = null;
+          } else if (typeof newValue === 'string') {
+            diff[key] = formatDateTime(newValue);
+          }
           break;
+        }
       }
     });
 
@@ -149,16 +140,6 @@ export default function MemberInfoPage() {
       if (Object.keys(diffPayload).length === 0) {
         toast.info('변경 사항이 없습니다.');
         return;
-      }
-
-      // 날짜 변환
-      if (diffPayload.birthday) {
-        diffPayload.birthday = String(diffPayload.birthday).substring(0, 10);
-      }
-      if (diffPayload.authenticatedAt) {
-        diffPayload.authenticatedAt = formatDateTime(
-          diffPayload.authenticatedAt as string
-        );
       }
 
       await editUsersAPI(selectedMember.encryptedUserId, diffPayload);
@@ -205,6 +186,7 @@ export default function MemberInfoPage() {
           검색
         </Button>
       </div>
+      {errorMessage && <p className='font-medium'>{errorMessage}</p>}
 
       {selectedMember && (
         <>
@@ -246,8 +228,6 @@ export default function MemberInfoPage() {
           </article>
         </>
       )}
-
-      {errorMessage && <p className='font-medium'>{errorMessage}</p>}
     </div>
   );
 }
