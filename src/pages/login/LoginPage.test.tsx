@@ -112,46 +112,56 @@ describe('로그인 페이지', () => {
     ).toBeInTheDocument();
   });
 
-  test('아이디만 입력하고 로그인 시도하면 toast.info가 호출된다', async () => {
-    const user = userEvent.setup();
-    render(<LogInPage />);
+  test.each([
+    {
+      id: 'testuser',
+      password: '',
+      description: '비밀번호가 비어있는 경우',
+    },
+    {
+      id: '',
+      password: 'password123',
+      description: '아이디가 비어있는 경우',
+    },
+    {
+      id: '',
+      password: '',
+      description: '아이디와 비밀번호 모두 비어있는 경우',
+    },
+    {
+      id: '   ',
+      password: 'password123',
+      description: '아이디가 공백만 있는 경우',
+    },
+    {
+      id: 'testuser',
+      password: '   ',
+      description: '비밀번호가 공백만 있는 경우',
+    },
+  ])(
+    '$description 로그인 시도 시 유효성 검사에 실패한다',
+    async ({ id, password }) => {
+      const user = userEvent.setup();
+      render(<LogInPage />);
 
-    await user.type(screen.getByPlaceholderText('스노로즈 아이디'), 'testuser');
-    await user.click(screen.getByRole('button', { name: '로그인' }));
+      if (id) {
+        await user.type(screen.getByPlaceholderText('스노로즈 아이디'), id);
+      }
+      if (password) {
+        await user.type(
+          screen.getByPlaceholderText('스노로즈 비밀번호'),
+          password
+        );
+      }
 
-    expect(toast.info).toHaveBeenCalledWith(
-      '아이디와 비밀번호를 입력해 주세요.'
-    );
-    expect(mockLogin).not.toHaveBeenCalled();
-  });
+      await user.click(screen.getByRole('button', { name: '로그인' }));
 
-  test('비밀번호만 입력하고 로그인 시도하면 toast.info가 호출된다', async () => {
-    const user = userEvent.setup();
-    render(<LogInPage />);
-
-    await user.type(
-      screen.getByPlaceholderText('스노로즈 비밀번호'),
-      'password123'
-    );
-    await user.click(screen.getByRole('button', { name: '로그인' }));
-
-    expect(toast.info).toHaveBeenCalledWith(
-      '아이디와 비밀번호를 입력해 주세요.'
-    );
-    expect(mockLogin).not.toHaveBeenCalled();
-  });
-
-  test('아이디와 비밀번호를 모두 입력하지 않고 로그인 시도하면 toast.info가 호출된다', async () => {
-    const user = userEvent.setup();
-    render(<LogInPage />);
-
-    await user.click(screen.getByRole('button', { name: '로그인' }));
-
-    expect(toast.info).toHaveBeenCalledWith(
-      '아이디와 비밀번호를 입력해 주세요.'
-    );
-    expect(mockLogin).not.toHaveBeenCalled();
-  });
+      expect(toast.info).toHaveBeenCalledWith(
+        '아이디와 비밀번호를 입력해 주세요.'
+      );
+      expect(mockLogin).not.toHaveBeenCalled();
+    }
+  );
 
   test('유효한 아이디와 비밀번호로 로그인 시도 시 login 함수가 호출된다', async () => {
     mockLogin.mockResolvedValue({ success: true });
@@ -284,38 +294,6 @@ describe('로그인 페이지', () => {
     await user.click(screen.getByRole('button', { name: '로그인' }));
 
     expect(mockClearError).toHaveBeenCalledTimes(1);
-  });
-
-  test('공백만 입력된 아이디는 유효성 검증에 실패한다', async () => {
-    const user = userEvent.setup();
-    render(<LogInPage />);
-
-    await user.type(screen.getByPlaceholderText('스노로즈 아이디'), '   ');
-    await user.type(
-      screen.getByPlaceholderText('스노로즈 비밀번호'),
-      'password123'
-    );
-    await user.click(screen.getByRole('button', { name: '로그인' }));
-
-    // trim() 처리로 공백만 있는 경우 toast.info가 호출되고 login은 호출되지 않음
-    expect(toast.info).toHaveBeenCalledWith(
-      '아이디와 비밀번호를 입력해 주세요.'
-    );
-    expect(mockLogin).not.toHaveBeenCalled();
-  });
-
-  test('공백만 입력된 비밀번호는 유효성 검증에 실패한다', async () => {
-    const user = userEvent.setup();
-    render(<LogInPage />);
-
-    await user.type(screen.getByPlaceholderText('스노로즈 아이디'), 'testuser');
-    await user.type(screen.getByPlaceholderText('스노로즈 비밀번호'), '   ');
-    await user.click(screen.getByRole('button', { name: '로그인' }));
-
-    expect(toast.info).toHaveBeenCalledWith(
-      '아이디와 비밀번호를 입력해 주세요.'
-    );
-    expect(mockLogin).not.toHaveBeenCalled();
   });
 
   test('아이디와 비밀번호 앞뒤 공백은 자동으로 제거된다', async () => {
