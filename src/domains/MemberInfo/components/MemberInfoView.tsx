@@ -1,8 +1,6 @@
 import { Label, Input } from '@/components/ui';
-import {
-  convertUserRoleIdToEnum,
-  MEMBER_INFO,
-} from '@/domains/MemberInfo/utils/memberInfoFormatters';
+import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+import { MEMBER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
 
 import type { MemberInfo } from '@/types';
 
@@ -64,7 +62,7 @@ export default function MemberInfoView({ member }: { member: MemberInfo }) {
                 readOnly
                 value={displayValue}
                 onClick={() => isCopy && handleCopy(String(displayValue))}
-                className={`w-60 ${!rawValue ? 'bg-gray-100 text-gray-500' : ''} ${isCopy ? 'cursor-pointer text-gray-600 underline hover:text-blue-800' : ''}`}
+                className={`w-60 overflow-x-scroll ${!rawValue ? 'bg-gray-100 text-gray-500' : ''} ${isCopy ? 'cursor-pointer text-gray-600 underline hover:text-blue-800' : ''}`}
               />
             </div>
           );

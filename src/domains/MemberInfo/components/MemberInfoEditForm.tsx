@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Label, Input, Button } from '@/components/ui';
-import { MEMBER_INFO } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 import type { MemberInfo } from '@/types';
+import {
+  MEMBER_INFO,
+  USER_ROLES,
+} from '@/domains/MemberInfo/constants/memberInfo';
 
 const EDITABLE_KEYS: (keyof MemberInfo)[] = [
   'userName',
@@ -53,12 +56,11 @@ export default function MemberInfoEditForm({
                   value={rawValue as number}
                   onChange={(e) => handleChange(key, Number(e.target.value))}
                 >
-                  <option value={1}>준회원</option>
-                  <option value={2}>정회원</option>
-                  <option value={4}>리자</option>
-                  <option value={5}>공식 계정</option>
-                  <option value={6}>강등 회원</option>
-                  <option value={7}>기업</option>
+                  {USER_ROLES.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             );
