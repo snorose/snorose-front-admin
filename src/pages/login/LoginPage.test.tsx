@@ -197,6 +197,7 @@ describe('로그인 페이지', () => {
     );
     await user.click(screen.getByRole('button', { name: '로그인' }));
 
+    expect(mockClearError).toHaveBeenCalledTimes(1);
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
         '아이디 또는 비밀번호가 일치하지 않습니다.'
@@ -264,21 +265,6 @@ describe('로그인 페이지', () => {
         password: 'password123',
       });
     });
-    expect(mockClearError).toHaveBeenCalledTimes(1);
-  });
-
-  test('로그인 시도마다 clearError가 호출된다', async () => {
-    mockLogin.mockResolvedValue({ success: true });
-    const user = userEvent.setup();
-    render(<LogInPage />);
-
-    await user.type(screen.getByPlaceholderText('스노로즈 아이디'), 'testuser');
-    await user.type(
-      screen.getByPlaceholderText('스노로즈 비밀번호'),
-      'password123'
-    );
-    await user.click(screen.getByRole('button', { name: '로그인' }));
-
     expect(mockClearError).toHaveBeenCalledTimes(1);
   });
 
