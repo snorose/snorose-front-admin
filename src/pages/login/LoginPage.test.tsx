@@ -23,14 +23,19 @@ vi.mock('@/assets', () => ({
 describe('로그인 페이지', () => {
   const mockLogin = vi.fn();
   const mockClearError = vi.fn();
+  const mockLogout = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
-      login: mockLogin,
+      user: null,
+      isAuthenticated: false,
       isLoading: false,
+      error: null,
+      login: mockLogin,
+      logout: mockLogout,
       clearError: mockClearError,
-    } as ReturnType<typeof useAuth>);
+    });
   });
 
   test('로그인 페이지가 정상적으로 렌더링된다', () => {
@@ -209,10 +214,14 @@ describe('로그인 페이지', () => {
 
   test('isLoading이 true일 때 입력란과 버튼이 비활성화된다', () => {
     vi.mocked(useAuth).mockReturnValue({
-      login: mockLogin,
+      user: null,
+      isAuthenticated: false,
       isLoading: true,
+      error: null,
+      login: mockLogin,
+      logout: mockLogout,
       clearError: mockClearError,
-    } as ReturnType<typeof useAuth>);
+    });
 
     render(<LogInPage />);
 
@@ -223,10 +232,14 @@ describe('로그인 페이지', () => {
 
   test('isLoading이 true일 때 버튼 텍스트가 "로그인 중..."으로 변경된다', () => {
     vi.mocked(useAuth).mockReturnValue({
-      login: mockLogin,
+      user: null,
+      isAuthenticated: false,
       isLoading: true,
+      error: null,
+      login: mockLogin,
+      logout: mockLogout,
       clearError: mockClearError,
-    } as ReturnType<typeof useAuth>);
+    });
 
     render(<LogInPage />);
 
