@@ -222,7 +222,7 @@ describe('로그인 페이지', () => {
     expect(toast.error).not.toHaveBeenCalled();
   });
 
-  test('isLoading이 true일 때 입력란과 버튼이 비활성화된다', () => {
+  test('isLoading이 true일 때 입력란과 버튼이 비활성화되고 버튼 텍스트가 변경된다', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -237,25 +237,11 @@ describe('로그인 페이지', () => {
 
     expect(screen.getByPlaceholderText('스노로즈 아이디')).toBeDisabled();
     expect(screen.getByPlaceholderText('스노로즈 비밀번호')).toBeDisabled();
-    expect(screen.getByRole('button', { name: '로그인 중...' })).toBeDisabled();
-  });
 
-  test('isLoading이 true일 때 버튼 텍스트가 "로그인 중..."으로 변경된다', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      user: null,
-      isAuthenticated: false,
-      isLoading: true,
-      error: null,
-      login: mockLogin,
-      logout: mockLogout,
-      clearError: mockClearError,
-    });
+    const loadingButton = screen.getByRole('button', { name: '로그인 중...' });
+    expect(loadingButton).toBeInTheDocument();
+    expect(loadingButton).toBeDisabled();
 
-    render(<LogInPage />);
-
-    expect(
-      screen.getByRole('button', { name: '로그인 중...' })
-    ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: '로그인' })
     ).not.toBeInTheDocument();
