@@ -2,7 +2,7 @@
 name: Test Template
 about: 테스트 코드를 작성하는 경우에 사용합니다
 title: '[TEST] 테스트 코드 작성'
-labels: "\U0001F9EA TEST"
+labels: '🧪 Test'
 assignees: ''
 ---
 
