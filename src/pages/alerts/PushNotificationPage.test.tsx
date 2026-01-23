@@ -191,53 +191,45 @@ describe('PushNotificationPage', () => {
     expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
   });
 
-  test('알림명이 비어있을 때 알림 전송 버튼 클릭 시 토스트가 표시된다', async () => {
-    const user = userEvent.setup();
-    render(<PushNotificationPage />);
+  test.each([
+    {
+      description: '알림명이 비어있을 때',
+      name: '',
+      title: '테스트 제목',
+      body: '테스트 내용',
+    },
+    {
+      description: '알림 제목이 비어있을 때',
+      name: '테스트 알림',
+      title: '',
+      body: '테스트 내용',
+    },
+    {
+      description: '알림 내용이 비어있을 때',
+      name: '테스트 알림',
+      title: '테스트 제목',
+      body: '',
+    },
+  ])(
+    '$description 알림 전송 버튼 클릭 시 토스트가 표시된다',
+    async ({ name, title, body }) => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
 
-    const titleInput = screen.getByLabelText(/알림 제목/);
-    const bodyInput = screen.getByLabelText(/알림 내용/);
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
 
-    await user.type(titleInput, '테스트 제목');
-    await user.type(bodyInput, '테스트 내용');
+      if (name) await user.type(nameInput, name);
+      if (title) await user.type(titleInput, title);
+      if (body) await user.type(bodyInput, body);
 
-    const applyButton = screen.getByRole('button', { name: '알림 전송' });
-    await user.click(applyButton);
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
 
-    expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
-  });
-
-  test('알림 제목이 비어있을 때 알림 전송 버튼 클릭 시 토스트가 표시된다', async () => {
-    const user = userEvent.setup();
-    render(<PushNotificationPage />);
-
-    const nameInput = screen.getByLabelText(/알림명/);
-    const bodyInput = screen.getByLabelText(/알림 내용/);
-
-    await user.type(nameInput, '테스트 알림');
-    await user.type(bodyInput, '테스트 내용');
-
-    const applyButton = screen.getByRole('button', { name: '알림 전송' });
-    await user.click(applyButton);
-
-    expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
-  });
-
-  test('알림 내용이 비어있을 때 알림 전송 버튼 클릭 시 토스트가 표시된다', async () => {
-    const user = userEvent.setup();
-    render(<PushNotificationPage />);
-
-    const nameInput = screen.getByLabelText(/알림명/);
-    const titleInput = screen.getByLabelText(/알림 제목/);
-
-    await user.type(nameInput, '테스트 알림');
-    await user.type(titleInput, '테스트 제목');
-
-    const applyButton = screen.getByRole('button', { name: '알림 전송' });
-    await user.click(applyButton);
-
-    expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
-  });
+      expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
+    }
+  );
 
   test('모든 필수 항목이 입력되어 있을 때 알림 전송 버튼 클릭 시 모달이 열린다', async () => {
     const user = userEvent.setup();
@@ -416,62 +408,48 @@ describe('PushNotificationPage', () => {
   });
 
   describe('예외 상황 및 엣지 케이스', () => {
-    test('알림명에 공백만 입력한 경우 알림 전송이 되지 않아야 한다', async () => {
-      const user = userEvent.setup();
-      render(<PushNotificationPage />);
+    test.each([
+      {
+        description: '알림명에 공백만 입력한 경우',
+        name: '   ',
+        title: '테스트 제목',
+        body: '테스트 내용',
+      },
+      {
+        description: '알림 제목에 공백만 입력한 경우',
+        name: '테스트 알림',
+        title: '   ',
+        body: '테스트 내용',
+      },
+      {
+        description: '알림 내용에 공백만 입력한 경우',
+        name: '테스트 알림',
+        title: '테스트 제목',
+        body: '   ',
+      },
+    ])(
+      '$description 알림 전송이 되지 않아야 한다',
+      async ({ name, title, body }) => {
+        const user = userEvent.setup();
+        render(<PushNotificationPage />);
 
-      const nameInput = screen.getByLabelText(/알림명/);
-      const titleInput = screen.getByLabelText(/알림 제목/);
-      const bodyInput = screen.getByLabelText(/알림 내용/);
+        const nameInput = screen.getByLabelText(/알림명/);
+        const titleInput = screen.getByLabelText(/알림 제목/);
+        const bodyInput = screen.getByLabelText(/알림 내용/);
 
-      await user.type(nameInput, '   ');
-      await user.type(titleInput, '테스트 제목');
-      await user.type(bodyInput, '테스트 내용');
+        await user.type(nameInput, name);
+        await user.type(titleInput, title);
+        await user.type(bodyInput, body);
 
-      const applyButton = screen.getByRole('button', { name: '알림 전송' });
-      await user.click(applyButton);
+        const applyButton = screen.getByRole('button', { name: '알림 전송' });
+        await user.click(applyButton);
 
-      expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
-      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-    });
-
-    test('알림 제목에 공백만 입력한 경우 알림 전송이 되지 않아야 한다', async () => {
-      const user = userEvent.setup();
-      render(<PushNotificationPage />);
-
-      const nameInput = screen.getByLabelText(/알림명/);
-      const titleInput = screen.getByLabelText(/알림 제목/);
-      const bodyInput = screen.getByLabelText(/알림 내용/);
-
-      await user.type(nameInput, '테스트 알림');
-      await user.type(titleInput, '   ');
-      await user.type(bodyInput, '테스트 내용');
-
-      const applyButton = screen.getByRole('button', { name: '알림 전송' });
-      await user.click(applyButton);
-
-      expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
-      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-    });
-
-    test('알림 내용에 공백만 입력한 경우 알림 전송이 되지 않아야 한다', async () => {
-      const user = userEvent.setup();
-      render(<PushNotificationPage />);
-
-      const nameInput = screen.getByLabelText(/알림명/);
-      const titleInput = screen.getByLabelText(/알림 제목/);
-      const bodyInput = screen.getByLabelText(/알림 내용/);
-
-      await user.type(nameInput, '테스트 알림');
-      await user.type(titleInput, '테스트 제목');
-      await user.type(bodyInput, '   ');
-
-      const applyButton = screen.getByRole('button', { name: '알림 전송' });
-      await user.click(applyButton);
-
-      expect(toast.info).toHaveBeenCalledWith('모든 필수 항목을 입력해주세요.');
-      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-    });
+        expect(toast.info).toHaveBeenCalledWith(
+          '모든 필수 항목을 입력해주세요.'
+        );
+        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+      }
+    );
 
     test('모든 필수 필드에 공백만 입력한 경우 알림 전송이 되지 않아야 한다', async () => {
       const user = userEvent.setup();
