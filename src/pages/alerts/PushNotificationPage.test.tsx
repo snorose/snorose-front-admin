@@ -114,7 +114,7 @@ describe('PushNotificationPage', () => {
 
     const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
     await user.clear(urlInput);
-    await user.type(urlInput, '{Backspace}test/path');
+    await user.type(urlInput, 'test/path');
 
     expect(urlInput).toHaveValue('/test/path');
   });
@@ -387,7 +387,7 @@ describe('PushNotificationPage', () => {
     await user.type(titleInput, '리뉴얼 제목');
     await user.type(bodyInput, '리뉴얼 내용');
     await user.clear(urlInput);
-    await user.type(urlInput, '{Backspace}board/notice/post/123');
+    await user.type(urlInput, 'board/notice/post/123');
 
     // 광고성 알림 여부를 정보성으로 변경
     const marketingFalseRadio = screen.getByLabelText('정보성');
@@ -571,7 +571,7 @@ describe('PushNotificationPage', () => {
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
       await user.clear(urlInput);
-      await user.type(urlInput, '{Backspace}board/notice?page=1&id=123');
+      await user.type(urlInput, 'board/notice?page=1&id=123');
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
