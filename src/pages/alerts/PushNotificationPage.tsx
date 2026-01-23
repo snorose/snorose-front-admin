@@ -26,6 +26,7 @@ const INITIAL_FORM_DATA: PushNotification = {
 export default function PushNotificationPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -46,7 +47,11 @@ export default function PushNotificationPage() {
   };
 
   const handleApplyButtonClick = () => {
-    if (!formData.name || !formData.title || !formData.body) {
+    if (
+      !formData.name.trim() ||
+      !formData.title.trim() ||
+      !formData.body.trim()
+    ) {
       toast.info('모든 필수 항목을 입력해주세요.');
       return;
     }
@@ -55,6 +60,11 @@ export default function PushNotificationPage() {
   };
 
   const handleConfirmModalButtonClick = async () => {
+    if (isLoading) {
+      return;
+    }
+
+    setIsLoading(true);
     try {
       await postPushNotificationAPI(formData);
       toast.success('푸시 알림 전송이 완료되었어요.');
@@ -62,6 +72,7 @@ export default function PushNotificationPage() {
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '푸시 알림 전송에 실패했어요.'));
     } finally {
+      setIsLoading(false);
       setIsOpen(false);
     }
   };
