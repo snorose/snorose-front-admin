@@ -71,6 +71,16 @@ export default function PushNotificationPage() {
       return;
     }
 
+    // 전체 URL이 아닌 경우, URL이 슬래시로 시작하지 않으면 경고
+    // 전체 URL(http:// 또는 https://로 시작)은 제외
+    const urlToCheck = formData.url || '/';
+    const isFullUrl =
+      urlToCheck.startsWith('http://') || urlToCheck.startsWith('https://');
+    if (!isFullUrl && urlToCheck !== '/' && !urlToCheck.startsWith('/')) {
+      toast.info('URL은 반드시 슬래시("/")로 시작해야 합니다.');
+      return;
+    }
+
     setIsOpen(true);
   };
 

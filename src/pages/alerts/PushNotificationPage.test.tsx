@@ -113,10 +113,55 @@ describe('PushNotificationPage', () => {
     render(<PushNotificationPage />);
 
     const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
-    await user.clear(urlInput);
-    await user.type(urlInput, 'test/path');
+    await user.tripleClick(urlInput);
+    await user.paste('/test/path');
 
     expect(urlInput).toHaveValue('/test/path');
+  });
+
+  test('URL이 슬래시로 시작하지 않으면 알림 전송 시 토스트 메시지가 표시되어야 한다', async () => {
+    const user = userEvent.setup();
+    render(<PushNotificationPage />);
+
+    const nameInput = screen.getByLabelText(/알림명/);
+    const titleInput = screen.getByLabelText(/알림 제목/);
+    const bodyInput = screen.getByLabelText(/알림 내용/);
+    const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+    await user.type(nameInput, '테스트 알림');
+    await user.type(titleInput, '테스트 제목');
+    await user.type(bodyInput, '테스트 내용');
+    await user.tripleClick(urlInput);
+    await user.paste('board/notice/post/123');
+
+    const applyButton = screen.getByRole('button', { name: '알림 전송' });
+    await user.click(applyButton);
+
+    expect(toast.info).toHaveBeenCalledWith(
+      'URL은 반드시 슬래시("/")로 시작해야 합니다.'
+    );
+    expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+  });
+
+  test('URL이 슬래시로 시작하면 정상적으로 모달이 열려야 한다', async () => {
+    const user = userEvent.setup();
+    render(<PushNotificationPage />);
+
+    const nameInput = screen.getByLabelText(/알림명/);
+    const titleInput = screen.getByLabelText(/알림 제목/);
+    const bodyInput = screen.getByLabelText(/알림 내용/);
+    const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+    await user.type(nameInput, '테스트 알림');
+    await user.type(titleInput, '테스트 제목');
+    await user.type(bodyInput, '테스트 내용');
+    await user.tripleClick(urlInput);
+    await user.paste('/board/notice/post/123');
+
+    const applyButton = screen.getByRole('button', { name: '알림 전송' });
+    await user.click(applyButton);
+
+    expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
   });
 
   test('알림 제목 글자 수가 표시된다', async () => {
