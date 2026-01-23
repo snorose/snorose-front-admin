@@ -41,6 +41,7 @@ vi.mock('@/domains/Alerts', () => ({
         <div>알림명: {data.name}</div>
         <div>알림 제목: {data.title}</div>
         <div>알림 내용: {data.body}</div>
+        <div data-testid='modal-url'>URL: {data.url}</div>
         <button onClick={onClose}>취소</button>
         <button onClick={onConfirm}>확인</button>
       </div>
@@ -668,6 +669,96 @@ describe('PushNotificationPage', () => {
 
       const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
       expect(urlInput).toHaveValue('/');
+    });
+
+    test('URL을 수정하지 않고 기본값을 사용할 때 모달에서도 /가 표시되어야 한다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+
+      // URL은 수정하지 않고 기본값('/') 그대로 사용
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      // 모달이 열렸는지 확인
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+
+      // 모달에서 URL이 '/'로 표시되어야 함
+      const modalUrl = screen.getByTestId('modal-url');
+      expect(modalUrl).toHaveTextContent('URL: /');
+    });
+
+    test('URL이 빈 문자열일 때 모달에서도 기본값(/)이 표시되어야 한다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+
+      // URL을 빈 문자열로 만들기
+      await user.tripleClick(urlInput);
+      await user.keyboard('{Delete}');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      // 모달이 열렸는지 확인
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+
+      // 모달에서 URL이 '/'로 표시되어야 함 (빈 문자열이 아닌 기본값)
+      const modalUrl = screen.getByTestId('modal-url');
+      expect(modalUrl).toHaveTextContent('URL: /');
+    });
+
+    test('URL이 빈 문자열일 때 API 호출 시에도 기본값(/)이 전달되어야 한다', async () => {
+      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+
+      // URL을 빈 문자열로 만들기
+      await user.tripleClick(urlInput);
+      await user.keyboard('{Delete}');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      const confirmButton = screen.getByRole('button', { name: '확인' });
+      await user.click(confirmButton);
+
+      // API 호출 시 URL이 기본값 '/'로 전달되어야 함 (빈 문자열이 아님)
+      await waitFor(() => {
+        expect(postPushNotificationAPI).toHaveBeenCalledWith({
+          name: '테스트 알림',
+          title: '테스트 제목',
+          body: '테스트 내용',
+          url: '/',
+          isMarketing: true,
+          isTest: true,
+        });
+      });
     });
   });
 });

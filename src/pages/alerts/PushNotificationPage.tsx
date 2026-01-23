@@ -66,7 +66,10 @@ export default function PushNotificationPage() {
 
     setIsLoading(true);
     try {
-      await postPushNotificationAPI(formData);
+      await postPushNotificationAPI({
+        ...formData,
+        url: formData.url || '/',
+      });
       toast.success('푸시 알림 전송이 완료되었어요.');
       handleResetButtonClick();
     } catch (error: unknown) {
@@ -253,7 +256,10 @@ export default function PushNotificationPage() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleConfirmModalButtonClick}
-        data={formData as PushNotification}
+        data={{
+          ...formData,
+          url: formData.url || '/',
+        }}
       />
 
       <div className='flex justify-end gap-2'>
