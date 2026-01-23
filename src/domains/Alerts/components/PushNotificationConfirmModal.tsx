@@ -30,12 +30,14 @@ export default function PushNotificationConfirmModal({
       { label: '알림 내용', value: data.body },
       { label: 'URL', value: data.url },
       {
-        label: '광고성 알림 여부',
+        label: '메시지 유형',
         value: data.isMarketing ? '광고성' : '정보성',
       },
       {
-        label: '테스트 발송 여부',
-        value: data.isTest ? '관리자에게만' : '전체 발송',
+        label: '발송 대상',
+        value: data.isTest
+          ? '관리자에게만 테스트 발송'
+          : '푸시 알림 허용 회원 전체에게 발송',
       },
     ],
     [data]

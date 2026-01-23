@@ -46,6 +46,10 @@ export default function PushNotificationPage() {
     setFormData(INITIAL_FORM_DATA);
   };
 
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, url: e.target.value });
+  };
+
   const handleApplyButtonClick = () => {
     if (
       !formData.name.trim() ||
@@ -53,6 +57,17 @@ export default function PushNotificationPage() {
       !formData.body.trim()
     ) {
       toast.info('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
+    // snorose.com 도메인이 포함된 전체 URL이 입력된 경우 경고
+    if (
+      formData.url.includes('https://www.snorose.com') ||
+      formData.url.includes('http://www.snorose.com')
+    ) {
+      toast.info(
+        '"https://www.snorose.com"를 제외한 경로만 입력해 주세요. (예: /board/notice/post/1863135)'
+      );
       return;
     }
 
@@ -154,13 +169,14 @@ export default function PushNotificationPage() {
                 type='text'
                 id='url'
                 value={formData.url || '/'}
-                onChange={(e) =>
-                  setFormData({ ...formData, url: e.target.value })
-                }
+                onChange={handleUrlChange}
               />
               <div className='flex px-1'>
                 <p className='text-xs text-gray-500'>
-                  기본 주소의 뒷부분 입력 (예:{' '}
+                  기본 주소("https://www.snorose.com")를 제외한 경로만 입력해
+                  주세요.
+                  <br />
+                  (예:{' '}
                   <a
                     href='https://www.snorose.com/board/notice/post/1863135'
                     target='_blank'
@@ -182,7 +198,7 @@ export default function PushNotificationPage() {
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
                 <Label htmlFor='isMarketing' required>
-                  광고성 알림 여부
+                  메시지 유형
                 </Label>
                 <RadioGroup
                   value={formData.isMarketing ? 'true' : 'false'}
@@ -200,7 +216,7 @@ export default function PushNotificationPage() {
                       htmlFor='marketing-true'
                       className='cursor-pointer font-normal'
                     >
-                      광고성
+                      광고성 (이벤트 홍보 등)
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
@@ -209,7 +225,7 @@ export default function PushNotificationPage() {
                       htmlFor='marketing-false'
                       className='cursor-pointer font-normal'
                     >
-                      정보성
+                      정보성 (전체 공지, 댓글, 관리자 삭제/비공개 통보 등)
                     </Label>
                   </div>
                 </RadioGroup>
@@ -218,7 +234,7 @@ export default function PushNotificationPage() {
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
                 <Label htmlFor='isTest' required>
-                  테스트 발송 여부
+                  발송 대상
                 </Label>
                 <RadioGroup
                   value={formData.isTest ? 'true' : 'false'}
@@ -233,7 +249,7 @@ export default function PushNotificationPage() {
                       htmlFor='test-true'
                       className='cursor-pointer font-normal'
                     >
-                      관리자에게만 발송
+                      관리자에게만 테스트 발송
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
@@ -242,7 +258,7 @@ export default function PushNotificationPage() {
                       htmlFor='test-false'
                       className='cursor-pointer font-normal'
                     >
-                      전체 회원 발송
+                      푸시 알림 허용 회원 전체에게 발송
                     </Label>
                   </div>
                 </RadioGroup>

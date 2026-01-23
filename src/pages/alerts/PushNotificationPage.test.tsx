@@ -74,8 +74,8 @@ describe('PushNotificationPage', () => {
     expect(
       screen.getByLabelText(/알림 클릭 시 연결되는 주소/)
     ).toBeInTheDocument();
-    expect(screen.getByText(/광고성 알림 여부/)).toBeInTheDocument();
-    expect(screen.getByText(/테스트 발송 여부/)).toBeInTheDocument();
+    expect(screen.getByText(/메시지 유형/)).toBeInTheDocument();
+    expect(screen.getByText(/발송 대상/)).toBeInTheDocument();
   });
 
   test('알림명 입력란에 값을 입력할 수 있다', async () => {
@@ -145,7 +145,9 @@ describe('PushNotificationPage', () => {
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
-    const marketingFalseRadio = screen.getByLabelText('정보성');
+    const marketingFalseRadio = screen.getByLabelText(
+      /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+    );
     await user.click(marketingFalseRadio);
 
     expect(marketingFalseRadio).toBeChecked();
@@ -155,7 +157,8 @@ describe('PushNotificationPage', () => {
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
-    const testFalseRadio = screen.getByLabelText('전체 회원 발송');
+    const testFalseRadio =
+      screen.getByLabelText(/푸시 알림 허용 회원 전체에게 발송/);
     await user.click(testFalseRadio);
 
     expect(testFalseRadio).toBeChecked();
@@ -382,11 +385,14 @@ describe('PushNotificationPage', () => {
     await user.type(urlInput, 'board/notice/post/123');
 
     // 광고성 알림 여부를 정보성으로 변경
-    const marketingFalseRadio = screen.getByLabelText('정보성');
+    const marketingFalseRadio = screen.getByLabelText(
+      /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+    );
     await user.click(marketingFalseRadio);
 
     // 테스트 발송 여부를 전체 회원 발송으로 변경
-    const testFalseRadio = screen.getByLabelText('전체 회원 발송');
+    const testFalseRadio =
+      screen.getByLabelText(/푸시 알림 허용 회원 전체에게 발송/);
     await user.click(testFalseRadio);
 
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
@@ -589,19 +595,23 @@ describe('PushNotificationPage', () => {
       render(<PushNotificationPage />);
 
       // 라디오 버튼 변경
-      const marketingFalseRadio = screen.getByLabelText('정보성');
+      const marketingFalseRadio = screen.getByLabelText(
+        /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+      );
       await user.click(marketingFalseRadio);
 
-      const testFalseRadio = screen.getByLabelText('전체 회원 발송');
+      const testFalseRadio =
+        screen.getByLabelText(/푸시 알림 허용 회원 전체에게 발송/);
       await user.click(testFalseRadio);
 
       // 초기화 버튼 클릭
       const resetButton = screen.getByRole('button', { name: '초기화' });
       await user.click(resetButton);
 
-      // 초기값으로 돌아가야 함 (광고성, 관리자에게만 발송)
-      const marketingTrueRadio = screen.getByLabelText('광고성');
-      const testTrueRadio = screen.getByLabelText('관리자에게만 발송');
+      // 초기값으로 돌아가야 함 (광고성, 관리자에게만 테스트 발송)
+      const marketingTrueRadio =
+        screen.getByLabelText(/광고성 \(이벤트 홍보 등\)/);
+      const testTrueRadio = screen.getByLabelText(/관리자에게만 테스트 발송/);
 
       expect(marketingTrueRadio).toBeChecked();
       expect(testTrueRadio).toBeChecked();
@@ -647,6 +657,87 @@ describe('PushNotificationPage', () => {
 
       const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
       expect(urlInput).toHaveValue('/');
+    });
+
+    test('전체 URL(https://)을 입력하고 알림 전송 버튼을 클릭하면 경고가 표시되고 모달이 열리지 않아야 한다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.tripleClick(urlInput);
+      await user.paste('https://www.snorose.com/board/notice/post/1869958');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      // 경고 토스트가 표시되어야 함
+      expect(toast.info).toHaveBeenCalledWith(
+        '"https://www.snorose.com"를 제외한 경로만 입력해 주세요. (예: /board/notice/post/1863135)'
+      );
+
+      // 모달이 열리지 않아야 함
+      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+    });
+
+    test('전체 URL(http://)을 입력하고 알림 전송 버튼을 클릭하면 경고가 표시되고 모달이 열리지 않아야 한다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.tripleClick(urlInput);
+      await user.paste('http://www.snorose.com/board/notice/post/1869958');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      // 경고 토스트가 표시되어야 함
+      expect(toast.info).toHaveBeenCalledWith(
+        '"https://www.snorose.com"를 제외한 경로만 입력해 주세요. (예: /board/notice/post/1863135)'
+      );
+
+      // 모달이 열리지 않아야 함
+      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+    });
+
+    test('다른 도메인의 전체 URL을 입력해도 경고가 표시되지 않고 모달이 열려야 한다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.tripleClick(urlInput);
+      await user.paste('https://example.com/some/path');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      // 경고 토스트가 표시되지 않아야 함 (snorose.com이 아니므로)
+      expect(toast.info).not.toHaveBeenCalledWith(
+        expect.stringContaining('https://www.snorose.com')
+      );
+
+      // 모달이 열려야 함
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
     });
 
     test('URL을 수정하지 않고 기본값을 사용할 때 모달에서도 /가 표시되어야 한다', async () => {
