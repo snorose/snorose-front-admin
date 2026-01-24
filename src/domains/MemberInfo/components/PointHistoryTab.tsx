@@ -13,12 +13,12 @@ import MemberInfoPagination from './MemberInfoTablePagenation';
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 interface PointHistoryTabProps {
-  loginId?: string;
+  encryptedUserId?: string;
   studentNumber?: string;
 }
 
 export default function PointHistoryTab({
-  loginId,
+  encryptedUserId,
   studentNumber,
 }: PointHistoryTabProps) {
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -29,7 +29,8 @@ export default function PointHistoryTab({
 
   const filteredData = USERPOINT_SAMPLE_DATA.filter(
     (history) =>
-      history.loginId === loginId || history.studentNumber === studentNumber
+      history.encryptedUserId === encryptedUserId ||
+      history.studentNumber === studentNumber
   );
 
   // 최신 순으로 이력 정렬

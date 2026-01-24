@@ -12,12 +12,12 @@ import { DOWNLOADEDEXAMREVIEW_SAMPLE_DATA } from '@/__mocks__';
 import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface DownloadedExamReviewTabProps {
-  loginId?: string;
+  encryptedUserId?: string;
   studentNumber?: string;
 }
 
 export default function DownloadedExamReviewTab({
-  loginId,
+  encryptedUserId,
   studentNumber,
 }: DownloadedExamReviewTabProps) {
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -25,7 +25,8 @@ export default function DownloadedExamReviewTab({
 
   const downloadedData = DOWNLOADEDEXAMREVIEW_SAMPLE_DATA.filter((history) => {
     return (
-      history.loginId === loginId || history.studentNumber === studentNumber
+      history.encryptedUserId === encryptedUserId ||
+      history.studentNumber === studentNumber
     );
   });
 

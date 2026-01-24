@@ -156,7 +156,7 @@ export default function MemberInfoPage() {
   const tabs = useMemo(() => {
     if (!selectedMember) return [];
     return getMemberInfoTabs(
-      selectedMember.loginId,
+      selectedMember.encryptedUserId,
       selectedMember.studentNumber
     );
   }, [selectedMember]);

@@ -4,12 +4,18 @@ import {
   BlacklistHistoryTab,
 } from '@/domains/MemberInfo';
 
-export const getMemberInfoTabs = (loginId: string, studentNumber: string) => [
+export const getMemberInfoTabs = (
+  encryptedUserId: string,
+  studentNumber: string
+) => [
   {
     label: '포인트 내역',
     value: 'point',
     content: (
-      <UserPointHistoryTab loginId={loginId} studentNumber={studentNumber} />
+      <UserPointHistoryTab
+        encryptedUserId={encryptedUserId}
+        studentNumber={studentNumber}
+      />
     ),
   },
   {
@@ -17,7 +23,7 @@ export const getMemberInfoTabs = (loginId: string, studentNumber: string) => [
     value: 'review',
     content: (
       <DownloadedExamReviewTab
-        loginId={loginId}
+        encryptedUserId={encryptedUserId}
         studentNumber={studentNumber}
       />
     ),
@@ -26,7 +32,10 @@ export const getMemberInfoTabs = (loginId: string, studentNumber: string) => [
     label: '강등/경고 내역',
     value: 'blacklist',
     content: (
-      <BlacklistHistoryTab loginId={loginId} studentNumber={studentNumber} />
+      <BlacklistHistoryTab
+        encryptedUserId={encryptedUserId}
+        studentNumber={studentNumber}
+      />
     ),
   },
 ];
