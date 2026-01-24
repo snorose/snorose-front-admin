@@ -48,7 +48,7 @@ export type UserBlacklistHistory = {
 
 export type PenaltyUserInfo = {
   loginId: string;
-  encryptedUscerId: string;
+  encryptedUserId: string;
   userName: string;
   studentNumber: string;
   userRoleId: number;
