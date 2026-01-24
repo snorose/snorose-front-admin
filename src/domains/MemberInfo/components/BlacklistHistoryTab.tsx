@@ -6,40 +6,82 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useState } from 'react';
-
-import { BLACKLIST_SAMPLE_DATA } from '@/__mocks__';
+import { useState, useEffect } from 'react';
 import MemberInfoPagination from './MemberInfoTablePagenation';
+import { toast } from 'sonner';
+import { getErrorMessage } from '@/utils';
+
+import { blacklistHistoryAPI } from '@/apis';
+import { BLACKLIST_SAMPLE_DATA } from '@/__mocks__';
+import type { BlacklistHistoryItem } from '@/types/member';
 
 interface BlacklistHistoryTabProps {
   loginId?: string;
-  studentNumber?: string;
+  encryptedUserId?: string;
+  studentNumber?: string; // mock fallback용
+  groupSize?: number;
 }
 
 export default function BlacklistHistoryTab({
-  loginId,
+  encryptedUserId,
   studentNumber,
+  groupSize = 10,
 }: BlacklistHistoryTabProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [historyData, setHistoryData] = useState<BlacklistHistoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const downloadedData = BLACKLIST_SAMPLE_DATA.filter((history) => {
-    return (
-      history.loginId === loginId || history.studentNumber === studentNumber
-    );
-  });
+  /** 블랙리스트 이력 조회 API */
+  useEffect(() => {
+    if (!encryptedUserId) return;
 
-  // 페이지당 10개씩 데이터 자르기
-  const PAGE_SIZE = 10;
+    const fetchHistory = async () => {
+      try {
+        setIsLoading(true);
+        const data = await blacklistHistoryAPI(encryptedUserId);
 
+        if (data?.result) {
+          setHistoryData(data.result);
+          return;
+        }
+
+        // API 정상이지만 데이터 없음
+        setHistoryData([]);
+      } catch (error) {
+        toast.error(getErrorMessage(error, '블랙리스트 조회에 실패했습니다.'));
+
+        // fallback (미완성 API용)
+        const mock = BLACKLIST_SAMPLE_DATA.filter(
+          (item) =>
+            item.encryptedUserId === encryptedUserId ||
+            item.studentNumber === studentNumber
+        );
+
+        if (mock.length > 0) {
+          setHistoryData(mock);
+        } else {
+          setHistoryData([]);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [encryptedUserId, studentNumber]);
+
+  /** 페이지 데이터 */
+  const downloadedData = historyData;
   const pageData = downloadedData.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    (currentPage - 1) * groupSize,
+    currentPage * groupSize
   );
+  const emptyCount = groupSize - pageData.length;
 
   return (
     <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
       <Table className='w-full border-separate border-spacing-0 rounded-md border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
-        {/* Table Header */}
+        {/* Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm'>
           <TableRow>
             <TableHead className='text-center'>번호</TableHead>
@@ -50,32 +92,48 @@ export default function BlacklistHistoryTab({
           </TableRow>
         </TableHeader>
 
-        {/* Table Body */}
+        {/* Body */}
         <TableBody className='bg-white'>
-          {pageData.length > 0 ? (
-            pageData.map((history, index) => (
-              <TableRow key={index} className='border-b-1 hover:bg-gray-100'>
-                <TableCell className='w-[50px] text-center'>
-                  {(currentPage - 1) * PAGE_SIZE + index + 1}
-                </TableCell>
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={5} className='py-6 text-center text-gray-500'>
+                로딩 중...
+              </TableCell>
+            </TableRow>
+          ) : pageData.length > 0 ? (
+            <>
+              {pageData.map((history, index) => (
+                <TableRow key={index} className='border-b-1 hover:bg-gray-100'>
+                  <TableCell className='w-[50px] text-center'>
+                    {(currentPage - 1) * groupSize + index + 1}
+                  </TableCell>
+                  <TableCell className='text-center'>{history.type}</TableCell>
+                  <TableCell className='text-center'>
+                    {history.blackReason}
+                  </TableCell>
+                  <TableCell className='text-center'>
+                    {history.createdAt}
+                  </TableCell>
+                  <TableCell
+                    className={`text-center ${
+                      history.blacklistDeadline === null ? 'bg-gray-50' : ''
+                    }`}
+                  >
+                    {history.blacklistDeadline}
+                  </TableCell>
+                </TableRow>
+              ))}
 
-                <TableCell className='text-center'>{history.type}</TableCell>
-                <TableCell className='text-center'>
-                  {history.blackReason}
-                </TableCell>
-
-                <TableCell className='text-center'>
-                  {history.blacklistStartDate}
-                </TableCell>
-                <TableCell
-                  className={`text-center ${
-                    history.blacklistEndDate === null ? 'bg-gray-50' : ''
-                  }`}
+              {/* 빈 셀 채우기 (테이블 높이 고정 목적) */}
+              {Array.from({ length: emptyCount }).map((_, idx) => (
+                <TableRow
+                  key={`empty-${idx}`}
+                  className='pointer-events-none h-7 bg-gray-50'
                 >
-                  {history.blacklistEndDate}
-                </TableCell>
-              </TableRow>
-            ))
+                  <TableCell colSpan={5}></TableCell>
+                </TableRow>
+              ))}
+            </>
           ) : (
             <TableRow>
               <TableCell colSpan={5} className='py-6 text-center text-gray-500'>
@@ -85,11 +143,14 @@ export default function BlacklistHistoryTab({
           )}
         </TableBody>
       </Table>
-      {pageData.length > 0 && (
+
+      {/* 페이지네이션 */}
+      {downloadedData.length > 0 && (
         <MemberInfoPagination
           currentPage={currentPage}
-          totalPages={Math.ceil(downloadedData.length / PAGE_SIZE)}
+          totalPages={Math.ceil(downloadedData.length / groupSize)}
           onPageChange={setCurrentPage}
+          groupSize={groupSize}
         />
       )}
     </div>
