@@ -1,15 +1,9 @@
 import { useState } from 'react';
-import {
-  ExamEditPanel,
-  // ExamDiscussionPanel,
-  // ExamWarningPanel,
-  // ExamDeletePanel,
-  // ExamDegradePanel,
-} from './index';
+import { ExamEditPanel } from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
-} from '@/domains/Exams/types/exam';
+} from '@/domains/Reviews/types';
 
 type Tab = 'edit' | 'warning' | 'delete' | 'demotion' | 'discussion';
 

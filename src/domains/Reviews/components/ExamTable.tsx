@@ -5,25 +5,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import { STATUS_COLOR } from '@/constants/exam-table-options';
+} from '@/components/ui';
+import { STATUS_COLOR } from '@/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
+import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
 import {
   ExamTableSkeleton,
   ExamTableEmptyRows,
   ExamTableEmpty,
 } from './ExamTableFallback';
 import ExamTablePagination from './ExamTablePagination';
-import { useExamReviews, useConfirmExamReview } from '@/domains/Exams/hooks';
-import { ExamStatusDot } from '@/domains/Exams/components';
-import type { ExamReview } from '@/domains/Exams/types/exam';
+import { ExamStatusDot } from '@/domains/Reviews/components';
+import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;

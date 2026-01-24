@@ -1,5 +1,4 @@
-import { TableRow, TableCell } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
+import { TableRow, TableCell, Skeleton } from '@/components/ui';
 
 // ======= types =======
 interface ExamTableSkeletonProps {

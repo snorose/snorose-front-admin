@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenu,
+  Badge,
 } from '@/components/ui';
 import { snoroseLogo } from '@/assets';
 import { SIDEBAR_MENUS } from '@/constants';
@@ -81,6 +82,9 @@ export const AppSidebar = ({
                           >
                             <NavLink to={subItem.url}>
                               <span>{subItem.title}</span>
+                              {subItem.beta && (
+                                <Badge variant='outline'>Beta</Badge>
+                              )}
                             </NavLink>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>

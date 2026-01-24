@@ -51,11 +51,11 @@ function App() {
                               element={<MemberInfoPage />}
                             />
                             <Route
-                              path='/member/managePenalty'
+                              path='/member/penalty'
                               element={<MemberPenaltyManagementPage />}
                             />
                             <Route
-                              path='/exam/list'
+                              path='/reviews/exam'
                               element={<ExamReviewPage />}
                             />
                             <Route

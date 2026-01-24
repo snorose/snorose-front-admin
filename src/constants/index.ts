@@ -1,3 +1,4 @@
 export * from './points';
-export * from './sidebarMenus';
+export * from './sidebar-menus';
 export * from './auth';
+export * from './exam-table-options';
