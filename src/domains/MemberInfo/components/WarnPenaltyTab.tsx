@@ -10,7 +10,7 @@ import {
   SelectItem,
 } from '@/components/ui';
 import { toast } from 'sonner';
-import ConfirmModal from '@/components/ui/confirm-modal';
+import { ConfirmModal } from '@/components/ui';
 import type { PenaltyUserInfo } from '@/types';
 import {
   WARNING_REASON_OPTIONS,

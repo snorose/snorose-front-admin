@@ -9,7 +9,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui';
-import ConfirmModal from '@/components/ui/confirm-modal';
+import { ConfirmModal } from '@/components/ui';
 import type { PenaltyUserInfo } from '@/types';
 import { toast } from 'sonner';
 import {
