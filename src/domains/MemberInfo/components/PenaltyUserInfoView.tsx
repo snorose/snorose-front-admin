@@ -1,19 +1,17 @@
 import { Label, Input } from '@/components/ui';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
-import { MEMBER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
+import { PENALTY_USER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
 
-import type { MemberInfo } from '@/types';
+import type { PenaltyUserInfo } from '@/types';
 
-export default function MemberInfoView({ member }: { member: MemberInfo }) {
-  const COPY_KEYS: (keyof MemberInfo)[] = [
-    'encryptedUserId',
-    'studentNumber',
-    'loginId',
-  ];
+export default function PenaltyUserInfo({
+  member,
+}: {
+  member: PenaltyUserInfo;
+}) {
+  const COPY_KEYS: (keyof PenaltyUserInfo)[] = ['studentNumber', 'loginId'];
 
-  const DATE_FIELDS: (keyof MemberInfo)[] = [
-    'createdAt',
-    'authenticatedAt',
+  const DATE_FIELDS: (keyof PenaltyUserInfo)[] = [
     'blacklistStartDate',
     'blacklistEndDate',
   ];
@@ -25,8 +23,8 @@ export default function MemberInfoView({ member }: { member: MemberInfo }) {
 
   return (
     <article>
-      <div className='grid grid-cols-2 gap-x-5 gap-y-1'>
-        {MEMBER_INFO.map(({ label, key }) => {
+      <div className='grid grid-cols-2 gap-x-5 gap-y-1 rounded-md border p-4 pb-5'>
+        {PENALTY_USER_INFO.map(({ label, key }) => {
           const rawValue = member[key];
 
           const displayValue =
@@ -47,7 +45,7 @@ export default function MemberInfoView({ member }: { member: MemberInfo }) {
                 <Input
                   readOnly
                   value={dateValue}
-                  className={`w-60 ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
+                  className={`w-60 overflow-x-scroll ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
                 />
               </div>
             );

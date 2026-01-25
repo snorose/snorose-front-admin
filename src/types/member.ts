@@ -18,14 +18,14 @@ export type MemberInfo = {
 };
 
 export type DownloadedExamReview = {
-  loginId: string;
+  encryptedUserId: string;
   studentNumber: string;
   postId: number;
   title: string;
 };
 
 export type UserPointHistory = {
-  loginId: string;
+  encryptedUserId: string;
   studentNumber: string;
   sourceId: number;
   source: string;
@@ -37,12 +37,25 @@ export type UserPointHistory = {
 };
 
 export type UserBlacklistHistory = {
-  loginId: string;
+  loginId?: string;
+  encryptedUserId: string;
   studentNumber: string;
   type: string;
   blackReason: string;
-  blacklistStartDate: string; // YYYY-MM-DD HH:MM:SS
-  blacklistEndDate: string | null; // YYYY-MM-DD HH:MM:SS
+  createdAt: string; // YYYY-MM-DD HH:MM:SS
+  blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
+};
+
+export type PenaltyUserInfo = {
+  loginId: string;
+  encryptedUserId: string;
+  userName: string;
+  studentNumber: string;
+  userRoleId: number;
+  totalWarningCount: number;
+  isBlacklist: string | null;
+  blacklistStartDate: string | null; // YYYY-MM-DDTHH:MM:SS
+  blacklistEndDate: string | null; // YYYY-MM-DDTHH:MM:SS
 };
 
 export interface EditMemberInfo {
@@ -59,4 +72,13 @@ export interface UpdateUserInfoResponse {
   isSuccess: boolean;
   code: number;
   message: string;
+}
+
+export interface BlacklistHistoryItem {
+  encryptedUserId: string;
+  studentNumber: string;
+  type: string;
+  blackReason: string;
+  createdAt: string;
+  blacklistDeadline: string | null;
 }
