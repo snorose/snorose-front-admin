@@ -1,0 +1,47 @@
+comment: |
+  PR 제목을 기준으로 라벨을 자동 부여했어요. 
+  필요할 경우 라벨을 수정하거나 추가해 주세요 🙌
+  그럼 오늘도 즐코하세요 - ̗̀ෆ(˶'ᵕ'˶)ෆ  ̖́-
+
+labels:
+  '✨ Feature':
+    - '.*\[FEAT\].*'
+    - '.*\[FEATURE\].*'
+
+  '🐞 BugFix':
+    - '.*\[FIX\].*'
+
+  '📄 Docs':
+    - '.*\[DOCS\].*'
+
+  '🧹 Chore':
+    - '.*\[CHORE\].*'
+
+  '🪄 Modify':
+    - '.*\[MODIFY\].*'
+
+  '🎨 UI':
+    - '.*\[DESIGN\].*'
+    - '.*\[UI\].*'
+
+  '🧚 STYLE':
+    - '.*\[STYLE\].*'
+
+  '❄️ Release':
+    - '.*\[MERGE\].*'
+
+  '⚙️ Setting':
+    - '.*\[SETTING\].*'
+
+  '🛠️ Refactor':
+    - '.*\[REFACTOR\].*'
+
+  '⚡️ Performance':
+    - '.*\[PERF\].*'
+    - '.*\[PERFORMANCE\].*'
+
+  '🧪 Test':
+    - '.*\[TEST\].*'
+
+  '🔥 Hotfix':
+    - '.*\[HOTFIX\].*'

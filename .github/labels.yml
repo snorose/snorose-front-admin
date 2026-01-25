@@ -1,0 +1,75 @@
+- name: "✨ Feature"
+  color: "B0F207"
+  description: "새로운 기능 추가"
+
+- name: "🐞 BugFix"
+  color: "d73a4a"
+  description: "버그, 에러 수정"
+
+- name: "📄 Docs"
+  color: "0075ca"
+  description: "문서 수정"
+
+- name: "🧹 Chore"
+  color: "A85C44"
+  description: "빌드, 패키지 관리 등"
+
+- name: "🪄 Modify"
+  color: "74D1BC"
+  description: "기능의 수정이나 사소한 변경 사항"
+
+- name: "🎨 UI"
+  color: "FEF2C0"
+  description: "UI/UX, 스타일링 등 디자인 관련 작업"
+
+- name: "🧚 STYLE"
+  color: "006B75"
+  description: "코드 스타일 관련 작업"
+
+- name: "❄️ Release"
+  color: "87BDD8"
+  description: "버전 배포 또는 릴리즈 관련"
+
+- name: "⚙️ Setting"
+  color: "BFD4F2"
+  description: "설정 파일 변경"
+
+- name: "🛠️ Refactor"
+  color: "0AC3B0"
+  description: "코드 리팩토링"
+
+- name: "⚡️ Performance"
+  color: "006b75"
+  description: "성능 개선"
+
+- name: "🍒 Cherry-pick"
+  color: "de8a89"
+  description: "특정 커밋을 선택해 다른 브랜치에 적용한 PR"
+
+- name: "👀 Look at Me"
+  color: "BFE1C8"
+  description: "주목해 주세요!"
+
+- name: "🧪 Test"
+  color: "E76923"
+  description: "테스트 코드 작성"
+
+- name: "🔥 Hotfix"
+  color: "d73a4a"
+  description: "급한 버그 수정"
+
+- name: "📝 Request"
+  color: "955500"
+  description: "제언 및 요청 사항"
+
+- name: "📬 API"
+  color: "D4C5F9"
+  description: "API 관련 작업"
+
+- name: "🙏 Next"
+  color: "FFFF00"
+  description: "리뷰만 먼저 해주세요! 다음 릴리즈 전까지 merge는 잠시 보류"
+
+- name: "🚧 Not Ready for Review"
+  color: "8d42a3"
+  description: "작업 중인 PR입니다. 완료 후 리뷰 부탁드려요."

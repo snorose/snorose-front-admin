@@ -8,7 +8,7 @@ import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/hooks';
 import { getErrorMessage } from '@/utils';
 import {
-  ConfirmPointAdjustmentModal,
+  PointAdjustmentConfirmModal,
   MemberInfoSection,
   PointDetailSection,
   PointActionButtons,
@@ -137,12 +137,13 @@ export default function AdjustSinglePointPage() {
         userId={userId}
         selectedCategory={selectedCategory}
         difference={difference}
+        memo={memo}
         onReset={handleResetButtonClick}
         onApply={() => setIsConfirmModalOpen(true)}
       />
 
       {searchedMember && (
-        <ConfirmPointAdjustmentModal
+        <PointAdjustmentConfirmModal
           isOpen={isConfirmModalOpen}
           onClose={() => setIsConfirmModalOpen(false)}
           onConfirm={handleConfirmModalButtonClick}

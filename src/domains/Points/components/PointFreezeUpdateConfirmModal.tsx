@@ -9,6 +9,7 @@ import {
   Label,
   Input,
 } from '@/components/ui';
+import { DateTimePicker } from '@/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/types';
@@ -18,6 +19,7 @@ import {
   formatDateTimeForAPI,
   formatDateTimeForInput,
 } from '@/utils';
+import { useDateTimeField } from '@/hooks';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -32,38 +34,44 @@ export default function PointFreezeUpdateConfirmModal({
   onClose,
   onSuccess,
 }: PointFreezeUpdateConfirmModalProps) {
-  const [updateFormData, setUpdateFormData] = useState({
-    title: '',
-    startAt: '',
-    endAt: '',
-  });
+  const [title, setTitle] = useState('');
+
+  const startDateTime = useDateTimeField();
+  const endDateTime = useDateTimeField();
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
-      setUpdateFormData({
-        title: selectedItem.title,
-        startAt: formatDateTimeForInput(selectedItem.startAt),
-        endAt: formatDateTimeForInput(selectedItem.endAt),
-      });
+      const startAtInput = formatDateTimeForInput(selectedItem.startAt);
+      const endAtInput = formatDateTimeForInput(selectedItem.endAt);
+
+      setTitle(selectedItem.title);
+      startDateTime.setDateTime(startAtInput);
+      endDateTime.setDateTime(endAtInput);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem, isUpdateModalOpen]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-
-    if (id in updateFormData) {
-      setUpdateFormData((prev) => ({ ...prev, [id]: value }));
-    }
+    setTitle(e.target.value);
   };
 
   const handleUpdateConfirm = async () => {
     if (!selectedItem) return;
 
+    if (
+      title === '' ||
+      startDateTime.dateTime === '' ||
+      endDateTime.dateTime === ''
+    ) {
+      toast.error('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+
     try {
       await patchPointFreezeAPI(selectedItem.id, {
-        title: updateFormData.title,
-        startAt: formatDateTimeForAPI(updateFormData.startAt),
-        endAt: formatDateTimeForAPI(updateFormData.endAt),
+        title,
+        startAt: formatDateTimeForAPI(startDateTime.dateTime),
+        endAt: formatDateTimeForAPI(endDateTime.dateTime),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();
@@ -95,28 +103,26 @@ export default function PointFreezeUpdateConfirmModal({
           <Input
             type='text'
             id='title'
-            value={updateFormData.title}
+            value={title}
             onChange={handleInputChange}
           />
         </div>
-        <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>시작 일시: </Label>
-          <Input
-            type='datetime-local'
-            id='startAt'
-            value={updateFormData.startAt}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>종료 일시: </Label>
-          <Input
-            type='datetime-local'
-            id='endAt'
-            value={updateFormData.endAt}
-            onChange={handleInputChange}
-          />
-        </div>
+        <DateTimePicker
+          label='시작 일시'
+          date={startDateTime.date}
+          time={startDateTime.time}
+          onDateSelect={startDateTime.onDateSelect}
+          onTimeChange={startDateTime.onTimeChange}
+          datePlaceholder='시작 날짜 선택'
+        />
+        <DateTimePicker
+          label='종료 일시'
+          date={endDateTime.date}
+          time={endDateTime.time}
+          onDateSelect={endDateTime.onDateSelect}
+          onTimeChange={endDateTime.onTimeChange}
+          datePlaceholder='종료 날짜 선택'
+        />
         <DialogFooter>
           <Button type='button' variant='outline' onClick={handleUpdateCancel}>
             취소
