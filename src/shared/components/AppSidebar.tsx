@@ -3,8 +3,6 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import {
   Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -65,14 +63,14 @@ export const AppSidebar = ({
                 className='group/collapsible'
               >
                 <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
+                  <Collapsible.Trigger asChild>
                     <SidebarMenuButton tooltip={menu.title}>
                       {menu.icon && <menu.icon />}
                       <span>{menu.title}</span>
                       <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                     </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
                     <SidebarMenuSub>
                       {menu.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
@@ -90,7 +88,7 @@ export const AppSidebar = ({
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
-                  </CollapsibleContent>
+                  </Collapsible.Content>
                 </SidebarMenuItem>
               </Collapsible>
             ))}

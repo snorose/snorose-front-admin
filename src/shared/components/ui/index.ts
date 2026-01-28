@@ -40,11 +40,7 @@ export {
   SidebarTrigger,
   useSidebar,
 } from './sidebar';
-export {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from './collapsible';
+export { Collapsible } from './collapsible';
 export { Separator } from './separator';
 export {
   Sheet,
