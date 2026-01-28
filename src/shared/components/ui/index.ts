@@ -8,12 +8,7 @@ export {
   SelectItem,
 } from './select';
 export { Tooltip } from './tooltip';
-export {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from './accordion';
+export { Accordion } from './accordion';
 export {
   Sidebar,
   SidebarContent,

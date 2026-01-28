@@ -10,7 +10,7 @@ function Accordion({
   return <AccordionPrimitive.Root data-slot='accordion' {...props} />;
 }
 
-function AccordionItem({
+Accordion.Item = function AccordionItem({
   className,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
@@ -21,9 +21,9 @@ function AccordionItem({
       {...props}
     />
   );
-}
+};
 
-function AccordionTrigger({
+Accordion.Trigger = function AccordionTrigger({
   className,
   children,
   ...props
@@ -43,9 +43,9 @@ function AccordionTrigger({
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   );
-}
+};
 
-function AccordionContent({
+Accordion.Content = function AccordionContent({
   className,
   children,
   ...props
@@ -59,6 +59,6 @@ function AccordionContent({
       <div className={cn('pt-0 pb-4', className)}>{children}</div>
     </AccordionPrimitive.Content>
   );
-}
+};
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+export { Accordion };
