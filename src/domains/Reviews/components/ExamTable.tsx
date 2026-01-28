@@ -176,18 +176,13 @@ export default function ExamTable({
   const isEmpty = !isLoading && currentPageData.length === 0;
 
   return (
-    <div
-      className={`no-scrollbar scroll-hidden ${
-        isEmpty ? 'overflow-hidden' : 'overflow-x-scroll'
-      }`}
-    >
+    <div className='overflow-hidden rounded-md border'>
       <Table
         className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
       >
         {/* Table Header */}
         <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
           <TableRow className='hover:bg-gray-100'>
-            <TableHead className='w-[70px] text-center'>id</TableHead>
             <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
               상태
             </TableHead>
@@ -201,7 +196,6 @@ export default function ExamTable({
               시험종류
             </TableHead>
             <TableHead className='w-[60px]'>분반</TableHead>
-            <TableHead className='w-[150px]'>시험 유형 및 문항수</TableHead>
             <TableHead className='w-[110px]'>업로드 시간</TableHead>
             <TableHead className='w-[80px]'>게시자</TableHead>
           </TableRow>
@@ -236,9 +230,6 @@ export default function ExamTable({
                       }
                     }}
                   >
-                    <TableCell className='w-[70px] text-center text-gray-600'>
-                      {review.id}
-                    </TableCell>
                     <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
                       <Select
                         value={selectedStatus[review.id] || review.status}
@@ -355,14 +346,6 @@ export default function ExamTable({
                         title={review.classNumber}
                       >
                         {review.classNumber}
-                      </div>
-                    </TableCell>
-                    <TableCell className='w-[150px] overflow-hidden'>
-                      <div
-                        className='w-full truncate'
-                        title={review.questionDetail}
-                      >
-                        {review.questionDetail}
                       </div>
                     </TableCell>
                     <TableCell className='w-[110px] overflow-hidden text-gray-600'>
