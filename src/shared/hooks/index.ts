@@ -1,3 +1,3 @@
 export * from './useAuth';
-export * from './useMobile';
+export * from './use-mobile';
 export * from './useDateTimeField';

@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui';
-import { useAuth } from '@/hooks';
+import { useAuth } from '@/shared/hooks';
 
 const EXTERNAL_LINKS = [
   {

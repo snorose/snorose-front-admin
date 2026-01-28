@@ -19,7 +19,7 @@ import {
   formatDateTimeForAPI,
   formatDateTimeForInput,
 } from '@/utils';
-import { useDateTimeField } from '@/hooks';
+import { useDateTimeField } from '@/shared/hooks';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;

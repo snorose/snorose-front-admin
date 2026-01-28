@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
-import { useDateTimeField } from '@/hooks';
+import { useDateTimeField } from '@/shared/hooks';
 
 interface PointFreezeScheduleFormProps {
   onSuccess: () => void;
