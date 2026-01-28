@@ -1,12 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
-import {
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui';
+import { Button, Select } from '@/shared/components/ui';
 import {
   deleteExamReview,
   updateExamReview,
@@ -544,18 +537,18 @@ export default function ExamEditPanel({
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
+                      <Select.Trigger className={SELECT_TRIGGER_STYLE}>
                         <div className='flex items-center gap-2'>
                           <ExamStatusDot status={formData.status} />
                           <span>{getStatusName(formData.status)}</span>
                         </div>
-                      </SelectTrigger>
-                      <SelectContent
+                      </Select.Trigger>
+                      <Select.Content
                         align='start'
                         className={SELECT_CONTENT_STYLE}
                       >
                         {STATUS_COLOR.map((statusOption) => (
-                          <SelectItem
+                          <Select.Item
                             key={statusOption.code}
                             value={statusOption.code}
                             className='text-[12px] font-medium'
@@ -564,9 +557,9 @@ export default function ExamEditPanel({
                               <ExamStatusDot status={statusOption.code} />
                               <span>{statusOption.name}</span>
                             </div>
-                          </SelectItem>
+                          </Select.Item>
                         ))}
-                      </SelectContent>
+                      </Select.Content>
                     </Select>
                   </td>
                 </tr>
@@ -717,23 +710,23 @@ export default function ExamEditPanel({
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{formData.semester}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
+                      <Select.Trigger className={SELECT_TRIGGER_STYLE}>
+                        <Select.Value>{formData.semester}</Select.Value>
+                      </Select.Trigger>
+                      <Select.Content
                         align='start'
                         className={SELECT_CONTENT_STYLE}
                       >
                         {SEMESTER_LIST.map((semesterOption) => (
-                          <SelectItem
+                          <Select.Item
                             key={semesterOption}
                             value={semesterOption}
                             className='text-[12px] font-medium'
                           >
                             {semesterOption}
-                          </SelectItem>
+                          </Select.Item>
                         ))}
-                      </SelectContent>
+                      </Select.Content>
                     </Select>
                   </td>
                 </tr>
@@ -747,23 +740,23 @@ export default function ExamEditPanel({
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{formData.examType}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
+                      <Select.Trigger className={SELECT_TRIGGER_STYLE}>
+                        <Select.Value>{formData.examType}</Select.Value>
+                      </Select.Trigger>
+                      <Select.Content
                         align='start'
                         className={SELECT_CONTENT_STYLE}
                       >
                         {EXAM_TYPE_LIST.map((examTypeOption) => (
-                          <SelectItem
+                          <Select.Item
                             key={examTypeOption}
                             value={examTypeOption}
                             className='text-[12px] font-medium'
                           >
                             {examTypeOption}
-                          </SelectItem>
+                          </Select.Item>
                         ))}
-                      </SelectContent>
+                      </Select.Content>
                     </Select>
                   </td>
                 </tr>
@@ -781,25 +774,25 @@ export default function ExamEditPanel({
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>
+                      <Select.Trigger className={SELECT_TRIGGER_STYLE}>
+                        <Select.Value>
                           {convertLectureTypeToString(formData.lectureType)}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
+                        </Select.Value>
+                      </Select.Trigger>
+                      <Select.Content
                         align='start'
                         className={SELECT_CONTENT_STYLE}
                       >
                         {LECTURE_TYPE_OPTIONS.map((option) => (
-                          <SelectItem
+                          <Select.Item
                             key={option.value}
                             value={option.value}
                             className='text-[12px] font-medium'
                           >
                             {option.label}
-                          </SelectItem>
+                          </Select.Item>
                         ))}
-                      </SelectContent>
+                      </Select.Content>
                     </Select>
                   </td>
                 </tr>
@@ -841,26 +834,26 @@ export default function ExamEditPanel({
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{formData.isPF}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
+                      <Select.Trigger className={SELECT_TRIGGER_STYLE}>
+                        <Select.Value>{formData.isPF}</Select.Value>
+                      </Select.Trigger>
+                      <Select.Content
                         align='start'
                         className={SELECT_CONTENT_STYLE}
                       >
-                        <SelectItem
+                        <Select.Item
                           value='O'
                           className='text-[12px] font-medium'
                         >
                           O
-                        </SelectItem>
-                        <SelectItem
+                        </Select.Item>
+                        <Select.Item
                           value='X'
                           className='text-[12px] font-medium'
                         >
                           X
-                        </SelectItem>
-                      </SelectContent>
+                        </Select.Item>
+                      </Select.Content>
                     </Select>
                   </td>
                 </tr>
@@ -874,26 +867,26 @@ export default function ExamEditPanel({
                       }
                       disabled={!selectedExamReview || isLoadingDetail}
                     >
-                      <SelectTrigger className={SELECT_TRIGGER_STYLE}>
-                        <SelectValue>{formData.isOnline}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent
+                      <Select.Trigger className={SELECT_TRIGGER_STYLE}>
+                        <Select.Value>{formData.isOnline}</Select.Value>
+                      </Select.Trigger>
+                      <Select.Content
                         align='start'
                         className={SELECT_CONTENT_STYLE}
                       >
-                        <SelectItem
+                        <Select.Item
                           value='O'
                           className='text-[12px] font-medium'
                         >
                           O
-                        </SelectItem>
-                        <SelectItem
+                        </Select.Item>
+                        <Select.Item
                           value='X'
                           className='text-[12px] font-medium'
                         >
                           X
-                        </SelectItem>
-                      </SelectContent>
+                        </Select.Item>
+                      </Select.Content>
                     </Select>
                   </td>
                 </tr>

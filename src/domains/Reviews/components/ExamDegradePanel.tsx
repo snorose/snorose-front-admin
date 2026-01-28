@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/components/ui';
+import { Button, Select } from '@/shared/components/ui';
 import { DEGRADE_REASON_LIST } from '@/shared/constants';
 
 const SELECT_CONTENT_STYLE =
@@ -29,16 +22,16 @@ export default function ExamDegradePanel() {
         <div>
           <p className='w-full py-1 text-xs font-semibold'>강등 사유</p>
           <Select value={selectedReason} onValueChange={setSelectedReason}>
-            <SelectTrigger className='w-full'>
-              <SelectValue placeholder='강등 사유를 선택해주세요.' />
-            </SelectTrigger>
-            <SelectContent className={SELECT_CONTENT_STYLE}>
+            <Select.Trigger className='w-full'>
+              <Select.Value placeholder='강등 사유를 선택해주세요.' />
+            </Select.Trigger>
+            <Select.Content className={SELECT_CONTENT_STYLE}>
               {DEGRADE_REASON_LIST.map((reason) => (
-                <SelectItem key={reason.code} value={reason.code}>
+                <Select.Item key={reason.code} value={reason.code}>
                   {reason.label}
-                </SelectItem>
+                </Select.Item>
               ))}
-            </SelectContent>
+            </Select.Content>
           </Select>
           {isEtcSelected && (
             <>

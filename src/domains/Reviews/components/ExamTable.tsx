@@ -6,10 +6,6 @@ import {
   TableHeader,
   TableRow,
   Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
 } from '@/shared/components/ui';
 import { STATUS_COLOR } from '@/shared/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
@@ -280,21 +276,21 @@ export default function ExamTable({
                             }
                           }}
                         >
-                          <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
-                            <SelectValue className='!flex !items-center !justify-center'>
+                          <Select.Trigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
+                            <Select.Value className='!flex !items-center !justify-center'>
                               <ExamStatusDot
                                 status={
                                   selectedStatus[review.id] || review.status
                                 }
                               />
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent
+                            </Select.Value>
+                          </Select.Trigger>
+                          <Select.Content
                             align='start'
                             className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
                           >
                             {STATUS_COLOR.map((statusOption) => (
-                              <SelectItem
+                              <Select.Item
                                 key={statusOption.id}
                                 value={statusOption.code}
                                 className='text-[12px] font-medium'
@@ -305,9 +301,9 @@ export default function ExamTable({
                                   />
                                   <span>{statusOption.name}</span>
                                 </div>
-                              </SelectItem>
+                              </Select.Item>
                             ))}
-                          </SelectContent>
+                          </Select.Content>
                         </Select>
                       </TableCell>
                       <TableCell className='w-[200px] overflow-hidden'>
