@@ -7,12 +7,7 @@ export {
   SelectContent,
   SelectItem,
 } from './select';
-export {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from './tooltip';
+export { Tooltip } from './tooltip';
 export {
   Accordion,
   AccordionContent,
