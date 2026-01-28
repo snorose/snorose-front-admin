@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-} from '@/shared/components/ui';
+import { Dialog, Button } from '@/shared/components/ui';
 import type { PushNotification } from '@/shared/types';
 import { useMemo } from 'react';
 
@@ -45,13 +37,13 @@ export default function PushNotificationConfirmModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>푸시 알림 전송 확인</DialogTitle>
-          <DialogDescription>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>푸시 알림 전송 확인</Dialog.Title>
+          <Dialog.Description>
             아래 내용으로 푸시 알림을 전송하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
+          </Dialog.Description>
+        </Dialog.Header>
         <div className='flex flex-col gap-3 py-4'>
           {CONFIRMATION_DATA.map((data) => (
             <div className='flex items-start gap-2' key={data.label}>
@@ -63,15 +55,15 @@ export default function PushNotificationConfirmModal({
           ))}
         </div>
 
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={onClose}>
             취소
           </Button>
           <Button type='button' onClick={onConfirm}>
             확인
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

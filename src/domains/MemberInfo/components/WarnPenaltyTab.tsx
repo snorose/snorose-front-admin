@@ -4,10 +4,6 @@ import {
   Input,
   Button,
   Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
   ConfirmModal,
 } from '@/shared/components/ui';
 import { toast } from 'sonner';
@@ -155,16 +151,16 @@ export default function WarnPenaltyTab({
               value={warnReasonType}
               onValueChange={(v) => handleChangeWarnReason(v)}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='경고 사유 선택' />
-              </SelectTrigger>
-              <SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='경고 사유 선택' />
+              </Select.Trigger>
+              <Select.Content>
                 {WARNING_REASON_OPTIONS.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                  </SelectItem>
+                  </Select.Item>
                 ))}
-              </SelectContent>
+              </Select.Content>
             </Select>
           </div>
 
@@ -218,16 +214,16 @@ export default function WarnPenaltyTab({
               value={warnCancelType}
               onValueChange={(v) => handleChangeCancelReason(v)}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='차감 사유 선택' />
-              </SelectTrigger>
-              <SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='차감 사유 선택' />
+              </Select.Trigger>
+              <Select.Content>
                 {REVOKE_WARNING_OPTIONS.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                  </SelectItem>
+                  </Select.Item>
                 ))}
-              </SelectContent>
+              </Select.Content>
             </Select>
           </div>
 

@@ -4,7 +4,6 @@ import {
   Input,
   Label,
   RadioGroup,
-  RadioGroupItem,
   Textarea,
 } from '@/shared/components/ui';
 import { PageHeader } from '@/shared/components';
@@ -221,7 +220,7 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='true' id='marketing-true' />
+                    <RadioGroup.Item value='true' id='marketing-true' />
                     <Label
                       htmlFor='marketing-true'
                       className='cursor-pointer font-normal'
@@ -230,7 +229,7 @@ export default function PushNotificationPage() {
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='false' id='marketing-false' />
+                    <RadioGroup.Item value='false' id='marketing-false' />
                     <Label
                       htmlFor='marketing-false'
                       className='cursor-pointer font-normal'
@@ -254,7 +253,7 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='true' id='test-true' />
+                    <RadioGroup.Item value='true' id='test-true' />
                     <Label
                       htmlFor='test-true'
                       className='cursor-pointer font-normal'
@@ -263,7 +262,7 @@ export default function PushNotificationPage() {
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='false' id='test-false' />
+                    <RadioGroup.Item value='false' id='test-false' />
                     <Label
                       htmlFor='test-false'
                       className='cursor-pointer font-normal'

@@ -1,11 +1,4 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shared/components/ui';
+import { Table } from '@/shared/components/ui';
 import { useState } from 'react';
 
 import { DOWNLOADEDEXAMREVIEW_SAMPLE_DATA } from '@/__mocks__';
@@ -53,48 +46,51 @@ export default function DownloadedExamReviewTab({
     <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
       <Table className='w-full border-separate border-spacing-0 rounded-md border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
         {/* Table Header */}
-        <TableHeader className='z-10 bg-gray-100 shadow-sm'>
-          <TableRow>
-            <TableHead className='text-center'>번호</TableHead>
-            <TableHead className='text-center'>id</TableHead>
-            <TableHead className='text-center'>시험후기명</TableHead>
-          </TableRow>
-        </TableHeader>
+        <Table.Header className='z-10 bg-gray-100 shadow-sm'>
+          <Table.Row>
+            <Table.Head className='text-center'>번호</Table.Head>
+            <Table.Head className='text-center'>id</Table.Head>
+            <Table.Head className='text-center'>시험후기명</Table.Head>
+          </Table.Row>
+        </Table.Header>
 
         {/* Table Body */}
-        <TableBody className='bg-white'>
+        <Table.Body className='bg-white'>
           {pageData.length > 0 ? (
             pageData.map((history, index) => (
-              <TableRow
+              <Table.Row
                 key={history.postId}
                 className='border-b-1 hover:bg-gray-100'
               >
-                <TableCell className='text-center'>
+                <Table.Cell className='text-center'>
                   {(currentPage - 1) * PAGE_SIZE + index + 1}
-                </TableCell>
-                <TableCell
+                </Table.Cell>
+                <Table.Cell
                   onClick={() => handleCopy(history.postId)}
                   className={`cursor-pointer text-center text-blue-600 underline hover:text-blue-800 ${copiedId === history.postId ? 'ml-2 text-purple-600' : ''} `}
                 >
                   {history.postId}
-                </TableCell>
+                </Table.Cell>
 
-                <TableCell
+                <Table.Cell
                   className='cursor-pointer text-center'
                   onClick={() => handleClickReview(history.postId)}
                 >
                   {history.title}
-                </TableCell>
-              </TableRow>
+                </Table.Cell>
+              </Table.Row>
             ))
           ) : (
-            <TableRow>
-              <TableCell colSpan={3} className='py-6 text-center text-gray-500'>
+            <Table.Row>
+              <Table.Cell
+                colSpan={3}
+                className='py-6 text-center text-gray-500'
+              >
                 다운로드한 시험후기 내역이 없습니다.
-              </TableCell>
-            </TableRow>
+              </Table.Cell>
+            </Table.Row>
           )}
-        </TableBody>
+        </Table.Body>
       </Table>
       {downloadedData.length > 0 && (
         <MemberInfoPagination

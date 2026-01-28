@@ -4,8 +4,6 @@ import {
   Button,
   Calendar,
   Popover,
-  PopoverContent,
-  PopoverTrigger,
 } from '@/shared/components/ui';
 import { format } from 'date-fns';
 import { ChevronDownIcon } from 'lucide-react';
@@ -46,7 +44,7 @@ export function DateTimePicker({
       <Label required={required}>{label}</Label>
       <div className='flex gap-2'>
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
+          <Popover.Trigger asChild>
             <Button
               variant='outline'
               className='border-input flex-1 justify-between text-left font-normal'
@@ -58,8 +56,8 @@ export function DateTimePicker({
               )}
               <ChevronDownIcon />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className='w-auto p-0' align='start'>
+          </Popover.Trigger>
+          <Popover.Content className='w-auto p-0' align='start'>
             <Calendar
               mode='single'
               selected={date}
@@ -67,7 +65,7 @@ export function DateTimePicker({
               defaultMonth={date || new Date()}
               initialFocus
             />
-          </PopoverContent>
+          </Popover.Content>
         </Popover>
         <Input
           type='time'

@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-} from '@/shared/components/ui';
+import { Dialog, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import type { MemberInfo } from '@/shared/types';
@@ -51,13 +43,13 @@ export default function PointAdjustmentConfirmModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>포인트 지급/차감 확인</DialogTitle>
-          <DialogDescription>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>포인트 지급/차감 확인</Dialog.Title>
+          <Dialog.Description>
             아래 내용으로 포인트를 적용하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
+          </Dialog.Description>
+        </Dialog.Header>
         <div className='flex flex-col gap-3 py-4'>
           {CONFIRMATION_DATA.map((data) => (
             <div className='flex items-center gap-2' key={data.label}>
@@ -84,15 +76,15 @@ export default function PointAdjustmentConfirmModal({
             </div>
           )}
         </div>
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={onClose}>
             취소
           </Button>
           <Button type='button' onClick={onConfirm}>
             확인
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

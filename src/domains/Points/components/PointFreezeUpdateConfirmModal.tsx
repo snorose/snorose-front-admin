@@ -1,14 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-  Label,
-  Input,
-} from '@/shared/components/ui';
+import { Dialog, Button, Label, Input } from '@/shared/components/ui';
 import { DateTimePicker } from '@/shared/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
@@ -91,13 +81,13 @@ export default function PointFreezeUpdateConfirmModal({
 
   return (
     <Dialog open={isUpdateModalOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-xs sm:max-w-sm'>
-        <DialogHeader>
-          <DialogTitle>일정 수정</DialogTitle>
-          <DialogDescription>
+      <Dialog.Content className='max-w-xs sm:max-w-sm'>
+        <Dialog.Header>
+          <Dialog.Title>일정 수정</Dialog.Title>
+          <Dialog.Description>
             포인트 미지급 일정을 수정하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
+          </Dialog.Description>
+        </Dialog.Header>
         <div className='flex flex-col gap-1'>
           <Label className='text-sm font-semibold'>일정 제목: </Label>
           <Input
@@ -123,15 +113,15 @@ export default function PointFreezeUpdateConfirmModal({
           onTimeChange={endDateTime.onTimeChange}
           datePlaceholder='종료 날짜 선택'
         />
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={handleUpdateCancel}>
             취소
           </Button>
           <Button type='button' onClick={handleUpdateConfirm}>
             수정
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

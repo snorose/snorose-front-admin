@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { Megaphone } from 'lucide-react';
-import {
-  Button,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-} from '@/shared/components/ui';
+import { Button, Alert } from '@/shared/components/ui';
 import { PageHeader } from '@/shared/components';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { postAllMemberPointAPI } from '@/apis/points';
@@ -75,13 +70,13 @@ export default function AdjustAllMemberPointPage() {
 
       <Alert>
         <Megaphone />
-        <AlertTitle>안내 사항</AlertTitle>
-        <AlertDescription>
+        <Alert.Title>안내 사항</Alert.Title>
+        <Alert.Description>
           <ul className='list-inside list-disc text-sm'>
             <li>포인트 카테고리, 메모, 지급/차감량을 설정할 수 있어요.</li>
             <li>포인트 지급/차감은 즉시 적용되므로 신중히 진행해 주세요.</li>
           </ul>
-        </AlertDescription>
+        </Alert.Description>
       </Alert>
 
       <PointDetailSection

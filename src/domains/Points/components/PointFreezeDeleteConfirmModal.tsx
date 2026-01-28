@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-} from '@/shared/components/ui';
+import { Dialog, Button } from '@/shared/components/ui';
 import type { PointFreeze } from '@/shared/types';
 import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
@@ -43,13 +35,13 @@ export default function PointFreezeDeleteConfirmModal({
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={handleDeleteCancel}>
-      <DialogContent className='max-w-xs sm:max-w-sm'>
-        <DialogHeader>
-          <DialogTitle>일정 삭제</DialogTitle>
-          <DialogDescription>
+      <Dialog.Content className='max-w-xs sm:max-w-sm'>
+        <Dialog.Header>
+          <Dialog.Title>일정 삭제</Dialog.Title>
+          <Dialog.Description>
             포인트 미지급 일정을 삭제하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
+          </Dialog.Description>
+        </Dialog.Header>
         <div className='flex flex-col gap-3'>
           <ul className='ml-4 flex list-outside list-disc flex-col gap-1'>
             <li>
@@ -66,15 +58,15 @@ export default function PointFreezeDeleteConfirmModal({
             </li>
           </ul>
         </div>
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={handleDeleteCancel}>
             취소
           </Button>
           <Button type='button' onClick={handleDeleteConfirm}>
             삭제
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

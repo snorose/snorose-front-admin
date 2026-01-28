@@ -4,10 +4,6 @@ import {
   Input,
   Button,
   Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
   ConfirmModal,
 } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
@@ -168,13 +164,13 @@ export default function DemotionPenaltyTab({
               value={demoteType}
               onValueChange={(v: DemoteType) => setDemoteType(v)}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='강등 유형 선택' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='RELEGATION'>일반 강등</SelectItem>
-                <SelectItem value='BLACKLIST'>영구 강등</SelectItem>
-              </SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='강등 유형 선택' />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value='RELEGATION'>일반 강등</Select.Item>
+                <Select.Item value='BLACKLIST'>영구 강등</Select.Item>
+              </Select.Content>
             </Select>
           </div>
 
@@ -186,19 +182,19 @@ export default function DemotionPenaltyTab({
               onValueChange={(v) => handleChangeDemoteReason(v)}
               disabled={!demoteType}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='강등 사유 선택' />
-              </SelectTrigger>
-              <SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='강등 사유 선택' />
+              </Select.Trigger>
+              <Select.Content>
                 {(demoteType === 'RELEGATION'
                   ? RELEGATION_DEMOTE_OPTIONS
                   : BLACKLIST_DEMOTE_OPTIONS
                 ).map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                  </SelectItem>
+                  </Select.Item>
                 ))}
-              </SelectContent>
+              </Select.Content>
             </Select>
           </div>
 
@@ -270,16 +266,16 @@ export default function DemotionPenaltyTab({
               value={cancelReasonType}
               onValueChange={setCancelReasonType}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='해제 사유 선택' />
-              </SelectTrigger>
-              <SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='해제 사유 선택' />
+              </Select.Trigger>
+              <Select.Content>
                 {REVOKE_DEMOTE_OPTIONS.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                  </SelectItem>
+                  </Select.Item>
                 ))}
-              </SelectContent>
+              </Select.Content>
             </Select>
           </div>
 

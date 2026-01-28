@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Button,
-} from '@/shared/components/ui';
+import { Select, Button } from '@/shared/components/ui';
 import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/shared/constants';
 import {
   convertSemesterToEnum,
@@ -221,12 +214,12 @@ export default function ExamSearch({
             handleSearchWithParams(value, undefined);
           }}
         >
-          <SelectTrigger
+          <Select.Trigger
             className={`relative !h-7 w-[130px] text-xs focus-visible:border focus-visible:ring-0 ${
               semester ? '!bg-blue-100 [&>svg]:hidden' : ''
             }`}
           >
-            <SelectValue placeholder='학기 선택' />
+            <Select.Value placeholder='학기 선택' />
             {semester && (
               <button
                 onClick={handleSemesterReset}
@@ -240,21 +233,21 @@ export default function ExamSearch({
                 <X className='pointer-events-none h-3 w-3 text-gray-600' />
               </button>
             )}
-          </SelectTrigger>
-          <SelectContent
+          </Select.Trigger>
+          <Select.Content
             align='start'
             className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
           >
             {SEMESTER_LIST.map((sem) => (
-              <SelectItem
+              <Select.Item
                 key={sem}
                 value={sem}
                 className='text-[12px] font-medium'
               >
                 {sem}
-              </SelectItem>
+              </Select.Item>
             ))}
-          </SelectContent>
+          </Select.Content>
         </Select>
 
         <Select
@@ -265,12 +258,12 @@ export default function ExamSearch({
             handleSearchWithParams(undefined, value);
           }}
         >
-          <SelectTrigger
+          <Select.Trigger
             className={`relative !h-7 w-[100px] text-xs focus-visible:border focus-visible:ring-0 ${
               examType ? '!bg-blue-100 [&>svg]:hidden' : ''
             }`}
           >
-            <SelectValue placeholder='시험 종류' />
+            <Select.Value placeholder='시험 종류' />
             {examType && (
               <button
                 onClick={handleExamTypeReset}
@@ -284,21 +277,21 @@ export default function ExamSearch({
                 <X className='pointer-events-none h-3 w-3 text-gray-600' />
               </button>
             )}
-          </SelectTrigger>
-          <SelectContent
+          </Select.Trigger>
+          <Select.Content
             align='start'
             className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
           >
             {EXAM_TYPE_LIST.map((type) => (
-              <SelectItem
+              <Select.Item
                 key={type}
                 value={type}
                 className='text-[12px] font-medium'
               >
                 {type === '중간' ? '중간고사' : '기말고사'}
-              </SelectItem>
+              </Select.Item>
             ))}
-          </SelectContent>
+          </Select.Content>
         </Select>
       </div>
     </div>

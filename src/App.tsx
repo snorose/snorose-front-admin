@@ -14,7 +14,7 @@ import {
   PushNotificationPage,
 } from './pages';
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
-import { SidebarProvider, Toaster } from '@/shared/components/ui';
+import { Sidebar, Toaster } from '@/shared/components/ui';
 import { AuthProvider } from '@/shared/contexts';
 
 // QueryClient 인스턴스 생성
@@ -41,7 +41,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <div className='flex min-h-screen'>
-                    <SidebarProvider>
+                    <Sidebar.Provider>
                       <AppSidebar />
                       <main className='flex flex-1 flex-col overflow-hidden px-6 py-5'>
                         <section className='flex w-full flex-1 overflow-auto'>
@@ -82,7 +82,7 @@ function App() {
                           </Routes>
                         </section>
                       </main>
-                    </SidebarProvider>
+                    </Sidebar.Provider>
                   </div>
                 </ProtectedRoute>
               }
