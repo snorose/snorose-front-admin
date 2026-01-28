@@ -10,7 +10,7 @@ import {
 import { PageHeader } from '@/components';
 import { PushNotificationConfirmModal } from '@/domains/Alerts';
 import { postPushNotificationAPI } from '@/apis';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 import { toast } from 'sonner';
 import type { PushNotification } from '@/types';
 

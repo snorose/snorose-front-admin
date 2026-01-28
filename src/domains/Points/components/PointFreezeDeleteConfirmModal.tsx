@@ -10,7 +10,7 @@ import {
 import type { PointFreeze } from '@/types';
 import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;

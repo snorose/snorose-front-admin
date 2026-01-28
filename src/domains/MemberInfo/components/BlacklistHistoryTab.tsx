@@ -9,7 +9,7 @@ import {
 import { useState, useEffect } from 'react';
 import MemberInfoPagination from './MemberInfoTablePagenation';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 import { blacklistHistoryAPI } from '@/apis';
 import { BLACKLIST_SAMPLE_DATA } from '@/__mocks__';

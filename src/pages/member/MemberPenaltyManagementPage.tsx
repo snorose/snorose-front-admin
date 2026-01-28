@@ -3,7 +3,7 @@ import { Button, Input } from '@/components/ui';
 import { PageHeader } from '@/components';
 import { toast } from 'sonner';
 import type { PenaltyUserInfo } from '@/types';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 import { searchUsersAPI } from '@/apis';
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';

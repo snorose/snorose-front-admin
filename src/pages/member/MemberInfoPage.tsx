@@ -16,7 +16,7 @@ import { formatDateTime } from '@/domains/MemberInfo/utils/formatDateTime';
 
 import { PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 export default function MemberInfoPage() {
   const [searchQuery, setSearchQuery] = useState('');

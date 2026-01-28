@@ -6,7 +6,7 @@ import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import { toast } from 'sonner';
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 import { useAuth } from '@/shared/hooks';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 import {
   PointAdjustmentConfirmModal,
   MemberInfoSection,

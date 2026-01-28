@@ -3,7 +3,7 @@ import { DateTimePicker } from '@/components';
 import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
+import { getErrorMessage, formatDateTimeForAPI } from '@/shared/utils';
 import { useDateTimeField } from '@/shared/hooks';
 
 interface PointFreezeScheduleFormProps {

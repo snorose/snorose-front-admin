@@ -18,7 +18,7 @@ import {
   getErrorMessage,
   formatDateTimeForAPI,
   formatDateTimeForInput,
-} from '@/utils';
+} from '@/shared/utils';
 import { useDateTimeField } from '@/shared/hooks';
 
 interface PointFreezeUpdateConfirmModalProps {

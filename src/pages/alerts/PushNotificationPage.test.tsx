@@ -18,7 +18,7 @@ vi.mock('sonner', () => ({
   },
 }));
 
-vi.mock('@/utils', () => ({
+vi.mock('@/shared/utils', () => ({
   getErrorMessage: vi.fn((_error, defaultMessage) => defaultMessage),
 }));
 

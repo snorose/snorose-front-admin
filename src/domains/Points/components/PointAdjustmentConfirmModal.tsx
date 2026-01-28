@@ -7,7 +7,7 @@ import {
   DialogFooter,
   Button,
 } from '@/components/ui';
-import { cn } from '@/utils';
+import { cn } from '@/shared/utils';
 import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import type { MemberInfo } from '@/types';
 

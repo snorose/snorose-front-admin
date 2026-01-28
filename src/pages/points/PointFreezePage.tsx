@@ -7,7 +7,7 @@ import {
   PointFreezeListSection,
   PointFreezeScheduleForm,
 } from '@/domains/Points';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 export default function PointFreezePage() {
   const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);

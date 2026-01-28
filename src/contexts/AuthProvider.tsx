@@ -20,7 +20,7 @@ import {
   TokenRefreshManager,
   executeTokenRefresh,
   userStorage,
-} from '@/utils';
+} from '@/shared/utils';
 import {
   ACCESS_TOKEN_EXPIRE_MINUTES,
   REFRESH_TOKEN_EXPIRE_DAYS,

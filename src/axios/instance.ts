@@ -3,7 +3,7 @@ import axios, {
   type AxiosError,
   type InternalAxiosRequestConfig,
 } from 'axios';
-import { tokenStorage, executeTokenRefresh } from '@/utils';
+import { tokenStorage, executeTokenRefresh } from '@/shared/utils';
 import { REISSUE_TOKEN_ENDPOINT } from '@/constants';
 
 class AxiosInstanceManager {
