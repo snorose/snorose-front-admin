@@ -3,32 +3,7 @@ export { Input } from './input';
 export { Select } from './select';
 export { Tooltip } from './tooltip';
 export { Accordion } from './accordion';
-export {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInput,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSkeleton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarTrigger,
-  useSidebar,
-} from './sidebar';
+export { Sidebar } from './sidebar';
 export { Collapsible } from './collapsible';
 export { Separator } from './separator';
 export { Sheet } from './sheet';

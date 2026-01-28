@@ -6,13 +6,7 @@ import {
   Instagram,
   NotebookPen,
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/shared/components/ui';
+import { DropdownMenu, Sidebar } from '@/shared/components/ui';
 import { useAuth } from '@/shared/hooks';
 
 const EXTERNAL_LINKS = [
@@ -36,15 +30,15 @@ const EXTERNAL_LINKS = [
 const ICON_SIZE = 16;
 
 export function NavUser() {
-  const { isMobile } = useSidebar();
+  const { isMobile } = Sidebar.useSidebar();
   const { user, logout } = useAuth();
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
+    <Sidebar.Menu>
+      <Sidebar.MenuItem>
         <DropdownMenu>
           <DropdownMenu.Trigger asChild>
-            <SidebarMenuButton
+            <Sidebar.MenuButton
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
             >
@@ -53,7 +47,7 @@ export function NavUser() {
                 <span>{user?.nickname || '리자'}</span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
-            </SidebarMenuButton>
+            </Sidebar.MenuButton>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content
             className='w-[var(--radix-dropdown-menu-trigger-width)] min-w-42 rounded-lg'
@@ -78,7 +72,7 @@ export function NavUser() {
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+      </Sidebar.MenuItem>
+    </Sidebar.Menu>
   );
 }
