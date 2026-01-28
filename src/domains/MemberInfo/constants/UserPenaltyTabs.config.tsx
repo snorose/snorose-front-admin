@@ -1,5 +1,5 @@
 import { WarnPenaltyTab, DemotionPenaltyTab } from '@/domains/MemberInfo';
-import type { PenaltyUserInfo } from '@/types';
+import type { PenaltyUserInfo } from '@/shared/types';
 
 export const getPenaltyTabs = ({ member }: { member: PenaltyUserInfo }) => [
   {

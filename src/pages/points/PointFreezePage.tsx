@@ -2,7 +2,7 @@ import { PageHeader } from '@/components';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getPointFreezesAPI } from '@/apis';
 import { toast } from 'sonner';
-import type { PointFreeze } from '@/types';
+import type { PointFreeze } from '@/shared/types';
 import {
   PointFreezeListSection,
   PointFreezeScheduleForm,

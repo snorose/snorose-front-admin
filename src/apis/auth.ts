@@ -4,7 +4,7 @@ import type {
   LoginResponse,
   ReissueTokenRequest,
   ReissueTokenResponse,
-} from '@/types';
+} from '@/shared/types';
 import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
 
 export const loginAPI = async (

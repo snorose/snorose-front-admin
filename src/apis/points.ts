@@ -4,7 +4,7 @@ import type {
   CreatePointFreeze,
   UpdatePointFreeze,
   AdjustAllMemberPoint,
-} from '@/types';
+} from '@/shared/types';
 
 export const postSinglePointAPI = async (data: AdjustSinglePoint) => {
   const response = await axiosInstance.post('/v1/points', data);

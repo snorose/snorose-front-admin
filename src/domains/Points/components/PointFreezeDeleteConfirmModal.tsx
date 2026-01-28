@@ -7,7 +7,7 @@ import {
   DialogFooter,
   Button,
 } from '@/components/ui';
-import type { PointFreeze } from '@/types';
+import type { PointFreeze } from '@/shared/types';
 import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/shared/utils';

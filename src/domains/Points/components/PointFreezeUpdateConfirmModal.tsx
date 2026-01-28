@@ -12,7 +12,7 @@ import {
 import { DateTimePicker } from '@/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import type { PointFreeze } from '@/types';
+import type { PointFreeze } from '@/shared/types';
 import { useState, useEffect } from 'react';
 import {
   getErrorMessage,

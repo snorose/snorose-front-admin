@@ -10,7 +10,7 @@ import {
   SelectItem,
 } from '@/components/ui';
 import { ConfirmModal } from '@/components/ui';
-import type { PenaltyUserInfo } from '@/types';
+import type { PenaltyUserInfo } from '@/shared/types';
 import { toast } from 'sonner';
 import {
   RELEGATION_DEMOTE_OPTIONS,

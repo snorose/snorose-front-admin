@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Label, Input, Button } from '@/components/ui';
-import type { MemberInfo } from '@/types';
+import type { MemberInfo } from '@/shared/types';
 import {
   MEMBER_INFO,
   USER_ROLES,

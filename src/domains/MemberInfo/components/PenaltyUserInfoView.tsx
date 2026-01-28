@@ -2,7 +2,7 @@ import { Label, Input } from '@/components/ui';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 import { PENALTY_USER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
 
-import type { PenaltyUserInfo } from '@/types';
+import type { PenaltyUserInfo } from '@/shared/types';
 
 export default function PenaltyUserInfo({
   member,

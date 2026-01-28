@@ -9,7 +9,7 @@ import {
 } from '@/components/ui';
 import { cn } from '@/shared/utils';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
-import type { MemberInfo } from '@/types';
+import type { MemberInfo } from '@/shared/types';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 

@@ -12,7 +12,7 @@ import { PushNotificationConfirmModal } from '@/domains/Alerts';
 import { postPushNotificationAPI } from '@/apis';
 import { getErrorMessage } from '@/shared/utils';
 import { toast } from 'sonner';
-import type { PushNotification } from '@/types';
+import type { PushNotification } from '@/shared/types';
 
 const INITIAL_FORM_DATA: PushNotification = {
   name: '',

@@ -2,7 +2,7 @@ import { useCallback, useState, useMemo } from 'react';
 import { Button, Input } from '@/components/ui';
 import { PageHeader } from '@/components';
 
-import type { MemberInfo, EditMemberInfo } from '@/types';
+import type { MemberInfo, EditMemberInfo } from '@/shared/types';
 import {
   TabList,
   getMemberInfoTabs,

@@ -1,4 +1,4 @@
-import type { MemberInfo, PenaltyUserInfo } from '@/types';
+import type { MemberInfo, PenaltyUserInfo } from '@/shared/types';
 
 export const USER_ROLES = [
   { id: 1, name: '준회원' },

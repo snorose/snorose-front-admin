@@ -7,7 +7,7 @@ import {
   DialogFooter,
   Button,
 } from '@/components/ui';
-import type { PushNotification } from '@/types';
+import type { PushNotification } from '@/shared/types';
 import { useMemo } from 'react';
 
 interface PushNotificationConfirmModalProps {

@@ -3,7 +3,7 @@ import type {
   DownloadedExamReview,
   UserPointHistory,
   UserBlacklistHistory,
-} from '@/types';
+} from '@/shared/types';
 
 export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
   {

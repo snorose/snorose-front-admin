@@ -1,5 +1,5 @@
 import { isAxiosError } from 'axios';
-import type { ApiErrorResponse } from '@/types';
+import type { ApiErrorResponse } from '@/shared/types';
 
 /**
  * API 에러에서 메시지를 추출하는 유틸리티 함수

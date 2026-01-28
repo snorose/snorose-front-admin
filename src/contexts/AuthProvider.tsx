@@ -14,7 +14,7 @@ import type {
   LoginRequest,
   AuthContextType,
   ApiErrorResponse,
-} from '@/types';
+} from '@/shared/types';
 import {
   tokenStorage,
   TokenRefreshManager,

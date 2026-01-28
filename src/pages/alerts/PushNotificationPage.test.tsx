@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import PushNotificationPage from './PushNotificationPage';
 import { postPushNotificationAPI } from '@/apis';
 import { toast } from 'sonner';
-import type { PushNotification } from '@/types';
+import type { PushNotification } from '@/shared/types';
 
 vi.mock('@/apis', () => ({
   postPushNotificationAPI: vi.fn(),
