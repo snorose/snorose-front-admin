@@ -8,11 +8,6 @@ import {
 } from 'lucide-react';
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuGroup,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -48,7 +43,7 @@ export function NavUser() {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenu.Trigger asChild>
             <SidebarMenuButton
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
@@ -59,29 +54,29 @@ export function NavUser() {
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content
             className='w-[var(--radix-dropdown-menu-trigger-width)] min-w-42 rounded-lg'
             side={isMobile ? 'bottom' : 'right'}
             align='end'
             sideOffset={4}
           >
-            <DropdownMenuGroup>
+            <DropdownMenu.Group>
               {EXTERNAL_LINKS.map(({ icon: Icon, label, url }) => (
-                <DropdownMenuItem key={label} asChild>
+                <DropdownMenu.Item key={label} asChild>
                   <a href={url} target='_blank' rel='noopener noreferrer'>
                     <Icon />
                     {label}
                   </a>
-                </DropdownMenuItem>
+                </DropdownMenu.Item>
               ))}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
+            </DropdownMenu.Group>
+            <DropdownMenu.Separator />
+            <DropdownMenu.Item onClick={logout}>
               <LogOut />
               로그아웃
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

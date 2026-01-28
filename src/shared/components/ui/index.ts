@@ -47,15 +47,7 @@ export { Switch } from './switch';
 export { Label } from './label';
 export { Alert } from './alert';
 export { Toaster } from 'sonner';
-export {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-} from './dropdown-menu';
+export { DropdownMenu } from './dropdown-menu';
 export { Dialog } from './dialog';
 export { Table } from './table';
 export { RadioGroup } from './radio-group';

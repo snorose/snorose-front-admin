@@ -10,15 +10,15 @@ function DropdownMenu({
   return <DropdownMenuPrimitive.Root data-slot='dropdown-menu' {...props} />;
 }
 
-function DropdownMenuPortal({
+DropdownMenu.Portal = function DropdownMenuPortal({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
   return (
     <DropdownMenuPrimitive.Portal data-slot='dropdown-menu-portal' {...props} />
   );
-}
+};
 
-function DropdownMenuTrigger({
+DropdownMenu.Trigger = function DropdownMenuTrigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
   return (
@@ -27,9 +27,9 @@ function DropdownMenuTrigger({
       {...props}
     />
   );
-}
+};
 
-function DropdownMenuContent({
+DropdownMenu.Content = function DropdownMenuContent({
   className,
   sideOffset = 4,
   ...props
@@ -47,17 +47,17 @@ function DropdownMenuContent({
       />
     </DropdownMenuPrimitive.Portal>
   );
-}
+};
 
-function DropdownMenuGroup({
+DropdownMenu.Group = function DropdownMenuGroup({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
   return (
     <DropdownMenuPrimitive.Group data-slot='dropdown-menu-group' {...props} />
   );
-}
+};
 
-function DropdownMenuItem({
+DropdownMenu.Item = function DropdownMenuItem({
   className,
   inset,
   variant = 'default',
@@ -78,9 +78,9 @@ function DropdownMenuItem({
       {...props}
     />
   );
-}
+};
 
-function DropdownMenuCheckboxItem({
+DropdownMenu.CheckboxItem = function DropdownMenuCheckboxItem({
   className,
   children,
   checked,
@@ -104,9 +104,9 @@ function DropdownMenuCheckboxItem({
       {children}
     </DropdownMenuPrimitive.CheckboxItem>
   );
-}
+};
 
-function DropdownMenuRadioGroup({
+DropdownMenu.RadioGroup = function DropdownMenuRadioGroup({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
   return (
@@ -115,9 +115,9 @@ function DropdownMenuRadioGroup({
       {...props}
     />
   );
-}
+};
 
-function DropdownMenuRadioItem({
+DropdownMenu.RadioItem = function DropdownMenuRadioItem({
   className,
   children,
   ...props
@@ -139,9 +139,9 @@ function DropdownMenuRadioItem({
       {children}
     </DropdownMenuPrimitive.RadioItem>
   );
-}
+};
 
-function DropdownMenuLabel({
+DropdownMenu.Label = function DropdownMenuLabel({
   className,
   inset,
   ...props
@@ -159,9 +159,9 @@ function DropdownMenuLabel({
       {...props}
     />
   );
-}
+};
 
-function DropdownMenuSeparator({
+DropdownMenu.Separator = function DropdownMenuSeparator({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
@@ -172,9 +172,9 @@ function DropdownMenuSeparator({
       {...props}
     />
   );
-}
+};
 
-function DropdownMenuShortcut({
+DropdownMenu.Shortcut = function DropdownMenuShortcut({
   className,
   ...props
 }: React.ComponentProps<'span'>) {
@@ -188,15 +188,15 @@ function DropdownMenuShortcut({
       {...props}
     />
   );
-}
+};
 
-function DropdownMenuSub({
+DropdownMenu.Sub = function DropdownMenuSub({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
   return <DropdownMenuPrimitive.Sub data-slot='dropdown-menu-sub' {...props} />;
-}
+};
 
-function DropdownMenuSubTrigger({
+DropdownMenu.SubTrigger = function DropdownMenuSubTrigger({
   className,
   inset,
   children,
@@ -218,9 +218,9 @@ function DropdownMenuSubTrigger({
       <ChevronRightIcon className='ml-auto size-4' />
     </DropdownMenuPrimitive.SubTrigger>
   );
-}
+};
 
-function DropdownMenuSubContent({
+DropdownMenu.SubContent = function DropdownMenuSubContent({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
@@ -234,22 +234,6 @@ function DropdownMenuSubContent({
       {...props}
     />
   );
-}
-
-export {
-  DropdownMenu,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
 };
+
+export { DropdownMenu };
