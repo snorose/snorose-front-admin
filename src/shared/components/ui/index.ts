@@ -93,6 +93,6 @@ export {
 } from './table';
 export { RadioGroup, RadioGroupItem } from './radio-group';
 export { Calendar } from './calendar';
-export { Popover, PopoverContent, PopoverTrigger } from './popover';
+export { Popover } from './popover';
 export { ConfirmModal } from './confirm-modal';
 export { Badge } from './badge';
