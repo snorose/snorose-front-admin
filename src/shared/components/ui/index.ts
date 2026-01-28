@@ -57,14 +57,7 @@ export {
   DropdownMenuLabel,
 } from './dropdown-menu';
 export { Dialog } from './dialog';
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from './table';
+export { Table } from './table';
 export { RadioGroup } from './radio-group';
 export { Calendar } from './calendar';
 export { Popover } from './popover';

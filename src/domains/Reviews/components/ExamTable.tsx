@@ -1,12 +1,4 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Select,
-} from '@/shared/components/ui';
+import { Table, Select } from '@/shared/components/ui';
 import { STATUS_COLOR } from '@/shared/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
@@ -178,28 +170,28 @@ export default function ExamTable({
           className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
         >
           {/* Table Header */}
-          <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
-            <TableRow className='hover:bg-gray-100'>
-              <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+          <Table.Header className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
+            <Table.Row className='hover:bg-gray-100'>
+              <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
                 상태
-              </TableHead>
-              <TableHead className='w-[200px]'>시험후기명</TableHead>
-              <TableHead className='w-[120px]'>강의명</TableHead>
-              <TableHead className='w-[60px]'>교수</TableHead>
-              <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              </Table.Head>
+              <Table.Head className='w-[200px]'>시험후기명</Table.Head>
+              <Table.Head className='w-[120px]'>강의명</Table.Head>
+              <Table.Head className='w-[60px]'>교수</Table.Head>
+              <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
                 수강학기
-              </TableHead>
-              <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              </Table.Head>
+              <Table.Head className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
                 시험종류
-              </TableHead>
-              <TableHead className='w-[60px]'>분반</TableHead>
-              <TableHead className='w-[110px]'>업로드 시간</TableHead>
-              <TableHead className='w-[80px]'>게시자</TableHead>
-            </TableRow>
-          </TableHeader>
+              </Table.Head>
+              <Table.Head className='w-[60px]'>분반</Table.Head>
+              <Table.Head className='w-[110px]'>업로드 시간</Table.Head>
+              <Table.Head className='w-[80px]'>게시자</Table.Head>
+            </Table.Row>
+          </Table.Header>
 
           {/* Table Body */}
-          <TableBody>
+          <Table.Body>
             {isLoading ? (
               <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
             ) : currentPageData.length === 0 ? (
@@ -213,7 +205,7 @@ export default function ExamTable({
                     ? openStatusSelect[review.id]
                     : selectedId === review.id;
                   return (
-                    <TableRow
+                    <Table.Row
                       key={review.id}
                       className={`hover:cursor-pointer [&_td]:h-[24px] ${
                         isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
@@ -227,7 +219,7 @@ export default function ExamTable({
                         }
                       }}
                     >
-                      <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
+                      <Table.Cell className='relative w-[50px] cursor-pointer p-0 text-center'>
                         <Select
                           value={selectedStatus[review.id] || review.status}
                           onValueChange={async (value) => {
@@ -305,72 +297,72 @@ export default function ExamTable({
                             ))}
                           </Select.Content>
                         </Select>
-                      </TableCell>
-                      <TableCell className='w-[200px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[200px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.reviewTitle}
                         >
                           {review.reviewTitle}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[120px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[120px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.courseName}
                         >
                           {review.courseName}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[60px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[60px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.professor}
                         >
                           {review.professor}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[84px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[84px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.semester}
                         >
                           {review.semester}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[60px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[60px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.examType}
                         >
                           {review.examType}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[60px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[60px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.classNumber}
                         >
                           {review.classNumber}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[110px] overflow-hidden text-gray-600'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[110px] overflow-hidden text-gray-600'>
                         <div
                           className='w-full truncate'
                           title={review.uploadTime}
                         >
                           {review.uploadTime}
                         </div>
-                      </TableCell>
-                      <TableCell className='w-[80px] overflow-hidden'>
+                      </Table.Cell>
+                      <Table.Cell className='w-[80px] overflow-hidden'>
                         <div
                           className='w-full truncate'
                           title={review.userDisplay}
                         >
                           {review.userDisplay}
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </Table.Cell>
+                    </Table.Row>
                   );
                 })}
                 <ExamTableEmptyRows
@@ -378,7 +370,7 @@ export default function ExamTable({
                 />
               </>
             )}
-          </TableBody>
+          </Table.Body>
         </Table>
       </div>
 

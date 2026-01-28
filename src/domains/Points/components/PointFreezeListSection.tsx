@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/shared/components/ui';
+import { Table } from '@/shared/components/ui';
 import { PencilIcon, Trash2 } from 'lucide-react';
 import {
   PointFreezeDeleteConfirmModal,
@@ -48,56 +41,60 @@ export default function PointFreezeListSection({
         <h3 className='text-lg font-bold'>미지급 일정 조회</h3>
         <div className='overflow-hidden rounded-md border'>
           <Table className='w-full'>
-            <TableHeader>
-              <TableRow className='text-center'>
-                <TableHead className='text-center'>ID</TableHead>
-                <TableHead className='text-center'>일정 제목</TableHead>
-                <TableHead className='text-center'>시작 일시</TableHead>
-                <TableHead className='text-center'>종료 일시</TableHead>
-                <TableHead className='text-center'>생성 일시</TableHead>
-                <TableHead className='text-center'>수정 일시</TableHead>
-                <TableHead className='text-center'>삭제</TableHead>
-                <TableHead className='text-center'>수정</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+            <Table.Header>
+              <Table.Row className='text-center'>
+                <Table.Head className='text-center'>ID</Table.Head>
+                <Table.Head className='text-center'>일정 제목</Table.Head>
+                <Table.Head className='text-center'>시작 일시</Table.Head>
+                <Table.Head className='text-center'>종료 일시</Table.Head>
+                <Table.Head className='text-center'>생성 일시</Table.Head>
+                <Table.Head className='text-center'>수정 일시</Table.Head>
+                <Table.Head className='text-center'>삭제</Table.Head>
+                <Table.Head className='text-center'>수정</Table.Head>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {pointFreezes.length > 0 ? (
                 pointFreezes.map(
                   ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
-                    <TableRow key={id}>
-                      <TableCell className='text-center'>{id}</TableCell>
-                      <TableCell className='text-center'>{title}</TableCell>
-                      <TableCell className='text-center'>{startAt}</TableCell>
-                      <TableCell className='text-center'>{endAt}</TableCell>
-                      <TableCell className='text-center'>{createdAt}</TableCell>
-                      <TableCell className='text-center'>{updatedAt}</TableCell>
-                      <TableCell className='text-center'>
+                    <Table.Row key={id}>
+                      <Table.Cell className='text-center'>{id}</Table.Cell>
+                      <Table.Cell className='text-center'>{title}</Table.Cell>
+                      <Table.Cell className='text-center'>{startAt}</Table.Cell>
+                      <Table.Cell className='text-center'>{endAt}</Table.Cell>
+                      <Table.Cell className='text-center'>
+                        {createdAt}
+                      </Table.Cell>
+                      <Table.Cell className='text-center'>
+                        {updatedAt}
+                      </Table.Cell>
+                      <Table.Cell className='text-center'>
                         <div className='flex items-center justify-center'>
                           <Trash2
                             className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
                             onClick={() => handleDeleteScheduleClick(id)}
                           />
                         </div>
-                      </TableCell>
-                      <TableCell className='text-center'>
+                      </Table.Cell>
+                      <Table.Cell className='text-center'>
                         <div className='flex items-center justify-center'>
                           <PencilIcon
                             className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
                             onClick={() => handleUpdateScheduleButtonClick(id)}
                           />
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </Table.Cell>
+                    </Table.Row>
                   )
                 )
               ) : (
-                <TableRow>
-                  <TableCell className='text-center' colSpan={8}>
+                <Table.Row>
+                  <Table.Cell className='text-center' colSpan={8}>
                     등록된 일정이 없습니다.
-                  </TableCell>
-                </TableRow>
+                  </Table.Cell>
+                </Table.Row>
               )}
-            </TableBody>
+            </Table.Body>
           </Table>
         </div>
       </article>
