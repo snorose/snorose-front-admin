@@ -1,7 +1,7 @@
 import {
   REFRESH_TOKEN_EXPIRE_DAYS,
   ACCESS_TOKEN_EXPIRE_MINUTES,
-} from '@/constants';
+} from '@/shared/constants';
 import type { User } from '@/types';
 
 export const cookie = {

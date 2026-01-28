@@ -5,7 +5,7 @@ import type {
   ReissueTokenRequest,
   ReissueTokenResponse,
 } from '@/types';
-import { REISSUE_TOKEN_ENDPOINT } from '@/constants';
+import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
 
 export const loginAPI = async (
   credentials: LoginRequest

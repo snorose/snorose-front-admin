@@ -1,4 +1,4 @@
-import { STATUS_COLOR } from '@/constants';
+import { STATUS_COLOR } from '@/shared/constants';
 
 interface ExamStatusDotProps {
   status: string;

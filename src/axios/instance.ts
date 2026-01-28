@@ -4,7 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 import { tokenStorage, executeTokenRefresh } from '@/shared/utils';
-import { REISSUE_TOKEN_ENDPOINT } from '@/constants';
+import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
 
 class AxiosInstanceManager {
   private static instance: AxiosInstance | null = null;

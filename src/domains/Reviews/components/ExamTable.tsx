@@ -11,7 +11,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui';
-import { STATUS_COLOR } from '@/constants';
+import { STATUS_COLOR } from '@/shared/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
 import {

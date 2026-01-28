@@ -8,7 +8,7 @@ import {
   SelectItem,
   Button,
 } from '@/components/ui';
-import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/constants';
+import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/shared/constants';
 import {
   convertSemesterToEnum,
   convertExamTypeToEnum,

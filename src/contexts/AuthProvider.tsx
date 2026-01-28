@@ -25,7 +25,7 @@ import {
   ACCESS_TOKEN_EXPIRE_MINUTES,
   REFRESH_TOKEN_EXPIRE_DAYS,
   ADMIN_ROLE_ID,
-} from '@/constants';
+} from '@/shared/constants';
 import { loginAPI } from '@/apis';
 
 type AuthProviderProps = {

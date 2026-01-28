@@ -19,7 +19,7 @@ import {
   Badge,
 } from '@/components/ui';
 import { snoroseLogo } from '@/assets';
-import { SIDEBAR_MENUS } from '@/constants';
+import { SIDEBAR_MENUS } from '@/shared/constants';
 import { NavUser } from '@/components';
 
 export const AppSidebar = ({

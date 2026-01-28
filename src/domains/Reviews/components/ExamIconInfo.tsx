@@ -1,4 +1,4 @@
-import { STATUS_COLOR } from '@/constants';
+import { STATUS_COLOR } from '@/shared/constants';
 
 export default function ExamIconInfo() {
   return (

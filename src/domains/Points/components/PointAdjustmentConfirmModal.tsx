@@ -8,7 +8,7 @@ import {
   Button,
 } from '@/components/ui';
 import { cn } from '@/shared/utils';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import type { MemberInfo } from '@/types';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
