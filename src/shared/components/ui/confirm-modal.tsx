@@ -1,12 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-} from '@/shared/components/ui';
+import { Dialog, Button } from '@/shared/components/ui';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -31,23 +23,25 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
-        </DialogHeader>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>{title}</Dialog.Title>
+          {description && (
+            <Dialog.Description>{description}</Dialog.Description>
+          )}
+        </Dialog.Header>
 
         {children && <div className='py-4'>{children}</div>}
 
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={onClose}>
             {closeText}
           </Button>
           <Button type='button' onClick={onConfirm}>
             {confirmText}
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

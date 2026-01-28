@@ -56,18 +56,7 @@ export {
   DropdownMenuGroup,
   DropdownMenuLabel,
 } from './dropdown-menu';
-export {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogClose,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  DialogPortal,
-  DialogOverlay,
-} from './dialog';
+export { Dialog } from './dialog';
 export {
   Table,
   TableHeader,
