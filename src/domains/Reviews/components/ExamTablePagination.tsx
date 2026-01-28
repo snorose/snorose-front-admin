@@ -13,7 +13,7 @@ export default function ExamTablePagination({
   onPageChange,
 }: ExamTablePaginationProps) {
   return (
-    <div className='relative flex flex-col items-center gap-3 px-4 py-4'>
+    <div className='relative flex flex-col items-center gap-3 py-2'>
       <div className='flex items-center gap-2'>
         <button
           onClick={() => onPageChange((prev) => Math.max(1, prev - 1))}

@@ -2,7 +2,7 @@ import { STATUS_COLOR } from '@/constants';
 
 export default function ExamIconInfo() {
   return (
-    <div className='flex items-center gap-4 px-4 pb-3'>
+    <div>
       <ul>
         {/* 상태 리스트 */}
         {STATUS_COLOR.map((status) => (

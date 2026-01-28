@@ -176,144 +176,79 @@ export default function ExamTable({
   const isEmpty = !isLoading && currentPageData.length === 0;
 
   return (
-    <div
-      className={`no-scrollbar scroll-hidden ${
-        isEmpty ? 'overflow-hidden' : 'overflow-x-scroll'
-      }`}
-    >
-      <Table
-        size='sm'
-        className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
-      >
-        {/* Table Header */}
-        <TableHeader
-          size='sm'
-          className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'
+    <>
+      <div className='overflow-hidden rounded-md border'>
+        <Table
+          className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
         >
-          <TableRow size='sm' className='hover:bg-gray-100'>
-            <TableHead size='sm' className='w-[70px] text-center'>
-              id
-            </TableHead>
-            <TableHead
-              size='sm'
-              className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'
-            >
-              상태
-            </TableHead>
-            <TableHead size='sm' className='w-[200px]'>
-              시험후기명
-            </TableHead>
-            <TableHead size='sm' className='w-[120px]'>
-              강의명
-            </TableHead>
-            <TableHead size='sm' className='w-[60px]'>
-              교수
-            </TableHead>
-            <TableHead
-              size='sm'
-              className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'
-            >
-              수강학기
-            </TableHead>
-            <TableHead
-              size='sm'
-              className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'
-            >
-              시험종류
-            </TableHead>
-            <TableHead size='sm' className='w-[60px]'>
-              분반
-            </TableHead>
-            <TableHead size='sm' className='w-[150px]'>
-              시험 유형 및 문항수
-            </TableHead>
-            <TableHead size='sm' className='w-[110px]'>
-              업로드 시간
-            </TableHead>
-            <TableHead size='sm' className='w-[80px]'>
-              게시자
-            </TableHead>
-          </TableRow>
-        </TableHeader>
+          {/* Table Header */}
+          <TableHeader className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
+            <TableRow className='hover:bg-gray-100'>
+              <TableHead className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+                상태
+              </TableHead>
+              <TableHead className='w-[200px]'>시험후기명</TableHead>
+              <TableHead className='w-[120px]'>강의명</TableHead>
+              <TableHead className='w-[60px]'>교수</TableHead>
+              <TableHead className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+                수강학기
+              </TableHead>
+              <TableHead className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+                시험종류
+              </TableHead>
+              <TableHead className='w-[60px]'>분반</TableHead>
+              <TableHead className='w-[110px]'>업로드 시간</TableHead>
+              <TableHead className='w-[80px]'>게시자</TableHead>
+            </TableRow>
+          </TableHeader>
 
-        {/* Table Body */}
-        <TableBody size='sm'>
-          {isLoading ? (
-            <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
-          ) : currentPageData.length === 0 ? (
-            <ExamTableEmpty />
-          ) : (
-            <>
-              {currentPageData.map((review) => {
-                const hasOpenSelect =
-                  Object.values(openStatusSelect).some(Boolean);
-                const isRowActive = hasOpenSelect
-                  ? openStatusSelect[review.id]
-                  : selectedId === review.id;
-                return (
-                  <TableRow
-                    key={review.id}
-                    size='sm'
-                    className={`hover:cursor-pointer [&_td]:h-[24px] ${
-                      isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (selectedId === review.id) {
-                        onRowSelect?.(null);
-                      } else {
-                        onRowSelect?.(review);
-                      }
-                    }}
-                  >
-                    <TableCell
-                      size='sm'
-                      className='w-[70px] text-center text-gray-600'
+          {/* Table Body */}
+          <TableBody>
+            {isLoading ? (
+              <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
+            ) : currentPageData.length === 0 ? (
+              <ExamTableEmpty />
+            ) : (
+              <>
+                {currentPageData.map((review) => {
+                  const hasOpenSelect =
+                    Object.values(openStatusSelect).some(Boolean);
+                  const isRowActive = hasOpenSelect
+                    ? openStatusSelect[review.id]
+                    : selectedId === review.id;
+                  return (
+                    <TableRow
+                      key={review.id}
+                      className={`hover:cursor-pointer [&_td]:h-[24px] ${
+                        isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (selectedId === review.id) {
+                          onRowSelect?.(null);
+                        } else {
+                          onRowSelect?.(review);
+                        }
+                      }}
                     >
-                      {review.id}
-                    </TableCell>
-                    <TableCell
-                      size='sm'
-                      className='relative w-[50px] cursor-pointer p-0 text-center'
-                    >
-                      <Select
-                        value={selectedStatus[review.id] || review.status}
-                        onValueChange={async (value) => {
-                          const statusOption = STATUS_COLOR.find(
-                            (s) => s.code === value
-                          );
-                          if (statusOption) {
-                            await handleStatusSelect(
-                              review.id,
-                              statusOption.code
+                      <TableCell className='relative w-[50px] cursor-pointer p-0 text-center'>
+                        <Select
+                          value={selectedStatus[review.id] || review.status}
+                          onValueChange={async (value) => {
+                            const statusOption = STATUS_COLOR.find(
+                              (s) => s.code === value
                             );
-                          }
-                          setOpenStatusSelect((prev) => ({
-                            ...prev,
-                            [review.id]: false,
-                          }));
-                          // 포커스 제거
-                          setTimeout(() => {
-                            const activeElement =
-                              document.activeElement as HTMLElement;
-                            if (activeElement) {
-                              activeElement.blur();
+                            if (statusOption) {
+                              await handleStatusSelect(
+                                review.id,
+                                statusOption.code
+                              );
                             }
-                          }, 0);
-                        }}
-                        open={openStatusSelect[review.id] || false}
-                        onOpenChange={(open) => {
-                          setOpenStatusSelect((prev) => ({
-                            ...prev,
-                            [review.id]: open,
-                          }));
-                          if (open) {
-                            // Select가 열릴 때 해당 행 선택
-                            if (selectedId !== review.id && onRowSelect) {
-                              onRowSelect(review);
-                            }
-                          } else {
-                            // 닫힐 때 포커스 제거
+                            setOpenStatusSelect((prev) => ({
+                              ...prev,
+                              [review.id]: false,
+                            }));
+                            // 포커스 제거
                             setTimeout(() => {
                               const activeElement =
                                 document.activeElement as HTMLElement;
@@ -321,121 +256,141 @@ export default function ExamTable({
                                 activeElement.blur();
                               }
                             }, 0);
-                          }
-                        }}
-                      >
-                        <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
-                          <SelectValue className='!flex !items-center !justify-center'>
-                            <ExamStatusDot
-                              status={
-                                selectedStatus[review.id] || review.status
+                          }}
+                          open={openStatusSelect[review.id] || false}
+                          onOpenChange={(open) => {
+                            setOpenStatusSelect((prev) => ({
+                              ...prev,
+                              [review.id]: open,
+                            }));
+                            if (open) {
+                              // Select가 열릴 때 해당 행 선택
+                              if (selectedId !== review.id && onRowSelect) {
+                                onRowSelect(review);
                               }
-                            />
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent
-                          align='start'
-                          className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+                            } else {
+                              // 닫힐 때 포커스 제거
+                              setTimeout(() => {
+                                const activeElement =
+                                  document.activeElement as HTMLElement;
+                                if (activeElement) {
+                                  activeElement.blur();
+                                }
+                              }, 0);
+                            }
+                          }}
                         >
-                          {STATUS_COLOR.map((statusOption) => (
-                            <SelectItem
-                              key={statusOption.id}
-                              value={statusOption.code}
-                              className='text-[12px] font-medium'
-                            >
-                              <div className='flex items-center gap-2'>
-                                <div
-                                  className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                                />
-                                <span>{statusOption.name}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[200px] overflow-hidden'>
-                      <div
-                        className='w-full truncate'
-                        title={review.reviewTitle}
-                      >
-                        {review.reviewTitle}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[120px] overflow-hidden'>
-                      <div
-                        className='w-full truncate'
-                        title={review.courseName}
-                      >
-                        {review.courseName}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[60px] overflow-hidden'>
-                      <div className='w-full truncate' title={review.professor}>
-                        {review.professor}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[84px] overflow-hidden'>
-                      <div className='w-full truncate' title={review.semester}>
-                        {review.semester}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[60px] overflow-hidden'>
-                      <div className='w-full truncate' title={review.examType}>
-                        {review.examType}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[60px] overflow-hidden'>
-                      <div
-                        className='w-full truncate'
-                        title={review.classNumber}
-                      >
-                        {review.classNumber}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[150px] overflow-hidden'>
-                      <div
-                        className='w-full truncate'
-                        title={review.questionDetail}
-                      >
-                        {review.questionDetail}
-                      </div>
-                    </TableCell>
-                    <TableCell
-                      size='sm'
-                      className='w-[110px] overflow-hidden text-gray-600'
-                    >
-                      <div
-                        className='w-full truncate'
-                        title={review.uploadTime}
-                      >
-                        {review.uploadTime}
-                      </div>
-                    </TableCell>
-                    <TableCell size='sm' className='w-[80px] overflow-hidden'>
-                      <div
-                        className='w-full truncate'
-                        title={review.userDisplay}
-                      >
-                        {review.userDisplay}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              <ExamTableEmptyRows
-                count={ITEMS_PER_PAGE - currentPageData.length}
-              />
-            </>
-          )}
-        </TableBody>
-      </Table>
+                          <SelectTrigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
+                            <SelectValue className='!flex !items-center !justify-center'>
+                              <ExamStatusDot
+                                status={
+                                  selectedStatus[review.id] || review.status
+                                }
+                              />
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent
+                            align='start'
+                            className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+                          >
+                            {STATUS_COLOR.map((statusOption) => (
+                              <SelectItem
+                                key={statusOption.id}
+                                value={statusOption.code}
+                                className='text-[12px] font-medium'
+                              >
+                                <div className='flex items-center gap-2'>
+                                  <div
+                                    className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
+                                  />
+                                  <span>{statusOption.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className='w-[200px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.reviewTitle}
+                        >
+                          {review.reviewTitle}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[120px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.courseName}
+                        >
+                          {review.courseName}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[60px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.professor}
+                        >
+                          {review.professor}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[84px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.semester}
+                        >
+                          {review.semester}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[60px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.examType}
+                        >
+                          {review.examType}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[60px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.classNumber}
+                        >
+                          {review.classNumber}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[110px] overflow-hidden text-gray-600'>
+                        <div
+                          className='w-full truncate'
+                          title={review.uploadTime}
+                        >
+                          {review.uploadTime}
+                        </div>
+                      </TableCell>
+                      <TableCell className='w-[80px] overflow-hidden'>
+                        <div
+                          className='w-full truncate'
+                          title={review.userDisplay}
+                        >
+                          {review.userDisplay}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                <ExamTableEmptyRows
+                  count={ITEMS_PER_PAGE - currentPageData.length}
+                />
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       <ExamTablePagination
         currentPage={currentPage}
         hasNext={hasNext}
         onPageChange={setCurrentPage}
       />
-    </div>
+    </>
   );
 }

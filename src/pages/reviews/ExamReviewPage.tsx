@@ -278,14 +278,14 @@ export default function ExamReviewPage() {
   }, [selectedExamReview]);
 
   return (
-    <div className='box-border w-full max-w-full'>
-      {/* 검색 + 아이콘 정보*/}
-      <div className='flex items-end justify-between'>
-        <div>
-          <PageHeader
-            title='시험후기 관리'
-            description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
-          />
+    <div className='flex flex-col gap-6'>
+      <PageHeader
+        title='시험후기 관리'
+        description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
+      />
+
+      <div className='flex flex-col gap-2'>
+        <div className='flex'>
           <ExamSearch
             onSearchChange={handleSearchChange}
             initialKeyword={searchParamsFromUrl.get('keyword') || ''}
@@ -306,20 +306,22 @@ export default function ExamReviewPage() {
                   : undefined
             }
           />
+
+          <div className='ml-auto'>
+            <ExamIconInfo />
+          </div>
         </div>
 
-        <ExamIconInfo />
+        {/* 시험후기 테이블 */}
+        <ExamTable
+          onRowSelect={setSelectedExamReview}
+          refreshKey={refreshKey}
+          selectedId={selectedExamReview?.id}
+          searchParams={searchParams}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
       </div>
-
-      {/* 시험후기 테이블 */}
-      <ExamTable
-        onRowSelect={setSelectedExamReview}
-        refreshKey={refreshKey}
-        selectedId={selectedExamReview?.id}
-        searchParams={searchParams}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-      />
 
       {/* 시험후기 패널 - 편집, 삭제, 경고, 메모, 강등... */}
       <ExamPanel

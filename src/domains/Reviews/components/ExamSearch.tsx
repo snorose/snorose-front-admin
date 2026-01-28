@@ -174,7 +174,7 @@ export default function ExamSearch({
   };
 
   return (
-    <div key={searchKey} className='flex flex-col gap-2 py-3'>
+    <div key={searchKey} className='flex flex-col gap-2'>
       {/* 검색 input */}
       <div className='flex items-center gap-2'>
         <div className='relative w-full'>
