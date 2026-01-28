@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Input } from '@/components/ui';
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 import type { MemberInfo } from '@/shared/types';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { toast } from 'sonner';

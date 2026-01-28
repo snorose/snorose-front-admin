@@ -1,4 +1,4 @@
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getPointFreezesAPI } from '@/apis';
 import { toast } from 'sonner';

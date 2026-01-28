@@ -1,5 +1,5 @@
 import { Label, Input, Button } from '@/components/ui';
-import { DateTimePicker } from '@/components';
+import { DateTimePicker } from '@/shared/components';
 import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';

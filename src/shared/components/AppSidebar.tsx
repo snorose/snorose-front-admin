@@ -20,7 +20,7 @@ import {
 } from '@/components/ui';
 import { snoroseLogo } from '@/assets';
 import { SIDEBAR_MENUS } from '@/shared/constants';
-import { NavUser } from '@/components';
+import { NavUser } from '@/shared/components';
 
 export const AppSidebar = ({
   ...props

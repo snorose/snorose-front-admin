@@ -13,7 +13,7 @@ import {
   CommentPage,
   PushNotificationPage,
 } from './pages';
-import { AppSidebar, ProtectedRoute } from '@/components';
+import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { SidebarProvider, Toaster } from '@/components/ui';
 import { AuthProvider } from '@/contexts';
 

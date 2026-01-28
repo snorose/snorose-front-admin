@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Megaphone } from 'lucide-react';
 import { Button, Alert, AlertTitle, AlertDescription } from '@/components/ui';
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { postAllMemberPointAPI } from '@/apis/points';
 import { getErrorMessage } from '@/shared/utils';

@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo } from 'react';
 import { Button, Input } from '@/components/ui';
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 
 import type { MemberInfo, EditMemberInfo } from '@/shared/types';
 import {

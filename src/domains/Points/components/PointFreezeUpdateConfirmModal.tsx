@@ -9,7 +9,7 @@ import {
   Label,
   Input,
 } from '@/components/ui';
-import { DateTimePicker } from '@/components';
+import { DateTimePicker } from '@/shared/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
 import type { PointFreeze } from '@/shared/types';

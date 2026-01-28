@@ -12,7 +12,7 @@ import type {
   ExamReviewDetailResult,
   Semester,
 } from '@/domains/Reviews/types';
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 import { getExamReviewDetail } from '@/apis';
 import { toast } from 'sonner';
 import { isAxiosError } from 'axios';
