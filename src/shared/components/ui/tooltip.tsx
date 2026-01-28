@@ -6,11 +6,7 @@ import { cn } from '@/shared/lib';
 function Tooltip({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return (
-    <TooltipPrimitive.Provider delayDuration={0}>
-      <TooltipPrimitive.Root data-slot='tooltip' {...props} />
-    </TooltipPrimitive.Provider>
-  );
+  return <TooltipPrimitive.Root data-slot='tooltip' {...props} />;
 }
 
 Tooltip.Provider = function TooltipProvider({
