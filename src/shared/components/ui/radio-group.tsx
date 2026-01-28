@@ -17,7 +17,7 @@ function RadioGroup({
   );
 }
 
-function RadioGroupItem({
+RadioGroup.Item = function RadioGroupItem({
   className,
   ...props
 }: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
@@ -38,6 +38,6 @@ function RadioGroupItem({
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );
-}
+};
 
-export { RadioGroup, RadioGroupItem };
+export { RadioGroup };

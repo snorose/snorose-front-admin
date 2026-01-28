@@ -65,7 +65,7 @@ export {
   TableHead,
   TableCell,
 } from './table';
-export { RadioGroup, RadioGroupItem } from './radio-group';
+export { RadioGroup } from './radio-group';
 export { Calendar } from './calendar';
 export { Popover } from './popover';
 export { ConfirmModal } from './confirm-modal';
