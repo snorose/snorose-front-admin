@@ -6,10 +6,10 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@/components/ui';
-import { cn } from '@/utils';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
-import type { MemberInfo } from '@/types';
+} from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
+import type { MemberInfo } from '@/shared/types';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 

@@ -1,4 +1,4 @@
-import { STATUS_COLOR } from '@/constants';
+import { STATUS_COLOR } from '@/shared/constants';
 import * as Popover from '@radix-ui/react-popover';
 import React, { useEffect } from 'react';
 

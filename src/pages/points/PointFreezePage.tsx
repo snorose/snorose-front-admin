@@ -1,13 +1,13 @@
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getPointFreezesAPI } from '@/apis';
 import { toast } from 'sonner';
-import type { PointFreeze } from '@/types';
+import type { PointFreeze } from '@/shared/types';
 import {
   PointFreezeListSection,
   PointFreezeScheduleForm,
 } from '@/domains/Points';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 export default function PointFreezePage() {
   const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);

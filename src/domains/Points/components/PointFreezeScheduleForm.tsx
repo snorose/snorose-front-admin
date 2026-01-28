@@ -1,10 +1,10 @@
-import { Label, Input, Button } from '@/components/ui';
-import { DateTimePicker } from '@/components';
+import { Label, Input, Button } from '@/shared/components/ui';
+import { DateTimePicker } from '@/shared/components';
 import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import { getErrorMessage, formatDateTimeForAPI } from '@/utils';
-import { useDateTimeField } from '@/hooks';
+import { getErrorMessage, formatDateTimeForAPI } from '@/shared/utils';
+import { useDateTimeField } from '@/shared/hooks';
 
 interface PointFreezeScheduleFormProps {
   onSuccess: () => void;

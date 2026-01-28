@@ -1,5 +1,5 @@
-import { Label, Input } from '@/components/ui';
-import type { MemberInfo } from '@/types';
+import { Label, Input } from '@/shared/components/ui';
+import type { MemberInfo } from '@/shared/types';
 
 interface MemberInfoSectionProps {
   searchedMember: MemberInfo;

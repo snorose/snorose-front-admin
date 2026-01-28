@@ -1,8 +1,8 @@
 import { useCallback, useState, useMemo } from 'react';
-import { Button, Input } from '@/components/ui';
-import { PageHeader } from '@/components';
+import { Button, Input } from '@/shared/components/ui';
+import { PageHeader } from '@/shared/components';
 
-import type { MemberInfo, EditMemberInfo } from '@/types';
+import type { MemberInfo, EditMemberInfo } from '@/shared/types';
 import {
   TabList,
   getMemberInfoTabs,
@@ -16,7 +16,7 @@ import { formatDateTime } from '@/domains/MemberInfo/utils/formatDateTime';
 
 import { PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 export default function MemberInfoPage() {
   const [searchQuery, setSearchQuery] = useState('');

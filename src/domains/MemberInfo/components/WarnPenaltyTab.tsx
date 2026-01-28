@@ -8,10 +8,10 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui';
+  ConfirmModal,
+} from '@/shared/components/ui';
 import { toast } from 'sonner';
-import { ConfirmModal } from '@/components/ui';
-import type { PenaltyUserInfo } from '@/types';
+import type { PenaltyUserInfo } from '@/shared/types';
 import {
   WARNING_REASON_OPTIONS,
   REVOKE_WARNING_OPTIONS,

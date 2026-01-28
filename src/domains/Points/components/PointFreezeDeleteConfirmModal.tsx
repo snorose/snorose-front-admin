@@ -6,11 +6,11 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@/components/ui';
-import type { PointFreeze } from '@/types';
+} from '@/shared/components/ui';
+import type { PointFreeze } from '@/shared/types';
 import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;

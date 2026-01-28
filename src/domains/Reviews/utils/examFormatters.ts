@@ -1,4 +1,4 @@
-import { STATUS_COLOR } from '@/constants/exam-table-options';
+import { STATUS_COLOR } from '@/shared/constants';
 
 /**
  * lectureType enum을 문자열로 변환

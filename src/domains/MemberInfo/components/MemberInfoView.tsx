@@ -1,8 +1,8 @@
-import { Label, Input } from '@/components/ui';
+import { Label, Input } from '@/shared/components/ui';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 import { MEMBER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
 
-import type { MemberInfo } from '@/types';
+import type { MemberInfo } from '@/shared/types';
 
 export default function MemberInfoView({ member }: { member: MemberInfo }) {
   const COPY_KEYS: (keyof MemberInfo)[] = [

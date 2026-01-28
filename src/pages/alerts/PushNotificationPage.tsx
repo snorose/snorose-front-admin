@@ -6,13 +6,13 @@ import {
   RadioGroup,
   RadioGroupItem,
   Textarea,
-} from '@/components/ui';
-import { PageHeader } from '@/components';
+} from '@/shared/components/ui';
+import { PageHeader } from '@/shared/components';
 import { PushNotificationConfirmModal } from '@/domains/Alerts';
 import { postPushNotificationAPI } from '@/apis';
-import { getErrorMessage } from '@/utils';
+import { getErrorMessage } from '@/shared/utils';
 import { toast } from 'sonner';
-import type { PushNotification } from '@/types';
+import type { PushNotification } from '@/shared/types';
 
 const INITIAL_FORM_DATA: PushNotification = {
   name: '',

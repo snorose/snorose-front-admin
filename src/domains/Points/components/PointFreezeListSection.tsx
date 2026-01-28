@@ -6,13 +6,13 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { PencilIcon, Trash2 } from 'lucide-react';
 import {
   PointFreezeDeleteConfirmModal,
   PointFreezeUpdateConfirmModal,
 } from '@/domains/Points';
-import type { PointFreeze } from '@/types';
+import type { PointFreeze } from '@/shared/types';
 
 export default function PointFreezeListSection({
   pointFreezes,

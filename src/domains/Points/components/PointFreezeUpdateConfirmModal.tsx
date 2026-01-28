@@ -8,18 +8,18 @@ import {
   Button,
   Label,
   Input,
-} from '@/components/ui';
-import { DateTimePicker } from '@/components';
+} from '@/shared/components/ui';
+import { DateTimePicker } from '@/shared/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import type { PointFreeze } from '@/types';
+import type { PointFreeze } from '@/shared/types';
 import { useState, useEffect } from 'react';
 import {
   getErrorMessage,
   formatDateTimeForAPI,
   formatDateTimeForInput,
-} from '@/utils';
-import { useDateTimeField } from '@/hooks';
+} from '@/shared/utils';
+import { useDateTimeField } from '@/shared/hooks';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;

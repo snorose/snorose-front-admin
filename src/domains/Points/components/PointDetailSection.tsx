@@ -6,8 +6,8 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
+} from '@/shared/components/ui';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { useEffect } from 'react';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];

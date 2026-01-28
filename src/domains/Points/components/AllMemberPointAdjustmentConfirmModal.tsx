@@ -6,9 +6,9 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@/components/ui';
-import { cn } from '@/utils';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
+} from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 

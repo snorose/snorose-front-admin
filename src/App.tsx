@@ -13,9 +13,9 @@ import {
   CommentPage,
   PushNotificationPage,
 } from './pages';
-import { AppSidebar, ProtectedRoute } from '@/components';
-import { SidebarProvider, Toaster } from '@/components/ui';
-import { AuthProvider } from '@/contexts';
+import { AppSidebar, ProtectedRoute } from '@/shared/components';
+import { SidebarProvider, Toaster } from '@/shared/components/ui';
+import { AuthProvider } from '@/shared/contexts';
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({

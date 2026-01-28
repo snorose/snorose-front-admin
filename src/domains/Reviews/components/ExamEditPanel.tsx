@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import {
   deleteExamReview,
   updateExamReview,
@@ -21,7 +21,7 @@ import type {
   ExamReviewDetailResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
-import { ConfirmModal, Skeleton } from '@/components/ui';
+import { ConfirmModal, Skeleton } from '@/shared/components/ui';
 import {
   convertLectureTypeToString,
   convertSemesterEnumToString,
@@ -36,7 +36,7 @@ import {
   SEMESTER_LIST,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
-} from '@/constants';
+} from '@/shared/constants';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[12px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;

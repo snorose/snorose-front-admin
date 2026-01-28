@@ -1,4 +1,4 @@
-import { axiosInstance } from '@/axios/instance';
+import { axiosInstance } from '@/shared/axios/instance';
 
 export const blacklistHistoryAPI = async (encryptedUserId: string) => {
   const response = await axiosInstance.get(

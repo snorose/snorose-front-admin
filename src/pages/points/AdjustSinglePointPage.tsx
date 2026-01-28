@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Button, Input } from '@/components/ui';
-import { PageHeader } from '@/components';
-import type { MemberInfo } from '@/types';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
+import { Button, Input } from '@/shared/components/ui';
+import { PageHeader } from '@/shared/components';
+import type { MemberInfo } from '@/shared/types';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { toast } from 'sonner';
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
-import { useAuth } from '@/hooks';
-import { getErrorMessage } from '@/utils';
+import { useAuth } from '@/shared/hooks';
+import { getErrorMessage } from '@/shared/utils';
 import {
   PointAdjustmentConfirmModal,
   MemberInfoSection,
