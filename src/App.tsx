@@ -1,11 +1,11 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { Sidebar, Toaster } from '@/shared/components/ui';
 import { AuthProvider } from '@/shared/contexts';
 
-import './App.css';
 import {
   AdjustAllMemberPointPage,
   AdjustSinglePointPage,
@@ -17,7 +17,9 @@ import {
   PointFreezePage,
   PostPage,
   PushNotificationPage,
-} from './pages';
+} from '@/pages';
+
+import './App.css';
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({
