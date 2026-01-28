@@ -1,21 +1,25 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import './App.css';
-import {
-  ExamReviewPage,
-  MemberInfoPage,
-  MemberPenaltyManagementPage,
-  AdjustSinglePointPage,
-  AdjustAllMemberPointPage,
-  PointFreezePage,
-  LogInPage,
-  PostPage,
-  CommentPage,
-  PushNotificationPage,
-} from './pages';
+
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { Sidebar, Toaster } from '@/shared/components/ui';
 import { AuthProvider } from '@/shared/contexts';
+
+import {
+  AdjustAllMemberPointPage,
+  AdjustSinglePointPage,
+  CommentPage,
+  ExamReviewPage,
+  LogInPage,
+  MemberInfoPage,
+  MemberPenaltyManagementPage,
+  PointFreezePage,
+  PostPage,
+  PushNotificationPage,
+} from '@/pages';
+
+import './App.css';
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({
