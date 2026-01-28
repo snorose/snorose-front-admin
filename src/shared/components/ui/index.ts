@@ -31,16 +31,7 @@ export {
 } from './sidebar';
 export { Collapsible } from './collapsible';
 export { Separator } from './separator';
-export {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
-} from './sheet';
+export { Sheet } from './sheet';
 export { Skeleton } from './skeleton';
 export { Textarea } from './textarea';
 export { Switch } from './switch';

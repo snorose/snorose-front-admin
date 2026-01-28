@@ -10,13 +10,7 @@ import { cn } from '@/shared/lib';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Separator } from '@/shared/components/ui/separator';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/components/ui/sheet';
+import { Sheet } from '@/shared/components/ui/sheet';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Tooltip } from '@/shared/components/ui/tooltip';
 
@@ -178,7 +172,7 @@ function Sidebar({
   if (isMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-        <SheetContent
+        <Sheet.Content
           data-sidebar='sidebar'
           data-slot='sidebar'
           data-mobile='true'
@@ -190,12 +184,12 @@ function Sidebar({
           }
           side={side}
         >
-          <SheetHeader className='sr-only'>
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-          </SheetHeader>
+          <Sheet.Header className='sr-only'>
+            <Sheet.Title>Sidebar</Sheet.Title>
+            <Sheet.Description>Displays the mobile sidebar.</Sheet.Description>
+          </Sheet.Header>
           <div className='flex h-full w-full flex-col'>{children}</div>
-        </SheetContent>
+        </Sheet.Content>
       </Sheet>
     );
   }
