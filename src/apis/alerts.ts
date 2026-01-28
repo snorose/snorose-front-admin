@@ -1,4 +1,4 @@
-import { axiosInstance } from '@/axios/instance';
+import { axiosInstance } from '@/shared/axios/instance';
 import type { PushNotification } from '@/types';
 
 export const postPushNotificationAPI = async (data: PushNotification) => {

@@ -1,4 +1,4 @@
-import { axiosInstance } from '@/axios/instance';
+import { axiosInstance } from '@/shared/axios/instance';
 import type { EditMemberInfo, UpdateUserInfoResponse } from '@/types/member';
 
 export const searchUsersAPI = async (keyword: string) => {
