@@ -34,7 +34,10 @@ function Alert({
   );
 }
 
-function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
+Alert.Title = function AlertTitle({
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot='alert-title'
@@ -45,9 +48,9 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
       {...props}
     />
   );
-}
+};
 
-function AlertDescription({
+Alert.Description = function AlertDescription({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
@@ -61,6 +64,6 @@ function AlertDescription({
       {...props}
     />
   );
-}
+};
 
-export { Alert, AlertTitle, AlertDescription };
+export { Alert };
