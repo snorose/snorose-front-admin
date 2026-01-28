@@ -5,7 +5,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/shared/components/ui/table';
 import { useState } from 'react';
 
 import { USERPOINT_SAMPLE_DATA } from '@/__mocks__';

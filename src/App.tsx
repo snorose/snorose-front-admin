@@ -14,7 +14,7 @@ import {
   PushNotificationPage,
 } from './pages';
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
-import { SidebarProvider, Toaster } from '@/components/ui';
+import { SidebarProvider, Toaster } from '@/shared/components/ui';
 import { AuthProvider } from '@/contexts';
 
 // QueryClient 인스턴스 생성

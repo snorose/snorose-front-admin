@@ -26,8 +26,12 @@ export default defineConfig([
     },
   },
   // components/ui 폴더에서는 react-refresh 규칙 비활성화
+  // shadcn/ui 컴포넌트는 variants를 함께 export하는 패턴을 사용하므로
   {
-    files: ['src/components/ui/**/*.{ts,tsx}'],
+    files: [
+      'src/components/ui/**/*.{ts,tsx}',
+      'src/shared/components/ui/**/*.{ts,tsx}',
+    ],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

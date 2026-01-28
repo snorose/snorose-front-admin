@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import {
   deleteExamReview,
   updateExamReview,
@@ -21,7 +21,7 @@ import type {
   ExamReviewDetailResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
-import { ConfirmModal, Skeleton } from '@/components/ui';
+import { ConfirmModal, Skeleton } from '@/shared/components/ui';
 import {
   convertLectureTypeToString,
   convertSemesterEnumToString,

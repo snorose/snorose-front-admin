@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Input } from '@/components/ui';
+import { Button, Input } from '@/shared/components/ui';
 import { PageHeader } from '@/shared/components';
 import type { MemberInfo } from '@/shared/types';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';

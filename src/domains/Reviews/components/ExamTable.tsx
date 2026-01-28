@@ -10,7 +10,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { STATUS_COLOR } from '@/shared/constants';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';

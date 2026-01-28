@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import type { PushNotification } from '@/shared/types';
 import { useMemo } from 'react';
 

@@ -1,4 +1,4 @@
-import { Label, Input, Button } from '@/components/ui';
+import { Label, Input, Button } from '@/shared/components/ui';
 import { DateTimePicker } from '@/shared/components';
 import { useState } from 'react';
 import { postPointFreezeAPI } from '@/apis';

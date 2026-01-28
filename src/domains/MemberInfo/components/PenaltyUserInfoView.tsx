@@ -1,4 +1,4 @@
-import { Label, Input } from '@/components/ui';
+import { Label, Input } from '@/shared/components/ui';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 import { PENALTY_USER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
 

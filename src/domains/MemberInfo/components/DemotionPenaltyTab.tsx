@@ -8,8 +8,8 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui';
-import { ConfirmModal } from '@/components/ui';
+  ConfirmModal,
+} from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 import { toast } from 'sonner';
 import {

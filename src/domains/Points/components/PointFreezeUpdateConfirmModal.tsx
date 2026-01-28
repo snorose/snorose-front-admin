@@ -8,7 +8,7 @@ import {
   Button,
   Label,
   Input,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { DateTimePicker } from '@/shared/components';
 import { patchPointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';

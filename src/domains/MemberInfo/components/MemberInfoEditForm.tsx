@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Label, Input, Button } from '@/components/ui';
+import { Label, Input, Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import {
   MEMBER_INFO,

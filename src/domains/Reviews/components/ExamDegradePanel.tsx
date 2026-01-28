@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { DEGRADE_REASON_LIST } from '@/shared/constants';
 
 const SELECT_CONTENT_STYLE =

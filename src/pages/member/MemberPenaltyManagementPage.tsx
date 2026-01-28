@@ -1,5 +1,5 @@
 import { useCallback, useState, useMemo } from 'react';
-import { Button, Input } from '@/components/ui';
+import { Button, Input } from '@/shared/components/ui';
 import { PageHeader } from '@/shared/components';
 import { toast } from 'sonner';
 import type { PenaltyUserInfo } from '@/shared/types';

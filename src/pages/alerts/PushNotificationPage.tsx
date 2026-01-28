@@ -6,7 +6,7 @@ import {
   RadioGroup,
   RadioGroupItem,
   Textarea,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { PageHeader } from '@/shared/components';
 import { PushNotificationConfirmModal } from '@/domains/Alerts';
 import { postPushNotificationAPI } from '@/apis';

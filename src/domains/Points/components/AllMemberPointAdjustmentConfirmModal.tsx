@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { snoroseLogo } from '@/assets';
-import { Button, Input } from '@/components/ui';
+import { Button, Input } from '@/shared/components/ui';
 import { useAuth } from '@/shared/hooks';
 
 export default function LogInPage() {

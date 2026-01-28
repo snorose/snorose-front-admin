@@ -6,7 +6,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { format } from 'date-fns';
 import { ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';

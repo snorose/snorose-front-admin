@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui';
+import { Button } from '@/shared/components/ui';
 import { toast } from 'sonner';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 

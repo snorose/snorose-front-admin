@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 
 interface ConfirmModalProps {
   isOpen: boolean;

@@ -1,4 +1,4 @@
-import { TableRow, TableCell, Skeleton } from '@/components/ui';
+import { TableRow, TableCell, Skeleton } from '@/shared/components/ui';
 
 // ======= types =======
 interface ExamTableSkeletonProps {

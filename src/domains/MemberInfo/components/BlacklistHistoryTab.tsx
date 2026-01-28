@@ -5,7 +5,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/shared/components/ui/table';
 import { useState, useEffect } from 'react';
 import MemberInfoPagination from './MemberInfoTablePagenation';
 import { toast } from 'sonner';

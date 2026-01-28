@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   SidebarMenu,
   Badge,
-} from '@/components/ui';
+} from '@/shared/components/ui';
 import { snoroseLogo } from '@/assets';
 import { SIDEBAR_MENUS } from '@/shared/constants';
 import { NavUser } from '@/shared/components';
