@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { AuthContext } from '@/shared/contexts';
 import type { AuthContextType } from '@/shared/types';
 

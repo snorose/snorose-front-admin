@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
 import { format } from 'date-fns';
 
 interface UseDateTimeFieldOptions {
@@ -13,7 +14,7 @@ interface UseDateTimeFieldReturn {
   time: string;
   dateTime: string;
   onDateSelect: (date: Date | undefined) => void;
-  onTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTimeChange: (time: string) => void;
   setDate: (date: Date | undefined) => void;
   setTime: (time: string) => void;
   setDateTime: (dateTime: string) => void;
@@ -32,7 +33,7 @@ export function useDateTimeField({
     const parts = dateTime.split('T');
     return {
       date: parts[0] ? new Date(parts[0]) : undefined,
-      time: parts[1] || '00:00',
+      time: parts[1]?.slice(0, 5) || '00:00',
     };
   };
 
@@ -71,8 +72,7 @@ export function useDateTimeField({
   );
 
   const handleTimeChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newTime = e.target.value;
+    (newTime: string) => {
       setTime(newTime);
       updateDateTime(date, newTime);
     },

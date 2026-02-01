@@ -13,3 +13,15 @@ export function formatDateTimeForAPI(dateTimeString: string): string {
 export function formatDateTimeForInput(dateTimeString: string): string {
   return dateTimeString.replace(' ', 'T').slice(0, 16);
 }
+
+/**
+ * 날짜/시간 문자열에서 초 단위를 제거
+ * '2024-01-01 12:00:00' → '2024-01-01 12:00'
+ * 값이 없으면 '-' 반환
+ */
+export function formatDateTimeToMinutes(
+  dateTimeString: string | null | undefined
+): string {
+  if (!dateTimeString) return '-';
+  return dateTimeString.slice(0, 16);
+}
