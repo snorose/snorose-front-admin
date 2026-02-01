@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { Table } from '@/shared/components/ui';
+
 import { PencilIcon, Trash2 } from 'lucide-react';
+
+import { Table } from '@/shared/components/ui';
+import type { PointFreeze } from '@/shared/types';
+import { formatDateTimeToMinutes } from '@/shared/utils';
+
 import {
   PointFreezeDeleteConfirmModal,
   PointFreezeUpdateConfirmModal,
 } from '@/domains/Points';
-import type { PointFreeze } from '@/shared/types';
 
 export default function PointFreezeListSection({
   pointFreezes,
@@ -43,7 +47,6 @@ export default function PointFreezeListSection({
           <Table className='w-full'>
             <Table.Header>
               <Table.Row className='text-center'>
-                <Table.Head className='text-center'>ID</Table.Head>
                 <Table.Head className='text-center'>일정 제목</Table.Head>
                 <Table.Head className='text-center'>시작 일시</Table.Head>
                 <Table.Head className='text-center'>종료 일시</Table.Head>
@@ -58,15 +61,18 @@ export default function PointFreezeListSection({
                 pointFreezes.map(
                   ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
                     <Table.Row key={id}>
-                      <Table.Cell className='text-center'>{id}</Table.Cell>
                       <Table.Cell className='text-center'>{title}</Table.Cell>
-                      <Table.Cell className='text-center'>{startAt}</Table.Cell>
-                      <Table.Cell className='text-center'>{endAt}</Table.Cell>
                       <Table.Cell className='text-center'>
-                        {createdAt}
+                        {formatDateTimeToMinutes(startAt)}
                       </Table.Cell>
                       <Table.Cell className='text-center'>
-                        {updatedAt}
+                        {formatDateTimeToMinutes(endAt)}
+                      </Table.Cell>
+                      <Table.Cell className='text-center'>
+                        {formatDateTimeToMinutes(createdAt)}
+                      </Table.Cell>
+                      <Table.Cell className='text-center'>
+                        {formatDateTimeToMinutes(updatedAt)}
                       </Table.Cell>
                       <Table.Cell className='text-center'>
                         <div className='flex items-center justify-center'>

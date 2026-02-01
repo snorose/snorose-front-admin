@@ -1,8 +1,10 @@
-import { Dialog, Button } from '@/shared/components/ui';
-import type { PointFreeze } from '@/shared/types';
-import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/shared/utils';
+
+import { Button, Dialog } from '@/shared/components/ui';
+import type { PointFreeze } from '@/shared/types';
+import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
+
+import { deletePointFreezeAPI } from '@/apis';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;
@@ -50,11 +52,15 @@ export default function PointFreezeDeleteConfirmModal({
             </li>
             <li>
               <span className='text-sm font-semibold'>시작 일시: </span>
-              <span className='text-sm'>{selectedItem.startAt}</span>
+              <span className='text-sm'>
+                {formatDateTimeToMinutes(selectedItem.startAt)}
+              </span>
             </li>
             <li>
               <span className='text-sm font-semibold'>종료 일시: </span>
-              <span className='text-sm'>{selectedItem.endAt}</span>
+              <span className='text-sm'>
+                {formatDateTimeToMinutes(selectedItem.endAt)}
+              </span>
             </li>
           </ul>
         </div>
