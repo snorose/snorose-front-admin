@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { format } from 'date-fns';
 import { ChevronDownIcon } from 'lucide-react';
@@ -10,6 +10,11 @@ import {
   Popover,
   Select,
 } from '@/shared/components/ui';
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = Array.from({ length: 60 }, (_, i) =>
+  String(i).padStart(2, '0')
+);
 
 interface DateTimePickerProps {
   label: string;
@@ -42,16 +47,6 @@ export function DateTimePicker({
   };
 
   const [hour = '00', minute = '00'] = (time || '00:00').split(':');
-
-  const hours = useMemo(
-    () => Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
-    []
-  );
-
-  const minutes = useMemo(
-    () => Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0')),
-    []
-  );
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
@@ -90,10 +85,10 @@ export function DateTimePicker({
             <Select.Trigger className='flex-1' size='default'>
               <Select.Value placeholder='시' />
             </Select.Trigger>
-            <Select.Content className='max-h-50 overflow-y-auto'>
-              {hours.map((h) => (
-                <Select.Item key={h} value={h}>
-                  {h}시
+            <Select.Content className='max-h-[200px] overflow-y-auto'>
+              {HOURS.map((hour) => (
+                <Select.Item key={hour} value={hour}>
+                  {hour}시
                 </Select.Item>
               ))}
             </Select.Content>
@@ -105,10 +100,10 @@ export function DateTimePicker({
             <Select.Trigger className='flex-1' size='default'>
               <Select.Value placeholder='분' />
             </Select.Trigger>
-            <Select.Content className='max-h-50 overflow-y-auto'>
-              {minutes.map((m) => (
-                <Select.Item key={m} value={m}>
-                  {m}분
+            <Select.Content className='max-h-[200px] overflow-y-auto'>
+              {MINUTES.map((minute) => (
+                <Select.Item key={minute} value={minute}>
+                  {minute}분
                 </Select.Item>
               ))}
             </Select.Content>
