@@ -1,15 +1,18 @@
-import { Dialog, Button, Label, Input } from '@/shared/components/ui';
-import { DateTimePicker } from '@/shared/components';
-import { patchPointFreezeAPI } from '@/apis';
+import { useEffect, useState } from 'react';
+
 import { toast } from 'sonner';
+
+import { DateTimePicker } from '@/shared/components';
+import { Button, Dialog, Input, Label } from '@/shared/components/ui';
+import { useDateTimeField } from '@/shared/hooks';
 import type { PointFreeze } from '@/shared/types';
-import { useState, useEffect } from 'react';
 import {
-  getErrorMessage,
   formatDateTimeForAPI,
   formatDateTimeForInput,
+  getErrorMessage,
 } from '@/shared/utils';
-import { useDateTimeField } from '@/shared/hooks';
+
+import { patchPointFreezeAPI } from '@/apis';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
@@ -18,7 +21,7 @@ interface PointFreezeUpdateConfirmModalProps {
   onSuccess: () => void;
 }
 
-export default function PointFreezeUpdateConfirmModal({
+export function PointFreezeUpdateConfirmModal({
   isUpdateModalOpen,
   selectedItem,
   onClose,

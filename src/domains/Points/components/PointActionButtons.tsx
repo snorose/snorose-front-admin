@@ -1,5 +1,6 @@
-import { Button } from '@/shared/components/ui';
 import { toast } from 'sonner';
+
+import { Button } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
@@ -13,7 +14,7 @@ interface PointActionButtonsProps {
   onApply: () => void;
 }
 
-export default function PointActionButtons({
+export function PointActionButtons({
   userId,
   selectedCategory,
   difference,

@@ -9,9 +9,9 @@ import { formatDateTimeToMinutes } from '@/shared/utils';
 import {
   PointFreezeDeleteConfirmModal,
   PointFreezeUpdateConfirmModal,
-} from '@/domains/Points';
+} from '@/domains/Points/components';
 
-export default function PointFreezeListSection({
+export function PointFreezeListSection({
   pointFreezes,
   getPointFreezes,
 }: {

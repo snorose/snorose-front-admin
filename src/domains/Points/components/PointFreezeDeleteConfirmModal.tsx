@@ -12,7 +12,7 @@ interface PointFreezeDeleteConfirmModalProps {
   onSuccess: () => void;
   onClose: () => void;
 }
-export default function PointFreezeDeleteConfirmModal({
+export function PointFreezeDeleteConfirmModal({
   isDeleteModalOpen,
   selectedItem,
   onSuccess,
