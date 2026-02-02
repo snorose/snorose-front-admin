@@ -1,15 +1,18 @@
-import { Table, Select } from '@/shared/components/ui';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { Select, Table } from '@/shared/components/ui';
 import { STATUS_COLOR } from '@/shared/constants';
-import { useState, useRef, useMemo, useEffect } from 'react';
-import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
+
+import { ExamStatusDot } from '@/domains/Reviews/components';
+import { useConfirmExamReview, useExamReviews } from '@/domains/Reviews/hooks';
+import type { ExamReview } from '@/domains/Reviews/types';
+
 import {
-  ExamTableSkeleton,
-  ExamTableEmptyRows,
   ExamTableEmpty,
+  ExamTableEmptyRows,
+  ExamTableSkeleton,
 } from './ExamTableFallback';
 import ExamTablePagination from './ExamTablePagination';
-import { ExamStatusDot } from '@/domains/Reviews/components';
-import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;

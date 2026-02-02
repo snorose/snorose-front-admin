@@ -1,10 +1,13 @@
 import { useState } from 'react';
+
 import { X } from 'lucide-react';
-import { Select, Button } from '@/shared/components/ui';
-import { SEMESTER_LIST, EXAM_TYPE_LIST } from '@/shared/constants';
+
+import { Button, Select } from '@/shared/components/ui';
+import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
+
 import {
-  convertSemesterToEnum,
   convertExamTypeToEnum,
+  convertSemesterToEnum,
   extractYearFromSemester,
 } from '@/domains/Reviews/utils';
 
