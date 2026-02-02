@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { getExamReviews } from '@/apis';
+
 import type { ExamReview, ExamReviews } from '@/domains/Reviews/types';
 
-// types
+import { getExamReviews } from '@/apis';
+
 interface UseExamReviewsParams {
   page: number;
   keyword?: string;
@@ -13,7 +14,6 @@ interface UseExamReviewsParams {
   refreshKey?: number;
 }
 
-// functions
 const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
   // title 파싱: "2023-1/기말/프로그래밍입문/이종우/001"
   const titleParts = apiData.title.split('/');
