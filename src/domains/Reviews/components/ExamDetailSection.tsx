@@ -43,6 +43,11 @@ import {
   updateExamReview,
 } from '@/apis/reviews';
 
+import {
+  type ExamReviewUpdateChange,
+  ExamReviewUpdateConfirmModal,
+} from './ExamReviewUpdateConfirmModal';
+
 interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
@@ -222,28 +227,50 @@ export function ExamDetailSection({
     );
   }, [formData, initialValues, selectedFile]);
 
-  const changedFields = useMemo(() => {
+  const updateChanges = useMemo<ExamReviewUpdateChange[]>(() => {
     if (!initialValues) return [];
-    const fields: string[] = [];
 
-    if (formData.status !== initialValues.status) fields.push('확인 여부');
-    if (formData.lectureName !== initialValues.lectureName)
-      fields.push('강의명');
-    if (formData.professorName !== initialValues.professorName)
-      fields.push('교수');
-    if (formData.semester !== initialValues.semester) fields.push('수강학기');
-    if (formData.examType !== initialValues.examType) fields.push('시험 종류');
-    if (formData.lectureType !== initialValues.lectureType)
-      fields.push('강의 종류');
-    if (formData.classNumber !== initialValues.classNumber) fields.push('분반');
-    if (formData.isPF !== initialValues.isPF) fields.push('P/F');
-    if (formData.isOnline !== initialValues.isOnline)
-      fields.push('온라인 수업');
-    if (formData.examTypeAndQuestions !== initialValues.questionDetail)
-      fields.push('시험 유형 및 문항수');
-    if (selectedFile) fields.push('업로드 파일');
+    const changes: ExamReviewUpdateChange[] = [];
+    const add = (label: string, before: string, after: string) => {
+      if (before === after) return;
+      changes.push({ label, before, after });
+    };
 
-    return fields;
+    if (formData.status !== initialValues.status) {
+      add(
+        '확인 여부',
+        getStatusName(initialValues.status),
+        getStatusName(formData.status)
+      );
+    }
+
+    add('강의명', initialValues.lectureName, formData.lectureName);
+    add('교수', initialValues.professorName, formData.professorName);
+    add('수강학기', initialValues.semester, formData.semester);
+    add('시험 종류', initialValues.examType, formData.examType);
+    add(
+      '강의 종류',
+      convertLectureTypeToString(initialValues.lectureType),
+      convertLectureTypeToString(formData.lectureType)
+    );
+    add(
+      '분반',
+      String(initialValues.classNumber ?? ''),
+      String(formData.classNumber ?? '')
+    );
+    add('P/F', initialValues.isPF, formData.isPF);
+    add('온라인 수업', initialValues.isOnline, formData.isOnline);
+    add(
+      '시험 유형 및 문항수',
+      initialValues.questionDetail,
+      formData.examTypeAndQuestions
+    );
+
+    if (selectedFile) {
+      add('업로드 파일', formData.fileName || '', selectedFile.name);
+    }
+
+    return changes;
   }, [formData, initialValues, selectedFile]);
 
   const handleCancel = () => {
@@ -787,24 +814,15 @@ export function ExamDetailSection({
         )}
       </div>
 
-      <ConfirmModal
+      <ExamReviewUpdateConfirmModal
         isOpen={isSaveModalOpen}
-        title='시험 후기 수정'
-        description='아래 항목이 수정됩니다. 저장하시겠습니까?'
-        confirmText='저장'
-        closeText='취소'
+        changes={updateChanges}
         onClose={() => setIsSaveModalOpen(false)}
         onConfirm={() => {
           setIsSaveModalOpen(false);
           void handleSave();
         }}
-      >
-        <ul className='list-disc pl-5 text-sm text-gray-700'>
-          {changedFields.map((field) => (
-            <li key={field}>{field}</li>
-          ))}
-        </ul>
-      </ConfirmModal>
+      />
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
