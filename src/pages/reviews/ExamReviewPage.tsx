@@ -1,22 +1,26 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
 import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
+
 import {
-  ExamTable,
-  ExamSearch,
+  ExamDetailSection,
   ExamIconInfo,
-  ExamPanel,
+  ExamSearch,
+  ExamTable,
 } from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
   Semester,
 } from '@/domains/Reviews/types';
-import { PageHeader } from '@/shared/components';
-import { getExamReviewDetail } from '@/apis';
-import { toast } from 'sonner';
-import { isAxiosError } from 'axios';
 import { convertSemesterEnumToString } from '@/domains/Reviews/utils';
+
+import { getExamReviewDetail } from '@/apis';
 
 export default function ExamReviewPage() {
   const queryClient = useQueryClient();
@@ -312,7 +316,6 @@ export default function ExamReviewPage() {
           </div>
         </div>
 
-        {/* 시험후기 테이블 */}
         <ExamTable
           onRowSelect={setSelectedExamReview}
           refreshKey={refreshKey}
@@ -323,8 +326,7 @@ export default function ExamReviewPage() {
         />
       </div>
 
-      {/* 시험후기 패널 - 편집, 삭제, 경고, 메모, 강등... */}
-      <ExamPanel
+      <ExamDetailSection
         selectedExamReview={selectedExamReview}
         selectedExamReviewDetail={selectedExamReviewDetail}
         isLoadingDetail={isLoadingDetail}
