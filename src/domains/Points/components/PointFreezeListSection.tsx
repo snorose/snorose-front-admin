@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import { PencilIcon, Trash2 } from 'lucide-react';
+import { MoreHorizontalIcon } from 'lucide-react';
 
-import { Table } from '@/shared/components/ui';
+import { Button, DropdownMenu, Table } from '@/shared/components/ui';
 import type { PointFreeze } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -47,20 +47,26 @@ export default function PointFreezeListSection({
           <Table className='w-full'>
             <Table.Header>
               <Table.Row className='text-center'>
+                <Table.Head className='text-center'>번호</Table.Head>
                 <Table.Head className='text-center'>일정 제목</Table.Head>
                 <Table.Head className='text-center'>시작 일시</Table.Head>
                 <Table.Head className='text-center'>종료 일시</Table.Head>
                 <Table.Head className='text-center'>생성 일시</Table.Head>
                 <Table.Head className='text-center'>수정 일시</Table.Head>
-                <Table.Head className='text-center'>삭제</Table.Head>
-                <Table.Head className='text-center'>수정</Table.Head>
+                <Table.Head className='text-center'>더보기</Table.Head>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {pointFreezes.length > 0 ? (
                 pointFreezes.map(
-                  ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
+                  (
+                    { id, title, startAt, endAt, createdAt, updatedAt },
+                    index
+                  ) => (
                     <Table.Row key={id}>
+                      <Table.Cell className='text-center'>
+                        {index + 1}
+                      </Table.Cell>
                       <Table.Cell className='text-center'>{title}</Table.Cell>
                       <Table.Cell className='text-center'>
                         {formatDateTimeToMinutes(startAt)}
@@ -75,20 +81,36 @@ export default function PointFreezeListSection({
                         {formatDateTimeToMinutes(updatedAt)}
                       </Table.Cell>
                       <Table.Cell className='text-center'>
-                        <div className='flex items-center justify-center'>
-                          <Trash2
-                            className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
-                            onClick={() => handleDeleteScheduleClick(id)}
-                          />
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='text-center'>
-                        <div className='flex items-center justify-center'>
-                          <PencilIcon
-                            className='h-4 w-4 cursor-pointer text-gray-500 active:text-gray-800'
-                            onClick={() => handleUpdateScheduleButtonClick(id)}
-                          />
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenu.Trigger asChild>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='size-6'
+                            >
+                              <MoreHorizontalIcon />
+                              <span className='sr-only'>Open menu</span>
+                            </Button>
+                          </DropdownMenu.Trigger>
+                          <DropdownMenu.Content align='end'>
+                            <DropdownMenu.Item
+                              onClick={() =>
+                                handleUpdateScheduleButtonClick(id)
+                              }
+                              className='cursor-pointer'
+                            >
+                              수정
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Separator />
+                            <DropdownMenu.Item
+                              variant='destructive'
+                              onClick={() => handleDeleteScheduleClick(id)}
+                              className='cursor-pointer'
+                            >
+                              삭제
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Content>
+                        </DropdownMenu>
                       </Table.Cell>
                     </Table.Row>
                   )
