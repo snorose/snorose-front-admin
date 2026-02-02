@@ -97,7 +97,6 @@ export default function PointFreezeListSection({
                               onClick={() =>
                                 handleUpdateScheduleButtonClick(id)
                               }
-                              className='cursor-pointer'
                             >
                               수정
                             </DropdownMenu.Item>
@@ -105,7 +104,6 @@ export default function PointFreezeListSection({
                             <DropdownMenu.Item
                               variant='destructive'
                               onClick={() => handleDeleteScheduleClick(id)}
-                              className='cursor-pointer'
                             >
                               삭제
                             </DropdownMenu.Item>
