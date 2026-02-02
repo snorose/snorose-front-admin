@@ -7,6 +7,7 @@ export { Collapsible } from './collapsible';
 export { ConfirmModal } from './confirm-modal';
 export { Dialog } from './dialog';
 export { DropdownMenu } from './dropdown-menu';
+export { Field } from './field';
 export { Input } from './input';
 export { Label } from './label';
 export { Popover } from './popover';
