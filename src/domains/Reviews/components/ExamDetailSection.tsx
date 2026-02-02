@@ -5,7 +5,6 @@ import { Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
-  Accordion,
   Button,
   ConfirmModal,
   Field,
@@ -21,7 +20,11 @@ import {
   STATUS_COLOR,
 } from '@/shared/constants';
 
-import { ExamStatusDot } from '@/domains/Reviews/components';
+import {
+  ExamReviewMetaInfoSection,
+  ExamReviewUpdateConfirmModal,
+  ExamStatusDot,
+} from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
@@ -43,10 +46,7 @@ import {
   updateExamReview,
 } from '@/apis/reviews';
 
-import {
-  type ExamReviewUpdateChange,
-  ExamReviewUpdateConfirmModal,
-} from './ExamReviewUpdateConfirmModal';
+import type { ExamReviewUpdateChange } from './ExamReviewUpdateConfirmModal';
 
 interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
@@ -345,10 +345,12 @@ export function ExamDetailSection({
         post.lectureName = formData.lectureName;
       }
       if (formData.professorName !== initialValues.professorName) {
-        post.professor = formData.professorName || undefined;
+        post.professor = formData.professorName;
       }
       if (formData.classNumber !== initialValues.classNumber) {
-        post.classNumber = formData.classNumber ?? undefined;
+        if (formData.classNumber !== null) {
+          post.classNumber = formData.classNumber;
+        }
       }
       if (formData.semester !== initialValues.semester) {
         const yearMatch = formData.semester.match(/^(\d{4})/);
@@ -772,44 +774,12 @@ export function ExamDetailSection({
               </div>
             </div>
 
-            <Accordion type='single' collapsible className='rounded-md border'>
-              <Accordion.Item value='meta'>
-                <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline'>
-                  메타 정보
-                </Accordion.Trigger>
-                <Accordion.Content className='px-4'>
-                  <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-2'>
-                    <Field className='gap-0'>
-                      <Field.Label>시험 후기 ID</Field.Label>
-                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
-                        {formData.postId ?? ''}
-                      </div>
-                    </Field>
-
-                    <Field className='gap-0'>
-                      <Field.Label>업로드 시간</Field.Label>
-                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
-                        {formData.uploadTime}
-                      </div>
-                    </Field>
-
-                    <Field className='gap-0'>
-                      <Field.Label>게시자</Field.Label>
-                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
-                        {formData.author}
-                      </div>
-                    </Field>
-
-                    <Field className='gap-0'>
-                      <Field.Label>게시자 ID</Field.Label>
-                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
-                        {formData.userId}
-                      </div>
-                    </Field>
-                  </div>
-                </Accordion.Content>
-              </Accordion.Item>
-            </Accordion>
+            <ExamReviewMetaInfoSection
+              postId={formData.postId}
+              uploadTime={formData.uploadTime}
+              author={formData.author}
+              userId={formData.userId}
+            />
           </div>
         )}
       </div>
