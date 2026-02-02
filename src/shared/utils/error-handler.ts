@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+
 import type { ApiErrorResponse } from '@/shared/types';
 
 /**
