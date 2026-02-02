@@ -1,6 +1,7 @@
-import { Dialog, Button } from '@/shared/components/ui';
-import type { PushNotification } from '@/shared/types';
 import { useMemo } from 'react';
+
+import { Button, Dialog } from '@/shared/components/ui';
+import type { PushNotification } from '@/shared/types';
 
 interface PushNotificationConfirmModalProps {
   isOpen: boolean;
@@ -9,7 +10,7 @@ interface PushNotificationConfirmModalProps {
   data: PushNotification;
 }
 
-export default function PushNotificationConfirmModal({
+export function PushNotificationConfirmModal({
   isOpen,
   onClose,
   onConfirm,

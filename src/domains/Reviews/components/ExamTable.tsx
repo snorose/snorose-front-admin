@@ -1,15 +1,18 @@
-import { Table, Select } from '@/shared/components/ui';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { Select, Table } from '@/shared/components/ui';
 import { STATUS_COLOR } from '@/shared/constants';
-import { useState, useRef, useMemo, useEffect } from 'react';
-import { useExamReviews, useConfirmExamReview } from '@/domains/Reviews/hooks';
+
+import { ExamStatusDot } from '@/domains/Reviews/components';
+import { useConfirmExamReview, useExamReviews } from '@/domains/Reviews/hooks';
+import type { ExamReview } from '@/domains/Reviews/types';
+
 import {
-  ExamTableSkeleton,
-  ExamTableEmptyRows,
   ExamTableEmpty,
+  ExamTableEmptyRows,
+  ExamTableSkeleton,
 } from './ExamTableFallback';
 import ExamTablePagination from './ExamTablePagination';
-import { ExamStatusDot } from '@/domains/Reviews/components';
-import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
@@ -77,7 +80,7 @@ export default function ExamTable({
   const confirmMutation = useConfirmExamReview();
 
   // propData가 제공되면 사용, 없으면 API 데이터 사용
-  const currentPageData = useMemo(
+  const currentPageData = useMemo<ExamReview[]>(
     () => propData || queryData?.data || [],
     [propData, queryData?.data]
   );
@@ -111,7 +114,7 @@ export default function ExamTable({
     // 현재 상태 저장 (롤백용)
     const previousStatus =
       selectedStatus[reviewId] ||
-      currentPageData.find((r) => r.id === reviewId)?.status;
+      currentPageData.find((r: ExamReview) => r.id === reviewId)?.status;
 
     // 로컬 상태 먼저 업데이트 (낙관적 업데이트)
     setSelectedStatus((prev) => ({
@@ -130,7 +133,7 @@ export default function ExamTable({
           // 성공 시 선택된 review가 현재 변경된 review이면 상태 업데이트
           if (selectedId === reviewId && onRowSelect) {
             const updatedReview = currentPageData.find(
-              (r) => r.id === reviewId
+              (r: ExamReview) => r.id === reviewId
             );
             if (updatedReview) {
               // 상태가 업데이트된 review 객체 생성
@@ -198,7 +201,7 @@ export default function ExamTable({
               <ExamTableEmpty />
             ) : (
               <>
-                {currentPageData.map((review) => {
+                {currentPageData.map((review: ExamReview) => {
                   const hasOpenSelect =
                     Object.values(openStatusSelect).some(Boolean);
                   const isRowActive = hasOpenSelect

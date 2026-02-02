@@ -1,18 +1,22 @@
 import { useState } from 'react';
-import { Button, Input } from '@/shared/components/ui';
-import { PageHeader } from '@/shared/components';
-import type { MemberInfo } from '@/shared/types';
-import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
+
 import { toast } from 'sonner';
-import { postSinglePointAPI, searchUsersAPI } from '@/apis';
+
+import { PageHeader } from '@/shared/components';
+import { Button, Input } from '@/shared/components/ui';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { useAuth } from '@/shared/hooks';
+import type { MemberInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
+
 import {
-  PointAdjustmentConfirmModal,
   MemberInfoSection,
-  PointDetailSection,
   PointActionButtons,
-} from '@/domains/Points';
+  PointAdjustmentConfirmModal,
+  PointDetailSection,
+} from '@/domains/Points/components';
+
+import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 
 export default function AdjustSinglePointPage() {
   const { user } = useAuth();

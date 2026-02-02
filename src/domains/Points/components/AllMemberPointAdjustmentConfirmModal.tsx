@@ -1,6 +1,6 @@
-import { Dialog, Button } from '@/shared/components/ui';
-import { cn } from '@/shared/lib';
+import { Button, Dialog } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
+import { cn } from '@/shared/lib';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -13,7 +13,7 @@ interface AllMemberPointAdjustmentConfirmModalProps {
   memo: string;
 }
 
-export default function AllMemberPointAdjustmentConfirmModal({
+export function AllMemberPointAdjustmentConfirmModal({
   isOpen,
   onClose,
   onConfirm,

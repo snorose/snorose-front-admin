@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
+
 import { Input, Label, Select } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
-import { useEffect } from 'react';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -13,7 +14,7 @@ interface PointDetailSectionProps {
   onMemoChange: (value: string) => void;
 }
 
-export default function PointDetailSection({
+export function PointDetailSection({
   selectedCategory,
   onCategoryChange,
   difference,

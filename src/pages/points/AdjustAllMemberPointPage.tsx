@@ -1,15 +1,19 @@
 import { useState } from 'react';
+
 import { Megaphone } from 'lucide-react';
-import { Button, Alert } from '@/shared/components/ui';
-import { PageHeader } from '@/shared/components';
-import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
-import { postAllMemberPointAPI } from '@/apis/points';
-import { getErrorMessage } from '@/shared/utils';
 import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
+import { Alert, Button } from '@/shared/components/ui';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
+import { getErrorMessage } from '@/shared/utils';
+
 import {
-  PointDetailSection,
   AllMemberPointAdjustmentConfirmModal,
-} from '@/domains/Points';
+  PointDetailSection,
+} from '@/domains/Points/components';
+
+import { postAllMemberPointAPI } from '@/apis/points';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 

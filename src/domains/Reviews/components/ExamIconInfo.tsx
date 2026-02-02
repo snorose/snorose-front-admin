@@ -4,7 +4,6 @@ export default function ExamIconInfo() {
   return (
     <div>
       <ul>
-        {/* 상태 리스트 */}
         {STATUS_COLOR.map((status) => (
           <li key={status.id} className='text-[12px] font-medium text-gray-800'>
             <span

@@ -1,6 +1,8 @@
-import { STATUS_COLOR } from '@/shared/constants';
-import * as Popover from '@radix-ui/react-popover';
 import React, { useEffect } from 'react';
+
+import * as Popover from '@radix-ui/react-popover';
+
+import { STATUS_COLOR } from '@/shared/constants';
 
 // 상태 드롭다운 컴포넌트 (아이콘 + 텍스트)
 export const StatusDropdown = ({

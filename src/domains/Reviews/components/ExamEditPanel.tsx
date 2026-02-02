@@ -1,35 +1,39 @@
-import { useState, useRef, useMemo, useEffect } from 'react';
-import { Button, Select } from '@/shared/components/ui';
-import {
-  deleteExamReview,
-  updateExamReview,
-  downloadExamReviewFile,
-} from '@/apis/reviews';
-import { toast } from 'sonner';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
 import { isAxiosError } from 'axios';
-import { Trash2, Loader2 } from 'lucide-react';
-import type {
-  LectureType,
-  ExamReview,
-  ExamReviewDetailResult,
-  UpdateExamReviewRequest,
-} from '@/domains/Reviews/types';
+import { Loader2, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Button, Select } from '@/shared/components/ui';
 import { ConfirmModal, Skeleton } from '@/shared/components/ui';
 import {
-  convertLectureTypeToString,
-  convertSemesterEnumToString,
-  convertExamTypeEnumToString,
-  convertSemesterToEnum,
-  convertExamTypeToEnum,
-  getStatusName,
-} from '@/domains/Reviews/utils';
-import { ExamStatusDot } from '@/domains/Reviews/components';
-import {
-  STATUS_COLOR,
-  SEMESTER_LIST,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
+  SEMESTER_LIST,
+  STATUS_COLOR,
 } from '@/shared/constants';
+
+import { ExamStatusDot } from '@/domains/Reviews/components';
+import type {
+  ExamReview,
+  ExamReviewDetailResult,
+  LectureType,
+  UpdateExamReviewRequest,
+} from '@/domains/Reviews/types';
+import {
+  convertExamTypeEnumToString,
+  convertExamTypeToEnum,
+  convertLectureTypeToString,
+  convertSemesterEnumToString,
+  convertSemesterToEnum,
+  getStatusName,
+} from '@/domains/Reviews/utils';
+
+import {
+  deleteExamReview,
+  downloadExamReviewFile,
+  updateExamReview,
+} from '@/apis/reviews';
 
 const TABLE_CELL_BASE_STYLE = 'border border-gray-300 text-left text-[12px]';
 const TABLE_HEADER_STYLE = `${TABLE_CELL_BASE_STYLE} bg-gray-100 font-medium w-[120px] px-3 py-1`;
