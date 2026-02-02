@@ -80,7 +80,7 @@ export default function ExamTable({
   const confirmMutation = useConfirmExamReview();
 
   // propData가 제공되면 사용, 없으면 API 데이터 사용
-  const currentPageData = useMemo(
+  const currentPageData = useMemo<ExamReview[]>(
     () => propData || queryData?.data || [],
     [propData, queryData?.data]
   );
@@ -114,7 +114,7 @@ export default function ExamTable({
     // 현재 상태 저장 (롤백용)
     const previousStatus =
       selectedStatus[reviewId] ||
-      currentPageData.find((r) => r.id === reviewId)?.status;
+      currentPageData.find((r: ExamReview) => r.id === reviewId)?.status;
 
     // 로컬 상태 먼저 업데이트 (낙관적 업데이트)
     setSelectedStatus((prev) => ({
@@ -133,7 +133,7 @@ export default function ExamTable({
           // 성공 시 선택된 review가 현재 변경된 review이면 상태 업데이트
           if (selectedId === reviewId && onRowSelect) {
             const updatedReview = currentPageData.find(
-              (r) => r.id === reviewId
+              (r: ExamReview) => r.id === reviewId
             );
             if (updatedReview) {
               // 상태가 업데이트된 review 객체 생성
@@ -201,7 +201,7 @@ export default function ExamTable({
               <ExamTableEmpty />
             ) : (
               <>
-                {currentPageData.map((review) => {
+                {currentPageData.map((review: ExamReview) => {
                   const hasOpenSelect =
                     Object.values(openStatusSelect).some(Boolean);
                   const isRowActive = hasOpenSelect
