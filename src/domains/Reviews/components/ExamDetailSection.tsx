@@ -5,12 +5,14 @@ import { Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
+  Accordion,
   Button,
   ConfirmModal,
   Field,
   Input,
   Select,
   Skeleton,
+  Textarea,
 } from '@/shared/components/ui';
 import {
   EXAM_TYPE_LIST,
@@ -50,6 +52,7 @@ interface ExamDetailSectionProps {
 }
 
 type FormData = {
+  userId: string;
   postId: number | null;
   status: string;
   examReviewName: string;
@@ -81,6 +84,7 @@ type InitialValues = {
 };
 
 const DEFAULT_FORM_DATA: FormData = {
+  userId: '',
   postId: null,
   status: '',
   examReviewName: '',
@@ -109,12 +113,14 @@ export function ExamDetailSection({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [initialValues, setInitialValues] = useState<InitialValues | null>(
     null
   );
 
   const isDisabled = !selectedExamReview || isLoadingDetail || false;
+  const isFormDisabled = !selectedExamReview || Boolean(isLoadingDetail);
 
   const resetForm = () => {
     setFormData(DEFAULT_FORM_DATA);
@@ -138,6 +144,7 @@ export function ExamDetailSection({
         (selectedExamReviewDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED');
 
       return {
+        userId: selectedExamReviewDetail.userId,
         postId: selectedExamReviewDetail.postId,
         status: statusValue,
         examReviewName: selectedExamReviewDetail.title,
@@ -173,6 +180,7 @@ export function ExamDetailSection({
   useEffect(() => {
     if (formInitialValues) {
       setFormData({
+        userId: formInitialValues.userId,
         postId: formInitialValues.postId,
         status: formInitialValues.status,
         examReviewName: formInitialValues.examReviewName,
@@ -214,10 +222,35 @@ export function ExamDetailSection({
     );
   }, [formData, initialValues, selectedFile]);
 
+  const changedFields = useMemo(() => {
+    if (!initialValues) return [];
+    const fields: string[] = [];
+
+    if (formData.status !== initialValues.status) fields.push('확인 여부');
+    if (formData.lectureName !== initialValues.lectureName)
+      fields.push('강의명');
+    if (formData.professorName !== initialValues.professorName)
+      fields.push('교수');
+    if (formData.semester !== initialValues.semester) fields.push('수강학기');
+    if (formData.examType !== initialValues.examType) fields.push('시험 종류');
+    if (formData.lectureType !== initialValues.lectureType)
+      fields.push('강의 종류');
+    if (formData.classNumber !== initialValues.classNumber) fields.push('분반');
+    if (formData.isPF !== initialValues.isPF) fields.push('P/F');
+    if (formData.isOnline !== initialValues.isOnline)
+      fields.push('온라인 수업');
+    if (formData.examTypeAndQuestions !== initialValues.questionDetail)
+      fields.push('시험 유형 및 문항수');
+    if (selectedFile) fields.push('업로드 파일');
+
+    return fields;
+  }, [formData, initialValues, selectedFile]);
+
   const handleCancel = () => {
     if (selectedExamReviewDetail && initialValues) {
       setFormData((prev) => ({
         ...prev,
+        userId: selectedExamReviewDetail.userId,
         postId: selectedExamReviewDetail.postId,
         status: initialValues.status,
         lectureName: initialValues.lectureName,
@@ -233,6 +266,11 @@ export function ExamDetailSection({
       }));
       setSelectedFile(null);
     }
+  };
+
+  const openSaveModal = () => {
+    if (!isDirty) return;
+    setIsSaveModalOpen(true);
   };
 
   const handleFileDownload = async () => {
@@ -394,11 +432,11 @@ export function ExamDetailSection({
         </div>
 
         {!selectedExamReview ? (
-          <div className='rounded-md bg-gray-50 p-4 text-gray-600'>
+          <div className='rounded-md bg-gray-50 p-4 text-sm text-gray-600'>
             상단 시험후기 목록에서 시험후기를 선택해주세요.
           </div>
         ) : isLoadingDetail ? (
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+          <div className='grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-4'>
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i}>
                 <Skeleton className='h-4 w-24' />
@@ -407,17 +445,17 @@ export function ExamDetailSection({
             ))}
           </div>
         ) : (
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            <Field className='gap-0'>
-              <Field.Label>상태</Field.Label>
-              <Field.Content>
-                <div className='mt-1'>
+          <div className='flex flex-col gap-4'>
+            <div className='grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-4'>
+              <Field className='gap-0'>
+                <Field.Label>확인 여부</Field.Label>
+                <Field.Content>
                   <Select
                     value={formData.status}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, status: value }))
                     }
-                    disabled={isDisabled}
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
@@ -439,109 +477,92 @@ export function ExamDetailSection({
                       ))}
                     </Select.Content>
                   </Select>
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>ID</Field.Label>
-              <Input value={formData.postId ?? ''} disabled={true} />
-            </Field>
-
-            <Field className='gap-0'>
-              <Field.Label>게시자</Field.Label>
-              <Input value={formData.author} disabled={true} />
-            </Field>
-
-            <Field className='gap-0'>
-              <Field.Label>업로드 시간</Field.Label>
-              <Input value={formData.uploadTime} disabled={true} />
-            </Field>
-
-            <Field className='gap-0'>
-              <Field.Label>업로드 파일</Field.Label>
-              <Field.Content>
-                <div className='mt-1 flex items-center gap-2'>
-                  <button
-                    type='button'
-                    className='flex-1 truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-blue-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400'
-                    onClick={handleFileDownload}
-                    disabled={!formData.fileName}
-                    title={formData.fileName}
-                  >
-                    {formData.fileName || '파일 없음'}
-                  </button>
-                  <button
-                    type='button'
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isDisabled}
-                    className='rounded-md border border-gray-200 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60'
-                  >
-                    파일 변경
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type='file'
-                    className='hidden'
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setSelectedFile(file);
-                        setFormData((prev) => ({
-                          ...prev,
-                          fileName: file.name,
-                        }));
-                      }
-                      if (e.target) e.target.value = '';
-                    }}
-                    accept='.pdf,.doc,.docx,.hwp'
+              <Field className='gap-0'>
+                <Field.Label>강의명</Field.Label>
+                <Field.Content>
+                  <Input
+                    value={formData.lectureName}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        lectureName: e.target.value,
+                      }))
+                    }
+                    disabled={isFormDisabled}
                   />
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>강의명</Field.Label>
-              <Field.Content>
-                <Input
-                  value={formData.lectureName}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      lectureName: e.target.value,
-                    }))
-                  }
-                  disabled={isDisabled}
-                />
-              </Field.Content>
-            </Field>
+              <Field className='gap-0'>
+                <Field.Label>교수</Field.Label>
+                <Field.Content>
+                  <Input
+                    value={formData.professorName}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        professorName: e.target.value,
+                      }))
+                    }
+                    disabled={isFormDisabled}
+                  />
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>교수</Field.Label>
-              <Field.Content>
-                <Input
-                  value={formData.professorName}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      professorName: e.target.value,
-                    }))
-                  }
-                  disabled={isDisabled}
-                />
-              </Field.Content>
-            </Field>
+              <Field className='gap-0'>
+                <Field.Label>업로드 파일</Field.Label>
+                <Field.Content>
+                  <div className='flex items-center gap-2'>
+                    <button
+                      type='button'
+                      className='flex-1 truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400'
+                      onClick={handleFileDownload}
+                      disabled={!formData.fileName}
+                      title={formData.fileName}
+                    >
+                      {selectedFile?.name || formData.fileName || '파일 없음'}
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isFormDisabled}
+                      className='rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60'
+                    >
+                      파일 변경
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type='file'
+                      className='hidden'
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSelectedFile(file);
+                          setFormData((prev) => ({
+                            ...prev,
+                            fileName: file.name,
+                          }));
+                        }
+                        if (e.target) e.target.value = '';
+                      }}
+                      accept='.pdf,.doc,.docx,.hwp'
+                    />
+                  </div>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>수강학기</Field.Label>
-              <Field.Content>
-                <div className='mt-1'>
+              <Field className='gap-0'>
+                <Field.Label>수강학기</Field.Label>
+                <Field.Content>
                   <Select
                     value={formData.semester}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, semester: value }))
                     }
-                    disabled={isDisabled}
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <Select.Value>{formData.semester}</Select.Value>
@@ -557,20 +578,18 @@ export function ExamDetailSection({
                       ))}
                     </Select.Content>
                   </Select>
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>시험 종류</Field.Label>
-              <Field.Content>
-                <div className='mt-1'>
+              <Field className='gap-0'>
+                <Field.Label>시험 종류</Field.Label>
+                <Field.Content>
                   <Select
                     value={formData.examType}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, examType: value }))
                     }
-                    disabled={isDisabled}
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <Select.Value>{formData.examType}</Select.Value>
@@ -586,14 +605,12 @@ export function ExamDetailSection({
                       ))}
                     </Select.Content>
                   </Select>
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>강의 종류</Field.Label>
-              <Field.Content>
-                <div className='mt-1'>
+              <Field className='gap-0'>
+                <Field.Label>강의 종류</Field.Label>
+                <Field.Content>
                   <Select
                     value={formData.lectureType}
                     onValueChange={(value) =>
@@ -603,7 +620,7 @@ export function ExamDetailSection({
                           value as (typeof LECTURE_TYPE_OPTIONS)[number]['value'],
                       }))
                     }
-                    disabled={isDisabled}
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <Select.Value>
@@ -618,39 +635,37 @@ export function ExamDetailSection({
                       ))}
                     </Select.Content>
                   </Select>
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>분반</Field.Label>
-              <Field.Content>
-                <Input
-                  type='number'
-                  value={formData.classNumber ?? ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setFormData((prev) => ({
-                      ...prev,
-                      classNumber: value === '' ? null : parseInt(value, 10),
-                    }));
-                  }}
-                  disabled={isDisabled}
-                  min={1}
-                />
-              </Field.Content>
-            </Field>
+              <Field className='gap-0'>
+                <Field.Label>분반</Field.Label>
+                <Field.Content>
+                  <Input
+                    type='number'
+                    value={formData.classNumber ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData((prev) => ({
+                        ...prev,
+                        classNumber: value === '' ? null : parseInt(value, 10),
+                      }));
+                    }}
+                    disabled={isFormDisabled}
+                    min={1}
+                  />
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>P/F</Field.Label>
-              <Field.Content>
-                <div className='mt-1'>
+              <Field className='gap-0'>
+                <Field.Label>P/F</Field.Label>
+                <Field.Content>
                   <Select
                     value={formData.isPF}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, isPF: value }))
                     }
-                    disabled={isDisabled}
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <Select.Value>{formData.isPF}</Select.Value>
@@ -660,20 +675,18 @@ export function ExamDetailSection({
                       <Select.Item value='X'>X</Select.Item>
                     </Select.Content>
                   </Select>
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>온라인 수업</Field.Label>
-              <Field.Content>
-                <div className='mt-1'>
+              <Field className='gap-0'>
+                <Field.Label>온라인 수업</Field.Label>
+                <Field.Content>
                   <Select
                     value={formData.isOnline}
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, isOnline: value }))
                     }
-                    disabled={isDisabled}
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <Select.Value>{formData.isOnline}</Select.Value>
@@ -683,54 +696,115 @@ export function ExamDetailSection({
                       <Select.Item value='X'>X</Select.Item>
                     </Select.Content>
                   </Select>
-                </div>
-              </Field.Content>
-            </Field>
+                </Field.Content>
+              </Field>
 
-            <Field className='gap-0'>
-              <Field.Label>시험 유형 및 문항수</Field.Label>
-              <Field.Content>
-                <Input
-                  value={formData.examTypeAndQuestions}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      examTypeAndQuestions: e.target.value,
-                    }))
-                  }
-                  disabled={isDisabled}
-                />
-              </Field.Content>
-            </Field>
+              <Field className='gap-0'>
+                <Field.Label>시험 유형 및 문항수</Field.Label>
+                <Field.Content>
+                  <Textarea
+                    value={formData.examTypeAndQuestions}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        examTypeAndQuestions: e.target.value,
+                      }))
+                    }
+                    disabled={isFormDisabled}
+                    className='min-h-[84px]'
+                  />
+                </Field.Content>
+              </Field>
 
-            <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
-              <Button
-                variant='outline'
-                className='w-20'
-                onClick={handleCancel}
-                disabled={isDisabled || !isDirty}
-              >
-                취소
-              </Button>
-              <Button
-                variant='default'
-                className='w-20 bg-gray-700'
-                onClick={handleSave}
-                disabled={isDisabled || !isDirty || isSaving}
-              >
-                {isSaving ? (
-                  <div className='flex items-center gap-1'>
-                    <Loader2 className='h-3 w-3 animate-spin' />
-                    <span>수정 중</span>
-                  </div>
-                ) : (
-                  '수정'
-                )}
-              </Button>
+              <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
+                <>
+                  <Button
+                    variant='outline'
+                    className='w-20'
+                    onClick={handleCancel}
+                    disabled={isDisabled || !isDirty || isSaving}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    variant='default'
+                    className='w-20 bg-gray-700'
+                    onClick={openSaveModal}
+                    disabled={isDisabled || !isDirty || isSaving}
+                  >
+                    {isSaving ? (
+                      <div className='flex items-center gap-1'>
+                        <Loader2 className='h-3 w-3 animate-spin' />
+                        <span>저장 중</span>
+                      </div>
+                    ) : (
+                      '저장'
+                    )}
+                  </Button>
+                </>
+              </div>
             </div>
+
+            <Accordion type='single' collapsible className='rounded-md border'>
+              <Accordion.Item value='meta'>
+                <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline'>
+                  메타 정보
+                </Accordion.Trigger>
+                <Accordion.Content className='px-4'>
+                  <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-2'>
+                    <Field className='gap-0'>
+                      <Field.Label>시험 후기 ID</Field.Label>
+                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
+                        {formData.postId ?? ''}
+                      </div>
+                    </Field>
+
+                    <Field className='gap-0'>
+                      <Field.Label>업로드 시간</Field.Label>
+                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
+                        {formData.uploadTime}
+                      </div>
+                    </Field>
+
+                    <Field className='gap-0'>
+                      <Field.Label>게시자</Field.Label>
+                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
+                        {formData.author}
+                      </div>
+                    </Field>
+
+                    <Field className='gap-0'>
+                      <Field.Label>게시자 ID</Field.Label>
+                      <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
+                        {formData.userId}
+                      </div>
+                    </Field>
+                  </div>
+                </Accordion.Content>
+              </Accordion.Item>
+            </Accordion>
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={isSaveModalOpen}
+        title='시험 후기 수정'
+        description='아래 항목이 수정됩니다. 저장하시겠습니까?'
+        confirmText='저장'
+        closeText='취소'
+        onClose={() => setIsSaveModalOpen(false)}
+        onConfirm={() => {
+          setIsSaveModalOpen(false);
+          void handleSave();
+        }}
+      >
+        <ul className='list-disc pl-5 text-sm text-gray-700'>
+          {changedFields.map((field) => (
+            <li key={field}>{field}</li>
+          ))}
+        </ul>
+      </ConfirmModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
