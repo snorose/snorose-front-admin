@@ -9,7 +9,6 @@ import { PageHeader } from '@/shared/components';
 
 import {
   ExamDetailSection,
-  ExamIconInfo,
   ExamSearch,
   ExamTable,
 } from '@/domains/Reviews/components';
@@ -310,10 +309,6 @@ export default function ExamReviewPage() {
                   : undefined
             }
           />
-
-          <div className='ml-auto'>
-            <ExamIconInfo />
-          </div>
         </div>
 
         <ExamTable
