@@ -14,10 +14,10 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import {
+  EXAM_CONFIRM_STATUS,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
   SEMESTER_LIST,
-  STATUS_COLOR,
 } from '@/shared/constants';
 
 import {
@@ -492,7 +492,7 @@ export function ExamDetailSection({
                       </div>
                     </Select.Trigger>
                     <Select.Content align='start'>
-                      {STATUS_COLOR.map((statusOption) => (
+                      {EXAM_CONFIRM_STATUS.map((statusOption) => (
                         <Select.Item
                           key={statusOption.code}
                           value={statusOption.code}

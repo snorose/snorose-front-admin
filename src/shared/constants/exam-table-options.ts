@@ -1,5 +1,5 @@
 // 상태 리스트
-export const STATUS_COLOR = [
+export const EXAM_CONFIRM_STATUS = [
   { code: 'CONFIRMED', label: '확인완료' },
   { code: 'UNCONFIRMED', label: '미확인' },
 ] as const;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import * as Popover from '@radix-ui/react-popover';
 
-import { STATUS_COLOR } from '@/shared/constants';
+import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 export interface MultiSelectProps {
   value: string[];
@@ -98,7 +98,7 @@ export const MultiSelect = ({
             {options.map((option) => {
               const isSelected = value.includes(option);
               const statusOption = showStatusDot
-                ? STATUS_COLOR.find((s) => s.label === option)
+                ? EXAM_CONFIRM_STATUS.find((s) => s.label === option)
                 : null;
               return (
                 <div

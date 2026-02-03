@@ -1,4 +1,4 @@
-import { STATUS_COLOR } from '@/shared/constants';
+import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 /**
  * lectureType enum을 문자열로 변환
@@ -130,6 +130,6 @@ export const extractYearFromSemester = (
  * @returns 상태 이름
  */
 export const getStatusName = (statusCode: string): string => {
-  const statusOption = STATUS_COLOR.find((s) => s.code === statusCode);
+  const statusOption = EXAM_CONFIRM_STATUS.find((s) => s.code === statusCode);
   return statusOption?.label || '확인';
 };
