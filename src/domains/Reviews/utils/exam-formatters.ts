@@ -131,5 +131,5 @@ export const extractYearFromSemester = (
  */
 export const getStatusName = (statusCode: string): string => {
   const statusOption = STATUS_COLOR.find((s) => s.code === statusCode);
-  return statusOption?.name || '확인';
+  return statusOption?.label || '확인';
 };

@@ -489,7 +489,6 @@ export function ExamDetailSection({
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
                         <ExamConfirmStatusBadge status={formData.status} />
-                        <span>{getStatusName(formData.status)}</span>
                       </div>
                     </Select.Trigger>
                     <Select.Content align='start'>
@@ -498,12 +497,7 @@ export function ExamDetailSection({
                           key={statusOption.code}
                           value={statusOption.code}
                         >
-                          <div className='flex items-center gap-2'>
-                            <ExamConfirmStatusBadge
-                              status={statusOption.code}
-                            />
-                            <span>{statusOption.name}</span>
-                          </div>
+                          <ExamConfirmStatusBadge status={statusOption.code} />
                         </Select.Item>
                       ))}
                     </Select.Content>

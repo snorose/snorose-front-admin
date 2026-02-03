@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui/badge';
+import { Badge } from '@/shared/components/ui';
 import { STATUS_COLOR } from '@/shared/constants';
 
 interface ExamConfirmStatusBadgeProps {
@@ -20,7 +20,7 @@ export function ExamConfirmStatusBadge({
   status,
 }: ExamConfirmStatusBadgeProps) {
   const option = STATUS_COLOR.find((s) => s.code === status);
-  const label = option?.name ?? status;
+  const label = option?.label ?? '';
 
   const variantInfo =
     EXAM_CONFIRMED_STATUS_VARIANTS[

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import * as Popover from '@radix-ui/react-popover';
+
 import { STATUS_COLOR } from '@/shared/constants';
 
 export interface MultiSelectProps {
@@ -96,7 +98,7 @@ export const MultiSelect = ({
             {options.map((option) => {
               const isSelected = value.includes(option);
               const statusOption = showStatusDot
-                ? STATUS_COLOR.find((s) => s.name === option)
+                ? STATUS_COLOR.find((s) => s.label === option)
                 : null;
               return (
                 <div
@@ -126,9 +128,7 @@ export const MultiSelect = ({
                   />
                   <span className='flex-1'>{option}</span>
                   {showStatusDot && statusOption && (
-                    <div
-                      className={`ml-2 h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                    />
+                    <div className='ml-2 h-2 w-2 shrink-0 rounded-full bg-blue-500' />
                   )}
                 </div>
               );
