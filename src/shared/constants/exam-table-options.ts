@@ -1,7 +1,7 @@
 // 상태 리스트
 export const STATUS_COLOR = [
   { id: 1, code: 'CONFIRMED', name: '확인완료', color: 'bg-blue-500' },
-  { id: 2, code: 'UNCONFIRMED', name: '미확인 족보', color: 'bg-gray-300' },
+  { id: 2, code: 'UNCONFIRMED', name: '미확인', color: 'bg-gray-300' },
 ];
 
 // 수강 학기 자동 생성 함수 (2007년 ~ 현재년도)

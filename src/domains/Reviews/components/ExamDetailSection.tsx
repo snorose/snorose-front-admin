@@ -21,9 +21,9 @@ import {
 } from '@/shared/constants';
 
 import {
+  ExamConfirmStatusBadge,
   ExamReviewMetaInfoSection,
   ExamReviewUpdateConfirmModal,
-  ExamStatusDot,
 } from '@/domains/Reviews/components';
 import type {
   ExamReview,
@@ -488,7 +488,7 @@ export function ExamDetailSection({
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
-                        <ExamStatusDot status={formData.status} />
+                        <ExamConfirmStatusBadge status={formData.status} />
                         <span>{getStatusName(formData.status)}</span>
                       </div>
                     </Select.Trigger>
@@ -499,7 +499,9 @@ export function ExamDetailSection({
                           value={statusOption.code}
                         >
                           <div className='flex items-center gap-2'>
-                            <ExamStatusDot status={statusOption.code} />
+                            <ExamConfirmStatusBadge
+                              status={statusOption.code}
+                            />
                             <span>{statusOption.name}</span>
                           </div>
                         </Select.Item>

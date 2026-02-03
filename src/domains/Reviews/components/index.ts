@@ -1,3 +1,4 @@
+export { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
 export { default as ExamDegradePanel } from './ExamDegradePanel';
 export { default as ExamDeletePanel } from './ExamDeletePanel';
 export { ExamDetailSection } from './ExamDetailSection';
@@ -6,7 +7,6 @@ export { StatusDropdown, TextDropdown } from './ExamDropdown';
 export { ExamReviewMetaInfoSection } from './ExamReviewMetaInfoSection';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';
 export { default as ExamSearch } from './ExamSearch';
-export { default as ExamStatusDot } from './ExamStatusDot';
 export { default as ExamTable } from './ExamTable';
 export {
   ExamTableEmpty,

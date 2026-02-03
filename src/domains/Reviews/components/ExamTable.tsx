@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
 
-import { ExamStatusDot } from '@/domains/Reviews/components';
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
 import { useExamReviews } from '@/domains/Reviews/hooks';
 import type { ExamReview } from '@/domains/Reviews/types';
 
@@ -145,7 +145,7 @@ export default function ExamTable({
                       }}
                     >
                       <Table.Cell className='relative w-[50px] cursor-pointer p-0 text-center'>
-                        <ExamStatusDot status={review.status} />
+                        <ExamConfirmStatusBadge status={review.status} />
                       </Table.Cell>
                       <Table.Cell className='w-[200px] overflow-hidden'>
                         <div
