@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Select, Table } from '@/shared/components/ui';
-import { STATUS_COLOR } from '@/shared/constants';
+import { Table } from '@/shared/components/ui';
 
 import { ExamStatusDot } from '@/domains/Reviews/components';
-import { useConfirmExamReview, useExamReviews } from '@/domains/Reviews/hooks';
+import { useExamReviews } from '@/domains/Reviews/hooks';
 import type { ExamReview } from '@/domains/Reviews/types';
 
 import {
@@ -57,16 +56,6 @@ export default function ExamTable({
     }
   };
 
-  // 상태 선택 상태 관리 (로컬 UI 상태)
-  const [selectedStatus, setSelectedStatus] = useState<{
-    [key: number]: string;
-  }>({});
-
-  // Select 열림 상태 관리
-  const [openStatusSelect, setOpenStatusSelect] = useState<{
-    [key: number]: boolean;
-  }>({});
-
   const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
     keyword: searchParams.keyword,
@@ -76,8 +65,6 @@ export default function ExamTable({
     enabled: !propData,
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
-
-  const confirmMutation = useConfirmExamReview();
 
   // propData가 제공되면 사용, 없으면 API 데이터 사용
   const currentPageData = useMemo<ExamReview[]>(
@@ -105,64 +92,6 @@ export default function ExamTable({
       lastSelectedIdRef.current = null;
     }
   }, [selectedId, currentPageData, onRowSelect]);
-
-  // 상태 선택 함수
-  const handleStatusSelect = async (reviewId: number, statusCode: string) => {
-    // 상태 코드에 따라 isConfirmed 값 결정
-    const isConfirmed = statusCode === 'CONFIRMED';
-
-    // 현재 상태 저장 (롤백용)
-    const previousStatus =
-      selectedStatus[reviewId] ||
-      currentPageData.find((r: ExamReview) => r.id === reviewId)?.status;
-
-    // 로컬 상태 먼저 업데이트 (낙관적 업데이트)
-    setSelectedStatus((prev) => ({
-      ...prev,
-      [reviewId]: statusCode,
-    }));
-
-    // Mutation 실행
-    confirmMutation.mutate(
-      {
-        reviewId,
-        isConfirmed,
-      },
-      {
-        onSuccess: () => {
-          // 성공 시 선택된 review가 현재 변경된 review이면 상태 업데이트
-          if (selectedId === reviewId && onRowSelect) {
-            const updatedReview = currentPageData.find(
-              (r: ExamReview) => r.id === reviewId
-            );
-            if (updatedReview) {
-              // 상태가 업데이트된 review 객체 생성
-              const reviewWithUpdatedStatus: ExamReview = {
-                ...updatedReview,
-                status: statusCode,
-              };
-              onRowSelect(reviewWithUpdatedStatus);
-            }
-          }
-        },
-        onError: () => {
-          // 실패 시 롤백
-          if (previousStatus) {
-            setSelectedStatus((prev) => ({
-              ...prev,
-              [reviewId]: previousStatus,
-            }));
-          } else {
-            setSelectedStatus((prev) => {
-              const newState = { ...prev };
-              delete newState[reviewId];
-              return newState;
-            });
-          }
-        },
-      }
-    );
-  };
 
   const isEmpty = !isLoading && currentPageData.length === 0;
 
@@ -202,17 +131,10 @@ export default function ExamTable({
             ) : (
               <>
                 {currentPageData.map((review: ExamReview) => {
-                  const hasOpenSelect =
-                    Object.values(openStatusSelect).some(Boolean);
-                  const isRowActive = hasOpenSelect
-                    ? openStatusSelect[review.id]
-                    : selectedId === review.id;
                   return (
                     <Table.Row
                       key={review.id}
-                      className={`hover:cursor-pointer [&_td]:h-[24px] ${
-                        isRowActive ? 'bg-blue-100 hover:bg-blue-100' : ''
-                      }`}
+                      className='hover:cursor-pointer [&_td]:h-[24px]'
                       onClick={(e) => {
                         e.stopPropagation();
                         if (selectedId === review.id) {
@@ -223,83 +145,7 @@ export default function ExamTable({
                       }}
                     >
                       <Table.Cell className='relative w-[50px] cursor-pointer p-0 text-center'>
-                        <Select
-                          value={selectedStatus[review.id] || review.status}
-                          onValueChange={async (value) => {
-                            const statusOption = STATUS_COLOR.find(
-                              (s) => s.code === value
-                            );
-                            if (statusOption) {
-                              await handleStatusSelect(
-                                review.id,
-                                statusOption.code
-                              );
-                            }
-                            setOpenStatusSelect((prev) => ({
-                              ...prev,
-                              [review.id]: false,
-                            }));
-                            // 포커스 제거
-                            setTimeout(() => {
-                              const activeElement =
-                                document.activeElement as HTMLElement;
-                              if (activeElement) {
-                                activeElement.blur();
-                              }
-                            }, 0);
-                          }}
-                          open={openStatusSelect[review.id] || false}
-                          onOpenChange={(open) => {
-                            setOpenStatusSelect((prev) => ({
-                              ...prev,
-                              [review.id]: open,
-                            }));
-                            if (open) {
-                              // Select가 열릴 때 해당 행 선택
-                              if (selectedId !== review.id && onRowSelect) {
-                                onRowSelect(review);
-                              }
-                            } else {
-                              // 닫힐 때 포커스 제거
-                              setTimeout(() => {
-                                const activeElement =
-                                  document.activeElement as HTMLElement;
-                                if (activeElement) {
-                                  activeElement.blur();
-                                }
-                              }, 0);
-                            }
-                          }}
-                        >
-                          <Select.Trigger className='!absolute !inset-0 !flex !h-full !w-full !items-center !justify-center !border-0 !bg-transparent !p-0 !shadow-none hover:!bg-transparent focus:!ring-0 focus:!outline-none focus-visible:!ring-0 focus-visible:!ring-offset-0 focus-visible:!outline-none [&>svg]:!hidden'>
-                            <Select.Value className='!flex !items-center !justify-center'>
-                              <ExamStatusDot
-                                status={
-                                  selectedStatus[review.id] || review.status
-                                }
-                              />
-                            </Select.Value>
-                          </Select.Trigger>
-                          <Select.Content
-                            align='start'
-                            className='max-h-[200px] overflow-y-auto bg-blue-50 text-[12px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
-                          >
-                            {STATUS_COLOR.map((statusOption) => (
-                              <Select.Item
-                                key={statusOption.id}
-                                value={statusOption.code}
-                                className='text-[12px] font-medium'
-                              >
-                                <div className='flex items-center gap-2'>
-                                  <div
-                                    className={`h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                                  />
-                                  <span>{statusOption.name}</span>
-                                </div>
-                              </Select.Item>
-                            ))}
-                          </Select.Content>
-                        </Select>
+                        <ExamStatusDot status={review.status} />
                       </Table.Cell>
                       <Table.Cell className='w-[200px] overflow-hidden'>
                         <div
