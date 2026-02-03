@@ -18,7 +18,7 @@ export function ExamTableSkeleton({
       {Array.from({ length: itemsPerPage }).map((_, index) => (
         <Table.Row key={`skeleton-${index}`} className='[&_td]:h-[24px]'>
           <Table.Cell className='w-[50px]'>
-            <Skeleton className='mx-auto h-2 w-2 rounded-full' />
+            <Skeleton className='h-4 w-full' />
           </Table.Cell>
           <Table.Cell className='w-[200px]'>
             <Skeleton className='h-4 w-full' />
