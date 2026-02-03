@@ -238,7 +238,7 @@ export function ExamDetailSection({
 
     if (formData.status !== initialValues.status) {
       add(
-        '확인 여부',
+        '확인여부',
         getStatusName(initialValues.status),
         getStatusName(formData.status)
       );
@@ -477,7 +477,7 @@ export function ExamDetailSection({
           <div className='flex flex-col gap-4'>
             <div className='grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-4'>
               <Field className='gap-0'>
-                <Field.Label>확인 여부</Field.Label>
+                <Field.Label>확인여부</Field.Label>
                 <Field.Content>
                   <Select
                     value={formData.status}
