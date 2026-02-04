@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
-import * as Popover from '@radix-ui/react-popover';
-import { STATUS_COLOR } from '@/shared/constants';
+import { useEffect, useState } from 'react';
 
-export interface MultiSelectProps {
+import * as Popover from '@radix-ui/react-popover';
+
+import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
+
+export interface ExamMultiSelectProps {
   value: string[];
   onValueChange: (value: string[]) => void;
   options: string[];
@@ -13,7 +15,7 @@ export interface MultiSelectProps {
   children: React.ReactNode;
 }
 
-export const MultiSelect = ({
+export const ExamMultiSelect = ({
   value,
   onValueChange,
   options,
@@ -22,7 +24,7 @@ export const MultiSelect = ({
   align = 'start',
   showStatusDot = false,
   children,
-}: MultiSelectProps) => {
+}: ExamMultiSelectProps) => {
   const [open, setOpen] = useState(false);
 
   // 드롭다운이 열려있을 때 body 스크롤 막기
@@ -96,7 +98,7 @@ export const MultiSelect = ({
             {options.map((option) => {
               const isSelected = value.includes(option);
               const statusOption = showStatusDot
-                ? STATUS_COLOR.find((s) => s.name === option)
+                ? EXAM_CONFIRM_STATUS.find((s) => s.label === option)
                 : null;
               return (
                 <div
@@ -126,9 +128,7 @@ export const MultiSelect = ({
                   />
                   <span className='flex-1'>{option}</span>
                   {showStatusDot && statusOption && (
-                    <div
-                      className={`ml-2 h-2 w-2 shrink-0 rounded-full ${statusOption.color}`}
-                    />
+                    <div className='ml-2 h-2 w-2 shrink-0 rounded-full bg-blue-500' />
                   )}
                 </div>
               );

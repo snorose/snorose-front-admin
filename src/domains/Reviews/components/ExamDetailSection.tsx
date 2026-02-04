@@ -14,16 +14,16 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import {
+  EXAM_CONFIRM_STATUS,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
   SEMESTER_LIST,
-  STATUS_COLOR,
 } from '@/shared/constants';
 
 import {
+  ExamConfirmStatusBadge,
   ExamReviewMetaInfoSection,
   ExamReviewUpdateConfirmModal,
-  ExamStatusDot,
 } from '@/domains/Reviews/components';
 import type {
   ExamReview,
@@ -238,7 +238,7 @@ export function ExamDetailSection({
 
     if (formData.status !== initialValues.status) {
       add(
-        '확인 여부',
+        '확인여부',
         getStatusName(initialValues.status),
         getStatusName(formData.status)
       );
@@ -477,7 +477,7 @@ export function ExamDetailSection({
           <div className='flex flex-col gap-4'>
             <div className='grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-4'>
               <Field className='gap-0'>
-                <Field.Label>확인 여부</Field.Label>
+                <Field.Label>확인여부</Field.Label>
                 <Field.Content>
                   <Select
                     value={formData.status}
@@ -488,20 +488,16 @@ export function ExamDetailSection({
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
-                        <ExamStatusDot status={formData.status} />
-                        <span>{getStatusName(formData.status)}</span>
+                        <ExamConfirmStatusBadge status={formData.status} />
                       </div>
                     </Select.Trigger>
                     <Select.Content align='start'>
-                      {STATUS_COLOR.map((statusOption) => (
+                      {EXAM_CONFIRM_STATUS.map((statusOption) => (
                         <Select.Item
                           key={statusOption.code}
                           value={statusOption.code}
                         >
-                          <div className='flex items-center gap-2'>
-                            <ExamStatusDot status={statusOption.code} />
-                            <span>{statusOption.name}</span>
-                          </div>
+                          <ExamConfirmStatusBadge status={statusOption.code} />
                         </Select.Item>
                       ))}
                     </Select.Content>

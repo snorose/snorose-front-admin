@@ -32,21 +32,22 @@ export function ExamReviewUpdateConfirmModal({
       <div className='overflow-hidden rounded-md border'>
         <div className='grid grid-cols-[140px_1fr_1fr] gap-3 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700'>
           <div>항목</div>
-          <div>이전</div>
-          <div>이후</div>
+          <div>수정 전</div>
+          <div>수정 후</div>
         </div>
+
         <div className='divide-y'>
-          {changes.map((c) => (
+          {changes.map((change) => (
             <div
-              key={c.label}
+              key={change.label}
               className='grid grid-cols-[140px_1fr_1fr] gap-3 px-3 py-2 text-sm'
             >
-              <div className='text-gray-700'>{c.label}</div>
-              <div className='break-words whitespace-pre-wrap text-gray-600'>
-                {c.before || '-'}
+              <div className='text-gray-700'>{change.label}</div>
+              <div className='break-words whitespace-pre-wrap text-gray-700'>
+                {change.before || '-'}
               </div>
-              <div className='break-words whitespace-pre-wrap text-gray-900'>
-                {c.after || '-'}
+              <div className='break-words whitespace-pre-wrap text-blue-600'>
+                {change.after || '-'}
               </div>
             </div>
           ))}

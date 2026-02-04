@@ -9,7 +9,6 @@ import { PageHeader } from '@/shared/components';
 
 import {
   ExamDetailSection,
-  ExamIconInfo,
   ExamSearch,
   ExamTable,
 } from '@/domains/Reviews/components';
@@ -282,7 +281,7 @@ export default function ExamReviewPage() {
   }, [selectedExamReview]);
 
   return (
-    <div className='flex flex-col gap-6'>
+    <div className='flex w-full flex-col gap-6'>
       <PageHeader
         title='시험후기 관리'
         description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
@@ -310,10 +309,6 @@ export default function ExamReviewPage() {
                   : undefined
             }
           />
-
-          <div className='ml-auto'>
-            <ExamIconInfo />
-          </div>
         </div>
 
         <ExamTable
