@@ -4,7 +4,7 @@ import * as Popover from '@radix-ui/react-popover';
 
 import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
-export interface MultiSelectProps {
+export interface ExamMultiSelectProps {
   value: string[];
   onValueChange: (value: string[]) => void;
   options: string[];
@@ -15,7 +15,7 @@ export interface MultiSelectProps {
   children: React.ReactNode;
 }
 
-export const MultiSelect = ({
+export const ExamMultiSelect = ({
   value,
   onValueChange,
   options,
@@ -24,7 +24,7 @@ export const MultiSelect = ({
   align = 'start',
   showStatusDot = false,
   children,
-}: MultiSelectProps) => {
+}: ExamMultiSelectProps) => {
   const [open, setOpen] = useState(false);
 
   // 드롭다운이 열려있을 때 body 스크롤 막기
