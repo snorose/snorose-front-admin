@@ -2,7 +2,7 @@ import { Badge } from '@/shared/components/ui';
 import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 interface ExamConfirmStatusBadgeProps {
-  status: 'CONFIRMED' | 'UNCONFIRMED';
+  status: string;
 }
 
 const EXAM_CONFIRMED_STATUS_VARIANTS = {
