@@ -15,6 +15,25 @@ import type { ExamReview } from '@/domains/Reviews/types';
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
 
+const EXAM_REVIEW_TABLE_COLUMNS = [
+  {
+    key: 'status',
+    label: '확인여부',
+    width: '50px',
+    render: (review: ExamReview) => (
+      <ExamConfirmStatusBadge status={review.status} />
+    ),
+  },
+  { key: 'reviewTitle', label: '시험후기명', width: '200px' },
+  { key: 'courseName', label: '강의명', width: '120px' },
+  { key: 'professor', label: '교수명', width: '60px' },
+  { key: 'semester', label: '수강학기', width: '60px' },
+  { key: 'examType', label: '시험종류', width: '60px' },
+  { key: 'classNumber', label: '분반', width: '60px' },
+  { key: 'uploadTime', label: '업로드 시간', width: '110px' },
+  { key: 'userDisplay', label: '게시자', width: '80px' },
+];
+
 interface ExamTableProps {
   data?: ExamReview[];
   onRowSelect?: (review: ExamReview | null) => void;
@@ -100,24 +119,16 @@ export default function ExamTable({
         <Table
           className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
         >
-          <Table.Header className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
-            <Table.Row className='hover:bg-gray-100'>
-              <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden'>
-                확인여부
+          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+            {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
+              <Table.Head
+                key={column.key}
+                style={{ width: column.width }}
+                className='relative cursor-pointer overflow-hidden'
+              >
+                {column.label}
               </Table.Head>
-              <Table.Head className='w-[200px]'>시험후기명</Table.Head>
-              <Table.Head className='w-[120px]'>강의명</Table.Head>
-              <Table.Head className='w-[60px]'>교수명</Table.Head>
-              <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden'>
-                수강학기
-              </Table.Head>
-              <Table.Head className='relative w-[60px] cursor-pointer overflow-hidden'>
-                시험종류
-              </Table.Head>
-              <Table.Head className='w-[60px]'>분반</Table.Head>
-              <Table.Head className='w-[110px]'>업로드 시간</Table.Head>
-              <Table.Head className='w-[80px]'>게시자</Table.Head>
-            </Table.Row>
+            ))}
           </Table.Header>
 
           <Table.Body>
@@ -131,7 +142,7 @@ export default function ExamTable({
                   return (
                     <Table.Row
                       key={review.id}
-                      className='hover:cursor-pointer [&_td]:h-[24px]'
+                      className='hover:cursor-pointer [&_td]:h-[40px]'
                       onClick={(e) => {
                         e.stopPropagation();
                         if (selectedId === review.id) {
@@ -141,73 +152,19 @@ export default function ExamTable({
                         }
                       }}
                     >
-                      <Table.Cell className='relative w-[50px] cursor-pointer p-0 text-center'>
-                        <ExamConfirmStatusBadge status={review.status} />
-                      </Table.Cell>
-                      <Table.Cell className='w-[200px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.reviewTitle}
+                      {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
+                        <Table.Cell
+                          key={column.key}
+                          style={{ width: column.width }}
+                          className='truncate overflow-hidden'
                         >
-                          {review.reviewTitle}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[120px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.courseName}
-                        >
-                          {review.courseName}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[60px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.professor}
-                        >
-                          {review.professor}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[84px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.semester}
-                        >
-                          {review.semester}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[60px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.examType}
-                        >
-                          {review.examType}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[60px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.classNumber}
-                        >
-                          {review.classNumber}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[110px] overflow-hidden text-gray-600'>
-                        <div
-                          className='w-full truncate'
-                          title={review.uploadTime}
-                        >
-                          {review.uploadTime}
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className='w-[80px] overflow-hidden'>
-                        <div
-                          className='w-full truncate'
-                          title={review.userDisplay}
-                        >
-                          {review.userDisplay}
-                        </div>
-                      </Table.Cell>
+                          {column.render
+                            ? column.render(review)
+                            : (review[
+                                column.key as keyof ExamReview
+                              ] as string)}
+                        </Table.Cell>
+                      ))}
                     </Table.Row>
                   );
                 })}
