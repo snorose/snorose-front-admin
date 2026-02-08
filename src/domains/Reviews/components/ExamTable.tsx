@@ -123,7 +123,8 @@ export default function ExamTable({
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <Table.Head
                 key={column.key}
-                className={`relative w-[${column.width}] cursor-pointer overflow-hidden`}
+                style={{ width: column.width }}
+                className='relative cursor-pointer overflow-hidden'
               >
                 {column.label}
               </Table.Head>
@@ -154,7 +155,8 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
-                          className={`w-[${column.width}] truncate overflow-hidden`}
+                          style={{ width: column.width }}
+                          className='truncate overflow-hidden'
                         >
                           {column.render
                             ? column.render(review)
