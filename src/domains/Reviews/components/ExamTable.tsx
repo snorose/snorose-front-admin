@@ -2,16 +2,15 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
 
-import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
-import { useExamReviews } from '@/domains/Reviews/hooks';
-import type { ExamReview } from '@/domains/Reviews/types';
-
 import {
+  ExamConfirmStatusBadge,
   ExamTableEmpty,
   ExamTableEmptyRows,
+  ExamTablePagination,
   ExamTableSkeleton,
-} from './ExamTableFallback';
-import ExamTablePagination from './ExamTablePagination';
+} from '@/domains/Reviews/components';
+import { useExamReviews } from '@/domains/Reviews/hooks';
+import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
@@ -101,19 +100,18 @@ export default function ExamTable({
         <Table
           className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
         >
-          {/* Table Header */}
           <Table.Header className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
             <Table.Row className='hover:bg-gray-100'>
-              <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+              <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden'>
                 확인여부
               </Table.Head>
               <Table.Head className='w-[200px]'>시험후기명</Table.Head>
               <Table.Head className='w-[120px]'>강의명</Table.Head>
-              <Table.Head className='w-[60px]'>교수</Table.Head>
-              <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              <Table.Head className='w-[60px]'>교수명</Table.Head>
+              <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden'>
                 수강학기
               </Table.Head>
-              <Table.Head className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              <Table.Head className='relative w-[60px] cursor-pointer overflow-hidden'>
                 시험종류
               </Table.Head>
               <Table.Head className='w-[60px]'>분반</Table.Head>
@@ -122,7 +120,6 @@ export default function ExamTable({
             </Table.Row>
           </Table.Header>
 
-          {/* Table Body */}
           <Table.Body>
             {isLoading ? (
               <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
