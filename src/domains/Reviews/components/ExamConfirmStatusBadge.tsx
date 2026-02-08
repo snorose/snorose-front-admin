@@ -1,8 +1,10 @@
 import { Badge } from '@/shared/components/ui';
 import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
+import { cn } from '@/shared/lib';
 
 interface ExamConfirmStatusBadgeProps {
   status: string;
+  className?: string;
 }
 
 const EXAM_CONFIRMED_STATUS_VARIANTS = {
@@ -18,6 +20,7 @@ const EXAM_CONFIRMED_STATUS_VARIANTS = {
 
 export function ExamConfirmStatusBadge({
   status,
+  className,
 }: ExamConfirmStatusBadgeProps) {
   const option = EXAM_CONFIRM_STATUS.find((s) => s.code === status);
   const label = option?.label ?? '';
@@ -28,7 +31,7 @@ export function ExamConfirmStatusBadge({
     ] ?? EXAM_CONFIRMED_STATUS_VARIANTS.UNCONFIRMED;
 
   return (
-    <div className='flex items-center'>
+    <div className={cn('flex items-center', className)}>
       <Badge
         variant={variantInfo.variant}
         className={variantInfo.className}
