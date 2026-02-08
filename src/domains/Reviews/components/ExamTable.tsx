@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Table } from '@/shared/components/ui';
+import { Pagination, Table } from '@/shared/components/ui';
 
 import {
   ExamConfirmStatusBadge,
   ExamTableEmpty,
   ExamTableEmptyRows,
-  ExamTablePagination,
   ExamTableSkeleton,
 } from '@/domains/Reviews/components';
 import { useExamReviews } from '@/domains/Reviews/hooks';
@@ -177,11 +176,66 @@ export default function ExamTable({
         </Table>
       </div>
 
-      <ExamTablePagination
-        currentPage={currentPage}
-        hasNext={hasNext}
-        onPageChange={setCurrentPage}
-      />
+      <Pagination className='py-4'>
+        <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
+          <Pagination.Item>
+            <Pagination.Previous
+              href='#'
+              onClick={(e) => {
+                e.preventDefault();
+                if (currentPage > 1) setCurrentPage((p) => p - 1);
+              }}
+              className={
+                currentPage === 1 ? 'pointer-events-none opacity-50' : undefined
+              }
+            />
+          </Pagination.Item>
+          {(() => {
+            const inBlockMode = currentPage > 10;
+            const startPage = inBlockMode
+              ? Math.floor((currentPage - 1) / 10) * 10 + 1
+              : 1;
+            const endPage = hasNext
+              ? inBlockMode
+                ? startPage + 9
+                : 10
+              : currentPage;
+            const pageNumbers = Array.from(
+              { length: endPage - startPage + 1 },
+              (_, i) => startPage + i
+            );
+            return pageNumbers.map((page) => (
+              <Pagination.Item key={page}>
+                <Pagination.Link
+                  isActive={currentPage === page}
+                  href='#'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(page);
+                  }}
+                  className={
+                    currentPage === page ? 'cursor-default' : undefined
+                  }
+                >
+                  {page}
+                </Pagination.Link>
+              </Pagination.Item>
+            ));
+          })()}
+          <Pagination.Item>
+            <Pagination.Next
+              href='#'
+              onClick={(e) => {
+                e.preventDefault();
+                if (hasNext) setCurrentPage((p) => p + 1);
+              }}
+              className={
+                !hasNext ? 'pointer-events-none opacity-50' : undefined
+              }
+            />
+          </Pagination.Item>
+        </Pagination.Content>
+      </Pagination>
     </>
   );
 }
