@@ -104,16 +104,16 @@ export default function ExamTable({
           {/* Table Header */}
           <Table.Header className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
             <Table.Row className='hover:bg-gray-100'>
-              <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden text-center hover:bg-gray-200'>
+              <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden'>
                 확인여부
               </Table.Head>
               <Table.Head className='w-[200px]'>시험후기명</Table.Head>
               <Table.Head className='w-[120px]'>강의명</Table.Head>
               <Table.Head className='w-[60px]'>교수명</Table.Head>
-              <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden'>
                 수강학기
               </Table.Head>
-              <Table.Head className='relative w-[60px] cursor-pointer overflow-hidden hover:bg-gray-200'>
+              <Table.Head className='relative w-[60px] cursor-pointer overflow-hidden'>
                 시험종류
               </Table.Head>
               <Table.Head className='w-[60px]'>분반</Table.Head>
