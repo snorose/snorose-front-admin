@@ -109,7 +109,7 @@ export default function ExamTable({
               </Table.Head>
               <Table.Head className='w-[200px]'>시험후기명</Table.Head>
               <Table.Head className='w-[120px]'>강의명</Table.Head>
-              <Table.Head className='w-[60px]'>교수</Table.Head>
+              <Table.Head className='w-[60px]'>교수명</Table.Head>
               <Table.Head className='relative w-[84px] cursor-pointer overflow-hidden hover:bg-gray-200'>
                 수강학기
               </Table.Head>

@@ -245,7 +245,7 @@ export function ExamDetailSection({
     }
 
     add('강의명', initialValues.lectureName, formData.lectureName);
-    add('교수', initialValues.professorName, formData.professorName);
+    add('교수명', initialValues.professorName, formData.professorName);
     add('수강학기', initialValues.semester, formData.semester);
     add('시험 종류', initialValues.examType, formData.examType);
     add(
@@ -522,7 +522,7 @@ export function ExamDetailSection({
               </Field>
 
               <Field className='gap-0'>
-                <Field.Label>교수</Field.Label>
+                <Field.Label>교수명</Field.Label>
                 <Field.Content>
                   <Input
                     value={formData.professorName}
