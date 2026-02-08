@@ -119,7 +119,7 @@ export default function ExamTable({
         <Table
           className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
         >
-          <Table.Header className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
+          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <Table.Head
                 key={column.key}
@@ -141,7 +141,7 @@ export default function ExamTable({
                   return (
                     <Table.Row
                       key={review.id}
-                      className='hover:cursor-pointer [&_td]:h-[24px]'
+                      className='hover:cursor-pointer [&_td]:h-[40px]'
                       onClick={(e) => {
                         e.stopPropagation();
                         if (selectedId === review.id) {
