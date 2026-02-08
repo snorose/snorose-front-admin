@@ -28,7 +28,7 @@ export function ExamConfirmStatusBadge({
     ] ?? EXAM_CONFIRMED_STATUS_VARIANTS.UNCONFIRMED;
 
   return (
-    <div className='flex items-center justify-center'>
+    <div className='flex items-center'>
       <Badge
         variant={variantInfo.variant}
         className={variantInfo.className}
