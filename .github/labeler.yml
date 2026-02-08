@@ -7,6 +7,7 @@ labels:
   '✨ Feature':
     - '.*\[FEAT\].*'
     - '.*\[FEATURE\].*'
+    - '.*\[ADD\].*'
 
   '🐞 BugFix':
     - '.*\[FIX\].*'
@@ -19,12 +20,14 @@ labels:
 
   '🪄 Modify':
     - '.*\[MODIFY\].*'
+    - '.*\[RENAME\].*'
+    - '.*\[CORRECT\].*'
 
   '🎨 UI':
     - '.*\[DESIGN\].*'
     - '.*\[UI\].*'
 
-  '🧚 STYLE':
+  '🧚 Style':
     - '.*\[STYLE\].*'
 
   '❄️ Release':
