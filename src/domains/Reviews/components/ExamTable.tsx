@@ -3,8 +3,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Table } from '@/shared/components/ui';
 
 import {
+  ExamConfirmStatusBadge,
   ExamTableEmpty,
   ExamTableEmptyRows,
+  ExamTablePagination,
   ExamTableSkeleton,
 } from '@/domains/Reviews/components';
 import { useExamReviews } from '@/domains/Reviews/hooks';
@@ -98,7 +100,6 @@ export default function ExamTable({
         <Table
           className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
         >
-          {/* Table Header */}
           <Table.Header className='z-10 bg-gray-100 shadow-sm [&_tr]:border-b'>
             <Table.Row className='hover:bg-gray-100'>
               <Table.Head className='relative w-[50px] cursor-pointer overflow-hidden'>
@@ -119,7 +120,6 @@ export default function ExamTable({
             </Table.Row>
           </Table.Header>
 
-          {/* Table Body */}
           <Table.Body>
             {isLoading ? (
               <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
