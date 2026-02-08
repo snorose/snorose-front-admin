@@ -176,7 +176,7 @@ export default function ExamSearch({
         <div className='relative w-full'>
           <input
             type='text'
-            placeholder='키워드를 입력하세요'
+            placeholder='시험후기명, 강의명, 교수명을 검색해주세요.'
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={handleKeyDown}
