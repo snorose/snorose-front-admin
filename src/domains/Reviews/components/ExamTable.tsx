@@ -2,16 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
 
-import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
-import { useExamReviews } from '@/domains/Reviews/hooks';
-import type { ExamReview } from '@/domains/Reviews/types';
-
 import {
   ExamTableEmpty,
   ExamTableEmptyRows,
   ExamTableSkeleton,
-} from './ExamTableFallback';
-import ExamTablePagination from './ExamTablePagination';
+} from '@/domains/Reviews/components';
+import { useExamReviews } from '@/domains/Reviews/hooks';
+import type { ExamReview } from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
