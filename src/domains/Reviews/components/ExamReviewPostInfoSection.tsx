@@ -1,23 +1,23 @@
 import { Accordion, Field } from '@/shared/components/ui';
 
-interface ExamReviewMetaInfoSectionProps {
+interface ExamReviewPostInfoSectionProps {
   postId: number | null;
   uploadTime: string;
   author: string;
   userId: string;
 }
 
-export function ExamReviewMetaInfoSection({
+export function ExamReviewPostInfoSection({
   postId,
   uploadTime,
   author,
   userId,
-}: ExamReviewMetaInfoSectionProps) {
+}: ExamReviewPostInfoSectionProps) {
   return (
     <Accordion type='single' collapsible className='rounded-md border'>
-      <Accordion.Item value='meta'>
-        <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline'>
-          메타 정보
+      <Accordion.Item value='post'>
+        <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline data-[state=closed]:hover:bg-gray-50'>
+          게시글 정보
         </Accordion.Trigger>
         <Accordion.Content className='px-4'>
           <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-2'>

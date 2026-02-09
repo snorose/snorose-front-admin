@@ -22,7 +22,7 @@ import {
 
 import {
   ExamConfirmStatusBadge,
-  ExamReviewMetaInfoSection,
+  ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
 } from '@/domains/Reviews/components';
 import type {
@@ -770,7 +770,7 @@ export function ExamDetailSection({
               </div>
             </div>
 
-            <ExamReviewMetaInfoSection
+            <ExamReviewPostInfoSection
               postId={formData.postId}
               uploadTime={formData.uploadTime}
               author={formData.author}

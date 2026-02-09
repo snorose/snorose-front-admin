@@ -4,7 +4,7 @@ export { default as ExamDeletePanel } from './ExamDeletePanel';
 export { ExamDetailSection } from './ExamDetailSection';
 export { default as ExamDiscussionPanel } from './ExamDiscussionPanel';
 export { ExamMultiSelect } from './ExamMultiSelect';
-export { ExamReviewMetaInfoSection } from './ExamReviewMetaInfoSection';
+export { ExamReviewPostInfoSection } from './ExamReviewPostInfoSection';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamTable } from './ExamTable';
