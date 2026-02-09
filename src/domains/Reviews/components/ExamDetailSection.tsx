@@ -438,8 +438,8 @@ export function ExamDetailSection({
 
   return (
     <article className='flex flex-col gap-1'>
-      <div className='w-full rounded-md border p-4'>
-        <div className='mb-3 flex items-center justify-between'>
+      <div className='flex w-full flex-col rounded-md border'>
+        <div className='flex items-center justify-between bg-blue-100 px-4 py-3'>
           <div>
             <p className='font-semibold'>
               {selectedExamReview?.reviewTitle || '시험후기'}
@@ -460,7 +460,7 @@ export function ExamDetailSection({
             상단 시험후기 목록에서 시험후기를 선택해주세요.
           </div>
         ) : isLoadingDetail ? (
-          <div className='flex flex-col gap-y-2 md:gap-x-4'>
+          <div className='flex flex-col gap-y-2 p-4 md:gap-x-4'>
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i}>
                 <Skeleton className='h-4 w-24' />
@@ -469,7 +469,7 @@ export function ExamDetailSection({
             ))}
           </div>
         ) : (
-          <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-4 p-4 pt-2'>
             <div className='flex flex-col gap-y-2 md:gap-x-4'>
               <Field className='w-1/2 gap-0'>
                 <Field.Label>확인여부</Field.Label>
