@@ -27,7 +27,7 @@ export function ExamReviewTablePagination({
   };
 
   return (
-    <Pagination className='py-4'>
+    <Pagination className='py-2'>
       <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
         <Pagination.Item>
           <Pagination.Previous
