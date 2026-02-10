@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
 
 import {
   ExamConfirmStatusBadge,
+  ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
-  ExamTablePagination,
   ExamTableSkeleton,
 } from '@/domains/Reviews/components';
 import { useExamReviews } from '@/domains/Reviews/hooks';
@@ -46,7 +46,7 @@ interface ExamTableProps {
     examType?: string;
   };
   currentPage?: number;
-  onPageChange?: (page: number) => void;
+  onPageChange?: (page: number | ((prev: number) => number)) => void;
 }
 
 export default function ExamTable({
@@ -56,23 +56,23 @@ export default function ExamTable({
   selectedId,
   searchParams = {},
   currentPage: propCurrentPage,
-  onPageChange,
+  onPageChange: propOnPageChange,
 }: ExamTableProps) {
   const lastSelectedIdRef = useRef<number | null>(null);
+  const [internalPage, setInternalPage] = useState(1);
 
-  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
+  const currentPage = propCurrentPage ?? internalPage;
 
-  // prop으로 전달된 currentPage가 있으면 사용, 없으면 내부 state 사용
-  const currentPage = propCurrentPage ?? internalCurrentPage;
-
-  const setCurrentPage = (page: number | ((prev: number) => number)) => {
-    const newPage = typeof page === 'function' ? page(currentPage) : page;
-    if (onPageChange) {
-      onPageChange(newPage);
-    } else {
-      setInternalCurrentPage(newPage);
-    }
-  };
+  const setCurrentPage = useCallback(
+    (pageOrUpdater: number | ((prev: number) => number)) => {
+      if (propOnPageChange) {
+        propOnPageChange(pageOrUpdater);
+      } else {
+        setInternalPage(pageOrUpdater);
+      }
+    },
+    [propOnPageChange]
+  );
 
   const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
@@ -84,13 +84,11 @@ export default function ExamTable({
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
 
-  // propData가 제공되면 사용, 없으면 API 데이터 사용
   const currentPageData = useMemo<ExamReview[]>(
-    () => propData || queryData?.data || [],
+    () => propData ?? queryData?.data ?? [],
     [propData, queryData?.data]
   );
-
-  const hasNext = queryData?.hasNext || false;
+  const hasNext = queryData?.hasNext ?? false;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
   useEffect(() => {
@@ -177,10 +175,10 @@ export default function ExamTable({
         </Table>
       </div>
 
-      <ExamTablePagination
+      <ExamReviewTablePagination
         currentPage={currentPage}
-        hasNext={hasNext}
         onPageChange={setCurrentPage}
+        hasNext={hasNext}
       />
     </>
   );

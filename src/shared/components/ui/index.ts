@@ -10,6 +10,7 @@ export { DropdownMenu } from './dropdown-menu';
 export { Field } from './field';
 export { Input } from './input';
 export { Label } from './label';
+export { Pagination } from './pagination';
 export { Popover } from './popover';
 export { RadioGroup } from './radio-group';
 export { Select } from './select';

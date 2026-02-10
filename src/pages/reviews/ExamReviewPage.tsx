@@ -124,12 +124,19 @@ export default function ExamReviewPage() {
     setCurrentPage(1);
   };
 
-  // 페이지 변경 핸들러
-  const handlePageChange = (page: number) => {
-    const newSearchParams = new URLSearchParams(searchParamsFromUrl);
-    newSearchParams.set('page', page.toString());
-    setSearchParamsFromUrl(newSearchParams, { replace: true });
-    setCurrentPage(page);
+  const handlePageChange = (
+    pageOrUpdater: number | ((prev: number) => number)
+  ) => {
+    setCurrentPage((prev) => {
+      const next =
+        typeof pageOrUpdater === 'function'
+          ? pageOrUpdater(prev)
+          : pageOrUpdater;
+      const newSearchParams = new URLSearchParams(searchParamsFromUrl);
+      newSearchParams.set('page', next.toString());
+      setSearchParamsFromUrl(newSearchParams, { replace: true });
+      return next;
+    });
   };
 
   const handleSaveSuccess = async () => {
