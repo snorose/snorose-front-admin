@@ -8,21 +8,15 @@ import {
   Button,
   ConfirmModal,
   Field,
-  Input,
   Select,
   Skeleton,
-  Textarea,
 } from '@/shared/components/ui';
-import {
-  EXAM_CONFIRM_STATUS,
-  EXAM_TYPE_LIST,
-  LECTURE_TYPE_OPTIONS,
-  SEMESTER_LIST,
-} from '@/shared/constants';
+import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 import {
   ExamConfirmStatusBadge,
-  ExamReviewMetaInfoSection,
+  ExamReviewDetailInfoSection,
+  ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
 } from '@/domains/Reviews/components';
 import type {
@@ -443,8 +437,8 @@ export function ExamDetailSection({
 
   return (
     <article className='flex flex-col gap-1'>
-      <div className='w-full rounded-md border p-4'>
-        <div className='mb-3 flex items-center justify-between'>
+      <div className='flex w-full flex-col rounded-md border'>
+        <div className='flex items-center justify-between bg-blue-100 px-4 py-3'>
           <div>
             <p className='font-semibold'>
               {selectedExamReview?.reviewTitle || '시험후기'}
@@ -465,7 +459,7 @@ export function ExamDetailSection({
             상단 시험후기 목록에서 시험후기를 선택해주세요.
           </div>
         ) : isLoadingDetail ? (
-          <div className='grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-4'>
+          <div className='flex flex-col gap-y-2 p-4 md:gap-x-4'>
             {Array.from({ length: 10 }).map((_, i) => (
               <div key={i}>
                 <Skeleton className='h-4 w-24' />
@@ -474,9 +468,9 @@ export function ExamDetailSection({
             ))}
           </div>
         ) : (
-          <div className='flex flex-col gap-4'>
-            <div className='grid grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-4'>
-              <Field className='gap-0'>
+          <div className='flex flex-col gap-4 p-4 pt-2'>
+            <div className='flex flex-col gap-y-2 md:gap-x-4'>
+              <Field className='w-1/2 gap-0'>
                 <Field.Label>확인여부</Field.Label>
                 <Field.Content>
                   <Select
@@ -505,241 +499,24 @@ export function ExamDetailSection({
                 </Field.Content>
               </Field>
 
-              <Field className='gap-0'>
-                <Field.Label>강의명</Field.Label>
-                <Field.Content>
-                  <Input
-                    value={formData.lectureName}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        lectureName: e.target.value,
-                      }))
-                    }
-                    disabled={isFormDisabled}
-                  />
-                </Field.Content>
-              </Field>
+              <ExamReviewDetailInfoSection
+                formData={formData}
+                setFormData={(partialData) =>
+                  setFormData((prev) => ({ ...prev, ...partialData }))
+                }
+                isFormDisabled={isFormDisabled}
+                onFileDownload={handleFileDownload}
+                fileInputRef={fileInputRef}
+                selectedFile={selectedFile}
+                setSelectedFile={setSelectedFile}
+              />
 
-              <Field className='gap-0'>
-                <Field.Label>교수명</Field.Label>
-                <Field.Content>
-                  <Input
-                    value={formData.professorName}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        professorName: e.target.value,
-                      }))
-                    }
-                    disabled={isFormDisabled}
-                  />
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>업로드 파일</Field.Label>
-                <Field.Content>
-                  <div className='flex items-center gap-2'>
-                    <button
-                      type='button'
-                      className='flex-1 truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400'
-                      onClick={handleFileDownload}
-                      disabled={!formData.fileName}
-                      title={formData.fileName}
-                    >
-                      {selectedFile?.name || formData.fileName || '파일 없음'}
-                    </button>
-                    <button
-                      type='button'
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isFormDisabled}
-                      className='rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60'
-                    >
-                      파일 변경
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type='file'
-                      className='hidden'
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          setSelectedFile(file);
-                          setFormData((prev) => ({
-                            ...prev,
-                            fileName: file.name,
-                          }));
-                        }
-                        if (e.target) e.target.value = '';
-                      }}
-                      accept='.pdf,.doc,.docx,.hwp'
-                    />
-                  </div>
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>수강학기</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.semester}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, semester: value }))
-                    }
-                    disabled={isFormDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <Select.Value>{formData.semester}</Select.Value>
-                    </Select.Trigger>
-                    <Select.Content className='max-h-[200px] overflow-y-auto'>
-                      {SEMESTER_LIST.map((semesterOption) => (
-                        <Select.Item
-                          key={semesterOption}
-                          value={semesterOption}
-                        >
-                          {semesterOption}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>시험 종류</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.examType}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, examType: value }))
-                    }
-                    disabled={isFormDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <Select.Value>{formData.examType}</Select.Value>
-                    </Select.Trigger>
-                    <Select.Content className='max-h-[200px] overflow-y-auto'>
-                      {EXAM_TYPE_LIST.map((examTypeOption) => (
-                        <Select.Item
-                          key={examTypeOption}
-                          value={examTypeOption}
-                        >
-                          {examTypeOption}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>강의 종류</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.lectureType}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        lectureType:
-                          value as (typeof LECTURE_TYPE_OPTIONS)[number]['value'],
-                      }))
-                    }
-                    disabled={isFormDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <Select.Value>
-                        {convertLectureTypeToString(formData.lectureType)}
-                      </Select.Value>
-                    </Select.Trigger>
-                    <Select.Content className='max-h-[200px] overflow-y-auto'>
-                      {LECTURE_TYPE_OPTIONS.map((option) => (
-                        <Select.Item key={option.value} value={option.value}>
-                          {option.label}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>분반</Field.Label>
-                <Field.Content>
-                  <Input
-                    type='number'
-                    value={formData.classNumber ?? ''}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFormData((prev) => ({
-                        ...prev,
-                        classNumber: value === '' ? null : parseInt(value, 10),
-                      }));
-                    }}
-                    disabled={isFormDisabled}
-                    min={1}
-                  />
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>P/F</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.isPF}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, isPF: value }))
-                    }
-                    disabled={isFormDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <Select.Value>{formData.isPF}</Select.Value>
-                    </Select.Trigger>
-                    <Select.Content>
-                      <Select.Item value='O'>O</Select.Item>
-                      <Select.Item value='X'>X</Select.Item>
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>온라인 수업</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.isOnline}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, isOnline: value }))
-                    }
-                    disabled={isFormDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <Select.Value>{formData.isOnline}</Select.Value>
-                    </Select.Trigger>
-                    <Select.Content>
-                      <Select.Item value='O'>O</Select.Item>
-                      <Select.Item value='X'>X</Select.Item>
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-
-              <Field className='gap-0'>
-                <Field.Label>시험 유형 및 문항수</Field.Label>
-                <Field.Content>
-                  <Textarea
-                    value={formData.examTypeAndQuestions}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        examTypeAndQuestions: e.target.value,
-                      }))
-                    }
-                    disabled={isFormDisabled}
-                    className='min-h-[84px]'
-                  />
-                </Field.Content>
-              </Field>
+              <ExamReviewPostInfoSection
+                postId={formData.postId}
+                uploadTime={formData.uploadTime}
+                author={formData.author}
+                userId={formData.userId}
+              />
 
               <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
                 <>
@@ -769,13 +546,6 @@ export function ExamDetailSection({
                 </>
               </div>
             </div>
-
-            <ExamReviewMetaInfoSection
-              postId={formData.postId}
-              uploadTime={formData.uploadTime}
-              author={formData.author}
-              userId={formData.userId}
-            />
           </div>
         )}
       </div>
