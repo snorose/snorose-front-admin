@@ -40,7 +40,6 @@ import {
   updateExamReview,
 } from '@/apis/reviews';
 
-import type { ExamReviewDetailInfoSectionProps } from './ExamReviewDetailInfoSection';
 import type { ExamReviewUpdateChange } from './ExamReviewUpdateConfirmModal';
 
 interface ExamDetailSectionProps {
@@ -502,8 +501,8 @@ export function ExamDetailSection({
 
               <ExamReviewDetailInfoSection
                 formData={formData}
-                setFormData={
-                  setFormData as ExamReviewDetailInfoSectionProps['setFormData']
+                setFormData={(partialData) =>
+                  setFormData((prev) => ({ ...prev, ...partialData }))
                 }
                 isFormDisabled={isFormDisabled}
                 onFileDownload={handleFileDownload}
