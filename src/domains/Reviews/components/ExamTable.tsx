@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Pagination, Table } from '@/shared/components/ui';
+import { Table } from '@/shared/components/ui';
 
 import {
   ExamConfirmStatusBadge,
+  ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
   ExamTableSkeleton,
@@ -44,8 +45,6 @@ interface ExamTableProps {
     semester?: string;
     examType?: string;
   };
-  currentPage?: number;
-  onPageChange?: (page: number) => void;
 }
 
 export default function ExamTable({
@@ -54,24 +53,9 @@ export default function ExamTable({
   refreshKey,
   selectedId,
   searchParams = {},
-  currentPage: propCurrentPage,
-  onPageChange,
 }: ExamTableProps) {
   const lastSelectedIdRef = useRef<number | null>(null);
-
-  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
-
-  // prop으로 전달된 currentPage가 있으면 사용, 없으면 내부 state 사용
-  const currentPage = propCurrentPage ?? internalCurrentPage;
-
-  const setCurrentPage = (page: number | ((prev: number) => number)) => {
-    const newPage = typeof page === 'function' ? page(currentPage) : page;
-    if (onPageChange) {
-      onPageChange(newPage);
-    } else {
-      setInternalCurrentPage(newPage);
-    }
-  };
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
@@ -83,13 +67,11 @@ export default function ExamTable({
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
 
-  // propData가 제공되면 사용, 없으면 API 데이터 사용
   const currentPageData = useMemo<ExamReview[]>(
-    () => propData || queryData?.data || [],
+    () => propData ?? queryData?.data ?? [],
     [propData, queryData?.data]
   );
-
-  const hasNext = queryData?.hasNext || false;
+  const hasNext = queryData?.hasNext ?? false;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
   useEffect(() => {
@@ -176,66 +158,11 @@ export default function ExamTable({
         </Table>
       </div>
 
-      <Pagination className='py-4'>
-        <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
-          <Pagination.Item>
-            <Pagination.Previous
-              href='#'
-              onClick={(e) => {
-                e.preventDefault();
-                if (currentPage > 1) setCurrentPage((p) => p - 1);
-              }}
-              className={
-                currentPage === 1 ? 'pointer-events-none opacity-50' : undefined
-              }
-            />
-          </Pagination.Item>
-          {(() => {
-            const inBlockMode = currentPage > 10;
-            const startPage = inBlockMode
-              ? Math.floor((currentPage - 1) / 10) * 10 + 1
-              : 1;
-            const endPage = hasNext
-              ? inBlockMode
-                ? startPage + 9
-                : 10
-              : currentPage;
-            const pageNumbers = Array.from(
-              { length: endPage - startPage + 1 },
-              (_, i) => startPage + i
-            );
-            return pageNumbers.map((page) => (
-              <Pagination.Item key={page}>
-                <Pagination.Link
-                  isActive={currentPage === page}
-                  href='#'
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(page);
-                  }}
-                  className={
-                    currentPage === page ? 'cursor-default' : undefined
-                  }
-                >
-                  {page}
-                </Pagination.Link>
-              </Pagination.Item>
-            ));
-          })()}
-          <Pagination.Item>
-            <Pagination.Next
-              href='#'
-              onClick={(e) => {
-                e.preventDefault();
-                if (hasNext) setCurrentPage((p) => p + 1);
-              }}
-              className={
-                !hasNext ? 'pointer-events-none opacity-50' : undefined
-              }
-            />
-          </Pagination.Item>
-        </Pagination.Content>
-      </Pagination>
+      <ExamReviewTablePagination
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        hasNext={hasNext}
+      />
     </>
   );
 }
