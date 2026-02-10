@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
 
@@ -45,6 +45,8 @@ interface ExamTableProps {
     semester?: string;
     examType?: string;
   };
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
 }
 
 export default function ExamTable({
@@ -53,9 +55,28 @@ export default function ExamTable({
   refreshKey,
   selectedId,
   searchParams = {},
+  currentPage: propCurrentPage,
+  onPageChange: propOnPageChange,
 }: ExamTableProps) {
   const lastSelectedIdRef = useRef<number | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
+
+  const currentPage = propCurrentPage ?? internalPage;
+
+  const setCurrentPage = useCallback(
+    (pageOrUpdater: number | ((prev: number) => number)) => {
+      const nextPage =
+        typeof pageOrUpdater === 'function'
+          ? pageOrUpdater(currentPage)
+          : pageOrUpdater;
+      if (propOnPageChange) {
+        propOnPageChange(nextPage);
+      } else {
+        setInternalPage(nextPage);
+      }
+    },
+    [currentPage, propOnPageChange]
+  );
 
   const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
