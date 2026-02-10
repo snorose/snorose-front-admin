@@ -42,15 +42,10 @@ export function ExamReviewTablePagination({
           />
         </Pagination.Item>
         {(() => {
-          const inBlockMode = currentPage > 10;
-          const startPage = inBlockMode
-            ? Math.floor((currentPage - 1) / 10) * 10 + 1
-            : 1;
-          const endPage = hasNext
-            ? inBlockMode
-              ? startPage + 9
-              : 10
-            : currentPage;
+          // TODO: 총 페이지 수에 따라 마지막 블록 단위 조정하기
+          const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+          const endPage = startPage + 9;
+
           const pageNumbers = Array.from(
             { length: endPage - startPage + 1 },
             (_, i) => startPage + i
