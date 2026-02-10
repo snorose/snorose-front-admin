@@ -46,7 +46,7 @@ interface ExamTableProps {
     examType?: string;
   };
   currentPage?: number;
-  onPageChange?: (page: number) => void;
+  onPageChange?: (page: number | ((prev: number) => number)) => void;
 }
 
 export default function ExamTable({
@@ -65,17 +65,13 @@ export default function ExamTable({
 
   const setCurrentPage = useCallback(
     (pageOrUpdater: number | ((prev: number) => number)) => {
-      const nextPage =
-        typeof pageOrUpdater === 'function'
-          ? pageOrUpdater(currentPage)
-          : pageOrUpdater;
       if (propOnPageChange) {
-        propOnPageChange(nextPage);
+        propOnPageChange(pageOrUpdater);
       } else {
-        setInternalPage(nextPage);
+        setInternalPage(pageOrUpdater);
       }
     },
-    [currentPage, propOnPageChange]
+    [propOnPageChange]
   );
 
   const { data: queryData, isLoading } = useExamReviews({

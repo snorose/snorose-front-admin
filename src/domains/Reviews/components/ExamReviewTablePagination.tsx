@@ -18,11 +18,10 @@ export function ExamReviewTablePagination({
   const currentPage = propCurrentPage ?? internalCurrentPage;
 
   const setCurrentPage = (page: number | ((prev: number) => number)) => {
-    const newPage = typeof page === 'function' ? page(currentPage) : page;
     if (onPageChange) {
-      onPageChange(newPage);
+      onPageChange(page);
     } else {
-      setInternalCurrentPage(newPage);
+      setInternalCurrentPage(page);
     }
   };
 
