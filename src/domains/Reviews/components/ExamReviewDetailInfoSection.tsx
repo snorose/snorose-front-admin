@@ -218,9 +218,11 @@ export function ExamReviewDetailInfoSection({
                   value={formData.classNumber ?? ''}
                   onChange={(e) => {
                     const value = e.target.value;
+                    const parsedValue = parseInt(value, 10);
                     setFormData((prev) => ({
                       ...prev,
-                      classNumber: value === '' ? null : parseInt(value, 10),
+                      classNumber:
+                        value === '' || isNaN(parsedValue) ? null : parsedValue,
                     }));
                   }}
                   disabled={isFormDisabled}
