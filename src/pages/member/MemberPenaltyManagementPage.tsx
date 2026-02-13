@@ -1,18 +1,21 @@
-import { useCallback, useState, useMemo } from 'react';
-import { Button, Input } from '@/shared/components/ui';
-import { PageHeader } from '@/shared/components';
+import { useCallback, useMemo, useState } from 'react';
+
 import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
+import { Button, Input } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
-import { searchUsersAPI } from '@/apis';
-import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import {
-  PenaltyUserInfoView,
   BlacklistHistoryTab,
+  PenaltyUserInfoView,
   TabList,
   getPenaltyTabs,
 } from '@/domains/MemberInfo';
+
+import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
+import { searchUsersAPI } from '@/apis';
 
 export default function MemberPenaltyManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +23,7 @@ export default function MemberPenaltyManagementPage() {
     null
   );
   const [errorMessage, setErrorMessage] = useState('');
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // 회원 검색 API
   const handleSearch = useCallback(async () => {
@@ -64,7 +68,10 @@ export default function MemberPenaltyManagementPage() {
 
   const tabs = useMemo(() => {
     if (!selectedMember) return [];
-    return getPenaltyTabs({ member: selectedMember });
+    return getPenaltyTabs({
+      member: selectedMember,
+      onApplied: () => setHistoryRefreshKey((prev) => prev + 1),
+    });
   }, [selectedMember]);
 
   return (
@@ -110,6 +117,7 @@ export default function MemberPenaltyManagementPage() {
                   encryptedUserId={selectedMember.encryptedUserId}
                   studentNumber={selectedMember.studentNumber}
                   groupSize={5}
+                  refreshKey={historyRefreshKey}
                 />
               </div>
             </div>
