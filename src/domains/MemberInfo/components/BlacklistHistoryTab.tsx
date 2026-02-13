@@ -1,24 +1,29 @@
-import { Table } from '@/shared/components/ui';
-import { useState, useEffect } from 'react';
-import MemberInfoPagination from './MemberInfoTablePagenation';
+import { useEffect, useState } from 'react';
+
 import { toast } from 'sonner';
+
+import { Table } from '@/shared/components/ui';
+import type { BlacklistHistoryItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
-import { blacklistHistoryAPI } from '@/apis';
 import { BLACKLIST_SAMPLE_DATA } from '@/__mocks__';
-import type { BlacklistHistoryItem } from '@/shared/types';
+import { blacklistHistoryAPI } from '@/apis';
+
+import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface BlacklistHistoryTabProps {
   loginId?: string;
   encryptedUserId?: string;
   studentNumber?: string; // mock fallback용
   groupSize?: number;
+  refreshKey?: number;
 }
 
 export default function BlacklistHistoryTab({
   encryptedUserId,
   studentNumber,
   groupSize = 10,
+  refreshKey = 0,
 }: BlacklistHistoryTabProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [historyData, setHistoryData] = useState<BlacklistHistoryItem[]>([]);
@@ -61,7 +66,7 @@ export default function BlacklistHistoryTab({
     };
 
     fetchHistory();
-  }, [encryptedUserId, studentNumber]);
+  }, [encryptedUserId, studentNumber, refreshKey]);
 
   /** 페이지 데이터 */
   const downloadedData = historyData;
