@@ -6,7 +6,6 @@ import { Table } from '@/shared/components/ui';
 import type { BlacklistHistoryItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
-import { BLACKLIST_SAMPLE_DATA } from '@/__mocks__';
 import { blacklistHistoryAPI } from '@/apis';
 
 import MemberInfoPagination from './MemberInfoTablePagenation';
@@ -31,11 +30,17 @@ export default function BlacklistHistoryTab({
 
   /** 블랙리스트 이력 조회 API */
   useEffect(() => {
-    if (!encryptedUserId) return;
+    if (!encryptedUserId) {
+      setHistoryData([]);
+      setIsLoading(false);
+      setCurrentPage(1);
+      return;
+    }
 
     const fetchHistory = async () => {
       try {
         setIsLoading(true);
+        setCurrentPage(1);
         const data = await blacklistHistoryAPI(encryptedUserId);
 
         if (data?.result) {
@@ -47,19 +52,7 @@ export default function BlacklistHistoryTab({
         setHistoryData([]);
       } catch (error) {
         toast.error(getErrorMessage(error, '블랙리스트 조회에 실패했습니다.'));
-
-        // fallback (미완성 API용)
-        const mock = BLACKLIST_SAMPLE_DATA.filter(
-          (item) =>
-            item.encryptedUserId === encryptedUserId ||
-            item.studentNumber === studentNumber
-        );
-
-        if (mock.length > 0) {
-          setHistoryData(mock);
-        } else {
-          setHistoryData([]);
-        }
+        setHistoryData([]);
       } finally {
         setIsLoading(false);
       }
@@ -92,7 +85,16 @@ export default function BlacklistHistoryTab({
 
         {/* Body */}
         <Table.Body className='bg-white'>
-          {isLoading ? (
+          {!encryptedUserId ? (
+            <Table.Row>
+              <Table.Cell
+                colSpan={5}
+                className='py-6 text-center text-gray-500'
+              >
+                회원을 검색해 주세요.
+              </Table.Cell>
+            </Table.Row>
+          ) : isLoading ? (
             <Table.Row>
               <Table.Cell
                 colSpan={5}
@@ -150,7 +152,7 @@ export default function BlacklistHistoryTab({
         </Table.Body>
       </Table>
 
-      {downloadedData.length > 0 && (
+      {encryptedUserId && downloadedData.length > 0 && (
         <MemberInfoPagination
           currentPage={currentPage}
           totalPages={Math.ceil(downloadedData.length / groupSize)}
