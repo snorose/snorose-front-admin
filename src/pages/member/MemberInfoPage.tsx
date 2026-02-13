@@ -98,13 +98,13 @@ export default function MemberInfoPage() {
     setIsEdit(false);
   }, [searchQuery]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setSearchQuery('');
     setSelectedMember(null);
     setHasSearched(false);
     setIsEdit(false);
     setErrorMessage('');
-  };
+  }, []);
 
   // 회원 정보 수정 가능 필드
   const EDIT_KEYS: (keyof EditMemberInfo)[] = [

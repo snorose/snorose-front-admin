@@ -29,6 +29,8 @@ export default function MemberPenaltyManagementPage() {
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) {
+      setSelectedMember(null);
+      setErrorMessage('');
       toast.info('검색어를 입력해주세요.');
       return;
     }
