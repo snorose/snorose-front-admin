@@ -1,10 +1,17 @@
-import { Label, Input } from '@/shared/components/ui';
-import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
-import { MEMBER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
+import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
+import { Input, Label } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
-export default function MemberInfoView({ member }: { member: MemberInfo }) {
+import { MEMBER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
+import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+
+export default function MemberInfoView({
+  member,
+}: {
+  member: MemberInfo | null;
+}) {
   const COPY_KEYS: (keyof MemberInfo)[] = [
     'encryptedUserId',
     'studentNumber',
@@ -21,13 +28,14 @@ export default function MemberInfoView({ member }: { member: MemberInfo }) {
   const handleCopy = async (value: string) => {
     if (!value) return;
     await navigator.clipboard.writeText(value);
+    toast.success('복사되었습니다.');
   };
 
   return (
     <article>
       <div className='grid grid-cols-2 gap-x-5 gap-y-1'>
         {MEMBER_INFO.map(({ label, key }) => {
-          const rawValue = member[key];
+          const rawValue = member?.[key];
 
           const displayValue =
             key === 'userRoleId'
@@ -47,6 +55,7 @@ export default function MemberInfoView({ member }: { member: MemberInfo }) {
                 <Input
                   readOnly
                   value={dateValue}
+                  placeholder='회원을 검색해 주세요.'
                   className={`w-60 ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
                 />
               </div>
@@ -56,13 +65,25 @@ export default function MemberInfoView({ member }: { member: MemberInfo }) {
           return (
             <div key={key} className='flex gap-4'>
               <Label className='w-32 text-gray-700'>{label}</Label>
-
-              <Input
-                readOnly
-                value={displayValue}
-                onClick={() => isCopy && handleCopy(String(displayValue))}
-                className={`w-60 overflow-x-scroll ${!rawValue ? 'bg-gray-100 text-gray-500' : ''} ${isCopy ? 'cursor-pointer text-gray-600 underline hover:text-blue-800' : ''}`}
-              />
+              <div className='relative w-60'>
+                <Input
+                  readOnly
+                  value={displayValue}
+                  placeholder='회원을 검색해 주세요.'
+                  className={`w-full overflow-x-scroll ${isCopy ? 'pr-10' : ''} ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
+                />
+                {isCopy && (
+                  <button
+                    type='button'
+                    onClick={() => handleCopy(String(displayValue))}
+                    disabled={!displayValue}
+                    aria-label='복사'
+                    className='absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40'
+                  >
+                    <Copy className='h-4 w-4' />
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}

@@ -1,35 +1,34 @@
-import { useCallback, useState, useMemo } from 'react';
-import { Button, Input } from '@/shared/components/ui';
-import { PageHeader } from '@/shared/components';
+import { useCallback, useMemo, useState } from 'react';
 
-import type { MemberInfo, EditMemberInfo } from '@/shared/types';
+import { Copy, PencilIcon } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
+import { Button, Input } from '@/shared/components/ui';
+import type { EditMemberInfo, MemberInfo } from '@/shared/types';
+import { getErrorMessage } from '@/shared/utils';
+
 import {
+  MemberInfoEditForm,
+  MemberInfoView,
   TabList,
   getMemberInfoTabs,
-  MemberInfoView,
-  MemberInfoEditForm,
 } from '@/domains/MemberInfo';
-
-import { searchUsersAPI, editUsersAPI } from '@/apis';
-import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
 import { formatDateTime } from '@/domains/MemberInfo/utils/formatDateTime';
 
-import { PencilIcon } from 'lucide-react';
-import { toast } from 'sonner';
-import { getErrorMessage } from '@/shared/utils';
+import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
+import { editUsersAPI, searchUsersAPI } from '@/apis';
 
 export default function MemberInfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isEdit, setIsEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   // 상단 '학번' 카피
   const handleCopy = async (sourceId: string) => {
     await navigator.clipboard.writeText(String(sourceId));
-    setCopiedId(sourceId);
-    setTimeout(() => setCopiedId(null), 1500);
+    toast.success('복사되었습니다.');
   };
 
   // 회원 검색 API
@@ -76,6 +75,13 @@ export default function MemberInfoPage() {
 
     setIsEdit(false);
   }, [searchQuery]);
+
+  const handleReset = () => {
+    setSearchQuery('');
+    setSelectedMember(null);
+    setIsEdit(false);
+    setErrorMessage('');
+  };
 
   // 회원 정보 수정 가능 필드
   const EDIT_KEYS: (keyof EditMemberInfo)[] = [
@@ -180,54 +186,68 @@ export default function MemberInfoPage() {
         <Button
           size='sm'
           variant='outline'
-          className='h-auto w-20 text-black'
+          className='h-auto w-15 text-black'
           onClick={handleSearch}
         >
           검색
         </Button>
+        <Button
+          size='sm'
+          variant='outline'
+          className='h-auto w-15 bg-gray-200 text-black hover:bg-gray-500 hover:text-white'
+          onClick={handleReset}
+        >
+          초기화
+        </Button>
       </div>
       {errorMessage && <p className='font-medium'>{errorMessage}</p>}
 
-      {selectedMember && (
-        <>
-          <div className='flex items-center gap-2'>
-            <span className='text-2xl font-bold'>{selectedMember.loginId}</span>
+      <div className='relative flex items-center gap-2'>
+        <span className='text-2xl font-bold'>
+          {selectedMember?.loginId ?? '회원 미선택'}
+        </span>
 
-            <span
-              className={`cursor-pointer underline ${
-                copiedId === selectedMember.studentNumber
-                  ? 'text-purple-600'
-                  : 'text-gray-600 hover:text-blue-800'
-              }`}
+        <div className='relative'>
+          <span className='pr-6'>
+            ({selectedMember?.studentNumber ?? '회원을 검색해 주세요.'})
+          </span>
+
+          {selectedMember?.studentNumber && (
+            <button
+              type='button'
               onClick={() => handleCopy(selectedMember.studentNumber)}
+              aria-label='복사'
+              className='absolute top-1/2 right-0 -translate-y-1/2 rounded p-1 text-gray-600 hover:bg-gray-100'
             >
-              ({selectedMember.studentNumber})
-            </span>
-          </div>
-
-          <div className='flex items-center gap-2'>
-            <h3 className='text-lg font-bold'>회원정보</h3>
-            <PencilIcon
-              onClick={() => setIsEdit(true)}
-              className='h-6 w-6 cursor-pointer rounded-sm bg-black p-1 text-white'
-            />
-          </div>
-
-          {!isEdit ? (
-            <MemberInfoView member={selectedMember} />
-          ) : (
-            <MemberInfoEditForm
-              member={selectedMember}
-              onSubmit={handleSaveEdit}
-              onCancel={() => setIsEdit(false)}
-            />
+              <Copy className='h-4 w-4' />
+            </button>
           )}
+        </div>
+      </div>
 
-          <article className='rounded-md bg-blue-50 p-2'>
-            <TabList defaultTab='point' tabs={tabs} />
-          </article>
-        </>
+      <div className='flex items-center gap-2'>
+        <h3 className='text-lg font-bold'>회원정보</h3>
+        {selectedMember && (
+          <PencilIcon
+            onClick={() => setIsEdit(true)}
+            className='h-6 w-6 cursor-pointer rounded-sm bg-black p-1 text-white'
+          />
+        )}
+      </div>
+
+      {!isEdit || !selectedMember ? (
+        <MemberInfoView member={selectedMember} />
+      ) : (
+        <MemberInfoEditForm
+          member={selectedMember}
+          onSubmit={handleSaveEdit}
+          onCancel={() => setIsEdit(false)}
+        />
       )}
+
+      <article className='rounded-md bg-blue-50 p-2'>
+        <TabList defaultTab='point' tabs={tabs} />
+      </article>
     </div>
   );
 }
