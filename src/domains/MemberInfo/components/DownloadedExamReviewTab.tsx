@@ -1,7 +1,12 @@
-import { Table } from '@/shared/components/ui';
 import { useState } from 'react';
 
+import { Copy, ExternalLink } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Table } from '@/shared/components/ui';
+
 import { DOWNLOADEDEXAMREVIEW_SAMPLE_DATA } from '@/__mocks__';
+
 import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface DownloadedExamReviewTabProps {
@@ -13,7 +18,6 @@ export default function DownloadedExamReviewTab({
   encryptedUserId,
   studentNumber,
 }: DownloadedExamReviewTabProps) {
-  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const downloadedData = DOWNLOADEDEXAMREVIEW_SAMPLE_DATA.filter((history) => {
@@ -32,13 +36,12 @@ export default function DownloadedExamReviewTab({
 
   const handleCopy = async (postId: number) => {
     await navigator.clipboard.writeText(String(postId));
-    setCopiedId(postId);
-    setTimeout(() => setCopiedId(null), 1500);
+    toast.success('복사되었습니다.');
   };
 
-  const handleClickReview = (postId: number) => {
-    const base = import.meta.env.VITE_SNOROSE_EXAM_REVIEW_URL;
-    const url = `${base}/${postId}`;
+  const handleGoToReview = (title: string) => {
+    const keyword = encodeURIComponent(title);
+    const url = `/reviews/exam?keyword=${keyword}&page=1`;
     window.open(url, '_blank');
   };
 
@@ -51,6 +54,7 @@ export default function DownloadedExamReviewTab({
             <Table.Head className='text-center'>번호</Table.Head>
             <Table.Head className='text-center'>id</Table.Head>
             <Table.Head className='text-center'>시험후기명</Table.Head>
+            <Table.Head className='text-center'>바로가기</Table.Head>
           </Table.Row>
         </Table.Header>
 
@@ -65,25 +69,37 @@ export default function DownloadedExamReviewTab({
                 <Table.Cell className='text-center'>
                   {(currentPage - 1) * PAGE_SIZE + index + 1}
                 </Table.Cell>
-                <Table.Cell
-                  onClick={() => handleCopy(history.postId)}
-                  className={`cursor-pointer text-center text-blue-600 underline hover:text-blue-800 ${copiedId === history.postId ? 'ml-2 text-purple-600' : ''} `}
-                >
-                  {history.postId}
+                <Table.Cell className='text-center'>
+                  <div className='flex items-center justify-center gap-1'>
+                    <span>{history.postId}</span>
+                    <button
+                      type='button'
+                      onClick={() => handleCopy(history.postId)}
+                      aria-label='id 복사'
+                      className={`rounded p-1 transition hover:bg-gray-100`}
+                    >
+                      <Copy className='h-4 w-4' />
+                    </button>
+                  </div>
                 </Table.Cell>
 
-                <Table.Cell
-                  className='cursor-pointer text-center'
-                  onClick={() => handleClickReview(history.postId)}
-                >
-                  {history.title}
+                <Table.Cell className='text-center'>{history.title}</Table.Cell>
+                <Table.Cell className='text-center'>
+                  <button
+                    type='button'
+                    onClick={() => handleGoToReview(history.title)}
+                    aria-label='시험후기 바로가기'
+                    className='rounded p-1 text-gray-600 transition hover:bg-gray-100 hover:text-blue-700'
+                  >
+                    <ExternalLink className='h-4 w-4' />
+                  </button>
                 </Table.Cell>
               </Table.Row>
             ))
           ) : (
             <Table.Row>
               <Table.Cell
-                colSpan={3}
+                colSpan={4}
                 className='py-6 text-center text-gray-500'
               >
                 다운로드한 시험후기 내역이 없습니다.
