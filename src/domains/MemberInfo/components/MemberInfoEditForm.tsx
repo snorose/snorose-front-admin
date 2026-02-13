@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Label, Input, Button } from '@/shared/components/ui';
+
+import { Button, Input, Label } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
+
 import {
   MEMBER_INFO,
   USER_ROLES,
@@ -13,7 +15,6 @@ const EDITABLE_KEYS: (keyof MemberInfo)[] = [
   'userRoleId',
   'email',
   'birthday',
-  'authenticatedAt',
 ];
 
 export default function MemberInfoEditForm({
@@ -29,6 +30,13 @@ export default function MemberInfoEditForm({
 
   const handleChange = (key: keyof MemberInfo, value: string | number) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = () => {
+    const payload =
+      form.userRoleId === 1 ? { ...form, authenticatedAt: null } : form;
+
+    onSubmit(payload);
   };
 
   return (
@@ -99,7 +107,7 @@ export default function MemberInfoEditForm({
       </div>
 
       <div className='mt-4 flex gap-3'>
-        <Button onClick={() => onSubmit(form)}>저장</Button>
+        <Button onClick={handleSubmit}>저장</Button>
         <Button variant='outline' onClick={onCancel}>
           취소
         </Button>

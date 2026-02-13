@@ -22,6 +22,7 @@ import { editUsersAPI, searchUsersAPI } from '@/apis';
 export default function MemberInfoPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -34,32 +35,53 @@ export default function MemberInfoPage() {
   // 회원 검색 API
   const handleSearch = useCallback(async () => {
     const query = searchQuery.trim().toLowerCase();
+    const findMockMember = () =>
+      MEMBER_SAMPLE_DATA.find(
+        (dummy) =>
+          dummy.loginId.toLowerCase() === query ||
+          dummy.studentNumber.toLowerCase() === query
+      );
 
     if (!query) {
       setSelectedMember(null);
+      setHasSearched(false);
       setErrorMessage('');
       toast.info('검색어를 입력해주세요.');
       return;
     }
 
     try {
+      setHasSearched(true);
       const data = await searchUsersAPI(query);
+      const result = data?.result;
+      const resultMember = Array.isArray(result)
+        ? (result[0] as MemberInfo | undefined)
+        : (result as MemberInfo | null);
 
-      if (data?.result) {
-        setSelectedMember(data.result);
+      if (resultMember) {
+        setSelectedMember(resultMember);
         setIsEdit(false);
         setErrorMessage('');
         return;
       }
+
+      const mock = findMockMember();
+      if (mock) {
+        setSelectedMember(mock);
+        setIsEdit(false);
+        setErrorMessage('(MOCK) API 미완성으로 mock 데이터를 사용함.');
+        return;
+      }
+
+      setSelectedMember(null);
+      setErrorMessage('사용자가 존재하지 않아요.');
+      setIsEdit(false);
+      return;
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
 
       // 에러면 데이터 없으면 찾기 (미완성 api용 - 추후 삭제)
-      const mock = MEMBER_SAMPLE_DATA.find(
-        (dummy) =>
-          dummy.loginId.toLowerCase() === query ||
-          dummy.studentNumber.toLowerCase() === query
-      );
+      const mock = findMockMember();
 
       if (mock) {
         setSelectedMember(mock);
@@ -79,6 +101,7 @@ export default function MemberInfoPage() {
   const handleReset = () => {
     setSearchQuery('');
     setSelectedMember(null);
+    setHasSearched(false);
     setIsEdit(false);
     setErrorMessage('');
   };
@@ -236,7 +259,10 @@ export default function MemberInfoPage() {
       </div>
 
       {!isEdit || !selectedMember ? (
-        <MemberInfoView member={selectedMember} />
+        <MemberInfoView
+          member={selectedMember}
+          showSearchPlaceholder={!hasSearched}
+        />
       ) : (
         <MemberInfoEditForm
           member={selectedMember}

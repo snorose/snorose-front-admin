@@ -9,8 +9,10 @@ import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFo
 
 export default function MemberInfoView({
   member,
+  showSearchPlaceholder = true,
 }: {
   member: MemberInfo | null;
+  showSearchPlaceholder?: boolean;
 }) {
   const COPY_KEYS: (keyof MemberInfo)[] = [
     'encryptedUserId',
@@ -45,6 +47,10 @@ export default function MemberInfoView({
           const isCopy = COPY_KEYS.includes(key);
 
           // 날짜 처리
+          const placeholder = showSearchPlaceholder
+            ? '회원을 검색해 주세요.'
+            : '';
+
           if (DATE_FIELDS.includes(key)) {
             const dateValue = rawValue ? String(rawValue).substring(0, 10) : '';
 
@@ -55,7 +61,7 @@ export default function MemberInfoView({
                 <Input
                   readOnly
                   value={dateValue}
-                  placeholder='회원을 검색해 주세요.'
+                  placeholder={placeholder}
                   className={`w-60 ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
                 />
               </div>
@@ -69,7 +75,7 @@ export default function MemberInfoView({
                 <Input
                   readOnly
                   value={displayValue}
-                  placeholder='회원을 검색해 주세요.'
+                  placeholder={placeholder}
                   className={`w-full overflow-x-scroll ${isCopy ? 'pr-10' : ''} ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
                 />
                 {isCopy && (
