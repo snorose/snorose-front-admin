@@ -1,9 +1,15 @@
-import { Table } from '@/shared/components/ui/table';
 import { useState } from 'react';
 
-import { USERPOINT_SAMPLE_DATA } from '@/__mocks__';
-import MemberInfoPagination from './MemberInfoTablePagenation';
+import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Table } from '@/shared/components/ui/table';
+
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+
+import { USERPOINT_SAMPLE_DATA } from '@/__mocks__';
+
+import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface PointHistoryTabProps {
   encryptedUserId?: string;
@@ -14,7 +20,6 @@ export default function PointHistoryTab({
   encryptedUserId,
   studentNumber,
 }: PointHistoryTabProps) {
-  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   // 한 페이지에 10개 이력
@@ -40,8 +45,7 @@ export default function PointHistoryTab({
   // 포인트 ID 클릭시 복사
   const handleCopy = async (sourceId: number) => {
     await navigator.clipboard.writeText(String(sourceId));
-    setCopiedId(sourceId);
-    setTimeout(() => setCopiedId(null), 1500);
+    toast.success('복사되었습니다.');
   };
 
   return (
@@ -74,15 +78,19 @@ export default function PointHistoryTab({
                 </Table.Cell>
 
                 {/* 포인트 ID 복사 */}
-                <Table.Cell
-                  onClick={() => handleCopy(history.sourceId)}
-                  className={`cursor-pointer text-center underline ${
-                    copiedId === history.sourceId
-                      ? 'text-purple-600'
-                      : 'text-blue-600 hover:text-blue-800'
-                  }`}
-                >
-                  {history.sourceId}
+                <Table.Cell className='text-center'>
+                  <div className='flex items-center justify-center gap-1'>
+                    <span>{history.sourceId}</span>
+
+                    <button
+                      type='button'
+                      onClick={() => handleCopy(history.sourceId)}
+                      aria-label='복사'
+                      className='rounded p-1 text-gray-600 transition hover:bg-gray-100 hover:text-black'
+                    >
+                      <Copy className='h-4 w-4' />
+                    </button>
+                  </div>
                 </Table.Cell>
 
                 <Table.Cell className='text-center'>
@@ -97,7 +105,7 @@ export default function PointHistoryTab({
                 </Table.Cell>
 
                 <Table.Cell
-                  className={`text-center font-bold ${history.difference > 0 ? 'text-green-700' : 'text-red-700'}`}
+                  className={`text-center font-bold ${history.difference > 0 ? 'text-blue-700' : 'text-red-700'}`}
                 >
                   {history.difference}
                 </Table.Cell>
