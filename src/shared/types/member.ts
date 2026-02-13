@@ -82,3 +82,12 @@ export interface BlacklistHistoryItem {
   createdAt: string;
   blacklistDeadline: string | null;
 }
+
+export interface AdminBlacklistReq {
+  encryptedUserId: string;
+  type: 'WARNING' | 'RELEGATION' | 'BLACKLIST';
+  reason: string;
+  customReason?: string;
+  warningCount?: number;
+  relegationMonth?: number;
+}
