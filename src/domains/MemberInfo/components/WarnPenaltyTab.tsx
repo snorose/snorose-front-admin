@@ -1,22 +1,30 @@
 import { useState } from 'react';
-import {
-  Label,
-  Input,
-  Button,
-  Select,
-  ConfirmModal,
-} from '@/shared/components/ui';
+
 import { toast } from 'sonner';
-import type { PenaltyUserInfo } from '@/shared/types';
+
 import {
-  WARNING_REASON_OPTIONS,
+  Button,
+  ConfirmModal,
+  Input,
+  Label,
+  Select,
+} from '@/shared/components/ui';
+import type { AdminBlacklistReq, PenaltyUserInfo } from '@/shared/types';
+import { getErrorMessage } from '@/shared/utils';
+
+import {
   REVOKE_WARNING_OPTIONS,
+  WARNING_REASON_OPTIONS,
 } from '@/domains/MemberInfo/constants/memberInfo';
+
+import { warnPenaltyAPI } from '@/apis';
 
 export default function WarnPenaltyTab({
   member,
+  onApplied,
 }: {
   member: PenaltyUserInfo;
+  onApplied?: () => void;
 }) {
   const [openModal, setOpenModal] = useState(false);
   const [formType, setFormType] = useState<'warn' | 'warnCancel' | null>(null);
@@ -26,6 +34,7 @@ export default function WarnPenaltyTab({
   const [warnCancelType, setWarnCancelType] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [cancelCount, setCancelCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetWarnForm = () => {
     setWarnReasonType('');
@@ -115,15 +124,35 @@ export default function WarnPenaltyTab({
     setOpenModal(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (isSubmitting) return;
+
     if (formType === 'warn') {
-      console.log('경고 부여:', {
-        member: member.studentNumber,
-        reasonType: warnReasonType,
-        reason: warnReason,
-        count: warnCount,
-        totalAfter: member.totalWarningCount + warnCount,
-      });
+      const payload: AdminBlacklistReq = {
+        encryptedUserId: member.encryptedUserId,
+        type: 'WARNING',
+        reason: warnReasonType,
+        warningCount: warnCount,
+      };
+
+      if (warnReasonType === 'ETC') {
+        payload.customReason = warnReason.trim();
+      }
+
+      try {
+        setIsSubmitting(true);
+        await warnPenaltyAPI(payload);
+        toast.success('경고 부여가 완료되었습니다.');
+        resetWarnForm();
+        onApplied?.();
+        setOpenModal(false);
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error, '경고 부여에 실패했습니다.'));
+      } finally {
+        setIsSubmitting(false);
+      }
+
+      return;
     } else {
       console.log('경고 차감:', {
         member: member.studentNumber,
@@ -195,6 +224,7 @@ export default function WarnPenaltyTab({
             <Button
               className='bg-red-600 text-white hover:bg-red-700'
               onClick={() => handleSubmit('warn')}
+              disabled={isSubmitting}
             >
               경고 적용
             </Button>

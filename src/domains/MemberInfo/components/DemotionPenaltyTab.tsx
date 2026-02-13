@@ -1,23 +1,31 @@
-import { useState, useMemo } from 'react';
-import {
-  Label,
-  Input,
-  Button,
-  Select,
-  ConfirmModal,
-} from '@/shared/components/ui';
-import type { PenaltyUserInfo } from '@/shared/types';
+import { useMemo, useState } from 'react';
+
 import { toast } from 'sonner';
+
 import {
-  RELEGATION_DEMOTE_OPTIONS,
+  Button,
+  ConfirmModal,
+  Input,
+  Label,
+  Select,
+} from '@/shared/components/ui';
+import type { AdminBlacklistReq, PenaltyUserInfo } from '@/shared/types';
+import { getErrorMessage } from '@/shared/utils';
+
+import {
   BLACKLIST_DEMOTE_OPTIONS,
+  RELEGATION_DEMOTE_OPTIONS,
   REVOKE_DEMOTE_OPTIONS,
 } from '@/domains/MemberInfo/constants/memberInfo';
 
+import { warnPenaltyAPI } from '@/apis';
+
 export default function DemotionPenaltyTab({
   member,
+  onApplied,
 }: {
   member: PenaltyUserInfo;
+  onApplied?: () => void;
 }) {
   const [openModal, setOpenModal] = useState(false);
   const [formType, setFormType] = useState<'demote' | 'demoteCancel' | null>(
@@ -32,6 +40,10 @@ export default function DemotionPenaltyTab({
   const [endDate, setEndDate] = useState('');
   const [cancelReasonType, setCancelReasonType] = useState('');
   const [cancelReason, setCancelReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isValidDemoteType = (value: string): value is Exclude<DemoteType, ''> =>
+    value === 'RELEGATION' || value === 'BLACKLIST';
 
   // 종료 예정일 계산
   const calculatedEndDate = useMemo(() => {
@@ -128,16 +140,43 @@ export default function DemotionPenaltyTab({
     setOpenModal(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (isSubmitting) return;
+
     if (formType === 'demote') {
-      console.log('강등 적용:', {
-        member,
-        demoteType,
-        demoteReasonType,
-        reason: demoteReason,
-        months,
-        endDate: calculatedEndDate,
-      });
+      if (!isValidDemoteType(demoteType)) {
+        toast.error('강등 유형을 선택해주세요.');
+        return;
+      }
+
+      const payload: AdminBlacklistReq = {
+        encryptedUserId: member.encryptedUserId,
+        type: demoteType,
+        reason: demoteReasonType,
+      };
+
+      if (demoteReasonType === 'ETC') {
+        payload.customReason = demoteReason.trim();
+      }
+
+      if (demoteType === 'RELEGATION') {
+        payload.relegationMonth = months;
+      }
+
+      try {
+        setIsSubmitting(true);
+        await warnPenaltyAPI(payload);
+        toast.success('강등 부여가 완료되었습니다.');
+        resetDemoteForm();
+        onApplied?.();
+        setOpenModal(false);
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error, '강등 부여에 실패했습니다.'));
+      } finally {
+        setIsSubmitting(false);
+      }
+
+      return;
     } else {
       console.log('강등 해제 적용:', {
         member,
@@ -162,7 +201,9 @@ export default function DemotionPenaltyTab({
             <Label className='w-24'>강등 유형</Label>
             <Select
               value={demoteType}
-              onValueChange={(v: DemoteType) => setDemoteType(v)}
+              onValueChange={(v) =>
+                setDemoteType(isValidDemoteType(v) ? v : '')
+              }
             >
               <Select.Trigger className='w-40 bg-white'>
                 <Select.Value placeholder='강등 유형 선택' />
@@ -236,6 +277,7 @@ export default function DemotionPenaltyTab({
             <Button
               className='bg-red-600 text-white hover:bg-red-700'
               onClick={() => handleSubmit('demote')}
+              disabled={isSubmitting}
             >
               강등 적용
             </Button>
@@ -300,7 +342,7 @@ export default function DemotionPenaltyTab({
             <Button
               className='bg-blue-600 text-white hover:bg-blue-700'
               onClick={() => handleSubmit('demoteCancel')}
-              disabled={!member.isBlacklist}
+              disabled={!member.isBlacklist || isSubmitting}
             >
               강등 해제
             </Button>
