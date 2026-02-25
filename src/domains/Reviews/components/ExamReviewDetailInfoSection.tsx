@@ -1,5 +1,7 @@
 import { type RefObject } from 'react';
 
+import { Pencil } from 'lucide-react';
+
 import {
   Accordion,
   Field,
@@ -31,10 +33,10 @@ export interface ExamReviewDetailInfoSectionFormData {
 
 export interface ExamReviewDetailInfoSectionProps {
   formData: ExamReviewDetailInfoSectionFormData;
-  setFormData: React.Dispatch<
-    React.SetStateAction<ExamReviewDetailInfoSectionFormData>
-  >;
+  setFormData: (partial: Partial<ExamReviewDetailInfoSectionFormData>) => void;
   isFormDisabled: boolean;
+  isEditMode: boolean;
+  onToggleEditMode: () => void;
   onFileDownload: () => void;
   fileInputRef: RefObject<HTMLInputElement | null>;
   selectedFile: File | null;
@@ -45,6 +47,8 @@ export function ExamReviewDetailInfoSection({
   formData,
   setFormData,
   isFormDisabled,
+  isEditMode,
+  onToggleEditMode,
   onFileDownload,
   fileInputRef,
   selectedFile,
@@ -59,7 +63,31 @@ export function ExamReviewDetailInfoSection({
     >
       <Accordion.Item value='detail'>
         <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline data-[state=closed]:hover:bg-gray-100 data-[state=open]:rounded-b-none data-[state=open]:bg-gray-100'>
-          시험후기 상세 정보
+          <span className='flex items-center gap-3'>
+            시험후기 상세 정보
+            <span
+              role='button'
+              tabIndex={0}
+              className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                isEditMode
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-white text-gray-700 hover:bg-gray-200'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleEditMode();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation();
+                  onToggleEditMode();
+                }
+              }}
+            >
+              <Pencil className='h-3.5 w-3.5' />
+              {isEditMode ? '편집 중' : '편집 모드'}
+            </span>
+          </span>
         </Accordion.Trigger>
 
         <Accordion.Content className='p-4 pt-2'>
@@ -69,12 +97,7 @@ export function ExamReviewDetailInfoSection({
               <Field.Content>
                 <Input
                   value={formData.lectureName}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      lectureName: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => setFormData({ lectureName: e.target.value })}
                   disabled={isFormDisabled}
                 />
               </Field.Content>
@@ -85,10 +108,7 @@ export function ExamReviewDetailInfoSection({
                 <Input
                   value={formData.professorName}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      professorName: e.target.value,
-                    }))
+                    setFormData({ professorName: e.target.value })
                   }
                   disabled={isFormDisabled}
                 />
@@ -123,10 +143,7 @@ export function ExamReviewDetailInfoSection({
                       const file = e.target.files?.[0];
                       if (file) {
                         setSelectedFile(file);
-                        setFormData((prev) => ({
-                          ...prev,
-                          fileName: file.name,
-                        }));
+                        setFormData({ fileName: file.name });
                       }
                       if (e.target) e.target.value = '';
                     }}
@@ -140,9 +157,7 @@ export function ExamReviewDetailInfoSection({
               <Field.Content>
                 <Select
                   value={formData.semester}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, semester: value }))
-                  }
+                  onValueChange={(value) => setFormData({ semester: value })}
                   disabled={isFormDisabled}
                 >
                   <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
@@ -163,9 +178,7 @@ export function ExamReviewDetailInfoSection({
               <Field.Content>
                 <Select
                   value={formData.examType}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, examType: value }))
-                  }
+                  onValueChange={(value) => setFormData({ examType: value })}
                   disabled={isFormDisabled}
                 >
                   <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
@@ -187,11 +200,10 @@ export function ExamReviewDetailInfoSection({
                 <Select
                   value={formData.lectureType}
                   onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
+                    setFormData({
                       lectureType:
                         value as (typeof LECTURE_TYPE_OPTIONS)[number]['value'],
-                    }))
+                    })
                   }
                   disabled={isFormDisabled}
                 >
@@ -219,11 +231,10 @@ export function ExamReviewDetailInfoSection({
                   onChange={(e) => {
                     const value = e.target.value;
                     const parsedValue = parseInt(value, 10);
-                    setFormData((prev) => ({
-                      ...prev,
+                    setFormData({
                       classNumber:
                         value === '' || isNaN(parsedValue) ? null : parsedValue,
-                    }));
+                    });
                   }}
                   disabled={isFormDisabled}
                   min={1}
@@ -235,9 +246,7 @@ export function ExamReviewDetailInfoSection({
               <Field.Content>
                 <Select
                   value={formData.isPF}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, isPF: value }))
-                  }
+                  onValueChange={(value) => setFormData({ isPF: value })}
                   disabled={isFormDisabled}
                 >
                   <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
@@ -255,9 +264,7 @@ export function ExamReviewDetailInfoSection({
               <Field.Content>
                 <Select
                   value={formData.isOnline}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, isOnline: value }))
-                  }
+                  onValueChange={(value) => setFormData({ isOnline: value })}
                   disabled={isFormDisabled}
                 >
                   <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
@@ -276,10 +283,7 @@ export function ExamReviewDetailInfoSection({
                 <Textarea
                   value={formData.examTypeAndQuestions}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      examTypeAndQuestions: e.target.value,
-                    }))
+                    setFormData({ examTypeAndQuestions: e.target.value })
                   }
                   disabled={isFormDisabled}
                   className='min-h-[84px]'

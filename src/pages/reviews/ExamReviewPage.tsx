@@ -310,9 +310,9 @@ export default function ExamReviewPage() {
             }
             initialExamType={
               searchParamsFromUrl.get('examType') === 'MIDTERM'
-                ? '중간'
+                ? '중간고사'
                 : searchParamsFromUrl.get('examType') === 'FINALTERM'
-                  ? '기말'
+                  ? '기말고사'
                   : undefined
             }
           />

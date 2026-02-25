@@ -1,7 +1,7 @@
 import {
+  EXAM_TYPE,
   LECTURE_TYPE,
   SEMESTER,
-  EXAM_TYPE,
   STATUS,
 } from '@/domains/Reviews/constants';
 
@@ -94,7 +94,7 @@ export interface DeleteExamReviewResponse {
 }
 
 export interface ExamReviewDetailResult {
-  userId: string;
+  encryptedUserId: string;
   userDisplay: string;
   isWriter: boolean;
   isWriterWithdrawn: boolean;

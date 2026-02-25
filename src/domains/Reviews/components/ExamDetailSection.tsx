@@ -51,7 +51,7 @@ interface ExamDetailSectionProps {
 }
 
 type FormData = {
-  userId: string;
+  encryptedUserId: string;
   postId: number | null;
   status: string;
   examReviewName: string;
@@ -83,7 +83,7 @@ type InitialValues = {
 };
 
 const DEFAULT_FORM_DATA: FormData = {
-  userId: '',
+  encryptedUserId: '',
   postId: null,
   status: '',
   examReviewName: '',
@@ -113,13 +113,15 @@ export function ExamDetailSection({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [initialValues, setInitialValues] = useState<InitialValues | null>(
     null
   );
 
   const isDisabled = !selectedExamReview || isLoadingDetail || false;
-  const isFormDisabled = !selectedExamReview || Boolean(isLoadingDetail);
+  const isFormDisabled =
+    !selectedExamReview || Boolean(isLoadingDetail) || !isEditMode;
 
   const resetForm = () => {
     setFormData(DEFAULT_FORM_DATA);
@@ -143,7 +145,7 @@ export function ExamDetailSection({
         (selectedExamReviewDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED');
 
       return {
-        userId: selectedExamReviewDetail.userId,
+        encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         status: statusValue,
         examReviewName: selectedExamReviewDetail.title,
@@ -177,9 +179,13 @@ export function ExamDetailSection({
   }, [selectedExamReviewDetail, selectedExamReview?.status]);
 
   useEffect(() => {
+    setIsEditMode(false);
+  }, [selectedExamReview?.id]);
+
+  useEffect(() => {
     if (formInitialValues) {
       setFormData({
-        userId: formInitialValues.userId,
+        encryptedUserId: formInitialValues.encryptedUserId,
         postId: formInitialValues.postId,
         status: formInitialValues.status,
         examReviewName: formInitialValues.examReviewName,
@@ -271,7 +277,7 @@ export function ExamDetailSection({
     if (selectedExamReviewDetail && initialValues) {
       setFormData((prev) => ({
         ...prev,
-        userId: selectedExamReviewDetail.userId,
+        encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         status: initialValues.status,
         lectureName: initialValues.lectureName,
@@ -287,6 +293,7 @@ export function ExamDetailSection({
       }));
       setSelectedFile(null);
     }
+    setIsEditMode(false);
   };
 
   const openSaveModal = () => {
@@ -386,6 +393,7 @@ export function ExamDetailSection({
       if (response.isSuccess) {
         toast.success('시험 후기가 성공적으로 수정되었습니다.');
         setSelectedFile(null);
+        setIsEditMode(false);
         setInitialValues({
           status: formData.status,
           lectureName: formData.lectureName,
@@ -478,7 +486,7 @@ export function ExamDetailSection({
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, status: value }))
                     }
-                    disabled={isFormDisabled}
+                    disabled={isDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
@@ -505,6 +513,8 @@ export function ExamDetailSection({
                   setFormData((prev) => ({ ...prev, ...partialData }))
                 }
                 isFormDisabled={isFormDisabled}
+                isEditMode={isEditMode}
+                onToggleEditMode={() => setIsEditMode((prev) => !prev)}
                 onFileDownload={handleFileDownload}
                 fileInputRef={fileInputRef}
                 selectedFile={selectedFile}
@@ -515,16 +525,16 @@ export function ExamDetailSection({
                 postId={formData.postId}
                 uploadTime={formData.uploadTime}
                 author={formData.author}
-                userId={formData.userId}
+                encryptedUserId={formData.encryptedUserId}
               />
 
-              <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
-                <>
+              {(isEditMode || isDirty) && (
+                <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
                   <Button
                     variant='outline'
                     className='w-20'
                     onClick={handleCancel}
-                    disabled={isDisabled || !isDirty || isSaving}
+                    disabled={isDisabled || isSaving}
                   >
                     취소
                   </Button>
@@ -543,8 +553,8 @@ export function ExamDetailSection({
                       '저장'
                     )}
                   </Button>
-                </>
-              </div>
+                </div>
+              )}
             </div>
           </div>
         )}

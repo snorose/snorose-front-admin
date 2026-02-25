@@ -24,7 +24,7 @@ const generateSemesterList = (): string[] => {
 export const SEMESTER_LIST = generateSemesterList();
 
 // 시험 종류 리스트
-export const EXAM_TYPE_LIST = ['중간', '기말'];
+export const EXAM_TYPE_LIST = ['중간고사', '기말고사'];
 
 // 강의 종류 옵션 리스트
 export const LECTURE_TYPE_OPTIONS = [
