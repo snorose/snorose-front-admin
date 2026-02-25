@@ -51,7 +51,7 @@ interface ExamDetailSectionProps {
 }
 
 type FormData = {
-  userId: string;
+  encryptedUserId: string;
   postId: number | null;
   status: string;
   examReviewName: string;
@@ -83,7 +83,7 @@ type InitialValues = {
 };
 
 const DEFAULT_FORM_DATA: FormData = {
-  userId: '',
+  encryptedUserId: '',
   postId: null,
   status: '',
   examReviewName: '',
@@ -145,7 +145,7 @@ export function ExamDetailSection({
         (selectedExamReviewDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED');
 
       return {
-        userId: selectedExamReviewDetail.userId,
+        encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         status: statusValue,
         examReviewName: selectedExamReviewDetail.title,
@@ -185,7 +185,7 @@ export function ExamDetailSection({
   useEffect(() => {
     if (formInitialValues) {
       setFormData({
-        userId: formInitialValues.userId,
+        encryptedUserId: formInitialValues.encryptedUserId,
         postId: formInitialValues.postId,
         status: formInitialValues.status,
         examReviewName: formInitialValues.examReviewName,
@@ -277,7 +277,7 @@ export function ExamDetailSection({
     if (selectedExamReviewDetail && initialValues) {
       setFormData((prev) => ({
         ...prev,
-        userId: selectedExamReviewDetail.userId,
+        encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         status: initialValues.status,
         lectureName: initialValues.lectureName,
@@ -525,7 +525,7 @@ export function ExamDetailSection({
                 postId={formData.postId}
                 uploadTime={formData.uploadTime}
                 author={formData.author}
-                userId={formData.userId}
+                encryptedUserId={formData.encryptedUserId}
               />
 
               {(isEditMode || isDirty) && (
