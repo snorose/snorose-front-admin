@@ -291,7 +291,7 @@ export default function ExamSearch({
                 value={type}
                 className='text-[12px] font-medium'
               >
-                {type === '중간' ? '중간고사' : '기말고사'}
+                {type === '중간고사' ? '중간고사' : '기말고사'}
               </Select.Item>
             ))}
           </Select.Content>
