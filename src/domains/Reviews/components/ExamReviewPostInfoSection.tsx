@@ -16,7 +16,7 @@ export function ExamReviewPostInfoSection({
   return (
     <Accordion type='single' collapsible className='rounded-md border'>
       <Accordion.Item value='post'>
-        <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline data-[state=closed]:hover:bg-gray-100 data-[state=open]:rounded-b-none data-[state=open]:bg-gray-100'>
+        <Accordion.Trigger className='bg-gray-100 px-4 py-3 text-base font-semibold hover:no-underline data-[state=open]:rounded-b-none'>
           게시글 정보
         </Accordion.Trigger>
         <Accordion.Content className='p-4 pt-2'>

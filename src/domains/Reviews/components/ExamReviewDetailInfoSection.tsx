@@ -56,7 +56,7 @@ export function ExamReviewDetailInfoSection({
       className='rounded-md border'
     >
       <Accordion.Item value='detail'>
-        <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline data-[state=closed]:hover:bg-gray-100 data-[state=open]:rounded-b-none data-[state=open]:bg-gray-100'>
+        <Accordion.Trigger className='bg-gray-100 px-4 py-3 text-base font-semibold hover:no-underline data-[state=open]:rounded-b-none'>
           시험후기 상세 정보
         </Accordion.Trigger>
 
