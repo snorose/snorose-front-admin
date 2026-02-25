@@ -54,7 +54,7 @@ export default function DownloadedExamReviewTab({
             <Table.Head className='text-center'>번호</Table.Head>
             <Table.Head className='text-center'>id</Table.Head>
             <Table.Head className='text-center'>시험후기명</Table.Head>
-            <Table.Head className='text-center'>바로가기</Table.Head>
+            <Table.Head className='text-center'>시험후기관리</Table.Head>
           </Table.Row>
         </Table.Header>
 

@@ -227,7 +227,7 @@ export default function MemberInfoPage() {
 
       <div className='relative flex items-center gap-2'>
         <span className='text-2xl font-bold'>
-          {selectedMember?.loginId ?? '회원 미선택'}
+          {selectedMember?.userName ?? '회원 미선택'}
         </span>
 
         <div className='relative'>
