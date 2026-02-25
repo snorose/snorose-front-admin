@@ -1,5 +1,7 @@
 import { type RefObject } from 'react';
 
+import { Pencil } from 'lucide-react';
+
 import {
   Accordion,
   Field,
@@ -33,6 +35,8 @@ export interface ExamReviewDetailInfoSectionProps {
   formData: ExamReviewDetailInfoSectionFormData;
   setFormData: (partial: Partial<ExamReviewDetailInfoSectionFormData>) => void;
   isFormDisabled: boolean;
+  isEditMode: boolean;
+  onToggleEditMode: () => void;
   onFileDownload: () => void;
   fileInputRef: RefObject<HTMLInputElement | null>;
   selectedFile: File | null;
@@ -43,6 +47,8 @@ export function ExamReviewDetailInfoSection({
   formData,
   setFormData,
   isFormDisabled,
+  isEditMode,
+  onToggleEditMode,
   onFileDownload,
   fileInputRef,
   selectedFile,
@@ -56,8 +62,32 @@ export function ExamReviewDetailInfoSection({
       className='rounded-md border'
     >
       <Accordion.Item value='detail'>
-        <Accordion.Trigger className='bg-gray-100 px-4 py-3 text-base font-semibold hover:no-underline data-[state=open]:rounded-b-none'>
-          시험후기 상세 정보
+        <Accordion.Trigger className='px-4 py-3 text-base font-semibold hover:no-underline data-[state=closed]:hover:bg-gray-100 data-[state=open]:rounded-b-none data-[state=open]:bg-gray-100'>
+          <span className='flex items-center gap-3'>
+            시험후기 상세 정보
+            <span
+              role='button'
+              tabIndex={0}
+              className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                isEditMode
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-white text-gray-700 hover:bg-gray-200'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleEditMode();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation();
+                  onToggleEditMode();
+                }
+              }}
+            >
+              <Pencil className='h-3.5 w-3.5' />
+              {isEditMode ? '편집 중' : '편집 모드'}
+            </span>
+          </span>
         </Accordion.Trigger>
 
         <Accordion.Content className='p-4 pt-2'>

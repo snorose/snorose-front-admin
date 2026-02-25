@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -452,29 +452,14 @@ export function ExamDetailSection({
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
           </div>
-          <div className='flex items-center gap-2'>
-            <button
-              type='button'
-              className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                isEditMode
-                  ? 'bg-blue-500 text-white hover:bg-blue-600'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setIsEditMode((prev) => !prev)}
-              disabled={!selectedExamReview || Boolean(isLoadingDetail)}
-            >
-              <Pencil className='h-3.5 w-3.5' />
-              {isEditMode ? '편집 중' : '편집 모드'}
-            </button>
-            <button
-              type='button'
-              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-              onClick={() => setIsDeleteModalOpen(true)}
-              disabled={!selectedExamReview || Boolean(isLoadingDetail)}
-            >
-              <Trash2 className='h-4 w-4 text-red-500' />
-            </button>
-          </div>
+          <button
+            type='button'
+            className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+            onClick={() => setIsDeleteModalOpen(true)}
+            disabled={!selectedExamReview || Boolean(isLoadingDetail)}
+          >
+            <Trash2 className='h-4 w-4 text-red-500' />
+          </button>
         </div>
 
         {!selectedExamReview ? (
@@ -528,6 +513,8 @@ export function ExamDetailSection({
                   setFormData((prev) => ({ ...prev, ...partialData }))
                 }
                 isFormDisabled={isFormDisabled}
+                isEditMode={isEditMode}
+                onToggleEditMode={() => setIsEditMode((prev) => !prev)}
                 onFileDownload={handleFileDownload}
                 fileInputRef={fileInputRef}
                 selectedFile={selectedFile}
