@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -113,13 +113,15 @@ export function ExamDetailSection({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [initialValues, setInitialValues] = useState<InitialValues | null>(
     null
   );
 
   const isDisabled = !selectedExamReview || isLoadingDetail || false;
-  const isFormDisabled = !selectedExamReview || Boolean(isLoadingDetail);
+  const isFormDisabled =
+    !selectedExamReview || Boolean(isLoadingDetail) || !isEditMode;
 
   const resetForm = () => {
     setFormData(DEFAULT_FORM_DATA);
@@ -175,6 +177,10 @@ export function ExamDetailSection({
     }
     return null;
   }, [selectedExamReviewDetail, selectedExamReview?.status]);
+
+  useEffect(() => {
+    setIsEditMode(false);
+  }, [selectedExamReview?.id]);
 
   useEffect(() => {
     if (formInitialValues) {
@@ -287,6 +293,7 @@ export function ExamDetailSection({
       }));
       setSelectedFile(null);
     }
+    setIsEditMode(false);
   };
 
   const openSaveModal = () => {
@@ -386,6 +393,7 @@ export function ExamDetailSection({
       if (response.isSuccess) {
         toast.success('시험 후기가 성공적으로 수정되었습니다.');
         setSelectedFile(null);
+        setIsEditMode(false);
         setInitialValues({
           status: formData.status,
           lectureName: formData.lectureName,
@@ -444,14 +452,29 @@ export function ExamDetailSection({
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
           </div>
-          <button
-            type='button'
-            className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-            onClick={() => setIsDeleteModalOpen(true)}
-            disabled={!selectedExamReview || Boolean(isLoadingDetail)}
-          >
-            <Trash2 className='h-4 w-4 text-red-500' />
-          </button>
+          <div className='flex items-center gap-2'>
+            <button
+              type='button'
+              className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                isEditMode
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => setIsEditMode((prev) => !prev)}
+              disabled={!selectedExamReview || Boolean(isLoadingDetail)}
+            >
+              <Pencil className='h-3.5 w-3.5' />
+              {isEditMode ? '편집 중' : '편집 모드'}
+            </button>
+            <button
+              type='button'
+              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+              onClick={() => setIsDeleteModalOpen(true)}
+              disabled={!selectedExamReview || Boolean(isLoadingDetail)}
+            >
+              <Trash2 className='h-4 w-4 text-red-500' />
+            </button>
+          </div>
         </div>
 
         {!selectedExamReview ? (
@@ -478,7 +501,7 @@ export function ExamDetailSection({
                     onValueChange={(value) =>
                       setFormData((prev) => ({ ...prev, status: value }))
                     }
-                    disabled={isFormDisabled}
+                    disabled={isDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
@@ -518,13 +541,13 @@ export function ExamDetailSection({
                 userId={formData.userId}
               />
 
-              <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
-                <>
+              {(isEditMode || isDirty) && (
+                <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
                   <Button
                     variant='outline'
                     className='w-20'
                     onClick={handleCancel}
-                    disabled={isDisabled || !isDirty || isSaving}
+                    disabled={isDisabled || isSaving}
                   >
                     취소
                   </Button>
@@ -543,8 +566,8 @@ export function ExamDetailSection({
                       '저장'
                     )}
                   </Button>
-                </>
-              </div>
+                </div>
+              )}
             </div>
           </div>
         )}
