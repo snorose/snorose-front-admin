@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Copy, PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -8,12 +8,7 @@ import { Button, Input } from '@/shared/components/ui';
 import type { EditMemberInfo, MemberInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
-import {
-  MemberInfoEditForm,
-  MemberInfoView,
-  TabList,
-  getMemberInfoTabs,
-} from '@/domains/MemberInfo';
+import { MemberInfoEditForm, MemberInfoView } from '@/domains/MemberInfo';
 import { formatDateTime } from '@/domains/MemberInfo/utils/formatDateTime';
 
 import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
@@ -182,13 +177,13 @@ export default function MemberInfoPage() {
     }
   };
 
-  const tabs = useMemo(() => {
-    if (!selectedMember) return [];
-    return getMemberInfoTabs(
-      selectedMember.encryptedUserId,
-      selectedMember.studentNumber
-    );
-  }, [selectedMember]);
+  // const tabs = useMemo(() => {
+  //   if (!selectedMember) return [];
+  //   return getMemberInfoTabs(
+  //     selectedMember.encryptedUserId,
+  //     selectedMember.studentNumber
+  //   );
+  // }, [selectedMember]);
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -271,9 +266,9 @@ export default function MemberInfoPage() {
         />
       )}
 
-      <article className='rounded-md bg-blue-50 p-2'>
+      {/* <article className='rounded-md bg-blue-50 p-2'>
         <TabList defaultTab='point' tabs={tabs} />
-      </article>
+      </article> */}
     </div>
   );
 }
