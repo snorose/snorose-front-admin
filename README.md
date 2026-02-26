@@ -19,10 +19,11 @@
 
 - 코어: `React`, `TypeScript`
 - 상태 관리: `TanStack Query`
-- UI/스타일링: `tailwind`, `shadcn/ui`, `lucide-react`
+- UI/스타일링: `tailwind`, `shadcn/ui`
 - 빌드 도구: `Vite`
 - 패키지 매니저: `npm`
 - 배포: `Cloudflare Pages`
+- 테스트: `Vitest`
 
 <br>
 
@@ -34,21 +35,23 @@
 src/
 ├── apis/                    # API 호출 함수
 ├── assets/                  # 정적 자산 (이미지, 로고 등)
-├── axios/                   # Axios 인스턴스 설정
-├── components/              # 공통 컴포넌트
-├── constants/               # 상수 정의
-├── contexts/                # React Context
-├── hooks/                   # 커스텀 훅
 ├── pages/                   # 페이지 컴포넌트
-├── types/                   # TypeScript 타입 정의
-├── utils/                   # 유틸리티 함수
-├── ...
+├── shared/                  # 공유 코드
+│   ├── axios/               # Axios 인스턴스 설정
+│   ├── components/          # 공통 컴포넌트
+│   │   └── ui/              # shadcn/ui 컴포넌트
+│   ├── constants/           # 상수 정의
+│   ├── contexts/            # React Context
+│   ├── hooks/               # 커스텀 훅
+│   ├── lib/                 # 라이브러리 유틸 (cn 등)
+│   ├── types/               # TypeScript 타입 정의
+│   └── utils/               # 유틸리티 함수
 └── domains/                 # 도메인별 기능
-    ├── Users/
+    ├── Points/
     │   ├── components/
     │   ├── hooks/
     │   └── ...
-    └── Points/
+    └── Reviews/
         ├── components/
         ├── hooks/
         └── ...

@@ -1,16 +1,10 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-} from '@/components/ui';
-import type { PointFreeze } from '@/types';
-import { deletePointFreezeAPI } from '@/apis';
 import { toast } from 'sonner';
-import { getErrorMessage } from '@/utils';
+
+import { Button, Dialog } from '@/shared/components/ui';
+import type { PointFreeze } from '@/shared/types';
+import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
+
+import { deletePointFreezeAPI } from '@/apis';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;
@@ -18,7 +12,7 @@ interface PointFreezeDeleteConfirmModalProps {
   onSuccess: () => void;
   onClose: () => void;
 }
-export default function PointFreezeDeleteConfirmModal({
+export function PointFreezeDeleteConfirmModal({
   isDeleteModalOpen,
   selectedItem,
   onSuccess,
@@ -43,13 +37,13 @@ export default function PointFreezeDeleteConfirmModal({
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={handleDeleteCancel}>
-      <DialogContent className='max-w-xs sm:max-w-sm'>
-        <DialogHeader>
-          <DialogTitle>일정 삭제</DialogTitle>
-          <DialogDescription>
+      <Dialog.Content className='max-w-xs sm:max-w-sm'>
+        <Dialog.Header>
+          <Dialog.Title>일정 삭제</Dialog.Title>
+          <Dialog.Description>
             포인트 미지급 일정을 삭제하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
+          </Dialog.Description>
+        </Dialog.Header>
         <div className='flex flex-col gap-3'>
           <ul className='ml-4 flex list-outside list-disc flex-col gap-1'>
             <li>
@@ -58,23 +52,27 @@ export default function PointFreezeDeleteConfirmModal({
             </li>
             <li>
               <span className='text-sm font-semibold'>시작 일시: </span>
-              <span className='text-sm'>{selectedItem.startAt}</span>
+              <span className='text-sm'>
+                {formatDateTimeToMinutes(selectedItem.startAt)}
+              </span>
             </li>
             <li>
               <span className='text-sm font-semibold'>종료 일시: </span>
-              <span className='text-sm'>{selectedItem.endAt}</span>
+              <span className='text-sm'>
+                {formatDateTimeToMinutes(selectedItem.endAt)}
+              </span>
             </li>
           </ul>
         </div>
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={handleDeleteCancel}>
             취소
           </Button>
           <Button type='button' onClick={handleDeleteConfirm}>
             삭제
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

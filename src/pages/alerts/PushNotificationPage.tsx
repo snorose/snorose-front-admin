@@ -1,18 +1,21 @@
 import { useState } from 'react';
+
+import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
 import {
   Button,
   Input,
   Label,
   RadioGroup,
-  RadioGroupItem,
   Textarea,
-} from '@/components/ui';
-import { PageHeader } from '@/components';
-import { PushNotificationConfirmModal } from '@/domains/Alerts';
+} from '@/shared/components/ui';
+import type { PushNotification } from '@/shared/types';
+import { getErrorMessage } from '@/shared/utils';
+
+import { PushNotificationConfirmModal } from '@/domains/Alerts/components';
+
 import { postPushNotificationAPI } from '@/apis';
-import { getErrorMessage } from '@/utils';
-import { toast } from 'sonner';
-import type { PushNotification } from '@/types';
 
 const INITIAL_FORM_DATA: PushNotification = {
   name: '',
@@ -221,7 +224,7 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='true' id='marketing-true' />
+                    <RadioGroup.Item value='true' id='marketing-true' />
                     <Label
                       htmlFor='marketing-true'
                       className='cursor-pointer font-normal'
@@ -230,7 +233,7 @@ export default function PushNotificationPage() {
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='false' id='marketing-false' />
+                    <RadioGroup.Item value='false' id='marketing-false' />
                     <Label
                       htmlFor='marketing-false'
                       className='cursor-pointer font-normal'
@@ -254,7 +257,7 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='true' id='test-true' />
+                    <RadioGroup.Item value='true' id='test-true' />
                     <Label
                       htmlFor='test-true'
                       className='cursor-pointer font-normal'
@@ -263,7 +266,7 @@ export default function PushNotificationPage() {
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroupItem value='false' id='test-false' />
+                    <RadioGroup.Item value='false' id='test-false' />
                     <Label
                       htmlFor='test-false'
                       className='cursor-pointer font-normal'

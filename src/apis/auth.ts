@@ -1,11 +1,11 @@
-import { axiosInstance } from '@/axios/instance';
+import { axiosInstance } from '@/shared/axios/instance';
 import type {
   LoginRequest,
   LoginResponse,
   ReissueTokenRequest,
   ReissueTokenResponse,
-} from '@/types';
-import { REISSUE_TOKEN_ENDPOINT } from '@/constants';
+} from '@/shared/types';
+import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
 
 export const loginAPI = async (
   credentials: LoginRequest

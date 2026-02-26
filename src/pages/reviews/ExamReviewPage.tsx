@@ -1,22 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
 import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
+
 import {
-  ExamTable,
+  ExamDetailSection,
   ExamSearch,
-  ExamIconInfo,
-  ExamPanel,
+  ExamTable,
 } from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
   Semester,
 } from '@/domains/Reviews/types';
-import { PageHeader } from '@/components';
-import { getExamReviewDetail } from '@/apis';
-import { toast } from 'sonner';
-import { isAxiosError } from 'axios';
 import { convertSemesterEnumToString } from '@/domains/Reviews/utils';
+
+import { getExamReviewDetail } from '@/apis';
 
 export default function ExamReviewPage() {
   const queryClient = useQueryClient();
@@ -121,12 +124,19 @@ export default function ExamReviewPage() {
     setCurrentPage(1);
   };
 
-  // 페이지 변경 핸들러
-  const handlePageChange = (page: number) => {
-    const newSearchParams = new URLSearchParams(searchParamsFromUrl);
-    newSearchParams.set('page', page.toString());
-    setSearchParamsFromUrl(newSearchParams, { replace: true });
-    setCurrentPage(page);
+  const handlePageChange = (
+    pageOrUpdater: number | ((prev: number) => number)
+  ) => {
+    setCurrentPage((prev) => {
+      const next =
+        typeof pageOrUpdater === 'function'
+          ? pageOrUpdater(prev)
+          : pageOrUpdater;
+      const newSearchParams = new URLSearchParams(searchParamsFromUrl);
+      newSearchParams.set('page', next.toString());
+      setSearchParamsFromUrl(newSearchParams, { replace: true });
+      return next;
+    });
   };
 
   const handleSaveSuccess = async () => {
@@ -278,14 +288,14 @@ export default function ExamReviewPage() {
   }, [selectedExamReview]);
 
   return (
-    <div className='box-border w-full max-w-full'>
-      {/* 검색 + 아이콘 정보*/}
-      <div className='flex items-end justify-between'>
-        <div>
-          <PageHeader
-            title='시험후기 관리'
-            description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
-          />
+    <div className='flex w-full flex-col gap-6'>
+      <PageHeader
+        title='시험후기 관리'
+        description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
+      />
+
+      <div className='flex flex-col gap-2'>
+        <div className='flex'>
           <ExamSearch
             onSearchChange={handleSearchChange}
             initialKeyword={searchParamsFromUrl.get('keyword') || ''}
@@ -300,29 +310,25 @@ export default function ExamReviewPage() {
             }
             initialExamType={
               searchParamsFromUrl.get('examType') === 'MIDTERM'
-                ? '중간'
+                ? '중간고사'
                 : searchParamsFromUrl.get('examType') === 'FINALTERM'
-                  ? '기말'
+                  ? '기말고사'
                   : undefined
             }
           />
         </div>
 
-        <ExamIconInfo />
+        <ExamTable
+          onRowSelect={setSelectedExamReview}
+          refreshKey={refreshKey}
+          selectedId={selectedExamReview?.id}
+          searchParams={searchParams}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
       </div>
 
-      {/* 시험후기 테이블 */}
-      <ExamTable
-        onRowSelect={setSelectedExamReview}
-        refreshKey={refreshKey}
-        selectedId={selectedExamReview?.id}
-        searchParams={searchParams}
-        currentPage={currentPage}
-        onPageChange={handlePageChange}
-      />
-
-      {/* 시험후기 패널 - 편집, 삭제, 경고, 메모, 강등... */}
-      <ExamPanel
+      <ExamDetailSection
         selectedExamReview={selectedExamReview}
         selectedExamReviewDetail={selectedExamReviewDetail}
         isLoadingDetail={isLoadingDetail}

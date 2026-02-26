@@ -1,14 +1,7 @@
-import {
-  Input,
-  Label,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
 import { useEffect } from 'react';
+
+import { Input, Label, Select } from '@/shared/components/ui';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -21,7 +14,7 @@ interface PointDetailSectionProps {
   onMemoChange: (value: string) => void;
 }
 
-export default function PointDetailSection({
+export function PointDetailSection({
   selectedCategory,
   onCategoryChange,
   difference,
@@ -73,16 +66,16 @@ export default function PointDetailSection({
             }
             value={selectedCategory || undefined}
           >
-            <SelectTrigger className='w-full'>
-              <SelectValue placeholder='포인트 유형을 선택해주세요' />
-            </SelectTrigger>
-            <SelectContent>
+            <Select.Trigger className='w-full'>
+              <Select.Value placeholder='포인트 유형을 선택해주세요' />
+            </Select.Trigger>
+            <Select.Content>
               {POINT_CATEGORY_OPTIONS.map(({ value, label }) => (
-                <SelectItem key={value} value={value}>
+                <Select.Item key={value} value={value}>
                   {label}
-                </SelectItem>
+                </Select.Item>
               ))}
-            </SelectContent>
+            </Select.Content>
           </Select>
         </div>
 

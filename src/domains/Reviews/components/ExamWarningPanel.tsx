@@ -1,13 +1,7 @@
 import { useState } from 'react';
-import {
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui';
-import { WARNING_REASON_LIST } from '@/constants';
+
+import { Button, Select } from '@/shared/components/ui';
+import { WARNING_REASON_LIST } from '@/shared/constants';
 
 const SELECT_CONTENT_STYLE =
   'text-[10px] max-h-[200px] overflow-y-auto bg-blue-50 [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-highlighted]]:bg-blue-100/50 [&_[data-state=checked]]:bg-blue-100';
@@ -29,16 +23,16 @@ export default function ExamWarningPanel() {
         <div>
           <p className='w-full py-1 text-xs font-semibold'>경고 사유</p>
           <Select value={selectedReason} onValueChange={setSelectedReason}>
-            <SelectTrigger className='w-full'>
-              <SelectValue placeholder='경고 사유를 선택해주세요.' />
-            </SelectTrigger>
-            <SelectContent className={SELECT_CONTENT_STYLE}>
+            <Select.Trigger className='w-full'>
+              <Select.Value placeholder='경고 사유를 선택해주세요.' />
+            </Select.Trigger>
+            <Select.Content className={SELECT_CONTENT_STYLE}>
               {WARNING_REASON_LIST.map((reason) => (
-                <SelectItem key={reason.code} value={reason.code}>
+                <Select.Item key={reason.code} value={reason.code}>
                   {reason.label}
-                </SelectItem>
+                </Select.Item>
               ))}
-            </SelectContent>
+            </Select.Content>
           </Select>
           {isEtcSelected && (
             <>

@@ -1,14 +1,6 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  Button,
-} from '@/components/ui';
-import { cn } from '@/utils';
-import { POINT_CATEGORY_OPTIONS } from '@/constants';
+import { Button, Dialog } from '@/shared/components/ui';
+import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
+import { cn } from '@/shared/lib';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -21,7 +13,7 @@ interface AllMemberPointAdjustmentConfirmModalProps {
   memo: string;
 }
 
-export default function AllMemberPointAdjustmentConfirmModal({
+export function AllMemberPointAdjustmentConfirmModal({
   isOpen,
   onClose,
   onConfirm,
@@ -33,13 +25,13 @@ export default function AllMemberPointAdjustmentConfirmModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>정회원 전체 포인트 지급/차감 확인</DialogTitle>
-          <DialogDescription>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>정회원 전체 포인트 지급/차감 확인</Dialog.Title>
+          <Dialog.Description>
             아래 내용으로 포인트를 적용하시겠습니까?
-          </DialogDescription>
-        </DialogHeader>
+          </Dialog.Description>
+        </Dialog.Header>
         <div className='flex flex-col gap-3 py-4'>
           <div className='flex items-center gap-2'>
             <span className='text-sm font-semibold'>포인트 유형:</span>
@@ -71,15 +63,15 @@ export default function AllMemberPointAdjustmentConfirmModal({
           )}
         </div>
 
-        <DialogFooter>
+        <Dialog.Footer>
           <Button type='button' variant='outline' onClick={onClose}>
             취소
           </Button>
           <Button type='button' onClick={onConfirm}>
             확인
           </Button>
-        </DialogFooter>
-      </DialogContent>
+        </Dialog.Footer>
+      </Dialog.Content>
     </Dialog>
   );
 }

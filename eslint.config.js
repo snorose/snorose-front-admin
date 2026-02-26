@@ -1,9 +1,10 @@
 import js from '@eslint/js';
-import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import tseslint from 'typescript-eslint';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -25,9 +26,18 @@ export default defineConfig([
       },
     },
   },
-  // components/ui 폴더에서는 react-refresh 규칙 비활성화
   {
-    files: ['src/components/ui/**/*.{ts,tsx}'],
+    plugins: {
+      'simple-import-sort': simpleImportSort,
+    },
+    rules: {
+      'simple-import-sort/imports': 'off',
+      'simple-import-sort/exports': 'warn',
+    },
+  },
+  // shadcn/ui 컴포넌트는 variants를 함께 export하는 패턴을 사용하므로 react-refresh 규칙 비활성화
+  {
+    files: ['src/shared/components/ui/**/*.{ts,tsx}'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

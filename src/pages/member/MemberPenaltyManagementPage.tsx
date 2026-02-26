@@ -1,18 +1,20 @@
-import { useCallback, useState, useMemo } from 'react';
-import { Button, Input } from '@/components/ui';
-import { PageHeader } from '@/components';
-import { toast } from 'sonner';
-import type { PenaltyUserInfo } from '@/types';
-import { getErrorMessage } from '@/utils';
+import { useCallback, useMemo, useState } from 'react';
 
-import { searchUsersAPI } from '@/apis';
-import { MEMBER_SAMPLE_DATA } from '@/__mocks__';
+import { toast } from 'sonner';
+
+import { PageHeader } from '@/shared/components';
+import { Button, Input } from '@/shared/components/ui';
+import type { PenaltyUserInfo } from '@/shared/types';
+import { getErrorMessage } from '@/shared/utils';
+
 import {
-  PenaltyUserInfoView,
   BlacklistHistoryTab,
+  PenaltyUserInfoView,
   TabList,
   getPenaltyTabs,
 } from '@/domains/MemberInfo';
+
+import { searchUsersAPI } from '@/apis';
 
 export default function MemberPenaltyManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +22,7 @@ export default function MemberPenaltyManagementPage() {
     null
   );
   const [errorMessage, setErrorMessage] = useState('');
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // 회원 검색 API
   const handleSearch = useCallback(async () => {
@@ -42,29 +45,17 @@ export default function MemberPenaltyManagementPage() {
       }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
-
-      // 에러면 데이터 없으면 찾기 (미완성 api용 - 추후 삭제)
-      const mock = MEMBER_SAMPLE_DATA.find(
-        (dummy) =>
-          dummy.loginId.toLowerCase() === query ||
-          dummy.studentNumber.toLowerCase() === query
-      );
-
-      if (mock) {
-        setSelectedMember(mock);
-        setErrorMessage('(MOCK) API 에러로 mock 데이터를 사용함.');
-        return;
-      }
-
-      // 둘 다 없으면 null (미완성 api용 - 추후 삭제)
       setSelectedMember(null);
-      setErrorMessage('사용자가 존재하지 않아요.');
+      setErrorMessage('데이터가 없습니다');
     }
   }, [searchQuery]);
 
   const tabs = useMemo(() => {
     if (!selectedMember) return [];
-    return getPenaltyTabs({ member: selectedMember });
+    return getPenaltyTabs({
+      member: selectedMember,
+      onApplied: () => setHistoryRefreshKey((prev) => prev + 1),
+    });
   }, [selectedMember]);
 
   return (
@@ -96,30 +87,27 @@ export default function MemberPenaltyManagementPage() {
       </section>
       {errorMessage && <p className='font-medium'>{errorMessage}</p>}
 
-      {selectedMember && (
-        <>
-          <article>
-            <h3 className='text-lg font-bold'>회원정보</h3>
+      <article>
+        <h3 className='text-lg font-bold'>회원정보</h3>
 
-            <div className='flex flex-row gap-4 rounded-md p-4 pb-5'>
-              <div className='w-2/5'>
-                <PenaltyUserInfoView member={selectedMember} />
-              </div>
-              <div className='w-3/5'>
-                <BlacklistHistoryTab
-                  encryptedUserId={selectedMember.encryptedUserId}
-                  studentNumber={selectedMember.studentNumber}
-                  groupSize={5}
-                />
-              </div>
-            </div>
-          </article>
+        <div className='flex flex-row gap-4 rounded-md p-4 pb-5'>
+          <div className='w-2/5'>
+            <PenaltyUserInfoView member={selectedMember} />
+          </div>
+          <div className='w-3/5'>
+            <BlacklistHistoryTab
+              encryptedUserId={selectedMember?.encryptedUserId}
+              studentNumber={selectedMember?.studentNumber}
+              groupSize={5}
+              refreshKey={historyRefreshKey}
+            />
+          </div>
+        </div>
+      </article>
 
-          <article className='rounded-md border p-2'>
-            <TabList defaultTab='warn' tabs={tabs} />
-          </article>
-        </>
-      )}
+      <article className='rounded-md border p-2'>
+        <TabList defaultTab='warn' tabs={tabs} />
+      </article>
     </div>
   );
 }

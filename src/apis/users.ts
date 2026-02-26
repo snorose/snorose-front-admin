@@ -1,5 +1,5 @@
-import { axiosInstance } from '@/axios/instance';
-import type { EditMemberInfo, UpdateUserInfoResponse } from '@/types/member';
+import { axiosInstance } from '@/shared/axios/instance';
+import type { EditMemberInfo, UpdateUserInfoResponse } from '@/shared/types';
 
 export const searchUsersAPI = async (keyword: string) => {
   const response = await axiosInstance.get(`/v1/admin/users/search`, {

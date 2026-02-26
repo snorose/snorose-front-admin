@@ -1,4 +1,4 @@
-import { TableRow, TableCell, Skeleton } from '@/components/ui';
+import { Skeleton, Table } from '@/shared/components/ui';
 
 // ======= types =======
 interface ExamTableSkeletonProps {
@@ -16,45 +16,35 @@ export function ExamTableSkeleton({
   return (
     <>
       {Array.from({ length: itemsPerPage }).map((_, index) => (
-        <TableRow
-          key={`skeleton-${index}`}
-          size='sm'
-          className='[&_td]:h-[24px]'
-        >
-          <TableCell size='sm' className='w-[70px] text-center'>
-            <Skeleton className='mx-auto h-4 w-8' />
-          </TableCell>
-          <TableCell size='sm' className='w-[50px]'>
-            <Skeleton className='mx-auto h-2 w-2 rounded-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[200px]'>
+        <Table.Row key={`skeleton-${index}`} className='[&_td]:h-[40px]'>
+          <Table.Cell className='w-[50px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[120px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[200px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[60px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[120px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[84px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[60px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[60px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[84px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[60px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[60px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[150px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[60px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[110px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[110px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-          <TableCell size='sm' className='w-[80px]'>
+          </Table.Cell>
+          <Table.Cell className='w-[80px]'>
             <Skeleton className='h-4 w-full' />
-          </TableCell>
-        </TableRow>
+          </Table.Cell>
+        </Table.Row>
       ))}
     </>
   );
@@ -62,13 +52,13 @@ export function ExamTableSkeleton({
 
 export function ExamTableEmpty() {
   return (
-    <TableRow size='sm'>
-      <TableCell size='sm' colSpan={11} className='h-[240px] p-0 text-gray-500'>
+    <Table.Row>
+      <Table.Cell colSpan={9} className='h-[240px] p-0 text-gray-500'>
         <div className='flex h-full items-center justify-center'>
           해당하는 데이터가 없습니다
         </div>
-      </TableCell>
-    </TableRow>
+      </Table.Cell>
+    </Table.Row>
   );
 }
 
@@ -78,41 +68,17 @@ export function ExamTableEmptyRows({ count }: ExamTableEmptyRowsProps) {
   return (
     <>
       {Array.from({ length: count }).map((_, index) => (
-        <TableRow key={`empty-${index}`} size='sm' className='[&_td]:h-[24px]'>
-          <TableCell size='sm' className='w-[70px] text-center text-gray-600'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[50px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[200px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[120px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[60px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[84px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[60px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[60px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[150px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[110px]'>
-            &nbsp;
-          </TableCell>
-          <TableCell size='sm' className='w-[80px]'>
-            &nbsp;
-          </TableCell>
-        </TableRow>
+        <Table.Row key={`empty-${index}`} className='[&_td]:h-[24px]'>
+          <Table.Cell className='w-[50px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[200px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[120px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[60px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[84px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[60px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[60px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[110px]'>&nbsp;</Table.Cell>
+          <Table.Cell className='w-[80px]'>&nbsp;</Table.Cell>
+        </Table.Row>
       ))}
     </>
   );

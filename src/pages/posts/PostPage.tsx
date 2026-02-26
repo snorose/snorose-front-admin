@@ -1,4 +1,4 @@
-import { PageHeader } from '@/components';
+import { PageHeader } from '@/shared/components';
 
 export default function PostPage() {
   return (

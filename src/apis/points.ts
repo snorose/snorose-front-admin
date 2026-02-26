@@ -1,16 +1,26 @@
-import { axiosInstance } from '@/axios/instance';
+import { axiosInstance } from '@/shared/axios/instance';
 import type {
+  AdjustAllMemberPoint,
   AdjustSinglePoint,
   CreatePointFreeze,
   UpdatePointFreeze,
-  AdjustAllMemberPoint,
-} from '@/types';
+} from '@/shared/types';
 
+// 포인트 증감
 export const postSinglePointAPI = async (data: AdjustSinglePoint) => {
   const response = await axiosInstance.post('/v1/points', data);
   return response.data;
 };
 
+export const postAllMemberPointAPI = async (data: AdjustAllMemberPoint) => {
+  const response = await axiosInstance.post(
+    '/v1/admin/points/bulk-reward',
+    data
+  );
+  return response.data;
+};
+
+// 포인트 미지급 일정 관리
 export const postPointFreezeAPI = async (data: CreatePointFreeze) => {
   const response = await axiosInstance.post(
     '/v1/admin/points/point-freeze',
@@ -38,14 +48,6 @@ export const patchPointFreezeAPI = async (
 export const deletePointFreezeAPI = async (id: number) => {
   const response = await axiosInstance.delete(
     `/v1/admin/points/point-freeze/${id}`
-  );
-  return response.data;
-};
-
-export const postAllMemberPointAPI = async (data: AdjustAllMemberPoint) => {
-  const response = await axiosInstance.post(
-    '/v1/admin/points/point-freeze/insert-bulk-logs',
-    data
   );
   return response.data;
 };

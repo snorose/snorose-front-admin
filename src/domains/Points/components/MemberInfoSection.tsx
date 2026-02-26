@@ -1,5 +1,5 @@
-import { Label, Input } from '@/components/ui';
-import type { MemberInfo } from '@/types';
+import { Input, Label } from '@/shared/components/ui';
+import type { MemberInfo } from '@/shared/types';
 
 interface MemberInfoSectionProps {
   searchedMember: MemberInfo;
@@ -7,7 +7,7 @@ interface MemberInfoSectionProps {
   onUserIdChange: (value: number) => void;
 }
 
-export default function MemberInfoSection({
+export function MemberInfoSection({
   searchedMember,
   userId,
   onUserIdChange,

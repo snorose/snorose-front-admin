@@ -1,21 +1,25 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import './App.css';
+
+import { AppSidebar, ProtectedRoute } from '@/shared/components';
+import { Sidebar, Toaster } from '@/shared/components/ui';
+import { AuthProvider } from '@/shared/contexts';
+
 import {
+  AdjustAllMemberPointPage,
+  AdjustSinglePointPage,
+  CommentPage,
   ExamReviewPage,
+  LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
-  AdjustSinglePointPage,
-  AdjustAllMemberPointPage,
   PointFreezePage,
-  LogInPage,
   PostPage,
-  CommentPage,
   PushNotificationPage,
-} from './pages';
-import { AppSidebar, ProtectedRoute } from '@/components';
-import { SidebarProvider, Toaster } from '@/components/ui';
-import { AuthProvider } from '@/contexts';
+} from '@/pages';
+
+import './App.css';
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient({
@@ -41,7 +45,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <div className='flex min-h-screen'>
-                    <SidebarProvider>
+                    <Sidebar.Provider>
                       <AppSidebar />
                       <main className='flex flex-1 flex-col overflow-hidden px-6 py-5'>
                         <section className='flex w-full flex-1 overflow-auto'>
@@ -82,7 +86,7 @@ function App() {
                           </Routes>
                         </section>
                       </main>
-                    </SidebarProvider>
+                    </Sidebar.Provider>
                   </div>
                 </ProtectedRoute>
               }

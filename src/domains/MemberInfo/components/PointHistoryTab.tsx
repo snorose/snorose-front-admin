@@ -1,16 +1,15 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useState } from 'react';
 
-import { USERPOINT_SAMPLE_DATA } from '@/__mocks__';
-import MemberInfoPagination from './MemberInfoTablePagenation';
+import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Table } from '@/shared/components/ui/table';
+
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+
+import { USERPOINT_SAMPLE_DATA } from '@/__mocks__';
+
+import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface PointHistoryTabProps {
   encryptedUserId?: string;
@@ -21,7 +20,6 @@ export default function PointHistoryTab({
   encryptedUserId,
   studentNumber,
 }: PointHistoryTabProps) {
-  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   // 한 페이지에 10개 이력
@@ -47,92 +45,95 @@ export default function PointHistoryTab({
   // 포인트 ID 클릭시 복사
   const handleCopy = async (sourceId: number) => {
     await navigator.clipboard.writeText(String(sourceId));
-    setCopiedId(sourceId);
-    setTimeout(() => setCopiedId(null), 1500);
+    toast.success('복사되었습니다.');
   };
 
   return (
     <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
       <Table className='border- w-full border-separate border-spacing-0 rounded-md border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
         {/* Header */}
-        <TableHeader className='bg-gray-100'>
-          <TableRow>
-            <TableHead className='text-center'>번호</TableHead>
-            <TableHead className='text-center'>포인트 ID</TableHead>
-            <TableHead className='text-center'>분류</TableHead>
-            <TableHead className='text-center'>분류 사유</TableHead>
-            <TableHead className='text-center'>상세 사유</TableHead>
-            <TableHead className='text-center'>포인트</TableHead>
-            <TableHead className='text-center'>일시</TableHead>
-            <TableHead className='text-center'>잔액</TableHead>
-          </TableRow>
-        </TableHeader>
+        <Table.Header className='bg-gray-100'>
+          <Table.Row>
+            <Table.Head className='text-center'>번호</Table.Head>
+            <Table.Head className='text-center'>포인트 ID</Table.Head>
+            <Table.Head className='text-center'>분류</Table.Head>
+            <Table.Head className='text-center'>분류 사유</Table.Head>
+            <Table.Head className='text-center'>상세 사유</Table.Head>
+            <Table.Head className='text-center'>포인트</Table.Head>
+            <Table.Head className='text-center'>일시</Table.Head>
+            <Table.Head className='text-center'>잔액</Table.Head>
+          </Table.Row>
+        </Table.Header>
 
         {/* Body */}
-        <TableBody>
+        <Table.Body>
           {paginatedData.length > 0 ? (
             paginatedData.map((history, index) => (
-              <TableRow
+              <Table.Row
                 key={history.sourceId}
                 className='bg-white hover:bg-gray-50'
               >
-                <TableCell className='text-center'>
+                <Table.Cell className='text-center'>
                   {(currentPage - 1) * PAGE_SIZE + index + 1}
-                </TableCell>
+                </Table.Cell>
 
                 {/* 포인트 ID 복사 */}
-                <TableCell
-                  onClick={() => handleCopy(history.sourceId)}
-                  className={`cursor-pointer text-center underline ${
-                    copiedId === history.sourceId
-                      ? 'text-purple-600'
-                      : 'text-blue-600 hover:text-blue-800'
-                  }`}
-                >
-                  {history.sourceId}
-                </TableCell>
+                <Table.Cell className='text-center'>
+                  <div className='flex items-center justify-center gap-1'>
+                    <span>{history.sourceId}</span>
 
-                <TableCell className='text-center'>
+                    <button
+                      type='button'
+                      onClick={() => handleCopy(history.sourceId)}
+                      aria-label='복사'
+                      className='rounded p-1 text-gray-600 transition hover:bg-gray-100 hover:text-black'
+                    >
+                      <Copy className='h-4 w-4' />
+                    </button>
+                  </div>
+                </Table.Cell>
+
+                <Table.Cell className='text-center'>
                   {convertCategoryEnumToString(history.category).category}
-                </TableCell>
-                <TableCell className='text-center'>
+                </Table.Cell>
+                <Table.Cell className='text-center'>
                   {convertCategoryEnumToString(history.category).detail}
-                </TableCell>
+                </Table.Cell>
 
-                <TableCell className='text-center'>
+                <Table.Cell className='text-center'>
                   {history.sourceDetail}
-                </TableCell>
+                </Table.Cell>
 
-                <TableCell
-                  className={`text-center font-bold ${history.difference > 0 ? 'text-green-700' : 'text-red-700'}`}
+                <Table.Cell
+                  className={`text-center font-bold ${history.difference > 0 ? 'text-blue-700' : 'text-red-700'}`}
                 >
                   {history.difference}
-                </TableCell>
+                </Table.Cell>
 
-                <TableCell className='text-center'>
+                <Table.Cell className='text-center'>
                   {history.createAt.replace('T', ' ')}
-                </TableCell>
+                </Table.Cell>
 
-                <TableCell
+                <Table.Cell
                   className={`text-center font-bold ${
                     history.pointBalance === null ? 'bg-gray-50' : ''
                   } `}
                 >
                   {history.pointBalance}
-                </TableCell>
-              </TableRow>
+                </Table.Cell>
+              </Table.Row>
             ))
           ) : (
-            <TableRow>
-              <TableCell
+            <Table.Row>
+              <Table.Cell
                 colSpan={8}
                 className='bg-white py-6 text-center text-gray-500'
               >
                 포인트 적립 내역이 없습니다.
-              </TableCell>
-            </TableRow>
+              </Table.Cell>
+            </Table.Row>
           )}
-        </TableBody>
+        </Table.Body>
       </Table>
 
       {/* Pagination */}

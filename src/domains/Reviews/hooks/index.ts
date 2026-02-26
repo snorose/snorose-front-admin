@@ -1,2 +1,1 @@
-export * from './useExamReviews';
-export * from './useConfirmExamReview';
+export { useExamReviews } from './use-exam-reviews';

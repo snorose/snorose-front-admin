@@ -1,26 +1,30 @@
 import { useState } from 'react';
-import {
-  Label,
-  Input,
-  Button,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui';
+
 import { toast } from 'sonner';
-import { ConfirmModal } from '@/components/ui';
-import type { PenaltyUserInfo } from '@/types';
+
 import {
-  WARNING_REASON_OPTIONS,
+  Button,
+  ConfirmModal,
+  Input,
+  Label,
+  Select,
+} from '@/shared/components/ui';
+import type { AdminBlacklistReq, PenaltyUserInfo } from '@/shared/types';
+import { getErrorMessage } from '@/shared/utils';
+
+import {
   REVOKE_WARNING_OPTIONS,
+  WARNING_REASON_OPTIONS,
 } from '@/domains/MemberInfo/constants/memberInfo';
+
+import { warnPenaltyAPI } from '@/apis';
 
 export default function WarnPenaltyTab({
   member,
+  onApplied,
 }: {
   member: PenaltyUserInfo;
+  onApplied?: () => void;
 }) {
   const [openModal, setOpenModal] = useState(false);
   const [formType, setFormType] = useState<'warn' | 'warnCancel' | null>(null);
@@ -30,6 +34,7 @@ export default function WarnPenaltyTab({
   const [warnCancelType, setWarnCancelType] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [cancelCount, setCancelCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const resetWarnForm = () => {
     setWarnReasonType('');
@@ -119,15 +124,35 @@ export default function WarnPenaltyTab({
     setOpenModal(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (isSubmitting) return;
+
     if (formType === 'warn') {
-      console.log('경고 부여:', {
-        member: member.studentNumber,
-        reasonType: warnReasonType,
-        reason: warnReason,
-        count: warnCount,
-        totalAfter: member.totalWarningCount + warnCount,
-      });
+      const payload: AdminBlacklistReq = {
+        encryptedUserId: member.encryptedUserId,
+        type: 'WARNING',
+        reason: warnReasonType,
+        warningCount: warnCount,
+      };
+
+      if (warnReasonType === 'ETC') {
+        payload.customReason = warnReason.trim();
+      }
+
+      try {
+        setIsSubmitting(true);
+        await warnPenaltyAPI(payload);
+        toast.success('경고 부여가 완료되었습니다.');
+        resetWarnForm();
+        onApplied?.();
+        setOpenModal(false);
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error, '경고 부여에 실패했습니다.'));
+      } finally {
+        setIsSubmitting(false);
+      }
+
+      return;
     } else {
       console.log('경고 차감:', {
         member: member.studentNumber,
@@ -155,16 +180,16 @@ export default function WarnPenaltyTab({
               value={warnReasonType}
               onValueChange={(v) => handleChangeWarnReason(v)}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='경고 사유 선택' />
-              </SelectTrigger>
-              <SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='경고 사유 선택' />
+              </Select.Trigger>
+              <Select.Content>
                 {WARNING_REASON_OPTIONS.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                  </SelectItem>
+                  </Select.Item>
                 ))}
-              </SelectContent>
+              </Select.Content>
             </Select>
           </div>
 
@@ -199,6 +224,7 @@ export default function WarnPenaltyTab({
             <Button
               className='bg-red-600 text-white hover:bg-red-700'
               onClick={() => handleSubmit('warn')}
+              disabled={isSubmitting}
             >
               경고 적용
             </Button>
@@ -218,16 +244,16 @@ export default function WarnPenaltyTab({
               value={warnCancelType}
               onValueChange={(v) => handleChangeCancelReason(v)}
             >
-              <SelectTrigger className='w-40 bg-white'>
-                <SelectValue placeholder='차감 사유 선택' />
-              </SelectTrigger>
-              <SelectContent>
+              <Select.Trigger className='w-40 bg-white'>
+                <Select.Value placeholder='차감 사유 선택' />
+              </Select.Trigger>
+              <Select.Content>
                 {REVOKE_WARNING_OPTIONS.map((item) => (
-                  <SelectItem key={item.value} value={item.value}>
+                  <Select.Item key={item.value} value={item.value}>
                     {item.label}
-                  </SelectItem>
+                  </Select.Item>
                 ))}
-              </SelectContent>
+              </Select.Content>
             </Select>
           </div>
 

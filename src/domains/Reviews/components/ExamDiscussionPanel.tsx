@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui';
+
+import { Button } from '@/shared/components/ui';
 
 // 시험후기 패널 - 논의사항 입력 컴포넌트
 export default function ExamDiscussionPanel() {
