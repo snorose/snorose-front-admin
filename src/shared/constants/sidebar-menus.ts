@@ -1,4 +1,4 @@
-import { User, BookOpen, HandCoins, Bell, type LucideIcon } from 'lucide-react';
+import { BookOpen, HandCoins, type LucideIcon, User } from 'lucide-react';
 
 export type SidebarMenu = {
   title: string;
@@ -21,10 +21,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         title: '회원 관리',
         url: '/member/info',
       },
-      {
-        title: '경고 및 강등 관리',
-        url: '/member/penalty',
-      },
+      // {
+      //   title: '경고 및 강등 관리',
+      //   url: '/member/penalty',
+      // },
     ],
   },
   // {
@@ -55,13 +55,9 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     title: '포인트 관리',
     icon: HandCoins,
     items: [
-      {
-        title: '단일건 증감',
-        url: '/points/single',
-      },
       // {
-      //   title: '일괄 증감',
-      //   url: '/points/multiple',
+      //   title: '단일건 증감',
+      //   url: '/points/single',
       // },
       {
         title: '정회원 전체 증감',
@@ -87,26 +83,26 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   //     },
   //   ],
   // },
-  {
-    title: '알림',
-    icon: Bell,
-    items: [
-      {
-        title: '푸시 알림 전송',
-        url: '/alerts',
-      },
-      // {
-      //   title: '이벤트 관리',
-      //   url: '/operation/event',
-      // },
-      // {
-      //   title: '팝업 관리',
-      //   url: '/operation/popup',
-      // },
-      // {
-      //   title: '배너 관리',
-      //   url: '/operation/banner',
-      // },
-    ],
-  },
+  // {
+  //   title: '알림',
+  //   icon: Bell,
+  //   items: [
+  //     {
+  //       title: '푸시 알림 전송',
+  //       url: '/alerts',
+  //     },
+  //     // {
+  //     //   title: '이벤트 관리',
+  //     //   url: '/operation/event',
+  //     // },
+  //     // {
+  //     //   title: '팝업 관리',
+  //     //   url: '/operation/popup',
+  //     // },
+  //     // {
+  //     //   title: '배너 관리',
+  //     //   url: '/operation/banner',
+  //     // },
+  //   ],
+  // },
 ];
