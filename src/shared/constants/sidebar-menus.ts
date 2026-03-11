@@ -1,4 +1,4 @@
-import { BookOpen, HandCoins, type LucideIcon, User } from 'lucide-react';
+import { Bell, BookOpen, HandCoins, type LucideIcon, User } from 'lucide-react';
 
 export type SidebarMenu = {
   title: string;
@@ -83,26 +83,26 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   //     },
   //   ],
   // },
-  // {
-  //   title: '알림',
-  //   icon: Bell,
-  //   items: [
-  //     {
-  //       title: '푸시 알림 전송',
-  //       url: '/alerts',
-  //     },
-  //     // {
-  //     //   title: '이벤트 관리',
-  //     //   url: '/operation/event',
-  //     // },
-  //     // {
-  //     //   title: '팝업 관리',
-  //     //   url: '/operation/popup',
-  //     // },
-  //     // {
-  //     //   title: '배너 관리',
-  //     //   url: '/operation/banner',
-  //     // },
-  //   ],
-  // },
+  {
+    title: '알림',
+    icon: Bell,
+    items: [
+      {
+        title: '푸시 알림 전송',
+        url: '/alerts',
+      },
+      //     // {
+      //     //   title: '이벤트 관리',
+      //     //   url: '/operation/event',
+      //     // },
+      //     // {
+      //     //   title: '팝업 관리',
+      //     //   url: '/operation/popup',
+      //     // },
+      //     // {
+      //     //   title: '배너 관리',
+      //     //   url: '/operation/banner',
+      //     // },
+    ],
+  },
 ];
