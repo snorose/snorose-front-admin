@@ -44,7 +44,7 @@ export function ExamReviewPostInfoSection({
 
             <Field className='gap-0'>
               <Field.Label>작성자 ID</Field.Label>
-              <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
+              <div className='flex h-9 items-center truncate rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
                 {encryptedUserId}
               </div>
             </Field>
