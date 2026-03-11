@@ -447,10 +447,13 @@ export function ExamDetailSection({
     <article className='flex flex-col gap-1'>
       <div className='flex w-full flex-col rounded-md border'>
         <div className='flex items-center justify-between bg-blue-100 px-4 py-3'>
-          <div>
+          <div className='flex items-center gap-3'>
             <p className='font-semibold'>
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
+            {selectedExamReview && (
+              <>(작성자: {selectedExamReview.userDisplay})</>
+            )}
           </div>
           <button
             type='button'
