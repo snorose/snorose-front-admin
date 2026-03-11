@@ -452,7 +452,7 @@ export function ExamDetailSection({
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
             {selectedExamReview && (
-              <>(작성자: {selectedExamReview.userDisplay})</>
+              <span>(작성자: {selectedExamReview.userDisplay})</span>
             )}
           </div>
           <button
