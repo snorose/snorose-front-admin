@@ -1,6 +1,13 @@
-import { PATHS } from './paths';
-import { Bell, BookOpen, HandCoins, type LucideIcon, User } from 'lucide-react';
+import {
+  Bell,
+  BookOpen,
+  FileText,
+  HandCoins,
+  type LucideIcon,
+  User,
+} from 'lucide-react';
 
+import { PATHS } from './paths';
 
 export type SidebarMenu = {
   title: string;
