@@ -1,4 +1,13 @@
-import { Bell, BookOpen, HandCoins, type LucideIcon, User } from 'lucide-react';
+import {
+  Bell,
+  BookOpen,
+  FileText,
+  HandCoins,
+  type LucideIcon,
+  User,
+} from 'lucide-react';
+
+import { PATHS } from './paths';
 
 export type SidebarMenu = {
   title: string;
@@ -19,7 +28,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     items: [
       {
         title: '회원 관리',
-        url: '/member/info',
+        url: PATHS.MEMBER_INFO,
       },
       // {
       //   title: '경고 및 강등 관리',
@@ -27,27 +36,23 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       // },
     ],
   },
-  // {
-  //   title: '게시글 관리',
-  //   url: '/post',
-  //   items: [
-  //     {
-  //       title: '게시글 관리',
-  //       url: '/post/list',
-  //     },
-  //     {
-  //       title: '댓글 관리',
-  //       url: '/post/comment',
-  //     },
-  //   ],
-  // },
+  {
+    title: '게시글 관리',
+    icon: FileText,
+    items: [
+      {
+        title: '댓글 관리',
+        url: PATHS.POST_COMMENTS,
+      },
+    ],
+  },
   {
     title: '시험 후기',
     icon: BookOpen,
     items: [
       {
         title: '시험 후기 관리',
-        url: '/reviews/exam',
+        url: PATHS.REVIEW_EXAM,
       },
     ],
   },
@@ -61,11 +66,11 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       // },
       {
         title: '정회원 전체 증감',
-        url: '/points/all',
+        url: PATHS.POINT_ALL,
       },
       {
         title: '미지급 일정 관리',
-        url: '/points/freeze',
+        url: PATHS.POINT_FREEZE,
       },
     ],
   },
