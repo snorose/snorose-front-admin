@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { Sidebar, Toaster } from '@/shared/components/ui';
-import { AuthProvider } from '@/shared/contexts';
 import { PATHS } from '@/shared/constants/paths';
+import { AuthProvider } from '@/shared/contexts';
 
 import {
   AdjustAllMemberPointPage,
@@ -72,7 +72,7 @@ function App() {
                               element={<AdjustAllMemberPointPage />}
                             />
                             <Route
-                              path={PATHS.POINT_HISTORY}
+                              path={PATHS.POINT_FREEZE}
                               element={<PointFreezePage />}
                             />
                             <Route path={PATHS.POSTS} element={<PostPage />} />
