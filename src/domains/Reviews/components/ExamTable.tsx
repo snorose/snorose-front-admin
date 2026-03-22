@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
 
 import {
   ExamConfirmStatusBadge,
@@ -19,7 +20,7 @@ const EXAM_REVIEW_TABLE_COLUMNS = [
   {
     key: 'status',
     label: '확인여부',
-    width: '50px',
+    width: '78px',
     render: (review: ExamReview) => (
       <ExamConfirmStatusBadge status={review.status} />
     ),
@@ -121,7 +122,7 @@ export default function ExamTable({
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <Table.Head
                 key={column.key}
-                style={{ width: column.width }}
+                style={{ width: column.width, minWidth: column.width }}
                 className='relative cursor-pointer overflow-hidden'
               >
                 {column.label}
@@ -140,7 +141,11 @@ export default function ExamTable({
                   return (
                     <Table.Row
                       key={review.id}
-                      className='hover:cursor-pointer [&_td]:h-[40px]'
+                      className={cn(
+                        'hover:cursor-pointer [&_td]:h-[40px]',
+                        selectedId === review.id &&
+                          'bg-blue-100 hover:bg-blue-100'
+                      )}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (selectedId === review.id) {
@@ -153,7 +158,10 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
-                          style={{ width: column.width }}
+                          style={{
+                            width: column.width,
+                            minWidth: column.width,
+                          }}
                           className='truncate overflow-hidden'
                         >
                           {column.render

@@ -17,11 +17,47 @@ import { PushNotificationConfirmModal } from '@/domains/Alerts/components';
 
 import { postPushNotificationAPI } from '@/apis';
 
+/** 알림 링크: 스노로즈 내부(경로만) vs 외부(전체 URL) */
+type UrlInputType = 'internal' | 'external';
+
+/** 내부 URL 모드에서 도메인까지 붙여 입력한 경우 (경로만 보내야 함) */
+function isSnoroseSiteAbsoluteUrl(url: string): boolean {
+  const trimmed = url.trim();
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    return false;
+  }
+  try {
+    const { hostname } = new URL(trimmed);
+    return hostname === 'www.snorose.com' || hostname === 'snorose.com';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * API로 보낼 `url` 필드.
+ * 내부: 경로만 보낸다. 기본 도메인은 서버에서 붙인다.
+ * 외부: 입력한 http(s) URL 전체를 그대로 보낸다.
+ */
+function toPushApiUrl(url: string, urlInputType: UrlInputType): string {
+  const trimmed = (url ?? '').trim();
+  if (urlInputType === 'external') {
+    return trimmed;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  if (trimmed === '') {
+    return '/';
+  }
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+}
+
 const INITIAL_FORM_DATA: PushNotification = {
   name: '',
   title: '',
   body: '',
-  url: '/',
+  url: '',
   isMarketing: true,
   isTest: true,
 };
@@ -30,6 +66,7 @@ export default function PushNotificationPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
   const [isLoading, setIsLoading] = useState(false);
+  const [urlInputType, setUrlInputType] = useState<UrlInputType>('internal');
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -47,10 +84,16 @@ export default function PushNotificationPage() {
 
   const handleResetButtonClick = () => {
     setFormData(INITIAL_FORM_DATA);
+    setUrlInputType('internal');
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, url: e.target.value });
+  };
+
+  const handleUrlInputTypeChange = (selectedUrlType: string) => {
+    setUrlInputType(selectedUrlType as UrlInputType);
+    setFormData((prev) => ({ ...prev, url: '' }));
   };
 
   const handleApplyButtonClick = () => {
@@ -63,25 +106,39 @@ export default function PushNotificationPage() {
       return;
     }
 
-    // snorose.com 도메인이 포함된 전체 URL이 입력된 경우 경고
-    if (
-      formData.url.includes('https://www.snorose.com') ||
-      formData.url.includes('http://www.snorose.com')
-    ) {
-      toast.info(
-        '"https://www.snorose.com"를 제외한 경로만 입력해 주세요. (예: /board/notice/post/1863135)'
-      );
-      return;
-    }
+    const urlToCheck = (formData.url || '/').trim() || '/';
 
-    // 전체 URL이 아닌 경우, URL이 슬래시로 시작하지 않으면 경고
-    // 전체 URL(http:// 또는 https://로 시작)은 제외
-    const urlToCheck = formData.url || '/';
-    const isFullUrl =
-      urlToCheck.startsWith('http://') || urlToCheck.startsWith('https://');
-    if (!isFullUrl && urlToCheck !== '/' && !urlToCheck.startsWith('/')) {
-      toast.info('URL은 반드시 슬래시("/")로 시작해야 합니다.');
-      return;
+    if (urlInputType === 'internal') {
+      if (isSnoroseSiteAbsoluteUrl(urlToCheck)) {
+        toast.info(
+          '기본 주소("https://www.snorose.com")를 제외한 경로만 입력해 주세요.'
+        );
+        return;
+      }
+      const isHttpUrl =
+        urlToCheck.startsWith('http://') || urlToCheck.startsWith('https://');
+      if (isHttpUrl) {
+        toast.info(
+          '내부 URL 모드에서는 경로만 입력할 수 있습니다. (예: /board/notice)'
+        );
+        return;
+      }
+      if (urlToCheck !== '/' && !urlToCheck.startsWith('/')) {
+        toast.info(
+          '스노로즈 내부 주소는 슬래시("/")로 시작해 주세요. (예: /board/notice/post/1863135)'
+        );
+        return;
+      }
+    } else {
+      if (
+        !urlToCheck.startsWith('http://') &&
+        !urlToCheck.startsWith('https://')
+      ) {
+        toast.info(
+          '외부 URL은 http:// 또는 https://로 시작하는 전체 주소를 입력해 주세요.'
+        );
+        return;
+      }
     }
 
     setIsOpen(true);
@@ -96,7 +153,7 @@ export default function PushNotificationPage() {
     try {
       await postPushNotificationAPI({
         ...formData,
-        url: formData.url || '/',
+        url: toPushApiUrl(formData.url ?? '', urlInputType),
       });
       toast.success('푸시 알림 전송이 완료되었어요.');
       handleResetButtonClick();
@@ -178,29 +235,51 @@ export default function PushNotificationPage() {
               <Label htmlFor='url' required>
                 알림 클릭 시 연결되는 주소
               </Label>
+              <RadioGroup
+                value={urlInputType}
+                onValueChange={handleUrlInputTypeChange}
+                className='mb-1 flex gap-4'
+              >
+                <div className='flex items-center gap-2'>
+                  <RadioGroup.Item value='internal' id='url-internal' />
+                  <Label
+                    htmlFor='url-internal'
+                    className='cursor-pointer font-normal'
+                  >
+                    스노로즈 내부 URL
+                  </Label>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <RadioGroup.Item value='external' id='url-external' />
+                  <Label
+                    htmlFor='url-external'
+                    className='cursor-pointer font-normal'
+                  >
+                    외부 URL
+                  </Label>
+                </div>
+              </RadioGroup>
               <Input
                 type='text'
                 id='url'
-                value={formData.url || '/'}
+                value={formData.url}
+                placeholder={
+                  urlInputType === 'internal'
+                    ? '예: /board/notice/post/123'
+                    : '예: https://www.instagram.com/snorose1906'
+                }
                 onChange={handleUrlChange}
               />
-              <div className='flex px-1'>
-                <p className='text-xs text-gray-500'>
-                  기본 주소("https://www.snorose.com")를 제외한 경로만 입력해
-                  주세요.
-                  <br />
-                  (예:{' '}
-                  <a
-                    href='https://www.snorose.com/board/notice/post/1863135'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='hover:!underline'
-                  >
-                    /board/notice/post/1863135
-                  </a>
-                  )
-                </p>
-              </div>
+              <p className='px-1 text-xs text-gray-500'>
+                {urlInputType === 'internal' ? (
+                  <>
+                    기본 주소("https://www.snorose.com")를 제외한 경로만 입력해
+                    주세요.
+                  </>
+                ) : (
+                  '전체 URL을 입력해 주세요.'
+                )}
+              </p>
             </div>
           </div>
         </article>
@@ -287,7 +366,7 @@ export default function PushNotificationPage() {
         onConfirm={handleConfirmModalButtonClick}
         data={{
           ...formData,
-          url: formData.url || '/',
+          url: toPushApiUrl(formData.url ?? '', urlInputType),
         }}
       />
 

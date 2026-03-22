@@ -1,10 +1,13 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import PushNotificationPage from './PushNotificationPage';
-import { postPushNotificationAPI } from '@/apis';
 import { toast } from 'sonner';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
 import type { PushNotification } from '@/shared/types';
+
+import { postPushNotificationAPI } from '@/apis';
+
+import PushNotificationPage from './PushNotificationPage';
 
 vi.mock('@/apis', () => ({
   postPushNotificationAPI: vi.fn(),
@@ -22,7 +25,7 @@ vi.mock('@/shared/utils', () => ({
   getErrorMessage: vi.fn((_error, defaultMessage) => defaultMessage),
 }));
 
-vi.mock('@/domains/Alerts', () => ({
+vi.mock('@/domains/Alerts/components', () => ({
   PushNotificationConfirmModal: ({
     isOpen,
     onClose,
@@ -74,6 +77,8 @@ describe('PushNotificationPage', () => {
     expect(
       screen.getByLabelText(/알림 클릭 시 연결되는 주소/)
     ).toBeInTheDocument();
+    expect(screen.getByLabelText(/스노로즈 내부 URL/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/외부 URL/)).toBeInTheDocument();
     expect(screen.getByText(/메시지 유형/)).toBeInTheDocument();
     expect(screen.getByText(/발송 대상/)).toBeInTheDocument();
   });
@@ -113,13 +118,13 @@ describe('PushNotificationPage', () => {
     render(<PushNotificationPage />);
 
     const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
-    await user.tripleClick(urlInput);
-    await user.paste('/test/path');
+    await user.clear(urlInput);
+    await user.type(urlInput, '/test/path');
 
     expect(urlInput).toHaveValue('/test/path');
   });
 
-  test('URL이 슬래시로 시작하지 않으면 알림 전송 시 토스트 메시지가 표시되어야 한다', async () => {
+  test('내부 URL인데 슬래시로 시작하지 않으면 알림 전송 시 토스트가 표시된다', async () => {
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
@@ -131,19 +136,19 @@ describe('PushNotificationPage', () => {
     await user.type(nameInput, '테스트 알림');
     await user.type(titleInput, '테스트 제목');
     await user.type(bodyInput, '테스트 내용');
-    await user.tripleClick(urlInput);
-    await user.paste('board/notice/post/123');
+    await user.clear(urlInput);
+    await user.type(urlInput, 'board/notice/post/123');
 
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
 
     expect(toast.info).toHaveBeenCalledWith(
-      'URL은 반드시 슬래시("/")로 시작해야 합니다.'
+      '스노로즈 내부 주소는 슬래시("/")로 시작해 주세요. (예: /board/notice/post/1863135)'
     );
     expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
   });
 
-  test('URL이 슬래시로 시작하면 정상적으로 모달이 열려야 한다', async () => {
+  test('내부 URL(슬래시로 시작)를 입력하면 모달이 열린다', async () => {
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
@@ -155,8 +160,8 @@ describe('PushNotificationPage', () => {
     await user.type(nameInput, '테스트 알림');
     await user.type(titleInput, '테스트 제목');
     await user.type(bodyInput, '테스트 내용');
-    await user.tripleClick(urlInput);
-    await user.paste('/board/notice/post/123');
+    await user.clear(urlInput);
+    await user.type(urlInput, '/board/notice/post/123');
 
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
@@ -427,7 +432,7 @@ describe('PushNotificationPage', () => {
     await user.type(titleInput, '리뉴얼 제목');
     await user.type(bodyInput, '리뉴얼 내용');
     await user.clear(urlInput);
-    await user.type(urlInput, 'board/notice/post/123');
+    await user.type(urlInput, '/board/notice/post/123');
 
     // 광고성 알림 여부를 정보성으로 변경
     const marketingFalseRadio = screen.getByLabelText(
@@ -600,7 +605,7 @@ describe('PushNotificationPage', () => {
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
       await user.clear(urlInput);
-      await user.type(urlInput, 'board/notice?page=1&id=123');
+      await user.type(urlInput, '/board/notice?page=1&id=123');
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
@@ -635,11 +640,10 @@ describe('PushNotificationPage', () => {
       expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
     });
 
-    test('초기화 버튼 클릭 시 라디오 버튼도 초기값으로 돌아가야 한다', async () => {
+    test('초기화 버튼 클릭 시 라디오 버튼과 URL 타입이 초기값으로 돌아간다', async () => {
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
-      // 라디오 버튼 변경
       const marketingFalseRadio = screen.getByLabelText(
         /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
       );
@@ -649,17 +653,19 @@ describe('PushNotificationPage', () => {
         screen.getByLabelText(/푸시 알림 허용 회원 전체에게 발송/);
       await user.click(testFalseRadio);
 
-      // 초기화 버튼 클릭
+      await user.click(screen.getByLabelText(/외부 URL/));
+
       const resetButton = screen.getByRole('button', { name: '초기화' });
       await user.click(resetButton);
 
-      // 초기값으로 돌아가야 함 (광고성, 관리자에게만 테스트 발송)
       const marketingTrueRadio =
         screen.getByLabelText(/광고성 \(이벤트 홍보 등\)/);
       const testTrueRadio = screen.getByLabelText(/관리자에게만 테스트 발송/);
+      const internalUrlRadio = screen.getByLabelText(/스노로즈 내부 URL/);
 
       expect(marketingTrueRadio).toBeChecked();
       expect(testTrueRadio).toBeChecked();
+      expect(internalUrlRadio).toBeChecked();
     });
 
     test('API 호출 중에 다시 확인 버튼을 클릭해도 중복 호출되지 않아야 한다', async () => {
@@ -697,14 +703,45 @@ describe('PushNotificationPage', () => {
       await promise;
     });
 
-    test('URL 입력란의 기본값이 /로 설정되어 있다', () => {
+    test('URL 입력 타입 기본값은 스노로즈 내부 URL이다', () => {
       render(<PushNotificationPage />);
 
-      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
-      expect(urlInput).toHaveValue('/');
+      const internalUrlRadio = screen.getByLabelText(/스노로즈 내부 URL/);
+      expect(internalUrlRadio).toBeChecked();
     });
 
-    test('전체 URL(https://)을 입력하고 알림 전송 버튼을 클릭하면 경고가 표시되고 모달이 열리지 않아야 한다', async () => {
+    test.each([
+      ['https', 'https://www.snorose.com/board/notice/post/1869958'],
+      ['http', 'http://www.snorose.com/board/notice/post/1869958'],
+    ])(
+      '내부 URL 모드에서 스노로즈 전체(%s) 주소를 입력하면 토스트만 뜨고 모달은 열리지 않는다',
+      async (_, url) => {
+        const user = userEvent.setup();
+        render(<PushNotificationPage />);
+
+        const nameInput = screen.getByLabelText(/알림명/);
+        const titleInput = screen.getByLabelText(/알림 제목/);
+        const bodyInput = screen.getByLabelText(/알림 내용/);
+        const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+        await user.type(nameInput, '테스트 알림');
+        await user.type(titleInput, '테스트 제목');
+        await user.type(bodyInput, '테스트 내용');
+        await user.clear(urlInput);
+        await user.type(urlInput, url);
+
+        const applyButton = screen.getByRole('button', { name: '알림 전송' });
+        await user.click(applyButton);
+
+        expect(toast.info).toHaveBeenCalledWith(
+          '기본 주소("https://www.snorose.com")를 제외한 경로만 입력해 주세요.'
+        );
+        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+      }
+    );
+
+    test('외부 URL 모드에서 스노로즈 전체(https) 주소를 입력하면 모달이 열리고 API 호출 시 그대로 전달된다', async () => {
+      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
@@ -713,79 +750,101 @@ describe('PushNotificationPage', () => {
       const bodyInput = screen.getByLabelText(/알림 내용/);
       const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
 
-      await user.type(nameInput, '테스트 알림');
-      await user.type(titleInput, '테스트 제목');
-      await user.type(bodyInput, '테스트 내용');
-      await user.tripleClick(urlInput);
-      await user.paste('https://www.snorose.com/board/notice/post/1869958');
-
-      const applyButton = screen.getByRole('button', { name: '알림 전송' });
-      await user.click(applyButton);
-
-      // 경고 토스트가 표시되어야 함
-      expect(toast.info).toHaveBeenCalledWith(
-        '"https://www.snorose.com"를 제외한 경로만 입력해 주세요. (예: /board/notice/post/1863135)'
-      );
-
-      // 모달이 열리지 않아야 함
-      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-    });
-
-    test('전체 URL(http://)을 입력하고 알림 전송 버튼을 클릭하면 경고가 표시되고 모달이 열리지 않아야 한다', async () => {
-      const user = userEvent.setup();
-      render(<PushNotificationPage />);
-
-      const nameInput = screen.getByLabelText(/알림명/);
-      const titleInput = screen.getByLabelText(/알림 제목/);
-      const bodyInput = screen.getByLabelText(/알림 내용/);
-      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+      await user.click(screen.getByLabelText(/외부 URL/));
 
       await user.type(nameInput, '테스트 알림');
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
-      await user.tripleClick(urlInput);
-      await user.paste('http://www.snorose.com/board/notice/post/1869958');
+      await user.clear(urlInput);
+      await user.type(
+        urlInput,
+        'https://www.snorose.com/board/notice/post/1869958'
+      );
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
 
-      // 경고 토스트가 표시되어야 함
-      expect(toast.info).toHaveBeenCalledWith(
-        '"https://www.snorose.com"를 제외한 경로만 입력해 주세요. (예: /board/notice/post/1863135)'
-      );
-
-      // 모달이 열리지 않아야 함
-      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
-    });
-
-    test('다른 도메인의 전체 URL을 입력해도 경고가 표시되지 않고 모달이 열려야 한다', async () => {
-      const user = userEvent.setup();
-      render(<PushNotificationPage />);
-
-      const nameInput = screen.getByLabelText(/알림명/);
-      const titleInput = screen.getByLabelText(/알림 제목/);
-      const bodyInput = screen.getByLabelText(/알림 내용/);
-      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
-
-      await user.type(nameInput, '테스트 알림');
-      await user.type(titleInput, '테스트 제목');
-      await user.type(bodyInput, '테스트 내용');
-      await user.tripleClick(urlInput);
-      await user.paste('https://example.com/some/path');
-
-      const applyButton = screen.getByRole('button', { name: '알림 전송' });
-      await user.click(applyButton);
-
-      // 경고 토스트가 표시되지 않아야 함 (snorose.com이 아니므로)
-      expect(toast.info).not.toHaveBeenCalledWith(
-        expect.stringContaining('https://www.snorose.com')
-      );
-
-      // 모달이 열려야 함
       expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+      const modalUrl = screen.getByTestId('modal-url');
+      expect(modalUrl).toHaveTextContent(
+        'URL: https://www.snorose.com/board/notice/post/1869958'
+      );
+
+      const confirmButton = screen.getByRole('button', { name: '확인' });
+      await user.click(confirmButton);
+
+      await waitFor(() => {
+        expect(postPushNotificationAPI).toHaveBeenCalledWith(
+          expect.objectContaining({
+            url: 'https://www.snorose.com/board/notice/post/1869958',
+          })
+        );
+      });
     });
 
-    test('URL을 수정하지 않고 기본값을 사용할 때 모달에서도 /가 표시되어야 한다', async () => {
+    test('외부 URL 모드에서 스노로즈 전체(http) 주소를 입력하면 모달이 열리고 API 호출 시 그대로 전달된다', async () => {
+      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.click(screen.getByLabelText(/외부 URL/));
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.clear(urlInput);
+      await user.type(
+        urlInput,
+        'http://www.snorose.com/board/notice/post/1869958'
+      );
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+
+      const confirmButton = screen.getByRole('button', { name: '확인' });
+      await user.click(confirmButton);
+
+      await waitFor(() => {
+        expect(postPushNotificationAPI).toHaveBeenCalledWith(
+          expect.objectContaining({
+            url: 'http://www.snorose.com/board/notice/post/1869958',
+          })
+        );
+      });
+    });
+
+    test('내부 URL 모드에서 다른 도메인의 전체 URL을 입력하면 토스트만 뜨고 모달은 열리지 않는다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.clear(urlInput);
+      await user.type(urlInput, 'https://example.com/some/path');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      expect(toast.info).toHaveBeenCalledWith(
+        '내부 URL 모드에서는 경로만 입력할 수 있습니다. (예: /board/notice)'
+      );
+      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+    });
+
+    test('URL을 수정하지 않고 기본값(/)을 사용할 때 모달에는 절대 경로가 표시되어야 한다', async () => {
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
@@ -797,7 +856,7 @@ describe('PushNotificationPage', () => {
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
 
-      // URL은 수정하지 않고 기본값('/') 그대로 사용
+      // URL 입력란은 비운 채(내부 기본 = 플레이스홀더만 보임) 전송
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
@@ -805,12 +864,12 @@ describe('PushNotificationPage', () => {
       // 모달이 열렸는지 확인
       expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
 
-      // 모달에서 URL이 '/'로 표시되어야 함
+      // 모달에는 저장될 절대 경로가 표시되어야 함
       const modalUrl = screen.getByTestId('modal-url');
       expect(modalUrl).toHaveTextContent('URL: /');
     });
 
-    test('URL이 빈 문자열일 때 모달에서도 기본값(/)이 표시되어야 한다', async () => {
+    test('URL이 빈 문자열일 때 모달에는 절대 경로 기본값이 표시된다', async () => {
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
@@ -822,10 +881,7 @@ describe('PushNotificationPage', () => {
       await user.type(nameInput, '테스트 알림');
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
-
-      // URL을 빈 문자열로 만들기
-      await user.tripleClick(urlInput);
-      await user.keyboard('{Delete}');
+      await user.clear(urlInput);
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
@@ -833,12 +889,12 @@ describe('PushNotificationPage', () => {
       // 모달이 열렸는지 확인
       expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
 
-      // 모달에서 URL이 '/'로 표시되어야 함 (빈 문자열이 아닌 기본값)
+      // 모달에는 저장될 절대 경로가 표시되어야 함
       const modalUrl = screen.getByTestId('modal-url');
       expect(modalUrl).toHaveTextContent('URL: /');
     });
 
-    test('URL이 빈 문자열일 때 API 호출 시에도 기본값(/)이 전달되어야 한다', async () => {
+    test('URL이 빈 문자열일 때 API 호출 시 절대 경로로 전달된다', async () => {
       vi.mocked(postPushNotificationAPI).mockResolvedValue({});
       const user = userEvent.setup();
       render(<PushNotificationPage />);
@@ -851,10 +907,7 @@ describe('PushNotificationPage', () => {
       await user.type(nameInput, '테스트 알림');
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
-
-      // URL을 빈 문자열로 만들기
-      await user.tripleClick(urlInput);
-      await user.keyboard('{Delete}');
+      await user.clear(urlInput);
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
@@ -862,7 +915,7 @@ describe('PushNotificationPage', () => {
       const confirmButton = screen.getByRole('button', { name: '확인' });
       await user.click(confirmButton);
 
-      // API 호출 시 URL이 기본값 '/'로 전달되어야 함 (빈 문자열이 아님)
+      // API 호출 시 URL이 절대 경로로 전달되어야 함
       await waitFor(() => {
         expect(postPushNotificationAPI).toHaveBeenCalledWith({
           name: '테스트 알림',

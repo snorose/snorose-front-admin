@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { Sidebar, Toaster } from '@/shared/components/ui';
+import { PATHS } from '@/shared/constants/paths';
 import { AuthProvider } from '@/shared/contexts';
 
 import {
@@ -51,36 +52,36 @@ function App() {
                         <section className='flex w-full flex-1 overflow-auto'>
                           <Routes>
                             <Route
-                              path='/member/info'
+                              path={PATHS.MEMBER_INFO}
                               element={<MemberInfoPage />}
                             />
                             <Route
-                              path='/member/penalty'
+                              path={PATHS.MEMBER_PENALTY}
                               element={<MemberPenaltyManagementPage />}
                             />
                             <Route
-                              path='/reviews/exam'
+                              path={PATHS.REVIEW_EXAM}
                               element={<ExamReviewPage />}
                             />
                             <Route
-                              path='/points/single'
+                              path={PATHS.POINT_SINGLE}
                               element={<AdjustSinglePointPage />}
                             />
                             <Route
-                              path='/points/all'
+                              path={PATHS.POINT_ALL}
                               element={<AdjustAllMemberPointPage />}
                             />
                             <Route
-                              path='/points/freeze'
+                              path={PATHS.POINT_FREEZE}
                               element={<PointFreezePage />}
                             />
-                            <Route path='/posts' element={<PostPage />} />
+                            <Route path={PATHS.POSTS} element={<PostPage />} />
                             <Route
-                              path='/posts/comments'
+                              path={PATHS.POST_COMMENTS}
                               element={<CommentPage />}
                             />
                             <Route
-                              path='/alerts'
+                              path={PATHS.ALERTS}
                               element={<PushNotificationPage />}
                             />
                           </Routes>

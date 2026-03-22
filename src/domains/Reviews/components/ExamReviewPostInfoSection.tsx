@@ -14,7 +14,12 @@ export function ExamReviewPostInfoSection({
   encryptedUserId,
 }: ExamReviewPostInfoSectionProps) {
   return (
-    <Accordion type='single' collapsible className='rounded-md border'>
+    <Accordion
+      type='single'
+      collapsible
+      defaultValue='post'
+      className='rounded-md border'
+    >
       <Accordion.Item value='post'>
         <Accordion.Trigger className='bg-gray-100 px-4 py-3 text-base font-semibold hover:no-underline data-[state=open]:rounded-b-none'>
           게시글 및 작성자 정보
@@ -44,7 +49,7 @@ export function ExamReviewPostInfoSection({
 
             <Field className='gap-0'>
               <Field.Label>작성자 ID</Field.Label>
-              <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
+              <div className='flex h-9 items-center truncate rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
                 {encryptedUserId}
               </div>
             </Field>
