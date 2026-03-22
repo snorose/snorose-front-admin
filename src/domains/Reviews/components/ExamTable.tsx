@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Table } from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
 
 import {
   ExamConfirmStatusBadge,
@@ -140,7 +141,11 @@ export default function ExamTable({
                   return (
                     <Table.Row
                       key={review.id}
-                      className='hover:cursor-pointer [&_td]:h-[40px]'
+                      className={cn(
+                        'hover:cursor-pointer [&_td]:h-[40px]',
+                        selectedId === review.id &&
+                          'bg-blue-100 hover:bg-blue-100'
+                      )}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (selectedId === review.id) {
