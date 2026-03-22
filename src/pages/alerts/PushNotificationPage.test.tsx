@@ -350,7 +350,7 @@ describe('PushNotificationPage', () => {
         name: '테스트 알림',
         title: '테스트 제목',
         body: '테스트 내용',
-        url: 'https://www.snorose.com/',
+        url: '/',
         isMarketing: true,
         isTest: true,
       });
@@ -456,7 +456,7 @@ describe('PushNotificationPage', () => {
         name: '리뉴얼 알림',
         title: '리뉴얼 제목',
         body: '리뉴얼 내용',
-        url: 'https://www.snorose.com/board/notice/post/123',
+        url: '/board/notice/post/123',
         isMarketing: false,
         isTest: false,
       });
@@ -616,7 +616,7 @@ describe('PushNotificationPage', () => {
       await waitFor(() => {
         expect(postPushNotificationAPI).toHaveBeenCalledWith(
           expect.objectContaining({
-            url: 'https://www.snorose.com/board/notice?page=1&id=123',
+            url: '/board/notice?page=1&id=123',
           })
         );
       });
@@ -878,7 +878,7 @@ describe('PushNotificationPage', () => {
       await user.type(titleInput, '테스트 제목');
       await user.type(bodyInput, '테스트 내용');
 
-      // URL은 수정하지 않고 기본값('/') 그대로 사용
+      // URL 입력란은 비운 채(내부 기본 = 플레이스홀더만 보임) 전송
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
@@ -888,7 +888,7 @@ describe('PushNotificationPage', () => {
 
       // 모달에는 저장될 절대 경로가 표시되어야 함
       const modalUrl = screen.getByTestId('modal-url');
-      expect(modalUrl).toHaveTextContent('URL: https://www.snorose.com/');
+      expect(modalUrl).toHaveTextContent('URL: /');
     });
 
     test('URL이 빈 문자열일 때 모달에는 절대 경로 기본값이 표시된다', async () => {
@@ -913,7 +913,7 @@ describe('PushNotificationPage', () => {
 
       // 모달에는 저장될 절대 경로가 표시되어야 함
       const modalUrl = screen.getByTestId('modal-url');
-      expect(modalUrl).toHaveTextContent('URL: https://www.snorose.com/');
+      expect(modalUrl).toHaveTextContent('URL: /');
     });
 
     test('URL이 빈 문자열일 때 API 호출 시 절대 경로로 전달된다', async () => {
@@ -943,7 +943,7 @@ describe('PushNotificationPage', () => {
           name: '테스트 알림',
           title: '테스트 제목',
           body: '테스트 내용',
-          url: 'https://www.snorose.com/',
+          url: '/',
           isMarketing: true,
           isTest: true,
         });

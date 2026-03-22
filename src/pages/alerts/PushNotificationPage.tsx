@@ -17,7 +17,8 @@ import { PushNotificationConfirmModal } from '@/domains/Alerts/components';
 
 import { postPushNotificationAPI } from '@/apis';
 
-const PUSH_BASE_URL = 'https://www.snorose.com';
+/** 알림 링크: 스노로즈 내부(경로만) vs 외부(전체 URL) */
+type UrlInputType = 'internal' | 'external';
 
 /** 내부 URL 모드에서 도메인까지 붙여 입력한 경우 (경로만 보내야 함) */
 function isSnoroseSiteAbsoluteUrl(url: string): boolean {
@@ -33,27 +34,33 @@ function isSnoroseSiteAbsoluteUrl(url: string): boolean {
   }
 }
 
-/** 내부 URL(경로)이면 스노로즈 도메인을 붙이고, 외부 URL(http(s)://)이면 그대로 둠 */
-function toAbsolutePushUrl(url: string): string {
-  const trimmed = (url || '/').trim() || '/';
+/**
+ * API로 보낼 `url` 필드.
+ * 내부: 경로만 보낸다. 기본 도메인은 서버에서 붙인다.
+ * 외부: 입력한 http(s) URL 전체를 그대로 보낸다.
+ */
+function toPushApiUrl(url: string, urlInputType: UrlInputType): string {
+  const trimmed = (url ?? '').trim();
+  if (urlInputType === 'external') {
+    return trimmed;
+  }
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
-  const path = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-  return `${PUSH_BASE_URL}${path}`;
+  if (trimmed === '') {
+    return '/';
+  }
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
 }
 
 const INITIAL_FORM_DATA: PushNotification = {
   name: '',
   title: '',
   body: '',
-  url: '/',
+  url: '',
   isMarketing: true,
   isTest: true,
 };
-
-/** 알림 링크: 스노로즈 내부(경로만) vs 외부(전체 URL) */
-type UrlInputType = 'internal' | 'external';
 
 export default function PushNotificationPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -140,7 +147,7 @@ export default function PushNotificationPage() {
     try {
       await postPushNotificationAPI({
         ...formData,
-        url: toAbsolutePushUrl(formData.url ?? ''),
+        url: toPushApiUrl(formData.url ?? '', urlInputType),
       });
       toast.success('푸시 알림 전송이 완료되었어요.');
       handleResetButtonClick();
@@ -353,7 +360,7 @@ export default function PushNotificationPage() {
         onConfirm={handleConfirmModalButtonClick}
         data={{
           ...formData,
-          url: toAbsolutePushUrl(formData.url ?? ''),
+          url: toPushApiUrl(formData.url ?? '', urlInputType),
         }}
       />
 
