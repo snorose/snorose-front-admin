@@ -180,7 +180,7 @@ export default function ExamSearch({
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={handleKeyDown}
-            className='h-8 w-full min-w-80 rounded-md border-1 border-gray-500 bg-white px-2 py-2 pr-7 text-[13px]'
+            className='h-9 w-full min-w-80 rounded-md border-1 border-gray-500 bg-white px-2 py-2 pr-7 text-[13px]'
           />
           {keyword && (
             <button
@@ -192,17 +192,8 @@ export default function ExamSearch({
             </button>
           )}
         </div>
-        <Button
-          onClick={handleSearch}
-          className='hover flex h-8 w-18 items-center justify-center rounded-md border bg-gray-700 text-[12px] font-medium transition-colors hover:bg-gray-700'
-        >
-          조회
-        </Button>
-        <Button
-          variant='secondary'
-          onClick={handleSearchOptionReset}
-          className='hover flex h-8 items-center justify-center rounded-md border border-gray-300 text-[12px] font-medium transition-colors hover:bg-gray-200'
-        >
+        <Button onClick={handleSearch}>조회</Button>
+        <Button variant='outline' onClick={handleSearchOptionReset}>
           검색 옵션 초기화
         </Button>
       </div>

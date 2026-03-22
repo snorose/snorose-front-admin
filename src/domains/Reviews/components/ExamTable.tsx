@@ -19,7 +19,7 @@ const EXAM_REVIEW_TABLE_COLUMNS = [
   {
     key: 'status',
     label: '확인여부',
-    width: '50px',
+    width: '78px',
     render: (review: ExamReview) => (
       <ExamConfirmStatusBadge status={review.status} />
     ),
@@ -121,7 +121,7 @@ export default function ExamTable({
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <Table.Head
                 key={column.key}
-                style={{ width: column.width }}
+                style={{ width: column.width, minWidth: column.width }}
                 className='relative cursor-pointer overflow-hidden'
               >
                 {column.label}
@@ -153,7 +153,10 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
-                          style={{ width: column.width }}
+                          style={{
+                            width: column.width,
+                            minWidth: column.width,
+                          }}
                           className='truncate overflow-hidden'
                         >
                           {column.render
