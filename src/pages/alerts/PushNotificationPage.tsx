@@ -117,7 +117,13 @@ export default function PushNotificationPage() {
       }
       const isHttpUrl =
         urlToCheck.startsWith('http://') || urlToCheck.startsWith('https://');
-      if (!isHttpUrl && urlToCheck !== '/' && !urlToCheck.startsWith('/')) {
+      if (isHttpUrl) {
+        toast.info(
+          '내부 URL 모드에서는 경로만 입력할 수 있습니다. (예: /board/notice)'
+        );
+        return;
+      }
+      if (urlToCheck !== '/' && !urlToCheck.startsWith('/')) {
         toast.info(
           '스노로즈 내부 주소는 슬래시("/")로 시작해 주세요. (예: /board/notice/post/1863135)'
         );
