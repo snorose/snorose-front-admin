@@ -14,7 +14,12 @@ export function ExamReviewPostInfoSection({
   encryptedUserId,
 }: ExamReviewPostInfoSectionProps) {
   return (
-    <Accordion type='single' collapsible className='rounded-md border'>
+    <Accordion
+      type='single'
+      collapsible
+      defaultValue='post'
+      className='rounded-md border'
+    >
       <Accordion.Item value='post'>
         <Accordion.Trigger className='bg-gray-100 px-4 py-3 text-base font-semibold hover:no-underline data-[state=open]:rounded-b-none'>
           게시글 및 작성자 정보
