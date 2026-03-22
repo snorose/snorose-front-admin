@@ -84,6 +84,11 @@ export default function PushNotificationPage() {
     setFormData({ ...formData, url: e.target.value });
   };
 
+  const handleUrlInputTypeChange = (selectedUrlType: string) => {
+    setUrlInputType(selectedUrlType as UrlInputType);
+    setFormData((prev) => ({ ...prev, url: '' }));
+  };
+
   const handleApplyButtonClick = () => {
     if (
       !formData.name.trim() ||
@@ -219,7 +224,7 @@ export default function PushNotificationPage() {
               </Label>
               <RadioGroup
                 value={urlInputType}
-                onValueChange={(v) => setUrlInputType(v as UrlInputType)}
+                onValueChange={handleUrlInputTypeChange}
                 className='mb-1 flex gap-4'
               >
                 <div className='flex items-center gap-2'>
@@ -244,6 +249,7 @@ export default function PushNotificationPage() {
               <Input
                 type='text'
                 id='url'
+                value={formData.url}
                 placeholder={
                   urlInputType === 'internal'
                     ? '예: /board/notice/post/123'
