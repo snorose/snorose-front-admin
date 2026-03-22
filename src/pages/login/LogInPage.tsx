@@ -52,7 +52,7 @@ export default function LogInPage() {
             어드민 페이지에 오신 것을 환영합니다
           </p>
         </div>
-        <form className='flex w-88 flex-col gap-2' onSubmit={handleLogin}>
+        <form className='flex w-96 flex-col gap-4' onSubmit={handleLogin}>
           <Input
             id='id'
             placeholder='스노로즈 아이디'
