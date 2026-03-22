@@ -1,9 +1,12 @@
 import { useState } from 'react';
+
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import { snoroseLogo } from '@/assets';
+
 import { Button, Input } from '@/shared/components/ui';
 import { useAuth } from '@/shared/hooks';
+
+import { snoroseLogo } from '@/assets';
 
 export default function LogInPage() {
   const { login, isLoading, clearError } = useAuth();
@@ -49,7 +52,7 @@ export default function LogInPage() {
             어드민 페이지에 오신 것을 환영합니다
           </p>
         </div>
-        <form className='flex w-80 flex-col gap-2' onSubmit={handleLogin}>
+        <form className='flex w-88 flex-col gap-2' onSubmit={handleLogin}>
           <Input
             id='id'
             placeholder='스노로즈 아이디'
@@ -95,6 +98,10 @@ export default function LogInPage() {
           >
             {isLoading ? '로그인 중...' : '로그인'}
           </Button>
+
+          <p className='text-center text-xs text-gray-500'>
+            안정적인 이용을 위해 Chrome 또는 Edge 브라우저 사용을 권장합니다.
+          </p>
         </form>
       </div>
     </main>
