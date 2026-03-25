@@ -1,7 +1,10 @@
 import type { AdminCommentListResponse } from '@/domains/Comments/types';
 
 // postId 기준으로 구성 — API의 POST /v1/admin/comments/search { postId } 와 동일한 구조
-export const MOCK_COMMENTS_BY_POST_ID: Record<number, AdminCommentListResponse[]> = {
+export const MOCK_COMMENTS_BY_POST_ID: Record<
+  number,
+  AdminCommentListResponse[]
+> = {
   148: [
     {
       commentId: 1,

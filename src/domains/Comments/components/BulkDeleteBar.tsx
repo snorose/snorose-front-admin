@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react';
+
 import { Button } from '@/shared/components/ui';
 
 interface BulkDeleteBarProps {
@@ -16,9 +17,7 @@ export default function BulkDeleteBar({
 
   return (
     <div className='flex items-center justify-between rounded-md bg-blue-50 px-4 py-2'>
-      <span className='text-sm text-blue-700'>
-        {selectedCount}개 선택됨
-      </span>
+      <span className='text-sm text-blue-700'>{selectedCount}개 선택됨</span>
       <div className='flex gap-2'>
         <Button
           type='button'

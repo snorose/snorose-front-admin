@@ -1,6 +1,8 @@
 import { CornerDownRight, Trash2 } from 'lucide-react';
+
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
+
 import type { AdminCommentListResponse } from '@/domains/Comments/types';
 
 interface CommentListItemProps {
@@ -54,7 +56,10 @@ export default function CommentListItem({
         <div className='flex items-center justify-between'>
           <span className='text-xs text-gray-400'>{comment.createdAt}</span>
           {comment.reportCount > 0 && (
-            <Badge variant='outline' className='border-red-200 bg-red-100 text-xs text-red-600'>
+            <Badge
+              variant='outline'
+              className='border-red-200 bg-red-100 text-xs text-red-600'
+            >
               신고 {comment.reportCount}
             </Badge>
           )}

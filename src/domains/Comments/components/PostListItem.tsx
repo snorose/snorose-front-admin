@@ -1,5 +1,6 @@
 import { Badge } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
+
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 interface PostListItemProps {
@@ -29,7 +30,10 @@ export default function PostListItem({
         </Badge>
         <span className='text-xs text-gray-500'>ID: {post.postId}</span>
         {post.reportCount > 0 && (
-          <Badge variant='outline' className='shrink-0 border-red-200 bg-red-100 text-xs text-red-600'>
+          <Badge
+            variant='outline'
+            className='shrink-0 border-red-200 bg-red-100 text-xs text-red-600'
+          >
             신고됨
           </Badge>
         )}
