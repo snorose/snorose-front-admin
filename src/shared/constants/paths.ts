@@ -11,4 +11,6 @@ export const PATHS = {
   POINT_ALL: '/point/all',
   POINT_FREEZE: '/point/freeze',
   ALERTS: '/alerts',
+  INQUIRY: '/inquiry',
+  INQUIRY_FAQ: '/inquiry/faq',
 } as const;

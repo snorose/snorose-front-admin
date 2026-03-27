@@ -12,6 +12,8 @@ import {
   AdjustSinglePointPage,
   CommentPage,
   ExamReviewPage,
+  InquiryFaqPage,
+  InquiryPage,
   LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
@@ -83,6 +85,14 @@ function App() {
                             <Route
                               path={PATHS.ALERTS}
                               element={<PushNotificationPage />}
+                            />
+                            <Route
+                              path={PATHS.INQUIRY}
+                              element={<InquiryPage />}
+                            />
+                            <Route
+                              path={PATHS.INQUIRY_FAQ}
+                              element={<InquiryFaqPage />}
                             />
                           </Routes>
                         </section>

@@ -4,6 +4,7 @@ import {
   FileText,
   HandCoins,
   type LucideIcon,
+  MessageCircleWarning,
   User,
 } from 'lucide-react';
 
@@ -74,20 +75,20 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       },
     ],
   },
-  // {
-  //   title: '문의 및 신고',
-  //   url: '/report',
-  //   items: [
-  //     {
-  //       title: '문의 및 신고',
-  //       url: '/report/inquiry',
-  //     },
-  //     {
-  //       title: '신고 글/댓글 조회',
-  //       url: '/report/report',
-  //     },
-  //   ],
-  // },
+  {
+    title: '문의 및 신고',
+    icon: MessageCircleWarning,
+    items: [
+      {
+        title: '문의/신고 관리',
+        url: PATHS.INQUIRY,
+      },
+      {
+        title: 'FAQ 관리',
+        url: PATHS.INQUIRY_FAQ,
+      },
+    ],
+  },
   // {
   //   title: '알림',
   //   icon: Bell,
