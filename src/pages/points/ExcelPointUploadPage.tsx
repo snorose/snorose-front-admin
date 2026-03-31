@@ -1,11 +1,10 @@
 import { useRef, useState } from 'react';
 
-import { Download, Upload } from 'lucide-react';
 import { Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Alert, Button, Table } from '@/shared/components/ui';
+import { Alert, Button, InputGroup, Table } from '@/shared/components/ui';
 
 const TABLE_HEADERS = [
   '이름',
@@ -44,7 +43,7 @@ export default function ExcelPointUploadPage() {
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
         title='엑셀 업로드 지급'
-        description='엑셀 파일을 업로드하여 포인트를 지급할 수 있어요.'
+        description='엑셀 파일을 업로드하여 학번으로 회원을 매칭하고 포인트를 지급합니다.'
       />
 
       <Alert>
@@ -58,34 +57,40 @@ export default function ExcelPointUploadPage() {
         </Alert.Description>
       </Alert>
 
-      <section className='flex flex-col gap-4'>
-        <div className='flex justify-end gap-3'>
+      <section className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-2'>
+          <h2 className='text-foreground text-lg font-bold'>
+            엑셀 파일 업로드
+          </h2>
           <div className='flex items-center gap-2'>
-            <p className='text-sm text-gray-500'>
-              {uploadedFileName || '선택된 파일이 없습니다.'}
-            </p>
-            <input
-              ref={fileInputRef}
-              type='file'
-              accept='.xlsx,.xls,.csv'
-              className='hidden'
-              onChange={handleFileChange}
-            />
-            <Button
-              type='button'
-              className='cursor-pointer'
-              onClick={handleUploadButtonClick}
-            >
-              <Upload />
-              파일 업로드
-            </Button>
+            <InputGroup>
+              <InputGroup.Button
+                type='button'
+                variant='secondary'
+                className='mx-1'
+                onClick={handleUploadButtonClick}
+              >
+                명단 업로드
+              </InputGroup.Button>
+              <p className='text-sm text-gray-500'>
+                {uploadedFileName || '선택된 파일이 없습니다.'}
+              </p>
+              <input
+                ref={fileInputRef}
+                id='excel-point-file'
+                type='file'
+                accept='.xlsx,.xls,.csv'
+                className='hidden'
+                onChange={handleFileChange}
+                tabIndex={-1}
+                aria-hidden
+              />
+            </InputGroup>
             <Button
               type='button'
               variant='outline'
-              className='cursor-pointer'
               onClick={handleTemplateDownload}
             >
-              <Download />
               템플릿 다운로드
             </Button>
           </div>
