@@ -65,6 +65,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       //   url: '/points/single',
       // },
       {
+        title: '엑셀 업로드 지급',
+        url: PATHS.POINT_UPLOAD_EXCEL,
+      },
+      {
         title: '정회원 전체 증감',
         url: PATHS.POINT_ALL,
       },
