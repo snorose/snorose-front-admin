@@ -1,5 +1,5 @@
 // TODO: API 연동 시 usePostList 훅으로 상태/로직 분리 예정
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PageHeader } from '@/shared/components';
 import { Input, Select } from '@/shared/components/ui';
@@ -27,16 +27,18 @@ export default function PostList({
   const selectAllRef = useRef<HTMLInputElement>(null);
 
   //TODO: API 연동 후 클라이언트에서 필터링 제거
-  const filtered = MOCK_POSTS.filter((post) => {
-    if (deletedIds.includes(post.postId)) return false;
-    const matchesKeyword =
-      post.title.includes(keyword) ||
-      post.userDisplay.includes(keyword) ||
-      String(post.postId).includes(keyword);
-    const matchesBoard = board === '전체' || board === String(post.boardId);
-    const matchesReport = reportFilter === '전체' || post.reportCount > 0;
-    return matchesKeyword && matchesBoard && matchesReport;
-  });
+  const filtered = useMemo(() => {
+    return MOCK_POSTS.filter((post) => {
+      if (deletedIds.includes(post.postId)) return false;
+      const matchesKeyword =
+        post.title.includes(keyword) ||
+        post.userDisplay.includes(keyword) ||
+        String(post.postId).includes(keyword);
+      const matchesBoard = board === '전체' || board === String(post.boardId);
+      const matchesReport = reportFilter === '전체' || post.reportCount > 0;
+      return matchesKeyword && matchesBoard && matchesReport;
+    });
+  }, [keyword, board, reportFilter, deletedIds]);
 
   const allIds = filtered.map((p) => p.postId);
   const isAllSelected =
@@ -84,7 +86,7 @@ export default function PostList({
         description='커뮤니티에 있는 모든 게시글과 남겨진 댓글을 관리합니다.'
       />
       <Input
-        placeholder='댓글 내용, 작성자(닉네임), 게시글 ID로 검색'
+        placeholder='게시글 제목, 작성자(닉네임), 게시글 ID로 검색'
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
       />

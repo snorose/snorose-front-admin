@@ -15,7 +15,10 @@ export default function CommentPage() {
         selectedPostId={selectedPost?.postId ?? null}
         onSelectPost={setSelectedPost}
       />
-      <CommentList selectedPostId={selectedPost?.postId ?? null} />
+      <CommentList
+        key={selectedPost?.postId ?? 'none'}
+        selectedPostId={selectedPost?.postId ?? null}
+      />
     </div>
   );
 }
