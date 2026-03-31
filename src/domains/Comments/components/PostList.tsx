@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// TODO: API 연동 시 usePostList 훅으로 상태/로직 분리 예정
+import { useEffect, useRef, useState } from 'react';
 
 import { PageHeader } from '@/shared/components';
 import { Input, Select } from '@/shared/components/ui';
@@ -6,6 +7,7 @@ import { Input, Select } from '@/shared/components/ui';
 import { MOCK_BOARDS, MOCK_POSTS } from '@/domains/Comments/mocks/posts';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
+import BulkDeleteBar from './BulkDeleteBar';
 import PostListItem from './PostListItem';
 
 interface PostListProps {
@@ -20,9 +22,13 @@ export default function PostList({
   const [keyword, setKeyword] = useState('');
   const [board, setBoard] = useState('전체');
   const [reportFilter, setReportFilter] = useState('전체');
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [deletedIds, setDeletedIds] = useState<number[]>([]);
+  const selectAllRef = useRef<HTMLInputElement>(null);
 
   //TODO: API 연동 후 클라이언트에서 필터링 제거
   const filtered = MOCK_POSTS.filter((post) => {
+    if (deletedIds.includes(post.postId)) return false;
     const matchesKeyword =
       post.title.includes(keyword) ||
       post.userDisplay.includes(keyword) ||
@@ -31,6 +37,43 @@ export default function PostList({
     const matchesReport = reportFilter === '전체' || post.reportCount > 0;
     return matchesKeyword && matchesBoard && matchesReport;
   });
+
+  const allIds = filtered.map((p) => p.postId);
+  const isAllSelected =
+    allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
+  const isSomeSelected =
+    allIds.some((id) => selectedIds.includes(id)) && !isAllSelected;
+
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = isSomeSelected;
+    }
+  }, [isSomeSelected]);
+
+  const handleSelectAll = () => {
+    setSelectedIds(isAllSelected ? [] : allIds);
+  };
+
+  const handleCheck = (postId: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId]
+    );
+  };
+
+  const handleDelete = (postId: number) => {
+    // TODO: 단일 삭제 API 연동
+    setDeletedIds((prev) => [...prev, postId]);
+    setSelectedIds((prev) => prev.filter((id) => id !== postId));
+    if (selectedPostId === postId) onSelectPost(null);
+  };
+
+  const handleBulkDelete = () => {
+    // TODO: 일괄 삭제 API 연동
+    setDeletedIds((prev) => [...prev, ...selectedIds]);
+    if (selectedPostId !== null && selectedIds.includes(selectedPostId))
+      onSelectPost(null);
+    setSelectedIds([]);
+  };
 
   return (
     <div className='flex h-full flex-col gap-4'>
@@ -67,6 +110,11 @@ export default function PostList({
           </Select.Content>
         </Select>
       </div>
+      <BulkDeleteBar
+        selectedCount={selectedIds.length}
+        onBulkDelete={handleBulkDelete}
+        onClearSelection={() => setSelectedIds([])}
+      />
       <div className='flex-1 overflow-y-auto rounded-md border'>
         {filtered.length === 0 ? (
           <p className='py-10 text-center text-sm text-gray-400'>
@@ -74,14 +122,27 @@ export default function PostList({
           </p>
         ) : (
           <div className='divide-y divide-gray-200'>
+            <div className='flex items-center gap-3 px-4 py-2 text-sm text-gray-500'>
+              <input
+                ref={selectAllRef}
+                type='checkbox'
+                className='cursor-pointer'
+                checked={isAllSelected}
+                onChange={handleSelectAll}
+              />
+              <span>전체 선택</span>
+            </div>
             {filtered.map((post) => (
               <PostListItem
                 key={post.postId}
                 post={post}
                 isSelected={selectedPostId === post.postId}
+                isChecked={selectedIds.includes(post.postId)}
+                onCheck={handleCheck}
                 onClick={(p) =>
                   onSelectPost(selectedPostId === p.postId ? null : p)
                 }
+                onDelete={handleDelete}
               />
             ))}
           </div>
