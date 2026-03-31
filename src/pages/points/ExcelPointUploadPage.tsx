@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
 
 import { Download, Upload } from 'lucide-react';
+import { Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Table } from '@/shared/components/ui';
+import { Alert, Button, Table } from '@/shared/components/ui';
 
 const TABLE_HEADERS = [
   '이름',
@@ -46,7 +47,18 @@ export default function ExcelPointUploadPage() {
         description='엑셀 파일을 업로드하여 포인트를 지급할 수 있어요.'
       />
 
-      <section className='flex flex-col gap-4 p-5'>
+      <Alert>
+        <Megaphone />
+        <Alert.Title>안내 사항</Alert.Title>
+        <Alert.Description>
+          <ul className='list-inside list-disc text-sm'>
+            <li>엑셀 파일을 업로드하여 포인트를 지급할 수 있어요.</li>
+            <li>포인트 지급 템플릿 파일을 다운로드하여 작성해 주세요.</li>
+          </ul>
+        </Alert.Description>
+      </Alert>
+
+      <section className='flex flex-col gap-4'>
         <div className='flex justify-end gap-3'>
           <div className='flex items-center gap-2'>
             <p className='text-sm text-gray-500'>
