@@ -4,7 +4,14 @@ import { Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Alert, Button, InputGroup, Table } from '@/shared/components/ui';
+import {
+  Alert,
+  Button,
+  InputGroup,
+  Label,
+  RadioGroup,
+  Table,
+} from '@/shared/components/ui';
 
 const TABLE_HEADERS = [
   '이름',
@@ -122,6 +129,40 @@ export default function ExcelPointUploadPage() {
               </Table.Row>
             </Table.Body>
           </Table>
+        </div>
+
+        <div className='flex flex-col gap-2'>
+          <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
+          <div className='flex flex-col gap-2'>
+            <div className='flex items-center gap-2'>
+              <RadioGroup className='flex gap-4'>
+                <div className='flex items-center gap-2'>
+                  <RadioGroup.Item
+                    value='immediate'
+                    id='immediate'
+                  ></RadioGroup.Item>
+                  <Label
+                    htmlFor='immediate'
+                    className='cursor-pointer font-normal'
+                  >
+                    즉시 지급
+                  </Label>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <RadioGroup.Item
+                    value='reservation'
+                    id='reservation'
+                  ></RadioGroup.Item>
+                  <Label
+                    htmlFor='reservation'
+                    className='cursor-pointer font-normal'
+                  >
+                    예약 지급
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
         </div>
       </section>
     </div>
