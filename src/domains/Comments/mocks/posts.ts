@@ -1,5 +1,12 @@
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
+export const MOCK_BOARDS = [
+  { boardId: 1, boardName: '첫눈온방' },
+  { boardId: 2, boardName: '함박눈방' },
+  { boardId: 3, boardName: '만년설방' },
+  { boardId: 4, boardName: '베숙트' },
+];
+
 export const MOCK_POSTS: AdminGetPostResponse[] = [
   {
     postId: 148,

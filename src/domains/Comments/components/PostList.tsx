@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/shared/components';
 import { Input, Select } from '@/shared/components/ui';
 
-import { MOCK_POSTS } from '@/domains/Comments/mocks/posts';
+import { MOCK_BOARDS, MOCK_POSTS } from '@/domains/Comments/mocks/posts';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 import PostListItem from './PostListItem';
@@ -13,17 +13,12 @@ interface PostListProps {
   onSelectPost: (post: AdminGetPostResponse | null) => void;
 }
 
-const CATEGORIES = [
-  '전체',
-  ...Array.from(new Set(MOCK_POSTS.map((p) => p.category))),
-];
-
 export default function PostList({
   selectedPostId,
   onSelectPost,
 }: PostListProps) {
   const [keyword, setKeyword] = useState('');
-  const [category, setCategory] = useState('전체');
+  const [board, setBoard] = useState('전체');
   const [reportFilter, setReportFilter] = useState('전체');
 
   //TODO: API 연동 후 클라이언트에서 필터링 제거
@@ -32,9 +27,9 @@ export default function PostList({
       post.title.includes(keyword) ||
       post.userDisplay.includes(keyword) ||
       String(post.postId).includes(keyword);
-    const matchesCategory = category === '전체' || post.category === category;
+    const matchesBoard = board === '전체' || board === String(post.boardId);
     const matchesReport = reportFilter === '전체' || post.reportCount > 0;
-    return matchesKeyword && matchesCategory && matchesReport;
+    return matchesKeyword && matchesBoard && matchesReport;
   });
 
   return (
@@ -49,14 +44,15 @@ export default function PostList({
         onChange={(e) => setKeyword(e.target.value)}
       />
       <div className='flex gap-2'>
-        <Select value={category} onValueChange={setCategory}>
+        <Select value={board} onValueChange={setBoard}>
           <Select.Trigger className='flex-1 justify-between rounded-md border border-gray-200 bg-white px-3'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content>
-            {CATEGORIES.map((cat) => (
-              <Select.Item key={cat} value={cat}>
-                {cat}
+            <Select.Item value='전체'>전체</Select.Item>
+            {MOCK_BOARDS.map((b) => (
+              <Select.Item key={b.boardId} value={String(b.boardId)}>
+                {b.boardName}
               </Select.Item>
             ))}
           </Select.Content>
