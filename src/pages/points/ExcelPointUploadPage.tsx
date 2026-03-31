@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { PageHeader } from '@/shared/components';
+import { DateTimePicker, PageHeader } from '@/shared/components';
 import {
   Alert,
   Button,
@@ -12,6 +12,7 @@ import {
   RadioGroup,
   Table,
 } from '@/shared/components/ui';
+import { useDateTimeField } from '@/shared/hooks';
 
 const TABLE_HEADERS = [
   '이름',
@@ -22,9 +23,14 @@ const TABLE_HEADERS = [
   '메모',
 ] as const;
 
+type PaymentTiming = 'immediate' | 'reservation';
+
 export default function ExcelPointUploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFileName, setUploadedFileName] = useState('');
+  const [paymentTiming, setPaymentTiming] =
+    useState<PaymentTiming>('immediate');
+  const reservationAt = useDateTimeField();
 
   const handleTemplateDownload = () => {
     toast.info('엑셀 템플릿 다운로드 기능 개발 준비중');
@@ -44,6 +50,14 @@ export default function ExcelPointUploadPage() {
     setUploadedFileName(file.name);
     toast.success('파일이 선택되었어요. 업로드를 진행합니다.');
     e.target.value = '';
+  };
+
+  const handlePaymentTimingChange = (value: string) => {
+    const next = value as PaymentTiming;
+    setPaymentTiming(next);
+    if (next === 'immediate') {
+      reservationAt.reset();
+    }
   };
 
   return (
@@ -131,37 +145,46 @@ export default function ExcelPointUploadPage() {
           </Table>
         </div>
 
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-3'>
           <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
-          <div className='flex flex-col gap-2'>
-            <div className='flex items-center gap-2'>
-              <RadioGroup className='flex gap-4'>
-                <div className='flex items-center gap-2'>
-                  <RadioGroup.Item
-                    value='immediate'
-                    id='immediate'
-                  ></RadioGroup.Item>
-                  <Label
-                    htmlFor='immediate'
-                    className='cursor-pointer font-normal'
-                  >
-                    즉시 지급
-                  </Label>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <RadioGroup.Item
-                    value='reservation'
-                    id='reservation'
-                  ></RadioGroup.Item>
-                  <Label
-                    htmlFor='reservation'
-                    className='cursor-pointer font-normal'
-                  >
-                    예약 지급
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
+          <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+            <RadioGroup
+              value={paymentTiming}
+              onValueChange={handlePaymentTimingChange}
+              className='flex flex-row gap-4'
+            >
+              <div className='flex items-center gap-2'>
+                <RadioGroup.Item value='immediate' id='immediate' />
+                <Label
+                  htmlFor='immediate'
+                  className='cursor-pointer font-normal'
+                >
+                  즉시 지급
+                </Label>
+              </div>
+              <div className='flex items-center gap-2'>
+                <RadioGroup.Item value='reservation' id='reservation' />
+                <Label
+                  htmlFor='reservation'
+                  className='cursor-pointer font-normal'
+                >
+                  예약 지급
+                </Label>
+              </div>
+            </RadioGroup>
+
+            {paymentTiming === 'reservation' ? (
+              <DateTimePicker
+                label='예약 일시'
+                date={reservationAt.date}
+                time={reservationAt.time}
+                onDateSelect={reservationAt.onDateSelect}
+                onTimeChange={reservationAt.onTimeChange}
+                datePlaceholder='예약 날짜 선택'
+                required
+                className='max-w-2xl'
+              />
+            ) : null}
           </div>
         </div>
       </section>
