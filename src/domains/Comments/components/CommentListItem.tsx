@@ -48,13 +48,7 @@ export default function CommentListItem({
               댓글
             </Badge>
           )}
-          <span className='text-xs text-gray-400'>
-            ID: {comment.commentId} · 게시글 ID: {comment.postId}
-          </span>
-        </div>
-        <p className='text-sm text-gray-700'>{comment.content}</p>
-        <div className='flex items-center justify-between'>
-          <span className='text-xs text-gray-400'>{comment.createdAt}</span>
+          <span className='text-xs text-gray-400'>ID: {comment.commentId}</span>
           {comment.reportCount > 0 && (
             <Badge
               variant='outline'
@@ -63,6 +57,10 @@ export default function CommentListItem({
               신고 {comment.reportCount}
             </Badge>
           )}
+        </div>
+        <p className='text-sm text-gray-700'>{comment.content}</p>
+        <div className='flex items-center justify-between'>
+          <span className='text-xs text-gray-400'>{comment.createdAt}</span>
         </div>
       </div>
       <Button
