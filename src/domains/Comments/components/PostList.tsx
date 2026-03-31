@@ -56,7 +56,9 @@ export default function PostList({
 
   const handleCheck = (postId: number) => {
     setSelectedIds((prev) =>
-      prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId]
+      prev.includes(postId)
+        ? prev.filter((id) => id !== postId)
+        : [...prev, postId]
     );
   };
 
