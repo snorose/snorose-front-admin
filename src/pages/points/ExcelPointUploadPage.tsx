@@ -25,8 +25,8 @@ const TABLE_HEADERS = [
   '메모',
 ] as const;
 
-const EXCEL_POINT_TEMPLATE_DRIVE_URL =
-  'https://drive.google.com/drive/folders/1LOgc0Jo7bGnNOftZgH5A3W3w-lKuNH7X';
+const EXCEL_POINT_TEMPLATE_SHEET_ID = '1292A7Rx0lZCGagtanIwdmrXFjm1jxjwE';
+const EXCEL_POINT_TEMPLATE_XLSX_URL = `https://docs.google.com/spreadsheets/d/${EXCEL_POINT_TEMPLATE_SHEET_ID}/export?format=xlsx`;
 
 export default function ExcelPointUploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,11 +36,7 @@ export default function ExcelPointUploadPage() {
   const reservationAt = useDateTimeField();
 
   const handleTemplateDownload = () => {
-    window.open(
-      EXCEL_POINT_TEMPLATE_DRIVE_URL,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    window.open(EXCEL_POINT_TEMPLATE_XLSX_URL, '_blank', 'noopener,noreferrer');
   };
 
   const handleUploadButtonClick = () => {
