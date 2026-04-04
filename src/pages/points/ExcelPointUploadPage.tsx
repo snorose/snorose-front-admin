@@ -14,6 +14,8 @@ import {
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 
+type PaymentTiming = 'immediate' | 'reservation';
+
 const TABLE_HEADERS = [
   '이름',
   '아이디',
@@ -23,7 +25,8 @@ const TABLE_HEADERS = [
   '메모',
 ] as const;
 
-type PaymentTiming = 'immediate' | 'reservation';
+const EXCEL_POINT_TEMPLATE_DRIVE_URL =
+  'https://drive.google.com/drive/folders/1LOgc0Jo7bGnNOftZgH5A3W3w-lKuNH7X';
 
 export default function ExcelPointUploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +36,11 @@ export default function ExcelPointUploadPage() {
   const reservationAt = useDateTimeField();
 
   const handleTemplateDownload = () => {
-    toast.info('엑셀 템플릿 다운로드 기능 개발 준비중');
+    window.open(
+      EXCEL_POINT_TEMPLATE_DRIVE_URL,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   const handleUploadButtonClick = () => {
