@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { AlertTriangle, CheckCircle2, Megaphone } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Download, Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DateTimePicker, PageHeader } from '@/shared/components';
@@ -14,7 +14,11 @@ import {
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExcelPointBulkRewardResult } from '@/shared/types';
-import { formatDateTimeForAPI, getErrorMessage } from '@/shared/utils';
+import {
+  downloadNotProcessedRowsExcel,
+  formatDateTimeForAPI,
+  getErrorMessage,
+} from '@/shared/utils';
 
 import { postExcelPointBulkRewardAPI } from '@/apis';
 
@@ -122,6 +126,16 @@ export default function ExcelPointUploadPage() {
     if (next === 'immediate') {
       reservationAt.reset();
     }
+  };
+
+  const handleDownloadNotProcessedExcel = () => {
+    if (!uploadResult?.notProcessedRows.length) {
+      return;
+    }
+    downloadNotProcessedRowsExcel(
+      uploadResult.notProcessedRows,
+      formatRowFailureReason
+    );
   };
 
   return (
@@ -361,23 +375,39 @@ export default function ExcelPointUploadPage() {
               aria-labelledby='excel-result-failure-heading'
               className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-white shadow-xs'
             >
-              <div className='flex flex-col gap-0.5 border-b border-amber-100 bg-amber-50/90 px-4 py-3'>
-                <div className='flex items-center gap-2'>
-                  <AlertTriangle
-                    className='size-5 shrink-0 text-amber-600'
-                    aria-hidden
-                  />
-                  <h3
-                    id='excel-result-failure-heading'
-                    className='text-sm font-semibold text-amber-950'
-                  >
-                    처리되지 않음
-                  </h3>
+              <div className='flex flex-col gap-2 border-b border-amber-100 bg-amber-50/90 px-4 py-3'>
+                <div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
+                  <div className='min-w-0 flex-1'>
+                    <div className='flex items-center gap-2'>
+                      <AlertTriangle
+                        className='size-5 shrink-0 text-amber-600'
+                        aria-hidden
+                      />
+                      <h3
+                        id='excel-result-failure-heading'
+                        className='text-sm font-semibold text-amber-950'
+                      >
+                        처리되지 않음
+                      </h3>
+                    </div>
+                    <p className='pl-7 text-xs text-amber-900/80'>
+                      엑셀 행 단위로 지급에 실패한 경우입니다. 사유를 확인해
+                      주세요 .{' '}
+                    </p>
+                  </div>
+                  {uploadResult && uploadResult.notProcessedRows.length > 0 ? (
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      className='shrink-0 border-amber-200 bg-white text-amber-950 hover:bg-amber-50'
+                      onClick={handleDownloadNotProcessedExcel}
+                    >
+                      <Download className='size-4' aria-hidden />
+                      미처리 명단 엑셀 저장
+                    </Button>
+                  ) : null}
                 </div>
-                <p className='pl-7 text-xs text-amber-900/80'>
-                  엑셀 행 단위로 지급에 실패한 경우입니다. 사유를 확인해 수정해
-                  주세요.
-                </p>
               </div>
               <div className='min-h-0 overflow-x-auto'>
                 <Table>
