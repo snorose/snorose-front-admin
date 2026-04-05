@@ -8,9 +8,9 @@ import type {
   UpdatePointFreeze,
 } from '@/shared/types';
 
-// 포인트 증감
+// 어드민 포인트 증감
 export const postSinglePointAPI = async (data: AdjustSinglePoint) => {
-  const response = await axiosInstance.post('/v1/points', data);
+  const response = await axiosInstance.post('/v1/admin/points', data);
   return response.data;
 };
 

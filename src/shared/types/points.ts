@@ -1,5 +1,5 @@
 export interface AdjustSinglePoint {
-  userId: number;
+  encryptedUserId: string;
   difference?: number;
   category: string;
   sourceId?: number;
