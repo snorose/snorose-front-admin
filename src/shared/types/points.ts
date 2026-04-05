@@ -36,10 +36,23 @@ export interface ExcelPointBulkRewardRequest {
   bulkMemo?: string;
 }
 
-export interface ExcelPointBulkNotProcessedRow {
-  rowNumber: number;
+export interface ExcelPointBulkSuccessRow {
+  userName: string;
   loginId: string;
   studentNumber: string;
+  difference: number;
+  category: string;
+  memo: string;
+}
+
+export interface ExcelPointBulkNotProcessedRow {
+  rowNumber: number;
+  userName: string;
+  loginId: string | null;
+  studentNumber: string;
+  difference: string | number;
+  category: string;
+  memo: string;
   reason: string;
 }
 
@@ -47,7 +60,7 @@ export interface ExcelPointBulkRewardResult {
   requestedCount: number;
   successCount: number;
   failedCount: number;
-  successLoginIds: string[];
+  successRows: ExcelPointBulkSuccessRow[];
   notProcessedRows: ExcelPointBulkNotProcessedRow[];
 }
 
