@@ -67,7 +67,6 @@ const FAILURE_TABLE_HEADERS = [
 const PREVIEW_TABLE_HEADERS = [
   '행 번호',
   '이름',
-  '아이디',
   '학번',
   '포인트',
   '카테고리',
@@ -264,9 +263,6 @@ export default function ExcelPointUploadPage() {
       setPreviewRows(nextPreviewRows);
       setUploadResult(null);
       setBulkMemo('');
-      toast.success(
-        '명단을 불러왔습니다. 표를 확인한 뒤 지급을 실행해 주세요.'
-      );
     } catch (error: unknown) {
       setUploadedFile(null);
       setPreviewRows([]);
@@ -481,9 +477,6 @@ export default function ExcelPointUploadPage() {
                         </Table.Cell>
                         <Table.Cell className='px-3 py-3 text-center text-sm'>
                           {row.userName || '—'}
-                        </Table.Cell>
-                        <Table.Cell className='px-3 py-3 text-center text-sm'>
-                          {row.loginId || '—'}
                         </Table.Cell>
                         <Table.Cell className='px-3 py-3 text-center text-sm'>
                           {row.studentNumber || '—'}
