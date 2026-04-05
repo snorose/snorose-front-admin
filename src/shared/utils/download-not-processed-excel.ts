@@ -16,8 +16,12 @@ export function downloadNotProcessedRowsExcel(
 
   const sheetRows = rows.map((row) => ({
     '행 번호': row.rowNumber,
-    아이디: row.loginId,
+    이름: row.userName,
+    아이디: row.loginId ?? '',
     학번: row.studentNumber,
+    포인트: row.difference,
+    카테고리: row.category,
+    메모: row.memo,
     '사유(코드)': row.reason,
     설명: formatReason(row.reason),
   }));

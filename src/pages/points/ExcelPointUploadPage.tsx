@@ -24,11 +24,22 @@ import { postExcelPointBulkRewardAPI } from '@/apis';
 
 type PaymentTiming = 'immediate' | 'reservation';
 
-const SUCCESS_TABLE_HEADERS = ['아이디'] as const;
-const FAILURE_TABLE_HEADERS = [
-  '행 번호',
+const SUCCESS_TABLE_HEADERS = [
+  '이름',
   '아이디',
   '학번',
+  '포인트',
+  '카테고리',
+  '메모',
+] as const;
+const FAILURE_TABLE_HEADERS = [
+  '행 번호',
+  '이름',
+  '아이디',
+  '학번',
+  '포인트',
+  '카테고리',
+  '메모',
   '사유(코드)',
   '설명',
 ] as const;
@@ -305,72 +316,7 @@ export default function ExcelPointUploadPage() {
             </div>
           ) : null}
 
-          <div className='grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]'>
-            <section
-              aria-labelledby='excel-result-success-heading'
-              className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-xs'
-            >
-              <div className='flex flex-col gap-0.5 border-b border-emerald-100 bg-emerald-50/90 px-4 py-3'>
-                <div className='flex items-center gap-2'>
-                  <CheckCircle2
-                    className='size-5 shrink-0 text-emerald-600'
-                    aria-hidden
-                  />
-                  <h3
-                    id='excel-result-success-heading'
-                    className='text-sm font-semibold text-emerald-950'
-                  >
-                    지급 성공
-                  </h3>
-                </div>
-                <p className='pl-7 text-xs text-emerald-800/80'>
-                  포인트가 정상 반영된 회원 아이디입니다.
-                </p>
-              </div>
-              <div className='min-h-0 overflow-x-auto'>
-                <Table>
-                  <Table.Header className='bg-emerald-50/40'>
-                    <Table.Row className='hover:bg-emerald-50/40'>
-                      {SUCCESS_TABLE_HEADERS.map((header) => (
-                        <Table.Head
-                          key={header}
-                          className='h-11 px-4 text-center text-xs font-semibold text-emerald-900'
-                        >
-                          {header}
-                        </Table.Head>
-                      ))}
-                    </Table.Row>
-                  </Table.Header>
-
-                  <Table.Body>
-                    {uploadResult && uploadResult.successLoginIds.length > 0 ? (
-                      uploadResult.successLoginIds.map((loginId, index) => (
-                        <Table.Row
-                          key={`${loginId}-${index}`}
-                          className='hover:bg-emerald-50/20'
-                        >
-                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
-                            {loginId}
-                          </Table.Cell>
-                        </Table.Row>
-                      ))
-                    ) : (
-                      <Table.Row className='hover:bg-white'>
-                        <Table.Cell
-                          colSpan={SUCCESS_TABLE_HEADERS.length}
-                          className='h-24 text-center text-sm text-gray-400'
-                        >
-                          {uploadResult
-                            ? '성공한 회원이 없습니다.'
-                            : '지급 실행 후 결과가 여기에 표시됩니다.'}
-                        </Table.Cell>
-                      </Table.Row>
-                    )}
-                  </Table.Body>
-                </Table>
-              </div>
-            </section>
-
+          <div className='flex flex-col gap-6'>
             <section
               aria-labelledby='excel-result-failure-heading'
               className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-white shadow-xs'
@@ -392,7 +338,7 @@ export default function ExcelPointUploadPage() {
                     </div>
                     <p className='pl-7 text-xs text-amber-900/80'>
                       엑셀 행 단위로 지급에 실패한 경우입니다. 사유를 확인해
-                      주세요 .{' '}
+                      주세요.
                     </p>
                   </div>
                   {uploadResult && uploadResult.notProcessedRows.length > 0 ? (
@@ -436,10 +382,22 @@ export default function ExcelPointUploadPage() {
                             {row.rowNumber}
                           </Table.Cell>
                           <Table.Cell className='px-3 py-3 text-center text-sm'>
-                            {row.loginId || '—'}
+                            {row.userName || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.loginId ?? '—'}
                           </Table.Cell>
                           <Table.Cell className='px-3 py-3 text-center text-sm'>
                             {row.studentNumber || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
+                            {row.difference}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.category}
+                          </Table.Cell>
+                          <Table.Cell className='max-w-[min(12rem,30vw)] px-3 py-3 text-center text-xs text-gray-700'>
+                            {row.memo || '—'}
                           </Table.Cell>
                           <Table.Cell className='px-3 py-3 text-center text-sm'>
                             {row.reason}
@@ -457,6 +415,86 @@ export default function ExcelPointUploadPage() {
                         >
                           {uploadResult
                             ? '처리되지 않은 행이 없습니다.'
+                            : '지급 실행 후 결과가 여기에 표시됩니다.'}
+                        </Table.Cell>
+                      </Table.Row>
+                    )}
+                  </Table.Body>
+                </Table>
+              </div>
+            </section>
+
+            <section
+              aria-labelledby='excel-result-success-heading'
+              className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-xs'
+            >
+              <div className='flex flex-col gap-0.5 border-b border-emerald-100 bg-emerald-50/90 px-4 py-3'>
+                <div className='flex items-center gap-2'>
+                  <CheckCircle2
+                    className='size-5 shrink-0 text-emerald-600'
+                    aria-hidden
+                  />
+                  <h3
+                    id='excel-result-success-heading'
+                    className='text-sm font-semibold text-emerald-950'
+                  >
+                    지급 성공
+                  </h3>
+                </div>
+                <p className='pl-7 text-xs text-emerald-800/80'>
+                  포인트가 정상 반영된 회원 목록입니다.
+                </p>
+              </div>
+              <div className='min-h-0 overflow-x-auto'>
+                <Table>
+                  <Table.Header className='bg-emerald-50/40'>
+                    <Table.Row className='hover:bg-emerald-50/40'>
+                      {SUCCESS_TABLE_HEADERS.map((header) => (
+                        <Table.Head
+                          key={header}
+                          className='h-11 px-4 text-center text-xs font-semibold text-emerald-900'
+                        >
+                          {header}
+                        </Table.Head>
+                      ))}
+                    </Table.Row>
+                  </Table.Header>
+
+                  <Table.Body>
+                    {uploadResult && uploadResult.successRows.length > 0 ? (
+                      uploadResult.successRows.map((row, index) => (
+                        <Table.Row
+                          key={`${row.loginId}-${row.studentNumber}-${index}`}
+                          className='hover:bg-emerald-50/20'
+                        >
+                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                            {row.userName}
+                          </Table.Cell>
+                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                            {row.loginId}
+                          </Table.Cell>
+                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                            {row.studentNumber}
+                          </Table.Cell>
+                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900 tabular-nums'>
+                            {row.difference}
+                          </Table.Cell>
+                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                            {row.category}
+                          </Table.Cell>
+                          <Table.Cell className='max-w-[min(14rem,35vw)] px-4 py-3 text-center text-xs text-gray-700'>
+                            {row.memo}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    ) : (
+                      <Table.Row className='hover:bg-white'>
+                        <Table.Cell
+                          colSpan={SUCCESS_TABLE_HEADERS.length}
+                          className='h-24 text-center text-sm text-gray-400'
+                        >
+                          {uploadResult
+                            ? '성공한 회원이 없습니다.'
                             : '지급 실행 후 결과가 여기에 표시됩니다.'}
                         </Table.Cell>
                       </Table.Row>
