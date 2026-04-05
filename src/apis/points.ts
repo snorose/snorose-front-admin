@@ -72,7 +72,7 @@ export const postExcelPointBulkRewardAPI = async (params: {
     formData,
     {
       headers: {
-        'Content-Type': false,
+        'Content-Type': undefined,
       },
     }
   );

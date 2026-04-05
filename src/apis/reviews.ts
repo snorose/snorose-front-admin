@@ -1,12 +1,13 @@
 import { axiosInstance } from '@/shared/axios/instance';
+
 import type {
   ConfirmExamReviewRequest,
   ConfirmExamReviewResponse,
-  UpdateExamReviewRequest,
-  UpdateExamReviewResponse,
   DeleteExamReviewResponse,
   ExamReviewDetailResponse,
   ExamReviewsResponse,
+  UpdateExamReviewRequest,
+  UpdateExamReviewResponse,
 } from '@/domains/Reviews/types';
 
 // 시험후기 목록 조회 api
@@ -53,7 +54,7 @@ export const updateExamReview = async (
     formData,
     {
       headers: {
-        'Content-Type': false,
+        'Content-Type': undefined,
       },
     }
   );
