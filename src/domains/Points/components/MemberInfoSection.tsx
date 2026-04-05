@@ -3,15 +3,9 @@ import type { MemberInfo } from '@/shared/types';
 
 interface MemberInfoSectionProps {
   searchedMember: MemberInfo;
-  userId: number | null;
-  onUserIdChange: (value: number) => void;
 }
 
-export function MemberInfoSection({
-  searchedMember,
-  userId,
-  onUserIdChange,
-}: MemberInfoSectionProps) {
+export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {
   const MEMBER_INFO = [
     {
       label: '이름',
@@ -32,6 +26,11 @@ export function MemberInfoSection({
       label: '학번',
       id: 'studentNumber',
       value: searchedMember?.studentNumber,
+    },
+    {
+      label: '회원 ID',
+      id: 'encryptedUserId',
+      value: searchedMember?.encryptedUserId,
     },
   ] as const;
 
@@ -54,19 +53,6 @@ export function MemberInfoSection({
             />
           </div>
         ))}
-
-        <div className='flex flex-col gap-1'>
-          <Label htmlFor='userId' required>
-            userId
-          </Label>
-          <Input
-            type='text'
-            id='userId'
-            placeholder='직접 입력해 주세요.'
-            value={userId ?? ''}
-            onChange={(e) => onUserIdChange(Number(e.target.value))}
-          />
-        </div>
       </div>
     </article>
   );

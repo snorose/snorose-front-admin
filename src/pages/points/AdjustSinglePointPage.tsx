@@ -21,7 +21,6 @@ import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 export default function AdjustSinglePointPage() {
   const { user } = useAuth();
   const [searchedMember, setSearchedMember] = useState<MemberInfo | null>(null);
-  const [userId, setUserId] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
   >('');
@@ -41,10 +40,6 @@ export default function AdjustSinglePointPage() {
     try {
       const data = await searchUsersAPI(searchQuery.trim());
       setSearchedMember(data.result);
-
-      if (userId === null) {
-        setUserId(data.result.userId);
-      }
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
       setSearchedMember(null);
@@ -59,7 +54,6 @@ export default function AdjustSinglePointPage() {
 
   const handleResetButtonClick = () => {
     setSearchedMember(null);
-    setUserId(null);
     setSelectedCategory('');
     setSearchQuery('');
     setDifference('');
@@ -67,11 +61,15 @@ export default function AdjustSinglePointPage() {
   };
 
   const handleConfirmModalButtonClick = async () => {
+    if (!searchedMember) {
+      return;
+    }
+
     try {
       const numDifference = Number(difference);
 
       await postSinglePointAPI({
-        userId: userId as number,
+        encryptedUserId: searchedMember.encryptedUserId,
         difference: numDifference,
         category: selectedCategory,
         sourceId: user?.userId,
@@ -122,11 +120,7 @@ export default function AdjustSinglePointPage() {
         </div>
       </article>
 
-      <MemberInfoSection
-        searchedMember={searchedMember as MemberInfo}
-        userId={userId}
-        onUserIdChange={setUserId}
-      />
+      <MemberInfoSection searchedMember={searchedMember as MemberInfo} />
 
       <PointDetailSection
         selectedCategory={selectedCategory}
@@ -138,7 +132,7 @@ export default function AdjustSinglePointPage() {
       />
 
       <PointActionButtons
-        userId={userId}
+        encryptedUserId={searchedMember?.encryptedUserId ?? null}
         selectedCategory={selectedCategory}
         difference={difference}
         memo={memo}
