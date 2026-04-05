@@ -27,3 +27,33 @@ export interface AdjustAllMemberPoint {
   memo: string;
   difference: number;
 }
+
+export type ExcelPointPaymentMethod = 'IMMEDIATE' | 'RESERVED';
+
+export interface ExcelPointBulkRewardRequest {
+  paymentMethod: ExcelPointPaymentMethod;
+  reservedAt?: string;
+  bulkMemo?: string;
+}
+
+export interface ExcelPointBulkNotProcessedRow {
+  rowNumber: number;
+  loginId: string;
+  studentNumber: string;
+  reason: string;
+}
+
+export interface ExcelPointBulkRewardResult {
+  requestedCount: number;
+  successCount: number;
+  failedCount: number;
+  successLoginIds: string[];
+  notProcessedRows: ExcelPointBulkNotProcessedRow[];
+}
+
+export interface ExcelPointBulkRewardResponse {
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  result: ExcelPointBulkRewardResult;
+}

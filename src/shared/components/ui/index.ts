@@ -9,6 +9,7 @@ export { Dialog } from './dialog';
 export { DropdownMenu } from './dropdown-menu';
 export { Field } from './field';
 export { Input } from './input';
+export { InputGroup } from './input-group';
 export { Label } from './label';
 export { Pagination } from './pagination';
 export { Popover } from './popover';

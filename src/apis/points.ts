@@ -3,6 +3,8 @@ import type {
   AdjustAllMemberPoint,
   AdjustSinglePoint,
   CreatePointFreeze,
+  ExcelPointBulkRewardRequest,
+  ExcelPointBulkRewardResponse,
   UpdatePointFreeze,
 } from '@/shared/types';
 
@@ -49,5 +51,31 @@ export const deletePointFreezeAPI = async (id: number) => {
   const response = await axiosInstance.delete(
     `/v1/admin/points/point-freeze/${id}`
   );
+  return response.data;
+};
+
+export const postExcelPointBulkRewardAPI = async (params: {
+  file: File;
+  request: ExcelPointBulkRewardRequest;
+}): Promise<ExcelPointBulkRewardResponse> => {
+  const formData = new FormData();
+
+  formData.append(
+    'request',
+    new Blob([JSON.stringify(params.request)], { type: 'application/json' }),
+    'request.json'
+  );
+  formData.append('file', params.file);
+
+  const response = await axiosInstance.post<ExcelPointBulkRewardResponse>(
+    '/v1/admin/points/bulk-reward/excel',
+    formData,
+    {
+      headers: {
+        'Content-Type': undefined,
+      },
+    }
+  );
+
   return response.data;
 };
