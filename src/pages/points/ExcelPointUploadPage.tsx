@@ -13,24 +13,43 @@ import {
   Table,
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
+import type { ExcelPointBulkRewardResult } from '@/shared/types';
+import { formatDateTimeForAPI, getErrorMessage } from '@/shared/utils';
+
+import { postExcelPointBulkRewardAPI } from '@/apis';
 
 type PaymentTiming = 'immediate' | 'reservation';
 
-const TABLE_HEADERS = [
-  '이름',
+const SUCCESS_TABLE_HEADERS = ['아이디'] as const;
+const FAILURE_TABLE_HEADERS = [
+  '행 번호',
   '아이디',
   '학번',
-  '카테고리',
-  '포인트',
-  '메모',
+  '사유(코드)',
+  '설명',
 ] as const;
 
 const EXCEL_POINT_TEMPLATE_SHEET_ID = '1292A7Rx0lZCGagtanIwdmrXFjm1jxjwE';
 const EXCEL_POINT_TEMPLATE_XLSX_URL = `https://docs.google.com/spreadsheets/d/${EXCEL_POINT_TEMPLATE_SHEET_ID}/export?format=xlsx`;
 
+const ROW_FAILURE_REASON_LABELS: Record<string, string> = {
+  REQUEST_ERROR:
+    '이름·학번·카테고리 등 필수값 누락, 포인트가 숫자가 아니거나, 정의되지 않은 카테고리를 사용',
+  USER_NOT_FOUND: '이름과 학번이 일치하는 회원을 찾을 수 없음',
+  POINT_ENTRY_DIFFERENCE:
+    '해당 카테고리는 포인트 값이 필수이지만, 값이 입력되지 않음',
+};
+
+function formatRowFailureReason(reason: string): string {
+  return ROW_FAILURE_REASON_LABELS[reason] ?? reason;
+}
+
 export default function ExcelPointUploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadResult, setUploadResult] =
+    useState<ExcelPointBulkRewardResult | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentTiming, setPaymentTiming] =
     useState<PaymentTiming>('immediate');
   const reservationAt = useDateTimeField();
@@ -50,9 +69,51 @@ export default function ExcelPointUploadPage() {
       return;
     }
 
-    setUploadedFileName(file.name);
-    toast.success('파일이 선택되었어요. 업로드를 진행합니다.');
+    setUploadedFile(file);
+    setUploadResult(null);
+    toast.success('파일이 선택되었어요. 지급 실행을 눌러 업로드해 주세요.');
     e.target.value = '';
+  };
+
+  const handleSubmit = async () => {
+    if (!uploadedFile) {
+      toast.error('엑셀 파일을 선택해 주세요.');
+      return;
+    }
+
+    if (paymentTiming === 'reservation' && !reservationAt.dateTime) {
+      toast.error('예약 일시를 선택해 주세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setUploadResult(null);
+
+    try {
+      const response = await postExcelPointBulkRewardAPI({
+        file: uploadedFile,
+        request: {
+          paymentMethod:
+            paymentTiming === 'immediate' ? 'IMMEDIATE' : 'RESERVED',
+          bulkMemo: '',
+          ...(paymentTiming === 'reservation' && reservationAt.dateTime
+            ? { reservedAt: formatDateTimeForAPI(reservationAt.dateTime) }
+            : {}),
+        },
+      });
+
+      if (!response.isSuccess || !response.result) {
+        toast.error(response.message || '처리에 실패했습니다.');
+        return;
+      }
+
+      setUploadResult(response.result);
+      toast.success(response.message || '처리가 완료되었습니다.');
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '엑셀 업로드 처리에 실패했습니다.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePaymentTimingChange = (value: string) => {
@@ -67,7 +128,7 @@ export default function ExcelPointUploadPage() {
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
         title='엑셀 업로드 지급'
-        description='엑셀 파일을 업로드하여 학번으로 회원을 매칭하고 포인트를 지급합니다.'
+        description='엑셀 파일을 업로드하면 학번을 기준으로 회원을 매칭하여 포인트를 일괄 지급합니다.'
       />
 
       <Alert>
@@ -75,8 +136,13 @@ export default function ExcelPointUploadPage() {
         <Alert.Title>안내 사항</Alert.Title>
         <Alert.Description>
           <ul className='list-inside list-disc text-sm'>
-            <li>엑셀 파일을 업로드하여 포인트를 지급할 수 있어요.</li>
-            <li>포인트 지급 템플릿 파일을 다운로드하여 작성해 주세요.</li>
+            <li>
+              포인트 지급 템플릿 파일을 다운로드하여 형식에 맞게 작성해 주세요.
+            </li>
+            <li>
+              처리되지 않은 회원은 다시 조회할 수 없으므로, 사유를 즉시 확인하신
+              후 해당 회원만 별도로 업로드해 주세요.
+            </li>
           </ul>
         </Alert.Description>
       </Alert>
@@ -97,7 +163,7 @@ export default function ExcelPointUploadPage() {
                 명단 업로드
               </InputGroup.Button>
               <p className='text-sm text-gray-500'>
-                {uploadedFileName || '선택된 파일이 없습니다.'}
+                {uploadedFile?.name ?? '선택된 파일이 없습니다.'}
               </p>
               <input
                 ref={fileInputRef}
@@ -118,34 +184,6 @@ export default function ExcelPointUploadPage() {
               템플릿 다운로드
             </Button>
           </div>
-        </div>
-
-        <div className='overflow-hidden rounded-xl border bg-white'>
-          <Table>
-            <Table.Header className='bg-gray-50'>
-              <Table.Row className='hover:bg-gray-50'>
-                {TABLE_HEADERS.map((header) => (
-                  <Table.Head
-                    key={header}
-                    className='h-12 px-4 text-center font-semibold text-gray-700'
-                  >
-                    {header}
-                  </Table.Head>
-                ))}
-              </Table.Row>
-            </Table.Header>
-
-            <Table.Body>
-              <Table.Row className='hover:bg-white'>
-                <Table.Cell
-                  colSpan={TABLE_HEADERS.length}
-                  className='h-40 text-center text-sm text-gray-400'
-                >
-                  업로드된 엑셀 데이터가 여기에 표시됩니다.
-                </Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          </Table>
         </div>
 
         <div className='flex flex-col gap-3'>
@@ -188,6 +226,137 @@ export default function ExcelPointUploadPage() {
                 className='max-w-2xl'
               />
             ) : null}
+
+            <Button
+              type='button'
+              className='w-fit'
+              disabled={isSubmitting || !uploadedFile || uploadResult !== null}
+              title={
+                uploadResult !== null
+                  ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
+                  : undefined
+              }
+              onClick={handleSubmit}
+            >
+              {isSubmitting ? '처리 중…' : '지급 실행'}
+            </Button>
+          </div>
+        </div>
+
+        <div className='flex flex-col gap-4'>
+          {uploadResult ? (
+            <div className='rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800'>
+              <p className='font-semibold'>처리 결과 요약</p>
+              <p className='mt-1'>
+                요청 {uploadResult.requestedCount}건 · 성공{' '}
+                {uploadResult.successCount}건 · 실패 {uploadResult.failedCount}
+                건
+              </p>
+            </div>
+          ) : null}
+
+          <div className='overflow-hidden rounded-xl border bg-white'>
+            <h3 className='border-b bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-800'>
+              처리되지 않은 회원
+            </h3>
+            <Table>
+              <Table.Header className='bg-gray-50'>
+                <Table.Row className='hover:bg-gray-50'>
+                  {FAILURE_TABLE_HEADERS.map((header) => (
+                    <Table.Head
+                      key={header}
+                      className='h-12 px-4 text-center font-semibold text-gray-700'
+                    >
+                      {header}
+                    </Table.Head>
+                  ))}
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Body>
+                {uploadResult && uploadResult.notProcessedRows.length > 0 ? (
+                  uploadResult.notProcessedRows.map((row, index) => (
+                    <Table.Row
+                      key={`${row.rowNumber}-${row.reason}-${index}`}
+                      className='hover:bg-white'
+                    >
+                      <Table.Cell className='px-4 py-3 text-center text-sm'>
+                        {row.rowNumber}
+                      </Table.Cell>
+                      <Table.Cell className='px-4 py-3 text-center text-sm'>
+                        {row.loginId || '—'}
+                      </Table.Cell>
+                      <Table.Cell className='px-4 py-3 text-center text-sm'>
+                        {row.studentNumber || '—'}
+                      </Table.Cell>
+                      <Table.Cell className='px-4 py-3 text-center text-sm'>
+                        {row.reason}
+                      </Table.Cell>
+                      <Table.Cell className='max-w-md px-4 py-3 text-left text-xs text-gray-600'>
+                        {formatRowFailureReason(row.reason)}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))
+                ) : (
+                  <Table.Row className='hover:bg-white'>
+                    <Table.Cell
+                      colSpan={FAILURE_TABLE_HEADERS.length}
+                      className='h-24 text-center text-sm text-gray-400'
+                    >
+                      {uploadResult
+                        ? '처리되지 않은 행이 없습니다.'
+                        : '지급 실행 후 결과가 여기에 표시됩니다.'}
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table>
+          </div>
+
+          <div className='overflow-hidden rounded-xl border bg-white'>
+            <h3 className='border-b bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-800'>
+              성공한 회원
+            </h3>
+            <Table>
+              <Table.Header className='bg-gray-50'>
+                <Table.Row className='hover:bg-gray-50'>
+                  {SUCCESS_TABLE_HEADERS.map((header) => (
+                    <Table.Head
+                      key={header}
+                      className='h-12 px-4 text-center font-semibold text-gray-700'
+                    >
+                      {header}
+                    </Table.Head>
+                  ))}
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Body>
+                {uploadResult && uploadResult.successLoginIds.length > 0 ? (
+                  uploadResult.successLoginIds.map((loginId, index) => (
+                    <Table.Row
+                      key={`${loginId}-${index}`}
+                      className='hover:bg-white'
+                    >
+                      <Table.Cell className='px-4 py-3 text-center text-sm'>
+                        {loginId}
+                      </Table.Cell>
+                    </Table.Row>
+                  ))
+                ) : (
+                  <Table.Row className='hover:bg-white'>
+                    <Table.Cell
+                      colSpan={SUCCESS_TABLE_HEADERS.length}
+                      className='h-24 text-center text-sm text-gray-400'
+                    >
+                      {uploadResult
+                        ? '성공한 회원이 없습니다.'
+                        : '지급 실행 후 결과가 여기에 표시됩니다.'}
+                    </Table.Cell>
+                  </Table.Row>
+                )}
+              </Table.Body>
+            </Table>
           </div>
         </div>
       </section>
