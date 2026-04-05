@@ -174,8 +174,7 @@ function remapNotProcessedRowNumber(
   row: ExcelPointBulkNotProcessedRow,
   submittedRows: ExcelPreviewRow[]
 ): ExcelPointBulkNotProcessedRow {
-  const submittedRow =
-    submittedRows[row.rowNumber - 2] ?? submittedRows[row.rowNumber - 1];
+  const submittedRow = submittedRows[row.rowNumber - 2];
 
   if (!submittedRow) {
     return row;
