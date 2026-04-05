@@ -2,7 +2,7 @@ import { Input, Label } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
 interface MemberInfoSectionProps {
-  searchedMember: MemberInfo;
+  searchedMember: MemberInfo | null;
 }
 
 export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {

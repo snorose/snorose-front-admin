@@ -120,7 +120,7 @@ export default function AdjustSinglePointPage() {
         </div>
       </article>
 
-      <MemberInfoSection searchedMember={searchedMember as MemberInfo} />
+      <MemberInfoSection searchedMember={searchedMember} />
 
       <PointDetailSection
         selectedCategory={selectedCategory}
