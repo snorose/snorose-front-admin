@@ -21,7 +21,10 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import type { ExcelPointBulkRewardResult } from '@/shared/types';
+import type {
+  ExcelPointBulkNotProcessedRow,
+  ExcelPointBulkRewardResult,
+} from '@/shared/types';
 import {
   downloadNotProcessedRowsExcel,
   formatDateTimeForAPI,
@@ -139,6 +142,64 @@ function parseExcelPreviewRows(
     );
 }
 
+function createUploadFileFromPreviewRows(
+  rows: ExcelPreviewRow[],
+  originalFileName: string
+): File {
+  const worksheetData = [
+    ['이름', '학번', '카테고리', '포인트', '메모'],
+    ...rows.map((row) => [
+      row.userName,
+      row.studentNumber,
+      row.category,
+      row.difference,
+      row.memo,
+    ]),
+  ];
+  const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, '포인트지급');
+
+  const workbookArray = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+  const nextFileName = originalFileName.replace(/\.(xlsx|xls|csv)$/i, '.xlsx');
+
+  return new File([workbookArray], nextFileName, {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+}
+
+function remapNotProcessedRowNumber(
+  row: ExcelPointBulkNotProcessedRow,
+  submittedRows: ExcelPreviewRow[]
+): ExcelPointBulkNotProcessedRow {
+  const submittedRow =
+    submittedRows[row.rowNumber - 2] ?? submittedRows[row.rowNumber - 1];
+
+  if (!submittedRow) {
+    return row;
+  }
+
+  return {
+    ...row,
+    rowNumber: submittedRow.rowNumber,
+  };
+}
+
+function remapUploadResultRowNumbers(
+  result: ExcelPointBulkRewardResult,
+  submittedRows: ExcelPreviewRow[]
+): ExcelPointBulkRewardResult {
+  return {
+    ...result,
+    notProcessedRows: result.notProcessedRows.map((row) =>
+      remapNotProcessedRowNumber(row, submittedRows)
+    ),
+  };
+}
+
 function formatRowFailureReason(reason: string): string {
   return ROW_FAILURE_REASON_LABELS[reason] ?? reason;
 }
@@ -238,8 +299,14 @@ export default function ExcelPointUploadPage() {
     setUploadResult(null);
 
     try {
+      const submittedRows = [...previewRows];
+      const submitFile = createUploadFileFromPreviewRows(
+        submittedRows,
+        uploadedFile.name
+      );
+
       const response = await postExcelPointBulkRewardAPI({
-        file: uploadedFile,
+        file: submitFile,
         request: {
           paymentMethod:
             paymentTiming === 'immediate' ? 'IMMEDIATE' : 'RESERVED',
@@ -255,7 +322,9 @@ export default function ExcelPointUploadPage() {
         return;
       }
 
-      setUploadResult(response.result);
+      setUploadResult(
+        remapUploadResultRowNumbers(response.result, submittedRows)
+      );
       toast.success(response.message || '처리가 완료되었습니다.');
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '엑셀 업로드 처리에 실패했습니다.'));
@@ -528,7 +597,7 @@ export default function ExcelPointUploadPage() {
                             }
                           >
                             <Trash2 className='size-4' aria-hidden />
-                            {/* 삭제 */}
+                            삭제
                           </Button>
                         </Table.Cell>
                       </Table.Row>
