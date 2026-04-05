@@ -203,7 +203,7 @@ export default function ExcelPointUploadPage() {
                   즉시 지급
                 </Label>
               </div>
-              <div className='flex items-center gap-2'>
+              {/* <div className='flex items-center gap-2'>
                 <RadioGroup.Item value='reservation' id='reservation' />
                 <Label
                   htmlFor='reservation'
@@ -211,7 +211,7 @@ export default function ExcelPointUploadPage() {
                 >
                   예약 지급
                 </Label>
-              </div>
+              </div> */}
             </RadioGroup>
 
             {paymentTiming === 'reservation' ? (
