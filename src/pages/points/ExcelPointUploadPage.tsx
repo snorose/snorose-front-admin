@@ -433,94 +433,6 @@ export default function ExcelPointUploadPage() {
         </div>
 
         <div className='flex flex-col gap-4'>
-          <div className='flex flex-col gap-3'>
-            <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
-            <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
-              <RadioGroup
-                value={paymentTiming}
-                onValueChange={handlePaymentTimingChange}
-                className='flex flex-row gap-4'
-              >
-                <div className='flex items-center gap-2'>
-                  <RadioGroup.Item value='immediate' id='immediate' />
-                  <Label
-                    htmlFor='immediate'
-                    className='cursor-pointer font-normal'
-                  >
-                    즉시 지급
-                  </Label>
-                </div>
-                {/* <div className='flex items-center gap-2'>
-                <RadioGroup.Item value='reservation' id='reservation' />
-                <Label
-                  htmlFor='reservation'
-                  className='cursor-pointer font-normal'
-                >
-                  예약 지급
-                </Label>
-              </div> */}
-              </RadioGroup>
-
-              {paymentTiming === 'reservation' ? (
-                <DateTimePicker
-                  label='예약 일시'
-                  date={reservationAt.date}
-                  time={reservationAt.time}
-                  onDateSelect={reservationAt.onDateSelect}
-                  onTimeChange={reservationAt.onTimeChange}
-                  datePlaceholder='예약 날짜 선택'
-                  required
-                  className='max-w-2xl'
-                />
-              ) : null}
-
-              <div className='flex flex-col gap-2'>
-                <Label htmlFor='excel-bulk-memo'>총괄 메모</Label>
-                <Textarea
-                  id='excel-bulk-memo'
-                  value={bulkMemo}
-                  onChange={(e) => setBulkMemo(e.target.value)}
-                  placeholder='지급 요청에 공통으로 남길 메모를 입력해 주세요.'
-                  disabled={isSubmitting}
-                  className='min-h-28 resize-y'
-                />
-              </div>
-
-              <div className='flex flex-wrap items-center gap-2'>
-                <Button
-                  type='button'
-                  className='w-fit'
-                  disabled={
-                    isSubmitting ||
-                    isParsingFile ||
-                    !uploadedFile ||
-                    previewRows.length === 0 ||
-                    uploadResult !== null
-                  }
-                  title={
-                    uploadResult !== null
-                      ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
-                      : undefined
-                  }
-                  onClick={handleSubmit}
-                >
-                  {isSubmitting ? '처리 중…' : '지급 실행'}
-                </Button>
-                {uploadedFile && uploadResult !== null ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    className='w-fit'
-                    disabled={isSubmitting || isParsingFile}
-                    onClick={handleUploadButtonClick}
-                  >
-                    다른 명단 업로드
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          </div>
-
           <section
             aria-labelledby='excel-preview-heading'
             className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
@@ -618,6 +530,94 @@ export default function ExcelPointUploadPage() {
               </Table>
             </div>
           </section>
+
+          <div className='flex flex-col gap-3'>
+            <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
+            <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+              <RadioGroup
+                value={paymentTiming}
+                onValueChange={handlePaymentTimingChange}
+                className='flex flex-row gap-4'
+              >
+                <div className='flex items-center gap-2'>
+                  <RadioGroup.Item value='immediate' id='immediate' />
+                  <Label
+                    htmlFor='immediate'
+                    className='cursor-pointer font-normal'
+                  >
+                    즉시 지급
+                  </Label>
+                </div>
+                {/* <div className='flex items-center gap-2'>
+                <RadioGroup.Item value='reservation' id='reservation' />
+                <Label
+                  htmlFor='reservation'
+                  className='cursor-pointer font-normal'
+                >
+                  예약 지급
+                </Label>
+              </div> */}
+              </RadioGroup>
+
+              {paymentTiming === 'reservation' ? (
+                <DateTimePicker
+                  label='예약 일시'
+                  date={reservationAt.date}
+                  time={reservationAt.time}
+                  onDateSelect={reservationAt.onDateSelect}
+                  onTimeChange={reservationAt.onTimeChange}
+                  datePlaceholder='예약 날짜 선택'
+                  required
+                  className='max-w-2xl'
+                />
+              ) : null}
+
+              <div className='flex flex-col gap-2'>
+                <Label htmlFor='excel-bulk-memo'>총괄 메모</Label>
+                <Textarea
+                  id='excel-bulk-memo'
+                  value={bulkMemo}
+                  onChange={(e) => setBulkMemo(e.target.value)}
+                  placeholder='지급 요청에 공통으로 남길 메모를 입력해 주세요.'
+                  disabled={isSubmitting}
+                  className='min-h-28 resize-y'
+                />
+              </div>
+
+              <div className='flex flex-wrap items-center gap-2'>
+                <Button
+                  type='button'
+                  className='w-fit'
+                  disabled={
+                    isSubmitting ||
+                    isParsingFile ||
+                    !uploadedFile ||
+                    previewRows.length === 0 ||
+                    uploadResult !== null
+                  }
+                  title={
+                    uploadResult !== null
+                      ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
+                      : undefined
+                  }
+                  onClick={handleSubmit}
+                >
+                  {isSubmitting ? '처리 중…' : '지급 실행'}
+                </Button>
+                {uploadedFile && uploadResult !== null ? (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-fit'
+                    disabled={isSubmitting || isParsingFile}
+                    onClick={handleUploadButtonClick}
+                  >
+                    다른 명단 업로드
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </div>
 
           {uploadResult ? (
             <div className='rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 shadow-xs sm:px-5'>
