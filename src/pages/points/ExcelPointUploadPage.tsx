@@ -227,19 +227,34 @@ export default function ExcelPointUploadPage() {
               />
             ) : null}
 
-            <Button
-              type='button'
-              className='w-fit'
-              disabled={isSubmitting || !uploadedFile || uploadResult !== null}
-              title={
-                uploadResult !== null
-                  ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
-                  : undefined
-              }
-              onClick={handleSubmit}
-            >
-              {isSubmitting ? '처리 중…' : '지급 실행'}
-            </Button>
+            <div className='flex flex-wrap items-center gap-2'>
+              <Button
+                type='button'
+                className='w-fit'
+                disabled={
+                  isSubmitting || !uploadedFile || uploadResult !== null
+                }
+                title={
+                  uploadResult !== null
+                    ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
+                    : undefined
+                }
+                onClick={handleSubmit}
+              >
+                {isSubmitting ? '처리 중…' : '지급 실행'}
+              </Button>
+              {uploadedFile && uploadResult !== null ? (
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='w-fit'
+                  disabled={isSubmitting}
+                  onClick={handleUploadButtonClick}
+                >
+                  다른 명단 업로드
+                </Button>
+              ) : null}
+            </div>
           </div>
         </div>
 
