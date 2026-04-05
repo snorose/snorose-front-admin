@@ -96,6 +96,8 @@ const EXCEL_PREVIEW_HEADER_ALIASES = {
   category: ['카테고리', '분류'],
   memo: ['메모', '비고', '사유'],
 } as const;
+type ExcelPreviewField = keyof typeof EXCEL_PREVIEW_HEADER_ALIASES;
+type ExcelPreviewColumnMap = Partial<Record<ExcelPreviewField, string>>;
 
 function normalizeExcelHeader(value: unknown): string {
   return String(value ?? '')
@@ -103,38 +105,66 @@ function normalizeExcelHeader(value: unknown): string {
     .toLowerCase();
 }
 
-function findExcelValue(
+function getExcelCellValue(
   row: Record<string, unknown>,
-  aliases: readonly string[]
+  columnKey?: string
 ): string {
-  for (const [key, value] of Object.entries(row)) {
-    if (
-      aliases.some(
-        (alias) => normalizeExcelHeader(alias) === normalizeExcelHeader(key)
-      )
-    ) {
-      return String(value ?? '').trim();
+  if (!columnKey) {
+    return '';
+  }
+
+  return String(row[columnKey] ?? '').trim();
+}
+
+function buildExcelPreviewColumnMap(
+  rows: Record<string, unknown>[]
+): ExcelPreviewColumnMap {
+  const firstRow = rows[0];
+
+  if (!firstRow) {
+    return {};
+  }
+
+  const normalizedAliasEntries = Object.entries(
+    EXCEL_PREVIEW_HEADER_ALIASES
+  ).map(
+    ([field, aliases]) =>
+      [
+        field as ExcelPreviewField,
+        new Set(aliases.map((alias) => normalizeExcelHeader(alias))),
+      ] as const
+  );
+
+  const columnMap: ExcelPreviewColumnMap = {};
+
+  for (const key of Object.keys(firstRow)) {
+    const normalizedKey = normalizeExcelHeader(key);
+
+    for (const [field, normalizedAliases] of normalizedAliasEntries) {
+      if (normalizedAliases.has(normalizedKey)) {
+        columnMap[field] = key;
+        break;
+      }
     }
   }
 
-  return '';
+  return columnMap;
 }
 
 function parseExcelPreviewRows(
   rows: Record<string, unknown>[]
 ): ExcelPreviewRow[] {
+  const columnMap = buildExcelPreviewColumnMap(rows);
+
   return rows
     .map((row, index) => ({
       rowNumber: index + 2,
-      userName: findExcelValue(row, EXCEL_PREVIEW_HEADER_ALIASES.userName),
-      loginId: findExcelValue(row, EXCEL_PREVIEW_HEADER_ALIASES.loginId),
-      studentNumber: findExcelValue(
-        row,
-        EXCEL_PREVIEW_HEADER_ALIASES.studentNumber
-      ),
-      difference: findExcelValue(row, EXCEL_PREVIEW_HEADER_ALIASES.difference),
-      category: findExcelValue(row, EXCEL_PREVIEW_HEADER_ALIASES.category),
-      memo: findExcelValue(row, EXCEL_PREVIEW_HEADER_ALIASES.memo),
+      userName: getExcelCellValue(row, columnMap.userName),
+      loginId: getExcelCellValue(row, columnMap.loginId),
+      studentNumber: getExcelCellValue(row, columnMap.studentNumber),
+      difference: getExcelCellValue(row, columnMap.difference),
+      category: getExcelCellValue(row, columnMap.category),
+      memo: getExcelCellValue(row, columnMap.memo),
     }))
     .filter((row) =>
       Object.values(row).some((value) => String(value ?? '').trim().length > 0)
