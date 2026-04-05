@@ -170,7 +170,7 @@ export default function ExcelPointUploadPage() {
             <InputGroup>
               <InputGroup.Button
                 type='button'
-                variant='secondary'
+                variant='outline'
                 className='mx-1'
                 onClick={handleUploadButtonClick}
               >
