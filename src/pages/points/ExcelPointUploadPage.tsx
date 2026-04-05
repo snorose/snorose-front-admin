@@ -44,6 +44,9 @@ const FAILURE_TABLE_HEADERS = [
   '설명',
 ] as const;
 
+const RESULT_TABLE_BODY_MAX_HEIGHT_CLASS =
+  'max-h-[min(24rem,50vh)] overflow-auto';
+
 const EXCEL_POINT_TEMPLATE_SHEET_ID = '1292A7Rx0lZCGagtanIwdmrXFjm1jxjwE';
 const EXCEL_POINT_TEMPLATE_XLSX_URL = `https://docs.google.com/spreadsheets/d/${EXCEL_POINT_TEMPLATE_SHEET_ID}/export?format=xlsx`;
 
@@ -359,9 +362,9 @@ export default function ExcelPointUploadPage() {
                   ) : null}
                 </div>
               </div>
-              <div className='min-h-0 overflow-x-auto'>
+              <div className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}>
                 <Table>
-                  <Table.Header className='bg-amber-50/40'>
+                  <Table.Header className='sticky top-0 z-[1] border-b border-amber-100 bg-amber-50'>
                     <Table.Row className='hover:bg-amber-50/40'>
                       {FAILURE_TABLE_HEADERS.map((header) => (
                         <Table.Head
@@ -449,9 +452,9 @@ export default function ExcelPointUploadPage() {
                   포인트가 정상 반영된 회원 목록입니다.
                 </p>
               </div>
-              <div className='min-h-0 overflow-x-auto'>
+              <div className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}>
                 <Table>
-                  <Table.Header className='bg-emerald-50/40'>
+                  <Table.Header className='sticky top-0 z-[1] border-b border-emerald-100 bg-emerald-50'>
                     <Table.Row className='hover:bg-emerald-50/40'>
                       {SUCCESS_TABLE_HEADERS.map((header) => (
                         <Table.Head
