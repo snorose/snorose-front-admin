@@ -209,6 +209,10 @@ export default function ExcelPointUploadPage() {
               템플릿 다운로드
             </Button>
           </div>
+          <p className='text-sm text-gray-600'>
+            엑셀 파일에는 이름, 학번, 카테고리, 포인트, 메모 컬럼이 반드시
+            포함되어야 합니다.
+          </p>
         </div>
 
         <div className='flex flex-col gap-3'>
