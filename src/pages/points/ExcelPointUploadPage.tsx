@@ -737,7 +737,7 @@ export default function ExcelPointUploadPage() {
                                 <Table.Cell className='px-3 py-3 text-center text-sm'>
                                   {row.reason}
                                 </Table.Cell>
-                                <Table.Cell className='max-w-[min(18rem,40vw)] px-3 py-3 text-left text-xs text-gray-600'>
+                                <Table.Cell className='max-w-[min(24rem,45vw)] min-w-64 px-3 py-3 text-left text-xs break-words whitespace-normal text-gray-600'>
                                   {formatRowFailureReason(row.reason)}
                                 </Table.Cell>
                               </Table.Row>
