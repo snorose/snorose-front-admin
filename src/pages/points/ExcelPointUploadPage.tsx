@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { Megaphone } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DateTimePicker, PageHeader } from '@/shared/components';
@@ -245,118 +245,181 @@ export default function ExcelPointUploadPage() {
 
         <div className='flex flex-col gap-4'>
           {uploadResult ? (
-            <div className='rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800'>
-              <p className='font-semibold'>처리 결과 요약</p>
-              <p className='mt-1'>
-                요청 {uploadResult.requestedCount}건 · 성공{' '}
-                {uploadResult.successCount}건 · 실패 {uploadResult.failedCount}
-                건
+            <div className='rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 shadow-xs sm:px-5'>
+              <p className='flex flex-nowrap items-center gap-x-2 overflow-x-auto text-sm sm:gap-x-3'>
+                <span className='shrink-0 font-semibold'>처리 결과 요약</span>
+                <span>·</span>
+                <span className='shrink-0'>
+                  요청{' '}
+                  <span className='font-semibold text-blue-600 tabular-nums'>
+                    {uploadResult.requestedCount}
+                  </span>
+                  건
+                </span>
+                <span>·</span>
+                <span className='shrink-0'>
+                  성공{' '}
+                  <span className='font-semibold text-green-600 tabular-nums'>
+                    {uploadResult.successCount}
+                  </span>
+                  건
+                </span>
+                <span>·</span>
+                <span className='shrink-0'>
+                  실패{' '}
+                  <span className='font-semibold text-red-600 tabular-nums'>
+                    {uploadResult.failedCount}
+                  </span>
+                  건
+                </span>
               </p>
             </div>
           ) : null}
 
-          <div className='overflow-hidden rounded-xl border bg-white'>
-            <h3 className='border-b bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-800'>
-              처리되지 않은 회원
-            </h3>
-            <Table>
-              <Table.Header className='bg-gray-50'>
-                <Table.Row className='hover:bg-gray-50'>
-                  {FAILURE_TABLE_HEADERS.map((header) => (
-                    <Table.Head
-                      key={header}
-                      className='h-12 px-4 text-center font-semibold text-gray-700'
-                    >
-                      {header}
-                    </Table.Head>
-                  ))}
-                </Table.Row>
-              </Table.Header>
-
-              <Table.Body>
-                {uploadResult && uploadResult.notProcessedRows.length > 0 ? (
-                  uploadResult.notProcessedRows.map((row, index) => (
-                    <Table.Row
-                      key={`${row.rowNumber}-${row.reason}-${index}`}
-                      className='hover:bg-white'
-                    >
-                      <Table.Cell className='px-4 py-3 text-center text-sm'>
-                        {row.rowNumber}
-                      </Table.Cell>
-                      <Table.Cell className='px-4 py-3 text-center text-sm'>
-                        {row.loginId || '—'}
-                      </Table.Cell>
-                      <Table.Cell className='px-4 py-3 text-center text-sm'>
-                        {row.studentNumber || '—'}
-                      </Table.Cell>
-                      <Table.Cell className='px-4 py-3 text-center text-sm'>
-                        {row.reason}
-                      </Table.Cell>
-                      <Table.Cell className='max-w-md px-4 py-3 text-left text-xs text-gray-600'>
-                        {formatRowFailureReason(row.reason)}
-                      </Table.Cell>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]'>
+            <section
+              aria-labelledby='excel-result-success-heading'
+              className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-xs'
+            >
+              <div className='flex flex-col gap-0.5 border-b border-emerald-100 bg-emerald-50/90 px-4 py-3'>
+                <div className='flex items-center gap-2'>
+                  <CheckCircle2
+                    className='size-5 shrink-0 text-emerald-600'
+                    aria-hidden
+                  />
+                  <h3
+                    id='excel-result-success-heading'
+                    className='text-sm font-semibold text-emerald-950'
+                  >
+                    지급 성공
+                  </h3>
+                </div>
+                <p className='pl-7 text-xs text-emerald-800/80'>
+                  포인트가 정상 반영된 회원 아이디입니다.
+                </p>
+              </div>
+              <div className='min-h-0 overflow-x-auto'>
+                <Table>
+                  <Table.Header className='bg-emerald-50/40'>
+                    <Table.Row className='hover:bg-emerald-50/40'>
+                      {SUCCESS_TABLE_HEADERS.map((header) => (
+                        <Table.Head
+                          key={header}
+                          className='h-11 px-4 text-center text-xs font-semibold text-emerald-900'
+                        >
+                          {header}
+                        </Table.Head>
+                      ))}
                     </Table.Row>
-                  ))
-                ) : (
-                  <Table.Row className='hover:bg-white'>
-                    <Table.Cell
-                      colSpan={FAILURE_TABLE_HEADERS.length}
-                      className='h-24 text-center text-sm text-gray-400'
-                    >
-                      {uploadResult
-                        ? '처리되지 않은 행이 없습니다.'
-                        : '지급 실행 후 결과가 여기에 표시됩니다.'}
-                    </Table.Cell>
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table>
-          </div>
+                  </Table.Header>
 
-          <div className='overflow-hidden rounded-xl border bg-white'>
-            <h3 className='border-b bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-800'>
-              성공한 회원
-            </h3>
-            <Table>
-              <Table.Header className='bg-gray-50'>
-                <Table.Row className='hover:bg-gray-50'>
-                  {SUCCESS_TABLE_HEADERS.map((header) => (
-                    <Table.Head
-                      key={header}
-                      className='h-12 px-4 text-center font-semibold text-gray-700'
-                    >
-                      {header}
-                    </Table.Head>
-                  ))}
-                </Table.Row>
-              </Table.Header>
+                  <Table.Body>
+                    {uploadResult && uploadResult.successLoginIds.length > 0 ? (
+                      uploadResult.successLoginIds.map((loginId, index) => (
+                        <Table.Row
+                          key={`${loginId}-${index}`}
+                          className='hover:bg-emerald-50/20'
+                        >
+                          <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                            {loginId}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    ) : (
+                      <Table.Row className='hover:bg-white'>
+                        <Table.Cell
+                          colSpan={SUCCESS_TABLE_HEADERS.length}
+                          className='h-24 text-center text-sm text-gray-400'
+                        >
+                          {uploadResult
+                            ? '성공한 회원이 없습니다.'
+                            : '지급 실행 후 결과가 여기에 표시됩니다.'}
+                        </Table.Cell>
+                      </Table.Row>
+                    )}
+                  </Table.Body>
+                </Table>
+              </div>
+            </section>
 
-              <Table.Body>
-                {uploadResult && uploadResult.successLoginIds.length > 0 ? (
-                  uploadResult.successLoginIds.map((loginId, index) => (
-                    <Table.Row
-                      key={`${loginId}-${index}`}
-                      className='hover:bg-white'
-                    >
-                      <Table.Cell className='px-4 py-3 text-center text-sm'>
-                        {loginId}
-                      </Table.Cell>
+            <section
+              aria-labelledby='excel-result-failure-heading'
+              className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-white shadow-xs'
+            >
+              <div className='flex flex-col gap-0.5 border-b border-amber-100 bg-amber-50/90 px-4 py-3'>
+                <div className='flex items-center gap-2'>
+                  <AlertTriangle
+                    className='size-5 shrink-0 text-amber-600'
+                    aria-hidden
+                  />
+                  <h3
+                    id='excel-result-failure-heading'
+                    className='text-sm font-semibold text-amber-950'
+                  >
+                    처리되지 않음
+                  </h3>
+                </div>
+                <p className='pl-7 text-xs text-amber-900/80'>
+                  엑셀 행 단위로 지급에 실패한 경우입니다. 사유를 확인해 수정해
+                  주세요.
+                </p>
+              </div>
+              <div className='min-h-0 overflow-x-auto'>
+                <Table>
+                  <Table.Header className='bg-amber-50/40'>
+                    <Table.Row className='hover:bg-amber-50/40'>
+                      {FAILURE_TABLE_HEADERS.map((header) => (
+                        <Table.Head
+                          key={header}
+                          className='h-11 px-3 text-center text-xs font-semibold text-amber-950'
+                        >
+                          {header}
+                        </Table.Head>
+                      ))}
                     </Table.Row>
-                  ))
-                ) : (
-                  <Table.Row className='hover:bg-white'>
-                    <Table.Cell
-                      colSpan={SUCCESS_TABLE_HEADERS.length}
-                      className='h-24 text-center text-sm text-gray-400'
-                    >
-                      {uploadResult
-                        ? '성공한 회원이 없습니다.'
-                        : '지급 실행 후 결과가 여기에 표시됩니다.'}
-                    </Table.Cell>
-                  </Table.Row>
-                )}
-              </Table.Body>
-            </Table>
+                  </Table.Header>
+
+                  <Table.Body>
+                    {uploadResult &&
+                    uploadResult.notProcessedRows.length > 0 ? (
+                      uploadResult.notProcessedRows.map((row, index) => (
+                        <Table.Row
+                          key={`${row.rowNumber}-${row.reason}-${index}`}
+                          className='hover:bg-amber-50/20'
+                        >
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.rowNumber}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.loginId || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.studentNumber || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.reason}
+                          </Table.Cell>
+                          <Table.Cell className='max-w-[min(18rem,40vw)] px-3 py-3 text-left text-xs text-gray-600'>
+                            {formatRowFailureReason(row.reason)}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    ) : (
+                      <Table.Row className='hover:bg-white'>
+                        <Table.Cell
+                          colSpan={FAILURE_TABLE_HEADERS.length}
+                          className='h-24 text-center text-sm text-gray-400'
+                        >
+                          {uploadResult
+                            ? '처리되지 않은 행이 없습니다.'
+                            : '지급 실행 후 결과가 여기에 표시됩니다.'}
+                        </Table.Cell>
+                      </Table.Row>
+                    )}
+                  </Table.Body>
+                </Table>
+              </div>
+            </section>
           </div>
         </div>
       </section>
