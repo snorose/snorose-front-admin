@@ -1,6 +1,12 @@
 import { useRef, useState } from 'react';
 
-import { AlertTriangle, CheckCircle2, Download, Megaphone } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Download,
+  Megaphone,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
@@ -12,6 +18,7 @@ import {
   Label,
   RadioGroup,
   Table,
+  Textarea,
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExcelPointBulkRewardResult } from '@/shared/types';
@@ -62,6 +69,7 @@ const PREVIEW_TABLE_HEADERS = [
   '포인트',
   '카테고리',
   '메모',
+  '삭제',
 ] as const;
 
 const RESULT_TABLE_BODY_MAX_HEIGHT_CLASS =
@@ -143,6 +151,7 @@ export default function ExcelPointUploadPage() {
     useState<ExcelPointBulkRewardResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
+  const [bulkMemo, setBulkMemo] = useState('');
   const [paymentTiming, setPaymentTiming] =
     useState<PaymentTiming>('immediate');
   const reservationAt = useDateTimeField();
@@ -193,6 +202,7 @@ export default function ExcelPointUploadPage() {
       setUploadedFile(file);
       setPreviewRows(nextPreviewRows);
       setUploadResult(null);
+      setBulkMemo('');
       toast.success(
         '명단을 불러왔습니다. 표를 확인한 뒤 지급을 실행해 주세요.'
       );
@@ -233,7 +243,7 @@ export default function ExcelPointUploadPage() {
         request: {
           paymentMethod:
             paymentTiming === 'immediate' ? 'IMMEDIATE' : 'RESERVED',
-          bulkMemo: '',
+          bulkMemo,
           ...(paymentTiming === 'reservation' && reservationAt.dateTime
             ? { reservedAt: formatDateTimeForAPI(reservationAt.dateTime) }
             : {}),
@@ -270,6 +280,19 @@ export default function ExcelPointUploadPage() {
       uploadResult.notProcessedRows,
       formatRowFailureReason
     );
+  };
+
+  const handleRemovePreviewRow = (rowNumber: number) => {
+    setPreviewRows((prevRows) => {
+      const nextRows = prevRows.filter((row) => row.rowNumber !== rowNumber);
+
+      if (nextRows.length === 0) {
+        setUploadedFile(null);
+        setUploadResult(null);
+      }
+
+      return nextRows;
+    });
   };
 
   return (
@@ -341,6 +364,94 @@ export default function ExcelPointUploadPage() {
         </div>
 
         <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-3'>
+            <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
+            <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+              <RadioGroup
+                value={paymentTiming}
+                onValueChange={handlePaymentTimingChange}
+                className='flex flex-row gap-4'
+              >
+                <div className='flex items-center gap-2'>
+                  <RadioGroup.Item value='immediate' id='immediate' />
+                  <Label
+                    htmlFor='immediate'
+                    className='cursor-pointer font-normal'
+                  >
+                    즉시 지급
+                  </Label>
+                </div>
+                {/* <div className='flex items-center gap-2'>
+                <RadioGroup.Item value='reservation' id='reservation' />
+                <Label
+                  htmlFor='reservation'
+                  className='cursor-pointer font-normal'
+                >
+                  예약 지급
+                </Label>
+              </div> */}
+              </RadioGroup>
+
+              {paymentTiming === 'reservation' ? (
+                <DateTimePicker
+                  label='예약 일시'
+                  date={reservationAt.date}
+                  time={reservationAt.time}
+                  onDateSelect={reservationAt.onDateSelect}
+                  onTimeChange={reservationAt.onTimeChange}
+                  datePlaceholder='예약 날짜 선택'
+                  required
+                  className='max-w-2xl'
+                />
+              ) : null}
+
+              <div className='flex flex-col gap-2'>
+                <Label htmlFor='excel-bulk-memo'>총괄 메모</Label>
+                <Textarea
+                  id='excel-bulk-memo'
+                  value={bulkMemo}
+                  onChange={(e) => setBulkMemo(e.target.value)}
+                  placeholder='지급 요청에 공통으로 남길 메모를 입력해 주세요.'
+                  disabled={isSubmitting}
+                  className='min-h-28 resize-y'
+                />
+              </div>
+
+              <div className='flex flex-wrap items-center gap-2'>
+                <Button
+                  type='button'
+                  className='w-fit'
+                  disabled={
+                    isSubmitting ||
+                    isParsingFile ||
+                    !uploadedFile ||
+                    previewRows.length === 0 ||
+                    uploadResult !== null
+                  }
+                  title={
+                    uploadResult !== null
+                      ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
+                      : undefined
+                  }
+                  onClick={handleSubmit}
+                >
+                  {isSubmitting ? '처리 중…' : '지급 실행'}
+                </Button>
+                {uploadedFile && uploadResult !== null ? (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-fit'
+                    disabled={isSubmitting || isParsingFile}
+                    onClick={handleUploadButtonClick}
+                  >
+                    다른 명단 업로드
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+
           <section
             aria-labelledby='excel-preview-heading'
             className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
@@ -365,7 +476,11 @@ export default function ExcelPointUploadPage() {
                     {PREVIEW_TABLE_HEADERS.map((header) => (
                       <Table.Head
                         key={header}
-                        className='h-11 px-3 text-center text-xs font-semibold text-slate-950'
+                        className={`h-11 px-3 text-center text-xs font-semibold text-slate-950 ${
+                          header === '삭제'
+                            ? 'sticky right-0 z-[2] bg-slate-50'
+                            : ''
+                        }`}
                       >
                         {header}
                       </Table.Head>
@@ -400,6 +515,21 @@ export default function ExcelPointUploadPage() {
                         </Table.Cell>
                         <Table.Cell className='max-w-[min(14rem,35vw)] px-3 py-3 text-center text-xs text-gray-700'>
                           {row.memo || '—'}
+                        </Table.Cell>
+                        <Table.Cell className='sticky right-0 bg-white px-3 py-3 text-center'>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='sm'
+                            className='text-red-600 hover:bg-red-50 hover:text-red-700'
+                            disabled={isSubmitting}
+                            onClick={() =>
+                              handleRemovePreviewRow(row.rowNumber)
+                            }
+                          >
+                            <Trash2 className='size-4' aria-hidden />
+                            {/* 삭제 */}
+                          </Button>
                         </Table.Cell>
                       </Table.Row>
                     ))
@@ -452,81 +582,6 @@ export default function ExcelPointUploadPage() {
             </div>
           ) : null}
 
-          <div className='flex flex-col gap-3'>
-            <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
-            <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
-              <RadioGroup
-                value={paymentTiming}
-                onValueChange={handlePaymentTimingChange}
-                className='flex flex-row gap-4'
-              >
-                <div className='flex items-center gap-2'>
-                  <RadioGroup.Item value='immediate' id='immediate' />
-                  <Label
-                    htmlFor='immediate'
-                    className='cursor-pointer font-normal'
-                  >
-                    즉시 지급
-                  </Label>
-                </div>
-                {/* <div className='flex items-center gap-2'>
-                <RadioGroup.Item value='reservation' id='reservation' />
-                <Label
-                  htmlFor='reservation'
-                  className='cursor-pointer font-normal'
-                >
-                  예약 지급
-                </Label>
-              </div> */}
-              </RadioGroup>
-
-              {paymentTiming === 'reservation' ? (
-                <DateTimePicker
-                  label='예약 일시'
-                  date={reservationAt.date}
-                  time={reservationAt.time}
-                  onDateSelect={reservationAt.onDateSelect}
-                  onTimeChange={reservationAt.onTimeChange}
-                  datePlaceholder='예약 날짜 선택'
-                  required
-                  className='max-w-2xl'
-                />
-              ) : null}
-
-              <div className='flex flex-wrap items-center gap-2'>
-                <Button
-                  type='button'
-                  className='w-fit'
-                  disabled={
-                    isSubmitting ||
-                    isParsingFile ||
-                    !uploadedFile ||
-                    previewRows.length === 0 ||
-                    uploadResult !== null
-                  }
-                  title={
-                    uploadResult !== null
-                      ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
-                      : undefined
-                  }
-                  onClick={handleSubmit}
-                >
-                  {isSubmitting ? '처리 중…' : '지급 실행'}
-                </Button>
-                {uploadedFile && uploadResult !== null ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    className='w-fit'
-                    disabled={isSubmitting || isParsingFile}
-                    onClick={handleUploadButtonClick}
-                  >
-                    다른 명단 업로드
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          </div>
           <div className='flex flex-col gap-3'>
             {uploadResult ? (
               <>
