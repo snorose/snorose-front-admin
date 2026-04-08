@@ -34,7 +34,6 @@ export default function PostList({
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
   const selectAllRef = useRef<HTMLInputElement>(null);
 
-  //TODO: API 연동 후 클라이언트에서 필터링 제거
   const filtered = useMemo(() => {
     if (!data) return [];
     return data?.filter((post) => {

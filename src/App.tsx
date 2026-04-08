@@ -10,14 +10,13 @@ import { AuthProvider } from '@/shared/contexts';
 import {
   AdjustAllMemberPointPage,
   AdjustSinglePointPage,
-  CommentPage,
   ExamReviewPage,
   ExcelPointUploadPage,
   LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
   PointFreezePage,
-  PostPage,
+  PostCommentPage,
   PushNotificationPage,
 } from '@/pages';
 
@@ -80,10 +79,9 @@ function App() {
                               path={PATHS.POINT_UPLOAD_EXCEL}
                               element={<ExcelPointUploadPage />}
                             />
-                            <Route path={PATHS.POSTS} element={<PostPage />} />
                             <Route
                               path={PATHS.POST_COMMENTS}
-                              element={<CommentPage />}
+                              element={<PostCommentPage />}
                             />
                             <Route
                               path={PATHS.ALERTS}
