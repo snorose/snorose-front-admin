@@ -4,7 +4,7 @@ import CommentList from '@/domains/Comments/components/CommentList';
 import PostList from '@/domains/Comments/components/PostList';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
-export default function CommentPage() {
+export default function PostCommentPage() {
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
 
   const handleSelectPost = (post: AdminGetPostResponse | null) => {
