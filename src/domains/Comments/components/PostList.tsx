@@ -26,7 +26,9 @@ export default function PostList({
 
   const categories = useMemo(() => {
     if (!data) return [];
-    return [...new Set(data.map((p) => p.category).filter(Boolean))] as string[];
+    return [
+      ...new Set(data.map((p) => p.category).filter(Boolean)),
+    ] as string[];
   }, [data]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
