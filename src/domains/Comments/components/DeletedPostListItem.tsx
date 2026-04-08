@@ -1,9 +1,9 @@
 import { Badge } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
-import { useDeletedPost } from '../hooks/useDeletedPost';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
+import { useDeletedPost } from '../hooks/useDeletedPost';
 import styles from './PostListItem.module.css';
 
 interface DeletedPostListItemProps {
@@ -17,7 +17,9 @@ export default function DeletedPostListItem({
   isSelected,
   onClick,
 }: DeletedPostListItemProps) {
-  const { data: detail, isLoading } = useDeletedPost(isSelected ? post.postId : null);
+  const { data: detail, isLoading } = useDeletedPost(
+    isSelected ? post.postId : null
+  );
 
   const linkifyContent = (html: string) =>
     html.replace(

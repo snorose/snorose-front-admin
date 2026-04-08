@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import DeletedPostList from '@/domains/Comments/components/DeletedPostList';
 import { PageHeader } from '@/shared/components';
+
+import DeletedPostList from '@/domains/Comments/components/DeletedPostList';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 export default function TrashPage() {
