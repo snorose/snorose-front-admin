@@ -1,8 +1,11 @@
 import { Trash2 } from 'lucide-react';
 
+import styles from './PostListItem.module.css';
+
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
+import { usePost } from '@/domains/Comments/hooks/usePost';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 interface PostListItemProps {
@@ -22,6 +25,14 @@ export default function PostListItem({
   onClick,
   onDelete,
 }: PostListItemProps) {
+  const { data: detail, isLoading } = usePost(isSelected ? post.postId : null);
+
+  const linkifyContent = (html: string) =>
+    html.replace(
+      /(?<!['"=])(https?:\/\/[^\s<"']+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+    );
+
   return (
     <div
       className={cn(
@@ -38,7 +49,7 @@ export default function PostListItem({
       <button
         type='button'
         onClick={() => onClick(post)}
-        className='flex flex-1 flex-col gap-1 text-left'
+        className='flex min-w-0 flex-1 flex-col gap-1 text-left'
       >
         <div className='flex items-center gap-2'>
           <span className='text-sm font-medium'>{post.userDisplay}</span>
@@ -54,12 +65,26 @@ export default function PostListItem({
               신고됨
             </Badge>
           )}
+          <span className='ml-auto text-xs text-gray-400'>댓글 {post.commentCount}</span>
         </div>
         {/* 선택 시 전체 텍스트 표시, 미선택 시 한 줄로 잘림 */}
-        <p className={cn('text-sm text-gray-700', !isSelected && 'line-clamp-1')}>
+        <p
+          className={cn('text-sm text-gray-700', !isSelected && 'line-clamp-1')}
+        >
           {post.title}
         </p>
-        <span className='text-xs text-gray-500'>댓글 {post.commentCount}</span>
+        {isSelected && (
+          <div className='mt-1 w-full text-sm text-gray-600'>
+            {isLoading ? (
+              <span className='text-xs text-gray-400'>불러오는 중...</span>
+            ) : (
+              <div
+                className={styles.postContent}
+                dangerouslySetInnerHTML={{ __html: linkifyContent(detail?.content ?? '') }}
+              />
+            )}
+          </div>
+        )}
       </button>
       <Button
         type='button'
