@@ -71,9 +71,14 @@ export default function DeletedPostListItem({
               <span>조회 {post.viewCount}</span>
               <span>좋아요 {post.likeCount}</span>
               <span>스크랩 {post.scrapCount}</span>
-              <span>작성 {formatDateTimeToMinutes(post.createdAt).replace('T', ' ')}</span>
+              <span>
+                작성 {formatDateTimeToMinutes(post.createdAt).replace('T', ' ')}
+              </span>
               {post.deletedAt && (
-                <span>삭제 {formatDateTimeToMinutes(post.deletedAt).replace('T', ' ')}</span>
+                <span>
+                  삭제{' '}
+                  {formatDateTimeToMinutes(post.deletedAt).replace('T', ' ')}
+                </span>
               )}
             </div>
           </div>
