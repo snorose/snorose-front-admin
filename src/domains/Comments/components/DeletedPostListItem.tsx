@@ -1,9 +1,9 @@
 import { Badge } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
-import { useDeletedPost } from '../hooks/useDeletedPost';
 import styles from './PostListItem.module.css';
 
 interface DeletedPostListItemProps {
@@ -17,10 +17,6 @@ export default function DeletedPostListItem({
   isSelected,
   onClick,
 }: DeletedPostListItemProps) {
-  const { data: detail, isLoading } = useDeletedPost(
-    isSelected ? post.postId : null
-  );
-
   const linkifyContent = (html: string) =>
     html.replace(
       /(?<!['"=])(https?:\/\/[^\s<"']+)/g,
@@ -65,16 +61,21 @@ export default function DeletedPostListItem({
         </p>
         {isSelected && (
           <div className='mt-1 w-full text-sm text-gray-600'>
-            {isLoading ? (
-              <span className='text-xs text-gray-400'>불러오는 중...</span>
-            ) : (
-              <div
-                className={styles.postContent}
-                dangerouslySetInnerHTML={{
-                  __html: linkifyContent(detail?.content ?? ''),
-                }}
-              />
-            )}
+            <div
+              className={styles.postContent}
+              dangerouslySetInnerHTML={{
+                __html: linkifyContent(post.content),
+              }}
+            />
+            <div className='mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500'>
+              <span>조회 {post.viewCount}</span>
+              <span>좋아요 {post.likeCount}</span>
+              <span>스크랩 {post.scrapCount}</span>
+              <span>작성 {formatDateTimeToMinutes(post.createdAt).replace('T', ' ')}</span>
+              {post.deletedAt && (
+                <span>삭제 {formatDateTimeToMinutes(post.deletedAt).replace('T', ' ')}</span>
+              )}
+            </div>
           </div>
         )}
       </button>

@@ -3,7 +3,6 @@ import { Trash2 } from 'lucide-react';
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
-import { usePost } from '@/domains/Comments/hooks/usePost';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 import styles from './PostListItem.module.css';
@@ -25,8 +24,6 @@ export default function PostListItem({
   onClick,
   onDelete,
 }: PostListItemProps) {
-  const { data: detail, isLoading } = usePost(isSelected ? post.postId : null);
-
   const linkifyContent = (html: string) =>
     html.replace(
       /(?<!['"=])(https?:\/\/[^\s<"']+)/g,
@@ -77,16 +74,12 @@ export default function PostListItem({
         </p>
         {isSelected && (
           <div className='mt-1 w-full text-sm text-gray-600'>
-            {isLoading ? (
-              <span className='text-xs text-gray-400'>불러오는 중...</span>
-            ) : (
-              <div
-                className={styles.postContent}
-                dangerouslySetInnerHTML={{
-                  __html: linkifyContent(detail?.content ?? ''),
-                }}
-              />
-            )}
+            <div
+              className={styles.postContent}
+              dangerouslySetInnerHTML={{
+                __html: linkifyContent(post.content),
+              }}
+            />
           </div>
         )}
       </button>

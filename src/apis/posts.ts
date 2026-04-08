@@ -5,14 +5,6 @@ import type {
   AdminPostSearchRequest,
 } from '@/domains/Comments/types/post';
 
-// 게시글 단건 조회 api
-export const getPosts = async (
-  postId: number
-): Promise<AdminGetPostResponse> => {
-  const response = await axiosInstance.get(`/v1/admin/posts/${postId}`);
-  return response.data.result;
-};
-
 // 삭제된 게시글 목록 조회 api
 export const getDeletedPosts = async (
   page: number
@@ -21,14 +13,6 @@ export const getDeletedPosts = async (
     params: { page },
   });
   return response.data.result.data;
-};
-
-// 삭제된 게시글 단건 조회 api
-export const getDeletedPost = async (
-  postId: number
-): Promise<AdminGetPostResponse> => {
-  const response = await axiosInstance.get(`/v1/admin/posts/deleted/${postId}`);
-  return response.data.result;
 };
 
 // 게시글 조건 조회 api
