@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PageHeader } from '@/shared/components';
 import { Input, Select } from '@/shared/components/ui';
 
-import { MOCK_BOARDS } from '@/domains/Comments/mocks/posts';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 import { usePostList } from '../hooks/usePostList';
@@ -20,12 +19,15 @@ export default function PostList({
   selectedPostId,
   onSelectPost,
 }: PostListProps) {
-  const [board, setBoard] = useState('전체');
-  const { data } = usePostList({
-    boardId: board === '전체' ? null : Number(board),
-  });
+  const [category, setCategory] = useState('전체');
+  const { data } = usePostList({ boardId: null });
   const [keyword, setKeyword] = useState('');
   const [reportFilter, setReportFilter] = useState('전체');
+
+  const categories = useMemo(() => {
+    if (!data) return [];
+    return [...new Set(data.map((p) => p.category).filter(Boolean))] as string[];
+  }, [data]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
   const selectAllRef = useRef<HTMLInputElement>(null);
@@ -39,11 +41,11 @@ export default function PostList({
         post.title.includes(keyword) ||
         post.userDisplay?.includes(keyword) ||
         String(post.postId).includes(keyword);
-      const matchesBoard = board === '전체' || board === String(post.boardId);
+      const matchesCategory = category === '전체' || post.category === category;
       const matchesReport = reportFilter === '전체' || post.reportCount > 0;
-      return matchesKeyword && matchesBoard && matchesReport;
+      return matchesKeyword && matchesCategory && matchesReport;
     });
-  }, [data, keyword, board, reportFilter, deletedIds]);
+  }, [data, keyword, category, reportFilter, deletedIds]);
 
   const allIds = filtered.map((p) => p.postId);
   const isAllSelected =
@@ -96,15 +98,15 @@ export default function PostList({
         onChange={(e) => setKeyword(e.target.value)}
       />
       <div className='flex gap-2'>
-        <Select value={board} onValueChange={setBoard}>
+        <Select value={category} onValueChange={setCategory}>
           <Select.Trigger className='flex-1 justify-between rounded-md border border-gray-200 bg-white px-3'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content>
             <Select.Item value='전체'>전체</Select.Item>
-            {MOCK_BOARDS.map((b) => (
-              <Select.Item key={b.boardId} value={String(b.boardId)}>
-                {b.boardName}
+            {categories.map((c) => (
+              <Select.Item key={c} value={c}>
+                {c}
               </Select.Item>
             ))}
           </Select.Content>

@@ -1,12 +1,12 @@
 import { Trash2 } from 'lucide-react';
 
-import styles from './PostListItem.module.css';
-
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 import { usePost } from '@/domains/Comments/hooks/usePost';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
+
+import styles from './PostListItem.module.css';
 
 interface PostListItemProps {
   post: AdminGetPostResponse;
@@ -65,7 +65,9 @@ export default function PostListItem({
               신고됨
             </Badge>
           )}
-          <span className='ml-auto text-xs text-gray-400'>댓글 {post.commentCount}</span>
+          <span className='ml-auto text-xs text-gray-400'>
+            댓글 {post.commentCount}
+          </span>
         </div>
         {/* 선택 시 전체 텍스트 표시, 미선택 시 한 줄로 잘림 */}
         <p
@@ -80,7 +82,9 @@ export default function PostListItem({
             ) : (
               <div
                 className={styles.postContent}
-                dangerouslySetInnerHTML={{ __html: linkifyContent(detail?.content ?? '') }}
+                dangerouslySetInnerHTML={{
+                  __html: linkifyContent(detail?.content ?? ''),
+                }}
               />
             )}
           </div>
