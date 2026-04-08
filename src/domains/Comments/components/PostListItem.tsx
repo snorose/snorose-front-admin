@@ -2,6 +2,7 @@ import { Trash2 } from 'lucide-react';
 
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
@@ -80,6 +81,14 @@ export default function PostListItem({
                 __html: linkifyContent(post.content),
               }}
             />
+            <div className='mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500'>
+              <span>조회 {post.viewCount}</span>
+              <span>좋아요 {post.likeCount}</span>
+              <span>스크랩 {post.scrapCount}</span>
+              <span>
+                작성 {formatDateTimeToMinutes(post.createdAt).replace('T', ' ')}
+              </span>
+            </div>
           </div>
         )}
       </button>
