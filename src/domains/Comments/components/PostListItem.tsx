@@ -55,7 +55,10 @@ export default function PostListItem({
             </Badge>
           )}
         </div>
-        <p className='line-clamp-1 text-sm text-gray-700'>{post.title}</p>
+        {/* 선택 시 전체 텍스트 표시, 미선택 시 한 줄로 잘림 */}
+        <p className={cn('text-sm text-gray-700', !isSelected && 'line-clamp-1')}>
+          {post.title}
+        </p>
         <span className='text-xs text-gray-500'>댓글 {post.commentCount}</span>
       </button>
       <Button

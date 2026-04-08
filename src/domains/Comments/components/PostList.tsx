@@ -4,9 +4,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PageHeader } from '@/shared/components';
 import { Input, Select } from '@/shared/components/ui';
 
-import { MOCK_BOARDS, MOCK_POSTS } from '@/domains/Comments/mocks/posts';
+import { MOCK_BOARDS } from '@/domains/Comments/mocks/posts';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
+import { usePostList } from '../hooks/usePostList';
 import BulkDeleteBar from './BulkDeleteBar';
 import PostListItem from './PostListItem';
 
@@ -19,8 +20,11 @@ export default function PostList({
   selectedPostId,
   onSelectPost,
 }: PostListProps) {
-  const [keyword, setKeyword] = useState('');
   const [board, setBoard] = useState('전체');
+  const { data } = usePostList({
+    boardId: board === '전체' ? null : Number(board),
+  });
+  const [keyword, setKeyword] = useState('');
   const [reportFilter, setReportFilter] = useState('전체');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
@@ -28,17 +32,18 @@ export default function PostList({
 
   //TODO: API 연동 후 클라이언트에서 필터링 제거
   const filtered = useMemo(() => {
-    return MOCK_POSTS.filter((post) => {
+    if (!data) return [];
+    return data?.filter((post) => {
       if (deletedIds.includes(post.postId)) return false;
       const matchesKeyword =
         post.title.includes(keyword) ||
-        post.userDisplay.includes(keyword) ||
+        post.userDisplay?.includes(keyword) ||
         String(post.postId).includes(keyword);
       const matchesBoard = board === '전체' || board === String(post.boardId);
       const matchesReport = reportFilter === '전체' || post.reportCount > 0;
       return matchesKeyword && matchesBoard && matchesReport;
     });
-  }, [keyword, board, reportFilter, deletedIds]);
+  }, [data, keyword, board, reportFilter, deletedIds]);
 
   const allIds = filtered.map((p) => p.postId);
   const isAllSelected =

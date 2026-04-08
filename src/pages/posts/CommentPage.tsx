@@ -5,19 +5,21 @@ import PostList from '@/domains/Comments/components/PostList';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
 export default function CommentPage() {
-  const [selectedPost, setSelectedPost] = useState<AdminGetPostResponse | null>(
-    null
-  );
+  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+  const handleSelectPost = (post: AdminGetPostResponse | null) => {
+    setSelectedPostId(post?.postId ?? null);
+  };
 
   return (
     <div className='grid w-full grid-cols-2 gap-6'>
       <PostList
-        selectedPostId={selectedPost?.postId ?? null}
-        onSelectPost={setSelectedPost}
+        selectedPostId={selectedPostId}
+        onSelectPost={handleSelectPost}
       />
       <CommentList
-        key={selectedPost?.postId ?? 'none'}
-        selectedPostId={selectedPost?.postId ?? null}
+        key={selectedPostId ?? 'none'}
+        selectedPostId={selectedPostId}
       />
     </div>
   );
