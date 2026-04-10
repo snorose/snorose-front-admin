@@ -46,6 +46,23 @@ export type UserBlacklistHistory = {
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
 };
 
+export type AdminUserListItem = {
+  encryptedUserId: string;
+  loginId: string;
+  userName: string;
+  nickname: string;
+  studentNumber: string;
+  major: string;
+  userRoleId: number;
+  userRoleName: string;
+  createdAt: string; // YYYY-MM-DD HH:MM:SS
+};
+
+export type AdminUserListResponse = {
+  hasNext: boolean;
+  data: AdminUserListItem[];
+};
+
 export type PenaltyUserInfo = {
   loginId: string;
   encryptedUserId: string;
