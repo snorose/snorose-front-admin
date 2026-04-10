@@ -44,12 +44,12 @@ export default function MemberInfoEditForm({
     const email = String(form.email ?? '').trim();
     const studentNumber = String(form.studentNumber ?? '').trim();
 
-    const userNameRegex = /^[A-Za-z가-힣]{2,30}$/;
+    const userNameRegex = /^[A-Za-z가-힣\s]{2,30}$/;
     const emailRegex = /^[A-Za-z0-9._%+-]+@(sookmyung\.ac\.kr|sm\.ac\.kr)$/i;
     const studentNumberRegex = /^[0-9]{7,10}$/;
 
     if (!userNameRegex.test(userName)) {
-      nextErrors.userName = '이름은 영문 또는 한글로 2 ~ 30자여야 합니다.';
+      nextErrors.userName = '이름은 영문, 한글 포함 2 ~ 30자여야 합니다.';
     }
 
     if (!emailRegex.test(email)) {

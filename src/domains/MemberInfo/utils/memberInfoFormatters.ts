@@ -7,12 +7,12 @@
 
 export const convertUserRoleIdToEnum = (userRoleId: number): string => {
   const userRoleIdMap: Record<number, string> = {
-    1: '준회원',
-    2: '정회원',
-    4: '리자',
-    5: '공식 계정',
-    6: '강등 회원',
-    7: '기업',
+    1: '정회원',
+    2: '준회원',
+    3: '리자',
+    4: '광고주',
+    5: '공식',
+    6: '강등자',
   };
 
   return userRoleIdMap[userRoleId] ?? String(userRoleId);

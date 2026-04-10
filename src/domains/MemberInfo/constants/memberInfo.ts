@@ -4,9 +4,9 @@ export const USER_ROLES = [
   { id: 1, name: '준회원' },
   { id: 2, name: '정회원' },
   { id: 4, name: '리자' },
-  { id: 5, name: '공식 계정' },
-  { id: 6, name: '강등 회원' },
-  { id: 7, name: '기업' },
+  { id: 5, name: '공식' },
+  { id: 6, name: '강등자' },
+  { id: 7, name: '광고주' },
 ];
 
 export const MEMBER_INFO: { label: string; key: keyof MemberInfo }[] = [
