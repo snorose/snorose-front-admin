@@ -1,6 +1,10 @@
 export { default as BlacklistHistoryTab } from './components/BlacklistHistoryTab';
 export { default as DemotionPenaltyTab } from './components/DemotionPenaltyTab';
 export { default as DownloadedExamReviewTab } from './components/DownloadedExamReviewTab';
+export { default as MemberDetailSection } from './components/MemberDetailSection';
+export { default as MemberDirectoryActionBar } from './components/MemberDirectoryActionBar';
+export { default as MemberDirectoryPagination } from './components/MemberDirectoryPagination';
+export { default as MemberDirectorySection } from './components/MemberDirectorySection';
 export { default as MemberInfoEditForm } from './components/MemberInfoEditForm';
 export { default as MemberInfoView } from './components/MemberInfoView';
 export { default as PenaltyUserInfoView } from './components/PenaltyUserInfoView';
