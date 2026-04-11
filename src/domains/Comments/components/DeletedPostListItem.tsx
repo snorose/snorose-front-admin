@@ -13,18 +13,16 @@ interface DeletedPostListItemProps {
   isSelected: boolean;
   onClick: (post: AdminGetPostResponse) => void;
 }
-
+const linkifyContent = (html: string) =>
+  html.replace(
+    /(?<!['"=])(https?:\/\/[^\s<"']+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
 export default function DeletedPostListItem({
   post,
   isSelected,
   onClick,
 }: DeletedPostListItemProps) {
-  const linkifyContent = (html: string) =>
-    html.replace(
-      /(?<!['"=])(https?:\/\/[^\s<"']+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-    );
-
   return (
     <div
       className={cn(
