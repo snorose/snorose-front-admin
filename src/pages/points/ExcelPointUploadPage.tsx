@@ -1,6 +1,12 @@
 import { useRef, useState } from 'react';
 
-import { AlertTriangle, CheckCircle2, Download, Megaphone } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Download,
+  Info,
+  Megaphone,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
@@ -13,8 +19,10 @@ import {
   RadioGroup,
   Table,
   Textarea,
+  Tooltip,
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
+import { cn } from '@/shared/lib';
 import type {
   ExcelPointBulkNotProcessedRow,
   ExcelPointBulkRewardResult,
@@ -225,6 +233,45 @@ function formatRowFailureReason(reason: string): string {
   return ROW_FAILURE_REASON_LABELS[reason] ?? reason;
 }
 
+const ROW_NUMBER_TOOLTIP_TEXT =
+  '1행은 제목 행이며, 데이터는 2행부터 시작합니다.';
+
+function RowNumberColumnHead({ variant }: { variant: 'preview' | 'failure' }) {
+  const isFailure = variant === 'failure';
+
+  return (
+    <Table.Head
+      className={cn(
+        'h-11 px-3 text-center text-xs font-semibold',
+        isFailure ? 'text-amber-950' : 'text-slate-950'
+      )}
+    >
+      <div className='flex items-center justify-center gap-1'>
+        <span>행 번호</span>
+        <Tooltip>
+          <Tooltip.Trigger asChild>
+            <button
+              type='button'
+              className={cn(
+                '-m-0.5 inline-flex shrink-0 rounded-full p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
+                isFailure
+                  ? 'text-amber-700/90 hover:text-amber-950 focus-visible:ring-amber-400'
+                  : 'text-slate-500 hover:text-slate-800 focus-visible:ring-slate-400'
+              )}
+              aria-label='행 번호 안내'
+            >
+              <Info className='size-3.5' aria-hidden />
+            </button>
+          </Tooltip.Trigger>
+          <Tooltip.Content side='top' sideOffset={4}>
+            {ROW_NUMBER_TOOLTIP_TEXT}
+          </Tooltip.Content>
+        </Tooltip>
+      </div>
+    </Table.Head>
+  );
+}
+
 export default function ExcelPointUploadPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -370,177 +417,183 @@ export default function ExcelPointUploadPage() {
   };
 
   return (
-    <div className='flex w-full flex-col gap-6'>
-      <PageHeader
-        title='엑셀 업로드 지급'
-        description='엑셀 파일을 업로드하면 학번을 기준으로 회원을 매칭하여 포인트를 일괄 지급합니다.'
-      />
+    <Tooltip.Provider delayDuration={200}>
+      <div className='flex w-full flex-col gap-6'>
+        <PageHeader
+          title='엑셀 업로드 지급'
+          description='엑셀 파일을 업로드하면 학번을 기준으로 회원을 매칭하여 포인트를 일괄 지급합니다.'
+        />
 
-      <Alert>
-        <Megaphone />
-        <Alert.Title>안내 사항</Alert.Title>
-        <Alert.Description>
-          <ul className='list-inside list-disc text-sm'>
-            <li>
-              포인트 지급 템플릿 파일을 다운로드하여 형식에 맞게 작성해 주세요.
-            </li>
-            <li>
-              처리되지 않은 회원은 다시 조회할 수 없으므로, 사유를 즉시 확인하신
-              후 해당 회원만 별도로 업로드해 주세요.
-            </li>
-            <li>
-              미리보기와 결과에 표시되는 행 번호는 엑셀 기준{' '}
-              <strong>2번 행부터</strong>입니다. 1번 행은 제목 줄입니다.
-            </li>
-          </ul>
-        </Alert.Description>
-      </Alert>
+        <Alert>
+          <Megaphone />
+          <Alert.Title>안내 사항</Alert.Title>
+          <Alert.Description>
+            <ul className='list-inside list-disc text-sm'>
+              <li>
+                포인트 지급 템플릿 파일을 다운로드하여 형식에 맞게 작성해
+                주세요.
+              </li>
+              <li>
+                처리되지 않은 회원은 다시 조회할 수 없으므로, 사유를 즉시
+                확인하신 후 해당 회원만 별도로 업로드해 주세요.
+              </li>
+              <li>
+                미리보기와 결과에 표시되는 행 번호는 엑셀 기준{' '}
+                <strong>2번 행부터</strong>입니다. 1번 행은 제목 줄입니다.
+              </li>
+            </ul>
+          </Alert.Description>
+        </Alert>
 
-      <section className='flex flex-col gap-6'>
-        <div className='flex flex-col gap-2'>
-          <h2 className='text-foreground text-lg font-bold'>
-            엑셀 파일 업로드
-          </h2>
-          <div className='flex items-center gap-2'>
-            <InputGroup>
-              <InputGroup.Button
+        <section className='flex flex-col gap-6'>
+          <div className='flex flex-col gap-2'>
+            <h2 className='text-foreground text-lg font-bold'>
+              엑셀 파일 업로드
+            </h2>
+            <div className='flex items-center gap-2'>
+              <InputGroup>
+                <InputGroup.Button
+                  type='button'
+                  variant='outline'
+                  className='mx-1'
+                  disabled={isSubmitting || isParsingFile}
+                  onClick={handleUploadButtonClick}
+                >
+                  {isParsingFile ? '불러오는 중…' : '명단 업로드'}
+                </InputGroup.Button>
+                <p className='text-sm text-gray-500'>
+                  {uploadedFile?.name ?? '선택된 파일이 없습니다.'}
+                </p>
+                <input
+                  ref={fileInputRef}
+                  id='excel-point-file'
+                  type='file'
+                  accept='.xlsx,.xls,.csv'
+                  className='hidden'
+                  onChange={handleFileChange}
+                  tabIndex={-1}
+                  aria-hidden
+                />
+              </InputGroup>
+              <Button
                 type='button'
                 variant='outline'
-                className='mx-1'
                 disabled={isSubmitting || isParsingFile}
-                onClick={handleUploadButtonClick}
+                onClick={handleTemplateDownload}
               >
-                {isParsingFile ? '불러오는 중…' : '명단 업로드'}
-              </InputGroup.Button>
-              <p className='text-sm text-gray-500'>
-                {uploadedFile?.name ?? '선택된 파일이 없습니다.'}
-              </p>
-              <input
-                ref={fileInputRef}
-                id='excel-point-file'
-                type='file'
-                accept='.xlsx,.xls,.csv'
-                className='hidden'
-                onChange={handleFileChange}
-                tabIndex={-1}
-                aria-hidden
-              />
-            </InputGroup>
-            <Button
-              type='button'
-              variant='outline'
-              disabled={isSubmitting || isParsingFile}
-              onClick={handleTemplateDownload}
-            >
-              템플릿 다운로드
-            </Button>
-          </div>
-          <p className='text-sm text-gray-600'>
-            엑셀 파일에는 이름, 학번, 카테고리, 포인트, 메모 컬럼이 반드시
-            포함되어야 합니다.
-          </p>
-        </div>
-
-        <div className='flex flex-col gap-4'>
-          <section
-            aria-labelledby='excel-preview-heading'
-            className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
-          >
-            <div className='flex flex-col gap-0.5 border-b border-slate-100 bg-slate-50/90 px-4 py-3'>
-              <div className='flex items-center gap-2'>
-                <h3
-                  id='excel-preview-heading'
-                  className='text-sm font-semibold text-slate-950'
-                >
-                  업로드 명단 미리보기{' '}
-                  {previewRows.length > 0 ? (
-                    <span className='font-semibold text-slate-950'>
-                      ({previewRows.length}명)
-                    </span>
-                  ) : null}
-                </h3>
-              </div>
-              <p className='text-xs text-slate-600'>
-                엑셀 업로드 후 실제 지급 전에 표에서 입력값을 먼저 확인합니다.
-              </p>
+                템플릿 다운로드
+              </Button>
             </div>
-            <div className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}>
-              <table className='w-full caption-bottom text-sm'>
-                <Table.Header className='sticky top-0 z-10 border-b border-slate-100 bg-slate-50 shadow-xs'>
-                  <Table.Row className='hover:bg-slate-50/40'>
-                    {PREVIEW_TABLE_HEADERS.map((header) => (
-                      <Table.Head
-                        key={header}
-                        className='h-11 px-3 text-center text-xs font-semibold text-slate-950'
-                      >
-                        {header}
-                      </Table.Head>
-                    ))}
-                  </Table.Row>
-                </Table.Header>
+            <p className='text-sm text-gray-600'>
+              엑셀 파일에는 이름, 학번, 카테고리, 포인트, 메모 컬럼이 반드시
+              포함되어야 합니다.
+            </p>
+          </div>
 
-                <Table.Body>
-                  {previewRows.length > 0 ? (
-                    previewRows.map((row, index) => (
-                      <Table.Row
-                        key={`${row.rowNumber}-${row.studentNumber}-${index}`}
-                        className='hover:bg-slate-50/20'
-                      >
-                        <Table.Cell className='px-3 py-3 text-center text-sm'>
-                          {row.rowNumber}
-                        </Table.Cell>
-                        <Table.Cell className='px-3 py-3 text-center text-sm'>
-                          {row.userName || '—'}
-                        </Table.Cell>
-                        <Table.Cell className='px-3 py-3 text-center text-sm'>
-                          {row.studentNumber || '—'}
-                        </Table.Cell>
-                        <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
-                          {row.difference || '—'}
-                        </Table.Cell>
-                        <Table.Cell className='px-3 py-3 text-center text-sm'>
-                          {row.category || '—'}
-                        </Table.Cell>
-                        <Table.Cell className='max-w-[min(14rem,35vw)] px-3 py-3 text-center text-xs text-gray-700'>
-                          {row.memo || '—'}
+          <div className='flex flex-col gap-4'>
+            <section
+              aria-labelledby='excel-preview-heading'
+              className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
+            >
+              <div className='flex flex-col gap-0.5 border-b border-slate-100 bg-slate-50/90 px-4 py-3'>
+                <div className='flex items-center gap-2'>
+                  <h3
+                    id='excel-preview-heading'
+                    className='text-sm font-semibold text-slate-950'
+                  >
+                    업로드 명단 미리보기{' '}
+                    {previewRows.length > 0 ? (
+                      <span className='font-semibold text-slate-950'>
+                        ({previewRows.length}명)
+                      </span>
+                    ) : null}
+                  </h3>
+                </div>
+                <p className='text-xs text-slate-600'>
+                  엑셀 업로드 후 실제 지급 전에 표에서 입력값을 먼저 확인합니다.
+                </p>
+              </div>
+              <div className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}>
+                <table className='w-full caption-bottom text-sm'>
+                  <Table.Header className='sticky top-0 z-10 border-b border-slate-100 bg-slate-50 shadow-xs'>
+                    <Table.Row className='hover:bg-slate-50/40'>
+                      {PREVIEW_TABLE_HEADERS.map((header) =>
+                        header === '행 번호' ? (
+                          <RowNumberColumnHead key={header} variant='preview' />
+                        ) : (
+                          <Table.Head
+                            key={header}
+                            className='h-11 px-3 text-center text-xs font-semibold text-slate-950'
+                          >
+                            {header}
+                          </Table.Head>
+                        )
+                      )}
+                    </Table.Row>
+                  </Table.Header>
+
+                  <Table.Body>
+                    {previewRows.length > 0 ? (
+                      previewRows.map((row, index) => (
+                        <Table.Row
+                          key={`${row.rowNumber}-${row.studentNumber}-${index}`}
+                          className='hover:bg-slate-50/20'
+                        >
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.rowNumber}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.userName || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.studentNumber || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
+                            {row.difference || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
+                            {row.category || '—'}
+                          </Table.Cell>
+                          <Table.Cell className='max-w-[min(14rem,35vw)] px-3 py-3 text-center text-xs text-gray-700'>
+                            {row.memo || '—'}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))
+                    ) : (
+                      <Table.Row className='hover:bg-white'>
+                        <Table.Cell
+                          colSpan={PREVIEW_TABLE_HEADERS.length}
+                          className='h-24 text-center text-sm text-gray-400'
+                        >
+                          {isParsingFile
+                            ? '엑셀 내용을 불러오는 중입니다.'
+                            : '명단 업로드 후 미리보기 표가 여기에 표시됩니다.'}
                         </Table.Cell>
                       </Table.Row>
-                    ))
-                  ) : (
-                    <Table.Row className='hover:bg-white'>
-                      <Table.Cell
-                        colSpan={PREVIEW_TABLE_HEADERS.length}
-                        className='h-24 text-center text-sm text-gray-400'
-                      >
-                        {isParsingFile
-                          ? '엑셀 내용을 불러오는 중입니다.'
-                          : '명단 업로드 후 미리보기 표가 여기에 표시됩니다.'}
-                      </Table.Cell>
-                    </Table.Row>
-                  )}
-                </Table.Body>
-              </table>
-            </div>
-          </section>
+                    )}
+                  </Table.Body>
+                </table>
+              </div>
+            </section>
 
-          <div className='flex flex-col gap-3'>
-            <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
-            <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
-              <RadioGroup
-                value={paymentTiming}
-                onValueChange={handlePaymentTimingChange}
-                className='flex flex-row gap-4'
-              >
-                <div className='flex items-center gap-2'>
-                  <RadioGroup.Item value='immediate' id='immediate' />
-                  <Label
-                    htmlFor='immediate'
-                    className='cursor-pointer font-normal'
-                  >
-                    즉시 지급
-                  </Label>
-                </div>
-                {/* <div className='flex items-center gap-2'>
+            <div className='flex flex-col gap-3'>
+              <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
+              <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+                <RadioGroup
+                  value={paymentTiming}
+                  onValueChange={handlePaymentTimingChange}
+                  className='flex flex-row gap-4'
+                >
+                  <div className='flex items-center gap-2'>
+                    <RadioGroup.Item value='immediate' id='immediate' />
+                    <Label
+                      htmlFor='immediate'
+                      className='cursor-pointer font-normal'
+                    >
+                      즉시 지급
+                    </Label>
+                  </div>
+                  {/* <div className='flex items-center gap-2'>
                 <RadioGroup.Item value='reservation' id='reservation' />
                 <Label
                   htmlFor='reservation'
@@ -549,309 +602,321 @@ export default function ExcelPointUploadPage() {
                   예약 지급
                 </Label>
               </div> */}
-              </RadioGroup>
+                </RadioGroup>
 
-              {paymentTiming === 'reservation' ? (
-                <DateTimePicker
-                  label='예약 일시'
-                  date={reservationAt.date}
-                  time={reservationAt.time}
-                  onDateSelect={reservationAt.onDateSelect}
-                  onTimeChange={reservationAt.onTimeChange}
-                  datePlaceholder='예약 날짜 선택'
-                  required
-                  className='max-w-2xl'
-                />
-              ) : null}
+                {paymentTiming === 'reservation' ? (
+                  <DateTimePicker
+                    label='예약 일시'
+                    date={reservationAt.date}
+                    time={reservationAt.time}
+                    onDateSelect={reservationAt.onDateSelect}
+                    onTimeChange={reservationAt.onTimeChange}
+                    datePlaceholder='예약 날짜 선택'
+                    required
+                    className='max-w-2xl'
+                  />
+                ) : null}
 
-              <div className='flex flex-col gap-2'>
-                <Label htmlFor='excel-bulk-memo'>총괄 메모</Label>
-                <Textarea
-                  id='excel-bulk-memo'
-                  value={bulkMemo}
-                  onChange={(e) => setBulkMemo(e.target.value)}
-                  placeholder='지급 요청에 공통으로 남길 메모를 입력해 주세요.'
-                  disabled={isSubmitting}
-                  className='min-h-28 resize-y'
-                />
-              </div>
+                <div className='flex flex-col gap-2'>
+                  <Label htmlFor='excel-bulk-memo'>총괄 메모</Label>
+                  <Textarea
+                    id='excel-bulk-memo'
+                    value={bulkMemo}
+                    onChange={(e) => setBulkMemo(e.target.value)}
+                    placeholder='지급 요청에 공통으로 남길 메모를 입력해 주세요.'
+                    disabled={isSubmitting}
+                    className='min-h-28 resize-y'
+                  />
+                </div>
 
-              <div className='flex flex-wrap items-center gap-2'>
-                <Button
-                  type='button'
-                  className='w-fit'
-                  disabled={
-                    isSubmitting ||
-                    isParsingFile ||
-                    !uploadedFile ||
-                    previewRows.length === 0 ||
-                    uploadResult !== null
-                  }
-                  title={
-                    uploadResult !== null
-                      ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
-                      : undefined
-                  }
-                  onClick={handleSubmit}
-                >
-                  {isSubmitting ? '처리 중…' : '지급 실행'}
-                </Button>
-                {uploadedFile && uploadResult !== null ? (
+                <div className='flex flex-wrap items-center gap-2'>
                   <Button
                     type='button'
-                    variant='outline'
                     className='w-fit'
-                    disabled={isSubmitting || isParsingFile}
-                    onClick={handleUploadButtonClick}
+                    disabled={
+                      isSubmitting ||
+                      isParsingFile ||
+                      !uploadedFile ||
+                      previewRows.length === 0 ||
+                      uploadResult !== null
+                    }
+                    title={
+                      uploadResult !== null
+                        ? '다른 명단을 업로드하면 다시 지급할 수 있어요.'
+                        : undefined
+                    }
+                    onClick={handleSubmit}
                   >
-                    다른 명단 업로드
+                    {isSubmitting ? '처리 중…' : '지급 실행'}
                   </Button>
-                ) : null}
+                  {uploadedFile && uploadResult !== null ? (
+                    <Button
+                      type='button'
+                      variant='outline'
+                      className='w-fit'
+                      disabled={isSubmitting || isParsingFile}
+                      onClick={handleUploadButtonClick}
+                    >
+                      다른 명단 업로드
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
 
-          {uploadResult ? (
-            <div className='rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 shadow-xs sm:px-5'>
-              <p className='flex flex-nowrap items-center gap-x-2 overflow-x-auto text-sm sm:gap-x-3'>
-                <span className='shrink-0 font-semibold'>처리 결과 요약</span>
-                <span>·</span>
-                <span className='shrink-0'>
-                  업로드한 회원{' '}
-                  <span className='font-semibold text-blue-600 tabular-nums'>
-                    {uploadResult.requestedCount}
-                  </span>
-                  명
-                </span>
-                <span>·</span>
-                <span className='shrink-0'>
-                  지급 성공{' '}
-                  <span className='font-semibold text-green-600 tabular-nums'>
-                    {uploadResult.successCount}
-                  </span>
-                  명
-                </span>
-                <span>·</span>
-                <span className='shrink-0'>
-                  실패{' '}
-                  <span className='font-semibold text-red-600 tabular-nums'>
-                    {uploadResult.failedCount}
-                  </span>
-                  명
-                </span>
-              </p>
-            </div>
-          ) : null}
-
-          <div className='flex flex-col gap-3'>
             {uploadResult ? (
-              <>
-                <h2 className='text-foreground text-lg font-bold'>지급 결과</h2>
-                <div className='flex flex-col gap-6'>
-                  <section
-                    aria-labelledby='excel-result-failure-heading'
-                    className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-white shadow-xs'
-                  >
-                    <div className='flex flex-col gap-2 border-b border-amber-100 bg-amber-50/90 px-4 py-3'>
-                      <div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
-                        <div className='min-w-0 flex-1'>
-                          <div className='flex items-center gap-2'>
-                            <AlertTriangle
-                              className='size-5 shrink-0 text-amber-600'
-                              aria-hidden
-                            />
-                            <h3
-                              id='excel-result-failure-heading'
-                              className='text-sm font-semibold text-amber-950'
-                            >
-                              처리되지 않음
-                              <span className='ml-1.5 font-normal text-amber-900/90 tabular-nums'>
-                                ({uploadResult.failedCount}명)
-                              </span>
-                            </h3>
-                          </div>
-                          <p className='pl-7 text-xs text-amber-900/80'>
-                            엑셀 행 단위로 지급에 실패한 경우입니다. 사유를
-                            확인해 주세요.
-                          </p>
-                        </div>
-                        {uploadResult &&
-                        uploadResult.notProcessedRows.length > 0 ? (
-                          <Button
-                            type='button'
-                            variant='outline'
-                            size='sm'
-                            className='shrink-0 border-amber-200 bg-white text-amber-950 hover:bg-amber-50'
-                            onClick={handleDownloadNotProcessedExcel}
-                          >
-                            <Download className='size-4' aria-hidden />
-                            미처리 명단 엑셀 저장
-                          </Button>
-                        ) : null}
-                      </div>
-                    </div>
-                    <div
-                      className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
-                    >
-                      <table className='w-full caption-bottom text-sm'>
-                        <Table.Header className='sticky top-0 z-10 border-b border-amber-100 bg-amber-50 shadow-xs'>
-                          <Table.Row className='hover:bg-amber-50/40'>
-                            {FAILURE_TABLE_HEADERS.map((header) => (
-                              <Table.Head
-                                key={header}
-                                className='h-11 px-3 text-center text-xs font-semibold text-amber-950'
-                              >
-                                {header}
-                              </Table.Head>
-                            ))}
-                          </Table.Row>
-                        </Table.Header>
+              <div className='rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 shadow-xs sm:px-5'>
+                <p className='flex flex-nowrap items-center gap-x-2 overflow-x-auto text-sm sm:gap-x-3'>
+                  <span className='shrink-0 font-semibold'>처리 결과 요약</span>
+                  <span>·</span>
+                  <span className='shrink-0'>
+                    업로드한 회원{' '}
+                    <span className='font-semibold text-blue-600 tabular-nums'>
+                      {uploadResult.requestedCount}
+                    </span>
+                    명
+                  </span>
+                  <span>·</span>
+                  <span className='shrink-0'>
+                    지급 성공{' '}
+                    <span className='font-semibold text-green-600 tabular-nums'>
+                      {uploadResult.successCount}
+                    </span>
+                    명
+                  </span>
+                  <span>·</span>
+                  <span className='shrink-0'>
+                    실패{' '}
+                    <span className='font-semibold text-red-600 tabular-nums'>
+                      {uploadResult.failedCount}
+                    </span>
+                    명
+                  </span>
+                </p>
+              </div>
+            ) : null}
 
-                        <Table.Body>
+            <div className='flex flex-col gap-3'>
+              {uploadResult ? (
+                <>
+                  <h2 className='text-foreground text-lg font-bold'>
+                    지급 결과
+                  </h2>
+                  <div className='flex flex-col gap-6'>
+                    <section
+                      aria-labelledby='excel-result-failure-heading'
+                      className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-white shadow-xs'
+                    >
+                      <div className='flex flex-col gap-2 border-b border-amber-100 bg-amber-50/90 px-4 py-3'>
+                        <div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
+                          <div className='min-w-0 flex-1'>
+                            <div className='flex items-center gap-2'>
+                              <AlertTriangle
+                                className='size-5 shrink-0 text-amber-600'
+                                aria-hidden
+                              />
+                              <h3
+                                id='excel-result-failure-heading'
+                                className='text-sm font-semibold text-amber-950'
+                              >
+                                처리되지 않음
+                                <span className='ml-1.5 font-normal text-amber-900/90 tabular-nums'>
+                                  ({uploadResult.failedCount}명)
+                                </span>
+                              </h3>
+                            </div>
+                            <p className='pl-7 text-xs text-amber-900/80'>
+                              엑셀 행 단위로 지급에 실패한 경우입니다. 사유를
+                              확인해 주세요.
+                            </p>
+                          </div>
                           {uploadResult &&
                           uploadResult.notProcessedRows.length > 0 ? (
-                            uploadResult.notProcessedRows.map((row, index) => (
-                              <Table.Row
-                                key={`${row.rowNumber}-${row.reason}-${index}`}
-                                className='hover:bg-amber-50/20'
-                              >
-                                <Table.Cell className='px-3 py-3 text-center text-sm'>
-                                  {row.rowNumber}
-                                </Table.Cell>
-                                <Table.Cell className='px-3 py-3 text-center text-sm'>
-                                  {row.userName || '—'}
-                                </Table.Cell>
-                                <Table.Cell className='px-3 py-3 text-center text-sm'>
-                                  {row.loginId ?? '—'}
-                                </Table.Cell>
-                                <Table.Cell className='px-3 py-3 text-center text-sm'>
-                                  {row.studentNumber || '—'}
-                                </Table.Cell>
-                                <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
-                                  {row.difference}
-                                </Table.Cell>
-                                <Table.Cell className='px-3 py-3 text-center text-sm'>
-                                  {row.category}
-                                </Table.Cell>
-                                <Table.Cell className='max-w-[min(12rem,30vw)] px-3 py-3 text-center text-xs text-gray-700'>
-                                  {row.memo || '—'}
-                                </Table.Cell>
-                                <Table.Cell className='px-3 py-3 text-center text-sm'>
-                                  {row.reason}
-                                </Table.Cell>
-                                <Table.Cell className='max-w-[min(24rem,45vw)] min-w-64 px-3 py-3 text-left text-xs break-words whitespace-normal text-gray-600'>
-                                  {formatRowFailureReason(row.reason)}
-                                </Table.Cell>
-                              </Table.Row>
-                            ))
-                          ) : (
-                            <Table.Row className='hover:bg-white'>
-                              <Table.Cell
-                                colSpan={FAILURE_TABLE_HEADERS.length}
-                                className='h-24 text-center text-sm text-gray-400'
-                              >
-                                {uploadResult
-                                  ? '처리되지 않은 행이 없습니다.'
-                                  : '지급 실행 후 결과가 여기에 표시됩니다.'}
-                              </Table.Cell>
-                            </Table.Row>
-                          )}
-                        </Table.Body>
-                      </table>
-                    </div>
-                  </section>
-
-                  <section
-                    aria-labelledby='excel-result-success-heading'
-                    className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-xs'
-                  >
-                    <div className='flex flex-col gap-0.5 border-b border-emerald-100 bg-emerald-50/90 px-4 py-3'>
-                      <div className='flex items-center gap-2'>
-                        <CheckCircle2
-                          className='size-5 shrink-0 text-emerald-600'
-                          aria-hidden
-                        />
-                        <h3
-                          id='excel-result-success-heading'
-                          className='text-sm font-semibold text-emerald-950'
-                        >
-                          지급 성공
-                          <span className='ml-1.5 font-normal text-emerald-900/90 tabular-nums'>
-                            ({uploadResult.successCount}명)
-                          </span>
-                        </h3>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              size='sm'
+                              className='shrink-0 border-amber-200 bg-white text-amber-950 hover:bg-amber-50'
+                              onClick={handleDownloadNotProcessedExcel}
+                            >
+                              <Download className='size-4' aria-hidden />
+                              미처리 명단 엑셀 저장
+                            </Button>
+                          ) : null}
+                        </div>
                       </div>
-                      <p className='pl-7 text-xs text-emerald-800/80'>
-                        포인트가 정상 반영된 회원 목록입니다.
-                      </p>
-                    </div>
-                    <div
-                      className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
-                    >
-                      <table className='w-full caption-bottom text-sm'>
-                        <Table.Header className='sticky top-0 z-10 border-b border-emerald-100 bg-emerald-50 shadow-xs'>
-                          <Table.Row className='hover:bg-emerald-50/40'>
-                            {SUCCESS_TABLE_HEADERS.map((header) => (
-                              <Table.Head
-                                key={header}
-                                className='h-11 px-4 text-center text-xs font-semibold text-emerald-900'
-                              >
-                                {header}
-                              </Table.Head>
-                            ))}
-                          </Table.Row>
-                        </Table.Header>
+                      <div
+                        className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
+                      >
+                        <table className='w-full caption-bottom text-sm'>
+                          <Table.Header className='sticky top-0 z-10 border-b border-amber-100 bg-amber-50 shadow-xs'>
+                            <Table.Row className='hover:bg-amber-50/40'>
+                              {FAILURE_TABLE_HEADERS.map((header) =>
+                                header === '행 번호' ? (
+                                  <RowNumberColumnHead
+                                    key={header}
+                                    variant='failure'
+                                  />
+                                ) : (
+                                  <Table.Head
+                                    key={header}
+                                    className='h-11 px-3 text-center text-xs font-semibold text-amber-950'
+                                  >
+                                    {header}
+                                  </Table.Head>
+                                )
+                              )}
+                            </Table.Row>
+                          </Table.Header>
 
-                        <Table.Body>
-                          {uploadResult &&
-                          uploadResult.successRows.length > 0 ? (
-                            uploadResult.successRows.map((row, index) => (
-                              <Table.Row
-                                key={`${row.loginId}-${row.studentNumber}-${index}`}
-                                className='hover:bg-emerald-50/20'
-                              >
-                                <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
-                                  {row.userName}
-                                </Table.Cell>
-                                <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
-                                  {row.loginId}
-                                </Table.Cell>
-                                <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
-                                  {row.studentNumber}
-                                </Table.Cell>
-                                <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900 tabular-nums'>
-                                  {row.difference}
-                                </Table.Cell>
-                                <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
-                                  {row.category}
-                                </Table.Cell>
-                                <Table.Cell className='max-w-[min(14rem,35vw)] px-4 py-3 text-center text-xs text-gray-700'>
-                                  {row.memo}
+                          <Table.Body>
+                            {uploadResult &&
+                            uploadResult.notProcessedRows.length > 0 ? (
+                              uploadResult.notProcessedRows.map(
+                                (row, index) => (
+                                  <Table.Row
+                                    key={`${row.rowNumber}-${row.reason}-${index}`}
+                                    className='hover:bg-amber-50/20'
+                                  >
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
+                                      {row.rowNumber}
+                                    </Table.Cell>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
+                                      {row.userName || '—'}
+                                    </Table.Cell>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
+                                      {row.loginId ?? '—'}
+                                    </Table.Cell>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
+                                      {row.studentNumber || '—'}
+                                    </Table.Cell>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
+                                      {row.difference}
+                                    </Table.Cell>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
+                                      {row.category}
+                                    </Table.Cell>
+                                    <Table.Cell className='max-w-[min(12rem,30vw)] px-3 py-3 text-center text-xs text-gray-700'>
+                                      {row.memo || '—'}
+                                    </Table.Cell>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
+                                      {row.reason}
+                                    </Table.Cell>
+                                    <Table.Cell className='max-w-[min(24rem,45vw)] min-w-64 px-3 py-3 text-left text-xs break-words whitespace-normal text-gray-600'>
+                                      {formatRowFailureReason(row.reason)}
+                                    </Table.Cell>
+                                  </Table.Row>
+                                )
+                              )
+                            ) : (
+                              <Table.Row className='hover:bg-white'>
+                                <Table.Cell
+                                  colSpan={FAILURE_TABLE_HEADERS.length}
+                                  className='h-24 text-center text-sm text-gray-400'
+                                >
+                                  {uploadResult
+                                    ? '처리되지 않은 행이 없습니다.'
+                                    : '지급 실행 후 결과가 여기에 표시됩니다.'}
                                 </Table.Cell>
                               </Table.Row>
-                            ))
-                          ) : (
-                            <Table.Row className='hover:bg-white'>
-                              <Table.Cell
-                                colSpan={SUCCESS_TABLE_HEADERS.length}
-                                className='h-24 text-center text-sm text-gray-400'
-                              >
-                                {uploadResult
-                                  ? '성공한 회원이 없습니다.'
-                                  : '지급 실행 후 결과가 여기에 표시됩니다.'}
-                              </Table.Cell>
+                            )}
+                          </Table.Body>
+                        </table>
+                      </div>
+                    </section>
+
+                    <section
+                      aria-labelledby='excel-result-success-heading'
+                      className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-xs'
+                    >
+                      <div className='flex flex-col gap-0.5 border-b border-emerald-100 bg-emerald-50/90 px-4 py-3'>
+                        <div className='flex items-center gap-2'>
+                          <CheckCircle2
+                            className='size-5 shrink-0 text-emerald-600'
+                            aria-hidden
+                          />
+                          <h3
+                            id='excel-result-success-heading'
+                            className='text-sm font-semibold text-emerald-950'
+                          >
+                            지급 성공
+                            <span className='ml-1.5 font-normal text-emerald-900/90 tabular-nums'>
+                              ({uploadResult.successCount}명)
+                            </span>
+                          </h3>
+                        </div>
+                        <p className='pl-7 text-xs text-emerald-800/80'>
+                          포인트가 정상 반영된 회원 목록입니다.
+                        </p>
+                      </div>
+                      <div
+                        className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
+                      >
+                        <table className='w-full caption-bottom text-sm'>
+                          <Table.Header className='sticky top-0 z-10 border-b border-emerald-100 bg-emerald-50 shadow-xs'>
+                            <Table.Row className='hover:bg-emerald-50/40'>
+                              {SUCCESS_TABLE_HEADERS.map((header) => (
+                                <Table.Head
+                                  key={header}
+                                  className='h-11 px-4 text-center text-xs font-semibold text-emerald-900'
+                                >
+                                  {header}
+                                </Table.Head>
+                              ))}
                             </Table.Row>
-                          )}
-                        </Table.Body>
-                      </table>
-                    </div>
-                  </section>
-                </div>
-              </>
-            ) : null}
+                          </Table.Header>
+
+                          <Table.Body>
+                            {uploadResult &&
+                            uploadResult.successRows.length > 0 ? (
+                              uploadResult.successRows.map((row, index) => (
+                                <Table.Row
+                                  key={`${row.loginId}-${row.studentNumber}-${index}`}
+                                  className='hover:bg-emerald-50/20'
+                                >
+                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                                    {row.userName}
+                                  </Table.Cell>
+                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                                    {row.loginId}
+                                  </Table.Cell>
+                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                                    {row.studentNumber}
+                                  </Table.Cell>
+                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900 tabular-nums'>
+                                    {row.difference}
+                                  </Table.Cell>
+                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
+                                    {row.category}
+                                  </Table.Cell>
+                                  <Table.Cell className='max-w-[min(14rem,35vw)] px-4 py-3 text-center text-xs text-gray-700'>
+                                    {row.memo}
+                                  </Table.Cell>
+                                </Table.Row>
+                              ))
+                            ) : (
+                              <Table.Row className='hover:bg-white'>
+                                <Table.Cell
+                                  colSpan={SUCCESS_TABLE_HEADERS.length}
+                                  className='h-24 text-center text-sm text-gray-400'
+                                >
+                                  {uploadResult
+                                    ? '성공한 회원이 없습니다.'
+                                    : '지급 실행 후 결과가 여기에 표시됩니다.'}
+                                </Table.Cell>
+                              </Table.Row>
+                            )}
+                          </Table.Body>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </>
+              ) : null}
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </Tooltip.Provider>
   );
 }
