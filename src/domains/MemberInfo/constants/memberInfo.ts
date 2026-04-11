@@ -1,5 +1,7 @@
 import type { MemberInfo, PenaltyUserInfo } from '@/shared/types';
 
+export const MEMBER_INFO_EDIT_FORM_ID = 'member-info-edit-form';
+
 export const USER_ROLES = [
   { id: 1, name: '준회원' },
   { id: 2, name: '정회원' },
