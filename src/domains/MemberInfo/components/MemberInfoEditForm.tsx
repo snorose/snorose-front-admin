@@ -1,173 +1,270 @@
-import { useState } from 'react';
+import { type FormEvent, useState } from 'react';
 
+import {
+  CalendarDays,
+  Coins,
+  GraduationCap,
+  IdCard,
+  Mail,
+  Trash2,
+  Upload,
+  UserRound,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Input, Label } from '@/shared/components/ui';
+import { Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
 import {
-  MEMBER_INFO,
-  USER_ROLES,
-} from '@/domains/MemberInfo/constants/memberInfo';
+  EditableField,
+  EditableRoleField,
+  type FieldItem,
+  ReadonlyField,
+} from '@/domains/MemberInfo/components/MemberInfoEditFormFields';
+import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
+import {
+  formatDate,
+  formatDateTime,
+  formatDisplayValue,
+  formatPoint,
+} from '@/domains/MemberInfo/utils/memberDirectory';
+import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
-const EDITABLE_KEYS: (keyof MemberInfo)[] = [
-  'userName',
-  'studentNumber',
-  'major',
-  'userRoleId',
-  'email',
-  'birthday',
-];
+type MemberInfoEditFormProps = {
+  member: MemberInfo;
+  onSubmit: (updated: MemberInfo) => void;
+  onCancel: () => void;
+  onCopy: (value: string) => void | Promise<void>;
+};
 
 export default function MemberInfoEditForm({
   member,
   onSubmit,
   onCancel,
-}: {
-  member: MemberInfo;
-  onSubmit: (updated: MemberInfo) => void;
-  onCancel: () => void;
-}) {
-  const [form, setForm] = useState<MemberInfo>(member);
-  const [fieldErrors, setFieldErrors] = useState<
-    Partial<Record<keyof MemberInfo, string>>
-  >({});
+  onCopy,
+}: MemberInfoEditFormProps) {
+  const [selectedRoleId, setSelectedRoleId] = useState(
+    String(member.userRoleId)
+  );
+  const [userName, setUserName] = useState(member.userName ?? '');
+  const [nickname, setNickname] = useState(member.nickname ?? '');
+  const [email, setEmail] = useState(member.email ?? '');
+  const [studentNumber, setStudentNumber] = useState(
+    member.studentNumber ?? ''
+  );
+  const [major, setMajor] = useState(member.major ?? '');
+  const [birthday, setBirthday] = useState(formatDate(member.birthday));
 
-  const handleChange = (key: keyof MemberInfo, value: string | number) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    setFieldErrors((prev) => ({ ...prev, [key]: '' }));
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const nextMember: MemberInfo = {
+      ...member,
+      userName,
+      nickname,
+      email,
+      studentNumber,
+      major,
+      birthday,
+      userRoleId: Number(selectedRoleId),
+    };
+
+    onSubmit(nextMember);
   };
 
-  const handleSubmit = () => {
-    const nextErrors: Partial<Record<keyof MemberInfo, string>> = {};
-    const userName = String(form.userName ?? '').trim();
-    const email = String(form.email ?? '').trim();
-    const studentNumber = String(form.studentNumber ?? '').trim();
-
-    const userNameRegex = /^[A-Za-z가-힣]{2,30}$/;
-    const emailRegex = /^[A-Za-z0-9._%+-]+@(sookmyung\.ac\.kr|sm\.ac\.kr)$/i;
-    const studentNumberRegex = /^[0-9]{7,10}$/;
-
-    if (!userNameRegex.test(userName)) {
-      nextErrors.userName = '이름은 영문 또는 한글로 2 ~ 30자여야 합니다.';
-    }
-
-    if (!emailRegex.test(email)) {
-      nextErrors.email =
-        '이메일 형식(xxx@sookmyung.ac.kr or xxx@sm.ac.kr)이 올바르지 않습니다.';
-    }
-
-    if (!studentNumberRegex.test(studentNumber)) {
-      nextErrors.studentNumber = '학번은 7 ~ 10자의 숫자여야 합니다.';
-    }
-
-    if (Object.keys(nextErrors).length > 0) {
-      setFieldErrors(nextErrors);
-      toast.error('입력값을 확인해주세요.');
-      return;
-    }
-
-    setFieldErrors({});
-    const payload =
-      form.userRoleId === 1 ? { ...form, authenticatedAt: null } : form;
-
-    onSubmit(payload);
+  const handleProfileImageAction = () => {
+    toast.info('프로필 이미지 수정 API 연동 예정입니다.');
   };
+
+  const fieldItems: FieldItem[] = [
+    {
+      type: 'editable',
+      icon: UserRound,
+      label: '이름',
+      value: userName,
+      onChange: setUserName,
+    },
+    {
+      type: 'readonly',
+      icon: IdCard,
+      label: '아이디',
+      value: formatDisplayValue(member.loginId),
+      kind: 'box',
+    },
+    {
+      type: 'editable',
+      icon: UserRound,
+      label: '닉네임',
+      value: nickname,
+      onChange: setNickname,
+    },
+    {
+      type: 'editable',
+      icon: GraduationCap,
+      label: '학번',
+      value: studentNumber,
+      onChange: setStudentNumber,
+    },
+    {
+      type: 'editable',
+      icon: CalendarDays,
+      label: '생년월일',
+      value: birthday,
+      onChange: setBirthday,
+      placeholder: 'YYYY-MM-DD',
+    },
+    {
+      type: 'editable',
+      icon: GraduationCap,
+      label: '전공',
+      value: major,
+      onChange: setMajor,
+    },
+    {
+      type: 'readonly',
+      icon: CalendarDays,
+      label: '가입일',
+      value: formatDate(member.createdAt),
+    },
+    {
+      type: 'readonly',
+      icon: CalendarDays,
+      label: '등업일',
+      value: formatDate(member.authenticatedAt),
+    },
+    {
+      type: 'readonly',
+      icon: CalendarDays,
+      label: '최근 로그인 날짜',
+      value: formatDate(member.lastLoginAt),
+    },
+    {
+      type: 'readonly',
+      icon: CalendarDays,
+      label: '정보 수정일',
+      value: formatDateTime(member.updatedAt),
+    },
+    {
+      type: 'readonly',
+      icon: Coins,
+      label: '보유 포인트',
+      value: formatPoint(member.pointBalance),
+    },
+    {
+      type: 'readonly',
+      icon: IdCard,
+      label: '회원 ID (암호화)',
+      value: formatDisplayValue(member.encryptedUserId),
+      copyValue: member.encryptedUserId,
+    },
+    {
+      type: 'role',
+      label: '회원 등급',
+      value: selectedRoleId,
+    },
+    {
+      type: 'editable',
+      icon: Mail,
+      label: '이메일',
+      value: email,
+      onChange: setEmail,
+      inputType: 'email',
+    },
+  ];
 
   return (
-    <article>
-      <h3 className='mb-2 text-lg font-bold'>회원정보 수정</h3>
+    <form
+      id={MEMBER_INFO_EDIT_FORM_ID}
+      onSubmit={handleSubmit}
+      className='space-y-8'
+    >
+      <div className='flex flex-col items-center gap-4 border-b border-slate-100 pb-8'>
+        <div className='relative'>
+          <div className='flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-slate-400 shadow-sm'>
+            {member.profileImageUrl ? (
+              <img
+                src={member.profileImageUrl}
+                alt={`${member.userName} 프로필`}
+                className='h-full w-full object-cover'
+              />
+            ) : (
+              <UserRound className='h-12 w-12' />
+            )}
+          </div>
 
-      <div className='grid grid-cols-2 gap-x-5 gap-y-3'>
-        {MEMBER_INFO.map(({ label, key }) => {
-          const rawValue = form[key];
-          const isEdit = EDITABLE_KEYS.includes(key);
-          const hasError = Boolean(fieldErrors[key]);
-          const errorMessage = fieldErrors[key];
+          <div className='absolute -bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-2'>
+            <Button
+              type='button'
+              size='icon-sm'
+              onClick={handleProfileImageAction}
+              className='rounded-full bg-slate-950 text-white hover:bg-slate-800'
+            >
+              <Upload className='h-4 w-4' />
+            </Button>
+            <Button
+              type='button'
+              size='icon-sm'
+              onClick={handleProfileImageAction}
+              className='rounded-full bg-rose-500 text-white hover:bg-rose-400'
+            >
+              <Trash2 className='h-4 w-4' />
+            </Button>
+          </div>
+        </div>
 
-          const inputClass = `w-60 ${
-            isEdit
-              ? hasError
-                ? 'bg-red-100'
-                : 'bg-blue-50'
-              : 'bg-gray-100 text-gray-500'
-          }`;
+        <div className='space-y-1 text-center text-sm font-medium text-slate-400'>
+          <p>프로필 이미지를 클릭하여 변경하거나 삭제할 수 있습니다</p>
+          <p>(최대 5MB, JPG/PNG)</p>
+        </div>
+      </div>
 
-          // 회원 등급 select
-          if (key === 'userRoleId') {
+      <div className='grid gap-x-10 gap-y-6 md:grid-cols-2'>
+        {fieldItems.map((field) => {
+          if (field.type === 'editable') {
             return (
-              <div key={key} className='flex items-start gap-4'>
-                <Label className='w-32 text-gray-700'>{label}</Label>
-
-                <div className='flex flex-col gap-1'>
-                  <select
-                    disabled={!isEdit}
-                    className={`${inputClass} rounded border px-2 py-1`}
-                    value={rawValue as number}
-                    onChange={(e) => handleChange(key, Number(e.target.value))}
-                  >
-                    {USER_ROLES.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
-                  {errorMessage && (
-                    <p className='text-xs text-red-600'>{errorMessage}</p>
-                  )}
-                </div>
-              </div>
+              <EditableField
+                key={field.label}
+                icon={field.icon}
+                label={field.label}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder={field.placeholder}
+                type={field.inputType}
+              />
             );
           }
 
-          // 생년월일 날짜선택
-          if (key === 'birthday') {
+          if (field.type === 'role') {
             return (
-              <div key={key} className='flex items-start gap-4'>
-                <Label className='w-32 text-gray-700'>{label}</Label>
-
-                <div className='flex flex-col gap-1'>
-                  <Input
-                    type='date'
-                    className={inputClass}
-                    readOnly={!isEdit}
-                    value={rawValue ? String(rawValue).substring(0, 10) : ''}
-                    onChange={(e) => handleChange(key, e.target.value)}
-                  />
-                  {errorMessage && (
-                    <p className='text-xs text-red-600'>{errorMessage}</p>
-                  )}
-                </div>
-              </div>
+              <EditableRoleField
+                key={field.label}
+                value={selectedRoleId}
+                onChange={setSelectedRoleId}
+                currentLabel={convertUserRoleIdToEnum(Number(selectedRoleId))}
+              />
             );
           }
 
           return (
-            <div key={key} className='flex items-start gap-4'>
-              <Label className='w-32 text-gray-700'>{label}</Label>
-
-              <div className='flex flex-col gap-1'>
-                <Input
-                  readOnly={!isEdit}
-                  value={rawValue ?? ''}
-                  onChange={(e) => isEdit && handleChange(key, e.target.value)}
-                  className={inputClass}
-                />
-                {errorMessage && (
-                  <p className='text-xs text-red-600'>{errorMessage}</p>
-                )}
-              </div>
-            </div>
+            <ReadonlyField
+              key={field.label}
+              icon={field.icon}
+              label={field.label}
+              value={field.value}
+              kind={field.kind}
+              copyValue={field.copyValue}
+              onCopy={onCopy}
+            />
           );
         })}
       </div>
 
-      <div className='mt-4 flex gap-3'>
-        <Button onClick={handleSubmit}>저장</Button>
-        <Button variant='outline' onClick={onCancel}>
-          취소
-        </Button>
+      <div className='hidden'>
+        <button type='submit'>submit</button>
+        <button type='button' onClick={onCancel}>
+          cancel
+        </button>
       </div>
-    </article>
+    </form>
   );
 }

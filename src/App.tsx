@@ -57,6 +57,10 @@ function App() {
                               element={<MemberInfoPage />}
                             />
                             <Route
+                              path={`${PATHS.MEMBER_INFO}/:memberKey`}
+                              element={<MemberInfoPage />}
+                            />
+                            <Route
                               path={PATHS.MEMBER_PENALTY}
                               element={<MemberPenaltyManagementPage />}
                             />
