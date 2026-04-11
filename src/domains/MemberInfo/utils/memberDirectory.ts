@@ -199,7 +199,9 @@ export function createMemberDiffPayload(
         if (typeof newValue === 'string') diff[key] = newValue;
         break;
       case 'birthday':
-        if (newValue) diff[key] = String(newValue).substring(0, 10);
+        if (typeof newValue === 'string' && newValue.trim()) {
+          diff[key] = newValue.trim().substring(0, 10);
+        }
         break;
       case 'userRoleId':
         if (typeof newValue === 'number') diff[key] = newValue;

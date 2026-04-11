@@ -33,6 +33,7 @@ export type RoleFieldItem = {
 export type FieldItem = EditableFieldItem | ReadonlyFieldItem | RoleFieldItem;
 
 export function EditableField({
+  error,
   icon: Icon,
   label,
   onChange,
@@ -40,6 +41,7 @@ export function EditableField({
   type = 'text',
   value,
 }: {
+  error?: string;
   icon: LucideIcon;
   label: string;
   onChange: (value: string) => void;
@@ -58,8 +60,11 @@ export function EditableField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className='h-12 rounded-xl border-0 bg-slate-100 px-4 text-base font-semibold text-slate-950 shadow-none focus-visible:ring-2'
+        className={`h-12 rounded-xl border-0 px-4 text-base font-semibold text-slate-950 shadow-none focus-visible:ring-2 ${
+          error ? 'bg-rose-50 ring-1 ring-rose-200' : 'bg-slate-100'
+        }`}
       />
+      {error ? <p className='text-sm text-rose-600'>{error}</p> : null}
     </div>
   );
 }
