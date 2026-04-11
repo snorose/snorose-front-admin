@@ -1,91 +1,50 @@
-// TODO: API 연동 시 usePostList 훅으로 상태/로직 분리 예정
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 import { PageHeader } from '@/shared/components';
 import { Input, Select } from '@/shared/components/ui';
 
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
-import { usePostList } from '../hooks/usePostList';
+import usePostListFilter from '../hooks/usePostListFilter';
 import BulkDeleteBar from './BulkDeleteBar';
 import PostListItem from './PostListItem';
 
 interface PostListProps {
   selectedPostId: number | null;
   onSelectPost: (post: AdminGetPostResponse | null) => void;
+  onOpenModal: (post: AdminGetPostResponse) => void;
 }
 
 export default function PostList({
   selectedPostId,
   onSelectPost,
+  onOpenModal,
 }: PostListProps) {
-  const [category, setCategory] = useState('전체');
-  const { data } = usePostList({ boardId: null });
-  const [keyword, setKeyword] = useState('');
-  const [reportFilter, setReportFilter] = useState('전체');
-
-  const categories = useMemo(() => {
-    if (!data) return [];
-    return [
-      ...new Set(data.map((p) => p.category).filter(Boolean)),
-    ] as string[];
-  }, [data]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [deletedIds, setDeletedIds] = useState<number[]>([]);
-  const selectAllRef = useRef<HTMLInputElement>(null);
-
-  const filtered = useMemo(() => {
-    if (!data) return [];
-    return data?.filter((post) => {
-      if (deletedIds.includes(post.postId)) return false;
-      const matchesKeyword =
-        post.title.includes(keyword) ||
-        post.userDisplay?.includes(keyword) ||
-        String(post.postId).includes(keyword);
-      const matchesCategory = category === '전체' || post.category === category;
-      const matchesReport = reportFilter === '전체' || post.reportCount > 0;
-      return matchesKeyword && matchesCategory && matchesReport;
-    });
-  }, [data, keyword, category, reportFilter, deletedIds]);
-
-  const allIds = filtered.map((p) => p.postId);
-  const isAllSelected =
-    allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
-  const isSomeSelected =
-    allIds.some((id) => selectedIds.includes(id)) && !isAllSelected;
-
-  useEffect(() => {
-    if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = isSomeSelected;
-    }
-  }, [isSomeSelected]);
-
-  const handleSelectAll = () => {
-    setSelectedIds(isAllSelected ? [] : allIds);
-  };
-
-  const handleCheck = (postId: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(postId)
-        ? prev.filter((id) => id !== postId)
-        : [...prev, postId]
-    );
-  };
-
-  const handleDelete = (postId: number) => {
-    // TODO: 단일 삭제 API 연동
-    setDeletedIds((prev) => [...prev, postId]);
-    setSelectedIds((prev) => prev.filter((id) => id !== postId));
-    if (selectedPostId === postId) onSelectPost(null);
-  };
-
-  const handleBulkDelete = () => {
-    // TODO: 일괄 삭제 API 연동
-    setDeletedIds((prev) => [...prev, ...selectedIds]);
-    if (selectedPostId !== null && selectedIds.includes(selectedPostId))
-      onSelectPost(null);
-    setSelectedIds([]);
-  };
+  const {
+    category,
+    setCategory,
+    keyword,
+    setKeyword,
+    reportFilter,
+    setReportFilter,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    selectedIds,
+    setSelectedIds,
+    handleCheck,
+    selectAllRef,
+    isAllSelected,
+    handleSelectAll,
+    handleBulkDelete,
+    handleDelete,
+    filtered,
+    categories,
+  } = usePostListFilter({
+    selectedPostId,
+    onSelectPost,
+  });
 
   return (
     <div className='flex h-full flex-col gap-4'>
@@ -98,10 +57,24 @@ export default function PostList({
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
       />
+      <div className='flex items-center'>
+        <Input
+          type='date'
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <ArrowRight className='mx-2' />
+        <Input
+          type='date'
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </div>
+
       <div className='flex gap-2'>
         <Select value={category} onValueChange={setCategory}>
           <Select.Trigger className='flex-1 justify-between rounded-md border border-gray-200 bg-white px-3'>
-            <Select.Value />
+            <Select.Value placeholder='카테고리' />
           </Select.Trigger>
           <Select.Content>
             <Select.Item value='전체'>전체</Select.Item>
@@ -114,11 +87,16 @@ export default function PostList({
         </Select>
         <Select value={reportFilter} onValueChange={setReportFilter}>
           <Select.Trigger className='flex-1 justify-between rounded-md border border-gray-200 bg-white px-3'>
-            <Select.Value />
+            <Select.Value placeholder='미노출 사유' />
           </Select.Trigger>
           <Select.Content>
+            {/* TODO: 백엔드 미노출 사유 enum API 연동 시 하드코딩 제거 후 map으로 교체 */}
             <Select.Item value='전체'>전체</Select.Item>
-            <Select.Item value='신고됨'>신고됨만</Select.Item>
+            <Select.Item value='신고됨'>신고누적</Select.Item>
+            <Select.Item value='삭제됨'>삭제됨</Select.Item>
+            <Select.Item value='리자삭제'>리자삭제</Select.Item>
+            <Select.Item value='리자비공개'>리자비공개</Select.Item>
+            <Select.Item value='해당없음'>해당없음</Select.Item>
           </Select.Content>
         </Select>
       </div>
@@ -151,9 +129,10 @@ export default function PostList({
                 isSelected={selectedPostId === post.postId}
                 isChecked={selectedIds.includes(post.postId)}
                 onCheck={handleCheck}
-                onClick={(p) =>
-                  onSelectPost(selectedPostId === p.postId ? null : p)
+                onClick={(post) =>
+                  onSelectPost(selectedPostId === post.postId ? null : post)
                 }
+                onOpenModal={onOpenModal}
                 onDelete={handleDelete}
               />
             ))}
