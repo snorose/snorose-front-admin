@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 import { Badge } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -64,7 +66,9 @@ export default function DeletedPostListItem({
             <div
               className={styles.postContent}
               dangerouslySetInnerHTML={{
-                __html: linkifyContent(post.content),
+                __html: DOMPurify.sanitize(linkifyContent(post.content), {
+                  ALLOWED_TAGS: ['iframe', 'a', 'img'],
+                }),
               }}
             />
             <div className='mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500'>

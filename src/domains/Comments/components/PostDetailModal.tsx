@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 import { Badge, Skeleton } from '@/shared/components/ui';
 import { Dialog } from '@/shared/components/ui/dialog';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -95,7 +97,11 @@ export default function PostDetailModal({
             <div className='min-h-[120px] rounded-md border bg-gray-50 p-3 text-sm whitespace-pre-wrap text-gray-700'>
               {data.content ? (
                 <div
-                  dangerouslySetInnerHTML={{ __html: data.content }}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(data.content, {
+                      ALLOWED_TAGS: ['iframe', 'a', 'img'],
+                    }),
+                  }}
                   className='[&_a]:break-all [&_a]:text-blue-500 [&_a]:underline'
                 />
               ) : (
