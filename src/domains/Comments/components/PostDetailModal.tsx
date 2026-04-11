@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui';
+import { Badge, Skeleton } from '@/shared/components/ui';
 import { Dialog } from '@/shared/components/ui/dialog';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -13,12 +13,18 @@ export default function PostDetailModal({
   deletedAt: string | null;
   onClose: () => void;
 }) {
-  const { data } = usePost(postId, deletedAt);
+  const { data, isPending } = usePost(postId, deletedAt);
 
   return (
     <Dialog open={!!postId} onOpenChange={() => onClose()}>
       <Dialog.Content className='max-w-2xl'>
-        {data && (
+        {isPending && (
+          <div className='flex flex-col gap-4'>
+            <Skeleton className='h-17.5 w-full rounded-md' />
+            <Skeleton className='h-41 w-full rounded-md' />
+          </div>
+        )}
+        {!isPending && data && (
           <div className='flex flex-col gap-4'>
             {/* 상단: 메타 정보 */}
             <div className='flex flex-col gap-1'>
