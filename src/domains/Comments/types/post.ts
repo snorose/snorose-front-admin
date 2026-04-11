@@ -2,8 +2,8 @@ export interface AdminGetPostResponse {
   postId: number;
   encryptedUserId: string;
   boardId: number;
-  userDisplay: string;
-  category: string;
+  userDisplay?: string;
+  category?: string;
   title: string;
   content: string;
   commentCount: number;
@@ -16,20 +16,39 @@ export interface AdminGetPostResponse {
   isEdited: boolean;
   isKeywordExist: boolean;
   createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  updatedAt?: string;
+  deletedAt?: string | null;
 }
 
-export interface AdminPostSearchResponse {
+export interface AdminPostListResponse {
   isSuccess: boolean;
   code: number;
   message: string;
   result: {
     hasNext: boolean;
-    totalPage: number;
-    totalCount: number;
+    totalPage?: number;
+    totalCount?: number;
     data: AdminGetPostResponse[];
   };
+}
+
+export interface AdminPostSearchRequest {
+  encryptedUserId?: string;
+  boardId?: number;
+  isNotice?: boolean;
+  isVisible?: boolean;
+  isKeywordExist?: boolean;
+  startDate?: string;
+  endDate?: string;
+  sortTypes?:
+    | 'CREATED_AT'
+    | 'UPDATED_AT'
+    | 'REPORT_COUNT'
+    | 'VIEW_COUNT'
+    | 'LIKE_COUNT'
+    | 'COMMENT_COUNT'
+    | 'SCRAP_COUNT';
+  sortDirection?: 'ASC' | 'DESC';
 }
 
 export interface DeletePostResponse {
