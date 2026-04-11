@@ -1,12 +1,10 @@
-import { Trash2 } from 'lucide-react';
+import { Eye, EyeOff, FileText, RotateCcw, Trash2 } from 'lucide-react';
 
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
-
-import styles from './PostListItem.module.css';
 
 interface PostListItemProps {
   post: AdminGetPostResponse;
@@ -15,6 +13,7 @@ interface PostListItemProps {
   onCheck: (postId: number) => void;
   onClick: (post: AdminGetPostResponse) => void;
   onDelete: (postId: number) => void;
+  onOpenModal: (post: AdminGetPostResponse) => void;
 }
 
 export default function PostListItem({
@@ -24,18 +23,15 @@ export default function PostListItem({
   onCheck,
   onClick,
   onDelete,
+  onOpenModal,
 }: PostListItemProps) {
-  const linkifyContent = (html: string) =>
-    html.replace(
-      /(?<!['"=])(https?:\/\/[^\s<"']+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-    );
-
   return (
     <div
       className={cn(
         'flex items-start gap-3 px-4 py-3 hover:bg-gray-50',
-        isSelected && 'bg-blue-50 hover:bg-blue-50'
+        isSelected && 'bg-blue-50 hover:bg-blue-50',
+        !post.isVisible && 'bg-yellow-50 hover:bg-yellow-50',
+        post.deletedAt && 'bg-red-50 hover:bg-red-50'
       )}
     >
       <input
@@ -54,7 +50,6 @@ export default function PostListItem({
           <Badge variant='outline' className='shrink-0 text-xs'>
             {post.category}
           </Badge>
-          <span className='text-xs text-gray-500'>ID: {post.postId}</span>
           {post.reportCount > 0 && (
             <Badge
               variant='outline'
@@ -63,44 +58,55 @@ export default function PostListItem({
               신고됨
             </Badge>
           )}
-          <span className='ml-auto text-xs text-gray-400'>
-            댓글 {post.commentCount}
-          </span>
         </div>
-        {/* 선택 시 전체 텍스트 표시, 미선택 시 한 줄로 잘림 */}
-        <p
-          className={cn('text-sm text-gray-700', !isSelected && 'line-clamp-1')}
-        >
-          {post.title}
-        </p>
-        {isSelected && (
-          <div className='mt-1 w-full text-sm text-gray-600'>
-            <div
-              className={styles.postContent}
-              dangerouslySetInnerHTML={{
-                __html: linkifyContent(post.content),
-              }}
-            />
-            <div className='mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500'>
-              <span>조회 {post.viewCount}</span>
-              <span>좋아요 {post.likeCount}</span>
-              <span>스크랩 {post.scrapCount}</span>
-              <span>
-                작성 {formatDateTimeToMinutes(post.createdAt).replace('T', ' ')}
-              </span>
-            </div>
+        <p className='text-sm text-gray-700'>{post.title}</p>
+        <div className='mt-1 w-full text-sm text-gray-600'>
+          <div className='mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500'>
+            <span>
+              작성 {formatDateTimeToMinutes(post.createdAt).replace('T', ' ')}
+            </span>
           </div>
-        )}
+        </div>
       </button>
-      <Button
-        type='button'
-        variant='ghost'
-        size='icon'
-        className='shrink-0 text-gray-400 hover:text-red-500'
-        onClick={() => onDelete(post.postId)}
-      >
-        <Trash2 className='size-4' />
-      </Button>
+      <div className='flex shrink-0 gap-1'>
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
+          className='text-gray-400 hover:text-black'
+          onClick={() => onOpenModal(post)}
+        >
+          <FileText className='size-4' />
+        </Button>
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
+          className='text-gray-400 hover:text-blue-500'
+          onClick={() => {
+            // TODO: 공개/비공개 API 연동
+          }}
+        >
+          {post.isVisible ? (
+            <EyeOff className='size-4' />
+          ) : (
+            <Eye className='size-4' />
+          )}
+        </Button>
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
+          className='text-gray-400 hover:text-red-500'
+          onClick={() => onDelete(post.postId)}
+        >
+          {post.deletedAt !== null ? (
+            <RotateCcw className='size-4' />
+          ) : (
+            <Trash2 className='size-4' />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
