@@ -29,6 +29,10 @@ import {
   formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+import {
+  type MemberEditFormErrors,
+  validateMemberEditForm,
+} from '@/domains/MemberInfo/utils/validateMemberEditForm';
 
 type MemberInfoEditFormProps = {
   member: MemberInfo;
@@ -53,20 +57,36 @@ export default function MemberInfoEditForm({
     member.studentNumber ?? ''
   );
   const [major, setMajor] = useState(member.major ?? '');
-  const [birthday, setBirthday] = useState(formatDate(member.birthday));
+  const [birthday, setBirthday] = useState(
+    member.birthday ? String(member.birthday).substring(0, 10) : ''
+  );
+  const [fieldErrors, setFieldErrors] = useState<MemberEditFormErrors>({});
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const nextValues = {
+      userName: userName.trim(),
+      nickname: nickname.trim(),
+      email: email.trim(),
+      studentNumber: studentNumber.trim(),
+      major: major.trim(),
+      birthday: birthday.trim(),
+      userRoleId: Number(selectedRoleId),
+    };
+
+    const nextErrors = validateMemberEditForm(nextValues);
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
+      toast.error('입력값을 확인해주세요.');
+      return;
+    }
+
+    setFieldErrors({});
+
     const nextMember: MemberInfo = {
       ...member,
-      userName,
-      nickname,
-      email,
-      studentNumber,
-      major,
-      birthday,
-      userRoleId: Number(selectedRoleId),
+      ...nextValues,
     };
 
     onSubmit(nextMember);
@@ -82,7 +102,10 @@ export default function MemberInfoEditForm({
       icon: UserRound,
       label: '이름',
       value: userName,
-      onChange: setUserName,
+      onChange: (value) => {
+        setUserName(value);
+        setFieldErrors((prev) => ({ ...prev, userName: undefined }));
+      },
     },
     {
       type: 'readonly',
@@ -96,29 +119,41 @@ export default function MemberInfoEditForm({
       icon: UserRound,
       label: '닉네임',
       value: nickname,
-      onChange: setNickname,
+      onChange: (value) => {
+        setNickname(value);
+        setFieldErrors((prev) => ({ ...prev, nickname: undefined }));
+      },
     },
     {
       type: 'editable',
       icon: GraduationCap,
       label: '학번',
       value: studentNumber,
-      onChange: setStudentNumber,
+      onChange: (value) => {
+        setStudentNumber(value);
+        setFieldErrors((prev) => ({ ...prev, studentNumber: undefined }));
+      },
     },
     {
       type: 'editable',
       icon: CalendarDays,
       label: '생년월일',
       value: birthday,
-      onChange: setBirthday,
-      placeholder: 'YYYY-MM-DD',
+      onChange: (value) => {
+        setBirthday(value);
+        setFieldErrors((prev) => ({ ...prev, birthday: undefined }));
+      },
+      inputType: 'date',
     },
     {
       type: 'editable',
       icon: GraduationCap,
       label: '전공',
       value: major,
-      onChange: setMajor,
+      onChange: (value) => {
+        setMajor(value);
+        setFieldErrors((prev) => ({ ...prev, major: undefined }));
+      },
     },
     {
       type: 'readonly',
@@ -167,7 +202,10 @@ export default function MemberInfoEditForm({
       icon: Mail,
       label: '이메일',
       value: email,
-      onChange: setEmail,
+      onChange: (value) => {
+        setEmail(value);
+        setFieldErrors((prev) => ({ ...prev, email: undefined }));
+      },
       inputType: 'email',
     },
   ];
@@ -230,6 +268,7 @@ export default function MemberInfoEditForm({
                 onChange={field.onChange}
                 placeholder={field.placeholder}
                 type={field.inputType}
+                error={fieldErrors[getFieldErrorKey(field.label)]}
               />
             );
           }
@@ -267,4 +306,23 @@ export default function MemberInfoEditForm({
       </div>
     </form>
   );
+}
+
+function getFieldErrorKey(label: string): keyof MemberEditFormErrors {
+  switch (label) {
+    case '이름':
+      return 'userName';
+    case '닉네임':
+      return 'nickname';
+    case '학번':
+      return 'studentNumber';
+    case '생년월일':
+      return 'birthday';
+    case '전공':
+      return 'major';
+    case '이메일':
+      return 'email';
+    default:
+      return 'userName';
+  }
 }
