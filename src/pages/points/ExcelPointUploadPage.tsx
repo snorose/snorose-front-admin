@@ -465,8 +465,8 @@ export default function ExcelPointUploadPage() {
               </p>
             </div>
             <div className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}>
-              <Table>
-                <Table.Header className='sticky top-0 z-[1] border-b border-slate-100 bg-slate-50'>
+              <table className='w-full caption-bottom text-sm'>
+                <Table.Header className='sticky top-0 z-10 border-b border-slate-100 bg-slate-50 shadow-xs'>
                   <Table.Row className='hover:bg-slate-50/40'>
                     {PREVIEW_TABLE_HEADERS.map((header) => (
                       <Table.Head
@@ -519,7 +519,7 @@ export default function ExcelPointUploadPage() {
                     </Table.Row>
                   )}
                 </Table.Body>
-              </Table>
+              </table>
             </div>
           </section>
 
@@ -693,8 +693,8 @@ export default function ExcelPointUploadPage() {
                     <div
                       className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
                     >
-                      <Table>
-                        <Table.Header className='sticky top-0 z-[1] border-b border-amber-100 bg-amber-50'>
+                      <table className='w-full caption-bottom text-sm'>
+                        <Table.Header className='sticky top-0 z-10 border-b border-amber-100 bg-amber-50 shadow-xs'>
                           <Table.Row className='hover:bg-amber-50/40'>
                             {FAILURE_TABLE_HEADERS.map((header) => (
                               <Table.Head
@@ -757,7 +757,7 @@ export default function ExcelPointUploadPage() {
                             </Table.Row>
                           )}
                         </Table.Body>
-                      </Table>
+                      </table>
                     </div>
                   </section>
 
@@ -788,8 +788,8 @@ export default function ExcelPointUploadPage() {
                     <div
                       className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
                     >
-                      <Table>
-                        <Table.Header className='sticky top-0 z-[1] border-b border-emerald-100 bg-emerald-50'>
+                      <table className='w-full caption-bottom text-sm'>
+                        <Table.Header className='sticky top-0 z-10 border-b border-emerald-100 bg-emerald-50 shadow-xs'>
                           <Table.Row className='hover:bg-emerald-50/40'>
                             {SUCCESS_TABLE_HEADERS.map((header) => (
                               <Table.Head
@@ -843,7 +843,7 @@ export default function ExcelPointUploadPage() {
                             </Table.Row>
                           )}
                         </Table.Body>
-                      </Table>
+                      </table>
                     </div>
                   </section>
                 </div>
