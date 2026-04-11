@@ -6,16 +6,6 @@ import type {
   AdminPostSearchRequest,
 } from '@/domains/Comments/types/post';
 
-// 삭제된 게시글 목록 조회 api
-export const getDeletedPosts = async (
-  page: number
-): Promise<AdminPostListResponse['result']> => {
-  const response = await axiosInstance.get('/v1/admin/posts/deleted', {
-    params: { page },
-  });
-  return response.data.result;
-};
-
 // 게시글 조건 조회 api
 export const searchPosts = async (
   page: number,
