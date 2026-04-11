@@ -17,17 +17,20 @@ export default function DeletedPostList({
   onSelectPost,
 }: DeletedPostListProps) {
   const [category, setCategory] = useState('전체');
-  const { data } = useDeletedPostList(1);
+  const [page, setPage] = useState(1);
+  const { data } = useDeletedPostList(page);
   const [keyword, setKeyword] = useState('');
   const [reportFilter, setReportFilter] = useState('전체');
 
-  const rawPosts = useMemo(() => data ?? [], [data]);
+  const rawPosts = useMemo(() => data?.data ?? [], [data]);
 
   const categories = useMemo(() => {
     if (!rawPosts) return [];
     return [
       ...new Set(
-        rawPosts.map((p: AdminGetPostResponse) => p.category).filter(Boolean)
+        rawPosts
+          .map((post: AdminGetPostResponse) => post.category)
+          .filter(Boolean)
       ),
     ] as string[];
   }, [rawPosts]);
@@ -99,6 +102,23 @@ export default function DeletedPostList({
               ))}
             </div>
           )}
+        </div>
+        <div className='flex items-center justify-center gap-4'>
+          <button
+            className='rounded border px-3 py-1 text-sm disabled:opacity-40'
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            이전
+          </button>
+          <span className='text-sm'>{page}</span>
+          <button
+            className='rounded border px-3 py-1 text-sm disabled:opacity-40'
+            disabled={!data?.hasNext}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            다음
+          </button>
         </div>
       </div>
     </div>

@@ -18,7 +18,10 @@ export const usePostList = (params: usePostListParams) => {
     queryKey: ['deletedPosts'],
     queryFn: () => getDeletedPosts(1),
   });
-  const merged = [...(normalResult.data ?? []), ...(deletedResult.data ?? [])];
+  const merged = [
+    ...(normalResult.data?.data ?? []),
+    ...(deletedResult.data?.data ?? []),
+  ];
 
   return {
     data: merged.sort(

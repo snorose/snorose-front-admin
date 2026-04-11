@@ -2,28 +2,29 @@ import { axiosInstance } from '@/shared/axios/instance';
 
 import type {
   AdminGetPostResponse,
+  AdminPostListResponse,
   AdminPostSearchRequest,
 } from '@/domains/Comments/types/post';
 
 // 삭제된 게시글 목록 조회 api
 export const getDeletedPosts = async (
   page: number
-): Promise<AdminGetPostResponse[]> => {
+): Promise<AdminPostListResponse['result']> => {
   const response = await axiosInstance.get('/v1/admin/posts/deleted', {
     params: { page },
   });
-  return response.data.result.data;
+  return response.data.result;
 };
 
 // 게시글 조건 조회 api
 export const searchPosts = async (
   page: number,
   body: AdminPostSearchRequest
-): Promise<AdminGetPostResponse[]> => {
+): Promise<AdminPostListResponse['result']> => {
   const response = await axiosInstance.post('/v1/admin/posts/search', body, {
     params: { page },
   });
-  return response.data.result.data;
+  return response.data.result;
 };
 
 // 게시글 단건 조회 api
