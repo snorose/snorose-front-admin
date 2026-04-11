@@ -10,12 +10,29 @@ export const convertUserRoleIdToEnum = (userRoleId: number): string => {
     1: '준회원',
     2: '정회원',
     4: '리자',
-    5: '공식 계정',
-    6: '강등 회원',
-    7: '기업',
+    5: '공식',
+    6: '강등자',
+    7: '광고주',
   };
 
   return userRoleIdMap[userRoleId] ?? String(userRoleId);
+};
+
+export const convertBlacklistTypeToLabel = (
+  blacklistType?: string | null
+): string => {
+  if (!blacklistType) return '정상';
+
+  const blacklistMap: Record<string, string> = {
+    WARNING: '경고',
+    RELEGATION: '일반 강등',
+    BLACKLIST: '영구 강등',
+    '일반 강등': '일반 강등',
+    '영구 강등': '영구 강등',
+    경고: '경고',
+  };
+
+  return blacklistMap[blacklistType] ?? blacklistType;
 };
 
 // BlacklistHistory Tab

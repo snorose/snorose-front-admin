@@ -6,7 +6,7 @@ import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 interface PointActionButtonsProps {
-  userId: number | null;
+  encryptedUserId: string | null;
   selectedCategory: PointCategoryValue | '';
   difference: string;
   memo: string;
@@ -15,7 +15,7 @@ interface PointActionButtonsProps {
 }
 
 export function PointActionButtons({
-  userId,
+  encryptedUserId,
   selectedCategory,
   difference,
   memo,
@@ -23,7 +23,7 @@ export function PointActionButtons({
   onApply,
 }: PointActionButtonsProps) {
   const handleApplyClick = () => {
-    if (!userId || !selectedCategory || !difference || !memo) {
+    if (!encryptedUserId?.trim() || !selectedCategory || !difference || !memo) {
       toast.info('모든 필수 항목을 입력해주세요.');
       return;
     }

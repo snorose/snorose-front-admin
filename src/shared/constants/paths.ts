@@ -10,5 +10,6 @@ export const PATHS = {
   POINT_SINGLE: '/point/single',
   POINT_ALL: '/point/all',
   POINT_FREEZE: '/point/freeze',
+  POINT_UPLOAD_EXCEL: '/point/excel-upload',
   ALERTS: '/alerts',
 } as const;

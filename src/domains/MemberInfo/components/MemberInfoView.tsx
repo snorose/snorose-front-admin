@@ -5,7 +5,10 @@ import { Input, Label } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
 import { MEMBER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
-import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+import {
+  convertBlacklistTypeToLabel,
+  convertUserRoleIdToEnum,
+} from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 export default function MemberInfoView({
   member,
@@ -39,10 +42,16 @@ export default function MemberInfoView({
         {MEMBER_INFO.map(({ label, key }) => {
           const rawValue = member?.[key];
 
-          const displayValue =
+          const displayValue: string | number =
             key === 'userRoleId'
               ? convertUserRoleIdToEnum(rawValue as number)
-              : (rawValue ?? '');
+              : key === 'isBlacklist'
+                ? member?.isBlacklist
+                  ? convertBlacklistTypeToLabel(member.blacklistType)
+                  : '정상'
+                : typeof rawValue === 'boolean'
+                  ? String(rawValue)
+                  : (rawValue ?? '');
 
           const isCopy = COPY_KEYS.includes(key);
 

@@ -1,7 +1,7 @@
 import {
   // Bell,
   BookOpen,
-  FileText,
+  // FileText,
   HandCoins,
   type LucideIcon,
   User,
@@ -36,16 +36,16 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       // },
     ],
   },
-  {
-    title: '게시글 관리',
-    icon: FileText,
-    items: [
-      {
-        title: '댓글 관리',
-        url: PATHS.POST_COMMENTS,
-      },
-    ],
-  },
+  // {
+  //   title: '게시글 관리',
+  //   icon: FileText,
+  //   items: [
+  //     {
+  //       title: '댓글 관리',
+  //       url: PATHS.POST_COMMENTS,
+  //     },
+  //   ],
+  // },
   {
     title: '시험 후기',
     icon: BookOpen,
@@ -60,10 +60,14 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     title: '포인트 관리',
     icon: HandCoins,
     items: [
-      // {
-      //   title: '단일건 증감',
-      //   url: '/points/single',
-      // },
+      {
+        title: '단일건 증감',
+        url: PATHS.POINT_SINGLE,
+      },
+      {
+        title: '엑셀 업로드 지급',
+        url: PATHS.POINT_UPLOAD_EXCEL,
+      },
       {
         title: '정회원 전체 증감',
         url: PATHS.POINT_ALL,

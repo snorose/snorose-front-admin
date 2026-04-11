@@ -12,6 +12,7 @@ import {
   AdjustSinglePointPage,
   CommentPage,
   ExamReviewPage,
+  ExcelPointUploadPage,
   LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
@@ -56,6 +57,10 @@ function App() {
                               element={<MemberInfoPage />}
                             />
                             <Route
+                              path={`${PATHS.MEMBER_INFO}/:memberKey`}
+                              element={<MemberInfoPage />}
+                            />
+                            <Route
                               path={PATHS.MEMBER_PENALTY}
                               element={<MemberPenaltyManagementPage />}
                             />
@@ -74,6 +79,10 @@ function App() {
                             <Route
                               path={PATHS.POINT_FREEZE}
                               element={<PointFreezePage />}
+                            />
+                            <Route
+                              path={PATHS.POINT_UPLOAD_EXCEL}
+                              element={<ExcelPointUploadPage />}
                             />
                             <Route path={PATHS.POSTS} element={<PostPage />} />
                             <Route

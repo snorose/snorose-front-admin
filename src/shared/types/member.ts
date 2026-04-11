@@ -2,8 +2,10 @@ export type MemberInfo = {
   encryptedUserId: string;
   loginId: string;
   userName: string;
+  userRoleName?: string;
   email: string;
   nickname: string;
+  profileImageUrl?: string | null;
   userRoleId: number;
   studentNumber: string;
   major: string;
@@ -11,8 +13,12 @@ export type MemberInfo = {
   pointBalance: number;
   createdAt: string; // YYYY-MM-DDTHH:MM:SS
   authenticatedAt: string | null; // YYYY-MM-DDTHH:MM:SS
+  updatedAt?: string | null; // YYYY-MM-DDTHH:MM:SS
+  lastLoginAt?: string | null; // YYYY-MM-DDTHH:MM:SS
+  currentWarningCount?: number;
   totalWarningCount: number;
-  isBlacklist: string | null;
+  isBlacklist: boolean | null;
+  blacklistType?: string | null;
   blacklistStartDate: string | null; // YYYY-MM-DDTHH:MM:SS
   blacklistEndDate: string | null; // YYYY-MM-DDTHH:MM:SS
 };
@@ -46,6 +52,23 @@ export type UserBlacklistHistory = {
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
 };
 
+export type AdminUserListItem = {
+  encryptedUserId: string;
+  loginId: string;
+  userName: string;
+  nickname: string;
+  studentNumber: string;
+  major: string;
+  userRoleId: number;
+  userRoleName: string;
+  createdAt: string; // YYYY-MM-DD HH:MM:SS
+};
+
+export type AdminUserListResponse = {
+  hasNext: boolean;
+  data: AdminUserListItem[];
+};
+
 export type PenaltyUserInfo = {
   loginId: string;
   encryptedUserId: string;
@@ -53,19 +76,20 @@ export type PenaltyUserInfo = {
   studentNumber: string;
   userRoleId: number;
   totalWarningCount: number;
-  isBlacklist: string | null;
+  isBlacklist: boolean | null;
+  blacklistType?: string | null;
   blacklistStartDate: string | null; // YYYY-MM-DDTHH:MM:SS
   blacklistEndDate: string | null; // YYYY-MM-DDTHH:MM:SS
 };
 
 export interface EditMemberInfo {
   userName?: string;
+  nickname?: string;
   email?: string;
   studentNumber?: string;
   major?: string;
   birthday?: string; // YYYY-MM-DD
   userRoleId?: number;
-  authenticatedAt?: string | null; // YYYY-MM-DDTHH:MM:SS
 }
 
 export interface UpdateUserInfoResponse {
