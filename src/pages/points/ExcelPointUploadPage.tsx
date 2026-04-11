@@ -468,7 +468,12 @@ export default function ExcelPointUploadPage() {
                   id='excel-preview-heading'
                   className='text-sm font-semibold text-slate-950'
                 >
-                  업로드 명단 미리보기
+                  업로드 명단 미리보기{' '}
+                  {previewRows.length > 0 ? (
+                    <span className='font-semibold text-slate-950'>
+                      ({previewRows.length}명)
+                    </span>
+                  ) : null}
                 </h3>
               </div>
               <p className='text-xs text-slate-600'>
@@ -647,19 +652,19 @@ export default function ExcelPointUploadPage() {
                 <span className='shrink-0 font-semibold'>처리 결과 요약</span>
                 <span>·</span>
                 <span className='shrink-0'>
-                  요청{' '}
+                  업로드한 회원{' '}
                   <span className='font-semibold text-blue-600 tabular-nums'>
                     {uploadResult.requestedCount}
                   </span>
-                  건
+                  명
                 </span>
                 <span>·</span>
                 <span className='shrink-0'>
-                  성공{' '}
+                  지급 성공{' '}
                   <span className='font-semibold text-green-600 tabular-nums'>
                     {uploadResult.successCount}
                   </span>
-                  건
+                  명
                 </span>
                 <span>·</span>
                 <span className='shrink-0'>
@@ -667,7 +672,7 @@ export default function ExcelPointUploadPage() {
                   <span className='font-semibold text-red-600 tabular-nums'>
                     {uploadResult.failedCount}
                   </span>
-                  건
+                  명
                 </span>
               </p>
             </div>
@@ -695,6 +700,9 @@ export default function ExcelPointUploadPage() {
                               className='text-sm font-semibold text-amber-950'
                             >
                               처리되지 않음
+                              <span className='ml-1.5 font-normal text-amber-900/90 tabular-nums'>
+                                ({uploadResult.failedCount}명)
+                              </span>
                             </h3>
                           </div>
                           <p className='pl-7 text-xs text-amber-900/80'>
@@ -803,6 +811,9 @@ export default function ExcelPointUploadPage() {
                           className='text-sm font-semibold text-emerald-950'
                         >
                           지급 성공
+                          <span className='ml-1.5 font-normal text-emerald-900/90 tabular-nums'>
+                            ({uploadResult.successCount}명)
+                          </span>
                         </h3>
                       </div>
                       <p className='pl-7 text-xs text-emerald-800/80'>
