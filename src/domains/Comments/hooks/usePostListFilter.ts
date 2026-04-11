@@ -13,12 +13,12 @@ export default function usePostListFilter({
   onSelectPost,
 }: PostListProps) {
   const [category, setCategory] = useState('전체');
-  const { data } = usePostList({ boardId: null });
+  const [page, setPage] = useState(1);
+  const { data, hasNext, totalPage } = usePostList({ boardId: null, page });
   const [keyword, setKeyword] = useState('');
   const [reportFilter, setReportFilter] = useState('전체');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
   const categories = useMemo(() => {
     if (!data) return [];
     return [
@@ -100,6 +100,10 @@ export default function usePostListFilter({
   };
   return {
     filtered,
+    page,
+    setPage,
+    hasNext,
+    totalPage,
     categories,
     category,
     setCategory,

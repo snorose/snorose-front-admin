@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 
 import { PageHeader } from '@/shared/components';
-import { Input, Select } from '@/shared/components/ui';
+import { Input, Pagination, Select } from '@/shared/components/ui';
 
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
@@ -41,6 +41,9 @@ export default function PostList({
     handleDelete,
     filtered,
     categories,
+    page,
+    setPage,
+    hasNext,
   } = usePostListFilter({
     selectedPostId,
     onSelectPost,
@@ -138,6 +141,56 @@ export default function PostList({
             ))}
           </div>
         )}
+        {/* TODO: 백엔드 totalPage 오면 마지막 페이지 블록 계산을 totalPage 기준으로 변경 */}
+        <Pagination className='py-2'>
+          <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
+            <Pagination.Item>
+              <Pagination.Previous
+                href='#'
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (page > 1) setPage((p) => p - 1);
+                }}
+                className={
+                  page === 1 ? 'pointer-events-none opacity-50' : undefined
+                }
+              />
+            </Pagination.Item>
+            {(() => {
+              const startPage = Math.floor((page - 1) / 10) * 10 + 1;
+              const endPage = startPage + 9;
+              return Array.from(
+                { length: endPage - startPage + 1 },
+                (_, i) => startPage + i
+              ).map((p) => (
+                <Pagination.Item key={p}>
+                  <Pagination.Link
+                    href='#'
+                    isActive={page === p}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage(p);
+                    }}
+                  >
+                    {p}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ));
+            })()}
+            <Pagination.Item>
+              <Pagination.Next
+                href='#'
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (hasNext) setPage((p) => p + 1);
+                }}
+                className={
+                  !hasNext ? 'pointer-events-none opacity-50' : undefined
+                }
+              />
+            </Pagination.Item>
+          </Pagination.Content>
+        </Pagination>
       </div>
     </div>
   );
