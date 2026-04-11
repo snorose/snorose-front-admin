@@ -8,6 +8,10 @@ interface ExamReviewTablePaginationProps {
   hasNext?: boolean;
 }
 
+function getBlockStartPage(page: number) {
+  return Math.floor((page - 1) / 10) * 10 + 1;
+}
+
 export function ExamReviewTablePagination({
   currentPage: propCurrentPage,
   onPageChange,
@@ -25,6 +29,11 @@ export function ExamReviewTablePagination({
     }
   };
 
+  const blockStart = getBlockStartPage(currentPage);
+  const prevBlockStart = Math.max(1, blockStart - 10);
+  const nextBlockStart = blockStart + 10;
+  const canGoPrevious = blockStart > 1;
+
   return (
     <Pagination className='py-2'>
       <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
@@ -33,10 +42,10 @@ export function ExamReviewTablePagination({
             href='#'
             onClick={(e) => {
               e.preventDefault();
-              if (currentPage > 1) setCurrentPage((p) => p - 1);
+              if (canGoPrevious) setCurrentPage(prevBlockStart);
             }}
             className={
-              currentPage === 1 ? 'pointer-events-none opacity-50' : undefined
+              !canGoPrevious ? 'pointer-events-none opacity-50' : undefined
             }
           />
         </Pagination.Item>
@@ -70,7 +79,7 @@ export function ExamReviewTablePagination({
             href='#'
             onClick={(e) => {
               e.preventDefault();
-              if (hasNext) setCurrentPage((p) => p + 1);
+              if (hasNext) setCurrentPage(nextBlockStart);
             }}
             className={!hasNext ? 'pointer-events-none opacity-50' : undefined}
           />
