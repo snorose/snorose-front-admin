@@ -1,7 +1,6 @@
 export const PATHS = {
   HOME: '/',
   LOGIN: '/login',
-  POST_TRASH: '/posts/trash',
   POST_COMMENTS: '/posts/comments',
   MEMBER_INFO: '/member/info',
   MEMBER_PENALTY: '/member/penalty',
