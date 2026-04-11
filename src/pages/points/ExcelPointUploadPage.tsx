@@ -1,12 +1,6 @@
 import { useRef, useState } from 'react';
 
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Download,
-  Megaphone,
-  Trash2,
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Download, Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
@@ -71,7 +65,6 @@ const PREVIEW_TABLE_HEADERS = [
   '포인트',
   '카테고리',
   '메모',
-  '삭제',
 ] as const;
 
 const RESULT_TABLE_BODY_MAX_HEIGHT_CLASS =
@@ -376,19 +369,6 @@ export default function ExcelPointUploadPage() {
     );
   };
 
-  const handleRemovePreviewRow = (rowNumber: number) => {
-    setPreviewRows((prevRows) => {
-      const nextRows = prevRows.filter((row) => row.rowNumber !== rowNumber);
-
-      if (nextRows.length === 0) {
-        setUploadedFile(null);
-        setUploadResult(null);
-      }
-
-      return nextRows;
-    });
-  };
-
   return (
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
@@ -491,11 +471,7 @@ export default function ExcelPointUploadPage() {
                     {PREVIEW_TABLE_HEADERS.map((header) => (
                       <Table.Head
                         key={header}
-                        className={`h-11 px-3 text-center text-xs font-semibold text-slate-950 ${
-                          header === '삭제'
-                            ? 'sticky right-0 z-[2] bg-slate-50'
-                            : ''
-                        }`}
+                        className='h-11 px-3 text-center text-xs font-semibold text-slate-950'
                       >
                         {header}
                       </Table.Head>
@@ -527,21 +503,6 @@ export default function ExcelPointUploadPage() {
                         </Table.Cell>
                         <Table.Cell className='max-w-[min(14rem,35vw)] px-3 py-3 text-center text-xs text-gray-700'>
                           {row.memo || '—'}
-                        </Table.Cell>
-                        <Table.Cell className='sticky right-0 bg-white px-3 py-3 text-center'>
-                          <Button
-                            type='button'
-                            variant='ghost'
-                            size='sm'
-                            className='text-red-600 hover:bg-red-50 hover:text-red-700'
-                            disabled={isSubmitting}
-                            onClick={() =>
-                              handleRemovePreviewRow(row.rowNumber)
-                            }
-                          >
-                            <Trash2 className='size-4' aria-hidden />
-                            삭제
-                          </Button>
                         </Table.Cell>
                       </Table.Row>
                     ))
