@@ -554,7 +554,7 @@ export default function ExcelPointUploadPage() {
                           <Table.Cell className='px-3 py-3 text-center text-sm'>
                             {row.category || '—'}
                           </Table.Cell>
-                          <Table.Cell className='max-w-[min(14rem,35vw)] px-3 py-3 text-center text-xs text-gray-700'>
+                          <Table.Cell className='max-w-[min(14rem,35vw)] px-3 py-3 text-center text-xs break-words whitespace-normal text-gray-700'>
                             {row.memo || '—'}
                           </Table.Cell>
                         </Table.Row>
@@ -796,7 +796,7 @@ export default function ExcelPointUploadPage() {
                                     <Table.Cell className='px-3 py-3 text-center text-sm'>
                                       {row.category}
                                     </Table.Cell>
-                                    <Table.Cell className='max-w-[min(12rem,30vw)] px-3 py-3 text-center text-xs text-gray-700'>
+                                    <Table.Cell className='max-w-[min(12rem,30vw)] px-3 py-3 text-center text-xs break-words whitespace-normal text-gray-700'>
                                       {row.memo || '—'}
                                     </Table.Cell>
                                     <Table.Cell className='px-3 py-3 text-center text-sm'>
@@ -889,7 +889,7 @@ export default function ExcelPointUploadPage() {
                                   <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
                                     {row.category}
                                   </Table.Cell>
-                                  <Table.Cell className='max-w-[min(14rem,35vw)] px-4 py-3 text-center text-xs text-gray-700'>
+                                  <Table.Cell className='max-w-[min(14rem,35vw)] px-4 py-3 text-center text-xs break-words whitespace-normal text-gray-700'>
                                     {row.memo}
                                   </Table.Cell>
                                 </Table.Row>
