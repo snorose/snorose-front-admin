@@ -1,13 +1,12 @@
 import {
   BadgeCheck,
-  BookOpen,
   CalendarDays,
+  Coins,
   Copy,
   GraduationCap,
   IdCard,
   type LucideIcon,
   Mail,
-  ShieldAlert,
   UserRound,
 } from 'lucide-react';
 
@@ -16,6 +15,7 @@ import type { MemberInfo } from '@/shared/types';
 import {
   EMPTY_TEXT,
   formatDate,
+  formatDateTime,
   formatDisplayValue,
   formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -34,8 +34,16 @@ export default function MemberDetailInfoGrid({
   return (
     <div className='space-y-8'>
       <div className='flex flex-col items-center gap-4 border-b border-slate-100 pb-8'>
-        <div className='flex h-28 w-28 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-400'>
-          <UserRound className='h-12 w-12' />
+        <div className='flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-slate-400'>
+          {member.profileImageUrl ? (
+            <img
+              src={member.profileImageUrl}
+              alt={`${member.userName} 프로필`}
+              className='h-full w-full object-cover'
+            />
+          ) : (
+            <UserRound className='h-12 w-12' />
+          )}
         </div>
         <div className='text-center'>
           <p className='text-2xl font-semibold text-slate-950'>
@@ -92,16 +100,20 @@ export default function MemberDetailInfoGrid({
           label='등업일'
           value={formatDate(member.authenticatedAt)}
         />
-        <DetailField icon={BadgeCheck} label='회원 등급' value={roleLabel} />
         <DetailField
-          icon={Mail}
-          label='이메일'
-          value={formatDisplayValue(member.email)}
+          icon={CalendarDays}
+          label='최근 로그인 날짜'
+          value={formatDate(member.lastLoginAt)}
         />
         <DetailField
-          icon={ShieldAlert}
-          label='누적 경고 수'
-          value={`${member.totalWarningCount}회`}
+          icon={CalendarDays}
+          label='정보 수정일'
+          value={formatDateTime(member.updatedAt)}
+        />
+        <DetailField
+          icon={Coins}
+          label='보유 포인트'
+          value={formatPoint(member.pointBalance)}
         />
         <DetailField
           icon={IdCard}
@@ -110,10 +122,11 @@ export default function MemberDetailInfoGrid({
           copyValue={member.encryptedUserId}
           onCopy={onCopy}
         />
+        <DetailField icon={BadgeCheck} label='회원 등급' value={roleLabel} />
         <DetailField
-          icon={BookOpen}
-          label='보유 포인트'
-          value={formatPoint(member.pointBalance)}
+          icon={Mail}
+          label='이메일'
+          value={formatDisplayValue(member.email)}
         />
       </div>
     </div>
