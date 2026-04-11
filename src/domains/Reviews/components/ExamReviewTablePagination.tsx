@@ -32,7 +32,7 @@ export function ExamReviewTablePagination({
   const blockStart = getBlockStartPage(currentPage);
   const prevBlockStart = Math.max(1, blockStart - 10);
   const nextBlockStart = blockStart + 10;
-  const canGoPrevious = currentPage > 1;
+  const canGoPrevious = blockStart > 1;
 
   return (
     <Pagination className='py-2'>
