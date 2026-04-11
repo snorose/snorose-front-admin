@@ -7,6 +7,5 @@ export { default as AdjustSinglePointPage } from './points/AdjustSinglePointPage
 export { default as ExcelPointUploadPage } from './points/ExcelPointUploadPage';
 export { default as PointFreezePage } from './points/PointFreezePage';
 export { default as PointMultiplePage } from './points/PointMultiplePage';
-export { default as CommentPage } from './posts/CommentPage';
-export { default as PostPage } from './posts/PostPage';
+export { default as PostCommentPage } from './posts/PostCommentPage';
 export { default as ExamReviewPage } from './reviews/ExamReviewPage';
