@@ -408,6 +408,10 @@ export default function ExcelPointUploadPage() {
               처리되지 않은 회원은 다시 조회할 수 없으므로, 사유를 즉시 확인하신
               후 해당 회원만 별도로 업로드해 주세요.
             </li>
+            <li>
+              미리보기와 결과에 표시되는 행 번호는 엑셀 기준{' '}
+              <strong>2번 행부터</strong>입니다. 1번 행은 제목 줄입니다.
+            </li>
           </ul>
         </Alert.Description>
       </Alert>
