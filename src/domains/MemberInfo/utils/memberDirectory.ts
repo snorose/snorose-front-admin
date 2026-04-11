@@ -4,8 +4,10 @@ import type {
   MemberInfo,
 } from '@/shared/types';
 
-import { formatDateTime } from '@/domains/MemberInfo/utils/formatDateTime';
-import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
+import {
+  convertBlacklistTypeToLabel,
+  convertUserRoleIdToEnum,
+} from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 export type FilterValue = 'ALL' | string;
 
@@ -24,12 +26,12 @@ export const EMPTY_TEXT = '-';
 
 const EDIT_KEYS: (keyof EditMemberInfo)[] = [
   'userName',
+  'nickname',
   'studentNumber',
   'major',
   'userRoleId',
   'email',
   'birthday',
-  'authenticatedAt',
 ];
 
 export function extractFirstSearchMember(result: unknown): MemberInfo | null {
@@ -48,6 +50,13 @@ export function formatDisplayValue(value: string | null | undefined) {
 export function formatDate(value: string | null | undefined) {
   if (!value) return EMPTY_TEXT;
   return value.substring(0, 10);
+}
+
+export function formatDateTime(value: string | null | undefined) {
+  if (!value) return EMPTY_TEXT;
+
+  const normalizedValue = value.replace('T', ' ');
+  return normalizedValue.slice(0, 16);
 }
 
 export function formatPoint(value: number | null | undefined) {
@@ -73,17 +82,17 @@ export function getAdmissionYear(studentNumber: string) {
 export function getRoleBadgeClassName(userRoleId: number) {
   switch (userRoleId) {
     case 1:
-      return 'bg-emerald-100 text-emerald-700';
-    case 2:
       return 'bg-slate-100 text-slate-700';
-    case 3:
-      return 'bg-indigo-100 text-indigo-700';
+    case 2:
+      return 'bg-emerald-100 text-emerald-700';
     case 4:
-      return 'bg-amber-100 text-amber-700';
+      return 'bg-indigo-100 text-indigo-700';
     case 5:
       return 'bg-sky-100 text-sky-700';
     case 6:
       return 'bg-rose-100 text-rose-700';
+    case 7:
+      return 'bg-amber-100 text-amber-700';
     default:
       return 'bg-gray-100 text-gray-700';
   }
@@ -102,20 +111,46 @@ export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
   }
 
   return {
-    label: member.isBlacklist,
+    label: convertBlacklistTypeToLabel(member.blacklistType),
     tone: 'border border-rose-200 bg-rose-50 text-rose-700',
     summary: '현재 제재 상태가 적용 중입니다.',
   };
 }
 
+export function getRemainingPenaltyLabel(
+  endDate: string | null | undefined,
+  now: Date = new Date()
+) {
+  if (!endDate) return EMPTY_TEXT;
+
+  const targetDate = new Date(endDate);
+  if (Number.isNaN(targetDate.getTime())) {
+    return EMPTY_TEXT;
+  }
+
+  const diffMs = targetDate.getTime() - now.getTime();
+  if (diffMs <= 0) {
+    return '종료됨';
+  }
+
+  const totalMinutes = Math.ceil(diffMs / (1000 * 60));
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) return `${days}일`;
+  if (hours > 0) return `${hours}시간`;
+  return `${Math.max(minutes, 1)}분`;
+}
+
 export function getRoleOptions(): DirectoryFilterOption[] {
   return [
-    { value: '1', label: '정회원' },
-    { value: '2', label: '준회원' },
-    { value: '3', label: '리자' },
-    { value: '4', label: '광고주' },
+    { value: '1', label: '준회원' },
+    { value: '2', label: '정회원' },
+    { value: '4', label: '리자' },
     { value: '5', label: '공식' },
     { value: '6', label: '강등자' },
+    { value: '7', label: '광고주' },
   ];
 }
 
@@ -157,6 +192,7 @@ export function createMemberDiffPayload(
 
     switch (key) {
       case 'userName':
+      case 'nickname':
       case 'email':
       case 'studentNumber':
       case 'major':
@@ -167,13 +203,6 @@ export function createMemberDiffPayload(
         break;
       case 'userRoleId':
         if (typeof newValue === 'number') diff[key] = newValue;
-        break;
-      case 'authenticatedAt':
-        if (newValue === null || newValue === '' || newValue === undefined) {
-          diff[key] = null;
-        } else if (typeof newValue === 'string') {
-          diff[key] = formatDateTime(newValue);
-        }
         break;
     }
   });

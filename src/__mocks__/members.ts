@@ -1,8 +1,8 @@
 import type {
-  MemberInfo,
   DownloadedExamReview,
-  UserPointHistory,
+  MemberInfo,
   UserBlacklistHistory,
+  UserPointHistory,
 } from '@/shared/types';
 
 export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
@@ -38,7 +38,8 @@ export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
     createdAt: '2025-01-01',
     authenticatedAt: '2025-01-01',
     totalWarningCount: 2,
-    isBlacklist: '강등',
+    isBlacklist: true,
+    blacklistType: 'RELEGATION',
     blacklistStartDate: '2025-11-01T11:11:11',
     blacklistEndDate: '2025-12-01T00:00:00',
   },
@@ -56,7 +57,8 @@ export const MEMBER_SAMPLE_DATA: MemberInfo[] = [
     createdAt: '2025-01-01',
     authenticatedAt: '2025-01-01',
     totalWarningCount: 1,
-    isBlacklist: '영구강등',
+    isBlacklist: true,
+    blacklistType: 'BLACKLIST',
     blacklistStartDate: null,
     blacklistEndDate: null,
   },
