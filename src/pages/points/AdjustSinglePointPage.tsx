@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { PageHeader } from '@/shared/components';
 import { Button, Input } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
-import { useAuth } from '@/shared/hooks';
 import type { MemberInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -19,7 +18,6 @@ import {
 import { postSinglePointAPI, searchUsersAPI } from '@/apis';
 
 export default function AdjustSinglePointPage() {
-  const { user } = useAuth();
   const [searchedMember, setSearchedMember] = useState<MemberInfo | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
@@ -72,7 +70,6 @@ export default function AdjustSinglePointPage() {
         encryptedUserId: searchedMember.encryptedUserId,
         difference: numDifference,
         category: selectedCategory,
-        sourceId: user?.userId,
         source: 'ADMIN',
         ...(memo && { memo }),
       });
