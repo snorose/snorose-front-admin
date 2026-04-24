@@ -6,6 +6,7 @@ export const PATHS = {
   MEMBER_INFO: '/member/info',
   MEMBER_PENALTY: '/member/penalty',
   REVIEW_EXAM: '/reviews/exam',
+  REVIEW_EXAM_PERIOD: '/reviews/exam-period',
   POINT_HISTORY: '/point/history',
   POINT_SINGLE: '/point/single',
   POINT_ALL: '/point/all',

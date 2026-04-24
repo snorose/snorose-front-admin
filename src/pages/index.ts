@@ -10,3 +10,4 @@ export { default as PointMultiplePage } from './points/PointMultiplePage';
 export { default as CommentPage } from './posts/CommentPage';
 export { default as PostPage } from './posts/PostPage';
 export { default as ExamReviewPage } from './reviews/ExamReviewPage';
+export { default as ExamReviewPeriodPage } from './reviews/ExamReviewPeriodPage';

@@ -12,6 +12,7 @@ import {
   AdjustSinglePointPage,
   CommentPage,
   ExamReviewPage,
+  ExamReviewPeriodPage,
   ExcelPointUploadPage,
   LogInPage,
   MemberInfoPage,
@@ -67,6 +68,10 @@ function App() {
                             <Route
                               path={PATHS.REVIEW_EXAM}
                               element={<ExamReviewPage />}
+                            />
+                            <Route
+                              path={PATHS.REVIEW_EXAM_PERIOD}
+                              element={<ExamReviewPeriodPage />}
                             />
                             <Route
                               path={PATHS.POINT_SINGLE}

@@ -1,4 +1,5 @@
 import { axiosInstance } from '@/shared/axios/instance';
+import type { CreateExamReviewPeriod } from '@/shared/types';
 
 import type {
   ConfirmExamReviewRequest,
@@ -87,6 +88,24 @@ export const downloadExamReviewFile = async (
     {
       responseType: 'blob',
     }
+  );
+  return response.data;
+};
+
+// 시험 후기 작성 기간 관리 api
+export const postExamReviewPeriodAPI = async (data: CreateExamReviewPeriod) => {
+  const response = await axiosInstance.post('/v1/admin/reviews/period', data);
+  return response.data;
+};
+
+export const getExamReviewPeriodsAPI = async () => {
+  const response = await axiosInstance.get('/v1/admin/reviews/period');
+  return response.data;
+};
+
+export const deleteExamReviewPeriodAPI = async (periodId: number) => {
+  const response = await axiosInstance.delete(
+    `/v1/admin/reviews/period/${periodId}`
   );
   return response.data;
 };
