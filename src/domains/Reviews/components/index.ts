@@ -8,6 +8,7 @@ export { ExamReviewDetailInfoSection } from './ExamReviewDetailInfoSection';
 export { ExamReviewPeriodDeleteConfirmModal } from './ExamReviewPeriodDeleteConfirmModal';
 export { ExamReviewPeriodListSection } from './ExamReviewPeriodListSection';
 export { ExamReviewPeriodScheduleForm } from './ExamReviewPeriodScheduleForm';
+export { ExamReviewPeriodUpdateConfirmModal } from './ExamReviewPeriodUpdateConfirmModal';
 export { ExamReviewPostInfoSection } from './ExamReviewPostInfoSection';
 export { ExamReviewTablePagination } from './ExamReviewTablePagination';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';

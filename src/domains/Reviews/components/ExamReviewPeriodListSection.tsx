@@ -6,7 +6,10 @@ import { Button, DropdownMenu, Table } from '@/shared/components/ui';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import { ExamReviewPeriodDeleteConfirmModal } from '@/domains/Reviews/components';
+import {
+  ExamReviewPeriodDeleteConfirmModal,
+  ExamReviewPeriodUpdateConfirmModal,
+} from '@/domains/Reviews/components';
 
 export function ExamReviewPeriodListSection({
   examReviewPeriods,
@@ -19,6 +22,7 @@ export function ExamReviewPeriodListSection({
     null
   );
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   const handleDeleteScheduleClick = (id: number) => {
     const deletedItem = examReviewPeriods.find((item) => item.id === id);
@@ -26,6 +30,15 @@ export function ExamReviewPeriodListSection({
     if (deletedItem) {
       setSelectedItem(deletedItem);
       setIsDeleteModalOpen(true);
+    }
+  };
+
+  const handleUpdateScheduleClick = (id: number) => {
+    const updatedItem = examReviewPeriods.find((item) => item.id === id);
+
+    if (updatedItem) {
+      setSelectedItem(updatedItem);
+      setIsUpdateModalOpen(true);
     }
   };
 
@@ -84,6 +97,12 @@ export function ExamReviewPeriodListSection({
                           </DropdownMenu.Trigger>
                           <DropdownMenu.Content align='end'>
                             <DropdownMenu.Item
+                              onClick={() => handleUpdateScheduleClick(id)}
+                            >
+                              수정
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Separator />
+                            <DropdownMenu.Item
                               variant='destructive'
                               onClick={() => handleDeleteScheduleClick(id)}
                             >
@@ -116,6 +135,20 @@ export function ExamReviewPeriodListSection({
           }}
           onClose={() => {
             setIsDeleteModalOpen(false);
+            setSelectedItem(null);
+          }}
+        />
+      )}
+
+      {isUpdateModalOpen && selectedItem && (
+        <ExamReviewPeriodUpdateConfirmModal
+          isUpdateModalOpen={isUpdateModalOpen}
+          selectedItem={selectedItem as ExamReviewPeriod}
+          onSuccess={() => {
+            getExamReviewPeriods();
+          }}
+          onClose={() => {
+            setIsUpdateModalOpen(false);
             setSelectedItem(null);
           }}
         />

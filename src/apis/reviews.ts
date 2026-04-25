@@ -1,5 +1,8 @@
 import { axiosInstance } from '@/shared/axios/instance';
-import type { CreateExamReviewPeriod } from '@/shared/types';
+import type {
+  CreateExamReviewPeriod,
+  UpdateExamReviewPeriod,
+} from '@/shared/types';
 
 import type {
   ConfirmExamReviewRequest,
@@ -100,6 +103,17 @@ export const postExamReviewPeriodAPI = async (data: CreateExamReviewPeriod) => {
 
 export const getExamReviewPeriodsAPI = async () => {
   const response = await axiosInstance.get('/v1/admin/reviews/period');
+  return response.data;
+};
+
+export const patchExamReviewPeriodAPI = async (
+  periodId: number,
+  data: UpdateExamReviewPeriod
+) => {
+  const response = await axiosInstance.patch(
+    `/v1/admin/reviews/period/${periodId}`,
+    data
+  );
   return response.data;
 };
 
