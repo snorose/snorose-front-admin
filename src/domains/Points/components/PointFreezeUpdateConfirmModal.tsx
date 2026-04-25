@@ -7,8 +7,8 @@ import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { PointFreeze } from '@/shared/types';
 import {
-  formatDateTimeForAPI,
   formatDateTimeForInput,
+  formatDateTimeWithT,
   getErrorMessage,
 } from '@/shared/utils';
 
@@ -63,8 +63,8 @@ export function PointFreezeUpdateConfirmModal({
     try {
       await patchPointFreezeAPI(selectedItem.id, {
         title,
-        startAt: formatDateTimeForAPI(startDateTime.dateTime),
-        endAt: formatDateTimeForAPI(endDateTime.dateTime),
+        startAt: formatDateTimeWithT(startDateTime.dateTime),
+        endAt: formatDateTimeWithT(endDateTime.dateTime),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();

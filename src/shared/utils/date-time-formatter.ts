@@ -7,6 +7,14 @@ export function formatDateTimeForAPI(dateTimeString: string): string {
 }
 
 /**
+ * datetime-local input 형식을 T 포함 API 형식으로 변환
+ * '2024-01-01T12:00' → '2024-01-01T12:00:00'
+ */
+export function formatDateTimeWithT(dateTimeString: string): string {
+  return `${dateTimeString}:00`;
+}
+
+/**
  * API 형식을 datetime-local input 형식으로 변환
  * '2024-01-01 12:00:00' → '2024-01-01T12:00'
  */
