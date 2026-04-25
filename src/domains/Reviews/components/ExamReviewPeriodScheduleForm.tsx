@@ -7,15 +7,15 @@ import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { formatDateTimeWithT, getErrorMessage } from '@/shared/utils';
 
-import { postPointFreezeAPI } from '@/apis';
+import { postExamReviewPeriodAPI } from '@/apis';
 
-interface PointFreezeScheduleFormProps {
+interface ExamReviewPeriodScheduleFormProps {
   onSuccess: () => void;
 }
 
-export function PointFreezeScheduleForm({
+export function ExamReviewPeriodScheduleForm({
   onSuccess,
-}: PointFreezeScheduleFormProps) {
+}: ExamReviewPeriodScheduleFormProps) {
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -42,16 +42,20 @@ export function PointFreezeScheduleForm({
     }
 
     try {
-      await postPointFreezeAPI({
-        title,
-        startAt: formatDateTimeWithT(startDateTime.dateTime),
-        endAt: formatDateTimeWithT(endDateTime.dateTime),
-      });
-      toast.success('미지급 일정 생성이 완료되었어요.');
+      await postExamReviewPeriodAPI([
+        {
+          title,
+          startAt: formatDateTimeWithT(startDateTime.dateTime),
+          endAt: formatDateTimeWithT(endDateTime.dateTime),
+        },
+      ]);
+      toast.success('시험 후기 작성 기간 생성이 완료되었어요.');
       handleResetButtonClick();
       onSuccess();
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, '미지급 일정 생성에 실패했습니다.'));
+      toast.error(
+        getErrorMessage(error, '시험 후기 작성 기간 생성에 실패했습니다.')
+      );
     }
   };
 
@@ -78,11 +82,11 @@ export function PointFreezeScheduleForm({
   return (
     <section className='flex flex-col gap-4'>
       <article className='flex w-full flex-col gap-1'>
-        <h3 className='text-lg font-bold'>미지급 일정 생성</h3>
+        <h3 className='text-lg font-bold'>시험 후기 작성 기간 생성</h3>
         <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor='title' required>
-              일정 제목
+              기간 제목
             </Label>
             <Input
               type='text'

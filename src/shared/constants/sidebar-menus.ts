@@ -54,6 +54,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         title: '시험 후기 관리',
         url: PATHS.REVIEW_EXAM,
       },
+      {
+        title: '시험후기 작성 기간',
+        url: PATHS.REVIEW_EXAM_PERIOD,
+      },
     ],
   },
   {

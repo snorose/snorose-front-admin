@@ -5,28 +5,28 @@ import { toast } from 'sonner';
 import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import type { PointFreeze } from '@/shared/types';
+import type { ExamReviewPeriod } from '@/shared/types';
 import {
   formatDateTimeForInput,
   formatDateTimeWithT,
   getErrorMessage,
 } from '@/shared/utils';
 
-import { patchPointFreezeAPI } from '@/apis';
+import { patchExamReviewPeriodAPI } from '@/apis';
 
-interface PointFreezeUpdateConfirmModalProps {
+interface ExamReviewPeriodUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
-  selectedItem: PointFreeze;
+  selectedItem: ExamReviewPeriod;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export function PointFreezeUpdateConfirmModal({
+export function ExamReviewPeriodUpdateConfirmModal({
   isUpdateModalOpen,
   selectedItem,
   onClose,
   onSuccess,
-}: PointFreezeUpdateConfirmModalProps) {
+}: ExamReviewPeriodUpdateConfirmModalProps) {
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -61,38 +61,32 @@ export function PointFreezeUpdateConfirmModal({
     }
 
     try {
-      await patchPointFreezeAPI(selectedItem.id, {
+      await patchExamReviewPeriodAPI(selectedItem.id, {
         title,
         startAt: formatDateTimeWithT(startDateTime.dateTime),
         endAt: formatDateTimeWithT(endDateTime.dateTime),
       });
-      toast.success('미지급 일정 수정이 완료되었어요.');
+      toast.success('시험 후기 작성 기간 수정이 완료되었어요.');
       onClose();
       onSuccess();
     } catch (error: unknown) {
-      const errorMessage = getErrorMessage(
-        error,
-        '미지급 일정 수정에 실패했습니다.'
+      toast.error(
+        getErrorMessage(error, '시험 후기 작성 기간 수정에 실패했습니다.')
       );
-      toast.error(errorMessage);
     }
-  };
-
-  const handleUpdateCancel = () => {
-    onClose();
   };
 
   return (
     <Dialog open={isUpdateModalOpen} onOpenChange={onClose}>
       <Dialog.Content className='max-w-xs sm:max-w-sm'>
         <Dialog.Header>
-          <Dialog.Title>일정 수정</Dialog.Title>
+          <Dialog.Title>작성 기간 수정</Dialog.Title>
           <Dialog.Description>
-            포인트 미지급 일정을 수정하시겠습니까?
+            시험 후기 작성 기간을 수정하시겠습니까?
           </Dialog.Description>
         </Dialog.Header>
         <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>일정 제목: </Label>
+          <Label className='text-sm font-semibold'>기간 제목: </Label>
           <Input
             type='text'
             id='title'
@@ -117,7 +111,7 @@ export function PointFreezeUpdateConfirmModal({
           datePlaceholder='종료 날짜 선택'
         />
         <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={handleUpdateCancel}>
+          <Button type='button' variant='outline' onClick={onClose}>
             취소
           </Button>
           <Button type='button' onClick={handleUpdateConfirm}>
