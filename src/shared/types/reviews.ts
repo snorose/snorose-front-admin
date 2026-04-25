@@ -10,5 +10,5 @@ export interface ExamReviewPeriod extends ExamReviewPeriodBase {
   updatedAt: string;
 }
 
-export type CreateExamReviewPeriod = ExamReviewPeriodBase;
+export type CreateExamReviewPeriod = ExamReviewPeriodBase[];
 export type UpdateExamReviewPeriod = ExamReviewPeriodBase;
