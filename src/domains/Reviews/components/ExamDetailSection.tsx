@@ -111,6 +111,9 @@ export function ExamDetailSection({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
+  const [activeTab, setActiveTab] = useState<'review' | 'post' | 'comments'>(
+    'review'
+  );
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -482,7 +485,13 @@ export function ExamDetailSection({
             ))}
           </div>
         ) : (
-          <Tabs defaultValue='review' className='w-full p-4'>
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              setActiveTab(value as 'review' | 'post' | 'comments')
+            }
+            className='w-full p-4'
+          >
             <div className='border-gray-200 bg-white'>
               <Field className='w-1/2 gap-0'>
                 <Field.Label>확인여부</Field.Label>
@@ -515,35 +524,37 @@ export function ExamDetailSection({
             </div>
 
             <div className='flex flex-col gap-2'>
-              <Tabs.List className='mt-3 inline-flex gap-4'>
-                <Tabs.Trigger value='review' className='w-fit'>
-                  시험후기 상세정보
-                </Tabs.Trigger>
-                <Tabs.Trigger value='post' className='w-fit'>
-                  게시글 및 작성자 정보
-                </Tabs.Trigger>
-                <Tabs.Trigger value='comments' className='w-fit'>
-                  댓글 목록
-                </Tabs.Trigger>
-              </Tabs.List>
+              <div className='mt-3 flex items-center justify-between gap-3'>
+                <Tabs.List className='inline-flex gap-4'>
+                  <Tabs.Trigger value='review' className='w-fit'>
+                    시험후기 상세정보
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='post' className='w-fit'>
+                    게시글 및 작성자 정보
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='comments' className='w-fit'>
+                    댓글 목록
+                  </Tabs.Trigger>
+                </Tabs.List>
+                {activeTab === 'review' && (
+                  <button
+                    type='button'
+                    className={`flex rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                      isEditMode
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                    }`}
+                    onClick={() => setIsEditMode((prev) => !prev)}
+                  >
+                    <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                    {isEditMode ? '편집 중' : '편집 모드'}
+                  </button>
+                )}
+              </div>
 
               <Tabs.Content value='review' className='min-h-[560px]'>
                 <Card>
                   <Card.Content className='flex min-h-[500px] flex-col gap-y-2 p-4'>
-                    <div className='flex items-center justify-between gap-2'>
-                      <button
-                        type='button'
-                        className={`flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                          isEditMode
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                        }`}
-                        onClick={() => setIsEditMode((prev) => !prev)}
-                      >
-                        <Pencil className='h-3.5 w-3.5' />
-                        {isEditMode ? '편집 중' : '편집 모드'}
-                      </button>
-                    </div>
                     <ExamReviewDetailInfoSection
                       formData={formData}
                       setFormData={(partialData) =>
