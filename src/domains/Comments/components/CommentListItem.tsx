@@ -3,10 +3,10 @@ import { CornerDownRight, Trash2 } from 'lucide-react';
 import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
-import type { AdminCommentListResponse } from '@/domains/Comments/types';
+import type { AdminCommentResponse } from '@/domains/Comments/types';
 
 interface CommentListItemProps {
-  comment: AdminCommentListResponse;
+  comment: AdminCommentResponse;
   isSelected: boolean;
   onSelect: (commentId: number) => void;
   onDelete: (commentId: number) => void;
