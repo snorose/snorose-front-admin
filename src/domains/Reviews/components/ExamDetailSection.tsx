@@ -5,7 +5,6 @@ import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
-  Button,
   Card,
   ConfirmModal,
   Field,
@@ -536,20 +535,44 @@ export function ExamDetailSection({
                     댓글 목록
                   </Tabs.Trigger>
                 </Tabs.List>
-                {activeTab === 'review' && (
-                  <button
-                    type='button'
-                    className={`flex rounded-sm px-2.5 py-1.5 text-xs font-medium transition-colors ${
-                      isEditMode
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                    }`}
-                    onClick={() => setIsEditMode((prev) => !prev)}
-                  >
-                    <Pencil className='mr-1.5 h-3.5 w-3.5' />
-                    {isEditMode ? '편집 중' : '편집 모드'}
-                  </button>
-                )}
+                {activeTab === 'review' ? (
+                  isEditMode ? (
+                    <div className='flex items-center gap-2'>
+                      <button
+                        type='button'
+                        className='inline-flex items-center rounded-sm border border-gray-300 bg-white px-5 py-2 text-xs font-medium whitespace-nowrap text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60'
+                        onClick={handleCancel}
+                        disabled={isDisabled || isSaving}
+                      >
+                        취소
+                      </button>
+                      <button
+                        type='button'
+                        className='inline-flex items-center rounded-sm bg-blue-600 px-5 py-2 text-xs font-medium whitespace-nowrap text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60'
+                        onClick={openSaveModal}
+                        disabled={isDisabled || !isDirty || isSaving}
+                      >
+                        {isSaving ? (
+                          <span className='inline-flex items-center gap-1'>
+                            <Loader2 className='h-3 w-3 animate-spin' />
+                            저장 중
+                          </span>
+                        ) : (
+                          '저장'
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type='button'
+                      className='inline-flex items-center rounded-sm bg-blue-100 px-5 py-2 text-xs font-medium whitespace-nowrap text-blue-700 transition-colors hover:bg-blue-200'
+                      onClick={() => setIsEditMode((prev) => !prev)}
+                    >
+                      <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                      편집 모드
+                    </button>
+                  )
+                ) : null}
               </div>
 
               <Tabs.Content value='review' className='min-h-[560px]'>
@@ -566,34 +589,6 @@ export function ExamDetailSection({
                       selectedFile={selectedFile}
                       setSelectedFile={setSelectedFile}
                     />
-
-                    {(isEditMode || isDirty) && (
-                      <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
-                        <Button
-                          variant='outline'
-                          className='w-20'
-                          onClick={handleCancel}
-                          disabled={isDisabled || isSaving}
-                        >
-                          취소
-                        </Button>
-                        <Button
-                          variant='default'
-                          className='w-20 bg-gray-700'
-                          onClick={openSaveModal}
-                          disabled={isDisabled || !isDirty || isSaving}
-                        >
-                          {isSaving ? (
-                            <div className='flex items-center gap-1'>
-                              <Loader2 className='h-3 w-3 animate-spin' />
-                              <span>저장 중</span>
-                            </div>
-                          ) : (
-                            '저장'
-                          )}
-                        </Button>
-                      </div>
-                    )}
                   </Card.Content>
                 </Card>
               </Tabs.Content>
