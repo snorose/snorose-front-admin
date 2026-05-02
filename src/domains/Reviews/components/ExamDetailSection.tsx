@@ -15,6 +15,7 @@ import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 import {
   ExamConfirmStatusBadge,
+  ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
@@ -530,6 +531,8 @@ export function ExamDetailSection({
                 author={formData.author}
                 encryptedUserId={formData.encryptedUserId}
               />
+
+              <ExamReviewCommentSection postId={formData.postId} />
 
               {(isEditMode || isDirty) && (
                 <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
