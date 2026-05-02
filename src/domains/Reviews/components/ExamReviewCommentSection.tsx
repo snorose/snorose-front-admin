@@ -70,8 +70,6 @@ export function ExamReviewCommentSection({
     comment: PostCommentResponse,
     depth = 0
   ): ReactNode => {
-    if (comment.isDeleted || !comment.isVisible) return null;
-
     return (
       <div key={comment.id} className='flex flex-col gap-2'>
         <article
