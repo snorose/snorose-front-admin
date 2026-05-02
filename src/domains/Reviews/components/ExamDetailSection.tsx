@@ -1,20 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
   Button,
+  Card,
   ConfirmModal,
   Field,
   Select,
   Skeleton,
+  Tabs,
 } from '@/shared/components/ui';
 import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 import {
   ExamConfirmStatusBadge,
+  ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
@@ -108,6 +111,9 @@ export function ExamDetailSection({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
+  const [activeTab, setActiveTab] = useState<'review' | 'post' | 'comments'>(
+    'review'
+  );
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -479,8 +485,14 @@ export function ExamDetailSection({
             ))}
           </div>
         ) : (
-          <div className='flex flex-col gap-4 p-4 pt-2'>
-            <div className='flex flex-col gap-y-2 md:gap-x-4'>
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              setActiveTab(value as 'review' | 'post' | 'comments')
+            }
+            className='w-full p-4'
+          >
+            <div className='border-gray-200 bg-white'>
               <Field className='w-1/2 gap-0'>
                 <Field.Label>확인여부</Field.Label>
                 <Field.Content>
@@ -509,57 +521,106 @@ export function ExamDetailSection({
                   </Select>
                 </Field.Content>
               </Field>
-
-              <ExamReviewDetailInfoSection
-                formData={formData}
-                setFormData={(partialData) =>
-                  setFormData((prev) => ({ ...prev, ...partialData }))
-                }
-                isFormDisabled={isFormDisabled}
-                isEditMode={isEditMode}
-                onToggleEditMode={() => setIsEditMode((prev) => !prev)}
-                onFileDownload={handleFileDownload}
-                fileInputRef={fileInputRef}
-                selectedFile={selectedFile}
-                setSelectedFile={setSelectedFile}
-              />
-
-              <ExamReviewPostInfoSection
-                postId={formData.postId}
-                uploadTime={formData.uploadTime}
-                author={formData.author}
-                encryptedUserId={formData.encryptedUserId}
-              />
-
-              {(isEditMode || isDirty) && (
-                <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
-                  <Button
-                    variant='outline'
-                    className='w-20'
-                    onClick={handleCancel}
-                    disabled={isDisabled || isSaving}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    variant='default'
-                    className='w-20 bg-gray-700'
-                    onClick={openSaveModal}
-                    disabled={isDisabled || !isDirty || isSaving}
-                  >
-                    {isSaving ? (
-                      <div className='flex items-center gap-1'>
-                        <Loader2 className='h-3 w-3 animate-spin' />
-                        <span>저장 중</span>
-                      </div>
-                    ) : (
-                      '저장'
-                    )}
-                  </Button>
-                </div>
-              )}
             </div>
-          </div>
+
+            <div className='flex flex-col gap-2'>
+              <div className='mt-3 flex items-center justify-between gap-3'>
+                <Tabs.List className='inline-flex gap-4'>
+                  <Tabs.Trigger value='review' className='w-fit'>
+                    시험후기 상세정보
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='post' className='w-fit'>
+                    게시글 및 작성자 정보
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='comments' className='w-fit'>
+                    댓글 목록
+                  </Tabs.Trigger>
+                </Tabs.List>
+                {activeTab === 'review' ? (
+                  isEditMode ? (
+                    <div className='flex items-center gap-2'>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        className='h-8 px-5 text-xs'
+                        onClick={handleCancel}
+                        disabled={isDisabled || isSaving}
+                      >
+                        취소
+                      </Button>
+                      <Button
+                        type='button'
+                        size='sm'
+                        className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
+                        onClick={openSaveModal}
+                        disabled={isDisabled || !isDirty || isSaving}
+                      >
+                        {isSaving ? (
+                          <span className='inline-flex items-center gap-1'>
+                            <Loader2 className='h-3 w-3 animate-spin' />
+                            저장 중
+                          </span>
+                        ) : (
+                          '저장'
+                        )}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type='button'
+                      variant='secondary'
+                      size='sm'
+                      className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
+                      onClick={() => setIsEditMode((prev) => !prev)}
+                    >
+                      <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                      편집 모드
+                    </Button>
+                  )
+                ) : null}
+              </div>
+
+              <Tabs.Content value='review' className='min-h-[680px]'>
+                <Card>
+                  <Card.Content className='flex min-h-[620px] flex-col gap-y-2 p-4'>
+                    <ExamReviewDetailInfoSection
+                      formData={formData}
+                      setFormData={(partialData) =>
+                        setFormData((prev) => ({ ...prev, ...partialData }))
+                      }
+                      isFormDisabled={isFormDisabled}
+                      onFileDownload={handleFileDownload}
+                      fileInputRef={fileInputRef}
+                      selectedFile={selectedFile}
+                      setSelectedFile={setSelectedFile}
+                    />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+
+              <Tabs.Content value='post' className='min-h-[460px]'>
+                <Card>
+                  <Card.Content className='p-4'>
+                    <ExamReviewPostInfoSection
+                      postId={formData.postId}
+                      uploadTime={formData.uploadTime}
+                      author={formData.author}
+                      encryptedUserId={formData.encryptedUserId}
+                    />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+
+              <Tabs.Content value='comments' className='min-h-[460px]'>
+                <Card>
+                  <Card.Content className='p-4'>
+                    <ExamReviewCommentSection postId={formData.postId} />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+            </div>
+          </Tabs>
         )}
       </div>
 

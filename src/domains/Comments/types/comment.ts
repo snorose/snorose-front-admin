@@ -7,6 +7,7 @@ export interface AdminCommentListResponse {
   isVisible: boolean;
   isKeywordExist: boolean;
   createdAt: string;
+  userDisplay: string;
   nickname: string;
   content: string;
   reportCount: number;
