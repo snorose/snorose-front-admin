@@ -3,6 +3,7 @@ export { Alert } from './alert';
 export { Badge } from './badge';
 export { Button } from './button';
 export { Calendar } from './calendar';
+export { Card } from './card';
 export { Collapsible } from './collapsible';
 export { ConfirmModal } from './confirm-modal';
 export { Dialog } from './dialog';

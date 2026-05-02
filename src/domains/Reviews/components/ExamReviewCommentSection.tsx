@@ -101,18 +101,15 @@ export function ExamReviewCommentSection({
   };
 
   return (
-    <section className='rounded-md border'>
-      <div className='flex items-center bg-gray-100 px-4 py-3'>
-        <h3 className='text-base font-semibold'>댓글 목록</h3>
+    <section>
+      <div>
         {isFetching && !isInitialLoading && (
-          <div className='flex items-center gap-1 text-xs text-gray-500'>
+          <div className='flex justify-end gap-1 text-xs text-gray-500'>
             <Loader2 className='size-3 animate-spin' />
             불러오는 중...
           </div>
         )}
-      </div>
 
-      <div className='p-4 pt-2'>
         {isInitialLoading ? (
           <div className='flex items-center justify-center gap-1 py-8 text-sm text-gray-500'>
             <Loader2 className='size-4 animate-spin' />
