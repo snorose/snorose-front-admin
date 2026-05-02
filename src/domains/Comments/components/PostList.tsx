@@ -44,6 +44,7 @@ export default function PostList({
     page,
     setPage,
     hasNext,
+    totalPage,
   } = usePostListFilter({
     selectedPostId,
     onSelectPost,
@@ -141,7 +142,6 @@ export default function PostList({
             ))}
           </div>
         )}
-        {/* TODO: 백엔드 totalPage 오면 마지막 페이지 블록 계산을 totalPage 기준으로 변경 */}
         <Pagination className='py-2'>
           <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
             <Pagination.Item>
@@ -158,7 +158,10 @@ export default function PostList({
             </Pagination.Item>
             {(() => {
               const startPage = Math.floor((page - 1) / 10) * 10 + 1;
-              const endPage = startPage + 9;
+              const endPage =
+                totalPage !== undefined
+                  ? Math.min(startPage + 9, Math.max(1, totalPage))
+                  : startPage + 9;
               return Array.from(
                 { length: endPage - startPage + 1 },
                 (_, i) => startPage + i
