@@ -5,6 +5,7 @@ import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
+  Button,
   Card,
   ConfirmModal,
   Field,
@@ -538,17 +539,20 @@ export function ExamDetailSection({
                 {activeTab === 'review' ? (
                   isEditMode ? (
                     <div className='flex items-center gap-2'>
-                      <button
+                      <Button
                         type='button'
-                        className='inline-flex items-center rounded-sm border border-gray-300 bg-white px-5 py-2 text-xs font-medium whitespace-nowrap text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60'
+                        variant='outline'
+                        size='sm'
+                        className='h-8 px-5 text-xs'
                         onClick={handleCancel}
                         disabled={isDisabled || isSaving}
                       >
                         취소
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type='button'
-                        className='inline-flex items-center rounded-sm bg-blue-600 px-5 py-2 text-xs font-medium whitespace-nowrap text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60'
+                        size='sm'
+                        className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
                         onClick={openSaveModal}
                         disabled={isDisabled || !isDirty || isSaving}
                       >
@@ -560,17 +564,19 @@ export function ExamDetailSection({
                         ) : (
                           '저장'
                         )}
-                      </button>
+                      </Button>
                     </div>
                   ) : (
-                    <button
+                    <Button
                       type='button'
-                      className='inline-flex items-center rounded-sm bg-blue-100 px-5 py-2 text-xs font-medium whitespace-nowrap text-blue-700 transition-colors hover:bg-blue-200'
+                      variant='secondary'
+                      size='sm'
+                      className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
                       onClick={() => setIsEditMode((prev) => !prev)}
                     >
                       <Pencil className='mr-1.5 h-3.5 w-3.5' />
                       편집 모드
-                    </button>
+                    </Button>
                   )
                 ) : null}
               </div>
