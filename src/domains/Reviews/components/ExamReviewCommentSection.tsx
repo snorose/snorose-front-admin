@@ -39,6 +39,7 @@ export function ExamReviewCommentSection({
   const isInitialLoading = commentsQuery.isLoading;
   const isFetchingNextPage = commentsQuery.isFetchingNextPage;
   const hasNextPage = commentsQuery.hasNextPage;
+  const fetchNextPage = commentsQuery.fetchNextPage;
 
   useEffect(() => {
     const observerTarget = loadMoreRef.current;
@@ -48,7 +49,7 @@ export function ExamReviewCommentSection({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting && !isFetchingNextPage) {
-          void commentsQuery.fetchNextPage();
+          void fetchNextPage();
         }
       },
       {
@@ -61,7 +62,7 @@ export function ExamReviewCommentSection({
     observer.observe(observerTarget);
 
     return () => observer.disconnect();
-  }, [commentsQuery, hasNextPage, isFetchingNextPage, postId]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, postId]);
 
   if (!postId) return null;
 
