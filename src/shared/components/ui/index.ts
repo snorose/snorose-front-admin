@@ -21,6 +21,7 @@ export { Sidebar } from './sidebar';
 export { Skeleton } from './skeleton';
 export { Switch } from './switch';
 export { Table } from './table';
+export { Tabs } from './tabs';
 export { Textarea } from './textarea';
 export { Tooltip } from './tooltip';
 export { Toaster } from 'sonner';
