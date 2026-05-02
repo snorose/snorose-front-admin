@@ -575,9 +575,9 @@ export function ExamDetailSection({
                 ) : null}
               </div>
 
-              <Tabs.Content value='review' className='min-h-[560px]'>
+              <Tabs.Content value='review' className='min-h-[680px]'>
                 <Card>
-                  <Card.Content className='flex min-h-[500px] flex-col gap-y-2 p-4'>
+                  <Card.Content className='flex min-h-[620px] flex-col gap-y-2 p-4'>
                     <ExamReviewDetailInfoSection
                       formData={formData}
                       setFormData={(partialData) =>
@@ -593,9 +593,9 @@ export function ExamDetailSection({
                 </Card>
               </Tabs.Content>
 
-              <Tabs.Content value='post' className='min-h-[560px]'>
+              <Tabs.Content value='post' className='min-h-[460px]'>
                 <Card>
-                  <Card.Content className='min-h-[500px] p-4'>
+                  <Card.Content className='p-4'>
                     <ExamReviewPostInfoSection
                       postId={formData.postId}
                       uploadTime={formData.uploadTime}
@@ -606,9 +606,9 @@ export function ExamDetailSection({
                 </Card>
               </Tabs.Content>
 
-              <Tabs.Content value='comments' className='min-h-[560px]'>
+              <Tabs.Content value='comments' className='min-h-[460px]'>
                 <Card>
-                  <Card.Content className='min-h-[500px] p-4'>
+                  <Card.Content className='p-4'>
                     <ExamReviewCommentSection postId={formData.postId} />
                   </Card.Content>
                 </Card>

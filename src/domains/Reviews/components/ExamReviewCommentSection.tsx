@@ -37,7 +37,6 @@ export function ExamReviewCommentSection({
 
   const comments = commentsQuery.data?.pages.flatMap((page) => page.data) ?? [];
   const isInitialLoading = commentsQuery.isLoading;
-  const isFetching = commentsQuery.isFetching;
   const isFetchingNextPage = commentsQuery.isFetchingNextPage;
   const hasNextPage = commentsQuery.hasNextPage;
 
@@ -73,7 +72,7 @@ export function ExamReviewCommentSection({
     if (comment.isDeleted || !comment.isVisible) return null;
 
     return (
-      <div key={comment.id} className='space-y-3'>
+      <div key={comment.id} className='flex flex-col gap-2'>
         <article
           className='rounded-md border border-gray-200 bg-gray-50 px-4 py-3'
           style={{ marginLeft: depth * 20 }}
@@ -92,7 +91,7 @@ export function ExamReviewCommentSection({
         </article>
 
         {comment.children?.length > 0 && (
-          <div className='space-y-3'>
+          <div className='flex flex-col gap-2'>
             {comment.children.map((child) => renderComment(child, depth + 1))}
           </div>
         )}
@@ -102,42 +101,33 @@ export function ExamReviewCommentSection({
 
   return (
     <section>
-      <div>
-        {isFetching && !isInitialLoading && (
-          <div className='flex justify-end gap-1 text-xs text-gray-500'>
-            <Loader2 className='size-3 animate-spin' />
-            불러오는 중...
-          </div>
-        )}
+      {isInitialLoading ? (
+        <div className='flex items-center justify-center gap-1 py-8 text-sm text-gray-500'>
+          <Loader2 className='size-4 animate-spin' />
+          불러오는 중...
+        </div>
+      ) : commentsQuery.isError ? (
+        <div className='rounded-md border border-dashed border-red-200 bg-red-50 px-4 py-8 text-center text-sm text-red-500'>
+          댓글 목록을 불러오지 못했습니다.
+        </div>
+      ) : comments.length === 0 ? (
+        <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500'>
+          표시할 댓글이 없습니다.
+        </div>
+      ) : (
+        <div className='flex flex-col gap-2'>
+          {comments.map((comment) => renderComment(comment))}
 
-        {isInitialLoading ? (
-          <div className='flex items-center justify-center gap-1 py-8 text-sm text-gray-500'>
-            <Loader2 className='size-4 animate-spin' />
-            불러오는 중...
+          <div ref={loadMoreRef}>
+            {isFetchingNextPage && (
+              <div className='flex items-center justify-center gap-1 py-2 text-xs text-gray-500'>
+                <Loader2 className='size-3 animate-spin' />
+                불러오는 중
+              </div>
+            )}
           </div>
-        ) : commentsQuery.isError ? (
-          <div className='rounded-md border border-dashed border-red-200 bg-red-50 px-4 py-8 text-center text-sm text-red-500'>
-            댓글 목록을 불러오지 못했습니다.
-          </div>
-        ) : comments.length === 0 ? (
-          <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500'>
-            표시할 댓글이 없습니다.
-          </div>
-        ) : (
-          <div className='space-y-3'>
-            {comments.map((comment) => renderComment(comment))}
-
-            <div ref={loadMoreRef}>
-              {isFetchingNextPage && (
-                <div className='flex items-center justify-center gap-1 py-2 text-xs text-gray-500'>
-                  <Loader2 className='size-3 animate-spin' />
-                  불러오는 중
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 }
