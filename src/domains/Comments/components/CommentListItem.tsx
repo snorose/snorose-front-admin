@@ -1,6 +1,7 @@
 import { CornerDownRight, Trash2 } from 'lucide-react';
 
 import { Badge, Button } from '@/shared/components/ui';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 import { cn } from '@/shared/lib';
 
 import type { AdminCommentResponse } from '@/domains/Comments/types';
@@ -28,7 +29,7 @@ export default function CommentListItem({
       )}
     >
       {isReply && (
-        <CornerDownRight className='mt-1 size-3 shrink-0 text-gray-400' />
+        <CornerDownRight className='mt-1 size-4 shrink-0 text-gray-400' />
       )}
       <input
         type='checkbox'
@@ -40,15 +41,7 @@ export default function CommentListItem({
         <div className='flex items-center gap-2'>
           <span className='text-xs text-gray-400'>ID: {comment.commentId}</span>
           <span className='text-sm font-medium'>{comment.nickname}</span>
-          {isReply ? (
-            <Badge variant='secondary' className='text-xs'>
-              대댓글
-            </Badge>
-          ) : (
-            <Badge variant='outline' className='text-xs'>
-              댓글
-            </Badge>
-          )}
+
           {comment.reportCount > 0 && (
             <Badge
               variant='outline'
@@ -60,7 +53,9 @@ export default function CommentListItem({
         </div>
         <p className='text-sm text-gray-700'>{comment.content}</p>
         <div className='flex items-center justify-between'>
-          <span className='text-xs text-gray-400'>{comment.createdAt}</span>
+          <span className='text-xs text-gray-400'>
+            {formatDateTimeToMinutes(comment.createdAt).replace('T', ' ')}
+          </span>
         </div>
       </div>
       <Button
