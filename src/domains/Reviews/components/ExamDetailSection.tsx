@@ -461,14 +461,57 @@ export function ExamDetailSection({
               <span>(작성자: {selectedExamReview.userDisplay})</span>
             )}
           </div>
-          <button
-            type='button'
-            className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-            onClick={() => setIsDeleteModalOpen(true)}
-            disabled={!selectedExamReview || Boolean(isLoadingDetail)}
-          >
-            <Trash2 className='h-4 w-4 text-red-500' />
-          </button>
+          <div className='flex items-center gap-2'>
+            {isEditMode ? (
+              <>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  className='h-8 px-5 text-xs'
+                  onClick={handleCancel}
+                  disabled={isDisabled || isSaving}
+                >
+                  취소
+                </Button>
+                <Button
+                  type='button'
+                  size='sm'
+                  className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
+                  onClick={openSaveModal}
+                  disabled={isDisabled || !isDirty || isSaving}
+                >
+                  {isSaving ? (
+                    <span className='inline-flex items-center gap-1'>
+                      <Loader2 className='h-3 w-3 animate-spin' />
+                      저장 중
+                    </span>
+                  ) : (
+                    '저장'
+                  )}
+                </Button>
+              </>
+            ) : selectedExamReview ? (
+              <Button
+                type='button'
+                variant='secondary'
+                size='sm'
+                className='h-8 bg-white px-5 text-xs text-gray-800 hover:bg-gray-100 hover:text-gray-900'
+                onClick={() => setIsEditMode((prev) => !prev)}
+              >
+                <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                편집 모드
+              </Button>
+            ) : null}
+            <button
+              type='button'
+              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+              onClick={() => setIsDeleteModalOpen(true)}
+              disabled={!selectedExamReview || Boolean(isLoadingDetail)}
+            >
+              <Trash2 className='h-4 w-4 text-red-500' />
+            </button>
+          </div>
         </div>
 
         {!selectedExamReview ? (
@@ -498,10 +541,11 @@ export function ExamDetailSection({
                 <Field.Content>
                   <Select
                     value={formData.status}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, status: value }))
-                    }
-                    disabled={isDisabled}
+                    onValueChange={(value) => {
+                      setFormData((prev) => ({ ...prev, status: value }));
+                      setIsEditMode(true);
+                    }}
+                    disabled={isDisabled || isSaving}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
@@ -536,49 +580,6 @@ export function ExamDetailSection({
                     댓글 목록
                   </Tabs.Trigger>
                 </Tabs.List>
-                {activeTab === 'review' ? (
-                  isEditMode ? (
-                    <div className='flex items-center gap-2'>
-                      <Button
-                        type='button'
-                        variant='outline'
-                        size='sm'
-                        className='h-8 px-5 text-xs'
-                        onClick={handleCancel}
-                        disabled={isDisabled || isSaving}
-                      >
-                        취소
-                      </Button>
-                      <Button
-                        type='button'
-                        size='sm'
-                        className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
-                        onClick={openSaveModal}
-                        disabled={isDisabled || !isDirty || isSaving}
-                      >
-                        {isSaving ? (
-                          <span className='inline-flex items-center gap-1'>
-                            <Loader2 className='h-3 w-3 animate-spin' />
-                            저장 중
-                          </span>
-                        ) : (
-                          '저장'
-                        )}
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      type='button'
-                      variant='secondary'
-                      size='sm'
-                      className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
-                      onClick={() => setIsEditMode((prev) => !prev)}
-                    >
-                      <Pencil className='mr-1.5 h-3.5 w-3.5' />
-                      편집 모드
-                    </Button>
-                  )
-                ) : null}
               </div>
 
               <Tabs.Content value='review' className='min-h-[680px]'>
