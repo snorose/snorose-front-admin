@@ -2,6 +2,9 @@
 export const EXAM_CONFIRM_STATUS = [
   { code: 'CONFIRMED', label: '확인완료' },
   { code: 'UNCONFIRMED', label: '미확인' },
+  { code: 'NEED_DISCUSS', label: '논의필요' },
+  { code: 'NEED_ACTION', label: '징계필요' },
+  { code: 'DELETED', label: '삭제됨' },
 ] as const;
 
 // 수강 학기 자동 생성 함수 (2007년 ~ 현재년도)
