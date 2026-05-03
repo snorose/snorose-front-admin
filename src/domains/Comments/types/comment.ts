@@ -1,4 +1,4 @@
-export interface AdminCommentListResponse {
+export interface AdminCommentResponse {
   encryptedUserId: string;
   boardId: number;
   commentId: number;
@@ -13,22 +13,22 @@ export interface AdminCommentListResponse {
 }
 
 export interface AdminCommentSearchRequest {
-  page: number;
+  encryptedUserId?: string;
+  boardId?: number;
   postId?: number;
-  keyword?: string;
+  parentId?: number | null;
   isVisible?: boolean;
+  isKeywordExist?: boolean;
+  startDate?: string;
+  endDate?: string;
+  content?: string;
 }
 
-export interface AdminCommentSearchResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    hasNext: boolean;
-    totalPage: number;
-    totalCount: number;
-    data: AdminCommentListResponse[];
-  };
+export interface AdminCommentListResponse {
+  hasNext: boolean;
+  totalPage?: number;
+  totalCount?: number;
+  data: AdminCommentResponse[];
 }
 
 export interface DeleteCommentResponse {

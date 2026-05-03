@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { MOCK_COMMENTS_BY_POST_ID } from '@/domains/Comments/mocks/comments';
+import { useCommentSearch } from '@/domains/Comments/hooks/useCommentSearch';
 
 import BulkDeleteBar from './BulkDeleteBar';
 import CommentListItem from './CommentListItem';
@@ -12,11 +12,13 @@ interface CommentListProps {
 export default function CommentList({ selectedPostId }: CommentListProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
+  const { data: commentSearch } = useCommentSearch(0, {
+    postId: selectedPostId ?? undefined,
+  });
+
   const selectAllRef = useRef<HTMLInputElement>(null);
 
-  const rawComments = selectedPostId
-    ? (MOCK_COMMENTS_BY_POST_ID[selectedPostId] ?? [])
-    : [];
+  const rawComments = commentSearch?.data ?? [];
   const comments = rawComments.filter((c) => !deletedIds.includes(c.commentId));
 
   const allIds = comments.map((c) => c.commentId);
@@ -61,7 +63,7 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
         <h2 className='text-2xl font-bold'>댓글 관리</h2>
         <p className='text-sm text-gray-500'>
           {selectedPostId
-            ? `전체 ${comments.length}개`
+            ? `전체 ${commentSearch?.totalCount || commentSearch?.data?.length}개`
             : '왼쪽에서 게시글을 선택하면 댓글이 표시됩니다.'}
         </p>
       </div>
