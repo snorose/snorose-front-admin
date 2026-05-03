@@ -1,9 +1,11 @@
 import { axiosInstance } from '@/shared/axios/instance';
 
 import type {
+  AdminCommentBulkDeleteResponse,
   AdminCommentListResponse,
   AdminCommentResponse,
   AdminCommentSearchRequest,
+  AdminDeleteCommentResponse,
 } from '@/domains/Comments/types/comment';
 
 // 댓글 상세 조회 api
@@ -35,6 +37,38 @@ export const searchComments = async (
 ): Promise<AdminCommentListResponse> => {
   const response = await axiosInstance.post('/v1/admin/comments/search', body, {
     params: { page },
+  });
+  return response.data.result;
+};
+
+// 댓글 삭제 api
+export const deleteComment = async (
+  commentId: number
+): Promise<AdminDeleteCommentResponse> => {
+  const response = await axiosInstance.delete(
+    `/v1/admin/comments/${commentId}`
+  );
+  return response.data.result;
+};
+
+// 댓글 일괄 삭제 api
+export const bulkDeleteComments = async (
+  commentIds: number[]
+): Promise<AdminCommentBulkDeleteResponse> => {
+  const response = await axiosInstance.delete(`/v1/admin/comments`, {
+    data: { commentIds },
+  });
+  return response.data.result;
+};
+
+// 댓글 노출/숨김 일괄 업데이트 api
+export const updateCommentVisibility = async (
+  commentIds: number[],
+  isVisible: boolean
+): Promise<string> => {
+  const response = await axiosInstance.patch(`/v1/admin/comments/visibility`, {
+    commentIds,
+    isVisible,
   });
   return response.data.result;
 };
