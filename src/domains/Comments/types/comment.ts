@@ -31,16 +31,11 @@ export interface AdminCommentListResponse {
   data: AdminCommentResponse[];
 }
 
-export interface DeleteCommentResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    id: number;
-    encryptedUserId: string;
-    postId: number;
-    content: string;
-  };
+export interface AdminDeleteCommentResponse {
+  id: number;
+  encryptedUserId: string;
+  postId: number;
+  content: string;
 }
 
 export interface AdminCommentBulkDeleteRequest {
@@ -48,17 +43,17 @@ export interface AdminCommentBulkDeleteRequest {
 }
 
 export interface AdminCommentBulkDeleteResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    requestedCount: number;
-    deletedCount: number;
-    failedCount: number;
-    deletedCommentIds: number[];
-    notDeletedComments: {
-      commentId: number;
-      reason: string;
-    }[];
-  };
+  requestedCount: number;
+  deletedCount: number;
+  failedCount: number;
+  deletedCommentIds: number[];
+  notDeletedComments: {
+    commentId: number;
+    reason: string;
+  }[];
+}
+
+export interface AdminCommentVisibilityUpdateRequest {
+  commentIds: number[];
+  isVisible: boolean;
 }
