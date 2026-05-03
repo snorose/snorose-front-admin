@@ -38,6 +38,7 @@ export default function CommentListItem({
       />
       <div className='flex flex-1 flex-col gap-1'>
         <div className='flex items-center gap-2'>
+          <span className='text-xs text-gray-400'>ID: {comment.commentId}</span>
           <span className='text-sm font-medium'>{comment.nickname}</span>
           {isReply ? (
             <Badge variant='secondary' className='text-xs'>
@@ -48,7 +49,6 @@ export default function CommentListItem({
               댓글
             </Badge>
           )}
-          <span className='text-xs text-gray-400'>ID: {comment.commentId}</span>
           {comment.reportCount > 0 && (
             <Badge
               variant='outline'
