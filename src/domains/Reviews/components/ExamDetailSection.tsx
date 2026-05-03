@@ -545,7 +545,7 @@ export function ExamDetailSection({
                       setFormData((prev) => ({ ...prev, status: value }));
                       setIsEditMode(true);
                     }}
-                    disabled={isDisabled}
+                    disabled={isDisabled || isSaving}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
