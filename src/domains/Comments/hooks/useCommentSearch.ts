@@ -12,5 +12,14 @@ export const useCommentSearch = (
     queryKey: ['commentSearch', page, body],
     queryFn: () => searchComments(page, body),
     enabled: !!body.postId,
+    select: (data) => {
+      if (!data.data) return data;
+      return {
+        ...data,
+        data: [...data.data].sort((a, b) =>
+          a.createdAt.localeCompare(b.createdAt)
+        ),
+      };
+    },
   });
 };
