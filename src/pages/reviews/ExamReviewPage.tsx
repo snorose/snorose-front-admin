@@ -139,7 +139,7 @@ export default function ExamReviewPage() {
     });
   };
 
-  const handleSaveSuccess = async () => {
+  const handleSaveSuccess = async (nextStatus?: string) => {
     // 쿼리 캐시를 직접 업데이트하여 스켈레톤 없이 즉시 반영
     if (selectedExamReview && selectedExamReviewDetail) {
       // 저장 후 최신 상세 정보 가져오기 (백그라운드)
@@ -188,7 +188,10 @@ export default function ExamReviewPage() {
 
               const updatedItem: ExamReview = {
                 id: updatedDetail.postId,
-                status: updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
+                status:
+                  nextStatus ??
+                  updatedDetail.status ??
+                  (updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'),
                 reviewTitle: updatedDetail.title,
                 courseName,
                 professor,
@@ -210,7 +213,15 @@ export default function ExamReviewPage() {
 
               // 선택된 항목도 업데이트
               setSelectedExamReview(updatedItem);
-              setSelectedExamReviewDetail(updatedDetail);
+              setSelectedExamReviewDetail((prev) => {
+                if (!prev) return updatedDetail;
+                if (!nextStatus) return updatedDetail;
+                return {
+                  ...prev,
+                  ...updatedDetail,
+                  status: nextStatus,
+                } as ExamReviewDetailResult;
+              });
             }
           }
         }

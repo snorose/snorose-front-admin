@@ -68,6 +68,7 @@ export interface UpdateExamReviewPost {
   lectureType?: LectureType;
   isPF?: boolean;
   isOnline?: boolean;
+  status?: string;
   isConfirmed?: boolean;
   examType?: ExamType;
   questionDetail?: string;
@@ -106,6 +107,7 @@ export interface ExamReviewDetailResult {
   commentCount: number;
   scrapCount: number;
   isScrapped: boolean;
+  status?: string;
   createdAt: string;
   isNotice: boolean;
   isEdited: boolean;

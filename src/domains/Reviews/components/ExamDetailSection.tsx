@@ -49,7 +49,7 @@ interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
-  onSaveSuccess?: () => void;
+  onSaveSuccess?: (status?: string) => void;
   onDeleteSuccess?: () => void;
 }
 
@@ -125,7 +125,7 @@ export function ExamDetailSection({
     null
   );
 
-  const isDisabled = !selectedExamReview || isLoadingDetail || false;
+  const isDisabled = !selectedExamReview || Boolean(isLoadingDetail);
   const isFormDisabled =
     !selectedExamReview || Boolean(isLoadingDetail) || !isEditMode;
 
@@ -380,7 +380,7 @@ export function ExamDetailSection({
         post.examType = convertExamTypeToEnum(formData.examType);
       }
       if (formData.status !== initialValues.status) {
-        post.isConfirmed = formData.status === 'CONFIRMED';
+        post.status = formData.status;
       }
       if (formData.examTypeAndQuestions !== initialValues.questionDetail) {
         post.questionDetail = formData.examTypeAndQuestions;
@@ -412,7 +412,7 @@ export function ExamDetailSection({
           examType: formData.examType,
           questionDetail: formData.examTypeAndQuestions,
         });
-        onSaveSuccess?.();
+        onSaveSuccess?.(formData.status);
       } else {
         toast.error(response.message || '시험 후기 수정에 실패했습니다.');
       }
@@ -462,55 +462,60 @@ export function ExamDetailSection({
             )}
           </div>
           <div className='flex items-center gap-2'>
-            {isEditMode ? (
-              <>
+            {activeTab === 'review' ? (
+              isEditMode ? (
+                <>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    className='h-8 px-5 text-xs'
+                    onClick={handleCancel}
+                    disabled={isDisabled || isSaving}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    type='button'
+                    size='sm'
+                    className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
+                    onClick={openSaveModal}
+                    disabled={isDisabled || !isDirty || isSaving}
+                  >
+                    {isSaving ? (
+                      <span className='inline-flex items-center gap-1'>
+                        <Loader2 className='h-3 w-3 animate-spin' />
+                        저장 중
+                      </span>
+                    ) : (
+                      '저장'
+                    )}
+                  </Button>
+                </>
+              ) : (
                 <Button
                   type='button'
-                  variant='outline'
+                  variant='secondary'
                   size='sm'
-                  className='h-8 px-5 text-xs'
-                  onClick={handleCancel}
-                  disabled={isDisabled || isSaving}
+                  className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
+                  onClick={() => setIsEditMode((prev) => !prev)}
+                  disabled={isDisabled}
                 >
-                  취소
+                  <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                  편집 모드
                 </Button>
-                <Button
-                  type='button'
-                  size='sm'
-                  className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
-                  onClick={openSaveModal}
-                  disabled={isDisabled || !isDirty || isSaving}
-                >
-                  {isSaving ? (
-                    <span className='inline-flex items-center gap-1'>
-                      <Loader2 className='h-3 w-3 animate-spin' />
-                      저장 중
-                    </span>
-                  ) : (
-                    '저장'
-                  )}
-                </Button>
-              </>
-            ) : selectedExamReview ? (
-              <Button
-                type='button'
-                variant='secondary'
-                size='sm'
-                className='h-8 bg-white px-5 text-xs text-gray-800 hover:bg-gray-100 hover:text-gray-900'
-                onClick={() => setIsEditMode((prev) => !prev)}
-              >
-                <Pencil className='mr-1.5 h-3.5 w-3.5' />
-                편집 모드
-              </Button>
+              )
             ) : null}
-            <button
-              type='button'
-              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-              onClick={() => setIsDeleteModalOpen(true)}
-              disabled={!selectedExamReview || Boolean(isLoadingDetail)}
-            >
-              <Trash2 className='h-4 w-4 text-red-500' />
-            </button>
+            {selectedExamReview && (
+              <button
+                type='button'
+                className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+                onClick={() => setIsDeleteModalOpen(true)}
+                disabled={isDisabled}
+              >
+                <Trash2 className='h-4 w-4 text-red-500' />
+              </button>
+            )}
           </div>
         </div>
 
@@ -541,11 +546,10 @@ export function ExamDetailSection({
                 <Field.Content>
                   <Select
                     value={formData.status}
-                    onValueChange={(value) => {
-                      setFormData((prev) => ({ ...prev, status: value }));
-                      setIsEditMode(true);
-                    }}
-                    disabled={isDisabled || isSaving}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, status: value }))
+                    }
+                    disabled={isFormDisabled}
                   >
                     <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
                       <div className='flex items-center gap-2'>
@@ -568,7 +572,7 @@ export function ExamDetailSection({
             </div>
 
             <div className='flex flex-col gap-2'>
-              <div className='mt-3 flex items-center justify-between gap-3'>
+              <div className='mt-3'>
                 <Tabs.List className='inline-flex gap-4'>
                   <Tabs.Trigger value='review' className='w-fit'>
                     시험후기 상세정보
