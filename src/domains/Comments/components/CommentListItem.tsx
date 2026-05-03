@@ -1,8 +1,8 @@
 import { CornerDownRight, Trash2 } from 'lucide-react';
 
 import { Badge, Button } from '@/shared/components/ui';
-import { formatDateTimeToMinutes } from '@/shared/utils';
 import { cn } from '@/shared/lib';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminCommentResponse } from '@/domains/Comments/types';
 
