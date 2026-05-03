@@ -33,7 +33,7 @@ export default function PostDetailModal({
           </div>
         )}
         {!isPending && data && (
-          <div className='flex flex-col gap-4 p-6 overflow-hidden'>
+          <div className='flex flex-col gap-4 overflow-hidden p-6'>
             {/* 상단: 메타 정보 */}
             <div className='flex flex-col gap-1'>
               <div className='flex flex-wrap items-center gap-2'>
