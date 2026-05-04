@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useCommentSearch } from '@/domains/Comments/hooks/useCommentSearch';
+import { useDeleteComment } from '@/domains/Comments/hooks/useDeleteComment';
 
+import { useBulkDeleteComment } from '../hooks/useBulkDeleteComment';
 import BulkDeleteBar from './BulkDeleteBar';
 import CommentListItem from './CommentListItem';
 
@@ -11,15 +13,16 @@ interface CommentListProps {
 
 export default function CommentList({ selectedPostId }: CommentListProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [deletedIds, setDeletedIds] = useState<number[]>([]);
+
+  const { mutate: deleteComment } = useDeleteComment();
+  const { mutate: bulkDeleteComments } = useBulkDeleteComment();
   const { data: commentSearch } = useCommentSearch(0, {
     postId: selectedPostId ?? undefined,
   });
 
   const selectAllRef = useRef<HTMLInputElement>(null);
 
-  const rawComments = commentSearch?.data ?? [];
-  const comments = rawComments.filter((c) => !deletedIds.includes(c.commentId));
+  const comments = commentSearch?.data ?? [];
 
   const allIds = comments.map((c) => c.commentId);
   const isAllSelected =
@@ -46,15 +49,28 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
   };
 
   const handleDelete = (commentId: number) => {
-    // TODO: 단일 삭제 API 연동
-    setDeletedIds((prev) => [...prev, commentId]);
-    setSelectedIds((prev) => prev.filter((id) => id !== commentId));
+    if (window.confirm('정말 이 댓글을 삭제하시겠습니까?')) {
+      deleteComment(commentId, {
+        onSuccess: () => {
+          setSelectedIds((prev) => prev.filter((id) => id !== commentId));
+        },
+      });
+    }
   };
 
   const handleBulkDelete = () => {
-    // TODO: 일괄 삭제 API 연동
-    setDeletedIds((prev) => [...prev, ...selectedIds]);
-    setSelectedIds([]);
+    if (selectedIds.length === 0) return;
+    if (
+      window.confirm(
+        `선택한 ${selectedIds.length}개의 댓글을 삭제하시겠습니까?`
+      )
+    ) {
+      bulkDeleteComments(selectedIds, {
+        onSuccess: () => {
+          setSelectedIds([]);
+        },
+      });
+    }
   };
 
   return (

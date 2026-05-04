@@ -5,7 +5,7 @@ import type {
   AdminCommentListResponse,
   AdminCommentResponse,
   AdminCommentSearchRequest,
-  DeleteCommentResponse,
+  AdminDeleteCommentResponse,
 } from '@/domains/Comments/types/comment';
 
 export interface PostCommentResponse {
@@ -86,7 +86,7 @@ export const searchComments = async (
 // 댓글 삭제 api
 export const deleteComment = async (
   commentId: number
-): Promise<DeleteCommentResponse> => {
+): Promise<AdminDeleteCommentResponse> => {
   const response = await axiosInstance.delete(
     `/v1/admin/comments/${commentId}`
   );
