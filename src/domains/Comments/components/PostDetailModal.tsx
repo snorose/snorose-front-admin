@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import DOMPurify from 'dompurify';
 import { CornerDownRight } from 'lucide-react';
 
@@ -21,9 +22,12 @@ export default function PostDetailModal({
 }) {
   const { data, isPending } = usePost(postId, deletedAt);
 
-  const searchBody = useMemo(() => ({
-    postId: postId ?? undefined,
-  }), [postId]);
+  const searchBody = useMemo(
+    () => ({
+      postId: postId ?? undefined,
+    }),
+    [postId]
+  );
 
   const { data: commentSearch } = useCommentSearch(0, searchBody);
 

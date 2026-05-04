@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useQuery } from '@tanstack/react-query';
 
 import type { AdminCommentSearchRequest } from '@/domains/Comments/types/comment';
@@ -12,7 +13,13 @@ export const useCommentSearch = (
   const [isSearchSubmitted, setIsSearchSubmitted] = useState(false);
 
   const query = useQuery({
-    queryKey: ['commentSearch', page, body.postId, body.content, body.isVisible],
+    queryKey: [
+      'commentSearch',
+      page,
+      body.postId,
+      body.content,
+      body.isVisible,
+    ],
     queryFn: () => searchComments(page, body),
     enabled: !!body.postId || isSearchSubmitted,
     select: (data) => {

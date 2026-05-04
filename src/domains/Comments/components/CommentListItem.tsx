@@ -54,7 +54,10 @@ export default function CommentListItem({
             </Badge>
           )}
           {!comment.isVisible && (
-            <Badge variant='outline' className='bg-gray-100 text-xs text-gray-500'>
+            <Badge
+              variant='outline'
+              className='bg-gray-100 text-xs text-gray-500'
+            >
               비공개
             </Badge>
           )}
@@ -75,7 +78,9 @@ export default function CommentListItem({
             'text-gray-400 hover:text-blue-500',
             !comment.isVisible && 'text-blue-500'
           )}
-          onClick={() => onToggleVisibility(comment.commentId, comment.isVisible)}
+          onClick={() =>
+            onToggleVisibility(comment.commentId, comment.isVisible)
+          }
           title={comment.isVisible ? '비공개로 전환' : '공개로 전환'}
         >
           {comment.isVisible ? (
