@@ -32,7 +32,7 @@ export default function BulkDeleteBar({
         >
           선택 해제
         </Button>
-        
+
         {onBulkToggleVisibility && (
           <Button
             type='button'
