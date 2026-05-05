@@ -35,6 +35,7 @@ export interface ExamReviews {
   lecture: string;
   professor: string;
   encryptedUserId: string | null;
+  userDisplay: string | null;
   userName: string | null;
   lectureYear: number;
   lectureSemester: Semester;

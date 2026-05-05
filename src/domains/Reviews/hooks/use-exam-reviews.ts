@@ -33,7 +33,7 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
   const classNumber = String(apiData.classNumber ?? '');
   const uploadTime = formatDateTimeToMinutes(apiData.contentDate);
   const status = apiData.status || STATUS.UNCONFIRMED;
-  const userDisplay = apiData.userName || apiData.encryptedUserId || '';
+  const userDisplay = apiData.userDisplay || '';
 
   return {
     id: apiData.postId,
