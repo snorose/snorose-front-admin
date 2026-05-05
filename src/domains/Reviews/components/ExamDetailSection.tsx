@@ -8,15 +8,11 @@ import {
   Button,
   Card,
   ConfirmModal,
-  Field,
-  Select,
   Skeleton,
   Tabs,
 } from '@/shared/components/ui';
-import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 import {
-  ExamConfirmStatusBadge,
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
   ExamReviewPostInfoSection,
@@ -461,62 +457,16 @@ export function ExamDetailSection({
               <span>(작성자: {selectedExamReview.userDisplay})</span>
             )}
           </div>
-          <div className='flex items-center gap-2'>
-            {activeTab === 'review' ? (
-              isEditMode ? (
-                <>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    className='h-8 px-5 text-xs'
-                    onClick={handleCancel}
-                    disabled={isDisabled || isSaving}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    type='button'
-                    size='sm'
-                    className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
-                    onClick={openSaveModal}
-                    disabled={isDisabled || !isDirty || isSaving}
-                  >
-                    {isSaving ? (
-                      <span className='inline-flex items-center gap-1'>
-                        <Loader2 className='h-3 w-3 animate-spin' />
-                        저장 중
-                      </span>
-                    ) : (
-                      '저장'
-                    )}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  type='button'
-                  variant='secondary'
-                  size='sm'
-                  className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
-                  onClick={() => setIsEditMode((prev) => !prev)}
-                  disabled={isDisabled}
-                >
-                  <Pencil className='mr-1.5 h-3.5 w-3.5' />
-                  편집 모드
-                </Button>
-              )
-            ) : null}
-            {selectedExamReview && (
-              <button
-                type='button'
-                className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-                onClick={() => setIsDeleteModalOpen(true)}
-                disabled={isDisabled}
-              >
-                <Trash2 className='h-4 w-4 text-red-500' />
-              </button>
-            )}
-          </div>
+          {selectedExamReview && (
+            <button
+              type='button'
+              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+              onClick={() => setIsDeleteModalOpen(true)}
+              disabled={isDisabled}
+            >
+              <Trash2 className='h-4 w-4 text-red-500' />
+            </button>
+          )}
         </div>
 
         {!selectedExamReview ? (
@@ -540,39 +490,8 @@ export function ExamDetailSection({
             }
             className='w-full p-4'
           >
-            <div className='border-gray-200 bg-white'>
-              <Field className='w-1/2 gap-0'>
-                <Field.Label>확인여부</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, status: value }))
-                    }
-                    disabled={isFormDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <div className='flex items-center gap-2'>
-                        <ExamConfirmStatusBadge status={formData.status} />
-                      </div>
-                    </Select.Trigger>
-                    <Select.Content align='start'>
-                      {EXAM_CONFIRM_STATUS.map((statusOption) => (
-                        <Select.Item
-                          key={statusOption.code}
-                          value={statusOption.code}
-                        >
-                          <ExamConfirmStatusBadge status={statusOption.code} />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-            </div>
-
             <div className='flex flex-col gap-2'>
-              <div className='mt-3'>
+              <div className='mt-3 flex items-center justify-between gap-3'>
                 <Tabs.List className='inline-flex gap-4'>
                   <Tabs.Trigger value='review' className='w-fit'>
                     시험후기 상세정보
@@ -584,6 +503,52 @@ export function ExamDetailSection({
                     댓글 목록
                   </Tabs.Trigger>
                 </Tabs.List>
+                <div className='flex items-center gap-2'>
+                  {activeTab === 'review' ? (
+                    isEditMode ? (
+                      <>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-8 px-5 text-xs'
+                          onClick={handleCancel}
+                          disabled={isDisabled || isSaving}
+                        >
+                          취소
+                        </Button>
+                        <Button
+                          type='button'
+                          size='sm'
+                          className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
+                          onClick={openSaveModal}
+                          disabled={isDisabled || !isDirty || isSaving}
+                        >
+                          {isSaving ? (
+                            <span className='inline-flex items-center gap-1'>
+                              <Loader2 className='h-3 w-3 animate-spin' />
+                              저장 중
+                            </span>
+                          ) : (
+                            '저장'
+                          )}
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        type='button'
+                        variant='secondary'
+                        size='sm'
+                        className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
+                        onClick={() => setIsEditMode((prev) => !prev)}
+                        disabled={isDisabled}
+                      >
+                        <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                        편집 모드
+                      </Button>
+                    )
+                  ) : null}
+                </div>
               </div>
 
               <Tabs.Content value='review' className='min-h-[680px]'>
