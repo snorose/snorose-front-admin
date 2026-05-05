@@ -29,17 +29,21 @@ export interface ExamReview {
 }
 
 export interface ExamReviews {
-  userDisplay: string;
-  isWriterWithdrawn: boolean;
   postId: number;
-  title: string;
-  questionDetail: string;
-  isConfirmed: boolean;
-  commentCount: number;
-  scrapCount: number;
-  isScrapped: boolean;
-  createdAt: string;
-  isEdited: boolean;
+  status: string;
+  content: string;
+  lecture: string;
+  professor: string;
+  encryptedUserId: string | null;
+  userDisplay: string | null;
+  userName: string | null;
+  lectureYear: number;
+  lectureSemester: Semester;
+  examType: ExamType;
+  classNumber: number;
+  contentDate: string;
+  encryptedAdminId: string | null;
+  adminName: string | null;
 }
 
 export interface ConfirmExamReviewRequest {
@@ -65,6 +69,7 @@ export interface UpdateExamReviewPost {
   lectureType?: LectureType;
   isPF?: boolean;
   isOnline?: boolean;
+  status?: string;
   isConfirmed?: boolean;
   examType?: ExamType;
   questionDetail?: string;
@@ -103,6 +108,7 @@ export interface ExamReviewDetailResult {
   commentCount: number;
   scrapCount: number;
   isScrapped: boolean;
+  status?: string;
   createdAt: string;
   isNotice: boolean;
   isEdited: boolean;

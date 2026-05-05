@@ -29,16 +29,31 @@ export default function ExamSearch({
   initialSemester,
   initialExamType,
 }: ExamSearchProps) {
+  const ALL_SELECTED = '전체';
+
   // key prop을 사용하여 prop 변경 시 컴포넌트 재초기화 (useEffect 대신)
   const searchKey = `${initialKeyword}-${initialSemester}-${initialExamType}`;
 
   // 내부 상태는 사용자 입력용으로만 사용
   const [keyword, setKeyword] = useState<string>(initialKeyword);
-  const [semester, setSemester] = useState<string | undefined>(initialSemester);
-  const [examType, setExamType] = useState<string | undefined>(initialExamType);
+  const [semester, setSemester] = useState<string>(
+    initialSemester || ALL_SELECTED
+  );
+  const [examType, setExamType] = useState<string>(
+    initialExamType || ALL_SELECTED
+  );
 
   // 검색 실행 함수 (현재 상태 기반)
   const handleSearch = () => {
+    const params = getSearchParams(semester, examType);
+    if (keyword.trim()) {
+      params.keyword = keyword.trim();
+    }
+
+    onSearchChange(params);
+  };
+
+  const getSearchParams = (targetSemester: string, targetExamType: string) => {
     const params: {
       keyword?: string;
       lectureYear?: number;
@@ -46,30 +61,24 @@ export default function ExamSearch({
       examType?: string;
     } = {};
 
-    if (keyword.trim()) {
-      params.keyword = keyword.trim();
-    }
-
-    // semester 선택 시 연도도 함께 설정
-    if (semester) {
-      params.semester = convertSemesterToEnum(semester);
-      const year = extractYearFromSemester(semester);
+    if (targetSemester && targetSemester !== ALL_SELECTED) {
+      params.semester = convertSemesterToEnum(targetSemester);
+      const year = extractYearFromSemester(targetSemester);
       if (year) {
         params.lectureYear = year;
       }
     }
 
-    if (examType) {
-      params.examType = convertExamTypeToEnum(examType);
+    if (targetExamType && targetExamType !== ALL_SELECTED) {
+      params.examType = convertExamTypeToEnum(targetExamType);
     }
 
-    onSearchChange(params);
+    return params;
   };
 
-  // 검색 실행 함수 (파라미터로 새 값 받기)
   const handleSearchWithParams = (
-    newSemester?: string | undefined | null,
-    newExamType?: string | undefined | null
+    nextSemester: string,
+    nextExamType: string
   ) => {
     const params: {
       keyword?: string;
@@ -83,49 +92,19 @@ export default function ExamSearch({
       params.keyword = keyword.trim();
     }
 
-    // 새 semester 값 사용 (null이면 리셋, undefined면 현재 값 유지)
-    const currentSemester =
-      newSemester === null
-        ? undefined
-        : newSemester !== undefined
-          ? newSemester
-          : semester;
-    if (currentSemester) {
-      params.semester = convertSemesterToEnum(currentSemester);
-      const year = extractYearFromSemester(currentSemester);
+    if (nextSemester && nextSemester !== ALL_SELECTED) {
+      params.semester = convertSemesterToEnum(nextSemester);
+      const year = extractYearFromSemester(nextSemester);
       if (year) {
         params.lectureYear = year;
       }
     }
 
-    // 새 examType 값 사용 (null이면 리셋, undefined면 현재 값 유지)
-    const currentExamType =
-      newExamType === null
-        ? undefined
-        : newExamType !== undefined
-          ? newExamType
-          : examType;
-    if (currentExamType) {
-      params.examType = convertExamTypeToEnum(currentExamType);
+    if (nextExamType && nextExamType !== ALL_SELECTED) {
+      params.examType = convertExamTypeToEnum(nextExamType);
     }
 
     onSearchChange(params);
-  };
-
-  // semester 리셋 핸들러
-  const handleSemesterReset = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSemester(undefined);
-    handleSearchWithParams(null, undefined);
-  };
-
-  // examType 리셋 핸들러
-  const handleExamTypeReset = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setExamType(undefined);
-    handleSearchWithParams(undefined, null);
   };
 
   // Enter 키 처리
@@ -138,25 +117,7 @@ export default function ExamSearch({
   // 키워드 리셋 핸들러
   const handleKeywordReset = () => {
     setKeyword('');
-
-    const params: {
-      keyword?: string;
-      lectureYear?: number;
-      semester?: string;
-      examType?: string;
-    } = {};
-
-    if (semester) {
-      params.semester = convertSemesterToEnum(semester);
-      const year = extractYearFromSemester(semester);
-      if (year) {
-        params.lectureYear = year;
-      }
-    }
-
-    if (examType) {
-      params.examType = convertExamTypeToEnum(examType);
-    }
+    const params = getSearchParams(semester, examType);
 
     onSearchChange(params);
   };
@@ -164,8 +125,8 @@ export default function ExamSearch({
   // 검색 옵션 초기화 핸들러
   const handleSearchOptionReset = () => {
     setKeyword('');
-    setSemester(undefined);
-    setExamType(undefined);
+    setSemester(ALL_SELECTED);
+    setExamType(ALL_SELECTED);
     onSearchChange({});
   };
 
@@ -201,37 +162,25 @@ export default function ExamSearch({
       {/* 필터 Select들 */}
       <div className='flex items-center gap-2'>
         <Select
-          key={semester || 'empty-semester'}
-          value={semester || undefined}
+          value={semester}
           onValueChange={(value) => {
             setSemester(value);
-            handleSearchWithParams(value, undefined);
+            handleSearchWithParams(value, examType);
           }}
         >
-          <Select.Trigger
-            className={`relative !h-7 w-[130px] text-xs focus-visible:border focus-visible:ring-0 ${
-              semester ? '!bg-blue-100 [&>svg]:hidden' : ''
-            }`}
-          >
-            <Select.Value placeholder='학기 선택' />
-            {semester && (
-              <button
-                onClick={handleSemesterReset}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                className='pointer-events-auto absolute right-2 z-10 flex items-center justify-center rounded-sm p-0.5 hover:bg-blue-200/80'
-                type='button'
-              >
-                <X className='pointer-events-none h-3 w-3 text-gray-600' />
-              </button>
-            )}
+          <Select.Trigger className='!h-7 w-[130px] text-xs'>
+            <Select.Value />
           </Select.Trigger>
           <Select.Content
             align='start'
-            className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+            className='max-h-[200px] overflow-y-auto'
           >
+            <Select.Item
+              value={ALL_SELECTED}
+              className='text-[12px] font-medium'
+            >
+              전체
+            </Select.Item>
             {SEMESTER_LIST.map((sem) => (
               <Select.Item
                 key={sem}
@@ -245,37 +194,25 @@ export default function ExamSearch({
         </Select>
 
         <Select
-          key={examType || 'empty-examtype'}
-          value={examType || undefined}
+          value={examType}
           onValueChange={(value) => {
             setExamType(value);
-            handleSearchWithParams(undefined, value);
+            handleSearchWithParams(semester, value);
           }}
         >
-          <Select.Trigger
-            className={`relative !h-7 w-[100px] text-xs focus-visible:border focus-visible:ring-0 ${
-              examType ? '!bg-blue-100 [&>svg]:hidden' : ''
-            }`}
-          >
-            <Select.Value placeholder='시험 종류' />
-            {examType && (
-              <button
-                onClick={handleExamTypeReset}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                className='pointer-events-auto absolute right-2 z-10 flex items-center justify-center rounded-sm p-0.5 hover:bg-blue-200/80'
-                type='button'
-              >
-                <X className='pointer-events-none h-3 w-3 text-gray-600' />
-              </button>
-            )}
+          <Select.Trigger className='!h-7 w-[100px] text-xs'>
+            <Select.Value />
           </Select.Trigger>
           <Select.Content
             align='start'
-            className='max-h-[200px] overflow-y-auto bg-blue-50 text-[10px] [&_[data-highlighted]]:bg-blue-100/50 [&_[data-slot=select-scroll-down-button]]:hidden [&_[data-slot=select-scroll-up-button]]:hidden [&_[data-state=checked]]:bg-blue-100'
+            className='max-h-[200px] overflow-y-auto'
           >
+            <Select.Item
+              value={ALL_SELECTED}
+              className='text-[12px] font-medium'
+            >
+              전체
+            </Select.Item>
             {EXAM_TYPE_LIST.map((type) => (
               <Select.Item
                 key={type}

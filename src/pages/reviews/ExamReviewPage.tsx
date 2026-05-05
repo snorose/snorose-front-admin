@@ -6,6 +6,7 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   ExamDetailSection,
@@ -17,7 +18,10 @@ import type {
   ExamReviewDetailResult,
   Semester,
 } from '@/domains/Reviews/types';
-import { convertSemesterEnumToString } from '@/domains/Reviews/utils';
+import {
+  convertExamTypeEnumToString,
+  convertSemesterEnumToString,
+} from '@/domains/Reviews/utils';
 
 import { getExamReviewDetail } from '@/apis';
 
@@ -139,7 +143,7 @@ export default function ExamReviewPage() {
     });
   };
 
-  const handleSaveSuccess = async () => {
+  const handleSaveSuccess = async (nextStatus?: string) => {
     // 쿼리 캐시를 직접 업데이트하여 스켈레톤 없이 즉시 반영
     if (selectedExamReview && selectedExamReviewDetail) {
       // 저장 후 최신 상세 정보 가져오기 (백그라운드)
@@ -175,20 +179,26 @@ export default function ExamReviewPage() {
               // 선택된 항목의 상태를 업데이트된 상태로 변경
               const updatedData = [...cachedData.data];
 
-              // title 파싱: "2023-1/기말/프로그래밍입문/이종우/001"
-              const titleParts = updatedDetail.title.split('/');
-              const semester = titleParts[0] || '';
-              const examType = titleParts[1] || '';
-              const courseName = titleParts[2] || '';
-              const professor = titleParts[3] || '';
-              const classNumber = titleParts[4] || '';
-
-              const date = new Date(updatedDetail.createdAt);
-              const uploadTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+              const courseName = updatedDetail.lectureName || '';
+              const professor = updatedDetail.professor || '';
+              const semester = convertSemesterEnumToString(
+                updatedDetail.semester,
+                updatedDetail.lectureYear
+              );
+              const examType = convertExamTypeEnumToString(
+                updatedDetail.examType
+              );
+              const classNumber = String(updatedDetail.classNumber ?? '');
+              const uploadTime = formatDateTimeToMinutes(
+                updatedDetail.createdAt
+              );
 
               const updatedItem: ExamReview = {
                 id: updatedDetail.postId,
-                status: updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
+                status:
+                  nextStatus ??
+                  updatedDetail.status ??
+                  (updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'),
                 reviewTitle: updatedDetail.title,
                 courseName,
                 professor,
@@ -210,7 +220,15 @@ export default function ExamReviewPage() {
 
               // 선택된 항목도 업데이트
               setSelectedExamReview(updatedItem);
-              setSelectedExamReviewDetail(updatedDetail);
+              setSelectedExamReviewDetail((prev) => {
+                if (!prev) return updatedDetail;
+                if (!nextStatus) return updatedDetail;
+                return {
+                  ...prev,
+                  ...updatedDetail,
+                  status: nextStatus,
+                } as ExamReviewDetailResult;
+              });
             }
           }
         }

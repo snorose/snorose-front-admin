@@ -2,15 +2,18 @@ import { type RefObject } from 'react';
 
 import { Field, Input, Select, Textarea } from '@/shared/components/ui';
 import {
+  EXAM_CONFIRM_STATUS,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
   SEMESTER_LIST,
 } from '@/shared/constants';
 
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
 import type { LectureType } from '@/domains/Reviews/types';
 import { convertLectureTypeToString } from '@/domains/Reviews/utils';
 
 export interface ExamReviewDetailInfoSectionFormData {
+  status: string;
   lectureName: string;
   professorName: string;
   fileName: string;
@@ -45,6 +48,32 @@ export function ExamReviewDetailInfoSection({
   return (
     <div className='space-y-4'>
       <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-4'>
+        <Field className='gap-0'>
+          <Field.Label>확인여부</Field.Label>
+          <Field.Content>
+            <Select
+              value={formData.status}
+              onValueChange={(value) => setFormData({ status: value })}
+              disabled={isFormDisabled}
+            >
+              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+                <div className='flex items-center gap-2'>
+                  <ExamConfirmStatusBadge status={formData.status} />
+                </div>
+              </Select.Trigger>
+              <Select.Content align='start'>
+                {EXAM_CONFIRM_STATUS.map((statusOption) => (
+                  <Select.Item
+                    key={statusOption.code}
+                    value={statusOption.code}
+                  >
+                    <ExamConfirmStatusBadge status={statusOption.code} />
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+          </Field.Content>
+        </Field>
         <Field className='gap-0'>
           <Field.Label>강의명</Field.Label>
           <Field.Content>

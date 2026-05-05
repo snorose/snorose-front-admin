@@ -1,6 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { formatDateTimeToMinutes } from '@/shared/utils';
+
+import { STATUS } from '@/domains/Reviews/constants';
 import type { ExamReview, ExamReviews } from '@/domains/Reviews/types';
+import {
+  convertExamTypeEnumToString,
+  convertSemesterEnumToString,
+} from '@/domains/Reviews/utils';
 
 import { getExamReviews } from '@/apis';
 
@@ -15,18 +22,18 @@ interface UseExamReviewsParams {
 }
 
 const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
-  // title 파싱: "2023-1/기말/프로그래밍입문/이종우/001"
-  const titleParts = apiData.title.split('/');
-  const semester = titleParts[0] || '';
-  const examType = titleParts[1] || '';
-  const courseName = titleParts[2] || '';
-  const professor = titleParts[3] || '';
-  const classNumber = titleParts[4] || '';
-  const reviewTitle = apiData.title;
-
-  const date = new Date(apiData.createdAt);
-  const uploadTime = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  const status = apiData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
+  const reviewTitle = apiData.content || '';
+  const courseName = apiData.lecture || '';
+  const professor = apiData.professor || '';
+  const semester = convertSemesterEnumToString(
+    apiData.lectureSemester,
+    apiData.lectureYear
+  );
+  const examType = convertExamTypeEnumToString(apiData.examType);
+  const classNumber = String(apiData.classNumber ?? '');
+  const uploadTime = formatDateTimeToMinutes(apiData.contentDate);
+  const status = apiData.status || STATUS.UNCONFIRMED;
+  const userDisplay = apiData.userDisplay || '';
 
   return {
     id: apiData.postId,
@@ -37,9 +44,9 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
     semester,
     examType,
     classNumber,
-    questionDetail: apiData.questionDetail,
+    questionDetail: '',
     uploadTime,
-    userDisplay: apiData.userDisplay,
+    userDisplay,
   };
 };
 
