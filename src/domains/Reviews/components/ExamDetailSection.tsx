@@ -500,7 +500,7 @@ export function ExamDetailSection({
                     게시글 및 작성자 정보
                   </Tabs.Trigger>
                   <Tabs.Trigger value='comments' className='w-fit'>
-                    댓글 목록
+                    댓글 목록 ({selectedExamReviewDetail?.commentCount ?? 0})
                   </Tabs.Trigger>
                 </Tabs.List>
                 <div className='flex items-center gap-2'>
