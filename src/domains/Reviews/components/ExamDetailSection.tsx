@@ -13,6 +13,7 @@ import {
 } from '@/shared/components/ui';
 
 import {
+  ExamConfirmStatusBadge,
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
   ExamReviewPostInfoSection,
@@ -455,6 +456,9 @@ export function ExamDetailSection({
             </p>
             {selectedExamReviewDetail?.userDisplay && (
               <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
+            )}
+            {selectedExamReview && (
+              <ExamConfirmStatusBadge status={formData.status} />
             )}
           </div>
           {selectedExamReview && (
