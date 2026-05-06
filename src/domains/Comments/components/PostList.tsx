@@ -119,9 +119,9 @@ export default function PostList({
         onBulkDelete={handleBulkDelete}
         onClearSelection={() => setSelectedIds([])}
       />
-      <div className='flex-1 overflow-y-auto rounded-md border'>
+      <div className='flex-1 flex-col overflow-y-auto rounded-md border'>
         {filtered.length === 0 ? (
-          <p className='py-10 text-center text-sm text-gray-400'>
+          <p className='flex h-full w-full items-center justify-center py-10 text-center text-sm text-gray-400'>
             게시글이 없습니다.
           </p>
         ) : (

@@ -164,9 +164,9 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
         onClearSelection={() => setSelectedIds([])}
       />
 
-      <div className='flex-1 overflow-y-auto rounded-md border'>
+      <div className='flex flex-1 overflow-y-auto rounded-md border'>
         {comments.length === 0 ? (
-          <p className='py-10 text-center text-sm text-gray-400'>
+          <p className='flex h-full w-full items-center justify-center py-10 text-center text-sm text-gray-400'>
             댓글이 없습니다.
           </p>
         ) : (
