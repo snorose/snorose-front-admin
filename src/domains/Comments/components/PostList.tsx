@@ -56,11 +56,21 @@ export default function PostList({
         title='게시글 관리'
         description='커뮤니티에 있는 모든 게시글과 남겨진 댓글을 관리합니다.'
       />
-      <Input
-        placeholder='게시글 제목, 작성자(닉네임), 게시글 ID로 검색'
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-      />
+      <div className='flex gap-2'>
+        <Input
+          placeholder='게시글 제목, 작성자(닉네임), 게시글 ID로 검색'
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && setKeyword(keyword)}
+          className='flex-1'
+        />
+        <button
+          className='rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800'
+          onClick={() => setKeyword(keyword)}
+        >
+          검색
+        </button>
+      </div>
       <div className='flex items-center'>
         <Input
           type='date'
