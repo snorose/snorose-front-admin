@@ -19,6 +19,7 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [keyword, setKeyword] = useState('');
   const [visibilityFilter, setVisibilityFilter] = useState('all');
+  const [submittedKeyword, setSubmittedKeyword] = useState('');
   const { mutate: deleteComment } = useDeleteComment();
   const { mutate: bulkDeleteComments } = useBulkDeleteComment();
 
@@ -27,11 +28,11 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
     const body: AdminCommentSearchRequest = {
       postId: selectedPostId ?? undefined,
     };
-    if (keyword) body.content = keyword;
+    if (submittedKeyword) body.content = submittedKeyword;
     if (visibilityFilter === 'visible') body.isVisible = true;
     if (visibilityFilter === 'hidden') body.isVisible = false;
     return body;
-  }, [selectedPostId, keyword, visibilityFilter]);
+  }, [selectedPostId, submittedKeyword, visibilityFilter]);
 
   const {
     data: commentSearch,
@@ -109,6 +110,7 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
 
   const handleSearch = () => {
     setIsSearchSubmitted(true);
+    setSubmittedKeyword(keyword);
   };
 
   return (
@@ -117,7 +119,7 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
         <h2 className='text-2xl font-bold'>댓글 관리</h2>
         <p className='text-sm text-gray-500'>
           {selectedPostId
-            ? `전체 ${commentSearch?.totalCount || commentSearch?.data?.length}개`
+            ? `전체 ${commentSearch?.totalCount ?? commentSearch?.data?.length ?? ''}개`
             : '댓글 상세 검색을 이용하거나 왼쪽에서 게시글을 선택하세요.'}
         </p>
       </div>
