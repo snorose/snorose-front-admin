@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import DOMPurify from 'dompurify';
 import { CornerDownRight } from 'lucide-react';
 
@@ -19,9 +21,15 @@ export default function PostDetailModal({
   onClose: () => void;
 }) {
   const { data, isPending } = usePost(postId, deletedAt);
-  const { data: commentSearch } = useCommentSearch(0, {
-    postId: postId ?? undefined,
-  });
+
+  const searchBody = useMemo(
+    () => ({
+      postId: postId ?? undefined,
+    }),
+    [postId]
+  );
+
+  const { data: commentSearch } = useCommentSearch(0, searchBody);
 
   return (
     <Dialog open={!!postId} onOpenChange={() => onClose()}>
