@@ -5,6 +5,7 @@ import type {
   AdminCommentListResponse,
   AdminCommentResponse,
   AdminCommentSearchRequest,
+  AdminCommentVisibilityUpdateRequest,
   AdminDeleteCommentResponse,
 } from '@/domains/Comments/types/comment';
 
@@ -63,12 +64,11 @@ export const bulkDeleteComments = async (
 
 // 댓글 노출/숨김 일괄 업데이트 api
 export const updateCommentVisibility = async (
-  commentIds: number[],
-  isVisible: boolean
+  body: AdminCommentVisibilityUpdateRequest
 ): Promise<string> => {
-  const response = await axiosInstance.patch(`/v1/admin/comments/visibility`, {
-    commentIds,
-    isVisible,
-  });
+  const response = await axiosInstance.patch(
+    `/v1/admin/comments/visibility`,
+    body
+  );
   return response.data.result;
 };

@@ -25,7 +25,7 @@ export const useCommentVisibility = (
     ) {
       mutate({
         commentIds: selectedIds,
-        visible: nextVisibleValue,
+        isVisible: nextVisibleValue,
       });
     }
   };
@@ -36,7 +36,7 @@ export const useCommentVisibility = (
   ) => {
     mutate({
       commentIds: [commentId],
-      visible: !currentVisible,
+      isVisible: !currentVisible,
     });
   };
 
