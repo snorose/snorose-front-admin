@@ -1,16 +1,20 @@
-import { Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Trash2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 
 interface BulkDeleteBarProps {
   selectedCount: number;
   onBulkDelete: () => void;
+  onBulkToggleVisibility?: () => void;
+  visibilityLabel?: '비공개' | '공개';
   onClearSelection: () => void;
 }
 
 export default function BulkDeleteBar({
   selectedCount,
   onBulkDelete,
+  onBulkToggleVisibility,
+  visibilityLabel = '비공개',
   onClearSelection,
 }: BulkDeleteBarProps) {
   if (selectedCount === 0) return null;
@@ -28,6 +32,24 @@ export default function BulkDeleteBar({
         >
           선택 해제
         </Button>
+
+        {onBulkToggleVisibility && (
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='border-blue-200 bg-white text-blue-600 hover:bg-blue-50'
+            onClick={onBulkToggleVisibility}
+          >
+            {visibilityLabel === '비공개' ? (
+              <EyeOff className='mr-1 size-4' />
+            ) : (
+              <Eye className='mr-1 size-4' />
+            )}
+            일괄 {visibilityLabel}
+          </Button>
+        )}
+
         <Button
           type='button'
           variant='destructive'
