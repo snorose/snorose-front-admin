@@ -26,8 +26,18 @@ export default function usePostListFilter({
     const result: AdminPostSearchRequest = {};
     if (startDate) result.startDate = startDate;
     if (endDate) result.endDate = endDate;
+    if (reportFilter === '리자비공개' || reportFilter === '리자삭제') {
+      result.isVisible = false;
+    } else if (reportFilter === '해당없음') {
+      result.isVisible = true;
+    }
+
     return result;
-  }, [startDate, endDate]);
+  }, [startDate, endDate, reportFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category, keyword, reportFilter, startDate, endDate]);
 
   const { data, hasNext, totalPage } = usePostList({ page, body });
 
