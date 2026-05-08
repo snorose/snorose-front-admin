@@ -23,5 +23,5 @@ export function formatDateTimeToMinutes(
   dateTimeString: string | null | undefined
 ): string {
   if (!dateTimeString) return '-';
-  return dateTimeString.slice(0, 16);
+  return dateTimeString.slice(0, 16).replace('T', ' ');
 }

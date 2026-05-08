@@ -65,7 +65,7 @@ export default function CommentListItem({
         <p className='text-sm text-gray-700'>{comment.content}</p>
         <div className='flex items-center justify-between'>
           <span className='text-xs text-gray-400'>
-            {formatDateTimeToMinutes(comment.createdAt).replace('T', ' ')}
+            {formatDateTimeToMinutes(comment.createdAt)}
           </span>
         </div>
       </div>
