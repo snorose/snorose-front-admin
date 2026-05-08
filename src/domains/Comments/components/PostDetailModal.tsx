@@ -106,6 +106,7 @@ export default function PostDetailModal({
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(data.content, {
                       ALLOWED_TAGS: ['iframe', 'a', 'img'],
+                      ALLOWED_ATTR: ['src', 'href', 'sandbox'],
                     }),
                   }}
                   className='[&_a]:break-all [&_a]:text-blue-500 [&_a]:underline'
