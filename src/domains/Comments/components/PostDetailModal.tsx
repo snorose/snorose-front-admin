@@ -87,13 +87,9 @@ export default function PostDetailModal({
               </div>
               <h2 className='text-base font-semibold'>{data.title}</h2>
               <div className='flex flex-wrap gap-x-3 text-xs text-gray-400'>
-                <span>
-                  작성 {formatDateTimeToMinutes(data.createdAt)}
-                </span>
+                <span>작성 {formatDateTimeToMinutes(data.createdAt)}</span>
                 {data.updatedAt && (
-                  <span>
-                    수정 {formatDateTimeToMinutes(data.updatedAt)}
-                  </span>
+                  <span>수정 {formatDateTimeToMinutes(data.updatedAt)}</span>
                 )}
                 {data.deletedAt && (
                   <span className='text-red-400'>

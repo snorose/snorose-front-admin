@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { updateCommentVisibility } from '@/apis';
 import type { AdminCommentVisibilityUpdateRequest } from '@/domains/Comments/types/comment';
+
+import { updateCommentVisibility } from '@/apis';
 
 export const useUpdateCommentVisibility = () => {
   const queryClient = useQueryClient();
