@@ -87,20 +87,13 @@ export default function PostDetailModal({
               </div>
               <h2 className='text-base font-semibold'>{data.title}</h2>
               <div className='flex flex-wrap gap-x-3 text-xs text-gray-400'>
-                <span>
-                  작성
-                  {formatDateTimeToMinutes(data.createdAt).replace('T', ' ')}
-                </span>
+                <span>작성 {formatDateTimeToMinutes(data.createdAt)}</span>
                 {data.updatedAt && (
-                  <span>
-                    수정
-                    {formatDateTimeToMinutes(data.updatedAt).replace('T', ' ')}
-                  </span>
+                  <span>수정 {formatDateTimeToMinutes(data.updatedAt)}</span>
                 )}
                 {data.deletedAt && (
                   <span className='text-red-400'>
-                    삭제
-                    {formatDateTimeToMinutes(data.deletedAt).replace('T', ' ')}
+                    삭제 {formatDateTimeToMinutes(data.deletedAt)}
                   </span>
                 )}
                 {data.isEdited && <span>편집됨</span>}
@@ -135,11 +128,11 @@ export default function PostDetailModal({
             {/* 댓글 */}
             <div className='flex flex-col gap-2 border-t pt-3'>
               <h3 className='text-sm font-medium'>댓글</h3>
-              {commentSearch?.data.length === 0 ? (
+              {commentSearch?.data?.length === 0 ? (
                 <p className='text-sm text-gray-400'>댓글이 없습니다.</p>
               ) : (
                 <div className='flex max-h-[30vh] flex-col gap-2 overflow-y-auto'>
-                  {commentSearch?.data.map((comment) => (
+                  {commentSearch?.data?.map((comment) => (
                     <div
                       key={comment.commentId}
                       className='flex items-start gap-3'
@@ -182,10 +175,7 @@ export default function PostDetailModal({
                           {comment.content}
                         </p>
                         <span className='mt-1 block text-xs text-gray-400'>
-                          {formatDateTimeToMinutes(comment.createdAt).replace(
-                            'T',
-                            ' '
-                          )}
+                          {formatDateTimeToMinutes(comment.createdAt)}
                         </span>
                       </div>
                     </div>

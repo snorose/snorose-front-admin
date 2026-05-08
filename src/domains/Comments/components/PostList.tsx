@@ -119,40 +119,42 @@ export default function PostList({
         onBulkDelete={handleBulkDelete}
         onClearSelection={() => setSelectedIds([])}
       />
-      <div className='flex-1 overflow-y-auto rounded-md border'>
-        {filtered.length === 0 ? (
-          <p className='py-10 text-center text-sm text-gray-400'>
-            게시글이 없습니다.
-          </p>
-        ) : (
-          <div className='divide-y divide-gray-200'>
-            <div className='flex items-center gap-3 px-4 py-2 text-sm text-gray-500'>
-              <input
-                ref={selectAllRef}
-                type='checkbox'
-                className='cursor-pointer'
-                checked={isAllSelected}
-                onChange={handleSelectAll}
-              />
-              <span>전체 선택</span>
+      <div className='flex flex-1 flex-col overflow-hidden rounded-md border'>
+        <div className='flex-1 overflow-y-auto'>
+          {filtered.length === 0 ? (
+            <p className='flex h-full w-full items-center justify-center py-10 text-center text-sm text-gray-400'>
+              게시글이 없습니다.
+            </p>
+          ) : (
+            <div className='divide-y divide-gray-200'>
+              <div className='flex items-center gap-3 px-4 py-2 text-sm text-gray-500'>
+                <input
+                  ref={selectAllRef}
+                  type='checkbox'
+                  className='cursor-pointer'
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                />
+                <span>전체 선택</span>
+              </div>
+              {filtered.map((post) => (
+                <PostListItem
+                  key={post.postId}
+                  post={post}
+                  isSelected={selectedPostId === post.postId}
+                  isChecked={selectedIds.includes(post.postId)}
+                  onCheck={handleCheck}
+                  onClick={(post) =>
+                    onSelectPost(selectedPostId === post.postId ? null : post)
+                  }
+                  onOpenModal={onOpenModal}
+                  onDelete={handleDelete}
+                />
+              ))}
             </div>
-            {filtered.map((post) => (
-              <PostListItem
-                key={post.postId}
-                post={post}
-                isSelected={selectedPostId === post.postId}
-                isChecked={selectedIds.includes(post.postId)}
-                onCheck={handleCheck}
-                onClick={(post) =>
-                  onSelectPost(selectedPostId === post.postId ? null : post)
-                }
-                onOpenModal={onOpenModal}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
-        <Pagination className='py-2'>
+          )}
+        </div>
+        <Pagination className='border-t py-2'>
           <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
             <Pagination.Item>
               <Pagination.Previous

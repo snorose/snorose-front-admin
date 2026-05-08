@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import type { AdminGetPostResponse } from '../types';
+import type { AdminGetPostResponse, AdminPostSearchRequest } from '../types';
 import { usePostList } from './usePostList';
 
 interface PostListProps {
@@ -14,24 +14,43 @@ export default function usePostListFilter({
 }: PostListProps) {
   const [category, setCategory] = useState('전체');
   const [page, setPage] = useState(1);
-  const { data, hasNext, totalPage } = usePostList({ boardId: null, page });
   const [keyword, setKeyword] = useState('');
   const [reportFilter, setReportFilter] = useState('전체');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [deletedIds, setDeletedIds] = useState<number[]>([]);
+  const selectAllRef = useRef<HTMLInputElement>(null);
+
+  const body = useMemo((): AdminPostSearchRequest => {
+    const result: AdminPostSearchRequest = {};
+    if (startDate) result.startDate = startDate;
+    if (endDate) result.endDate = endDate;
+    if (reportFilter === '리자비공개' || reportFilter === '리자삭제') {
+      result.isVisible = false;
+    } else if (reportFilter === '해당없음') {
+      result.isVisible = true;
+    }
+
+    return result;
+  }, [startDate, endDate, reportFilter]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category, keyword, reportFilter, startDate, endDate]);
+
+  const { data, hasNext, totalPage } = usePostList({ page, body });
+
   const categories = useMemo(() => {
     if (!data) return [];
     return [
       ...new Set(data.map((p) => p.category).filter(Boolean)),
     ] as string[];
   }, [data]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [deletedIds, setDeletedIds] = useState<number[]>([]);
-  const selectAllRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
     if (!data) return [];
-    return data?.filter((post) => {
+    return data.filter((post) => {
       if (deletedIds.includes(post.postId)) return false;
       const matchesKeyword =
         post.title.includes(keyword) ||
@@ -85,19 +104,18 @@ export default function usePostListFilter({
   };
 
   const handleDelete = (postId: number) => {
-    // TODO: 단일 삭제 API 연동
     setDeletedIds((prev) => [...prev, postId]);
     setSelectedIds((prev) => prev.filter((id) => id !== postId));
     if (selectedPostId === postId) onSelectPost(null);
   };
 
   const handleBulkDelete = () => {
-    // TODO: 일괄 삭제 API 연동
     setDeletedIds((prev) => [...prev, ...selectedIds]);
     if (selectedPostId !== null && selectedIds.includes(selectedPostId))
       onSelectPost(null);
     setSelectedIds([]);
   };
+
   return {
     filtered,
     page,

@@ -4,17 +4,19 @@ import { useQuery } from '@tanstack/react-query';
 
 import { searchPosts } from '@/apis';
 
+import type { AdminPostSearchRequest } from '../types';
+
 interface usePostListParams {
-  boardId: number | null;
   page: number;
+  body: AdminPostSearchRequest;
 }
 
 export const usePostList = (params: usePostListParams) => {
-  const { boardId, page } = params;
+  const { page, body } = params;
 
   const normalResult = useQuery({
-    queryKey: ['posts', boardId, page],
-    queryFn: () => searchPosts(page, { boardId: boardId ?? undefined }),
+    queryKey: ['posts', page, body],
+    queryFn: () => searchPosts(page, { ...body }),
   });
 
   const sorted = useMemo(() => {

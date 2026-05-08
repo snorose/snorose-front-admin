@@ -1,18 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import type { AdminCommentVisibilityUpdateRequest } from '@/domains/Comments/types/comment';
+
 import { updateCommentVisibility } from '@/apis';
 
 export const useUpdateCommentVisibility = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      commentIds,
-      visible,
-    }: {
-      commentIds: number[];
-      visible: boolean;
-    }) => updateCommentVisibility(commentIds, visible),
+    mutationFn: (body: AdminCommentVisibilityUpdateRequest) =>
+      updateCommentVisibility(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commentSearch'] });
     },
