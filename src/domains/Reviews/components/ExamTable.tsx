@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
@@ -15,7 +22,14 @@ import type { ExamReview } from '@/domains/Reviews/types';
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
 
-const EXAM_REVIEW_TABLE_COLUMNS = [
+interface ExamReviewTableColumn {
+  key: keyof ExamReview;
+  label: string;
+  width: string;
+  render?: (review: ExamReview) => ReactNode;
+}
+
+const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
   { key: 'id', label: 'postId', width: '70px' },
   // {
   //   key: 'status',
