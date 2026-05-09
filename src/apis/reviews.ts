@@ -22,7 +22,7 @@ export const getExamReviews = async (params: {
   semester?: string;
   examType?: string;
 }): Promise<ExamReviewsResponse> => {
-  const response = await axiosInstance.get(`/v1/reviews`, {
+  const response = await axiosInstance.get(`/v1/admin/reviews`, {
     params,
   });
   return response.data;

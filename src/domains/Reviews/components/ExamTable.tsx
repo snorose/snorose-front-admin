@@ -1,10 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 import {
-  ExamConfirmStatusBadge,
   ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
@@ -16,15 +22,23 @@ import type { ExamReview } from '@/domains/Reviews/types';
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
 
-const EXAM_REVIEW_TABLE_COLUMNS = [
-  {
-    key: 'status',
-    label: '확인여부',
-    width: '78px',
-    render: (review: ExamReview) => (
-      <ExamConfirmStatusBadge status={review.status} />
-    ),
-  },
+interface ExamReviewTableColumn {
+  key: keyof ExamReview;
+  label: string;
+  width: string;
+  render?: (review: ExamReview) => ReactNode;
+}
+
+const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
+  { key: 'id', label: 'postId', width: '70px' },
+  // {
+  //   key: 'status',
+  //   label: '확인여부',
+  //   width: '78px',
+  //   render: (review: ExamReview) => (
+  //     <ExamConfirmStatusBadge status={review.status} />
+  //   ),
+  // },
   { key: 'reviewTitle', label: '시험후기명', width: '200px' },
   { key: 'courseName', label: '강의명', width: '120px' },
   { key: 'professor', label: '교수명', width: '60px' },

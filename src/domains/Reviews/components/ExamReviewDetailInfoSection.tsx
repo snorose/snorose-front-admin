@@ -7,10 +7,12 @@ import {
   SEMESTER_LIST,
 } from '@/shared/constants';
 
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
 import type { LectureType } from '@/domains/Reviews/types';
 import { convertLectureTypeToString } from '@/domains/Reviews/utils';
 
 export interface ExamReviewDetailInfoSectionFormData {
+  isConfirmed: boolean;
   lectureName: string;
   professorName: string;
   fileName: string;
@@ -42,9 +44,35 @@ export function ExamReviewDetailInfoSection({
   selectedFile,
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
+  const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
+
   return (
     <div className='space-y-4'>
       <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-4'>
+        <Field className='gap-0'>
+          <Field.Label>확인여부</Field.Label>
+          <Field.Content>
+            <Select
+              value={formData.isConfirmed ? 'true' : 'false'}
+              onValueChange={(value) =>
+                setFormData({ isConfirmed: value === 'true' })
+              }
+              disabled={isFormDisabled}
+            >
+              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+                <ExamConfirmStatusBadge status={confirmStatus} />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value='true'>
+                  <ExamConfirmStatusBadge status='CONFIRMED' />
+                </Select.Item>
+                <Select.Item value='false'>
+                  <ExamConfirmStatusBadge status='UNCONFIRMED' />
+                </Select.Item>
+              </Select.Content>
+            </Select>
+          </Field.Content>
+        </Field>
         <Field className='gap-0'>
           <Field.Label>강의명</Field.Label>
           <Field.Content>
@@ -230,7 +258,7 @@ export function ExamReviewDetailInfoSection({
             </Select>
           </Field.Content>
         </Field>
-        <Field className='col-span-full'>
+        <Field className='gap-0'>
           <Field.Label>시험 유형 및 문항수</Field.Label>
           <Field.Content>
             <Textarea
@@ -239,8 +267,8 @@ export function ExamReviewDetailInfoSection({
                 setFormData({ examTypeAndQuestions: e.target.value })
               }
               disabled={isFormDisabled}
-              rows={2}
-              className='min-h-[90px] resize-none'
+              rows={3}
+              className='min-h-[110px] resize-none'
             />
           </Field.Content>
         </Field>
