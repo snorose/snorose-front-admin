@@ -70,6 +70,7 @@ export interface UpdateExamReviewPost {
   isPF?: boolean;
   isOnline?: boolean;
   status?: string;
+  statusModifiedReason?: string;
   isConfirmed?: boolean;
   examType?: ExamType;
   questionDetail?: string;

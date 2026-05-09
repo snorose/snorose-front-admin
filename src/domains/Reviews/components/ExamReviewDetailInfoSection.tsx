@@ -24,6 +24,7 @@ export interface ExamReviewDetailInfoSectionFormData {
   isPF: string;
   isOnline: string;
   examTypeAndQuestions: string;
+  statusModifiedReason: string;
 }
 
 export interface ExamReviewDetailInfoSectionProps {
@@ -259,7 +260,7 @@ export function ExamReviewDetailInfoSection({
             </Select>
           </Field.Content>
         </Field>
-        <Field className='col-span-full'>
+        <Field className='gap-0'>
           <Field.Label>시험 유형 및 문항수</Field.Label>
           <Field.Content>
             <Textarea
@@ -268,11 +269,26 @@ export function ExamReviewDetailInfoSection({
                 setFormData({ examTypeAndQuestions: e.target.value })
               }
               disabled={isFormDisabled}
-              rows={2}
-              className='min-h-[90px] resize-none'
+              rows={3}
+              className='min-h-[110px] resize-none'
             />
           </Field.Content>
         </Field>
+        {!isFormDisabled && (
+          <Field className='gap-0'>
+            <Field.Label>상태 변경 사유</Field.Label>
+            <Field.Content>
+              <Textarea
+                value={formData.statusModifiedReason}
+                onChange={(e) =>
+                  setFormData({ statusModifiedReason: e.target.value })
+                }
+                rows={3}
+                className='min-h-[110px] resize-none'
+              />
+            </Field.Content>
+          </Field>
+        )}
       </div>
     </div>
   );

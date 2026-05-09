@@ -66,6 +66,7 @@ type FormData = {
   examType: string;
   fileName: string;
   examTypeAndQuestions: string;
+  statusModifiedReason: string;
   author: string;
 };
 
@@ -98,6 +99,7 @@ const DEFAULT_FORM_DATA: FormData = {
   examType: '',
   fileName: '',
   examTypeAndQuestions: '',
+  statusModifiedReason: '',
   author: '',
 };
 
@@ -163,6 +165,7 @@ export function ExamDetailSection({
         examType: examTypeStr,
         fileName: selectedExamReviewDetail.fileName,
         examTypeAndQuestions: selectedExamReviewDetail.questionDetail,
+        statusModifiedReason: '',
         author: selectedExamReviewDetail.userDisplay,
         initialValues: {
           status: statusValue,
@@ -203,6 +206,7 @@ export function ExamDetailSection({
         examType: formInitialValues.examType,
         fileName: formInitialValues.fileName,
         examTypeAndQuestions: formInitialValues.examTypeAndQuestions,
+        statusModifiedReason: formInitialValues.statusModifiedReason,
         author: formInitialValues.author,
       });
       setSelectedFile(null);
@@ -226,6 +230,7 @@ export function ExamDetailSection({
       formData.isOnline !== initialValues.isOnline ||
       formData.examType !== initialValues.examType ||
       formData.examTypeAndQuestions !== initialValues.questionDetail ||
+      formData.statusModifiedReason.trim() !== '' ||
       selectedFile !== null
     );
   }, [formData, initialValues, selectedFile]);
@@ -268,6 +273,7 @@ export function ExamDetailSection({
       initialValues.questionDetail,
       formData.examTypeAndQuestions
     );
+    add('상태 변경 사유', '', formData.statusModifiedReason.trim());
 
     if (selectedFile) {
       add('업로드 파일', formData.fileName || '', selectedFile.name);
@@ -292,6 +298,7 @@ export function ExamDetailSection({
         isOnline: initialValues.isOnline,
         examType: initialValues.examType,
         examTypeAndQuestions: initialValues.questionDetail,
+        statusModifiedReason: '',
         fileName: selectedExamReviewDetail.fileName,
       }));
       setSelectedFile(null);
@@ -379,6 +386,9 @@ export function ExamDetailSection({
       if (formData.status !== initialValues.status) {
         post.status = formData.status;
       }
+      if (formData.statusModifiedReason.trim() !== '') {
+        post.statusModifiedReason = formData.statusModifiedReason.trim();
+      }
       if (formData.examTypeAndQuestions !== initialValues.questionDetail) {
         post.questionDetail = formData.examTypeAndQuestions;
       }
@@ -396,6 +406,7 @@ export function ExamDetailSection({
       if (response.isSuccess) {
         toast.success('시험 후기가 성공적으로 수정되었습니다.');
         setSelectedFile(null);
+        setFormData((prev) => ({ ...prev, statusModifiedReason: '' }));
         setIsEditMode(false);
         setInitialValues({
           status: formData.status,
