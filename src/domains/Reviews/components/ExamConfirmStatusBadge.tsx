@@ -10,7 +10,8 @@ interface ExamConfirmStatusBadgeProps {
 const EXAM_CONFIRMED_STATUS_VARIANTS = {
   CONFIRMED: {
     variant: 'default' as const,
-    className: 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
+    className:
+      'border-transparent bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
   },
   UNCONFIRMED: {
     variant: 'secondary' as const,

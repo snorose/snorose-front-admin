@@ -2,7 +2,6 @@ import { type RefObject } from 'react';
 
 import { Field, Input, Select, Textarea } from '@/shared/components/ui';
 import {
-  EXAM_CONFIRM_STATUS,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
   SEMESTER_LIST,
@@ -13,7 +12,7 @@ import type { LectureType } from '@/domains/Reviews/types';
 import { convertLectureTypeToString } from '@/domains/Reviews/utils';
 
 export interface ExamReviewDetailInfoSectionFormData {
-  status: string;
+  isConfirmed: boolean;
   lectureName: string;
   professorName: string;
   fileName: string;
@@ -24,7 +23,6 @@ export interface ExamReviewDetailInfoSectionFormData {
   isPF: string;
   isOnline: string;
   examTypeAndQuestions: string;
-  statusModifiedReason: string;
 }
 
 export interface ExamReviewDetailInfoSectionProps {
@@ -46,6 +44,8 @@ export function ExamReviewDetailInfoSection({
   selectedFile,
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
+  const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
+
   return (
     <div className='space-y-4'>
       <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-4'>
@@ -53,24 +53,22 @@ export function ExamReviewDetailInfoSection({
           <Field.Label>확인여부</Field.Label>
           <Field.Content>
             <Select
-              value={formData.status}
-              onValueChange={(value) => setFormData({ status: value })}
+              value={formData.isConfirmed ? 'true' : 'false'}
+              onValueChange={(value) =>
+                setFormData({ isConfirmed: value === 'true' })
+              }
               disabled={isFormDisabled}
             >
               <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                <div className='flex items-center gap-2'>
-                  <ExamConfirmStatusBadge status={formData.status} />
-                </div>
+                <ExamConfirmStatusBadge status={confirmStatus} />
               </Select.Trigger>
-              <Select.Content align='start'>
-                {EXAM_CONFIRM_STATUS.map((statusOption) => (
-                  <Select.Item
-                    key={statusOption.code}
-                    value={statusOption.code}
-                  >
-                    <ExamConfirmStatusBadge status={statusOption.code} />
-                  </Select.Item>
-                ))}
+              <Select.Content>
+                <Select.Item value='true'>
+                  <ExamConfirmStatusBadge status='CONFIRMED' />
+                </Select.Item>
+                <Select.Item value='false'>
+                  <ExamConfirmStatusBadge status='UNCONFIRMED' />
+                </Select.Item>
               </Select.Content>
             </Select>
           </Field.Content>
@@ -274,21 +272,6 @@ export function ExamReviewDetailInfoSection({
             />
           </Field.Content>
         </Field>
-        {!isFormDisabled && (
-          <Field className='gap-0'>
-            <Field.Label>상태 변경 사유</Field.Label>
-            <Field.Content>
-              <Textarea
-                value={formData.statusModifiedReason}
-                onChange={(e) =>
-                  setFormData({ statusModifiedReason: e.target.value })
-                }
-                rows={3}
-                className='min-h-[110px] resize-none'
-              />
-            </Field.Content>
-          </Field>
-        )}
       </div>
     </div>
   );
