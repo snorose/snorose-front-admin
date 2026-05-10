@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+
 import { ChevronRight } from 'lucide-react';
-import { Collapsible, Sidebar, Badge } from '@/shared/components/ui';
-import { snoroseLogo } from '@/assets';
-import { SIDEBAR_MENUS } from '@/shared/constants';
+
 import { NavUser } from '@/shared/components';
+import { Badge, Collapsible, Sidebar } from '@/shared/components/ui';
+import { SIDEBAR_MENUS } from '@/shared/constants';
+
+import { snoroseLogo } from '@/assets';
 
 export const AppSidebar = ({
   ...props
@@ -12,7 +15,8 @@ export const AppSidebar = ({
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const location = useLocation();
 
-  const isActive = (url: string) => location.pathname.startsWith(url);
+  const isActive = (url: string) =>
+    location.pathname === url || location.pathname.startsWith(`${url}/`);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('sidebar-open-states');
