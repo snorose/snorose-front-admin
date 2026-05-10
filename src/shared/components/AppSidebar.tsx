@@ -6,8 +6,21 @@ import { ChevronRight } from 'lucide-react';
 import { NavUser } from '@/shared/components';
 import { Badge, Collapsible, Sidebar } from '@/shared/components/ui';
 import { SIDEBAR_MENUS } from '@/shared/constants';
+import { cn } from '@/shared/lib';
 
 import { snoroseLogo } from '@/assets';
+
+const sidebarMenuButtonClassName = cn(
+  'hover:bg-blue-50 hover:!text-current',
+  'data-[active=true]:bg-blue-50 data-[active=true]:font-normal data-[active=true]:text-blue-700',
+  'data-[active=true]:hover:!bg-blue-50 data-[active=true]:hover:!text-blue-700 data-[active=true]:active:!bg-blue-50'
+);
+
+const sidebarMenuSubButtonClassName = cn(
+  'hover:bg-blue-50 hover:!text-current',
+  'data-[active=true]:bg-blue-100 data-[active=true]:font-semibold data-[active=true]:text-blue-600',
+  'data-[active=true]:hover:!bg-blue-100 data-[active=true]:hover:!text-blue-600 data-[active=true]:active:!bg-blue-100'
+);
 
 export const AppSidebar = ({
   ...props
@@ -62,7 +75,7 @@ export const AppSidebar = ({
                       <Sidebar.MenuButton
                         tooltip={menu.title}
                         isActive={hasActiveSubItem}
-                        className='hover:bg-blue-50 hover:!text-current data-[active=true]:bg-blue-50 data-[active=true]:font-normal data-[active=true]:text-blue-700 data-[active=true]:hover:!bg-blue-50 data-[active=true]:hover:!text-blue-700 data-[active=true]:active:!bg-blue-50'
+                        className={sidebarMenuButtonClassName}
                       >
                         {menu.icon && <menu.icon />}
                         <span>{menu.title}</span>
@@ -76,7 +89,7 @@ export const AppSidebar = ({
                             <Sidebar.MenuSubButton
                               asChild
                               isActive={isActive(subItem.url)}
-                              className='hover:bg-blue-50 hover:!text-current data-[active=true]:bg-blue-100 data-[active=true]:font-semibold data-[active=true]:text-blue-600 data-[active=true]:hover:!bg-blue-100 data-[active=true]:hover:!text-blue-600 data-[active=true]:active:!bg-blue-100'
+                              className={sidebarMenuSubButtonClassName}
                             >
                               <NavLink to={subItem.url}>
                                 <span>{subItem.title}</span>
