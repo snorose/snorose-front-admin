@@ -44,44 +44,55 @@ export const AppSidebar = ({
 
         <Sidebar.Group>
           <Sidebar.Menu className='p-2'>
-            {SIDEBAR_MENUS.map((menu) => (
-              <Collapsible
-                key={menu.title}
-                asChild
-                open={openStates[menu.title] ?? false}
-                onOpenChange={(open) => handleOpenChange(menu.title, open)}
-                className='group/collapsible'
-              >
-                <Sidebar.MenuItem>
-                  <Collapsible.Trigger asChild>
-                    <Sidebar.MenuButton tooltip={menu.title}>
-                      {menu.icon && <menu.icon />}
-                      <span>{menu.title}</span>
-                      <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                    </Sidebar.MenuButton>
-                  </Collapsible.Trigger>
-                  <Collapsible.Content>
-                    <Sidebar.MenuSub>
-                      {menu.items?.map((subItem) => (
-                        <Sidebar.MenuSubItem key={subItem.title}>
-                          <Sidebar.MenuSubButton
-                            asChild
-                            isActive={isActive(subItem.url)}
-                          >
-                            <NavLink to={subItem.url}>
-                              <span>{subItem.title}</span>
-                              {subItem.beta && (
-                                <Badge variant='outline'>Beta</Badge>
-                              )}
-                            </NavLink>
-                          </Sidebar.MenuSubButton>
-                        </Sidebar.MenuSubItem>
-                      ))}
-                    </Sidebar.MenuSub>
-                  </Collapsible.Content>
-                </Sidebar.MenuItem>
-              </Collapsible>
-            ))}
+            {SIDEBAR_MENUS.map((menu) => {
+              const hasActiveSubItem = menu.items.some((subItem) =>
+                isActive(subItem.url)
+              );
+
+              return (
+                <Collapsible
+                  key={menu.title}
+                  asChild
+                  open={openStates[menu.title] ?? false}
+                  onOpenChange={(open) => handleOpenChange(menu.title, open)}
+                  className='group/collapsible'
+                >
+                  <Sidebar.MenuItem>
+                    <Collapsible.Trigger asChild>
+                      <Sidebar.MenuButton
+                        tooltip={menu.title}
+                        isActive={hasActiveSubItem}
+                        className='hover:bg-blue-50 hover:!text-current data-[active=true]:bg-blue-50 data-[active=true]:font-normal data-[active=true]:text-blue-700 data-[active=true]:hover:!bg-blue-50 data-[active=true]:hover:!text-blue-700 data-[active=true]:active:!bg-blue-50'
+                      >
+                        {menu.icon && <menu.icon />}
+                        <span>{menu.title}</span>
+                        <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                      </Sidebar.MenuButton>
+                    </Collapsible.Trigger>
+                    <Collapsible.Content>
+                      <Sidebar.MenuSub>
+                        {menu.items?.map((subItem) => (
+                          <Sidebar.MenuSubItem key={subItem.title}>
+                            <Sidebar.MenuSubButton
+                              asChild
+                              isActive={isActive(subItem.url)}
+                              className='hover:bg-blue-50 hover:!text-current data-[active=true]:bg-blue-100 data-[active=true]:font-semibold data-[active=true]:text-blue-600 data-[active=true]:hover:!bg-blue-100 data-[active=true]:hover:!text-blue-600 data-[active=true]:active:!bg-blue-100'
+                            >
+                              <NavLink to={subItem.url}>
+                                <span>{subItem.title}</span>
+                                {subItem.beta && (
+                                  <Badge variant='outline'>Beta</Badge>
+                                )}
+                              </NavLink>
+                            </Sidebar.MenuSubButton>
+                          </Sidebar.MenuSubItem>
+                        ))}
+                      </Sidebar.MenuSub>
+                    </Collapsible.Content>
+                  </Sidebar.MenuItem>
+                </Collapsible>
+              );
+            })}
           </Sidebar.Menu>
         </Sidebar.Group>
       </Sidebar.Content>
