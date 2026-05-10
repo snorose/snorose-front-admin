@@ -71,7 +71,7 @@ export const AppSidebar = ({
                     </Collapsible.Trigger>
                     <Collapsible.Content>
                       <Sidebar.MenuSub>
-                        {menu.items?.map((subItem) => (
+                        {menu.items.map((subItem) => (
                           <Sidebar.MenuSubItem key={subItem.title}>
                             <Sidebar.MenuSubButton
                               asChild
