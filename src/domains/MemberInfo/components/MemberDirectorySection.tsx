@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react';
+
 import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
 import { Button, Input, Select, Table } from '@/shared/components/ui';
@@ -5,6 +7,7 @@ import type { AdminUserListItem } from '@/shared/types';
 
 import MemberDirectoryActionBar from '@/domains/MemberInfo/components/MemberDirectoryActionBar';
 import MemberDirectoryPagination from '@/domains/MemberInfo/components/MemberDirectoryPagination';
+import MemberPenaltyGrantModal from '@/domains/MemberInfo/components/MemberPenaltyGrantModal';
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
 import {
   formatDate,
@@ -69,6 +72,15 @@ export default function MemberDirectorySection({
   selectedRole,
   admissionYearOptions,
 }: MemberDirectorySectionProps) {
+  const [isPenaltyModalOpen, setIsPenaltyModalOpen] = useState(false);
+  const selectedMembers = useMemo(
+    () =>
+      filteredMembers.filter((member) =>
+        selectedIds.includes(member.encryptedUserId)
+      ),
+    [filteredMembers, selectedIds]
+  );
+
   return (
     <article className='flex w-full flex-col gap-4'>
       <section className='rounded-3xl border border-slate-200 bg-white p-6 shadow-sm'>
@@ -146,7 +158,10 @@ export default function MemberDirectorySection({
           </div>
 
           <div className='flex flex-wrap items-center justify-between gap-3'>
-            <MemberDirectoryActionBar hasSelection={selectedIds.length > 0} />
+            <MemberDirectoryActionBar
+              hasSelection={selectedIds.length > 0}
+              onOpenPenaltyModal={() => setIsPenaltyModalOpen(true)}
+            />
 
             <Button
               type='button'
@@ -265,6 +280,13 @@ export default function MemberDirectorySection({
           )}
         </div>
       </section>
+
+      <MemberPenaltyGrantModal
+        open={isPenaltyModalOpen}
+        selectedMembers={selectedMembers}
+        onOpenChange={setIsPenaltyModalOpen}
+        onRemoveMember={onToggleRow}
+      />
     </article>
   );
 }

@@ -4,21 +4,50 @@ import { Button } from '@/shared/components/ui';
 
 type MemberDirectoryActionBarProps = {
   hasSelection: boolean;
+  onOpenPenaltyModal: () => void;
 };
 
-const PLACEHOLDER_ACTIONS = [
-  { label: '포인트 지급', icon: BookOpen },
-  { label: '제재 부여', icon: ShieldAlert },
+const SECONDARY_ACTIONS = [
   { label: '회원 탈퇴', icon: UserRoundX, accent: true },
   { label: '알림 전송', icon: Bell },
 ];
 
 export default function MemberDirectoryActionBar({
   hasSelection,
+  onOpenPenaltyModal,
 }: MemberDirectoryActionBarProps) {
   return (
     <div className='flex flex-wrap items-center gap-2'>
-      {PLACEHOLDER_ACTIONS.map((action) => (
+      <Button
+        type='button'
+        variant='outline'
+        disabled={!hasSelection}
+        className={`h-9 rounded-full px-4 ${
+          hasSelection
+            ? 'border-slate-200 text-slate-700'
+            : 'border-slate-200 text-slate-400'
+        }`}
+      >
+        <BookOpen className='h-4 w-4' />
+        포인트 지급
+      </Button>
+
+      <Button
+        type='button'
+        variant='outline'
+        disabled={!hasSelection}
+        onClick={onOpenPenaltyModal}
+        className={`h-9 rounded-full px-4 ${
+          hasSelection
+            ? 'border-slate-200 text-slate-700'
+            : 'border-slate-200 text-slate-400'
+        }`}
+      >
+        <ShieldAlert className='h-4 w-4' />
+        제재 부여
+      </Button>
+
+      {SECONDARY_ACTIONS.map((action) => (
         <Button
           key={action.label}
           type='button'
