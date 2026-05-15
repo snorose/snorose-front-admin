@@ -40,6 +40,9 @@ export function useMemberDetailState({
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
   const [latestPenaltyHistory, setLatestPenaltyHistory] =
     useState<BlacklistHistoryItem | null>(null);
+  const [penaltyHistory, setPenaltyHistory] = useState<BlacklistHistoryItem[]>(
+    []
+  );
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -79,6 +82,7 @@ export function useMemberDetailState({
     if (!memberKey) {
       setSelectedMember(null);
       setLatestPenaltyHistory(null);
+      setPenaltyHistory([]);
       setIsEdit(false);
       return;
     }
@@ -149,6 +153,7 @@ export function useMemberDetailState({
   useEffect(() => {
     if (!selectedMember?.encryptedUserId) {
       setLatestPenaltyHistory(null);
+      setPenaltyHistory([]);
       return;
     }
 
@@ -158,11 +163,13 @@ export function useMemberDetailState({
         const response = await blacklistHistoryAPI(
           selectedMember.encryptedUserId
         );
-        const history = Array.isArray(response?.result) ? response.result : [];
+        const history = normalizePenaltyHistoryResponse(response);
         if (!isMounted) return;
+        setPenaltyHistory(history);
         setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
       } catch {
         if (!isMounted) return;
+        setPenaltyHistory([]);
         setLatestPenaltyHistory(null);
       }
     })();
@@ -229,9 +236,47 @@ export function useMemberDetailState({
     isDetailLoading,
     isEdit,
     latestPenaltyHistory,
+    penaltyHistory,
     selectedMember,
     setIsEdit,
   };
+}
+
+function normalizePenaltyHistoryResponse(response: unknown) {
+  const result =
+    response && typeof response === 'object' && 'result' in response
+      ? (response as { result?: unknown }).result
+      : null;
+
+  const data = Array.isArray(result)
+    ? result
+    : result && typeof result === 'object' && 'data' in result
+      ? (result as { data?: unknown }).data
+      : [];
+
+  if (!Array.isArray(data)) return [];
+
+  return data.map((item) => {
+    const history = item as {
+      blacklistDeadline?: string | null;
+      blackReason?: string;
+      createdAt?: string;
+      memo?: string | null;
+      type?: string;
+    };
+    const isWarning = history.type === '경고' || history.type === 'WARNING';
+
+    return {
+      encryptedUserId: '',
+      studentNumber: '',
+      type: history.type ?? '',
+      blackReason: history.blackReason ?? '',
+      createdAt: history.createdAt ?? '',
+      blacklistStartDate: isWarning ? null : (history.createdAt ?? null),
+      blacklistDeadline: history.blacklistDeadline ?? null,
+      operatorMemo: history.memo ?? '',
+    };
+  });
 }
 
 function resolveLatestPenaltyHistory(history: BlacklistHistoryItem[]) {

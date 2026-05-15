@@ -47,6 +47,8 @@ export type UserBlacklistHistory = {
   encryptedUserId: string;
   studentNumber: string;
   type: string;
+  reasonType?: string;
+  warningCount?: number;
   blackReason: string;
   createdAt: string; // YYYY-MM-DD HH:MM:SS
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
@@ -99,12 +101,21 @@ export interface UpdateUserInfoResponse {
 }
 
 export interface BlacklistHistoryItem {
+  id?: number;
   encryptedUserId: string;
   studentNumber: string;
   type: string;
+  reasonType?: string;
+  warningCount?: number;
   blackReason: string;
   createdAt: string;
+  blacklistStartDate?: string | null;
   blacklistDeadline: string | null;
+  adminId?: string;
+  operatorMemo?: string;
+  deletedAt?: string | null;
+  deletedReason?: string | null;
+  deletedBy?: string | null;
 }
 
 export interface AdminBlacklistReq {
