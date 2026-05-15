@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
   BadgeCheck,
   CalendarDays,
@@ -23,12 +25,14 @@ import {
 type MemberDetailInfoGridProps = {
   member: MemberInfo;
   onCopy: (value: string) => void | Promise<void>;
+  onPointAdjustmentOpen: () => void;
   roleLabel: string;
 };
 
 export default function MemberDetailInfoGrid({
   member,
   onCopy,
+  onPointAdjustmentOpen,
   roleLabel,
 }: MemberDetailInfoGridProps) {
   return (
@@ -114,6 +118,16 @@ export default function MemberDetailInfoGrid({
           icon={Coins}
           label='보유 포인트'
           value={formatPoint(member.pointBalance)}
+          action={
+            <button
+              type='button'
+              onClick={onPointAdjustmentOpen}
+              className='rounded-md p-1 text-slate-950 transition hover:bg-slate-100 hover:text-slate-700'
+              aria-label='포인트 지급/차감'
+            >
+              <Coins className='h-5 w-5' />
+            </button>
+          }
         />
         <DetailField
           icon={IdCard}
@@ -134,12 +148,14 @@ export default function MemberDetailInfoGrid({
 }
 
 function DetailField({
+  action,
   copyValue,
   icon: Icon,
   label,
   onCopy,
   value,
 }: {
+  action?: ReactNode;
   copyValue?: string;
   icon: LucideIcon;
   label: string;
@@ -167,6 +183,7 @@ function DetailField({
             <Copy className='h-4 w-4' />
           </button>
         )}
+        {action}
       </div>
     </div>
   );
