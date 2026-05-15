@@ -1,0 +1,94 @@
+name: 'Auto Assign and Set Issue Type'
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  issues: write
+
+jobs:
+  automation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Token
+        uses: actions/create-github-app-token@v3
+        id: app-token
+        continue-on-error: true
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Auto Assign and Set Issue Type
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ steps.app-token.outputs.token || github.token }}
+          script: |
+            const { owner, repo } = context.repo;
+            const issue = context.payload.issue;
+            const issue_number = issue.number;
+            const author = issue.user.login;
+            const title = issue.title || '';
+            const node_id = issue.node_id;
+
+            // 1. 담당자 지정 - 이미 담당자가 있으면 건너뜁니다.
+            if (issue.assignees && issue.assignees.length > 0) {
+              console.log(`[Skip] Already has assignees: ${issue.assignees.map(a => a.login).join(', ')}`);
+            } else {
+              try {
+                await github.rest.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number,
+                  assignees: [author]
+                });
+                console.log(`[Success] Assigned author: ${author}`);
+              } catch (e) {
+                console.log(`[Error] Failed to assign author: ${e.message}`);
+              }
+            }
+
+            // 2. 이슈 타입 설정
+            let targetTypeStr = 'Task';
+            if (title.toUpperCase().includes('[FEAT]')) targetTypeStr = 'Feature';
+            else if (title.toUpperCase().includes('[BUG]') || title.toUpperCase().includes('[FIX]')) targetTypeStr = 'Bug';
+
+            try {
+              const typeQuery = `
+                query getIssueTypes($owner: String!, $name: String!) {
+                  repository(owner: $owner, name: $name) {
+                    issueTypes(first: 20) {
+                      nodes {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              `;
+
+              const repoData = await github.graphql(typeQuery, { owner, name: repo });
+              const issueTypes = repoData.repository.issueTypes.nodes;
+              const matchedType = issueTypes.find(t => t.name.toLowerCase() === targetTypeStr.toLowerCase());
+
+              if (matchedType) {
+                const mutation = `
+                  mutation updateIssueType($issueId: ID!, $issueTypeId: ID!) {
+                    updateIssue(input: {id: $issueId, issueTypeId: $issueTypeId}) {
+                      issue { id }
+                    }
+                  }
+                `;
+                await github.graphql(mutation, {
+                  issueId: node_id,
+                  issueTypeId: matchedType.id
+                });
+                console.log(`[Success] Issue type set to: ${matchedType.name}`);
+              } else {
+                console.log(`[Warning] Issue type "${targetTypeStr}" not found.`);
+                console.log(`[Debug] Available types (${issueTypes.length}): ${issueTypes.map(t => t.name).join(', ')}`);
+              }
+            } catch (e) {
+              console.log(`[Warning] Issue Type automation failed: ${e.message}`);
+              if (e.errors) console.log(`[Debug] GraphQL Errors: ${JSON.stringify(e.errors)}`);
+            }
