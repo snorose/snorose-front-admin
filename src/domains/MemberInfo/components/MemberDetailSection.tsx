@@ -27,6 +27,7 @@ type MemberDetailSectionProps = {
   isDetailLoading: boolean;
   isEdit: boolean;
   member: MemberInfo;
+  penaltyHistory: BlacklistHistoryItem[];
   latestPenaltyHistory: BlacklistHistoryItem | null;
   onBack: () => void;
   onCopy: (value: string) => void | Promise<void>;
@@ -40,6 +41,7 @@ export default function MemberDetailSection({
   isEdit,
   latestPenaltyHistory,
   member,
+  penaltyHistory,
   onBack,
   onCopy,
   onEditCancel,
@@ -147,6 +149,7 @@ export default function MemberDetailSection({
         <MemberPenaltySummaryCard
           latestPenaltyHistory={latestPenaltyHistory}
           member={member}
+          penaltyHistory={penaltyHistory}
         />
       </div>
 
