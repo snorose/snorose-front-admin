@@ -1,7 +1,7 @@
 import {
   // Bell,
   BookOpen,
-  FileText,
+  // FileText,
   HandCoins,
   type LucideIcon,
   User,
@@ -36,23 +36,22 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       // },
     ],
   },
-
+  // {
+  //   title: '게시글 관리',
+  //   icon: FileText,
+  //   items: [
+  //     {
+  //       title: '댓글 관리',
+  //       url: PATHS.POST_COMMENTS,
+  //     },
+  //   ],
+  // },
   {
-    title: '게시글 관리',
-    icon: FileText,
-    items: [
-      {
-        title: '댓글 관리',
-        url: PATHS.POST_COMMENTS,
-      },
-    ],
-  },
-  {
-    title: '시험 후기',
+    title: '시험후기',
     icon: BookOpen,
     items: [
       {
-        title: '관리',
+        title: '시험후기 관리',
         url: PATHS.REVIEW_EXAM,
       },
       {
