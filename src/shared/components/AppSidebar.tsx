@@ -11,8 +11,8 @@ import { cn } from '@/shared/lib';
 import { snoroseLogo } from '@/assets';
 
 const sidebarMenuButtonClassName = cn(
-  'hover:bg-blue-50 hover:!text-current',
-  'data-[active=true]:bg-blue-50 data-[active=true]:font-normal data-[active=true]:text-blue-700',
+  'font-semibold hover:bg-blue-50 hover:!text-current',
+  'data-[active=true]:bg-blue-50 data-[active=true]:font-semibold data-[active=true]:text-blue-700',
   'data-[active=true]:hover:!bg-blue-50 data-[active=true]:hover:!text-blue-700 data-[active=true]:active:!bg-blue-50'
 );
 
