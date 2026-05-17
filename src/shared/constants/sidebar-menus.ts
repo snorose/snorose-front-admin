@@ -47,11 +47,11 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
   //   ],
   // },
   {
-    title: '시험 후기',
+    title: '시험후기',
     icon: BookOpen,
     items: [
       {
-        title: '관리',
+        title: '시험후기 관리',
         url: PATHS.REVIEW_EXAM,
       },
       {
