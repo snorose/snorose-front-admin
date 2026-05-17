@@ -1,20 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
   Button,
+  Card,
   ConfirmModal,
-  Field,
-  Select,
   Skeleton,
+  Tabs,
 } from '@/shared/components/ui';
-import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
 import {
-  ExamConfirmStatusBadge,
+  ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
@@ -31,10 +30,10 @@ import {
   convertLectureTypeToString,
   convertSemesterEnumToString,
   convertSemesterToEnum,
-  getStatusName,
 } from '@/domains/Reviews/utils';
 
 import {
+  confirmExamReview,
   deleteExamReview,
   downloadExamReviewFile,
   updateExamReview,
@@ -46,14 +45,14 @@ interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
-  onSaveSuccess?: () => void;
+  onSaveSuccess?: (status?: string) => void;
   onDeleteSuccess?: () => void;
 }
 
 type FormData = {
   encryptedUserId: string;
   postId: number | null;
-  status: string;
+  isConfirmed: boolean;
   examReviewName: string;
   uploadTime: string;
   lectureName: string;
@@ -70,7 +69,7 @@ type FormData = {
 };
 
 type InitialValues = {
-  status: string;
+  isConfirmed: boolean;
   lectureName: string;
   professorName: string;
   classNumber: number | null;
@@ -85,7 +84,7 @@ type InitialValues = {
 const DEFAULT_FORM_DATA: FormData = {
   encryptedUserId: '',
   postId: null,
-  status: '',
+  isConfirmed: false,
   examReviewName: '',
   uploadTime: '',
   lectureName: '',
@@ -108,6 +107,9 @@ export function ExamDetailSection({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
+  const [activeTab, setActiveTab] = useState<'review' | 'post' | 'comments'>(
+    'review'
+  );
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -119,7 +121,7 @@ export function ExamDetailSection({
     null
   );
 
-  const isDisabled = !selectedExamReview || isLoadingDetail || false;
+  const isDisabled = !selectedExamReview || Boolean(isLoadingDetail);
   const isFormDisabled =
     !selectedExamReview || Boolean(isLoadingDetail) || !isEditMode;
 
@@ -140,14 +142,10 @@ export function ExamDetailSection({
       const examTypeStr = convertExamTypeEnumToString(
         selectedExamReviewDetail.examType
       );
-      const statusValue =
-        selectedExamReview?.status ||
-        (selectedExamReviewDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED');
-
       return {
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
-        status: statusValue,
+        isConfirmed: selectedExamReviewDetail.isConfirmed,
         examReviewName: selectedExamReviewDetail.title,
         uploadTime: uploadTimeStr,
         lectureName: selectedExamReviewDetail.lectureName,
@@ -162,7 +160,7 @@ export function ExamDetailSection({
         examTypeAndQuestions: selectedExamReviewDetail.questionDetail,
         author: selectedExamReviewDetail.userDisplay,
         initialValues: {
-          status: statusValue,
+          isConfirmed: selectedExamReviewDetail.isConfirmed,
           lectureName: selectedExamReviewDetail.lectureName,
           professorName: selectedExamReviewDetail.professor,
           classNumber: selectedExamReviewDetail.classNumber,
@@ -176,7 +174,7 @@ export function ExamDetailSection({
       };
     }
     return null;
-  }, [selectedExamReviewDetail, selectedExamReview?.status]);
+  }, [selectedExamReviewDetail]);
 
   useEffect(() => {
     setIsEditMode(false);
@@ -187,7 +185,7 @@ export function ExamDetailSection({
       setFormData({
         encryptedUserId: formInitialValues.encryptedUserId,
         postId: formInitialValues.postId,
-        status: formInitialValues.status,
+        isConfirmed: formInitialValues.isConfirmed,
         examReviewName: formInitialValues.examReviewName,
         uploadTime: formInitialValues.uploadTime,
         lectureName: formInitialValues.lectureName,
@@ -213,7 +211,7 @@ export function ExamDetailSection({
   const isDirty = useMemo(() => {
     if (!initialValues) return false;
     return (
-      formData.status !== initialValues.status ||
+      formData.isConfirmed !== initialValues.isConfirmed ||
       formData.lectureName !== initialValues.lectureName ||
       formData.professorName !== initialValues.professorName ||
       formData.classNumber !== initialValues.classNumber ||
@@ -236,13 +234,11 @@ export function ExamDetailSection({
       changes.push({ label, before, after });
     };
 
-    if (formData.status !== initialValues.status) {
-      add(
-        '확인여부',
-        getStatusName(initialValues.status),
-        getStatusName(formData.status)
-      );
-    }
+    add(
+      '확인여부',
+      initialValues.isConfirmed ? '확인' : '미확인',
+      formData.isConfirmed ? '확인' : '미확인'
+    );
 
     add('강의명', initialValues.lectureName, formData.lectureName);
     add('교수명', initialValues.professorName, formData.professorName);
@@ -279,7 +275,7 @@ export function ExamDetailSection({
         ...prev,
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
-        status: initialValues.status,
+        isConfirmed: initialValues.isConfirmed,
         lectureName: initialValues.lectureName,
         professorName: initialValues.professorName,
         classNumber: initialValues.classNumber,
@@ -373,43 +369,58 @@ export function ExamDetailSection({
       if (formData.examType !== initialValues.examType) {
         post.examType = convertExamTypeToEnum(formData.examType);
       }
-      if (formData.status !== initialValues.status) {
-        post.isConfirmed = formData.status === 'CONFIRMED';
-      }
       if (formData.examTypeAndQuestions !== initialValues.questionDetail) {
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
-      const updateData: UpdateExamReviewRequest = {
-        ...(selectedFile ? { file: selectedFile } : {}),
-        post,
-      };
+      const hasReviewUpdate = Object.keys(post).length > 0 || selectedFile;
+      const hasConfirmUpdate =
+        formData.isConfirmed !== initialValues.isConfirmed;
 
-      const response = await updateExamReview(
-        selectedExamReview.id,
-        updateData
-      );
+      if (hasReviewUpdate) {
+        const updateData: UpdateExamReviewRequest = {
+          ...(selectedFile ? { file: selectedFile } : {}),
+          post,
+        };
 
-      if (response.isSuccess) {
-        toast.success('시험 후기가 성공적으로 수정되었습니다.');
-        setSelectedFile(null);
-        setIsEditMode(false);
-        setInitialValues({
-          status: formData.status,
-          lectureName: formData.lectureName,
-          professorName: formData.professorName,
-          classNumber: formData.classNumber,
-          semester: formData.semester,
-          lectureType: formData.lectureType,
-          isPF: formData.isPF,
-          isOnline: formData.isOnline,
-          examType: formData.examType,
-          questionDetail: formData.examTypeAndQuestions,
-        });
-        onSaveSuccess?.();
-      } else {
-        toast.error(response.message || '시험 후기 수정에 실패했습니다.');
+        const response = await updateExamReview(
+          selectedExamReview.id,
+          updateData
+        );
+
+        if (!response.isSuccess) {
+          toast.error(response.message || '시험 후기 수정에 실패했습니다.');
+          return;
+        }
       }
+
+      if (hasConfirmUpdate) {
+        const response = await confirmExamReview(selectedExamReview.id, {
+          isConfirmed: formData.isConfirmed,
+        });
+
+        if (!response.isSuccess) {
+          toast.error(response.message || '확인여부 변경에 실패했습니다.');
+          return;
+        }
+      }
+
+      toast.success('시험 후기가 성공적으로 수정되었습니다.');
+      setSelectedFile(null);
+      setIsEditMode(false);
+      setInitialValues({
+        isConfirmed: formData.isConfirmed,
+        lectureName: formData.lectureName,
+        professorName: formData.professorName,
+        classNumber: formData.classNumber,
+        semester: formData.semester,
+        lectureType: formData.lectureType,
+        isPF: formData.isPF,
+        isOnline: formData.isOnline,
+        examType: formData.examType,
+        questionDetail: formData.examTypeAndQuestions,
+      });
+      onSaveSuccess?.();
     } catch (error: unknown) {
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||
@@ -451,18 +462,20 @@ export function ExamDetailSection({
             <p className='font-semibold'>
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
-            {selectedExamReview && (
-              <span>(작성자: {selectedExamReview.userDisplay})</span>
+            {selectedExamReviewDetail?.userDisplay && (
+              <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
             )}
           </div>
-          <button
-            type='button'
-            className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-            onClick={() => setIsDeleteModalOpen(true)}
-            disabled={!selectedExamReview || Boolean(isLoadingDetail)}
-          >
-            <Trash2 className='h-4 w-4 text-red-500' />
-          </button>
+          {selectedExamReview && (
+            <button
+              type='button'
+              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+              onClick={() => setIsDeleteModalOpen(true)}
+              disabled={isDisabled}
+            >
+              <Trash2 className='h-4 w-4 text-red-500' />
+            </button>
+          )}
         </div>
 
         {!selectedExamReview ? (
@@ -479,87 +492,114 @@ export function ExamDetailSection({
             ))}
           </div>
         ) : (
-          <div className='flex flex-col gap-4 p-4 pt-2'>
-            <div className='flex flex-col gap-y-2 md:gap-x-4'>
-              <Field className='w-1/2 gap-0'>
-                <Field.Label>확인여부</Field.Label>
-                <Field.Content>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, status: value }))
-                    }
-                    disabled={isDisabled}
-                  >
-                    <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                      <div className='flex items-center gap-2'>
-                        <ExamConfirmStatusBadge status={formData.status} />
-                      </div>
-                    </Select.Trigger>
-                    <Select.Content align='start'>
-                      {EXAM_CONFIRM_STATUS.map((statusOption) => (
-                        <Select.Item
-                          key={statusOption.code}
-                          value={statusOption.code}
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              setActiveTab(value as 'review' | 'post' | 'comments')
+            }
+            className='w-full p-4'
+          >
+            <div className='flex flex-col gap-2'>
+              <div className='mt-3 flex items-center justify-between gap-3'>
+                <Tabs.List className='inline-flex gap-4'>
+                  <Tabs.Trigger value='review' className='w-fit'>
+                    시험후기 상세정보
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='post' className='w-fit'>
+                    게시글 및 작성자 정보
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='comments' className='w-fit'>
+                    댓글 목록 ({selectedExamReviewDetail?.commentCount ?? 0})
+                  </Tabs.Trigger>
+                </Tabs.List>
+                <div className='flex items-center gap-2'>
+                  {activeTab === 'review' ? (
+                    isEditMode ? (
+                      <>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='h-8 px-5 text-xs'
+                          onClick={handleCancel}
+                          disabled={isDisabled || isSaving}
                         >
-                          <ExamConfirmStatusBadge status={statusOption.code} />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
-                </Field.Content>
-              </Field>
-
-              <ExamReviewDetailInfoSection
-                formData={formData}
-                setFormData={(partialData) =>
-                  setFormData((prev) => ({ ...prev, ...partialData }))
-                }
-                isFormDisabled={isFormDisabled}
-                isEditMode={isEditMode}
-                onToggleEditMode={() => setIsEditMode((prev) => !prev)}
-                onFileDownload={handleFileDownload}
-                fileInputRef={fileInputRef}
-                selectedFile={selectedFile}
-                setSelectedFile={setSelectedFile}
-              />
-
-              <ExamReviewPostInfoSection
-                postId={formData.postId}
-                uploadTime={formData.uploadTime}
-                author={formData.author}
-                encryptedUserId={formData.encryptedUserId}
-              />
-
-              {(isEditMode || isDirty) && (
-                <div className='flex justify-end gap-2 pt-2 md:col-span-2'>
-                  <Button
-                    variant='outline'
-                    className='w-20'
-                    onClick={handleCancel}
-                    disabled={isDisabled || isSaving}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    variant='default'
-                    className='w-20 bg-gray-700'
-                    onClick={openSaveModal}
-                    disabled={isDisabled || !isDirty || isSaving}
-                  >
-                    {isSaving ? (
-                      <div className='flex items-center gap-1'>
-                        <Loader2 className='h-3 w-3 animate-spin' />
-                        <span>저장 중</span>
-                      </div>
+                          취소
+                        </Button>
+                        <Button
+                          type='button'
+                          size='sm'
+                          className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
+                          onClick={openSaveModal}
+                          disabled={isDisabled || !isDirty || isSaving}
+                        >
+                          {isSaving ? (
+                            <span className='inline-flex items-center gap-1'>
+                              <Loader2 className='h-3 w-3 animate-spin' />
+                              저장 중
+                            </span>
+                          ) : (
+                            '저장'
+                          )}
+                        </Button>
+                      </>
                     ) : (
-                      '저장'
-                    )}
-                  </Button>
+                      <Button
+                        type='button'
+                        variant='secondary'
+                        size='sm'
+                        className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
+                        onClick={() => setIsEditMode((prev) => !prev)}
+                        disabled={isDisabled}
+                      >
+                        <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                        편집 모드
+                      </Button>
+                    )
+                  ) : null}
                 </div>
-              )}
+              </div>
+
+              <Tabs.Content value='review' className='min-h-[680px]'>
+                <Card>
+                  <Card.Content className='flex min-h-[620px] flex-col gap-y-2 p-4'>
+                    <ExamReviewDetailInfoSection
+                      formData={formData}
+                      setFormData={(partialData) =>
+                        setFormData((prev) => ({ ...prev, ...partialData }))
+                      }
+                      isFormDisabled={isFormDisabled}
+                      onFileDownload={handleFileDownload}
+                      fileInputRef={fileInputRef}
+                      selectedFile={selectedFile}
+                      setSelectedFile={setSelectedFile}
+                    />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+
+              <Tabs.Content value='post' className='min-h-[460px]'>
+                <Card>
+                  <Card.Content className='p-4'>
+                    <ExamReviewPostInfoSection
+                      postId={formData.postId}
+                      uploadTime={formData.uploadTime}
+                      author={formData.author}
+                      encryptedUserId={formData.encryptedUserId}
+                    />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+
+              <Tabs.Content value='comments' className='min-h-[460px]'>
+                <Card>
+                  <Card.Content className='p-4'>
+                    <ExamReviewCommentSection postId={formData.postId} />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
             </div>
-          </div>
+          </Tabs>
         )}
       </div>
 

@@ -1,83 +1,54 @@
-// TODO: API 연동 시 usePostList 훅으로 상태/로직 분리 예정
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 
 import { PageHeader } from '@/shared/components';
-import { Input, Select } from '@/shared/components/ui';
+import { Input, Pagination, Select } from '@/shared/components/ui';
 
-import { MOCK_BOARDS, MOCK_POSTS } from '@/domains/Comments/mocks/posts';
 import type { AdminGetPostResponse } from '@/domains/Comments/types';
 
+import usePostListFilter from '../hooks/usePostListFilter';
 import BulkDeleteBar from './BulkDeleteBar';
 import PostListItem from './PostListItem';
 
 interface PostListProps {
   selectedPostId: number | null;
   onSelectPost: (post: AdminGetPostResponse | null) => void;
+  onOpenModal: (post: AdminGetPostResponse) => void;
 }
 
 export default function PostList({
   selectedPostId,
   onSelectPost,
+  onOpenModal,
 }: PostListProps) {
-  const [keyword, setKeyword] = useState('');
-  const [board, setBoard] = useState('전체');
-  const [reportFilter, setReportFilter] = useState('전체');
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [deletedIds, setDeletedIds] = useState<number[]>([]);
-  const selectAllRef = useRef<HTMLInputElement>(null);
-
-  //TODO: API 연동 후 클라이언트에서 필터링 제거
-  const filtered = useMemo(() => {
-    return MOCK_POSTS.filter((post) => {
-      if (deletedIds.includes(post.postId)) return false;
-      const matchesKeyword =
-        post.title.includes(keyword) ||
-        post.userDisplay.includes(keyword) ||
-        String(post.postId).includes(keyword);
-      const matchesBoard = board === '전체' || board === String(post.boardId);
-      const matchesReport = reportFilter === '전체' || post.reportCount > 0;
-      return matchesKeyword && matchesBoard && matchesReport;
-    });
-  }, [keyword, board, reportFilter, deletedIds]);
-
-  const allIds = filtered.map((p) => p.postId);
-  const isAllSelected =
-    allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
-  const isSomeSelected =
-    allIds.some((id) => selectedIds.includes(id)) && !isAllSelected;
-
-  useEffect(() => {
-    if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = isSomeSelected;
-    }
-  }, [isSomeSelected]);
-
-  const handleSelectAll = () => {
-    setSelectedIds(isAllSelected ? [] : allIds);
-  };
-
-  const handleCheck = (postId: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(postId)
-        ? prev.filter((id) => id !== postId)
-        : [...prev, postId]
-    );
-  };
-
-  const handleDelete = (postId: number) => {
-    // TODO: 단일 삭제 API 연동
-    setDeletedIds((prev) => [...prev, postId]);
-    setSelectedIds((prev) => prev.filter((id) => id !== postId));
-    if (selectedPostId === postId) onSelectPost(null);
-  };
-
-  const handleBulkDelete = () => {
-    // TODO: 일괄 삭제 API 연동
-    setDeletedIds((prev) => [...prev, ...selectedIds]);
-    if (selectedPostId !== null && selectedIds.includes(selectedPostId))
-      onSelectPost(null);
-    setSelectedIds([]);
-  };
+  const {
+    category,
+    setCategory,
+    keyword,
+    setKeyword,
+    reportFilter,
+    setReportFilter,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    selectedIds,
+    setSelectedIds,
+    handleCheck,
+    selectAllRef,
+    isAllSelected,
+    handleSelectAll,
+    handleBulkDelete,
+    handleDelete,
+    filtered,
+    categories,
+    page,
+    setPage,
+    hasNext,
+    totalPage,
+  } = usePostListFilter({
+    selectedPostId,
+    onSelectPost,
+  });
 
   return (
     <div className='flex h-full flex-col gap-4'>
@@ -85,32 +56,61 @@ export default function PostList({
         title='게시글 관리'
         description='커뮤니티에 있는 모든 게시글과 남겨진 댓글을 관리합니다.'
       />
-      <Input
-        placeholder='게시글 제목, 작성자(닉네임), 게시글 ID로 검색'
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-      />
       <div className='flex gap-2'>
-        <Select value={board} onValueChange={setBoard}>
+        <Input
+          placeholder='게시글 제목, 작성자(닉네임), 게시글 ID로 검색'
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && setKeyword(keyword)}
+          className='flex-1'
+        />
+        <button
+          className='rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800'
+          onClick={() => setKeyword(keyword)}
+        >
+          검색
+        </button>
+      </div>
+      <div className='flex items-center'>
+        <Input
+          type='date'
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <ArrowRight className='mx-2' />
+        <Input
+          type='date'
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </div>
+
+      <div className='flex gap-2'>
+        <Select value={category} onValueChange={setCategory}>
           <Select.Trigger className='flex-1 justify-between rounded-md border border-gray-200 bg-white px-3'>
-            <Select.Value />
+            <Select.Value placeholder='카테고리' />
           </Select.Trigger>
           <Select.Content>
             <Select.Item value='전체'>전체</Select.Item>
-            {MOCK_BOARDS.map((b) => (
-              <Select.Item key={b.boardId} value={String(b.boardId)}>
-                {b.boardName}
+            {categories.map((c) => (
+              <Select.Item key={c} value={c}>
+                {c}
               </Select.Item>
             ))}
           </Select.Content>
         </Select>
         <Select value={reportFilter} onValueChange={setReportFilter}>
           <Select.Trigger className='flex-1 justify-between rounded-md border border-gray-200 bg-white px-3'>
-            <Select.Value />
+            <Select.Value placeholder='미노출 사유' />
           </Select.Trigger>
           <Select.Content>
+            {/* TODO: 백엔드 미노출 사유 enum API 연동 시 하드코딩 제거 후 map으로 교체 */}
             <Select.Item value='전체'>전체</Select.Item>
-            <Select.Item value='신고됨'>신고됨만</Select.Item>
+            <Select.Item value='신고됨'>신고누적</Select.Item>
+            <Select.Item value='삭제됨'>삭제됨</Select.Item>
+            <Select.Item value='리자삭제'>리자삭제</Select.Item>
+            <Select.Item value='리자비공개'>리자비공개</Select.Item>
+            <Select.Item value='해당없음'>해당없음</Select.Item>
           </Select.Content>
         </Select>
       </div>
@@ -119,38 +119,93 @@ export default function PostList({
         onBulkDelete={handleBulkDelete}
         onClearSelection={() => setSelectedIds([])}
       />
-      <div className='flex-1 overflow-y-auto rounded-md border'>
-        {filtered.length === 0 ? (
-          <p className='py-10 text-center text-sm text-gray-400'>
-            게시글이 없습니다.
-          </p>
-        ) : (
-          <div className='divide-y divide-gray-200'>
-            <div className='flex items-center gap-3 px-4 py-2 text-sm text-gray-500'>
-              <input
-                ref={selectAllRef}
-                type='checkbox'
-                className='cursor-pointer'
-                checked={isAllSelected}
-                onChange={handleSelectAll}
-              />
-              <span>전체 선택</span>
+      <div className='flex flex-1 flex-col overflow-hidden rounded-md border'>
+        <div className='flex-1 overflow-y-auto'>
+          {filtered.length === 0 ? (
+            <p className='flex h-full w-full items-center justify-center py-10 text-center text-sm text-gray-400'>
+              게시글이 없습니다.
+            </p>
+          ) : (
+            <div className='divide-y divide-gray-200'>
+              <div className='flex items-center gap-3 px-4 py-2 text-sm text-gray-500'>
+                <input
+                  ref={selectAllRef}
+                  type='checkbox'
+                  className='cursor-pointer'
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                />
+                <span>전체 선택</span>
+              </div>
+              {filtered.map((post) => (
+                <PostListItem
+                  key={post.postId}
+                  post={post}
+                  isSelected={selectedPostId === post.postId}
+                  isChecked={selectedIds.includes(post.postId)}
+                  onCheck={handleCheck}
+                  onClick={(post) =>
+                    onSelectPost(selectedPostId === post.postId ? null : post)
+                  }
+                  onOpenModal={onOpenModal}
+                  onDelete={handleDelete}
+                />
+              ))}
             </div>
-            {filtered.map((post) => (
-              <PostListItem
-                key={post.postId}
-                post={post}
-                isSelected={selectedPostId === post.postId}
-                isChecked={selectedIds.includes(post.postId)}
-                onCheck={handleCheck}
-                onClick={(p) =>
-                  onSelectPost(selectedPostId === p.postId ? null : p)
+          )}
+        </div>
+        <Pagination className='border-t py-2'>
+          <Pagination.Content className='flex flex-wrap items-center justify-center gap-1'>
+            <Pagination.Item>
+              <Pagination.Previous
+                href='#'
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (page > 1) setPage((p) => p - 1);
+                }}
+                className={
+                  page === 1 ? 'pointer-events-none opacity-50' : undefined
                 }
-                onDelete={handleDelete}
               />
-            ))}
-          </div>
-        )}
+            </Pagination.Item>
+            {(() => {
+              const startPage = Math.floor((page - 1) / 10) * 10 + 1;
+              const endPage =
+                totalPage !== undefined
+                  ? Math.min(startPage + 9, Math.max(1, totalPage))
+                  : startPage + 9;
+              return Array.from(
+                { length: endPage - startPage + 1 },
+                (_, i) => startPage + i
+              ).map((p) => (
+                <Pagination.Item key={p}>
+                  <Pagination.Link
+                    href='#'
+                    isActive={page === p}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage(p);
+                    }}
+                  >
+                    {p}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ));
+            })()}
+            <Pagination.Item>
+              <Pagination.Next
+                href='#'
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (hasNext) setPage((p) => p + 1);
+                }}
+                className={
+                  !hasNext ? 'pointer-events-none opacity-50' : undefined
+                }
+              />
+            </Pagination.Item>
+          </Pagination.Content>
+        </Pagination>
       </div>
     </div>
   );

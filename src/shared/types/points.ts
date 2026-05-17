@@ -2,7 +2,6 @@ export interface AdjustSinglePoint {
   encryptedUserId: string;
   difference?: number;
   category: string;
-  sourceId?: number;
   source: string;
   memo?: string;
 }

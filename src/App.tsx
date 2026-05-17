@@ -10,14 +10,14 @@ import { AuthProvider } from '@/shared/contexts';
 import {
   AdjustAllMemberPointPage,
   AdjustSinglePointPage,
-  CommentPage,
   ExamReviewPage,
+  ExamReviewPeriodPage,
   ExcelPointUploadPage,
   LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
   PointFreezePage,
-  PostPage,
+  PostCommentPage,
   PushNotificationPage,
 } from '@/pages';
 
@@ -69,6 +69,10 @@ function App() {
                               element={<ExamReviewPage />}
                             />
                             <Route
+                              path={PATHS.REVIEW_EXAM_PERIOD}
+                              element={<ExamReviewPeriodPage />}
+                            />
+                            <Route
                               path={PATHS.POINT_SINGLE}
                               element={<AdjustSinglePointPage />}
                             />
@@ -84,10 +88,9 @@ function App() {
                               path={PATHS.POINT_UPLOAD_EXCEL}
                               element={<ExcelPointUploadPage />}
                             />
-                            <Route path={PATHS.POSTS} element={<PostPage />} />
                             <Route
                               path={PATHS.POST_COMMENTS}
-                              element={<CommentPage />}
+                              element={<PostCommentPage />}
                             />
                             <Route
                               path={PATHS.ALERTS}
