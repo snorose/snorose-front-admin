@@ -105,6 +105,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         title: '푸시 알림 전송',
         url: PATHS.ALERTS,
       },
+      {
+        title: '팝업창 관리',
+        url: PATHS.POPUPS,
+      },
     ],
   },
 ];
