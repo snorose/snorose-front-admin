@@ -5,6 +5,7 @@ import {
   HandCoins,
   type LucideIcon,
   MessageSquareWarning,
+  MonitorCog,
   User,
 } from 'lucide-react';
 
@@ -97,6 +98,30 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       },
     ],
   },
+  {
+    title: '운영 관리',
+    icon: MonitorCog,
+    items: [
+      {
+        title: '팝업창 관리',
+        url: PATHS.POPUPS,
+      },
+    ],
+  },
+  // {
+  //   title: '문의 및 신고',
+  //   url: '/report',
+  //   items: [
+  //     {
+  //       title: '문의 및 신고',
+  //       url: '/report/inquiry',
+  //     },
+  //     {
+  //       title: '신고 글/댓글 조회',
+  //       url: '/report/report',
+  //     },
+  //   ],
+  // },
   // {
   //   title: '알림',
   //   icon: Bell,
