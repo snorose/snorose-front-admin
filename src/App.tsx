@@ -17,6 +17,7 @@ import {
   MemberInfoPage,
   MemberPenaltyManagementPage,
   PointFreezePage,
+  PopupManagementPage,
   PostCommentPage,
   PostManagePage,
   PushNotificationPage,
@@ -100,6 +101,10 @@ function App() {
                             <Route
                               path={PATHS.ALERTS}
                               element={<PushNotificationPage />}
+                            />
+                            <Route
+                              path={PATHS.POPUPS}
+                              element={<PopupManagementPage />}
                             />
                           </Routes>
                         </section>
