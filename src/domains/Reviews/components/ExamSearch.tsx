@@ -257,7 +257,7 @@ export default function ExamSearch({
             handleSearchWithParams({ sort: value });
           }}
         >
-          <Select.Trigger className='!h-7 w-[110px] text-xs'>
+          <Select.Trigger className='h-9 w-[110px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content align='start'>
@@ -280,7 +280,7 @@ export default function ExamSearch({
             handleSearchWithParams({ semester: value });
           }}
         >
-          <Select.Trigger className='!h-7 w-[130px] text-xs'>
+          <Select.Trigger className='h-9 w-[130px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content
@@ -312,7 +312,7 @@ export default function ExamSearch({
             handleSearchWithParams({ examType: value });
           }}
         >
-          <Select.Trigger className='!h-7 w-[100px] text-xs'>
+          <Select.Trigger className='h-9 w-[100px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content
@@ -344,7 +344,7 @@ export default function ExamSearch({
             handleSearchWithParams({ confirmStatus: value });
           }}
         >
-          <Select.Trigger className='!h-7 w-[110px] text-xs'>
+          <Select.Trigger className='h-9 w-[110px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content align='start'>
