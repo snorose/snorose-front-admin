@@ -18,7 +18,10 @@ import {
   ExamTableSkeleton,
 } from '@/domains/Reviews/components';
 import { useExamReviews } from '@/domains/Reviews/hooks';
-import type { ExamReview } from '@/domains/Reviews/types';
+import type {
+  ExamReview,
+  ExamReviewSearchParams,
+} from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
@@ -50,12 +53,7 @@ interface ExamTableProps {
   onRowSelect?: (review: ExamReview | null) => void;
   refreshKey?: number;
   selectedId?: number | null;
-  searchParams?: {
-    keyword?: string;
-    lectureYear?: number;
-    semester?: string;
-    examType?: string;
-  };
+  searchParams?: ExamReviewSearchParams;
   currentPage?: number;
   onPageChange?: (page: number | ((prev: number) => number)) => void;
 }
@@ -87,10 +85,15 @@ export default function ExamTable({
 
   const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
-    keyword: searchParams.keyword,
+    startDate: searchParams.startDate,
+    endDate: searchParams.endDate,
+    keywordAuthor: searchParams.keywordAuthor,
+    keywordPost: searchParams.keywordPost,
+    sort: searchParams.sort,
     lectureYear: searchParams.lectureYear,
     semester: searchParams.semester,
     examType: searchParams.examType,
+    isConfirmed: searchParams.isConfirmed,
     enabled: !propData,
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });

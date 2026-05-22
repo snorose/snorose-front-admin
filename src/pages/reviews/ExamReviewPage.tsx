@@ -16,6 +16,7 @@ import {
 import type {
   ExamReview,
   ExamReviewDetailResult,
+  ExamReviewSearchParams,
   Semester,
 } from '@/domains/Reviews/types';
 import {
@@ -35,12 +36,7 @@ export default function ExamReviewPage() {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const fetchingIdRef = useRef<number | null>(null);
-  const [searchParams, setSearchParams] = useState<{
-    keyword?: string;
-    lectureYear?: number;
-    semester?: string;
-    examType?: string;
-  }>({});
+  const [searchParams, setSearchParams] = useState<ExamReviewSearchParams>({});
 
   // URL에서 페이지 번호 읽기
   const currentPageFromUrl = parseInt(
@@ -61,16 +57,33 @@ export default function ExamReviewPage() {
 
   // URL 쿼리 파라미터를 searchParams로 변환 (검색 파라미터만, page 제외)
   useEffect(() => {
-    const params: {
-      keyword?: string;
-      lectureYear?: number;
-      semester?: string;
-      examType?: string;
-    } = {};
+    const params: ExamReviewSearchParams = {};
 
-    const keyword = searchParamsFromUrl.get('keyword');
-    if (keyword) {
-      params.keyword = keyword;
+    const startDate = searchParamsFromUrl.get('startDate');
+    if (startDate) {
+      params.startDate = startDate;
+    }
+
+    const endDate = searchParamsFromUrl.get('endDate');
+    if (endDate) {
+      params.endDate = endDate;
+    }
+
+    const keywordAuthor = searchParamsFromUrl.get('keywordAuthor');
+    if (keywordAuthor) {
+      params.keywordAuthor = keywordAuthor;
+    }
+
+    const keywordPost =
+      searchParamsFromUrl.get('keywordPost') ||
+      searchParamsFromUrl.get('keyword');
+    if (keywordPost) {
+      params.keywordPost = keywordPost;
+    }
+
+    const sort = searchParamsFromUrl.get('sort');
+    if (sort) {
+      params.sort = sort;
     }
 
     const lectureYear = searchParamsFromUrl.get('lectureYear');
@@ -88,12 +101,25 @@ export default function ExamReviewPage() {
       params.examType = examType;
     }
 
+    const isConfirmed = searchParamsFromUrl.get('isConfirmed');
+    if (isConfirmed === 'true') {
+      params.isConfirmed = true;
+    }
+    if (isConfirmed === 'false') {
+      params.isConfirmed = false;
+    }
+
     // 실제로 검색 파라미터가 변경되었는지 확인
     const hasChanged =
-      params.keyword !== searchParams.keyword ||
+      params.startDate !== searchParams.startDate ||
+      params.endDate !== searchParams.endDate ||
+      params.keywordAuthor !== searchParams.keywordAuthor ||
+      params.keywordPost !== searchParams.keywordPost ||
+      params.sort !== searchParams.sort ||
       params.lectureYear !== searchParams.lectureYear ||
       params.semester !== searchParams.semester ||
-      params.examType !== searchParams.examType;
+      params.examType !== searchParams.examType ||
+      params.isConfirmed !== searchParams.isConfirmed;
 
     if (hasChanged) {
       setSearchParams(params);
@@ -101,16 +127,23 @@ export default function ExamReviewPage() {
   }, [searchParamsFromUrl, searchParams]);
 
   // searchParams가 변경될 때 URL 쿼리 파라미터 업데이트 (검색 시 첫 페이지로 이동)
-  const handleSearchChange = (params: {
-    keyword?: string;
-    lectureYear?: number;
-    semester?: string;
-    examType?: string;
-  }) => {
+  const handleSearchChange = (params: ExamReviewSearchParams) => {
     // URL 쿼리 파라미터 업데이트 (useEffect에서 자동으로 searchParams 업데이트됨)
     const newSearchParams = new URLSearchParams();
-    if (params.keyword) {
-      newSearchParams.set('keyword', params.keyword);
+    if (params.startDate) {
+      newSearchParams.set('startDate', params.startDate);
+    }
+    if (params.endDate) {
+      newSearchParams.set('endDate', params.endDate);
+    }
+    if (params.keywordAuthor) {
+      newSearchParams.set('keywordAuthor', params.keywordAuthor);
+    }
+    if (params.keywordPost) {
+      newSearchParams.set('keywordPost', params.keywordPost);
+    }
+    if (params.sort) {
+      newSearchParams.set('sort', params.sort);
     }
     if (params.lectureYear) {
       newSearchParams.set('lectureYear', params.lectureYear.toString());
@@ -120,6 +153,9 @@ export default function ExamReviewPage() {
     }
     if (params.examType) {
       newSearchParams.set('examType', params.examType);
+    }
+    if (params.isConfirmed !== undefined) {
+      newSearchParams.set('isConfirmed', String(params.isConfirmed));
     }
     // 검색 시 첫 페이지로 이동
     newSearchParams.set('page', '1');
@@ -156,10 +192,15 @@ export default function ExamReviewPage() {
           const queryKey = [
             'examReviews',
             currentPage,
-            searchParams.keyword,
+            searchParams.startDate,
+            searchParams.endDate,
+            searchParams.keywordAuthor,
+            searchParams.keywordPost,
+            searchParams.sort,
             searchParams.lectureYear,
             searchParams.semester,
             searchParams.examType,
+            searchParams.isConfirmed,
             refreshKey,
           ];
 
@@ -316,7 +357,16 @@ export default function ExamReviewPage() {
         <div className='flex'>
           <ExamSearch
             onSearchChange={handleSearchChange}
-            initialKeyword={searchParamsFromUrl.get('keyword') || ''}
+            initialEndDate={searchParamsFromUrl.get('endDate') || ''}
+            initialKeywordAuthor={
+              searchParamsFromUrl.get('keywordAuthor') || ''
+            }
+            initialKeywordPost={
+              searchParamsFromUrl.get('keywordPost') ||
+              searchParamsFromUrl.get('keyword') ||
+              ''
+            }
+            initialSort={searchParamsFromUrl.get('sort') || undefined}
             initialSemester={
               searchParamsFromUrl.get('semester') &&
               searchParamsFromUrl.get('lectureYear')
@@ -333,6 +383,14 @@ export default function ExamReviewPage() {
                   ? '기말고사'
                   : undefined
             }
+            initialIsConfirmed={
+              searchParamsFromUrl.get('isConfirmed') === 'true'
+                ? true
+                : searchParamsFromUrl.get('isConfirmed') === 'false'
+                  ? false
+                  : undefined
+            }
+            initialStartDate={searchParamsFromUrl.get('startDate') || ''}
           />
         </div>
 

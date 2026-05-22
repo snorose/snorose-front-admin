@@ -3,7 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { STATUS } from '@/domains/Reviews/constants';
-import type { ExamReview, ExamReviews } from '@/domains/Reviews/types';
+import type {
+  ExamReview,
+  ExamReviewSearchParams,
+  ExamReviews,
+} from '@/domains/Reviews/types';
 import {
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
@@ -11,12 +15,8 @@ import {
 
 import { getExamReviews } from '@/apis';
 
-interface UseExamReviewsParams {
+interface UseExamReviewsParams extends ExamReviewSearchParams {
   page: number;
-  keyword?: string;
-  lectureYear?: number;
-  semester?: string;
-  examType?: string;
   enabled?: boolean;
   refreshKey?: number;
 }
@@ -63,10 +63,15 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
 export const useExamReviews = (params: UseExamReviewsParams) => {
   const {
     page,
-    keyword,
+    startDate,
+    endDate,
+    keywordAuthor,
+    keywordPost,
+    sort,
     lectureYear,
     semester,
     examType,
+    isConfirmed,
     enabled = true,
     refreshKey,
   } = params;
@@ -75,19 +80,29 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     queryKey: [
       'examReviews',
       page,
-      keyword,
+      startDate,
+      endDate,
+      keywordAuthor,
+      keywordPost,
+      sort,
       lectureYear,
       semester,
       examType,
+      isConfirmed,
       refreshKey,
     ],
     queryFn: async () => {
       const response = await getExamReviews({
         page: page - 1, // API는 0부터 시작
-        keyword,
+        startDate,
+        endDate,
+        keywordAuthor,
+        keywordPost,
+        sort,
         lectureYear,
         semester,
         examType,
+        isConfirmed,
       });
 
       if (!response.isSuccess || !response.result) {

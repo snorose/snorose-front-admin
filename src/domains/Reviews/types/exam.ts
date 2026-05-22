@@ -14,6 +14,18 @@ export type ExamType = (typeof EXAM_TYPE)[keyof typeof EXAM_TYPE];
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 
+export interface ExamReviewSearchParams {
+  startDate?: string;
+  endDate?: string;
+  keywordAuthor?: string;
+  keywordPost?: string;
+  sort?: string;
+  lectureYear?: number;
+  semester?: string;
+  examType?: string;
+  isConfirmed?: boolean;
+}
+
 export interface ExamReview {
   id: number;
   status: string;
