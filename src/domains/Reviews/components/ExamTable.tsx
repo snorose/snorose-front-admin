@@ -100,6 +100,7 @@ export default function ExamTable({
     [propData, queryData?.data]
   );
   const hasNext = queryData?.hasNext ?? false;
+  const totalPage = queryData?.totalPage;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
   useEffect(() => {
@@ -197,6 +198,7 @@ export default function ExamTable({
         currentPage={currentPage}
         onPageChange={setCurrentPage}
         hasNext={hasNext}
+        totalPage={totalPage}
       />
     </>
   );

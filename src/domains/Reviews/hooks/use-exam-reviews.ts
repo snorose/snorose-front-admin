@@ -99,6 +99,7 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       return {
         data: response.result.data.map(transformApiResponseToExamReview),
         hasNext: response.result.hasNext,
+        totalPage: response.result.totalPage,
       };
     },
     enabled,

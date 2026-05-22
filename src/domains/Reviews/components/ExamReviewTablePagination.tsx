@@ -6,6 +6,7 @@ interface ExamReviewTablePaginationProps {
   currentPage?: number;
   onPageChange?: (page: number | ((prev: number) => number)) => void;
   hasNext?: boolean;
+  totalPage?: number;
 }
 
 function getBlockStartPage(page: number) {
@@ -16,6 +17,7 @@ export function ExamReviewTablePagination({
   currentPage: propCurrentPage,
   onPageChange,
   hasNext = false,
+  totalPage,
 }: ExamReviewTablePaginationProps) {
   const [internalCurrentPage, setInternalCurrentPage] = useState(1);
 
@@ -33,6 +35,9 @@ export function ExamReviewTablePagination({
   const prevBlockStart = Math.max(1, blockStart - 10);
   const nextBlockStart = blockStart + 10;
   const canGoPrevious = blockStart > 1;
+  const lastPage = Math.max(1, totalPage ?? nextBlockStart);
+  const canGoNext =
+    totalPage === undefined ? hasNext : blockStart + 9 < lastPage;
 
   return (
     <Pagination className='py-2'>
@@ -50,9 +55,11 @@ export function ExamReviewTablePagination({
           />
         </Pagination.Item>
         {(() => {
-          // TODO: 총 페이지 수에 따라 마지막 블록 단위 조정하기
           const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
-          const endPage = startPage + 9;
+          const endPage =
+            totalPage !== undefined
+              ? Math.min(startPage + 9, lastPage)
+              : startPage + 9;
 
           const pageNumbers = Array.from(
             { length: endPage - startPage + 1 },
@@ -79,9 +86,11 @@ export function ExamReviewTablePagination({
             href='#'
             onClick={(e) => {
               e.preventDefault();
-              if (hasNext) setCurrentPage(nextBlockStart);
+              if (canGoNext) setCurrentPage(nextBlockStart);
             }}
-            className={!hasNext ? 'pointer-events-none opacity-50' : undefined}
+            className={
+              !canGoNext ? 'pointer-events-none opacity-50' : undefined
+            }
           />
         </Pagination.Item>
       </Pagination.Content>
