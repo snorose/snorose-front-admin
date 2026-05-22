@@ -18,9 +18,15 @@ import type {
 export const getExamReviews = async (params: {
   page: number;
   keyword?: string;
+  startDate?: string;
+  endDate?: string;
+  keywordAuthor?: string;
+  keywordPost?: string;
+  sort?: string;
   lectureYear?: number;
   semester?: string;
   examType?: string;
+  isConfirmed?: boolean;
 }): Promise<ExamReviewsResponse> => {
   const response = await axiosInstance.get(`/v1/admin/reviews`, {
     params,

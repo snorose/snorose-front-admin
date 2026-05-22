@@ -22,18 +22,28 @@ interface UseExamReviewsParams {
 }
 
 const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
-  const reviewTitle = apiData.content || '';
+  const reviewTitle = apiData.title || apiData.content || '';
   const courseName = apiData.lecture || '';
   const professor = apiData.professor || '';
-  const semester = convertSemesterEnumToString(
-    apiData.lectureSemester,
-    apiData.lectureYear
-  );
-  const examType = convertExamTypeEnumToString(apiData.examType);
+  const semester =
+    apiData.lectureSemester && apiData.lectureYear
+      ? convertSemesterEnumToString(
+          apiData.lectureSemester,
+          apiData.lectureYear
+        )
+      : '';
+  const examType = apiData.examType
+    ? convertExamTypeEnumToString(apiData.examType)
+    : '';
   const classNumber = String(apiData.classNumber ?? '');
   const uploadTime = formatDateTimeToMinutes(apiData.contentDate);
-  const status = apiData.status || STATUS.UNCONFIRMED;
-  const userDisplay = apiData.userDisplay || '';
+  const status =
+    apiData.isConfirmed === true
+      ? STATUS.CONFIRMED
+      : apiData.isConfirmed === false
+        ? STATUS.UNCONFIRMED
+        : apiData.status || STATUS.UNCONFIRMED;
+  const userDisplay = apiData.userName || apiData.userDisplay || '';
 
   return {
     id: apiData.postId,

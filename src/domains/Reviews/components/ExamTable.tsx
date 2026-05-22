@@ -11,6 +11,7 @@ import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 import {
+  ExamConfirmStatusBadge,
   ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
@@ -30,23 +31,18 @@ interface ExamReviewTableColumn {
 }
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
+  {
+    key: 'status',
+    label: '확인여부',
+    width: '78px',
+    render: (review: ExamReview) => (
+      <ExamConfirmStatusBadge status={review.status} />
+    ),
+  },
   { key: 'id', label: 'postId', width: '70px' },
-  // {
-  //   key: 'status',
-  //   label: '확인여부',
-  //   width: '78px',
-  //   render: (review: ExamReview) => (
-  //     <ExamConfirmStatusBadge status={review.status} />
-  //   ),
-  // },
-  { key: 'reviewTitle', label: '시험후기명', width: '200px' },
-  { key: 'courseName', label: '강의명', width: '120px' },
-  { key: 'professor', label: '교수명', width: '60px' },
-  { key: 'semester', label: '수강학기', width: '60px' },
-  { key: 'examType', label: '시험종류', width: '60px' },
-  { key: 'classNumber', label: '분반', width: '60px' },
-  { key: 'uploadTime', label: '업로드 시간', width: '110px' },
-  { key: 'userDisplay', label: '게시자', width: '80px' },
+  { key: 'reviewTitle', label: '제목', width: '260px' },
+  { key: 'userDisplay', label: '작성자', width: '100px' },
+  { key: 'uploadTime', label: '작성일', width: '130px' },
 ];
 
 interface ExamTableProps {
