@@ -29,7 +29,7 @@ const ITEMS_PER_PAGE = 10;
 interface ExamReviewTableColumn {
   key: keyof ExamReview;
   label: string;
-  width: string;
+  width?: string;
   render?: (review: ExamReview) => ReactNode;
 }
 
@@ -42,10 +42,10 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       <ExamConfirmStatusBadge status={review.status} />
     ),
   },
-  { key: 'id', label: 'postId', width: '70px' },
-  { key: 'reviewTitle', label: '제목', width: '260px' },
-  { key: 'userDisplay', label: '작성자', width: '100px' },
-  { key: 'uploadTime', label: '작성일', width: '130px' },
+  { key: 'id', label: 'postId', width: '90px' },
+  { key: 'reviewTitle', label: '제목' },
+  { key: 'userDisplay', label: '작성자', width: '120px' },
+  { key: 'uploadTime', label: '작성일', width: '150px' },
 ];
 
 interface ExamTableProps {
@@ -124,24 +124,27 @@ export default function ExamTable({
     }
   }, [selectedId, currentPageData, onRowSelect]);
 
-  const isEmpty = !isLoading && currentPageData.length === 0;
-
   return (
     <>
-      <div className='overflow-hidden rounded-md border'>
-        <Table
-          className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
-        >
-          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+      <div className='w-full overflow-hidden rounded-md border'>
+        <Table className='w-full table-fixed rounded-lg bg-white shadow'>
+          <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
-              <Table.Head
-                key={column.key}
-                style={{ width: column.width, minWidth: column.width }}
-                className='relative cursor-pointer overflow-hidden'
-              >
-                {column.label}
-              </Table.Head>
+              <col key={column.key} style={{ width: column.width }} />
             ))}
+          </colgroup>
+
+          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+            <Table.Row>
+              {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
+                <Table.Head
+                  key={column.key}
+                  className='relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+                >
+                  {column.label}
+                </Table.Head>
+              ))}
+            </Table.Row>
           </Table.Header>
 
           <Table.Body>
@@ -172,11 +175,7 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
-                          style={{
-                            width: column.width,
-                            minWidth: column.width,
-                          }}
-                          className='truncate overflow-hidden'
+                          className='overflow-hidden text-ellipsis whitespace-nowrap'
                         >
                           {column.render
                             ? column.render(review)
