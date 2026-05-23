@@ -55,7 +55,7 @@ export function ExamReviewTablePagination({
           />
         </Pagination.Item>
         {(() => {
-          const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+          const startPage = blockStart;
           const endPage =
             totalPage !== undefined
               ? Math.min(startPage + 9, lastPage)
