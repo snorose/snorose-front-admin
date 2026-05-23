@@ -33,5 +33,6 @@ export const usePostList = (params: usePostListParams) => {
     error: normalResult.error,
     hasNext: normalResult.data?.hasNext,
     totalPage: normalResult.data?.totalPage,
+    refetch: normalResult.refetch,
   };
 };
