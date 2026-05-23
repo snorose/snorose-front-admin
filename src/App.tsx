@@ -18,6 +18,7 @@ import {
   MemberPenaltyManagementPage,
   PointFreezePage,
   PostCommentPage,
+  PostManagePage,
   PushNotificationPage,
 } from '@/pages';
 
@@ -91,6 +92,10 @@ function App() {
                             <Route
                               path={PATHS.POST_COMMENTS}
                               element={<PostCommentPage />}
+                            />
+                            <Route
+                              path={PATHS.POST_MANAGE}
+                              element={<PostManagePage />}
                             />
                             <Route
                               path={PATHS.ALERTS}

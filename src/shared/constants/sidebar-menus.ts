@@ -41,6 +41,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     icon: FileText,
     items: [
       {
+        title: '게시글 관리',
+        url: PATHS.POST_MANAGE,
+      },
+      {
         title: '댓글 관리',
         url: PATHS.POST_COMMENTS,
       },
