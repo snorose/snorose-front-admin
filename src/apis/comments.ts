@@ -43,11 +43,8 @@ export const getPostCommentsAPI = async (
   page: number
 ): Promise<GetPostCommentsResponse> => {
   const response = await axiosInstance.get(`/v1/posts/${postId}/comments`, {
-    params: {
-      page,
-    },
+    params: { page },
   });
-
   return response.data;
 };
 
@@ -66,9 +63,7 @@ export const getCommentChildrenList = async (
 ): Promise<AdminCommentListResponse> => {
   const response = await axiosInstance.get(
     `/v1/admin/comments/${commentId}/children`,
-    {
-      params: { page },
-    }
+    { params: { page } }
   );
   return response.data.result;
 };
@@ -88,9 +83,7 @@ export const searchComments = async (
 export const deleteComment = async (
   commentId: number
 ): Promise<AdminDeleteCommentResponse> => {
-  const response = await axiosInstance.delete(
-    `/v1/admin/comments/${commentId}`
-  );
+  const response = await axiosInstance.delete(`/v1/admin/comments/${commentId}`);
   return response.data.result;
 };
 
@@ -108,9 +101,6 @@ export const bulkDeleteComments = async (
 export const updateCommentVisibility = async (
   body: AdminCommentVisibilityUpdateRequest
 ): Promise<string> => {
-  const response = await axiosInstance.patch(
-    `/v1/admin/comments/visibility`,
-    body
-  );
+  const response = await axiosInstance.patch(`/v1/admin/comments/visibility`, body);
   return response.data.result;
 };
