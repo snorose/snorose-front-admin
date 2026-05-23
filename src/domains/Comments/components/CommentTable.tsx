@@ -50,6 +50,7 @@ export default function CommentTable({
     handleFilterByParentId,
     handleBulkDelete,
     handleBulkVisibility,
+    handleBulkRestore,
     isDeletePending,
     isVisibilityPending,
     hasNext,
@@ -72,6 +73,7 @@ export default function CommentTable({
         isVisibilityPending={isVisibilityPending}
         isDeletePending={isDeletePending}
         onBulkVisibility={handleBulkVisibility}
+        onBulkRestore={handleBulkRestore}
         onBulkDelete={handleBulkDelete}
       />
 

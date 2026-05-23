@@ -114,12 +114,20 @@ export function useCommentTableState({
 
   const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
-    if (
-      !window.confirm(
-        `선택한 ${selectedIds.length}개의 댓글을 삭제하시겠습니까?`
-      )
-    )
-      return;
+
+    const hasSelectedParentWithChildren = comments.some(
+      (c) =>
+        selectedIds.includes(c.commentId) &&
+        c.parentId === null &&
+        comments.some((child) => child.parentId === c.commentId)
+    );
+
+    const message = hasSelectedParentWithChildren
+      ? '하위댓글도 모두 삭제하시겠습니까?'
+      : `선택한 ${selectedIds.length}개의 댓글을 삭제하시겠습니까?`;
+
+    if (!window.confirm(message)) return;
+
     bulkDelete(selectedIds, {
       onSuccess: (res) => {
         toast.success(`${res.deletedCount}개의 댓글이 삭제되었습니다.`);
@@ -136,7 +144,11 @@ export function useCommentTableState({
       { commentIds: selectedIds, isVisible },
       {
         onSuccess: () => {
-          toast.success('댓글 노출 여부가 성공적으로 변경되었습니다.');
+          toast.success(
+            isVisible
+              ? '선택한 댓글의 비공개가 해제되었습니다.'
+              : '선택한 댓글이 비공개 처리되었습니다.'
+          );
           setSelectedIds([]);
           void refetch();
         },
@@ -145,6 +157,22 @@ export function useCommentTableState({
       }
     );
   };
+
+  const handleBulkRestore = () => {
+    if (selectedIds.length === 0) return;
+    bulkVisibility(
+      { commentIds: selectedIds, isVisible: true },
+      {
+        onSuccess: () => {
+          toast.success('선택한 댓글이 성공적으로 복구되었습니다.');
+          setSelectedIds([]);
+          void refetch();
+        },
+        onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
+      }
+    );
+  };
+
 
   // 체크박스 제어
   const allCommentIds = comments.map((c) => c.commentId);
@@ -277,6 +305,7 @@ export function useCommentTableState({
     handleFilterByParentId,
     handleBulkDelete,
     handleBulkVisibility,
+    handleBulkRestore,
     isDeletePending,
     isVisibilityPending,
     hasNext,
