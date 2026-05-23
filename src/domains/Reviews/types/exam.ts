@@ -14,6 +14,18 @@ export type ExamType = (typeof EXAM_TYPE)[keyof typeof EXAM_TYPE];
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 
+export interface ExamReviewSearchParams {
+  startDate?: string;
+  endDate?: string;
+  keywordAuthor?: string;
+  keywordPost?: string;
+  sort?: string;
+  lectureYear?: number;
+  semester?: string;
+  examType?: string;
+  isConfirmed?: boolean;
+}
+
 export interface ExamReview {
   id: number;
   status: string;
@@ -30,17 +42,19 @@ export interface ExamReview {
 
 export interface ExamReviews {
   postId: number;
-  status: string;
-  content: string;
-  lecture: string;
-  professor: string;
+  title?: string;
+  status?: string;
+  isConfirmed?: boolean;
+  content?: string;
+  lecture?: string;
+  professor?: string;
   encryptedUserId: string | null;
-  userDisplay: string | null;
+  userDisplay?: string | null;
   userName: string | null;
-  lectureYear: number;
-  lectureSemester: Semester;
-  examType: ExamType;
-  classNumber: number;
+  lectureYear?: number;
+  lectureSemester?: Semester;
+  examType?: ExamType;
+  classNumber?: number;
   contentDate: string;
   encryptedAdminId: string | null;
   adminName: string | null;
@@ -140,5 +154,7 @@ export interface ExamReviewsResponse {
   result: {
     data: ExamReviews[];
     hasNext: boolean;
+    totalPage?: number;
+    totalCount?: number;
   };
 }

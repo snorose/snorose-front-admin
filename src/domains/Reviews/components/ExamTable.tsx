@@ -11,13 +11,17 @@ import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 import {
+  ExamConfirmStatusBadge,
   ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
   ExamTableSkeleton,
 } from '@/domains/Reviews/components';
 import { useExamReviews } from '@/domains/Reviews/hooks';
-import type { ExamReview } from '@/domains/Reviews/types';
+import type {
+  ExamReview,
+  ExamReviewSearchParams,
+} from '@/domains/Reviews/types';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
@@ -25,28 +29,23 @@ const ITEMS_PER_PAGE = 10;
 interface ExamReviewTableColumn {
   key: keyof ExamReview;
   label: string;
-  width: string;
+  width?: string;
   render?: (review: ExamReview) => ReactNode;
 }
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
-  { key: 'id', label: 'postId', width: '70px' },
-  // {
-  //   key: 'status',
-  //   label: '확인여부',
-  //   width: '78px',
-  //   render: (review: ExamReview) => (
-  //     <ExamConfirmStatusBadge status={review.status} />
-  //   ),
-  // },
-  { key: 'reviewTitle', label: '시험후기명', width: '200px' },
-  { key: 'courseName', label: '강의명', width: '120px' },
-  { key: 'professor', label: '교수명', width: '60px' },
-  { key: 'semester', label: '수강학기', width: '60px' },
-  { key: 'examType', label: '시험종류', width: '60px' },
-  { key: 'classNumber', label: '분반', width: '60px' },
-  { key: 'uploadTime', label: '업로드 시간', width: '110px' },
-  { key: 'userDisplay', label: '게시자', width: '80px' },
+  {
+    key: 'status',
+    label: '확인여부',
+    width: '78px',
+    render: (review: ExamReview) => (
+      <ExamConfirmStatusBadge status={review.status} />
+    ),
+  },
+  { key: 'id', label: 'postId', width: '90px' },
+  { key: 'reviewTitle', label: '제목' },
+  { key: 'userDisplay', label: '작성자', width: '120px' },
+  { key: 'uploadTime', label: '작성일', width: '150px' },
 ];
 
 interface ExamTableProps {
@@ -54,12 +53,7 @@ interface ExamTableProps {
   onRowSelect?: (review: ExamReview | null) => void;
   refreshKey?: number;
   selectedId?: number | null;
-  searchParams?: {
-    keyword?: string;
-    lectureYear?: number;
-    semester?: string;
-    examType?: string;
-  };
+  searchParams?: ExamReviewSearchParams;
   currentPage?: number;
   onPageChange?: (page: number | ((prev: number) => number)) => void;
 }
@@ -91,10 +85,15 @@ export default function ExamTable({
 
   const { data: queryData, isLoading } = useExamReviews({
     page: currentPage,
-    keyword: searchParams.keyword,
+    startDate: searchParams.startDate,
+    endDate: searchParams.endDate,
+    keywordAuthor: searchParams.keywordAuthor,
+    keywordPost: searchParams.keywordPost,
+    sort: searchParams.sort,
     lectureYear: searchParams.lectureYear,
     semester: searchParams.semester,
     examType: searchParams.examType,
+    isConfirmed: searchParams.isConfirmed,
     enabled: !propData,
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
@@ -104,6 +103,7 @@ export default function ExamTable({
     [propData, queryData?.data]
   );
   const hasNext = queryData?.hasNext ?? false;
+  const totalPage = queryData?.totalPage;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
   useEffect(() => {
@@ -124,24 +124,27 @@ export default function ExamTable({
     }
   }, [selectedId, currentPageData, onRowSelect]);
 
-  const isEmpty = !isLoading && currentPageData.length === 0;
-
   return (
     <>
-      <div className='overflow-hidden rounded-md border'>
-        <Table
-          className={`${isEmpty ? 'w-full' : 'table-fixed'} rounded-lg bg-white shadow`}
-        >
-          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+      <div className='w-full overflow-hidden rounded-md border'>
+        <Table className='w-full table-fixed rounded-lg bg-white shadow'>
+          <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
-              <Table.Head
-                key={column.key}
-                style={{ width: column.width, minWidth: column.width }}
-                className='relative cursor-pointer overflow-hidden'
-              >
-                {column.label}
-              </Table.Head>
+              <col key={column.key} style={{ width: column.width }} />
             ))}
+          </colgroup>
+
+          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+            <Table.Row>
+              {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
+                <Table.Head
+                  key={column.key}
+                  className='relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+                >
+                  {column.label}
+                </Table.Head>
+              ))}
+            </Table.Row>
           </Table.Header>
 
           <Table.Body>
@@ -172,11 +175,7 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
-                          style={{
-                            width: column.width,
-                            minWidth: column.width,
-                          }}
-                          className='truncate overflow-hidden'
+                          className='overflow-hidden text-ellipsis whitespace-nowrap'
                         >
                           {column.render
                             ? column.render(review)
@@ -201,6 +200,7 @@ export default function ExamTable({
         currentPage={currentPage}
         onPageChange={setCurrentPage}
         hasNext={hasNext}
+        totalPage={totalPage}
       />
     </>
   );

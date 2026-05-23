@@ -3,7 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { STATUS } from '@/domains/Reviews/constants';
-import type { ExamReview, ExamReviews } from '@/domains/Reviews/types';
+import type {
+  ExamReview,
+  ExamReviewSearchParams,
+  ExamReviews,
+} from '@/domains/Reviews/types';
 import {
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
@@ -11,29 +15,35 @@ import {
 
 import { getExamReviews } from '@/apis';
 
-interface UseExamReviewsParams {
+interface UseExamReviewsParams extends ExamReviewSearchParams {
   page: number;
-  keyword?: string;
-  lectureYear?: number;
-  semester?: string;
-  examType?: string;
   enabled?: boolean;
   refreshKey?: number;
 }
 
 const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
-  const reviewTitle = apiData.content || '';
+  const reviewTitle = apiData.title || apiData.content || '';
   const courseName = apiData.lecture || '';
   const professor = apiData.professor || '';
-  const semester = convertSemesterEnumToString(
-    apiData.lectureSemester,
-    apiData.lectureYear
-  );
-  const examType = convertExamTypeEnumToString(apiData.examType);
+  const semester =
+    apiData.lectureSemester && apiData.lectureYear
+      ? convertSemesterEnumToString(
+          apiData.lectureSemester,
+          apiData.lectureYear
+        )
+      : '';
+  const examType = apiData.examType
+    ? convertExamTypeEnumToString(apiData.examType)
+    : '';
   const classNumber = String(apiData.classNumber ?? '');
   const uploadTime = formatDateTimeToMinutes(apiData.contentDate);
-  const status = apiData.status || STATUS.UNCONFIRMED;
-  const userDisplay = apiData.userDisplay || '';
+  const status =
+    apiData.isConfirmed === true
+      ? STATUS.CONFIRMED
+      : apiData.isConfirmed === false
+        ? STATUS.UNCONFIRMED
+        : apiData.status || STATUS.UNCONFIRMED;
+  const userDisplay = apiData.userName || apiData.userDisplay || '';
 
   return {
     id: apiData.postId,
@@ -53,10 +63,15 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
 export const useExamReviews = (params: UseExamReviewsParams) => {
   const {
     page,
-    keyword,
+    startDate,
+    endDate,
+    keywordAuthor,
+    keywordPost,
+    sort,
     lectureYear,
     semester,
     examType,
+    isConfirmed,
     enabled = true,
     refreshKey,
   } = params;
@@ -65,19 +80,29 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     queryKey: [
       'examReviews',
       page,
-      keyword,
+      startDate,
+      endDate,
+      keywordAuthor,
+      keywordPost,
+      sort,
       lectureYear,
       semester,
       examType,
+      isConfirmed,
       refreshKey,
     ],
     queryFn: async () => {
       const response = await getExamReviews({
         page: page - 1, // API는 0부터 시작
-        keyword,
+        startDate,
+        endDate,
+        keywordAuthor,
+        keywordPost,
+        sort,
         lectureYear,
         semester,
         examType,
+        isConfirmed,
       });
 
       if (!response.isSuccess || !response.result) {
@@ -89,6 +114,7 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       return {
         data: response.result.data.map(transformApiResponseToExamReview),
         hasNext: response.result.hasNext,
+        totalPage: response.result.totalPage,
       };
     },
     enabled,
