@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button, Input, Select } from '@/shared/components/ui';
 import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
@@ -65,6 +66,11 @@ export default function ExamSearch({
 
   // 검색 실행 함수 (현재 상태 기반)
   const handleSearch = () => {
+    if (startDate && endDate && startDate > endDate) {
+      toast.error('시작일은 종료일보다 늦을 수 없습니다.');
+      return;
+    }
+
     onSearchChange(
       getSearchParams({
         startDate,
@@ -375,6 +381,7 @@ export default function ExamSearch({
           type='date'
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
+          max={endDate || undefined}
           className='h-9 w-[150px] text-[13px]'
           aria-label='검색 시작일'
         />
@@ -383,6 +390,7 @@ export default function ExamSearch({
           type='date'
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
+          min={startDate || undefined}
           className='h-9 w-[150px] text-[13px]'
           aria-label='검색 종료일'
         />
