@@ -12,6 +12,7 @@ export const useUpdateCommentVisibility = () => {
       updateCommentVisibility(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commentSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
     },
     onError: (error) => {
       console.error('댓글 가시성 업데이트 중 오류 발생:', error);

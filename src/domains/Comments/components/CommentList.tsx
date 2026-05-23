@@ -23,7 +23,6 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
   const { mutate: deleteComment } = useDeleteComment();
   const { mutate: bulkDeleteComments } = useBulkDeleteComment();
 
-  // body 객체를 메모이제이션하여 참조값 변화로 인한 무한 요청 방지
   const searchBody = useMemo(() => {
     const body: AdminCommentSearchRequest = {
       postId: selectedPostId ?? undefined,
@@ -40,7 +39,6 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
     refetch,
   } = useCommentSearch(0, searchBody);
 
-  // 게시글이 바뀌면 선택 상태와 키워드 초기화
   useEffect(() => {
     setSelectedIds([]);
     setKeyword('');
@@ -49,7 +47,6 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
   }, [selectedPostId, setIsSearchSubmitted]);
 
   const selectAllRef = useRef<HTMLInputElement>(null);
-
   const comments = commentSearch?.data ?? [];
   const {
     visibilityLabel,
@@ -64,15 +61,11 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
     allIds.some((id) => selectedIds.includes(id)) && !isAllSelected;
 
   useEffect(() => {
-    if (selectAllRef.current) {
+    if (selectAllRef.current)
       selectAllRef.current.indeterminate = isSomeSelected;
-    }
   }, [isSomeSelected]);
 
-  const handleSelectAll = () => {
-    setSelectedIds(isAllSelected ? [] : allIds);
-  };
-
+  const handleSelectAll = () => setSelectedIds(isAllSelected ? [] : allIds);
   const handleSelect = (commentId: number) => {
     setSelectedIds((prev) =>
       prev.includes(commentId)
