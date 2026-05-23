@@ -17,31 +17,19 @@ export function ExamTableSkeleton({
     <>
       {Array.from({ length: itemsPerPage }).map((_, index) => (
         <Table.Row key={`skeleton-${index}`} className='[&_td]:h-[40px]'>
-          <Table.Cell className='w-[50px]'>
+          <Table.Cell>
             <Skeleton className='h-4 w-full' />
           </Table.Cell>
-          <Table.Cell className='w-[200px]'>
+          <Table.Cell>
             <Skeleton className='h-4 w-full' />
           </Table.Cell>
-          <Table.Cell className='w-[120px]'>
+          <Table.Cell>
             <Skeleton className='h-4 w-full' />
           </Table.Cell>
-          <Table.Cell className='w-[60px]'>
+          <Table.Cell>
             <Skeleton className='h-4 w-full' />
           </Table.Cell>
-          <Table.Cell className='w-[84px]'>
-            <Skeleton className='h-4 w-full' />
-          </Table.Cell>
-          <Table.Cell className='w-[60px]'>
-            <Skeleton className='h-4 w-full' />
-          </Table.Cell>
-          <Table.Cell className='w-[60px]'>
-            <Skeleton className='h-4 w-full' />
-          </Table.Cell>
-          <Table.Cell className='w-[110px]'>
-            <Skeleton className='h-4 w-full' />
-          </Table.Cell>
-          <Table.Cell className='w-[80px]'>
+          <Table.Cell>
             <Skeleton className='h-4 w-full' />
           </Table.Cell>
         </Table.Row>
@@ -53,7 +41,7 @@ export function ExamTableSkeleton({
 export function ExamTableEmpty() {
   return (
     <Table.Row>
-      <Table.Cell colSpan={9} className='h-[240px] p-0 text-gray-500'>
+      <Table.Cell colSpan={5} className='h-[240px] p-0 text-gray-500'>
         <div className='flex h-full items-center justify-center'>
           해당하는 데이터가 없습니다
         </div>
@@ -69,15 +57,11 @@ export function ExamTableEmptyRows({ count }: ExamTableEmptyRowsProps) {
     <>
       {Array.from({ length: count }).map((_, index) => (
         <Table.Row key={`empty-${index}`} className='[&_td]:h-[24px]'>
-          <Table.Cell className='w-[50px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[200px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[120px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[60px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[84px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[60px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[60px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[110px]'>&nbsp;</Table.Cell>
-          <Table.Cell className='w-[80px]'>&nbsp;</Table.Cell>
+          <Table.Cell>&nbsp;</Table.Cell>
+          <Table.Cell>&nbsp;</Table.Cell>
+          <Table.Cell>&nbsp;</Table.Cell>
+          <Table.Cell>&nbsp;</Table.Cell>
+          <Table.Cell>&nbsp;</Table.Cell>
         </Table.Row>
       ))}
     </>
