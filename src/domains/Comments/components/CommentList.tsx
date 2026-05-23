@@ -23,24 +23,16 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
   const { mutate: deleteComment } = useDeleteComment();
   const { mutate: bulkDeleteComments } = useBulkDeleteComment();
 
-  // body 객체를 메모이제이션하여 참조값 변화로 인한 무한 요청 방지
   const searchBody = useMemo(() => {
-    const body: AdminCommentSearchRequest = {
-      postId: selectedPostId ?? undefined,
-    };
+    const body: AdminCommentSearchRequest = { postId: selectedPostId ?? undefined };
     if (submittedKeyword) body.content = submittedKeyword;
     if (visibilityFilter === 'visible') body.isVisible = true;
     if (visibilityFilter === 'hidden') body.isVisible = false;
     return body;
   }, [selectedPostId, submittedKeyword, visibilityFilter]);
 
-  const {
-    data: commentSearch,
-    setIsSearchSubmitted,
-    refetch,
-  } = useCommentSearch(0, searchBody);
+  const { data: commentSearch, setIsSearchSubmitted, refetch } = useCommentSearch(0, searchBody);
 
-  // 게시글이 바뀌면 선택 상태와 키워드 초기화
   useEffect(() => {
     setSelectedIds([]);
     setKeyword('');
@@ -49,37 +41,25 @@ export default function CommentList({ selectedPostId }: CommentListProps) {
   }, [selectedPostId, setIsSearchSubmitted]);
 
   const selectAllRef = useRef<HTMLInputElement>(null);
-
   const comments = commentSearch?.data ?? [];
-  const {
-    visibilityLabel,
-    handleBulkToggleVisibility,
-    handleToggleVisibility,
-  } = useCommentVisibility(comments, selectedIds);
+  const { visibilityLabel, handleBulkToggleVisibility, handleToggleVisibility } =
+    useCommentVisibility(comments, selectedIds);
 
   const allIds = comments.map((c) => c.commentId);
-  const isAllSelected =
-    allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
-  const isSomeSelected =
-    allIds.some((id) => selectedIds.includes(id)) && !isAllSelected;
+  const isAllSelected = allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
+  const isSomeSelected = allIds.some((id) => selectedIds.includes(id)) && !isAllSelected;
 
   useEffect(() => {
-    if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = isSomeSelected;
-    }
+    if (selectAllRef.current) selectAllRef.current.indeterminate = isSomeSelected;
   }, [isSomeSelected]);
 
-  const handleSelectAll = () => {
-    setSelectedIds(isAllSelected ? [] : allIds);
-  };
-
+  const handleSelectAll = () => setSelectedIds(isAllSelected ? [] : allIds);
   const handleSelect = (commentId: number) => {
     setSelectedIds((prev) =>
-      prev.includes(commentId)
-        ? prev.filter((id) => id !== commentId)
-        : [...prev, commentId]
+      prev.includes(commentId) ? prev.filter((id) => id !== commentId) : [...prev, commentId]
     );
   };
+
 
   const handleDelete = (commentId: number) => {
     if (window.confirm('정말 이 댓글을 삭제하시겠습니까?')) {
