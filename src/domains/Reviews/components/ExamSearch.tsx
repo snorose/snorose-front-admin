@@ -207,7 +207,7 @@ export default function ExamSearch({
         <div className='relative w-[220px]'>
           <input
             type='text'
-            placeholder='게시글 검색'
+            placeholder='시험후기 검색'
             value={keywordPost}
             onChange={(e) => setKeywordPost(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -226,7 +226,7 @@ export default function ExamSearch({
         <div className='relative w-[180px]'>
           <input
             type='text'
-            placeholder='게시자 검색'
+            placeholder='작성자 검색'
             value={keywordAuthor}
             onChange={(e) => setKeywordAuthor(e.target.value)}
             onKeyDown={handleKeyDown}
