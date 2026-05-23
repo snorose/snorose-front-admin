@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '@/shared/components';
+
 import CommentTable from '@/domains/Comments/components/CommentTable';
 
 export default function PostCommentPage() {
