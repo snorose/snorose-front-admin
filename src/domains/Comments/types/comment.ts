@@ -11,6 +11,9 @@ export interface AdminCommentResponse {
   nickname: string;
   content: string;
   reportCount: number;
+  updatedAt?: string | null;
+  deletedAt?: string | null;
+  statusType?: string | null;
 }
 
 export interface AdminCommentSearchRequest {

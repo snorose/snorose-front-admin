@@ -43,11 +43,8 @@ export const getPostCommentsAPI = async (
   page: number
 ): Promise<GetPostCommentsResponse> => {
   const response = await axiosInstance.get(`/v1/posts/${postId}/comments`, {
-    params: {
-      page,
-    },
+    params: { page },
   });
-
   return response.data;
 };
 
@@ -66,9 +63,7 @@ export const getCommentChildrenList = async (
 ): Promise<AdminCommentListResponse> => {
   const response = await axiosInstance.get(
     `/v1/admin/comments/${commentId}/children`,
-    {
-      params: { page },
-    }
+    { params: { page } }
   );
   return response.data.result;
 };
