@@ -1,6 +1,6 @@
 import { Eye, EyeOff } from 'lucide-react';
-import { Button } from '@/shared/components/ui';
 
+import { Button } from '@/shared/components/ui';
 
 interface CommentBulkActionBarProps {
   selectedCount: number;

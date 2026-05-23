@@ -1,9 +1,12 @@
 import { Loader2 } from 'lucide-react';
+
 import { Table } from '@/shared/components/ui';
+
 import { ExamReviewTablePagination } from '@/domains/Reviews/components';
+
 import { useCommentTableState } from '../hooks/useCommentTableState';
-import CommentTableRow from './CommentTableRow';
 import CommentBulkActionBar from './CommentBulkActionBar';
+import CommentTableRow from './CommentTableRow';
 
 interface CommentTableProps {
   searchParams?: {
@@ -60,7 +63,10 @@ export default function CommentTable({
   const isEmpty = !isLoading && comments.length === 0;
 
   return (
-    <div className='flex flex-col gap-3' onClick={() => setActivePopoverId(null)}>
+    <div
+      className='flex flex-col gap-3'
+      onClick={() => setActivePopoverId(null)}
+    >
       <CommentBulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
@@ -73,7 +79,10 @@ export default function CommentTable({
         <div className='w-full overflow-x-auto'>
           <Table className='w-full min-w-[1250px] table-fixed text-[13px]'>
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
-              <Table.Head style={{ width: '40px' }} className='px-3 text-center'>
+              <Table.Head
+                style={{ width: '40px' }}
+                className='px-3 text-center'
+              >
                 <input
                   type='checkbox'
                   ref={selectAllRef}
@@ -103,10 +112,16 @@ export default function CommentTable({
               <Table.Head style={{ width: '330px' }} className='px-3 text-xs'>
                 내용 (더블클릭 상세조회)
               </Table.Head>
-              <Table.Head style={{ width: '120px' }} className='px-3 text-center text-xs'>
+              <Table.Head
+                style={{ width: '120px' }}
+                className='px-3 text-center text-xs'
+              >
                 상태
               </Table.Head>
-              <Table.Head style={{ width: '100px' }} className='px-3 text-center text-xs'>
+              <Table.Head
+                style={{ width: '100px' }}
+                className='px-3 text-center text-xs'
+              >
                 의심 키워드
               </Table.Head>
             </Table.Header>
@@ -123,7 +138,10 @@ export default function CommentTable({
                 </Table.Row>
               ) : isEmpty ? (
                 <Table.Row>
-                  <Table.Cell colSpan={10} className='h-48 text-center text-sm text-gray-400'>
+                  <Table.Cell
+                    colSpan={10}
+                    className='h-48 text-center text-sm text-gray-400'
+                  >
                     등록된 댓글이 없거나 검색 결과가 존재하지 않습니다.
                   </Table.Cell>
                 </Table.Row>
@@ -135,7 +153,9 @@ export default function CommentTable({
                     isSelected={selectedIds.includes(comment.commentId)}
                     onSelectToggle={(id) => {
                       setSelectedIds((prev) =>
-                        prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+                        prev.includes(id)
+                          ? prev.filter((item) => item !== id)
+                          : [...prev, id]
                       );
                     }}
                     activePopoverId={activePopoverId}
@@ -163,4 +183,3 @@ export default function CommentTable({
     </div>
   );
 }
-

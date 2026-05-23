@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { Loader2, X } from 'lucide-react';
-import type { MemberInfo } from '@/shared/types';
 
+import { Loader2, X } from 'lucide-react';
+
+import type { MemberInfo } from '@/shared/types';
 
 interface MemberInfoPopoverProps {
   encryptedUserId: string;
@@ -22,17 +23,17 @@ export default function MemberInfoPopover({
 
   return (
     <div
-      className='absolute left-3 top-10 z-50 w-72 rounded-lg border border-gray-250 bg-white p-4 shadow-xl text-xs text-gray-700 font-normal leading-relaxed'
+      className='border-gray-250 absolute top-10 left-3 z-50 w-72 rounded-lg border bg-white p-4 text-xs leading-relaxed font-normal text-gray-700 shadow-xl'
       onClick={(e) => e.stopPropagation()}
     >
-      <div className='flex justify-between items-center border-b border-gray-100 pb-2 mb-2'>
+      <div className='mb-2 flex items-center justify-between border-b border-gray-100 pb-2'>
         <span className='font-bold text-gray-900'>미니 회원 정보</span>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onClose();
           }}
-          className='p-0.5 hover:bg-gray-100 rounded'
+          className='rounded p-0.5 hover:bg-gray-100'
         >
           <X className='h-3.5 w-3.5 text-gray-400' />
         </button>
@@ -44,7 +45,7 @@ export default function MemberInfoPopover({
         </div>
       ) : popoverUser ? (
         <div className='flex flex-col gap-2'>
-          <div className='grid grid-cols-2 gap-y-1 gap-x-2 text-gray-600 border-b border-gray-50 pb-2 mb-1'>
+          <div className='mb-1 grid grid-cols-2 gap-x-2 gap-y-1 border-b border-gray-50 pb-2 text-gray-600'>
             <div>
               이름:{' '}
               <strong className='text-gray-900'>
@@ -53,19 +54,19 @@ export default function MemberInfoPopover({
             </div>
             <div>
               아이디:{' '}
-              <strong className='text-gray-900 font-mono'>
+              <strong className='font-mono text-gray-900'>
                 {popoverUser.loginId || '미정'}
               </strong>
             </div>
             <div>
               학번:{' '}
-              <strong className='text-gray-900 font-mono'>
+              <strong className='font-mono text-gray-900'>
                 {popoverUser.studentNumber || '미정'}
               </strong>
             </div>
             <div>
               포인트:{' '}
-              <strong className='text-blue-600 font-bold'>
+              <strong className='font-bold text-blue-600'>
                 {popoverUser.pointBalance || 0} P
               </strong>
             </div>
@@ -74,7 +75,7 @@ export default function MemberInfoPopover({
               <strong
                 className={
                   popoverUser.isBlacklist
-                    ? 'text-red-600 font-semibold'
+                    ? 'font-semibold text-red-600'
                     : 'text-gray-900'
                 }
               >
@@ -86,7 +87,7 @@ export default function MemberInfoPopover({
               <strong
                 className={
                   (popoverUser.totalWarningCount ?? 0) > 0
-                    ? 'text-red-600 font-semibold'
+                    ? 'font-semibold text-red-600'
                     : 'text-gray-900'
                 }
               >
@@ -102,13 +103,13 @@ export default function MemberInfoPopover({
               params.set('encryptedUserId', encryptedUserId);
               navigate(`?${params.toString()}`, { replace: true });
             }}
-            className='w-full py-1 text-left hover:bg-blue-50 hover:text-blue-700 px-2 rounded text-gray-800 font-medium'
+            className='w-full rounded px-2 py-1 text-left font-medium text-gray-800 hover:bg-blue-50 hover:text-blue-700'
           >
             작성한 댓글 검색 조회
           </button>
         </div>
       ) : (
-        <p className='text-gray-400 text-center py-2'>사용자 상세 조회 실패</p>
+        <p className='py-2 text-center text-gray-400'>사용자 상세 조회 실패</p>
       )}
     </div>
   );
