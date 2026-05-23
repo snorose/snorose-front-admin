@@ -1,4 +1,5 @@
 import { Eye, EyeOff, RotateCcw, Trash2 } from 'lucide-react';
+
 import { Button } from '@/shared/components/ui';
 
 interface CommentBulkActionBarProps {
@@ -26,7 +27,7 @@ export default function CommentBulkActionBar({
         선택된 <strong className='text-red-700'>{selectedCount}</strong>개의
         댓글에 대해 일괄 동작을 적용할 수 있습니다.
       </span>
-      <div className='flex items-center gap-2 flex-wrap'>
+      <div className='flex flex-wrap items-center gap-2'>
         <Button
           variant='outline'
           size='sm'
@@ -52,12 +53,12 @@ export default function CommentBulkActionBar({
           disabled={isVisibilityPending}
           onClick={onBulkRestore}
         >
-          <RotateCcw className='h-3.5 w-3.5 text-green-650' /> 복구
+          <RotateCcw className='text-green-650 h-3.5 w-3.5' /> 복구
         </Button>
         <Button
           variant='destructive'
           size='sm'
-          className='h-8 bg-red-600 text-xs hover:bg-red-700 flex items-center gap-1'
+          className='flex h-8 items-center gap-1 bg-red-600 text-xs hover:bg-red-700'
           disabled={isDeletePending}
           onClick={onBulkDelete}
         >
@@ -67,4 +68,3 @@ export default function CommentBulkActionBar({
     </div>
   );
 }
-

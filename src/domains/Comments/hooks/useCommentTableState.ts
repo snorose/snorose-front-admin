@@ -173,7 +173,6 @@ export function useCommentTableState({
     );
   };
 
-
   // 체크박스 제어
   const allCommentIds = comments.map((c) => c.commentId);
   const isAllSelected =
