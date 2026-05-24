@@ -13,4 +13,5 @@ export const PATHS = {
   POINT_FREEZE: '/point/freeze',
   POINT_UPLOAD_EXCEL: '/point/excel-upload',
   ALERTS: '/alerts',
+  POPUPS: '/operation/popup',
 } as const;

@@ -4,6 +4,7 @@ import {
   FileText,
   HandCoins,
   type LucideIcon,
+  MonitorCog,
   User,
 } from 'lucide-react';
 
@@ -83,6 +84,16 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       {
         title: '미지급 일정 관리',
         url: PATHS.POINT_FREEZE,
+      },
+    ],
+  },
+  {
+    title: '운영 관리',
+    icon: MonitorCog,
+    items: [
+      {
+        title: '팝업창 관리',
+        url: PATHS.POPUPS,
       },
     ],
   },
