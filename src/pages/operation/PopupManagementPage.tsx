@@ -20,7 +20,7 @@ const EMPTY_POPUP: PopupContent = {
   id: 0,
   title: '',
   bodyMarkdown: '',
-  imageUrl: '',
+  imageFileName: '',
   startDate: '',
   endDate: '',
   isEnabled: true,
@@ -120,6 +120,10 @@ export default function PopupManagementPage() {
     setEditingPopup((prevPopup) => ({ ...prevPopup, [field]: value }));
   };
 
+  const handleImageAttach = (file: File) => {
+    handleEditorPopupChange('imageFileName', file.name);
+  };
+
   const handleNewPopupButtonClick = () => {
     setEditorMode('create');
     setEditingPopup(createEmptyPopup());
@@ -210,6 +214,7 @@ export default function PopupManagementPage() {
         popup={editingPopup}
         onOpenChange={setIsEditorOpen}
         onPopupChange={handleEditorPopupChange}
+        onImageAttach={handleImageAttach}
         onSave={handleSavePopupButtonClick}
       />
     </div>

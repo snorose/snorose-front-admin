@@ -1,4 +1,6 @@
-import { Image } from 'lucide-react';
+import { useRef } from 'react';
+
+import { Image, X } from 'lucide-react';
 
 import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
 
@@ -15,6 +17,7 @@ type PopupEditorDialogProps = {
     field: keyof PopupContent,
     value: PopupContent[keyof PopupContent]
   ) => void;
+  onImageAttach: (file: File) => void;
   onSave: () => void;
 };
 
@@ -24,8 +27,19 @@ export function PopupEditorDialog({
   popup,
   onOpenChange,
   onPopupChange,
+  onImageAttach,
   onSave,
 }: PopupEditorDialogProps) {
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageRemove = () => {
+    onPopupChange('imageFileName', '');
+
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className='max-h-[90vh] overflow-y-auto sm:max-w-[760px]'>
@@ -94,21 +108,55 @@ export function PopupEditorDialog({
             </div>
           </div>
 
-          <div className='flex flex-col gap-1 md:col-span-2'>
-            <Label htmlFor='popup-image-url'>이미지 경로</Label>
-            <div className='flex gap-2'>
+          <div className='flex flex-col gap-2 md:col-span-2'>
+            <Label htmlFor='popup-image-file'>이미지 첨부</Label>
+            <div className='flex flex-col gap-3'>
               <Input
-                id='popup-image-url'
-                placeholder='예: /images/popup/event.png'
-                value={popup.imageUrl}
-                onChange={(event) =>
-                  onPopupChange('imageUrl', event.target.value)
-                }
+                ref={imageInputRef}
+                id='popup-image-file'
+                type='file'
+                accept='image/*'
+                className='sr-only'
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+
+                  if (file) {
+                    onImageAttach(file);
+                  }
+                }}
               />
-              <Button type='button' variant='outline' className='gap-2'>
-                <Image className='size-4' />
-                이미지 선택
-              </Button>
+              <div className='flex gap-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='gap-2'
+                  asChild
+                >
+                  <Label htmlFor='popup-image-file'>
+                    <Image className='size-4' />
+                    이미지 선택
+                  </Label>
+                </Button>
+              </div>
+              {popup.imageFileName ? (
+                <div className='flex items-center justify-between gap-3 rounded-md border border-dashed p-4 text-sm text-gray-700'>
+                  <span className='min-w-0 truncate'>
+                    {popup.imageFileName}
+                  </span>
+                  <button
+                    type='button'
+                    className='shrink-0 rounded-sm text-gray-500 transition-colors hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none'
+                    aria-label='첨부 이미지 삭제'
+                    onClick={handleImageRemove}
+                  >
+                    <X className='size-4' />
+                  </button>
+                </div>
+              ) : (
+                <div className='rounded-md border border-dashed p-4 text-sm text-gray-500'>
+                  첨부된 이미지가 없습니다.
+                </div>
+              )}
             </div>
           </div>
         </div>
