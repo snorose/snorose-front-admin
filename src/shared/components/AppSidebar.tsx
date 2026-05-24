@@ -13,13 +13,13 @@ import { snoroseLogo } from '@/assets';
 const sidebarMenuButtonClassName = cn(
   'font-semibold hover:bg-blue-50 hover:!text-current',
   'data-[active=true]:bg-blue-200 data-[active=true]:font-semibold',
-  'data-[active=true]:hover:!bg-blue-200 data-[active=true]:hover:!text-current data-[active=true]:active:!bg-blue-200'
+  'data-[active=true]:hover:!bg-blue-200 data-[active=true]:active:!bg-blue-200'
 );
 
 const sidebarMenuSubButtonClassName = cn(
   'hover:bg-blue-50 hover:!text-current',
   'data-[active=true]:bg-blue-100',
-  'data-[active=true]:hover:!bg-blue-100 data-[active=true]:hover:!text-current data-[active=true]:active:!bg-blue-100'
+  'data-[active=true]:hover:!bg-blue-100 data-[active=true]:active:!bg-blue-100'
 );
 
 export const AppSidebar = ({
