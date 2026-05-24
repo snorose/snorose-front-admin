@@ -109,7 +109,21 @@ export function PopupEditorDialog({
           </div>
 
           <div className='flex flex-col gap-2 md:col-span-2'>
-            <Label htmlFor='popup-image-file'>이미지 첨부</Label>
+            <div className='flex items-center justify-between gap-3'>
+              <Label htmlFor='popup-image-file'>이미지 첨부</Label>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='gap-2'
+                asChild
+              >
+                <Label htmlFor='popup-image-file'>
+                  <Image className='size-4' />
+                  이미지 선택
+                </Label>
+              </Button>
+            </div>
             <div className='flex flex-col gap-3'>
               <Input
                 ref={imageInputRef}
@@ -125,21 +139,8 @@ export function PopupEditorDialog({
                   }
                 }}
               />
-              <div className='flex gap-2'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  className='gap-2'
-                  asChild
-                >
-                  <Label htmlFor='popup-image-file'>
-                    <Image className='size-4' />
-                    이미지 선택
-                  </Label>
-                </Button>
-              </div>
               {popup.imageFileName ? (
-                <div className='flex items-center justify-between gap-3 rounded-md border border-dashed p-4 text-sm text-gray-700'>
+                <div className='bg-background flex min-h-9 items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm text-gray-700'>
                   <span className='min-w-0 truncate'>
                     {popup.imageFileName}
                   </span>
@@ -153,7 +154,7 @@ export function PopupEditorDialog({
                   </button>
                 </div>
               ) : (
-                <div className='rounded-md border border-dashed p-4 text-sm text-gray-500'>
+                <div className='bg-background flex min-h-9 items-center rounded-md border px-3 py-2 text-sm text-gray-500'>
                   첨부된 이미지가 없습니다.
                 </div>
               )}
