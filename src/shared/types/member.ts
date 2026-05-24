@@ -44,12 +44,20 @@ export type UserPointHistory = {
 
 export type UserBlacklistHistory = {
   loginId?: string;
-  encryptedUserId: string;
-  studentNumber: string;
+  encryptedUserId?: string;
+  studentNumber?: string;
   type: string;
+  reasonType?: string;
+  warningCount?: number;
   blackReason: string;
+  memo?: string | null;
   createdAt: string; // YYYY-MM-DD HH:MM:SS
+  blacklistStartDate?: string | null;
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
+  adminId?: string;
+  deletedAt?: string | null;
+  deletedReason?: string | null;
+  deletedBy?: string | null;
 };
 
 export type AdminUserListItem = {
@@ -99,12 +107,33 @@ export interface UpdateUserInfoResponse {
 }
 
 export interface BlacklistHistoryItem {
+  id?: number;
   encryptedUserId: string;
   studentNumber: string;
   type: string;
+  reasonType?: string;
+  warningCount?: number;
   blackReason: string;
   createdAt: string;
+  blacklistStartDate?: string | null;
   blacklistDeadline: string | null;
+  adminId?: string;
+  operatorMemo?: string;
+  deletedAt?: string | null;
+  deletedReason?: string | null;
+  deletedBy?: string | null;
+}
+
+export interface AdminBlacklistResponse {
+  isSuccess: boolean;
+  code: number;
+  message: string;
+  result: {
+    hasNext: boolean;
+    totalPage: number;
+    totalCount: number;
+    data: UserBlacklistHistory[];
+  };
 }
 
 export interface AdminBlacklistReq {

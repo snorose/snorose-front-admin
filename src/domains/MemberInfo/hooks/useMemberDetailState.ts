@@ -14,6 +14,7 @@ import { getErrorMessage } from '@/shared/utils';
 import {
   createMemberDiffPayload,
   extractFirstSearchMember,
+  toBlacklistHistoryItem,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { blacklistHistoryAPI, editUsersAPI, searchUsersAPI } from '@/apis';
@@ -40,6 +41,13 @@ export function useMemberDetailState({
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
   const [latestPenaltyHistory, setLatestPenaltyHistory] =
     useState<BlacklistHistoryItem | null>(null);
+  const [penaltyHistory, setPenaltyHistory] = useState<BlacklistHistoryItem[]>(
+    []
+  );
+  const [penaltyHistoryPage, setPenaltyHistoryPage] = useState(0);
+  const [hasNextPenaltyHistory, setHasNextPenaltyHistory] = useState(false);
+  const [isPenaltyHistoryLoading, setIsPenaltyHistoryLoading] = useState(false);
+  const [penaltyHistoryTotalCount, setPenaltyHistoryTotalCount] = useState(0);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -79,6 +87,10 @@ export function useMemberDetailState({
     if (!memberKey) {
       setSelectedMember(null);
       setLatestPenaltyHistory(null);
+      setPenaltyHistory([]);
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(false);
+      setPenaltyHistoryTotalCount(0);
       setIsEdit(false);
       return;
     }
@@ -149,28 +161,90 @@ export function useMemberDetailState({
   useEffect(() => {
     if (!selectedMember?.encryptedUserId) {
       setLatestPenaltyHistory(null);
+      setPenaltyHistory([]);
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(false);
+      setPenaltyHistoryTotalCount(0);
       return;
     }
 
     let isMounted = true;
     void (async () => {
       try {
+        setIsPenaltyHistoryLoading(true);
         const response = await blacklistHistoryAPI(
-          selectedMember.encryptedUserId
+          selectedMember.encryptedUserId,
+          { page: 0 }
         );
-        const history = Array.isArray(response?.result) ? response.result : [];
+        const history = response.result.data.map((item) =>
+          toBlacklistHistoryItem(item, {
+            encryptedUserId: selectedMember.encryptedUserId,
+            studentNumber: selectedMember.studentNumber,
+          })
+        );
         if (!isMounted) return;
+        setPenaltyHistory(history);
         setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
-      } catch {
+        setPenaltyHistoryPage(0);
+        setHasNextPenaltyHistory(response.result.hasNext);
+        setPenaltyHistoryTotalCount(response.result.totalCount);
+      } catch (error) {
         if (!isMounted) return;
+        toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
+        setPenaltyHistory([]);
         setLatestPenaltyHistory(null);
+        setPenaltyHistoryPage(0);
+        setHasNextPenaltyHistory(false);
+        setPenaltyHistoryTotalCount(0);
+      } finally {
+        if (isMounted) setIsPenaltyHistoryLoading(false);
       }
     })();
 
     return () => {
       isMounted = false;
     };
-  }, [selectedMember?.encryptedUserId]);
+  }, [selectedMember?.encryptedUserId, selectedMember?.studentNumber]);
+
+  const handleLoadMorePenaltyHistory = useCallback(async () => {
+    if (!selectedMember || isPenaltyHistoryLoading || !hasNextPenaltyHistory) {
+      return;
+    }
+
+    const nextPage = penaltyHistoryPage + 1;
+
+    try {
+      setIsPenaltyHistoryLoading(true);
+      const response = await blacklistHistoryAPI(
+        selectedMember.encryptedUserId,
+        {
+          page: nextPage,
+        }
+      );
+      const nextHistory = response.result.data.map((item) =>
+        toBlacklistHistoryItem(item, {
+          encryptedUserId: selectedMember.encryptedUserId,
+          studentNumber: selectedMember.studentNumber,
+        })
+      );
+
+      setPenaltyHistory((prev) => [...prev, ...nextHistory]);
+      setPenaltyHistoryPage(nextPage);
+      setHasNextPenaltyHistory(response.result.hasNext);
+      setPenaltyHistoryTotalCount(response.result.totalCount);
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, '다음 제재 이력을 불러오지 못했습니다.')
+      );
+    } finally {
+      setIsPenaltyHistoryLoading(false);
+    }
+  }, [
+    hasNextPenaltyHistory,
+    isPenaltyHistoryLoading,
+    penaltyHistoryPage,
+    selectedMember,
+  ]);
 
   const handleSaveEdit = useCallback(
     async (updated: MemberInfo) => {
@@ -259,11 +333,16 @@ export function useMemberDetailState({
   return {
     handleBack,
     handleCopy,
+    handleLoadMorePenaltyHistory,
     handleRefreshMemberDetail,
     handleSaveEdit,
+    hasNextPenaltyHistory,
     isDetailLoading,
     isEdit,
+    isPenaltyHistoryLoading,
     latestPenaltyHistory,
+    penaltyHistory,
+    penaltyHistoryTotalCount,
     selectedMember,
     setIsEdit,
   };

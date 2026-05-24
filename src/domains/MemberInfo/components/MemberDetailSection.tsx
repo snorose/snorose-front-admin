@@ -29,12 +29,17 @@ import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFo
 type MemberDetailSectionProps = {
   isDetailLoading: boolean;
   isEdit: boolean;
+  isPenaltyHistoryLoading: boolean;
   member: MemberInfo;
+  penaltyHistory: BlacklistHistoryItem[];
+  penaltyHistoryTotalCount: number;
+  hasNextPenaltyHistory: boolean;
   latestPenaltyHistory: BlacklistHistoryItem | null;
   onBack: () => void;
   onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
+  onLoadMorePenaltyHistory: () => void | Promise<void>;
   onPointAdjusted: () => void | Promise<void>;
   onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
 };
@@ -42,12 +47,17 @@ type MemberDetailSectionProps = {
 export default function MemberDetailSection({
   isDetailLoading,
   isEdit,
+  isPenaltyHistoryLoading,
+  hasNextPenaltyHistory,
   latestPenaltyHistory,
   member,
+  penaltyHistory,
+  penaltyHistoryTotalCount,
   onBack,
   onCopy,
   onEditCancel,
   onEditStart,
+  onLoadMorePenaltyHistory,
   onPointAdjusted,
   onSaveEdit,
 }: MemberDetailSectionProps) {
@@ -152,8 +162,13 @@ export default function MemberDetailSection({
         </SectionCard>
 
         <MemberPenaltySummaryCard
+          hasNextPenaltyHistory={hasNextPenaltyHistory}
+          isPenaltyHistoryLoading={isPenaltyHistoryLoading}
           latestPenaltyHistory={latestPenaltyHistory}
           member={member}
+          onLoadMorePenaltyHistory={onLoadMorePenaltyHistory}
+          penaltyHistory={penaltyHistory}
+          penaltyHistoryTotalCount={penaltyHistoryTotalCount}
         />
       </div>
 
