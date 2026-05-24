@@ -213,6 +213,40 @@ export function useMemberDetailState({
     [currentPage, loadMembers, selectedMember, updateCachedMember]
   );
 
+  const handleRefreshMemberDetail = useCallback(async () => {
+    if (!selectedMember) return;
+
+    setIsDetailLoading(true);
+    try {
+      const refreshedMember = await fetchMemberDetail([
+        selectedMember.loginId,
+        selectedMember.studentNumber,
+        selectedMember.userName,
+      ]);
+
+      if (!refreshedMember) {
+        toast.error('회원 상세 정보를 다시 불러오지 못했습니다.');
+        return;
+      }
+
+      setSelectedMember(refreshedMember);
+      updateCachedMember(refreshedMember);
+      await loadMembers(currentPage);
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, '회원 상세 정보를 다시 불러오지 못했습니다.')
+      );
+    } finally {
+      setIsDetailLoading(false);
+    }
+  }, [
+    currentPage,
+    fetchMemberDetail,
+    loadMembers,
+    selectedMember,
+    updateCachedMember,
+  ]);
+
   const handleCopy = useCallback(async (value: string) => {
     await navigator.clipboard.writeText(value);
     toast.success('복사되었습니다.');
@@ -232,6 +266,7 @@ export function useMemberDetailState({
   return {
     handleBack,
     handleCopy,
+    handleRefreshMemberDetail,
     handleSaveEdit,
     isDetailLoading,
     isEdit,

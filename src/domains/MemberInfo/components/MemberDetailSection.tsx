@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   ArrowLeft,
   Check,
@@ -15,6 +17,7 @@ import { SectionCard } from '@/domains/MemberInfo/components/MemberDetailCard';
 import MemberDetailInfoGrid from '@/domains/MemberInfo/components/MemberDetailInfoGrid';
 import MemberInfoEditForm from '@/domains/MemberInfo/components/MemberInfoEditForm';
 import MemberPenaltySummaryCard from '@/domains/MemberInfo/components/MemberPenaltySummaryCard';
+import MemberPointAdjustmentDialog from '@/domains/MemberInfo/components/MemberPointAdjustmentDialog';
 import MemberWithdrawalSection from '@/domains/MemberInfo/components/MemberWithdrawalSection';
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
 import {
@@ -33,6 +36,7 @@ type MemberDetailSectionProps = {
   onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
+  onPointAdjusted: () => void | Promise<void>;
   onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
 };
 
@@ -46,8 +50,10 @@ export default function MemberDetailSection({
   onCopy,
   onEditCancel,
   onEditStart,
+  onPointAdjusted,
   onSaveEdit,
 }: MemberDetailSectionProps) {
+  const [isPointDialogOpen, setIsPointDialogOpen] = useState(false);
   const roleLabel = convertUserRoleIdToEnum(member.userRoleId);
 
   return (
@@ -134,6 +140,7 @@ export default function MemberDetailSection({
             <MemberDetailInfoGrid
               member={member}
               onCopy={onCopy}
+              onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
               roleLabel={roleLabel}
             />
           ) : (
@@ -155,6 +162,13 @@ export default function MemberDetailSection({
 
       <MemberActivitySection />
       <MemberWithdrawalSection />
+
+      <MemberPointAdjustmentDialog
+        member={member}
+        onAdjusted={onPointAdjusted}
+        open={isPointDialogOpen}
+        onOpenChange={setIsPointDialogOpen}
+      />
     </article>
   );
 }

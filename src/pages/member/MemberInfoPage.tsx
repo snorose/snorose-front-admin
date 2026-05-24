@@ -15,6 +15,7 @@ export default function MemberInfoPage() {
     handleCopy,
     handleOpenMemberDetail,
     handleRefreshDirectory,
+    handleRefreshMemberDetail,
     handleResetFilters,
     handleSaveEdit,
     handleSearch,
@@ -64,6 +65,7 @@ export default function MemberInfoPage() {
             onCopy={handleCopy}
             onEditCancel={() => setIsEdit(false)}
             onEditStart={() => setIsEdit(true)}
+            onPointAdjusted={handleRefreshMemberDetail}
             onSaveEdit={handleSaveEdit}
             penaltyHistory={penaltyHistory}
           />
