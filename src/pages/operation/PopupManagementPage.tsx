@@ -4,7 +4,7 @@ import { Eye, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button } from '@/shared/components/ui';
+import { Button, ConfirmModal } from '@/shared/components/ui';
 
 import {
   PopupEditorDialog,
@@ -81,6 +81,7 @@ function getCurrentDateTimeString() {
 export default function PopupManagementPage() {
   const [popups, setPopups] = useState(MOCK_POPUP_CONTENTS);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isSaveConfirmOpen, setIsSaveConfirmOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<PopupEditorMode>('create');
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
   const [editingImagePreviewUrl, setEditingImagePreviewUrl] = useState('');
@@ -156,6 +157,10 @@ export default function PopupManagementPage() {
       return;
     }
 
+    setIsSaveConfirmOpen(true);
+  };
+
+  const handleSaveConfirmButtonClick = () => {
     const currentDateTime = getCurrentDateTimeString();
     const savedPopup = {
       ...editingPopup,
@@ -174,6 +179,7 @@ export default function PopupManagementPage() {
       );
     }
 
+    setIsSaveConfirmOpen(false);
     handleEditorOpenChange(false);
   };
 
@@ -229,6 +235,18 @@ export default function PopupManagementPage() {
         onImageAttach={handleImageAttach}
         onImageRemove={handleImageRemove}
         onSave={handleSavePopupButtonClick}
+      />
+
+      <ConfirmModal
+        isOpen={isSaveConfirmOpen}
+        title={
+          editorMode === 'create' ? '팝업을 등록할까요?' : '팝업을 수정할까요?'
+        }
+        description='입력한 내용으로 저장합니다.'
+        confirmText={editorMode === 'create' ? '등록' : '수정'}
+        closeText='취소'
+        onConfirm={handleSaveConfirmButtonClick}
+        onClose={() => setIsSaveConfirmOpen(false)}
       />
     </div>
   );
