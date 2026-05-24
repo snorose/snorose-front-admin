@@ -8,7 +8,7 @@ export type PopupContent = {
   id: number;
   title: string;
   bodyMarkdown: string;
-  imageUrl: string;
+  imageFileName: string;
   startDate: string;
   endDate: string;
   isEnabled: boolean;
