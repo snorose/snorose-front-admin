@@ -179,6 +179,12 @@ export default function PopupManagementPage() {
       );
     }
 
+    toast.success(
+      editorMode === 'create'
+        ? '팝업이 등록되었습니다.'
+        : '팝업이 수정되었습니다.'
+    );
+
     setIsSaveConfirmOpen(false);
     handleEditorOpenChange(false);
   };
