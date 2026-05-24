@@ -82,9 +82,9 @@ export function PopupManagementTable({
             <Table.Row>
               <Table.Cell colSpan={6} className='h-40 text-center'>
                 <div className='flex flex-col items-center justify-center gap-2'>
-                  <Badge variant='outline'>검색 결과 없음</Badge>
+                  <Badge variant='outline'>팝업 없음</Badge>
                   <p className='text-sm text-gray-500'>
-                    조건에 맞는 팝업창이 없습니다.
+                    등록된 팝업창이 없습니다.
                   </p>
                 </div>
               </Table.Cell>

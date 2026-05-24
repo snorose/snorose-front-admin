@@ -188,7 +188,7 @@ export function PopupEditorDialog({
               <div className='flex min-h-[236px]'>
                 <section className='flex w-full flex-col items-start gap-2 self-start rounded-[5px] bg-[#EAF5FD] p-[10px]'>
                   <h3 className='text-[13px] leading-[18.2px] font-medium tracking-[-0.5px] text-[#00368E]'>
-                    {popup.title.trim() || '제목 없는 팝업'}
+                    {popup.title.trim() || '제목을 입력해 주세요.'}
                   </h3>
                   {popup.bodyMarkdown.trim() ? (
                     <MarkdownPreview
