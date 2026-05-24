@@ -15,7 +15,7 @@ import { MOCK_POPUP_CONTENTS } from '@/domains/Operation/mocks';
 import type { PopupContent } from '@/domains/Operation/types';
 import { validatePopupContent } from '@/domains/Operation/utils';
 
-type PopupStatus = 'active' | 'reserved' | 'ended' | 'disabled';
+type PopupStatus = 'active' | 'reserved' | 'ended';
 type PopupEditorMode = 'create' | 'edit';
 
 const EMPTY_POPUP: PopupContent = {
@@ -25,16 +25,11 @@ const EMPTY_POPUP: PopupContent = {
   imageFileName: '',
   startDate: '',
   endDate: '',
-  isEnabled: true,
   createdAt: '',
   updatedAt: '',
 };
 
 function getPopupStatus(popup: PopupContent): PopupStatus {
-  if (!popup.isEnabled) {
-    return 'disabled';
-  }
-
   const today = new Date();
   const startDate = new Date(`${popup.startDate}T00:00:00`);
   const endDate = new Date(`${popup.endDate}T23:59:59`);
@@ -55,7 +50,6 @@ function getStatusLabel(status: PopupStatus) {
     active: '진행 중',
     reserved: '예약',
     ended: '종료',
-    disabled: '비활성',
   } as const;
 
   return statusMap[status];
@@ -66,7 +60,6 @@ function getStatusClassName(status: PopupStatus) {
     active: 'border-green-200 bg-green-50 text-green-700',
     reserved: 'border-blue-200 bg-blue-50 text-blue-700',
     ended: 'border-gray-200 bg-gray-50 text-gray-600',
-    disabled: 'border-red-200 bg-red-50 text-red-700',
   } as const;
 
   return statusClassNameMap[status];
@@ -108,7 +101,7 @@ export default function PopupManagementPage() {
 
   const popupStatusItems = useMemo(
     () =>
-      (['active', 'reserved', 'ended', 'disabled'] as const).map((status) => ({
+      (['active', 'reserved', 'ended'] as const).map((status) => ({
         label: getStatusLabel(status),
         value: popups.filter((popup) => getPopupStatus(popup) === status)
           .length,

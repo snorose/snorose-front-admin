@@ -11,7 +11,6 @@ export type PopupContent = {
   imageFileName: string;
   startDate: string;
   endDate: string;
-  isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
 };
