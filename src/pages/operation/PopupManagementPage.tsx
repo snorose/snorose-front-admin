@@ -82,6 +82,7 @@ export default function PopupManagementPage() {
   const [popups, setPopups] = useState(MOCK_POPUP_CONTENTS);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = useState(false);
+  const [deletingPopupId, setDeletingPopupId] = useState<number | null>(null);
   const [editorMode, setEditorMode] = useState<PopupEditorMode>('create');
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
   const [editingImagePreviewUrl, setEditingImagePreviewUrl] = useState('');
@@ -146,7 +147,7 @@ export default function PopupManagementPage() {
   };
 
   const handleDeletePopupButtonClick = (id: number) => {
-    setPopups((prevPopups) => prevPopups.filter((popup) => popup.id !== id));
+    setDeletingPopupId(id);
   };
 
   const handleSavePopupButtonClick = () => {
@@ -187,6 +188,18 @@ export default function PopupManagementPage() {
 
     setIsSaveConfirmOpen(false);
     handleEditorOpenChange(false);
+  };
+
+  const handleDeleteConfirmButtonClick = () => {
+    if (deletingPopupId === null) {
+      return;
+    }
+
+    setPopups((prevPopups) =>
+      prevPopups.filter((popup) => popup.id !== deletingPopupId)
+    );
+    toast.success('팝업이 삭제되었습니다.');
+    setDeletingPopupId(null);
   };
 
   // const handlePreviewPopupButtonClick = () => {
@@ -253,6 +266,16 @@ export default function PopupManagementPage() {
         closeText='취소'
         onConfirm={handleSaveConfirmButtonClick}
         onClose={() => setIsSaveConfirmOpen(false)}
+      />
+
+      <ConfirmModal
+        isOpen={deletingPopupId !== null}
+        title='팝업을 삭제할까요?'
+        description='삭제한 팝업은 목록에서 제거됩니다.'
+        confirmText='삭제'
+        closeText='취소'
+        onConfirm={handleDeleteConfirmButtonClick}
+        onClose={() => setDeletingPopupId(null)}
       />
     </div>
   );
