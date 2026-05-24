@@ -1,4 +1,4 @@
-import { Dialog, Button } from '@/shared/components/ui';
+import { Button, Dialog } from '@/shared/components/ui';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -7,6 +7,7 @@ interface ConfirmModalProps {
   onConfirm: () => void;
   onClose: () => void;
   confirmText?: string;
+  confirmButtonClassName?: string;
   closeText?: string;
   children?: React.ReactNode;
 }
@@ -18,6 +19,7 @@ export function ConfirmModal({
   onConfirm,
   onClose,
   confirmText = '확인',
+  confirmButtonClassName,
   closeText = '취소',
   children,
 }: ConfirmModalProps) {
@@ -37,7 +39,11 @@ export function ConfirmModal({
           <Button type='button' variant='outline' onClick={onClose}>
             {closeText}
           </Button>
-          <Button type='button' onClick={onConfirm}>
+          <Button
+            type='button'
+            onClick={onConfirm}
+            className={confirmButtonClassName}
+          >
             {confirmText}
           </Button>
         </Dialog.Footer>
