@@ -13,6 +13,7 @@ export default function MemberInfoPage() {
     filteredMembers,
     handleBack,
     handleCopy,
+    handleLoadMorePenaltyHistory,
     handleOpenMemberDetail,
     handleRefreshDirectory,
     handleRefreshMemberDetail,
@@ -21,12 +22,14 @@ export default function MemberInfoPage() {
     handleSearch,
     handleToggleAllVisibleRows,
     handleToggleRow,
+    hasNextPenaltyHistory,
     hasNextPage,
     isAllVisibleSelected,
     isDetailLoading,
     isDetailRoute,
     isEdit,
     isListLoading,
+    isPenaltyHistoryLoading,
     isSearchMode,
     isSearching,
     latestPenaltyHistory,
@@ -39,6 +42,7 @@ export default function MemberInfoPage() {
     selectedMajor,
     selectedMember,
     selectedRole,
+    penaltyHistoryTotalCount,
     setCurrentPage,
     setIsEdit,
     setSearchQuery,
@@ -61,13 +65,17 @@ export default function MemberInfoPage() {
             isEdit={isEdit}
             isDetailLoading={isDetailLoading}
             latestPenaltyHistory={latestPenaltyHistory}
+            hasNextPenaltyHistory={hasNextPenaltyHistory}
             onBack={handleBack}
             onCopy={handleCopy}
             onEditCancel={() => setIsEdit(false)}
             onEditStart={() => setIsEdit(true)}
+            onLoadMorePenaltyHistory={handleLoadMorePenaltyHistory}
             onPointAdjusted={handleRefreshMemberDetail}
             onSaveEdit={handleSaveEdit}
             penaltyHistory={penaltyHistory}
+            isPenaltyHistoryLoading={isPenaltyHistoryLoading}
+            penaltyHistoryTotalCount={penaltyHistoryTotalCount}
           />
         ) : (
           <div className='rounded-3xl border border-slate-200 bg-white px-6 py-16 text-center text-sm text-slate-500 shadow-sm'>

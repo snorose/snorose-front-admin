@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/shared/axios/instance';
-import type { AdminBlacklistReq } from '@/shared/types';
+import type { AdminBlacklistReq, AdminBlacklistResponse } from '@/shared/types';
 
 // 블랙리스트 이력 불러오기
 export const blacklistHistoryAPI = async (
@@ -9,9 +9,9 @@ export const blacklistHistoryAPI = async (
     startDate?: string;
     endDate?: string;
     type?: 'WARNING' | 'RELEGATION' | 'BLACKLIST';
-  } = {}
-) => {
-  const response = await axiosInstance.get(
+  } = { page: 0 }
+): Promise<AdminBlacklistResponse> => {
+  const response = await axiosInstance.get<AdminBlacklistResponse>(
     `/v1/admin/blacklists/${encryptedUserId}`,
     {
       params,

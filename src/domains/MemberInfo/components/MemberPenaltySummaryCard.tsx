@@ -17,15 +17,23 @@ import {
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type MemberPenaltySummaryCardProps = {
+  hasNextPenaltyHistory: boolean;
+  isPenaltyHistoryLoading: boolean;
   penaltyHistory: BlacklistHistoryItem[];
+  penaltyHistoryTotalCount: number;
   latestPenaltyHistory: BlacklistHistoryItem | null;
   member: MemberInfo;
+  onLoadMorePenaltyHistory: () => void | Promise<void>;
 };
 
 export default function MemberPenaltySummaryCard({
+  hasNextPenaltyHistory,
+  isPenaltyHistoryLoading,
   penaltyHistory,
+  penaltyHistoryTotalCount,
   latestPenaltyHistory,
   member,
+  onLoadMorePenaltyHistory,
 }: MemberPenaltySummaryCardProps) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const penaltyStatus = getPenaltyStatus(member);
@@ -118,10 +126,14 @@ export default function MemberPenaltySummaryCard({
       </SectionCard>
 
       <MemberPenaltyHistoryDialog
+        hasNext={hasNextPenaltyHistory}
         histories={penaltyHistory}
+        isLoading={isPenaltyHistoryLoading}
         member={member}
+        onLoadMore={onLoadMorePenaltyHistory}
         open={isHistoryOpen}
         onOpenChange={setIsHistoryOpen}
+        totalCount={penaltyHistoryTotalCount}
       />
     </>
   );

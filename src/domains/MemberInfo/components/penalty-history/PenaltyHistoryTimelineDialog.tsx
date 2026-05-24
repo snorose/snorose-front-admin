@@ -1,4 +1,6 @@
-import { History, Pencil, Plus, Trash2 } from 'lucide-react';
+import type { UIEvent } from 'react';
+
+import { History, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Button, Dialog } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
@@ -10,22 +12,42 @@ import {
 import { formatDateTime } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type PenaltyHistoryTimelineDialogProps = {
+  hasNext: boolean;
   histories: BlacklistHistoryItem[];
+  isLoading: boolean;
   member: MemberInfo;
   onDelete: (history: BlacklistHistoryItem) => void;
   onEdit: (history: BlacklistHistoryItem) => void;
+  onLoadMore: () => void | Promise<void>;
   onOpenChange: (open: boolean) => void;
   open: boolean;
+  totalCount: number;
 };
 
 export default function PenaltyHistoryTimelineDialog({
+  hasNext,
   histories,
+  isLoading,
   member,
   onDelete,
   onEdit,
+  onLoadMore,
   onOpenChange,
   open,
+  totalCount,
 }: PenaltyHistoryTimelineDialogProps) {
+  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
+    if (!hasNext || isLoading) return;
+
+    const target = event.currentTarget;
+    const remainingScroll =
+      target.scrollHeight - target.scrollTop - target.clientHeight;
+
+    if (remainingScroll <= 80) {
+      void onLoadMore();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className='max-h-[calc(100vh-4rem)] overflow-hidden rounded-2xl p-0 sm:max-w-2xl'>
@@ -41,7 +63,7 @@ export default function PenaltyHistoryTimelineDialog({
             </Dialog.Description>
           </Dialog.Header>
 
-          <div className='grid grid-cols-2 gap-3 px-8 py-6'>
+          <div className='grid grid-cols-2 gap-3 px-8 py-5'>
             <Button
               type='button'
               variant='outline'
@@ -62,21 +84,40 @@ export default function PenaltyHistoryTimelineDialog({
 
           <div className='border-t border-slate-200' />
 
-          <div className='overflow-y-auto px-8 py-7'>
+          <div className='px-8 pt-5'>
+            <p className='rounded-xl bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-500'>
+              전체 제재 이력 {totalCount.toLocaleString()}건
+            </p>
+          </div>
+
+          <div
+            className='min-h-0 flex-1 overflow-y-auto px-8 pt-5 pb-7'
+            onScroll={handleScroll}
+          >
             {histories.length > 0 ? (
-              <ol className='relative space-y-7 border-l-2 border-slate-200 pl-7'>
-                {histories.map((history, index) => (
-                  <PenaltyHistoryCard
-                    key={`${history.createdAt}-${history.type}-${index}`}
-                    history={history}
-                    onDelete={onDelete}
-                    onEdit={onEdit}
-                  />
-                ))}
-              </ol>
+              <>
+                <ol className='relative space-y-7 border-l-2 border-slate-200 pl-7'>
+                  {histories.map((history, index) => (
+                    <PenaltyHistoryCard
+                      key={`${history.createdAt}-${history.type}-${index}`}
+                      history={history}
+                      onDelete={onDelete}
+                      onEdit={onEdit}
+                    />
+                  ))}
+                </ol>
+                {isLoading ? (
+                  <div className='mt-6 flex items-center justify-center gap-2 text-sm font-semibold text-slate-500'>
+                    <Loader2 className='h-4 w-4 animate-spin' />
+                    제재 이력을 불러오는 중입니다.
+                  </div>
+                ) : null}
+              </>
             ) : (
               <div className='rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-10 text-center text-sm font-semibold text-emerald-700'>
-                제재 이력이 없습니다.
+                {isLoading
+                  ? '제재 이력을 불러오는 중입니다.'
+                  : '제재 이력이 없습니다.'}
               </div>
             )}
           </div>
@@ -100,7 +141,7 @@ function PenaltyHistoryCard({
   return (
     <li className='relative'>
       <span
-        className={`absolute top-3 -left-[2.15rem] h-5 w-5 rounded-full border-4 border-white shadow-sm ${
+        className={`absolute top-3 -left-[2.4375rem] h-5 w-5 rounded-full border-4 border-white shadow-sm ${
           isOngoing ? 'bg-rose-600' : 'bg-slate-950'
         }`}
       />

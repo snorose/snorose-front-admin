@@ -1,7 +1,9 @@
 import type {
   AdminUserListItem,
+  BlacklistHistoryItem,
   EditMemberInfo,
   MemberInfo,
+  UserBlacklistHistory,
 } from '@/shared/types';
 
 import {
@@ -62,6 +64,35 @@ export function formatDateTime(value: string | null | undefined) {
 export function formatPoint(value: number | null | undefined) {
   if (typeof value !== 'number') return EMPTY_TEXT;
   return `${value.toLocaleString()}P`;
+}
+
+export function toBlacklistHistoryItem(
+  history: UserBlacklistHistory,
+  fallback?: {
+    encryptedUserId?: string;
+    studentNumber?: string;
+  }
+): BlacklistHistoryItem {
+  const isWarning = history.type === '경고' || history.type === 'WARNING';
+
+  return {
+    encryptedUserId: history.encryptedUserId ?? fallback?.encryptedUserId ?? '',
+    studentNumber: history.studentNumber ?? fallback?.studentNumber ?? '',
+    type: history.type,
+    reasonType: history.reasonType,
+    warningCount: history.warningCount,
+    blackReason: history.blackReason,
+    createdAt: history.createdAt,
+    blacklistStartDate: isWarning
+      ? null
+      : (history.blacklistStartDate ?? history.createdAt),
+    blacklistDeadline: history.blacklistDeadline,
+    adminId: history.adminId,
+    operatorMemo: history.memo ?? '',
+    deletedAt: history.deletedAt,
+    deletedReason: history.deletedReason,
+    deletedBy: history.deletedBy,
+  };
 }
 
 export function getAdmissionYear(studentNumber: string) {

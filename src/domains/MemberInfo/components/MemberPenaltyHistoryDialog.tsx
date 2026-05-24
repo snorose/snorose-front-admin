@@ -7,17 +7,25 @@ import PenaltyHistoryTimelineDialog from '@/domains/MemberInfo/components/penalt
 import { usePenaltyHistoryDialogState } from '@/domains/MemberInfo/components/penalty-history/usePenaltyHistoryDialogState';
 
 type MemberPenaltyHistoryDialogProps = {
+  hasNext: boolean;
   histories: BlacklistHistoryItem[];
+  isLoading: boolean;
   member: MemberInfo;
+  onLoadMore: () => void | Promise<void>;
   onOpenChange: (open: boolean) => void;
   open: boolean;
+  totalCount: number;
 };
 
 export default function MemberPenaltyHistoryDialog({
+  hasNext,
   histories,
+  isLoading,
   member,
+  onLoadMore,
   onOpenChange,
   open,
+  totalCount,
 }: MemberPenaltyHistoryDialogProps) {
   const {
     deleteReason,
@@ -42,12 +50,16 @@ export default function MemberPenaltyHistoryDialog({
   return (
     <>
       <PenaltyHistoryTimelineDialog
+        hasNext={hasNext}
         histories={sortedHistories}
+        isLoading={isLoading}
         member={member}
         onDelete={openDeleteDialog}
         onEdit={openEditDialog}
+        onLoadMore={onLoadMore}
         onOpenChange={onOpenChange}
         open={open}
+        totalCount={totalCount}
       />
 
       <PenaltyHistoryEditDialog
