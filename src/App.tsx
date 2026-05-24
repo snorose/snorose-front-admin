@@ -13,6 +13,7 @@ import {
   ExamReviewPage,
   ExamReviewPeriodPage,
   ExcelPointUploadPage,
+  InquiryReportPage,
   LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
@@ -96,6 +97,10 @@ function App() {
                             <Route
                               path={PATHS.POST_MANAGE}
                               element={<PostManagePage />}
+                            />
+                            <Route
+                              path={PATHS.INQUIRY_REPORT}
+                              element={<InquiryReportPage />}
                             />
                             <Route
                               path={PATHS.ALERTS}

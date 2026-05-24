@@ -1,4 +1,5 @@
 export { default as PushNotificationPage } from './alerts/PushNotificationPage';
+export { default as InquiryReportPage } from './inquiries/InquiryReportPage';
 export { default as LogInPage } from './login/LogInPage';
 export { default as MemberInfoPage } from './member/MemberInfoPage';
 export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
