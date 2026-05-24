@@ -110,7 +110,7 @@ export default function MemberPointAdjustmentDialog({
     }
 
     if (parsedDifference === 0) {
-      toast.error('0 포인트는 지급 될 수 없다');
+      toast.error('0 포인트는 지급 될 수 없습니다.');
       return false;
     }
 
