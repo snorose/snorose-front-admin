@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Plus, Search } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
 import { Button, Input } from '@/shared/components/ui';
@@ -12,6 +13,7 @@ import {
 } from '@/domains/Operation/components';
 import { MOCK_POPUP_CONTENTS } from '@/domains/Operation/mocks';
 import type { PopupContent } from '@/domains/Operation/types';
+import { validatePopupContent } from '@/domains/Operation/utils';
 
 type PopupStatus = 'active' | 'reserved' | 'ended' | 'disabled';
 type PopupEditorMode = 'create' | 'edit';
@@ -141,6 +143,13 @@ export default function PopupManagementPage() {
   };
 
   const handleSavePopupButtonClick = () => {
+    const validationMessage = validatePopupContent(editingPopup);
+
+    if (validationMessage) {
+      toast.error(validationMessage);
+      return;
+    }
+
     const currentDateTime = getCurrentDateTimeString();
     const savedPopup = {
       ...editingPopup,
