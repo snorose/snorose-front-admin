@@ -140,7 +140,8 @@ export interface AdminBlacklistReq {
   encryptedUserId: string;
   type: 'WARNING' | 'RELEGATION' | 'BLACKLIST';
   reason: string;
-  customReason?: string;
-  warningCount?: number;
-  relegationMonth?: number;
+  customReason?: string | null;
+  warningCount?: number | null;
+  relegationMonth?: number | null;
+  memo?: string | null;
 }
