@@ -11,7 +11,7 @@ import {
   PopupStatusSummary,
 } from '@/domains/Operation/components';
 import { MOCK_POPUP_CONTENTS } from '@/domains/Operation/mocks';
-import type { PopupContent, PopupLink } from '@/domains/Operation/types';
+import type { PopupContent } from '@/domains/Operation/types';
 
 type PopupStatus = 'active' | 'reserved' | 'ended' | 'disabled';
 type PopupEditorMode = 'create' | 'edit';
@@ -19,9 +19,7 @@ type PopupEditorMode = 'create' | 'edit';
 const EMPTY_POPUP: PopupContent = {
   id: 0,
   title: '',
-  description: '',
-  contentList: [''],
-  links: [],
+  bodyMarkdown: '',
   imageUrl: '',
   startDate: '',
   endDate: '',
@@ -79,13 +77,6 @@ function createEmptyPopup() {
   };
 }
 
-function ensureContentListInput(popup: PopupContent) {
-  return {
-    ...popup,
-    contentList: popup.contentList.length > 0 ? popup.contentList : [''],
-  };
-}
-
 function getCurrentDateTimeString() {
   const now = new Date();
   now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -129,28 +120,6 @@ export default function PopupManagementPage() {
     setEditingPopup((prevPopup) => ({ ...prevPopup, [field]: value }));
   };
 
-  const handleContentListChange = (index: number, value: string) => {
-    handleEditorPopupChange(
-      'contentList',
-      editingPopup.contentList.map((item, itemIndex) =>
-        itemIndex === index ? value : item
-      )
-    );
-  };
-
-  const handleLinkChange = (
-    index: number,
-    field: keyof PopupLink,
-    value: PopupLink[keyof PopupLink]
-  ) => {
-    handleEditorPopupChange(
-      'links',
-      editingPopup.links.map((linkItem, linkIndex) =>
-        linkIndex === index ? { ...linkItem, [field]: value } : linkItem
-      )
-    );
-  };
-
   const handleNewPopupButtonClick = () => {
     setEditorMode('create');
     setEditingPopup(createEmptyPopup());
@@ -159,7 +128,7 @@ export default function PopupManagementPage() {
 
   const handleUpdatePopupButtonClick = (popup: PopupContent) => {
     setEditorMode('edit');
-    setEditingPopup(ensureContentListInput({ ...popup }));
+    setEditingPopup({ ...popup });
     setIsEditorOpen(true);
   };
 
@@ -241,8 +210,6 @@ export default function PopupManagementPage() {
         popup={editingPopup}
         onOpenChange={setIsEditorOpen}
         onPopupChange={handleEditorPopupChange}
-        onContentListChange={handleContentListChange}
-        onLinkChange={handleLinkChange}
         onSave={handleSavePopupButtonClick}
       />
     </div>
