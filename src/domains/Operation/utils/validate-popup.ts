@@ -32,6 +32,10 @@ export function validatePopupContent(popup: PopupContent) {
     return '게시 종료일은 시작일보다 빠를 수 없습니다.';
   }
 
+  if (!popup.bodyMarkdown.trim() && !popup.imageFileName.trim()) {
+    return '본문 또는 이미지를 하나 이상 입력해주세요.';
+  }
+
   if (popup.bodyMarkdown.length > MAX_POPUP_BODY_MARKDOWN_LENGTH) {
     return `본문은 ${MAX_POPUP_BODY_MARKDOWN_LENGTH.toLocaleString()}자 이하로 입력해주세요.`;
   }
