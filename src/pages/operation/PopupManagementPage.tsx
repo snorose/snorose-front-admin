@@ -92,6 +92,7 @@ export default function PopupManagementPage() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<PopupEditorMode>('create');
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
+  const [editingImagePreviewUrl, setEditingImagePreviewUrl] = useState('');
 
   const filteredPopups = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -123,18 +124,54 @@ export default function PopupManagementPage() {
   };
 
   const handleImageAttach = (file: File) => {
+    const imagePreviewUrl = URL.createObjectURL(file);
+
+    setEditingImagePreviewUrl((prevUrl) => {
+      if (prevUrl) {
+        URL.revokeObjectURL(prevUrl);
+      }
+
+      return imagePreviewUrl;
+    });
     handleEditorPopupChange('imageFileName', file.name);
+  };
+
+  const handleImageRemove = () => {
+    setEditingImagePreviewUrl((prevUrl) => {
+      if (prevUrl) {
+        URL.revokeObjectURL(prevUrl);
+      }
+
+      return '';
+    });
+    handleEditorPopupChange('imageFileName', '');
+  };
+
+  const handleEditorOpenChange = (open: boolean) => {
+    setIsEditorOpen(open);
+
+    if (!open) {
+      setEditingImagePreviewUrl((prevUrl) => {
+        if (prevUrl) {
+          URL.revokeObjectURL(prevUrl);
+        }
+
+        return '';
+      });
+    }
   };
 
   const handleNewPopupButtonClick = () => {
     setEditorMode('create');
     setEditingPopup(createEmptyPopup());
+    setEditingImagePreviewUrl('');
     setIsEditorOpen(true);
   };
 
   const handleUpdatePopupButtonClick = (popup: PopupContent) => {
     setEditorMode('edit');
     setEditingPopup({ ...popup });
+    setEditingImagePreviewUrl('');
     setIsEditorOpen(true);
   };
 
@@ -168,7 +205,7 @@ export default function PopupManagementPage() {
       );
     }
 
-    setIsEditorOpen(false);
+    handleEditorOpenChange(false);
   };
 
   return (
@@ -221,9 +258,11 @@ export default function PopupManagementPage() {
         open={isEditorOpen}
         mode={editorMode}
         popup={editingPopup}
-        onOpenChange={setIsEditorOpen}
+        imagePreviewUrl={editingImagePreviewUrl}
+        onOpenChange={handleEditorOpenChange}
         onPopupChange={handleEditorPopupChange}
         onImageAttach={handleImageAttach}
+        onImageRemove={handleImageRemove}
         onSave={handleSavePopupButtonClick}
       />
     </div>
