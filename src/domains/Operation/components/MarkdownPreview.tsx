@@ -20,7 +20,6 @@ export function MarkdownPreview({ markdown, className }: MarkdownPreviewProps) {
     <div
       className={cn(
         'space-y-2 text-sm leading-[18.2px] tracking-[-0.5px] text-gray-700',
-        '[&_a]:font-medium [&_a]:text-blue-600 [&_a]:underline [&_a]:underline-offset-2',
         '[&_ol]:list-decimal [&_ol]:space-y-1 [&_ol]:pl-5',
         '[&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5',
         className
@@ -37,6 +36,11 @@ export function MarkdownPreview({ markdown, className }: MarkdownPreviewProps) {
             return (
               <a
                 href={href}
+                style={{
+                  color: '#5f86bf',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
                 target={external ? '_blank' : undefined}
                 rel={external ? 'noopener noreferrer' : undefined}
               >
