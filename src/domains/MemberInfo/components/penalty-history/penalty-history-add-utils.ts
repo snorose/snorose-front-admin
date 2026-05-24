@@ -28,8 +28,6 @@ export function getReasonLabel(
 }
 
 export function getWarningCountByReason(reason: string) {
-  if (reason === 'ETC') return 1;
-
   return (
     WARNING_REASON_OPTIONS.find((option) => option.value === reason)
       ?.warnCount ?? 1
@@ -41,8 +39,7 @@ export function getDemotionTypeLabel(demotionType: DemotionType) {
 }
 
 export function getRelegationEndDateTimeLabel(months: number) {
-  const endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + months);
+  const endDate = addMonthsClamped(new Date(), months);
 
   const year = endDate.getFullYear();
   const month = String(endDate.getMonth() + 1).padStart(2, '0');
@@ -51,4 +48,22 @@ export function getRelegationEndDateTimeLabel(months: number) {
   const minutes = String(endDate.getMinutes()).padStart(2, '0');
 
   return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+function addMonthsClamped(date: Date, months: number) {
+  const targetDate = new Date(date);
+  const originalDay = targetDate.getDate();
+
+  targetDate.setDate(1);
+  targetDate.setMonth(targetDate.getMonth() + months);
+
+  const lastDayOfTargetMonth = new Date(
+    targetDate.getFullYear(),
+    targetDate.getMonth() + 1,
+    0
+  ).getDate();
+
+  targetDate.setDate(Math.min(originalDay, lastDayOfTargetMonth));
+
+  return targetDate;
 }

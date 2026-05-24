@@ -184,8 +184,16 @@ export default function PenaltyHistoryAddDialog({
       setIsSubmitting(true);
       await warnPenaltyAPI(payload);
       await onApplied?.();
+      const reasonLabel = getReasonLabel(
+        selectedReason,
+        isWarningMode,
+        demotionType
+      );
+      const displayReason = needsCustomReason
+        ? `${reasonLabel} (${customReason.trim()})`
+        : reasonLabel;
       toast.success(
-        `${member.userName}님에게 ${isWarningMode ? '경고' : getDemotionTypeLabel(demotionType)}이 추가되었습니다. 사유: ${getReasonLabel(selectedReason, isWarningMode, demotionType)}`
+        `${member.userName}님에게 ${isWarningMode ? '경고' : getDemotionTypeLabel(demotionType)}이 추가되었습니다. 사유: ${displayReason}`
       );
       resetForm();
       onOpenChange(false);
