@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '@/shared/components';
@@ -6,19 +5,8 @@ import { PageHeader } from '@/shared/components';
 import { InquiryReportTable } from '@/domains/InquiryReport';
 
 export default function InquiryReportPage() {
-  const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
-  const currentPageFromUrl = parseInt(
-    searchParamsFromUrl.get('page') || '1',
-    10
-  );
-  const [currentPage, setCurrentPage] = useState(currentPageFromUrl || 1);
-
-  useEffect(() => {
-    const pageFromUrl = parseInt(searchParamsFromUrl.get('page') || '1', 10);
-    if (pageFromUrl !== currentPage) {
-      setCurrentPage(pageFromUrl);
-    }
-  }, [currentPage, searchParamsFromUrl]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
   const handlePageChange = (
     pageOrUpdater: number | ((prev: number) => number)
@@ -28,11 +16,9 @@ export default function InquiryReportPage() {
         ? pageOrUpdater(currentPage)
         : pageOrUpdater;
 
-    setCurrentPage(next);
-
-    const nextSearchParams = new URLSearchParams(searchParamsFromUrl);
+    const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.set('page', next.toString());
-    setSearchParamsFromUrl(nextSearchParams, { replace: true });
+    setSearchParams(nextSearchParams, { replace: true });
   };
 
   return (

@@ -1,4 +1,4 @@
-export type InquiryGroup = 'INQUIRY' | 'REPORT' | 'ETC' | 'Inquiry' | 'Report';
+export type InquiryGroup = 'INQUIRY' | 'REPORT' | 'ETC';
 
 export type InquirySubGroup =
   | 'EXAM_REVIEW_INQUIRY'

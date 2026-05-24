@@ -11,7 +11,7 @@ export type AdminInquiryListParams = {
   group?: InquiryGroup;
   subGroup?: InquirySubGroup;
   status?: InquiryStatus;
-  userId?: string;
+  userId?: number;
 };
 
 export const getAdminInquiriesAPI = async (

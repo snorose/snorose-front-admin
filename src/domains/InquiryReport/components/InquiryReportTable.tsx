@@ -19,11 +19,9 @@ interface InquiryReportTableProps {
   onPageChange: (page: number | ((prev: number) => number)) => void;
 }
 
-const GROUP_LABELS: Record<string, string> = {
+const GROUP_LABELS: Record<InquiryGroup, string> = {
   INQUIRY: '문의',
-  Inquiry: '문의',
   REPORT: '신고',
-  Report: '신고',
   ETC: '기타',
 };
 
@@ -102,17 +100,15 @@ export default function InquiryReportTable({
 
     return [
       { label: '중분류', value: 'ALL' },
-      ...INQUIRY_SUB_GROUP_OPTIONS.slice(1),
-      ...REPORT_SUB_GROUP_OPTIONS.slice(1),
+      ...INQUIRY_SUB_GROUP_OPTIONS.filter((option) => option.value !== 'ALL'),
+      ...REPORT_SUB_GROUP_OPTIONS.filter((option) => option.value !== 'ALL'),
     ];
   }, [groupFilter]);
 
   const filteredInquiries = useMemo(() => {
     return INQUIRY_REPORT_SAMPLE_DATA.filter((inquiry) => {
-      const normalizedGroup = inquiry.group.toUpperCase();
-
       return (
-        (groupFilter === 'ALL' || normalizedGroup === groupFilter) &&
+        (groupFilter === 'ALL' || inquiry.group === groupFilter) &&
         (subGroupFilter === 'ALL' || inquiry.subGroup === subGroupFilter) &&
         (statusFilter === 'ALL' || inquiry.status === statusFilter)
       );
