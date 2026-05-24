@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
-import { Coins } from 'lucide-react';
+import { CheckCircle, Coins, TrendingDown, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -16,12 +16,13 @@ import { getErrorMessage } from '@/shared/utils';
 
 import { postSinglePointAPI } from '@/apis';
 
-import MemberPointAdjustmentConfirmDialog from './MemberPointAdjustmentConfirmDialog';
+// import MemberPointAdjustmentConfirmDialog from './MemberPointAdjustmentConfirmDialog';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 type MemberPointAdjustmentDialogProps = {
   member: MemberInfo;
+  onAdjusted?: () => void | Promise<void>;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
@@ -30,6 +31,7 @@ const CUSTOM_CATEGORY_VALUE = 'ETC';
 
 export default function MemberPointAdjustmentDialog({
   member,
+  onAdjusted,
   onOpenChange,
   open,
 }: MemberPointAdjustmentDialogProps) {
@@ -40,7 +42,7 @@ export default function MemberPointAdjustmentDialog({
   const [difference, setDifference] = useState('');
   const [memo, setMemo] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  // const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const isCustomCategory = selectedCategory === CUSTOM_CATEGORY_VALUE;
   const selectedOption = selectedCategory
@@ -50,13 +52,19 @@ export default function MemberPointAdjustmentDialog({
   const displayCategory = isCustomCategory
     ? customCategory.trim()
     : (selectedOption?.label ?? '');
+  const previewDifference = Number(difference);
+  const hasPointPreview =
+    difference.trim() !== '' &&
+    Number.isFinite(previewDifference) &&
+    previewDifference !== 0;
+  const isPreviewReward = previewDifference > 0;
 
   const resetForm = () => {
     setSelectedCategory('');
     setCustomCategory('');
     setDifference('');
     setMemo('');
-    setIsConfirmOpen(false);
+    // setIsConfirmOpen(false);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -96,6 +104,11 @@ export default function MemberPointAdjustmentDialog({
       return false;
     }
 
+    if (!Number.isInteger(parsedDifference)) {
+      toast.error('포인트는 정수만 입력할 수 있습니다.');
+      return false;
+    }
+
     if (parsedDifference === 0) {
       toast.error('0 포인트는 지급 될 수 없다');
       return false;
@@ -109,7 +122,9 @@ export default function MemberPointAdjustmentDialog({
       return;
     }
 
-    setIsConfirmOpen(true);
+    void handleSubmit();
+    // 확인 팝업을 다시 사용할 경우 아래 로직으로 복구합니다.
+    // setIsConfirmOpen(true);
   };
 
   const handleSubmit = async () => {
@@ -120,11 +135,31 @@ export default function MemberPointAdjustmentDialog({
       await postSinglePointAPI({
         encryptedUserId: member.encryptedUserId,
         difference: parsedDifference,
-        category: isCustomCategory ? customCategory.trim() : selectedCategory,
+        category: selectedCategory,
         source: 'ADMIN',
-        ...(memo.trim() ? { memo: memo.trim() } : {}),
+        memo: isCustomCategory
+          ? `[기타 카테고리] ${customCategory.trim()}\n${memo.trim()}`
+          : memo.trim(),
       });
-      toast.success('포인트 지급/차감이 완료되었습니다.');
+      const isReward = parsedDifference > 0;
+      toast(
+        `${member.userName}님에게 ${Math.abs(parsedDifference).toLocaleString()}P를 ${
+          isReward ? '지급' : '차감'
+        }했습니다. 카테고리: ${displayCategory}`,
+        {
+          icon: (
+            <CheckCircle
+              className={`h-5 w-5 ${isReward ? 'text-green-600' : 'text-red-600'}`}
+            />
+          ),
+          style: {
+            background: isReward ? '#F0FDF4' : '#FEF2F2',
+            borderColor: isReward ? '#86EFAC' : '#FCA5A5',
+            color: isReward ? '#166534' : '#991B1B',
+          },
+        }
+      );
+      await onAdjusted?.();
       handleOpenChange(false);
     } catch (error) {
       toast.error(getErrorMessage(error, '포인트 지급/차감에 실패했습니다.'));
@@ -148,13 +183,13 @@ export default function MemberPointAdjustmentDialog({
           </Dialog.Header>
 
           <div className='space-y-5 py-2'>
-            <div className='rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700'>
+            {/* <div className='rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700'>
               현재 보유 포인트: {member.pointBalance.toLocaleString()}P
-            </div>
+            </div> */}
 
             <Field label='카테고리' required>
               <Select
-                value={selectedCategory || undefined}
+                value={selectedCategory}
                 onValueChange={handleCategoryChange}
               >
                 <Select.Trigger className='h-12 w-full rounded-xl bg-slate-50'>
@@ -185,6 +220,7 @@ export default function MemberPointAdjustmentDialog({
             <Field label='포인트 수량' required>
               <Input
                 type='number'
+                step={1}
                 value={difference}
                 onChange={(event) => setDifference(event.target.value)}
                 placeholder='예: 100 (지급) 또는 -50 (차감)'
@@ -193,6 +229,23 @@ export default function MemberPointAdjustmentDialog({
                   isAutoFilled ? 'cursor-not-allowed' : ''
                 }`}
               />
+              {hasPointPreview ? (
+                <div
+                  className={`mt-3 flex items-center gap-1 text-lg font-semibold ${
+                    isPreviewReward ? 'text-green-600' : 'text-red-600'
+                  }`}
+                >
+                  {isPreviewReward ? (
+                    <TrendingUp className='h-5 w-5' />
+                  ) : (
+                    <TrendingDown className='h-5 w-5' />
+                  )}
+                  <span>
+                    {Math.abs(previewDifference).toLocaleString()}P{' '}
+                    {isPreviewReward ? '지급' : '차감'}
+                  </span>
+                </div>
+              ) : null}
             </Field>
 
             <Field label='메모' required>
@@ -227,7 +280,7 @@ export default function MemberPointAdjustmentDialog({
         </Dialog.Content>
       </Dialog>
 
-      <MemberPointAdjustmentConfirmDialog
+      {/* <MemberPointAdjustmentConfirmDialog
         category={displayCategory}
         difference={difference}
         isSubmitting={isSubmitting}
@@ -236,7 +289,7 @@ export default function MemberPointAdjustmentDialog({
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleSubmit}
         open={isConfirmOpen}
-      />
+      /> */}
     </>
   );
 }

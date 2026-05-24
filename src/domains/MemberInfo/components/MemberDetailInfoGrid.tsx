@@ -169,8 +169,10 @@ function DetailField({
         {label}
       </div>
 
-      <div className='flex items-start gap-2'>
-        <p className='text-lg font-semibold break-all text-slate-950'>
+      <div
+        className={`flex items-start gap-2 ${action ? 'justify-between' : ''}`}
+      >
+        <p className='min-w-0 text-lg font-semibold break-all text-slate-950'>
           {value}
         </p>
         {copyValue && onCopy && value !== EMPTY_TEXT && (

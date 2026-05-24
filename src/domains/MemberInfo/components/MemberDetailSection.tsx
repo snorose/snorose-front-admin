@@ -35,6 +35,7 @@ type MemberDetailSectionProps = {
   onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
+  onPointAdjusted: () => void | Promise<void>;
   onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
 };
 
@@ -47,6 +48,7 @@ export default function MemberDetailSection({
   onCopy,
   onEditCancel,
   onEditStart,
+  onPointAdjusted,
   onSaveEdit,
 }: MemberDetailSectionProps) {
   const [isPointDialogOpen, setIsPointDialogOpen] = useState(false);
@@ -160,6 +162,7 @@ export default function MemberDetailSection({
 
       <MemberPointAdjustmentDialog
         member={member}
+        onAdjusted={onPointAdjusted}
         open={isPointDialogOpen}
         onOpenChange={setIsPointDialogOpen}
       />
