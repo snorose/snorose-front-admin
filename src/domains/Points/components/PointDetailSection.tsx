@@ -64,7 +64,7 @@ export function PointDetailSection({
             onValueChange={(selectedKey: PointCategoryValue | '') =>
               onCategoryChange(selectedKey)
             }
-            value={selectedCategory || undefined}
+            value={selectedCategory}
           >
             <Select.Trigger className='w-full'>
               <Select.Value placeholder='포인트 유형을 선택해주세요' />
