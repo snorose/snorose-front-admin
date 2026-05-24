@@ -303,78 +303,74 @@ export default function InquiryReportTable({
                   </Table.Cell>
                 </Table.Row>
               ) : (
-                inquiries.map((inquiry, index) => (
-                  <Table.Row
-                    key={`${inquiry.postId}-${inquiry.createdAt}`}
-                    onClick={() =>
-                      onRowSelect(
-                        inquiry.postId === selectedPostId
-                          ? null
-                          : inquiry.postId
-                      )
-                    }
-                    className={`cursor-pointer border-b border-gray-100 last:border-0 [&_td]:h-[54px] ${
-                      inquiry.postId === selectedPostId
-                        ? 'bg-blue-50'
-                        : 'bg-white hover:bg-gray-50'
-                    }`}
-                  >
-                    {(() => {
-                      const inquiryStatus = getInquiryStatus(
-                        inquiry,
-                        statusByPostId
-                      );
+                inquiries.map((inquiry, index) => {
+                  const inquiryStatus = getInquiryStatus(
+                    inquiry,
+                    statusByPostId
+                  );
 
-                      return (
-                        <>
-                          <Table.Cell className='px-3 text-center text-gray-600'>
-                            {pageStartNumber + index + 1}
-                          </Table.Cell>
-                          <Table.Cell className='px-3 text-center'>
-                            {getGroupLabel(inquiry.group)}
-                          </Table.Cell>
-                          <Table.Cell
-                            className='truncate px-3 text-gray-700'
-                            title={getSubGroupLabel(inquiry.subGroup)}
-                          >
-                            {getSubGroupLabel(inquiry.subGroup)}
-                          </Table.Cell>
-                          <Table.Cell
-                            className='truncate px-3 text-gray-900'
-                            title={getUserDisplay(inquiry)}
-                          >
-                            {getUserDisplay(inquiry)}
-                          </Table.Cell>
-                          {!isDetailOpen && (
-                            <Table.Cell className='px-3 text-center'>
-                              <InquiryStatusSelect
-                                ariaLabel={`${inquiry.title} 상태 변경`}
-                                className='mx-auto'
-                                inquiryId={inquiry.postId}
-                                status={inquiryStatus}
-                                title={inquiry.title}
-                                onStatusChange={onStatusChange}
-                              />
-                            </Table.Cell>
-                          )}
-                          {!isDetailOpen && (
-                            <Table.Cell
-                              className='truncate px-3 font-bold text-gray-900'
-                              title={inquiry.title}
-                            >
-                              {inquiry.title}
-                            </Table.Cell>
-                          )}
-                          {!isDetailOpen && (
-                            <Table.Cell className='px-3 font-mono text-gray-600'>
-                              {formatDateTimeToMinutes(inquiry.createdAt)}
-                            </Table.Cell>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </Table.Row>
-                ))
+                  return (
+                    <Table.Row
+                      key={`${inquiry.postId}-${inquiry.createdAt}`}
+                      onClick={() =>
+                        onRowSelect(
+                          inquiry.postId === selectedPostId
+                            ? null
+                            : inquiry.postId
+                        )
+                      }
+                      className={`cursor-pointer border-b border-gray-100 last:border-0 [&_td]:h-[54px] ${
+                        inquiry.postId === selectedPostId
+                          ? 'bg-blue-50'
+                          : 'bg-white hover:bg-gray-50'
+                      }`}
+                    >
+                      <Table.Cell className='px-3 text-center text-gray-600'>
+                        {pageStartNumber + index + 1}
+                      </Table.Cell>
+                      <Table.Cell className='px-3 text-center'>
+                        {getGroupLabel(inquiry.group)}
+                      </Table.Cell>
+                      <Table.Cell
+                        className='truncate px-3 text-gray-700'
+                        title={getSubGroupLabel(inquiry.subGroup)}
+                      >
+                        {getSubGroupLabel(inquiry.subGroup)}
+                      </Table.Cell>
+                      <Table.Cell
+                        className='truncate px-3 text-gray-900'
+                        title={getUserDisplay(inquiry)}
+                      >
+                        {getUserDisplay(inquiry)}
+                      </Table.Cell>
+                      {!isDetailOpen && (
+                        <Table.Cell className='px-3 text-center'>
+                          <InquiryStatusSelect
+                            ariaLabel={`${inquiry.title} 상태 변경`}
+                            className='mx-auto'
+                            inquiryId={inquiry.postId}
+                            status={inquiryStatus}
+                            title={inquiry.title}
+                            onStatusChange={onStatusChange}
+                          />
+                        </Table.Cell>
+                      )}
+                      {!isDetailOpen && (
+                        <Table.Cell
+                          className='truncate px-3 font-bold text-gray-900'
+                          title={inquiry.title}
+                        >
+                          {inquiry.title}
+                        </Table.Cell>
+                      )}
+                      {!isDetailOpen && (
+                        <Table.Cell className='px-3 font-mono text-gray-600'>
+                          {formatDateTimeToMinutes(inquiry.createdAt)}
+                        </Table.Cell>
+                      )}
+                    </Table.Row>
+                  );
+                })
               )}
             </Table.Body>
           </Table>

@@ -65,8 +65,7 @@ export default function InquiryReportDetailPanel({
               rel='noopener noreferrer'
               aria-label='해당 글 바로가기'
               title='해당 글 바로가기'
-              style={{ color: '#475569' }}
-              className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
+              className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
             >
               <ExternalLink className='h-4 w-4 shrink-0' />
             </a>
