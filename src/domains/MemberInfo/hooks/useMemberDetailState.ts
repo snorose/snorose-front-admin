@@ -83,6 +83,23 @@ export function useMemberDetailState({
     [members, searchResultMembers]
   );
 
+  const fetchPenaltyHistoryPage = useCallback(
+    async (encryptedUserId: string, studentNumber: string, page: number) => {
+      const response = await blacklistHistoryAPI(encryptedUserId, {
+        page,
+      });
+      const history = response.result.data.map((item) =>
+        toBlacklistHistoryItem(item, {
+          encryptedUserId,
+          studentNumber,
+        })
+      );
+
+      return { history, response };
+    },
+    []
+  );
+
   useEffect(() => {
     if (!memberKey) {
       setSelectedMember(null);
@@ -159,7 +176,10 @@ export function useMemberDetailState({
   ]);
 
   useEffect(() => {
-    if (!selectedMember?.encryptedUserId) {
+    const encryptedUserId = selectedMember?.encryptedUserId;
+    const studentNumber = selectedMember?.studentNumber;
+
+    if (!encryptedUserId || !studentNumber) {
       setLatestPenaltyHistory(null);
       setPenaltyHistory([]);
       setPenaltyHistoryPage(0);
@@ -172,15 +192,10 @@ export function useMemberDetailState({
     void (async () => {
       try {
         setIsPenaltyHistoryLoading(true);
-        const response = await blacklistHistoryAPI(
-          selectedMember.encryptedUserId,
-          { page: 0 }
-        );
-        const history = response.result.data.map((item) =>
-          toBlacklistHistoryItem(item, {
-            encryptedUserId: selectedMember.encryptedUserId,
-            studentNumber: selectedMember.studentNumber,
-          })
+        const { history, response } = await fetchPenaltyHistoryPage(
+          encryptedUserId,
+          studentNumber,
+          0
         );
         if (!isMounted) return;
         setPenaltyHistory(history);
@@ -204,7 +219,11 @@ export function useMemberDetailState({
     return () => {
       isMounted = false;
     };
-  }, [selectedMember?.encryptedUserId, selectedMember?.studentNumber]);
+  }, [
+    fetchPenaltyHistoryPage,
+    selectedMember?.encryptedUserId,
+    selectedMember?.studentNumber,
+  ]);
 
   const handleLoadMorePenaltyHistory = useCallback(async () => {
     if (!selectedMember || isPenaltyHistoryLoading || !hasNextPenaltyHistory) {
@@ -215,17 +234,10 @@ export function useMemberDetailState({
 
     try {
       setIsPenaltyHistoryLoading(true);
-      const response = await blacklistHistoryAPI(
+      const { history: nextHistory, response } = await fetchPenaltyHistoryPage(
         selectedMember.encryptedUserId,
-        {
-          page: nextPage,
-        }
-      );
-      const nextHistory = response.result.data.map((item) =>
-        toBlacklistHistoryItem(item, {
-          encryptedUserId: selectedMember.encryptedUserId,
-          studentNumber: selectedMember.studentNumber,
-        })
+        selectedMember.studentNumber,
+        nextPage
       );
 
       setPenaltyHistory((prev) => [...prev, ...nextHistory]);
@@ -240,11 +252,36 @@ export function useMemberDetailState({
       setIsPenaltyHistoryLoading(false);
     }
   }, [
+    fetchPenaltyHistoryPage,
     hasNextPenaltyHistory,
     isPenaltyHistoryLoading,
     penaltyHistoryPage,
     selectedMember,
   ]);
+
+  const handleRefreshPenaltyHistory = useCallback(async () => {
+    if (!selectedMember) return;
+
+    try {
+      setIsPenaltyHistoryLoading(true);
+      const { history, response } = await fetchPenaltyHistoryPage(
+        selectedMember.encryptedUserId,
+        selectedMember.studentNumber,
+        0
+      );
+      setPenaltyHistory(history);
+      setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(response.result.hasNext);
+      setPenaltyHistoryTotalCount(response.result.totalCount);
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, '제재 이력을 다시 불러오지 못했습니다.')
+      );
+    } finally {
+      setIsPenaltyHistoryLoading(false);
+    }
+  }, [fetchPenaltyHistoryPage, selectedMember]);
 
   const handleSaveEdit = useCallback(
     async (updated: MemberInfo) => {
@@ -335,6 +372,7 @@ export function useMemberDetailState({
     handleCopy,
     handleLoadMorePenaltyHistory,
     handleRefreshMemberDetail,
+    handleRefreshPenaltyHistory,
     handleSaveEdit,
     hasNextPenaltyHistory,
     isDetailLoading,

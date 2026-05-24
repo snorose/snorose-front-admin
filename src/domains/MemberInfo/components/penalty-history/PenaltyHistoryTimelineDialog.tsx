@@ -16,6 +16,8 @@ type PenaltyHistoryTimelineDialogProps = {
   histories: BlacklistHistoryItem[];
   isLoading: boolean;
   member: MemberInfo;
+  onAddDemotion: () => void;
+  onAddWarning: () => void;
   onDelete: (history: BlacklistHistoryItem) => void;
   onEdit: (history: BlacklistHistoryItem) => void;
   onLoadMore: () => void | Promise<void>;
@@ -29,6 +31,8 @@ export default function PenaltyHistoryTimelineDialog({
   histories,
   isLoading,
   member,
+  onAddDemotion,
+  onAddWarning,
   onDelete,
   onEdit,
   onLoadMore,
@@ -68,6 +72,7 @@ export default function PenaltyHistoryTimelineDialog({
               type='button'
               variant='outline'
               className='h-12 rounded-xl text-base font-semibold'
+              onClick={onAddWarning}
             >
               <Plus className='h-5 w-5' />
               경고 추가
@@ -76,6 +81,7 @@ export default function PenaltyHistoryTimelineDialog({
               type='button'
               variant='outline'
               className='h-12 rounded-xl text-base font-semibold'
+              onClick={onAddDemotion}
             >
               <Plus className='h-5 w-5' />
               강등 추가
