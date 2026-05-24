@@ -17,6 +17,7 @@ export default function MemberInfoPage() {
     handleOpenMemberDetail,
     handleRefreshDirectory,
     handleRefreshMemberDetail,
+    handleRefreshPenaltyHistory,
     handleResetFilters,
     handleSaveEdit,
     handleSearch,
@@ -70,6 +71,12 @@ export default function MemberInfoPage() {
             onCopy={handleCopy}
             onEditCancel={() => setIsEdit(false)}
             onEditStart={() => setIsEdit(true)}
+            onChangedPenaltyHistory={async () => {
+              await Promise.all([
+                handleRefreshMemberDetail(),
+                handleRefreshPenaltyHistory(),
+              ]);
+            }}
             onLoadMorePenaltyHistory={handleLoadMorePenaltyHistory}
             onPointAdjusted={handleRefreshMemberDetail}
             onSaveEdit={handleSaveEdit}

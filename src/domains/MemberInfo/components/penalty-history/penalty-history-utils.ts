@@ -6,7 +6,7 @@ import {
   WARNING_REASON_OPTIONS,
 } from '@/domains/MemberInfo/constants/memberInfo';
 
-const WARNING_TYPES = ['경고'];
+const WARNING_TYPES = ['경고', 'WARNING'];
 
 export function isWarningType(type: string) {
   return WARNING_TYPES.some((warningType) => type.includes(warningType));

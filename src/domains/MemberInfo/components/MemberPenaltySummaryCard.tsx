@@ -23,6 +23,7 @@ type MemberPenaltySummaryCardProps = {
   penaltyHistoryTotalCount: number;
   latestPenaltyHistory: BlacklistHistoryItem | null;
   member: MemberInfo;
+  onChangedPenaltyHistory?: () => void | Promise<void>;
   onLoadMorePenaltyHistory: () => void | Promise<void>;
 };
 
@@ -33,6 +34,7 @@ export default function MemberPenaltySummaryCard({
   penaltyHistoryTotalCount,
   latestPenaltyHistory,
   member,
+  onChangedPenaltyHistory,
   onLoadMorePenaltyHistory,
 }: MemberPenaltySummaryCardProps) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -130,6 +132,7 @@ export default function MemberPenaltySummaryCard({
         histories={penaltyHistory}
         isLoading={isPenaltyHistoryLoading}
         member={member}
+        onChanged={onChangedPenaltyHistory}
         onLoadMore={onLoadMorePenaltyHistory}
         open={isHistoryOpen}
         onOpenChange={setIsHistoryOpen}

@@ -39,6 +39,7 @@ type MemberDetailSectionProps = {
   onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
+  onChangedPenaltyHistory?: () => void | Promise<void>;
   onLoadMorePenaltyHistory: () => void | Promise<void>;
   onPointAdjusted: () => void | Promise<void>;
   onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
@@ -55,6 +56,7 @@ export default function MemberDetailSection({
   penaltyHistoryTotalCount,
   onBack,
   onCopy,
+  onChangedPenaltyHistory,
   onEditCancel,
   onEditStart,
   onLoadMorePenaltyHistory,
@@ -166,6 +168,7 @@ export default function MemberDetailSection({
           isPenaltyHistoryLoading={isPenaltyHistoryLoading}
           latestPenaltyHistory={latestPenaltyHistory}
           member={member}
+          onChangedPenaltyHistory={onChangedPenaltyHistory}
           onLoadMorePenaltyHistory={onLoadMorePenaltyHistory}
           penaltyHistory={penaltyHistory}
           penaltyHistoryTotalCount={penaltyHistoryTotalCount}
