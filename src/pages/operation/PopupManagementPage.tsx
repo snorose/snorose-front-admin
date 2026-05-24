@@ -1,15 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
-import { Plus, Search } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input } from '@/shared/components/ui';
+import { Button } from '@/shared/components/ui';
 
 import {
   PopupEditorDialog,
   PopupManagementTable,
-  PopupStatusSummary,
 } from '@/domains/Operation/components';
 import { MOCK_POPUP_CONTENTS } from '@/domains/Operation/mocks';
 import type { PopupContent } from '@/domains/Operation/types';
@@ -81,33 +80,10 @@ function getCurrentDateTimeString() {
 
 export default function PopupManagementPage() {
   const [popups, setPopups] = useState(MOCK_POPUP_CONTENTS);
-  const [keyword, setKeyword] = useState('');
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<PopupEditorMode>('create');
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
   const [editingImagePreviewUrl, setEditingImagePreviewUrl] = useState('');
-
-  const filteredPopups = useMemo(() => {
-    const normalizedKeyword = keyword.trim().toLowerCase();
-
-    if (!normalizedKeyword) {
-      return popups;
-    }
-
-    return popups.filter((popup) =>
-      popup.title.toLowerCase().includes(normalizedKeyword)
-    );
-  }, [keyword, popups]);
-
-  const popupStatusItems = useMemo(
-    () =>
-      (['active', 'reserved', 'ended'] as const).map((status) => ({
-        label: getStatusLabel(status),
-        value: popups.filter((popup) => getPopupStatus(popup) === status)
-          .length,
-      })),
-    [popups]
-  );
 
   const handleEditorPopupChange = (
     field: keyof PopupContent,
@@ -201,6 +177,10 @@ export default function PopupManagementPage() {
     handleEditorOpenChange(false);
   };
 
+  const handlePreviewPopupButtonClick = () => {
+    console.log('특정 날짜 기준으로 팝업 보기');
+  };
+
   return (
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
@@ -208,36 +188,28 @@ export default function PopupManagementPage() {
         description='사용자 홈 화면에 노출되는 공지 팝업 콘텐츠와 노출 기간을 관리할 수 있어요.'
       />
 
-      <PopupStatusSummary items={popupStatusItems} />
-
-      <section className='flex flex-col gap-4 rounded-md border p-4'>
-        <div className='flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between'>
-          <div className='relative w-full lg:max-w-sm'>
-            <Search className='absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400' />
-            <Input
-              className='pl-9'
-              placeholder='팝업명 검색'
-              aria-label='팝업명 검색'
-              value={keyword}
-              onChange={(event) => setKeyword(event.target.value)}
-            />
-          </div>
-          <div className='flex flex-col gap-2 sm:flex-row'>
-            <Button type='button' variant='outline' disabled>
-              이전 팝업 보기(준비중)
-            </Button>
-            <Button
-              type='button'
-              className='gap-2'
-              onClick={handleNewPopupButtonClick}
-            >
-              <Plus className='size-4' />새 팝업 등록
-            </Button>
-          </div>
+      <section className='flex flex-col gap-4'>
+        <div className='flex gap-2'>
+          <Button
+            type='button'
+            className='gap-2'
+            onClick={handleNewPopupButtonClick}
+          >
+            <Plus className='size-4' />새 팝업 등록
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            className='gap-2'
+            onClick={handlePreviewPopupButtonClick}
+          >
+            <Eye className='size-4' />
+            특정 날짜 기준으로 팝업 보기
+          </Button>
         </div>
 
         <PopupManagementTable
-          popups={filteredPopups}
+          popups={popups}
           getStatusLabel={(popup) => getStatusLabel(getPopupStatus(popup))}
           getStatusClassName={(popup) =>
             getStatusClassName(getPopupStatus(popup))
