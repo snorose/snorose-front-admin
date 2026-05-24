@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { Image, X } from 'lucide-react';
 
 import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
+import { buttonVariants } from '@/shared/components/ui/button';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
@@ -132,18 +133,17 @@ export function PopupEditorDialog({
               <div className='flex flex-col gap-2'>
                 <div className='flex items-center justify-between gap-3'>
                   <Label htmlFor='popup-image-file'>이미지 첨부</Label>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    className='gap-2'
-                    asChild
+                  <Label
+                    htmlFor='popup-image-file'
+                    className={buttonVariants({
+                      variant: 'outline',
+                      size: 'sm',
+                      className: 'cursor-pointer gap-2',
+                    })}
                   >
-                    <Label htmlFor='popup-image-file'>
-                      <Image className='size-4' />
-                      이미지 선택
-                    </Label>
-                  </Button>
+                    <Image className='size-4' />
+                    이미지 선택
+                  </Label>
                 </div>
                 <div className='flex flex-col gap-3'>
                   <Input
