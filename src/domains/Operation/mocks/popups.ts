@@ -11,7 +11,7 @@ export const MOCK_POPUP_CONTENTS: PopupContent[] = [
   - 모집 기간: 4월 27일(월) ~ 5월 4일(월)
 
   [이벤트 관련 링크](/board/notice/post/1895414)`,
-    imageUrl: '/images/popup/event.png',
+    imageFileName: 'event.png',
     startDate: '2026-04-28',
     endDate: '2026-05-04',
     isEnabled: true,
@@ -22,7 +22,7 @@ export const MOCK_POPUP_CONTENTS: PopupContent[] = [
     id: 2,
     title: '[캘린더] 5월 스노로즈 일정',
     bodyMarkdown: '',
-    imageUrl: '/images/popup/calendar.png',
+    imageFileName: 'calendar.png',
     startDate: '2026-04-28',
     endDate: '2026-05-10',
     isEnabled: true,
