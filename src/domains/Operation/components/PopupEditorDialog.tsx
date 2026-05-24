@@ -109,7 +109,7 @@ export function PopupEditorDialog({
                 <Label htmlFor='popup-body-markdown'>본문</Label>
                 <Textarea
                   id='popup-body-markdown'
-                  className='field-sizing-fixed min-h-[320px]'
+                  className='min-h-[320px]'
                   placeholder={`본문을 입력해 주세요.
 
 **굵게 표시할 문장**
