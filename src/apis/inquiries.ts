@@ -1,6 +1,9 @@
 import { axiosInstance } from '@/shared/axios/instance';
 import type {
+  AdminInquiryDetailResponse,
   AdminInquiryListResponse,
+  AdminInquiryStatusUpdateRequest,
+  AdminInquiryStatusUpdateResponse,
   InquiryGroup,
   InquiryStatus,
   InquirySubGroup,
@@ -22,6 +25,26 @@ export const getAdminInquiriesAPI = async (
     {
       params,
     }
+  );
+  return response.data;
+};
+
+export const getAdminInquiryDetailAPI = async (
+  inquiryId: number
+): Promise<AdminInquiryDetailResponse> => {
+  const response = await axiosInstance.get<AdminInquiryDetailResponse>(
+    `/v1/admin/inquiries/${inquiryId}`
+  );
+  return response.data;
+};
+
+export const updateAdminInquiryStatusAPI = async (
+  inquiryId: number,
+  data: AdminInquiryStatusUpdateRequest
+): Promise<AdminInquiryStatusUpdateResponse> => {
+  const response = await axiosInstance.patch<AdminInquiryStatusUpdateResponse>(
+    `/v1/admin/inquiries/${inquiryId}/status`,
+    data
   );
   return response.data;
 };

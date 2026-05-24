@@ -2,53 +2,36 @@ import { useMemo, useState } from 'react';
 
 import { Loader2, X } from 'lucide-react';
 
-import { Badge, Select, Table } from '@/shared/components/ui';
+import { Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
   InquiryListItem,
   InquiryStatus,
   InquirySubGroup,
 } from '@/shared/types';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
+import {
+  INQUIRY_GROUP_LABELS,
+  INQUIRY_SUB_GROUP_LABELS,
+} from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import { ExamReviewTablePagination } from '@/domains/Reviews/components';
 
 import { INQUIRY_REPORT_SAMPLE_DATA } from '@/__mocks__';
 
+import InquiryStatusSelect from './InquiryStatusSelect';
+
 interface InquiryReportTableProps {
   currentPage: number;
   onPageChange: (page: number | ((prev: number) => number)) => void;
+  selectedPostId: number | null;
+  onRowSelect: (postId: number | null) => void;
+  statusByPostId: Record<number, InquiryStatus>;
+  onStatusChange: (
+    inquiryId: number,
+    status: InquiryStatus
+  ) => void | Promise<void>;
 }
-
-const GROUP_LABELS: Record<InquiryGroup, string> = {
-  INQUIRY: '문의',
-  REPORT: '신고',
-  ETC: '기타',
-};
-
-const SUB_GROUP_LABELS: Record<InquirySubGroup, string> = {
-  EXAM_REVIEW_INQUIRY: '족보 관련 문의',
-  EVENT_INQUIRY: '이벤트 관련 문의',
-  NOTICE_INQUIRY: '공지 관련 문의',
-  ETC_INQUIRY: '기타',
-  POST_REPORT: '게시글 신고',
-  EXAM_REVIEW_REPORT: '족보 신고',
-  COMMENT_REPORT: '댓글 신고',
-  USER_REPORT: '이용자 신고',
-};
-
-const STATUS_LABELS: Record<InquiryStatus, string> = {
-  PENDING: '답변 전',
-  COMPLETED: '답변 완료',
-  HOLD: '보류',
-};
-
-const STATUS_BADGE_CLASS_NAMES: Record<InquiryStatus, string> = {
-  PENDING:
-    'rounded-full border-none bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-50',
-  COMPLETED:
-    'rounded-full border-none bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-50',
-  HOLD: 'rounded-full border-none bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 hover:bg-amber-50',
-};
 
 const GROUP_OPTIONS = [
   { label: '분류', value: 'ALL' },
@@ -88,6 +71,10 @@ type SubGroupFilter = InquirySubGroup | 'ALL';
 export default function InquiryReportTable({
   currentPage,
   onPageChange,
+  selectedPostId,
+  onRowSelect,
+  statusByPostId,
+  onStatusChange,
 }: InquiryReportTableProps) {
   const [groupFilter, setGroupFilter] = useState<GroupFilter>('ALL');
   const [subGroupFilter, setSubGroupFilter] = useState<SubGroupFilter>('ALL');
@@ -107,13 +94,14 @@ export default function InquiryReportTable({
 
   const filteredInquiries = useMemo(() => {
     return INQUIRY_REPORT_SAMPLE_DATA.filter((inquiry) => {
+      const inquiryStatus = getInquiryStatus(inquiry, statusByPostId);
       return (
         (groupFilter === 'ALL' || inquiry.group === groupFilter) &&
         (subGroupFilter === 'ALL' || inquiry.subGroup === subGroupFilter) &&
-        (statusFilter === 'ALL' || inquiry.status === statusFilter)
+        (statusFilter === 'ALL' || inquiryStatus === statusFilter)
       );
     });
-  }, [groupFilter, statusFilter, subGroupFilter]);
+  }, [groupFilter, statusByPostId, statusFilter, subGroupFilter]);
 
   const inquiries = useMemo(() => {
     const pageStartIndex = (currentPage - 1) * PAGE_SIZE;
@@ -124,6 +112,7 @@ export default function InquiryReportTable({
   const hasNext = filteredInquiries.length > currentPage * PAGE_SIZE;
   const pageStartNumber = (currentPage - 1) * PAGE_SIZE;
   const isEmpty = !isLoading && inquiries.length === 0;
+  const isDetailOpen = selectedPostId !== null;
 
   const activeFilterCount = [
     groupFilter !== 'ALL',
@@ -245,7 +234,9 @@ export default function InquiryReportTable({
 
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
-          <Table className='w-full min-w-[860px] table-fixed text-[13px]'>
+          <Table
+            className={`w-full ${isDetailOpen ? 'min-w-[498px]' : 'min-w-[1010px]'} table-fixed text-[13px]`}
+          >
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
               <Table.Row>
                 <Table.Head
@@ -266,22 +257,34 @@ export default function InquiryReportTable({
                 <Table.Head style={{ width: '180px' }} className='px-3'>
                   아이디
                 </Table.Head>
-                <Table.Head
-                  style={{ width: '110px' }}
-                  className='px-3 text-center'
-                >
-                  답변여부
-                </Table.Head>
-                <Table.Head style={{ width: '252px' }} className='px-3'>
-                  제목
-                </Table.Head>
+                {!isDetailOpen && (
+                  <Table.Head
+                    style={{ width: '110px' }}
+                    className='px-3 text-center'
+                  >
+                    답변여부
+                  </Table.Head>
+                )}
+                {!isDetailOpen && (
+                  <Table.Head style={{ width: '252px' }} className='px-3'>
+                    제목
+                  </Table.Head>
+                )}
+                {!isDetailOpen && (
+                  <Table.Head style={{ width: '150px' }} className='px-3'>
+                    작성일
+                  </Table.Head>
+                )}
               </Table.Row>
             </Table.Header>
 
             <Table.Body>
               {isLoading ? (
                 <Table.Row>
-                  <Table.Cell colSpan={6} className='h-48 text-center'>
+                  <Table.Cell
+                    colSpan={isDetailOpen ? 4 : 7}
+                    className='h-48 text-center'
+                  >
                     <div className='flex items-center justify-center gap-2 text-gray-500'>
                       <Loader2 className='h-5 w-5 animate-spin text-blue-600' />
                       <span>문의 및 신고 목록을 불러오는 중입니다...</span>
@@ -291,7 +294,7 @@ export default function InquiryReportTable({
               ) : isEmpty ? (
                 <Table.Row>
                   <Table.Cell
-                    colSpan={6}
+                    colSpan={isDetailOpen ? 4 : 7}
                     className='h-48 text-center text-sm text-gray-400'
                   >
                     {activeFilterCount > 0
@@ -300,44 +303,74 @@ export default function InquiryReportTable({
                   </Table.Cell>
                 </Table.Row>
               ) : (
-                inquiries.map((inquiry, index) => (
-                  <Table.Row
-                    key={`${inquiry.postId}-${inquiry.createdAt}`}
-                    className='border-b border-gray-100 bg-white last:border-0 hover:bg-gray-50 [&_td]:h-[54px]'
-                  >
-                    <Table.Cell className='px-3 text-center text-gray-600'>
-                      {pageStartNumber + index + 1}
-                    </Table.Cell>
-                    <Table.Cell className='px-3 text-center'>
-                      {getGroupLabel(inquiry.group)}
-                    </Table.Cell>
-                    <Table.Cell
-                      className='truncate px-3 text-gray-700'
-                      title={getSubGroupLabel(inquiry.subGroup)}
+                inquiries.map((inquiry, index) => {
+                  const inquiryStatus = getInquiryStatus(
+                    inquiry,
+                    statusByPostId
+                  );
+
+                  return (
+                    <Table.Row
+                      key={`${inquiry.postId}-${inquiry.createdAt}`}
+                      onClick={() =>
+                        onRowSelect(
+                          inquiry.postId === selectedPostId
+                            ? null
+                            : inquiry.postId
+                        )
+                      }
+                      className={`cursor-pointer border-b border-gray-100 last:border-0 [&_td]:h-[54px] ${
+                        inquiry.postId === selectedPostId
+                          ? 'bg-blue-50'
+                          : 'bg-white hover:bg-gray-50'
+                      }`}
                     >
-                      {getSubGroupLabel(inquiry.subGroup)}
-                    </Table.Cell>
-                    <Table.Cell
-                      className='truncate px-3 text-gray-900'
-                      title={getUserDisplay(inquiry)}
-                    >
-                      {getUserDisplay(inquiry)}
-                    </Table.Cell>
-                    <Table.Cell className='px-3 text-center'>
-                      <Badge
-                        className={STATUS_BADGE_CLASS_NAMES[inquiry.status]}
+                      <Table.Cell className='px-3 text-center text-gray-600'>
+                        {pageStartNumber + index + 1}
+                      </Table.Cell>
+                      <Table.Cell className='px-3 text-center'>
+                        {getGroupLabel(inquiry.group)}
+                      </Table.Cell>
+                      <Table.Cell
+                        className='truncate px-3 text-gray-700'
+                        title={getSubGroupLabel(inquiry.subGroup)}
                       >
-                        {STATUS_LABELS[inquiry.status] ?? inquiry.status}
-                      </Badge>
-                    </Table.Cell>
-                    <Table.Cell
-                      className='truncate px-3 font-bold text-gray-900'
-                      title={inquiry.title}
-                    >
-                      {inquiry.title}
-                    </Table.Cell>
-                  </Table.Row>
-                ))
+                        {getSubGroupLabel(inquiry.subGroup)}
+                      </Table.Cell>
+                      <Table.Cell
+                        className='truncate px-3 text-gray-900'
+                        title={getUserDisplay(inquiry)}
+                      >
+                        {getUserDisplay(inquiry)}
+                      </Table.Cell>
+                      {!isDetailOpen && (
+                        <Table.Cell className='px-3 text-center'>
+                          <InquiryStatusSelect
+                            ariaLabel={`${inquiry.title} 상태 변경`}
+                            className='mx-auto'
+                            inquiryId={inquiry.postId}
+                            status={inquiryStatus}
+                            title={inquiry.title}
+                            onStatusChange={onStatusChange}
+                          />
+                        </Table.Cell>
+                      )}
+                      {!isDetailOpen && (
+                        <Table.Cell
+                          className='truncate px-3 font-bold text-gray-900'
+                          title={inquiry.title}
+                        >
+                          {inquiry.title}
+                        </Table.Cell>
+                      )}
+                      {!isDetailOpen && (
+                        <Table.Cell className='px-3 font-mono text-gray-600'>
+                          {formatDateTimeToMinutes(inquiry.createdAt)}
+                        </Table.Cell>
+                      )}
+                    </Table.Row>
+                  );
+                })
               )}
             </Table.Body>
           </Table>
@@ -355,13 +388,20 @@ export default function InquiryReportTable({
 }
 
 function getGroupLabel(group: InquiryGroup) {
-  return GROUP_LABELS[group] ?? group;
+  return INQUIRY_GROUP_LABELS[group] ?? group;
 }
 
 function getSubGroupLabel(subGroup: InquirySubGroup) {
-  return SUB_GROUP_LABELS[subGroup] ?? subGroup;
+  return INQUIRY_SUB_GROUP_LABELS[subGroup] ?? subGroup;
 }
 
 function getUserDisplay(inquiry: InquiryListItem) {
   return `${inquiry.userLoginId}(${inquiry.userId})`;
+}
+
+function getInquiryStatus(
+  inquiry: InquiryListItem,
+  statusByPostId: Record<number, InquiryStatus>
+) {
+  return statusByPostId[inquiry.postId] ?? inquiry.status;
 }
