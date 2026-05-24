@@ -13,12 +13,14 @@ type PopupEditorDialogProps = {
   open: boolean;
   mode: PopupEditorMode;
   popup: PopupContent;
+  imagePreviewUrl: string;
   onOpenChange: (open: boolean) => void;
   onPopupChange: (
     field: keyof PopupContent,
     value: PopupContent[keyof PopupContent]
   ) => void;
   onImageAttach: (file: File) => void;
+  onImageRemove: () => void;
   onSave: () => void;
 };
 
@@ -26,15 +28,17 @@ export function PopupEditorDialog({
   open,
   mode,
   popup,
+  imagePreviewUrl,
   onOpenChange,
   onPopupChange,
   onImageAttach,
+  onImageRemove,
   onSave,
 }: PopupEditorDialogProps) {
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageRemove = () => {
-    onPopupChange('imageFileName', '');
+    onImageRemove();
 
     if (imageInputRef.current) {
       imageInputRef.current.value = '';
@@ -82,24 +86,29 @@ export function PopupEditorDialog({
                 }
               />
             </div>
+          </div>
 
-            <div className='flex flex-col gap-1 md:col-span-2'>
-              <Label htmlFor='popup-title' required>
-                팝업 제목
-              </Label>
-              <Input
-                id='popup-title'
-                placeholder='예: [EVENT] 스노로즈 X 브랜드 체험단 이벤트'
-                value={popup.title}
-                onChange={(event) => onPopupChange('title', event.target.value)}
-              />
-            </div>
+          <div className='grid gap-4 md:grid-cols-2'>
+            <div className='flex flex-col gap-4'>
+              <div className='flex flex-col gap-1'>
+                <Label htmlFor='popup-title' required>
+                  팝업 제목
+                </Label>
+                <Input
+                  id='popup-title'
+                  placeholder='예: [EVENT] 스노로즈 X 브랜드 체험단 이벤트'
+                  value={popup.title}
+                  onChange={(event) =>
+                    onPopupChange('title', event.target.value)
+                  }
+                />
+              </div>
 
-            <div className='grid gap-3 md:col-span-2 md:grid-cols-2'>
               <div className='flex flex-col gap-1'>
                 <Label htmlFor='popup-body-markdown'>본문</Label>
                 <Textarea
                   id='popup-body-markdown'
+                  className='field-sizing-fixed min-h-[320px]'
                   placeholder={`본문을 입력해 주세요.
 
 **굵게 표시할 문장**
@@ -119,71 +128,87 @@ export function PopupEditorDialog({
                   }
                 />
               </div>
-              <div className='flex flex-col gap-1'>
-                <Label>미리보기</Label>
-                <div className='bg-background min-h-[236px] rounded-md border px-3 py-2'>
-                  {popup.bodyMarkdown.trim() ? (
-                    <MarkdownPreview markdown={popup.bodyMarkdown} />
+
+              <div className='flex flex-col gap-2'>
+                <div className='flex items-center justify-between gap-3'>
+                  <Label htmlFor='popup-image-file'>이미지 첨부</Label>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    className='gap-2'
+                    asChild
+                  >
+                    <Label htmlFor='popup-image-file'>
+                      <Image className='size-4' />
+                      이미지 선택
+                    </Label>
+                  </Button>
+                </div>
+                <div className='flex flex-col gap-3'>
+                  <Input
+                    ref={imageInputRef}
+                    id='popup-image-file'
+                    type='file'
+                    accept='image/*'
+                    className='sr-only'
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+
+                      if (file) {
+                        onImageAttach(file);
+                      }
+                    }}
+                  />
+                  {popup.imageFileName ? (
+                    <div className='bg-background flex min-h-9 items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm text-gray-700'>
+                      <span className='min-w-0 truncate'>
+                        {popup.imageFileName}
+                      </span>
+                      <button
+                        type='button'
+                        className='shrink-0 rounded-sm text-gray-500 transition-colors hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none'
+                        aria-label='첨부 이미지 삭제'
+                        onClick={handleImageRemove}
+                      >
+                        <X className='size-4' />
+                      </button>
+                    </div>
                   ) : (
-                    <p className='text-sm text-gray-500'>
-                      본문 미리보기가 여기에 표시됩니다.
-                    </p>
+                    <div className='bg-background flex min-h-9 items-center rounded-md border px-3 py-2 text-sm text-gray-500'>
+                      첨부된 이미지가 없습니다.
+                    </div>
                   )}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className='flex flex-col gap-2 md:col-span-2'>
-            <div className='flex items-center justify-between gap-3'>
-              <Label htmlFor='popup-image-file'>이미지 첨부</Label>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                className='gap-2'
-                asChild
-              >
-                <Label htmlFor='popup-image-file'>
-                  <Image className='size-4' />
-                  이미지 선택
-                </Label>
-              </Button>
-            </div>
-            <div className='flex flex-col gap-3'>
-              <Input
-                ref={imageInputRef}
-                id='popup-image-file'
-                type='file'
-                accept='image/*'
-                className='sr-only'
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-
-                  if (file) {
-                    onImageAttach(file);
-                  }
-                }}
-              />
-              {popup.imageFileName ? (
-                <div className='bg-background flex min-h-9 items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm text-gray-700'>
-                  <span className='min-w-0 truncate'>
-                    {popup.imageFileName}
-                  </span>
-                  <button
-                    type='button'
-                    className='shrink-0 rounded-sm text-gray-500 transition-colors hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-300 focus-visible:outline-none'
-                    aria-label='첨부 이미지 삭제'
-                    onClick={handleImageRemove}
-                  >
-                    <X className='size-4' />
-                  </button>
-                </div>
-              ) : (
-                <div className='bg-background flex min-h-9 items-center rounded-md border px-3 py-2 text-sm text-gray-500'>
-                  첨부된 이미지가 없습니다.
-                </div>
-              )}
+            <div className='flex flex-col gap-1'>
+              <Label>미리보기</Label>
+              <div className='flex min-h-[236px]'>
+                <section className='flex w-full flex-col items-start gap-2 self-start rounded-[5px] bg-[#EAF5FD] p-[10px]'>
+                  <h3 className='text-[13px] leading-[18.2px] font-medium tracking-[-0.5px] text-[#00368E]'>
+                    {popup.title.trim() || '제목 없는 팝업'}
+                  </h3>
+                  {popup.bodyMarkdown.trim() ? (
+                    <MarkdownPreview
+                      markdown={popup.bodyMarkdown}
+                      className='text-[13px] leading-[18.2px] font-normal tracking-[-0.5px] text-[#484848]'
+                    />
+                  ) : (
+                    <p className='text-[13px] leading-[18.2px] font-normal tracking-[-0.5px] text-[#484848]'>
+                      본문 미리보기가 여기에 표시됩니다.
+                    </p>
+                  )}
+                  {imagePreviewUrl && (
+                    <img
+                      src={imagePreviewUrl}
+                      alt={popup.imageFileName || '팝업 이미지'}
+                      className='w-full rounded-[5px] object-cover'
+                    />
+                  )}
+                </section>
+              </div>
             </div>
           </div>
         </div>
