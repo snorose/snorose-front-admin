@@ -1,15 +1,8 @@
-import { Image, Plus, Trash2 } from 'lucide-react';
+import { Image } from 'lucide-react';
 
-import {
-  Button,
-  Dialog,
-  Input,
-  Label,
-  Select,
-  Textarea,
-} from '@/shared/components/ui';
+import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
 
-import type { PopupContent, PopupLink } from '@/domains/Operation/types';
+import type { PopupContent } from '@/domains/Operation/types';
 
 type PopupEditorMode = 'create' | 'edit';
 
@@ -22,12 +15,6 @@ type PopupEditorDialogProps = {
     field: keyof PopupContent,
     value: PopupContent[keyof PopupContent]
   ) => void;
-  onContentListChange: (index: number, value: string) => void;
-  onLinkChange: (
-    index: number,
-    field: keyof PopupLink,
-    value: PopupLink[keyof PopupLink]
-  ) => void;
   onSave: () => void;
 };
 
@@ -37,8 +24,6 @@ export function PopupEditorDialog({
   popup,
   onOpenChange,
   onPopupChange,
-  onContentListChange,
-  onLinkChange,
   onSave,
 }: PopupEditorDialogProps) {
   return (
@@ -96,63 +81,17 @@ export function PopupEditorDialog({
             </div>
 
             <div className='flex flex-col gap-1 md:col-span-2'>
-              <Label htmlFor='popup-description'>설명</Label>
+              <Label htmlFor='popup-body-markdown'>본문</Label>
               <Textarea
-                id='popup-description'
-                placeholder='팝업 제목 아래에 노출할 짧은 설명'
-                value={popup.description}
-                rows={3}
+                id='popup-body-markdown'
+                placeholder='문단, 리스트, 링크를 마크다운으로 입력해 주세요.'
+                value={popup.bodyMarkdown}
+                rows={10}
                 onChange={(event) =>
-                  onPopupChange('description', event.target.value)
+                  onPopupChange('bodyMarkdown', event.target.value)
                 }
               />
             </div>
-          </div>
-
-          <div className='flex flex-col gap-3'>
-            <div className='flex items-center justify-between gap-3'>
-              <Label>본문 리스트</Label>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                className='gap-2'
-                onClick={() =>
-                  onPopupChange('contentList', [...popup.contentList, ''])
-                }
-              >
-                <Plus className='size-4' />
-                항목 추가
-              </Button>
-            </div>
-            {popup.contentList.map((content, index) => (
-              <div key={index} className='flex gap-2'>
-                <Input
-                  aria-label={`본문 항목 ${index + 1}`}
-                  value={content}
-                  onChange={(event) =>
-                    onContentListChange(index, event.target.value)
-                  }
-                />
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='icon'
-                  aria-label='본문 항목 삭제'
-                  disabled={index === 0}
-                  onClick={() =>
-                    onPopupChange(
-                      'contentList',
-                      popup.contentList.filter(
-                        (_, itemIndex) => itemIndex !== index
-                      )
-                    )
-                  }
-                >
-                  <Trash2 className='size-4' />
-                </Button>
-              </div>
-            ))}
           </div>
 
           <div className='flex flex-col gap-1 md:col-span-2'>
@@ -171,86 +110,6 @@ export function PopupEditorDialog({
                 이미지 선택
               </Button>
             </div>
-          </div>
-
-          <div className='flex flex-col gap-3'>
-            <div className='flex items-center justify-between gap-3'>
-              <Label>링크</Label>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                className='gap-2'
-                onClick={() =>
-                  onPopupChange('links', [
-                    ...popup.links,
-                    { title: '', url: '', isExternal: false },
-                  ])
-                }
-              >
-                <Plus className='size-4' />
-                링크 추가
-              </Button>
-            </div>
-            {popup.links.length > 0 ? (
-              popup.links.map((linkItem, index) => (
-                <div
-                  key={index}
-                  className='grid gap-2 rounded-md border p-3 md:grid-cols-[1fr_1fr_132px_40px]'
-                >
-                  <Input
-                    aria-label={`링크 제목 ${index + 1}`}
-                    placeholder='링크 텍스트'
-                    value={linkItem.title}
-                    onChange={(event) =>
-                      onLinkChange(index, 'title', event.target.value)
-                    }
-                  />
-                  <Input
-                    aria-label={`링크 URL ${index + 1}`}
-                    placeholder='URL 또는 내부 경로'
-                    value={linkItem.url}
-                    onChange={(event) =>
-                      onLinkChange(index, 'url', event.target.value)
-                    }
-                  />
-                  <Select
-                    value={linkItem.isExternal ? 'external' : 'internal'}
-                    onValueChange={(value) =>
-                      onLinkChange(index, 'isExternal', value === 'external')
-                    }
-                  >
-                    <Select.Trigger className='w-full'>
-                      <Select.Value />
-                    </Select.Trigger>
-                    <Select.Content>
-                      <Select.Item value='internal'>내부 이동</Select.Item>
-                      <Select.Item value='external'>새 탭</Select.Item>
-                    </Select.Content>
-                  </Select>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='icon'
-                    aria-label='링크 삭제'
-                    onClick={() =>
-                      onPopupChange(
-                        'links',
-                        popup.links.filter(
-                          (_, linkIndex) => linkIndex !== index
-                        )
-                      )
-                    }
-                  >
-                    <Trash2 className='size-4' />
-                  </Button>
-                </div>
-              ))
-            ) : (
-              <div className='rounded-md border border-dashed p-4 text-center text-sm text-gray-500'>
-                연결할 공지나 외부 링크가 없으면 링크 영역은 숨겨집니다.
-              </div>
-            )}
           </div>
         </div>
 

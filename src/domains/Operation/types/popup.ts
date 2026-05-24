@@ -7,9 +7,7 @@ export type PopupLink = {
 export type PopupContent = {
   id: number;
   title: string;
-  description: string;
-  contentList: string[];
-  links: PopupLink[];
+  bodyMarkdown: string;
   imageUrl: string;
   startDate: string;
   endDate: string;
