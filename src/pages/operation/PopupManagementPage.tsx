@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Eye, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
@@ -189,9 +189,9 @@ export default function PopupManagementPage() {
     handleEditorOpenChange(false);
   };
 
-  const handlePreviewPopupButtonClick = () => {
-    console.log('특정 날짜 기준으로 팝업 보기');
-  };
+  // const handlePreviewPopupButtonClick = () => {
+  //   console.log('특정 날짜 기준으로 팝업 보기');
+  // };
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -209,7 +209,7 @@ export default function PopupManagementPage() {
           >
             <Plus className='size-4' />새 팝업 등록
           </Button>
-          <Button
+          {/* <Button
             type='button'
             variant='outline'
             className='gap-2'
@@ -217,7 +217,7 @@ export default function PopupManagementPage() {
           >
             <Eye className='size-4' />
             특정 날짜 기준으로 팝업 보기
-          </Button>
+          </Button> */}
         </div>
 
         <PopupManagementTable
