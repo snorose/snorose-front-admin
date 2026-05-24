@@ -4,6 +4,7 @@ import { Image, X } from 'lucide-react';
 
 import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
 
+import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
 
 type PopupEditorMode = 'create' | 'edit';
@@ -94,17 +95,42 @@ export function PopupEditorDialog({
               />
             </div>
 
-            <div className='flex flex-col gap-1 md:col-span-2'>
-              <Label htmlFor='popup-body-markdown'>본문</Label>
-              <Textarea
-                id='popup-body-markdown'
-                placeholder='문단, 리스트, 링크를 마크다운으로 입력해 주세요.'
-                value={popup.bodyMarkdown}
-                rows={10}
-                onChange={(event) =>
-                  onPopupChange('bodyMarkdown', event.target.value)
-                }
-              />
+            <div className='grid gap-3 md:col-span-2 md:grid-cols-2'>
+              <div className='flex flex-col gap-1'>
+                <Label htmlFor='popup-body-markdown'>본문</Label>
+                <Textarea
+                  id='popup-body-markdown'
+                  placeholder={`본문을 입력해 주세요.
+
+**굵게 표시할 문장**
+
+1. 숫자 리스트
+2. 숫자 리스트
+
+- 순서 없는 리스트
+- 순서 없는 리스트
+
+[외부 링크](https://naver.com)
+[내부 링크](/board/notice/post/123)`}
+                  value={popup.bodyMarkdown}
+                  rows={10}
+                  onChange={(event) =>
+                    onPopupChange('bodyMarkdown', event.target.value)
+                  }
+                />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <Label>미리보기</Label>
+                <div className='bg-background min-h-[236px] rounded-md border px-3 py-2'>
+                  {popup.bodyMarkdown.trim() ? (
+                    <MarkdownPreview markdown={popup.bodyMarkdown} />
+                  ) : (
+                    <p className='text-sm text-gray-500'>
+                      본문 미리보기가 여기에 표시됩니다.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
