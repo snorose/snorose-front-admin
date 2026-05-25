@@ -229,10 +229,10 @@ export default function ExamSearch({
             </button>
           )}
         </div>
-        <div className='relative w-[180px]'>
+        <div className='relative w-[260px]'>
           <input
             type='text'
-            placeholder='작성자 검색'
+            placeholder='작성자 검색 (아이디, 닉네임, 학번)'
             value={keywordAuthor}
             onChange={(e) => setKeywordAuthor(e.target.value)}
             onKeyDown={handleKeyDown}
