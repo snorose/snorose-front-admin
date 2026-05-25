@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button, Input, Select } from '@/shared/components/ui';
 import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
 
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components/ExamConfirmStatusBadge';
 import type {
   ExamReviewSearchParams,
   ExamReviewSort,
@@ -349,18 +350,26 @@ export default function ExamSearch({
             handleSearchWithParams({ confirmStatus: value });
           }}
         >
-          <Select.Trigger className='h-9 w-[120px] text-xs'>
+          <Select.Trigger className='h-9 w-[130px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content align='start'>
             <Select.Item value={ALL_SELECTED} className='text-sm'>
               확인 상태 전체
             </Select.Item>
-            <Select.Item value={CONFIRMED_SELECTED} className='text-sm'>
-              확인완료
+            <Select.Item
+              value={CONFIRMED_SELECTED}
+              className='text-sm'
+              textValue='확인완료'
+            >
+              <ExamConfirmStatusBadge status={CONFIRMED_SELECTED} />
             </Select.Item>
-            <Select.Item value={UNCONFIRMED_SELECTED} className='text-sm'>
-              미확인
+            <Select.Item
+              value={UNCONFIRMED_SELECTED}
+              className='text-sm'
+              textValue='미확인'
+            >
+              <ExamConfirmStatusBadge status={UNCONFIRMED_SELECTED} />
             </Select.Item>
           </Select.Content>
         </Select>
