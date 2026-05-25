@@ -6,10 +6,10 @@ import { toast } from 'sonner';
 import { Button, Input, Select } from '@/shared/components/ui';
 import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
 
-import { ExamConfirmStatusBadge } from '@/domains/Reviews/components/ExamConfirmStatusBadge';
-import type {
-  ExamReviewSearchParams,
-  ExamReviewSort,
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
+import {
+  type ExamReviewSearchParams,
+  isExamReviewSort,
 } from '@/domains/Reviews/types';
 import {
   convertExamTypeToEnum,
@@ -28,11 +28,6 @@ interface ExamSearchProps {
   initialExamType?: string;
   initialIsConfirmed?: boolean;
 }
-
-const EXAM_REVIEW_SORTS: ExamReviewSort[] = ['ASC', 'DESC', 'REPORT'];
-
-const isExamReviewSort = (value?: string): value is ExamReviewSort =>
-  EXAM_REVIEW_SORTS.includes(value as ExamReviewSort);
 
 export default function ExamSearch({
   onSearchChange,

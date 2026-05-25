@@ -1,1 +1,20 @@
-export * from './exam';
+export type {
+  ConfirmExamReviewRequest,
+  ConfirmExamReviewResponse,
+  DeleteExamReviewResponse,
+  ExamReview,
+  ExamReviewDetailResponse,
+  ExamReviewDetailResult,
+  ExamReviews,
+  ExamReviewSearchParams,
+  ExamReviewSort,
+  ExamReviewsResponse,
+  ExamType,
+  LectureType,
+  Semester,
+  Status,
+  UpdateExamReviewPost,
+  UpdateExamReviewRequest,
+  UpdateExamReviewResponse,
+} from './exam';
+export { EXAM_REVIEW_SORTS, isExamReviewSort } from './exam';

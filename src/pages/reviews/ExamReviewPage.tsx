@@ -13,11 +13,11 @@ import {
   ExamSearch,
   ExamTable,
 } from '@/domains/Reviews/components';
+import { isExamReviewSort } from '@/domains/Reviews/types';
 import type {
   ExamReview,
   ExamReviewDetailResult,
   ExamReviewSearchParams,
-  ExamReviewSort,
   Semester,
 } from '@/domains/Reviews/types';
 import {
@@ -26,11 +26,6 @@ import {
 } from '@/domains/Reviews/utils';
 
 import { getExamReviewDetail } from '@/apis';
-
-const EXAM_REVIEW_SORTS: ExamReviewSort[] = ['ASC', 'DESC', 'REPORT'];
-
-const isExamReviewSort = (value: string): value is ExamReviewSort =>
-  EXAM_REVIEW_SORTS.includes(value as ExamReviewSort);
 
 export default function ExamReviewPage() {
   const queryClient = useQueryClient();

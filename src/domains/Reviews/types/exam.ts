@@ -14,7 +14,14 @@ export type ExamType = (typeof EXAM_TYPE)[keyof typeof EXAM_TYPE];
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 
-export type ExamReviewSort = 'ASC' | 'DESC' | 'REPORT';
+export const EXAM_REVIEW_SORTS = ['ASC', 'DESC', 'REPORT'] as const;
+
+export type ExamReviewSort = (typeof EXAM_REVIEW_SORTS)[number];
+
+export const isExamReviewSort = (
+  value?: string | null
+): value is ExamReviewSort =>
+  EXAM_REVIEW_SORTS.includes(value as ExamReviewSort);
 
 export interface ExamReviewSearchParams {
   startDate?: string;
