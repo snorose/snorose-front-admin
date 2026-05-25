@@ -6,7 +6,10 @@ import { toast } from 'sonner';
 import { Button, Input, Select } from '@/shared/components/ui';
 import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
 
-import type { ExamReviewSearchParams } from '@/domains/Reviews/types';
+import type {
+  ExamReviewSearchParams,
+  ExamReviewSort,
+} from '@/domains/Reviews/types';
 import {
   convertExamTypeToEnum,
   convertSemesterToEnum,
@@ -24,6 +27,11 @@ interface ExamSearchProps {
   initialExamType?: string;
   initialIsConfirmed?: boolean;
 }
+
+const EXAM_REVIEW_SORTS: ExamReviewSort[] = ['ASC', 'DESC', 'REPORT'];
+
+const isExamReviewSort = (value?: string): value is ExamReviewSort =>
+  EXAM_REVIEW_SORTS.includes(value as ExamReviewSort);
 
 export default function ExamSearch({
   onSearchChange,
@@ -49,7 +57,9 @@ export default function ExamSearch({
   const [keywordAuthor, setKeywordAuthor] =
     useState<string>(initialKeywordAuthor);
   const [keywordPost, setKeywordPost] = useState<string>(initialKeywordPost);
-  const [sort, setSort] = useState<string>(initialSort || ALL_SELECTED);
+  const [sort, setSort] = useState<string>(
+    isExamReviewSort(initialSort) ? initialSort : ALL_SELECTED
+  );
   const [semester, setSemester] = useState<string>(
     initialSemester || ALL_SELECTED
   );
@@ -122,7 +132,7 @@ export default function ExamSearch({
       params.keywordPost = targetKeywordPost.trim();
     }
 
-    if (targetSort && targetSort !== ALL_SELECTED) {
+    if (isExamReviewSort(targetSort)) {
       params.sort = targetSort;
     }
 
@@ -263,7 +273,7 @@ export default function ExamSearch({
             handleSearchWithParams({ sort: value });
           }}
         >
-          <Select.Trigger className='h-9 w-[110px] text-xs'>
+          <Select.Trigger className='h-9 w-[120px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content align='start'>
@@ -271,7 +281,13 @@ export default function ExamSearch({
               value={ALL_SELECTED}
               className='text-[12px] font-medium'
             >
-              정렬 전체
+              게시일 최신순
+            </Select.Item>
+            <Select.Item value='ASC' className='text-[12px] font-medium'>
+              제목 오름차순
+            </Select.Item>
+            <Select.Item value='DESC' className='text-[12px] font-medium'>
+              제목 내림차순
             </Select.Item>
             <Select.Item value='REPORT' className='text-[12px] font-medium'>
               신고순

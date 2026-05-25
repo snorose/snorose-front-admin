@@ -14,12 +14,14 @@ export type ExamType = (typeof EXAM_TYPE)[keyof typeof EXAM_TYPE];
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 
+export type ExamReviewSort = 'ASC' | 'DESC' | 'REPORT';
+
 export interface ExamReviewSearchParams {
   startDate?: string;
   endDate?: string;
   keywordAuthor?: string;
   keywordPost?: string;
-  sort?: string;
+  sort?: ExamReviewSort;
   lectureYear?: number;
   semester?: string;
   examType?: string;
