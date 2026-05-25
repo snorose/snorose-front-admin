@@ -259,10 +259,29 @@ export default function ExamSearch({
             </button>
           )}
         </div>
-        <Button onClick={handleSearch}>조회</Button>
-        <Button variant='outline' onClick={handleSearchOptionReset}>
-          검색 옵션 초기화
-        </Button>
+        <Input
+          type='date'
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          max={endDate || undefined}
+          className='h-9 w-[150px] text-[13px]'
+          aria-label='검색 시작일'
+        />
+        <span className='text-xs text-gray-500'>~</span>
+        <Input
+          type='date'
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          min={startDate || undefined}
+          className='h-9 w-[150px] text-[13px]'
+          aria-label='검색 종료일'
+        />
+        <div className='flex items-center gap-2'>
+          <Button onClick={handleSearch}>조회</Button>
+          <Button variant='outline' onClick={handleSearchOptionReset}>
+            검색 옵션 초기화
+          </Button>
+        </div>
       </div>
 
       {/* 필터 Select들 */}
@@ -373,26 +392,6 @@ export default function ExamSearch({
             </Select.Item>
           </Select.Content>
         </Select>
-      </div>
-
-      <div className='flex flex-wrap items-center gap-2'>
-        <Input
-          type='date'
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          max={endDate || undefined}
-          className='h-9 w-[150px] text-[13px]'
-          aria-label='검색 시작일'
-        />
-        <span className='text-xs text-gray-500'>~</span>
-        <Input
-          type='date'
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          min={startDate || undefined}
-          className='h-9 w-[150px] text-[13px]'
-          aria-label='검색 종료일'
-        />
       </div>
     </div>
   );
