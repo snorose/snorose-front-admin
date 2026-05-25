@@ -17,10 +17,3 @@ body:
       description: 수행할 구체적인 작업 항목을 나열해주세요.
     validations:
       required: true
-  - type: textarea
-    id: additional_info
-    attributes:
-      label: 📋 추가 정보
-      description: 추가로 공유할 내용이 있다면 자유롭게 작성해 주세요.
-    validations:
-      required: false
