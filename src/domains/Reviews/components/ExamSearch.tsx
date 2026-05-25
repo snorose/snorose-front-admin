@@ -6,7 +6,11 @@ import { toast } from 'sonner';
 import { Button, Input, Select } from '@/shared/components/ui';
 import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
 
-import type { ExamReviewSearchParams } from '@/domains/Reviews/types';
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
+import {
+  type ExamReviewSearchParams,
+  isExamReviewSort,
+} from '@/domains/Reviews/types';
 import {
   convertExamTypeToEnum,
   convertSemesterToEnum,
@@ -49,7 +53,9 @@ export default function ExamSearch({
   const [keywordAuthor, setKeywordAuthor] =
     useState<string>(initialKeywordAuthor);
   const [keywordPost, setKeywordPost] = useState<string>(initialKeywordPost);
-  const [sort, setSort] = useState<string>(initialSort || ALL_SELECTED);
+  const [sort, setSort] = useState<string>(
+    isExamReviewSort(initialSort) ? initialSort : ALL_SELECTED
+  );
   const [semester, setSemester] = useState<string>(
     initialSemester || ALL_SELECTED
   );
@@ -122,7 +128,7 @@ export default function ExamSearch({
       params.keywordPost = targetKeywordPost.trim();
     }
 
-    if (targetSort && targetSort !== ALL_SELECTED) {
+    if (isExamReviewSort(targetSort)) {
       params.sort = targetSort;
     }
 
@@ -213,7 +219,7 @@ export default function ExamSearch({
         <div className='relative w-[220px]'>
           <input
             type='text'
-            placeholder='시험후기 검색'
+            placeholder='시험후기명 검색'
             value={keywordPost}
             onChange={(e) => setKeywordPost(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -229,10 +235,10 @@ export default function ExamSearch({
             </button>
           )}
         </div>
-        <div className='relative w-[180px]'>
+        <div className='relative w-[260px]'>
           <input
             type='text'
-            placeholder='작성자 검색'
+            placeholder='작성자 검색 (아이디, 닉네임, 학번)'
             value={keywordAuthor}
             onChange={(e) => setKeywordAuthor(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -248,135 +254,6 @@ export default function ExamSearch({
             </button>
           )}
         </div>
-        <Button onClick={handleSearch}>조회</Button>
-        <Button variant='outline' onClick={handleSearchOptionReset}>
-          검색 옵션 초기화
-        </Button>
-      </div>
-
-      {/* 필터 Select들 */}
-      <div className='flex flex-wrap items-center gap-2'>
-        <Select
-          value={sort}
-          onValueChange={(value) => {
-            setSort(value);
-            handleSearchWithParams({ sort: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[110px] text-xs'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              정렬 전체
-            </Select.Item>
-            <Select.Item value='REPORT' className='text-[12px] font-medium'>
-              신고순
-            </Select.Item>
-          </Select.Content>
-        </Select>
-
-        <Select
-          value={semester}
-          onValueChange={(value) => {
-            setSemester(value);
-            handleSearchWithParams({ semester: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[130px] text-xs'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content
-            align='start'
-            className='max-h-[200px] overflow-y-auto'
-          >
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              전체
-            </Select.Item>
-            {SEMESTER_LIST.map((sem) => (
-              <Select.Item
-                key={sem}
-                value={sem}
-                className='text-[12px] font-medium'
-              >
-                {sem}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select>
-
-        <Select
-          value={examType}
-          onValueChange={(value) => {
-            setExamType(value);
-            handleSearchWithParams({ examType: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[100px] text-xs'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content
-            align='start'
-            className='max-h-[200px] overflow-y-auto'
-          >
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              전체
-            </Select.Item>
-            {EXAM_TYPE_LIST.map((type) => (
-              <Select.Item
-                key={type}
-                value={type}
-                className='text-[12px] font-medium'
-              >
-                {type}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select>
-
-        <Select
-          value={confirmStatus}
-          onValueChange={(value) => {
-            setConfirmStatus(value);
-            handleSearchWithParams({ confirmStatus: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[110px] text-xs'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              확인 전체
-            </Select.Item>
-            <Select.Item
-              value={CONFIRMED_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              확인완료
-            </Select.Item>
-            <Select.Item
-              value={UNCONFIRMED_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              미확인
-            </Select.Item>
-          </Select.Content>
-        </Select>
-      </div>
-
-      <div className='flex flex-wrap items-center gap-2'>
         <Input
           type='date'
           value={startDate}
@@ -394,6 +271,122 @@ export default function ExamSearch({
           className='h-9 w-[150px] text-[13px]'
           aria-label='검색 종료일'
         />
+        <div className='flex items-center gap-2'>
+          <Button onClick={handleSearch}>조회</Button>
+          <Button variant='outline' onClick={handleSearchOptionReset}>
+            검색 옵션 초기화
+          </Button>
+        </div>
+      </div>
+
+      {/* 필터 Select들 */}
+      <div className='flex flex-wrap items-center gap-2'>
+        <Select
+          value={sort}
+          onValueChange={(value) => {
+            setSort(value);
+            handleSearchWithParams({ sort: value });
+          }}
+        >
+          <Select.Trigger className='h-9 w-[150px] text-sm'>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content align='start'>
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              게시일 최신순
+            </Select.Item>
+            <Select.Item value='ASC' className='text-sm'>
+              제목 오름차순
+            </Select.Item>
+            <Select.Item value='DESC' className='text-sm'>
+              제목 내림차순
+            </Select.Item>
+            <Select.Item value='REPORT' className='text-sm'>
+              신고순
+            </Select.Item>
+          </Select.Content>
+        </Select>
+
+        <Select
+          value={semester}
+          onValueChange={(value) => {
+            setSemester(value);
+            handleSearchWithParams({ semester: value });
+          }}
+        >
+          <Select.Trigger className='h-9 w-[150px] text-sm'>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content
+            align='start'
+            className='max-h-[200px] overflow-y-auto'
+          >
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              강의 연도
+            </Select.Item>
+            {SEMESTER_LIST.map((sem) => (
+              <Select.Item key={sem} value={sem} className='text-sm'>
+                {sem}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select>
+
+        <Select
+          value={examType}
+          onValueChange={(value) => {
+            setExamType(value);
+            handleSearchWithParams({ examType: value });
+          }}
+        >
+          <Select.Trigger className='h-9 w-[150px] text-sm'>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content
+            align='start'
+            className='max-h-[200px] overflow-y-auto'
+          >
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              시험 종류
+            </Select.Item>
+            {EXAM_TYPE_LIST.map((type) => (
+              <Select.Item key={type} value={type} className='text-sm'>
+                {type}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select>
+
+        <Select
+          value={confirmStatus}
+          onValueChange={(value) => {
+            setConfirmStatus(value);
+            handleSearchWithParams({ confirmStatus: value });
+          }}
+        >
+          <Select.Trigger className='h-9 w-[150px] text-sm'>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content align='start'>
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              확인 상태 전체
+            </Select.Item>
+            <Select.Item
+              value={CONFIRMED_SELECTED}
+              className='text-sm'
+              textValue='확인완료'
+            >
+              <ExamConfirmStatusBadge status={CONFIRMED_SELECTED} />
+            </Select.Item>
+            <Select.Item
+              value={UNCONFIRMED_SELECTED}
+              className='text-sm'
+              textValue='미확인'
+            >
+              <ExamConfirmStatusBadge status={UNCONFIRMED_SELECTED} />
+            </Select.Item>
+          </Select.Content>
+        </Select>
       </div>
     </div>
   );

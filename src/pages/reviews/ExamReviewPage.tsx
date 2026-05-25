@@ -13,6 +13,7 @@ import {
   ExamSearch,
   ExamTable,
 } from '@/domains/Reviews/components';
+import { isExamReviewSort } from '@/domains/Reviews/types';
 import type {
   ExamReview,
   ExamReviewDetailResult,
@@ -82,7 +83,7 @@ export default function ExamReviewPage() {
     }
 
     const sort = searchParamsFromUrl.get('sort');
-    if (sort) {
+    if (sort && isExamReviewSort(sort)) {
       params.sort = sort;
     }
 
