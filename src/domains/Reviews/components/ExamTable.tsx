@@ -43,7 +43,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
     ),
   },
   { key: 'id', label: 'postId', width: '90px' },
-  { key: 'reviewTitle', label: '제목' },
+  { key: 'reviewTitle', label: '시험후기명' },
   { key: 'userDisplay', label: '작성자', width: '120px' },
   { key: 'uploadTime', label: '작성일', width: '150px' },
 ];
