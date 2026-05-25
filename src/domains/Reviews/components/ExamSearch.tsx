@@ -277,19 +277,16 @@ export default function ExamSearch({
             <Select.Value />
           </Select.Trigger>
           <Select.Content align='start'>
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
               게시일 최신순
             </Select.Item>
-            <Select.Item value='ASC' className='text-[12px] font-medium'>
+            <Select.Item value='ASC' className='text-sm'>
               제목 오름차순
             </Select.Item>
-            <Select.Item value='DESC' className='text-[12px] font-medium'>
+            <Select.Item value='DESC' className='text-sm'>
               제목 내림차순
             </Select.Item>
-            <Select.Item value='REPORT' className='text-[12px] font-medium'>
+            <Select.Item value='REPORT' className='text-sm'>
               신고순
             </Select.Item>
           </Select.Content>
@@ -309,18 +306,11 @@ export default function ExamSearch({
             align='start'
             className='max-h-[200px] overflow-y-auto'
           >
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              전체
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              강의 연도
             </Select.Item>
             {SEMESTER_LIST.map((sem) => (
-              <Select.Item
-                key={sem}
-                value={sem}
-                className='text-[12px] font-medium'
-              >
+              <Select.Item key={sem} value={sem} className='text-sm'>
                 {sem}
               </Select.Item>
             ))}
@@ -334,25 +324,18 @@ export default function ExamSearch({
             handleSearchWithParams({ examType: value });
           }}
         >
-          <Select.Trigger className='h-9 w-[100px] text-xs'>
+          <Select.Trigger className='h-9 w-[120px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content
             align='start'
             className='max-h-[200px] overflow-y-auto'
           >
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              전체
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              시험 종류
             </Select.Item>
             {EXAM_TYPE_LIST.map((type) => (
-              <Select.Item
-                key={type}
-                value={type}
-                className='text-[12px] font-medium'
-              >
+              <Select.Item key={type} value={type} className='text-sm'>
                 {type}
               </Select.Item>
             ))}
@@ -366,26 +349,17 @@ export default function ExamSearch({
             handleSearchWithParams({ confirmStatus: value });
           }}
         >
-          <Select.Trigger className='h-9 w-[110px] text-xs'>
+          <Select.Trigger className='h-9 w-[120px] text-xs'>
             <Select.Value />
           </Select.Trigger>
           <Select.Content align='start'>
-            <Select.Item
-              value={ALL_SELECTED}
-              className='text-[12px] font-medium'
-            >
-              확인 전체
+            <Select.Item value={ALL_SELECTED} className='text-sm'>
+              확인 상태 전체
             </Select.Item>
-            <Select.Item
-              value={CONFIRMED_SELECTED}
-              className='text-[12px] font-medium'
-            >
+            <Select.Item value={CONFIRMED_SELECTED} className='text-sm'>
               확인완료
             </Select.Item>
-            <Select.Item
-              value={UNCONFIRMED_SELECTED}
-              className='text-[12px] font-medium'
-            >
+            <Select.Item value={UNCONFIRMED_SELECTED} className='text-sm'>
               미확인
             </Select.Item>
           </Select.Content>
