@@ -1,8 +1,9 @@
 export interface AdminGetPostResponse {
   postId: number;
   encryptedUserId: string;
+  boardName: string;
   boardId: number;
-  userDisplay?: string;
+  nickName?: string;
   category?: string;
   title: string;
   content: string;
@@ -13,8 +14,9 @@ export interface AdminGetPostResponse {
   reportCount: number;
   isNotice: boolean;
   isVisible: boolean;
-  isEdited: boolean;
+  isEdited?: boolean;
   isKeywordExist: boolean;
+  adminCommonStatuses: string[];
   createdAt: string;
   updatedAt?: string;
   deletedAt?: string | null;
@@ -38,6 +40,9 @@ export interface AdminPostSearchRequest {
   isNotice?: boolean;
   isVisible?: boolean;
   isKeywordExist?: boolean;
+  keywordAuthor?: string;
+  keywordPost?: string;
+  postSearchScope?: 'TITLE_AND_CONTENT' | 'TITLE' | 'CONTENT';
   startDate?: string;
   endDate?: string;
   sortTypes?:
@@ -49,6 +54,8 @@ export interface AdminPostSearchRequest {
     | 'COMMENT_COUNT'
     | 'SCRAP_COUNT';
   sortDirection?: 'ASC' | 'DESC';
+  adminCommonStatuses?: string[];
+  content?: string;
 }
 
 export interface DeletePostResponse {

@@ -71,7 +71,6 @@ export const getBoardBadge = (boardId: number) => {
   );
 };
 
-// 상태별 Row 배경색 매핑 함수
 export const getRowStyle = (status: string) => {
   if (status.startsWith('신고누적')) {
     return 'bg-[#FFF9E6] hover:bg-[#FFF2CC] border-b border-gray-100 transition-colors text-yellow-950';
@@ -92,27 +91,14 @@ export const getRowStyle = (status: string) => {
   }
 };
 
-// 상태별 배지 스타일 매핑 함수
-export const getStatusBadgeClass = (status: string) => {
-  if (status.startsWith('신고누적')) {
-    return 'bg-[#FFF3E0] text-[#E65100] border-[#FFE0B2] hover:bg-[#FFF3E0] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-  }
-  switch (status) {
-    case '정상':
-      return 'bg-[#EBF7EE] text-[#2A7E3E] border-[#B2E2BD] hover:bg-[#EBF7EE] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-    case '삭제됨':
-      return 'bg-[#FFF0F0] text-[#D32F2F] border-[#FFCDD2] hover:bg-[#FFF0F0] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-    case '관리자삭제':
-      return 'bg-[#FFEBEB] text-[#C62828] border-[#EF9A9A] hover:bg-[#FFEBEB] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-    case '복구':
-      return 'bg-[#EBF7EE] text-[#2A7E3E] border-[#B2E2BD] hover:bg-[#EBF7EE] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-    case '관리자비공개':
-      return 'bg-[#ECEFF1] text-[#37474F] border-[#CFD8DC] hover:bg-[#ECEFF1] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-    case '비공개해제':
-      return 'bg-[#E3F2FD] text-[#0D47A1] border-[#BBDEFB] hover:bg-[#E3F2FD] font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-    default:
-      return 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-50 font-semibold text-[11px] px-2 py-0.5 rounded border cursor-pointer';
-  }
+export const stripHtmlTags = (html: string | null | undefined): string => {
+  if (!html) return '-';
+  return (
+    html
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .trim() || '-'
+  );
 };
 
 // ID 포맷터
@@ -122,18 +108,103 @@ export const formatPostId = (id: number) => `P${String(id).padStart(3, '0')}`;
 
 // 게시글 상태 결정 헬퍼 함수
 export const getPostStatus = (post: {
-  isVisible: boolean;
+  isVisible?: boolean;
   deletedAt?: string | null;
   reportCount: number;
+  adminCommonStatuses?: string[];
 }): string => {
-  if (post.deletedAt != null) {
+  const statuses = post.adminCommonStatuses || [];
+
+  if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     return '관리자삭제';
   }
-  if (!post.isVisible) {
-    return '관리자비공개';
+  if (statuses.includes('USER_DELETED')) {
+    return '유저 삭제';
   }
-  if (post.reportCount > 0) {
+  if (statuses.includes('AUTO_HIDDEN')) {
+    return '자동숨김';
+  }
+  if (statuses.includes('SANCTIONED')) {
+    return '징계';
+  }
+  if (statuses.includes('REPORTED') || post.reportCount > 0) {
     return `신고누적 (${post.reportCount})`;
+  }
+  if (post.isVisible === false) {
+    return '관리자비공개';
   }
   return '정상';
 };
+
+interface StatusBadgeInfo {
+  text: string;
+  className: string;
+}
+
+/**
+ * 게시글에 대한 상태 배지 리스트 반환 (Notion 명세 기준 최대 3개)
+ */
+export function getPostStatusBadges(post: {
+  isVisible?: boolean;
+  deletedAt?: string | null;
+  reportCount: number;
+  adminCommonStatuses?: string[];
+}): StatusBadgeInfo[] {
+  const statuses = post.adminCommonStatuses || [];
+  const badges: StatusBadgeInfo[] = [];
+
+  // 1. 신고 및 비공개 여부 (Report & Private)
+  const isReportedMultiple =
+    statuses.includes('AUTO_HIDDEN') ||
+    statuses.includes('REPORTED') ||
+    post.reportCount >= 5;
+
+  if (isReportedMultiple) {
+    badges.push({
+      text: '신고 다수',
+      className:
+        'bg-[#FEF9C3] text-[#A16207] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FEF9C3]',
+    });
+  } else if (post.isVisible === false) {
+    badges.push({
+      text: '리자 비공개',
+      className:
+        'bg-[#FFEDD5] text-[#374151] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FFEDD5]',
+    });
+  }
+
+  // 2. 징계 여부 (Sanction)
+  if (statuses.includes('SANCTIONED')) {
+    badges.push({
+      text: '징계',
+      className:
+        'bg-[#FEE2E2] text-[#DC2626] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FEE2E2]',
+    });
+  }
+
+  // 3. 삭제 여부 (Delete)
+  if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
+    badges.push({
+      text: '리자 삭제',
+      className:
+        'bg-[#F3F4F6] text-[#DC2626] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#F3F4F6]',
+    });
+  } else if (statuses.includes('USER_DELETED')) {
+    badges.push({
+      text: '유저 삭제',
+      className:
+        'bg-[#1F2937] text-white border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#1F2937]',
+    });
+  }
+
+  // 매칭되는 상태가 없는 경우 '노출' 표시
+  if (badges.length === 0) {
+    badges.push({
+      text: '노출',
+      className:
+        'bg-[#F3F4F6] text-[#6B7280] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#F3F4F6]',
+    });
+  }
+
+  return badges;
+}

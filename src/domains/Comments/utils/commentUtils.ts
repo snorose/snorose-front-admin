@@ -5,7 +5,6 @@ export {
   formatPostId,
   getBoardBadge,
   getRowStyle,
-  getStatusBadgeClass,
 } from '@/shared/utils/postCommentUtils';
 
 // 2. 댓글 상태 분류 헬퍼 함수
