@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { MemberInfo } from '@/shared/types';
-import { getPostStatus } from '@/shared/utils/postCommentUtils';
 
 import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
 
@@ -53,6 +52,36 @@ export function usePostTableState({
     searchParams.status,
   ]);
 
+  const statusParams = useMemo(() => {
+    if (
+      !searchParams.status ||
+      searchParams.status === 'all' ||
+      searchParams.status === '전체'
+    ) {
+      return {};
+    }
+    const mapping: Record<
+      string,
+      { adminCommonStatuses?: string[]; isVisible?: boolean }
+    > = {
+      신고누적: { adminCommonStatuses: ['REPORTED'] },
+      리자삭제: { adminCommonStatuses: ['ADMIN_DELETED'] },
+      유저삭제: { adminCommonStatuses: ['USER_DELETED'] },
+      자동숨김: { adminCommonStatuses: ['AUTO_HIDDEN'] },
+      징계: { adminCommonStatuses: ['SANCTIONED'] },
+      리자비공개: { isVisible: false },
+      정상: { isVisible: true },
+
+      REPORTED: { adminCommonStatuses: ['REPORTED'] },
+      ADMIN_DELETED: { adminCommonStatuses: ['ADMIN_DELETED'] },
+      USER_DELETED: { adminCommonStatuses: ['USER_DELETED'] },
+      AUTO_HIDDEN: { adminCommonStatuses: ['AUTO_HIDDEN'] },
+      SANCTIONED: { adminCommonStatuses: ['SANCTIONED'] },
+      ADMIN_HIDDEN: { isVisible: false },
+    };
+    return mapping[searchParams.status] || {};
+  }, [searchParams.status]);
+
   const {
     data: rawPosts,
     isLoading,
@@ -70,10 +99,14 @@ export function usePostTableState({
         !isNaN(Number(searchParams.boardId))
           ? Number(searchParams.boardId)
           : undefined,
-      isVisible: searchParams.isVisible,
+      isVisible:
+        searchParams.isVisible !== undefined
+          ? searchParams.isVisible
+          : statusParams.isVisible,
       isKeywordExist: searchParams.isKeywordExist,
       startDate: searchParams.startDate || undefined,
       endDate: searchParams.endDate || undefined,
+      adminCommonStatuses: statusParams.adminCommonStatuses,
     },
   });
 
@@ -82,18 +115,8 @@ export function usePostTableState({
   }, [refreshKey, refetch]);
 
   const posts = useMemo<AdminGetPostResponse[]>(() => {
-    let list = rawPosts ?? [];
-
-    if (
-      searchParams.status &&
-      searchParams.status !== 'all' &&
-      searchParams.status !== '전체'
-    ) {
-      list = list.filter((p) => getPostStatus(p) === searchParams.status);
-    }
-
-    return list;
-  }, [rawPosts, searchParams.status]);
+    return rawPosts ?? [];
+  }, [rawPosts]);
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeletePost();
