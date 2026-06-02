@@ -35,15 +35,11 @@ export function usePostTableState({
   currentPage,
 }: UsePostTableStateProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [sortBy] = useState<'reportCount' | 'createdAt'>('createdAt');
-  const [sortDir] = useState<'asc' | 'desc'>('desc');
 
-  // 닉네임 클릭 팝오버 상태
   const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
   const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(false);
 
-  // 검색 조건 변경 시 선택 초기화 및 팝오버 닫기
   useEffect(() => {
     setSelectedIds([]);
     setActivePopoverId(null);
@@ -62,16 +58,22 @@ export function usePostTableState({
     isLoading,
     error,
     hasNext,
+    totalCount,
     refetch,
   } = usePostList({
     page: currentPage,
     body: {
       encryptedUserId: searchParams.encryptedUserId,
-      boardId: searchParams.boardId,
+      boardId:
+        searchParams.boardId !== undefined &&
+        searchParams.boardId !== null &&
+        !isNaN(Number(searchParams.boardId))
+          ? Number(searchParams.boardId)
+          : undefined,
       isVisible: searchParams.isVisible,
       isKeywordExist: searchParams.isKeywordExist,
-      startDate: searchParams.startDate,
-      endDate: searchParams.endDate,
+      startDate: searchParams.startDate || undefined,
+      endDate: searchParams.endDate || undefined,
     },
   });
 
@@ -82,22 +84,16 @@ export function usePostTableState({
   const posts = useMemo<AdminGetPostResponse[]>(() => {
     let list = rawPosts ?? [];
 
-    // 상태 필터링 (클라이언트 보완 필터)
-    if (searchParams.status && searchParams.status !== '전체') {
+    if (
+      searchParams.status &&
+      searchParams.status !== 'all' &&
+      searchParams.status !== '전체'
+    ) {
       list = list.filter((p) => getPostStatus(p) === searchParams.status);
     }
 
-    return [...list].sort((a, b) => {
-      if (sortBy === 'reportCount') {
-        return sortDir === 'asc'
-          ? a.reportCount - b.reportCount
-          : b.reportCount - a.reportCount;
-      }
-      const ta = new Date(a.createdAt).getTime();
-      const tb = new Date(b.createdAt).getTime();
-      return sortDir === 'asc' ? ta - tb : tb - ta;
-    });
-  }, [rawPosts, sortBy, sortDir, searchParams.status]);
+    return list;
+  }, [rawPosts, searchParams.status]);
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeletePost();
@@ -111,7 +107,6 @@ export function usePostTableState({
     const message = `선택한 ${selectedIds.length}개의 게시글을 삭제하시겠습니까?`;
     if (!window.confirm(message)) return;
 
-    // 삭제 시 댓글도 일괄 삭제 여부 팝업
     const deleteComments = window.confirm('댓글도 모두 삭제하시겠습니까?');
 
     bulkDelete(selectedIds, {
@@ -175,7 +170,6 @@ export function usePostTableState({
     });
   };
 
-  // 체크박스 제어
   const allPostIds = posts.map((p) => p.postId);
   const isAllSelected =
     allPostIds.length > 0 && allPostIds.every((id) => selectedIds.includes(id));
@@ -196,7 +190,6 @@ export function usePostTableState({
     }
   };
 
-  // 닉네임 클릭 핸들러
   const handleNicknameClick = async (
     e: React.MouseEvent,
     post: AdminGetPostResponse
@@ -214,7 +207,7 @@ export function usePostTableState({
     setIsUserLoading(true);
 
     try {
-      const display = post.userDisplay || '익명';
+      const display = post.nickName || '익명';
       const res = await searchUsersAPI(display);
       const member = extractFirstSearchMember(res?.result);
       if (member) {
@@ -268,6 +261,7 @@ export function usePostTableState({
     handleSingleDelete,
     isDeletePending,
     isVisibilityPending,
-    hasNext: hasNext ?? posts.length > 0, // Fallback if query pagination hasNext is needed
+    hasNext: hasNext ?? posts.length > 0,
+    totalCount,
   };
 }
