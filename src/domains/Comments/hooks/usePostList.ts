@@ -22,8 +22,8 @@ export const usePostList = (params: usePostListParams) => {
   const sorted = useMemo(() => {
     return [...(normalResult.data?.data ?? [])].sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() ||
-        0 - (new Date(a.createdAt).getTime() || 0)
+        (new Date(b.createdAt).getTime() || 0) -
+        (new Date(a.createdAt).getTime() || 0)
     );
   }, [normalResult.data]);
 
@@ -33,6 +33,7 @@ export const usePostList = (params: usePostListParams) => {
     error: normalResult.error,
     hasNext: normalResult.data?.hasNext,
     totalPage: normalResult.data?.totalPage,
+    totalCount: normalResult.data?.totalCount,
     refetch: normalResult.refetch,
   };
 };

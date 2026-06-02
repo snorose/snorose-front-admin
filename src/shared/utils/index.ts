@@ -2,6 +2,7 @@ export {
   formatDateTimeForAPI,
   formatDateTimeForInput,
   formatDateTimeToMinutes,
+  formatDateTimeWithAmPm,
   formatDateTimeWithT,
 } from './date-time-formatter';
 export { downloadNotProcessedRowsExcel } from './download-not-processed-excel';

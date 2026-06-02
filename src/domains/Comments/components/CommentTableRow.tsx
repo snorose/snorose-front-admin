@@ -15,7 +15,6 @@ import {
   getBoardBadge,
   getCommentStatus,
   getRowStyle,
-  getStatusBadgeClass,
 } from '../utils/commentUtils';
 import MemberInfoPopover from './MemberInfoPopover';
 
@@ -163,7 +162,6 @@ export default function CommentTableRow({
       </Table.Cell>
       <Table.Cell className='px-3 text-center'>
         <Badge
-          className={getStatusBadgeClass(status)}
           onClick={(e) => {
             e.stopPropagation();
             onSingleVisibilityToggle(comment);

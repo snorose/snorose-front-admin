@@ -46,7 +46,7 @@ export default function PostListItem({
         className='flex min-w-0 flex-1 flex-col gap-1 text-left'
       >
         <div className='flex items-center gap-2'>
-          <span className='text-sm font-medium'>{post.userDisplay}</span>
+          <span className='text-sm font-medium'>{post.nickName}</span>
           <Badge variant='outline' className='shrink-0 text-xs'>
             {post.category}
           </Badge>

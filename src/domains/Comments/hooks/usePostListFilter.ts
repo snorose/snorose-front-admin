@@ -54,7 +54,7 @@ export default function usePostListFilter({
       if (deletedIds.includes(post.postId)) return false;
       const matchesKeyword =
         post.title.includes(keyword) ||
-        post.userDisplay?.includes(keyword) ||
+        post.nickName?.includes(keyword) ||
         String(post.postId).includes(keyword);
       const matchesCategory = category === '전체' || post.category === category;
       const matchesReport =

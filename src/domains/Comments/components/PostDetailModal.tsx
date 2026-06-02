@@ -46,8 +46,8 @@ export default function PostDetailModal({
             <div className='flex flex-col gap-1'>
               <div className='flex flex-wrap items-center gap-2'>
                 <span className='text-xs text-gray-400'>ID: {data.postId}</span>
-                <span className='text-sm text-gray-500'>
-                  {data.userDisplay}
+                <span className='text-sm font-medium text-gray-600'>
+                  {data.nickName}
                 </span>
                 <Badge variant='outline' className='text-xs'>
                   {data.category}
