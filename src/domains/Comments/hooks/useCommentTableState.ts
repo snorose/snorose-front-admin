@@ -308,5 +308,6 @@ export function useCommentTableState({
     isDeletePending,
     isVisibilityPending,
     hasNext,
+    totalCount: data?.totalCount,
   };
 }

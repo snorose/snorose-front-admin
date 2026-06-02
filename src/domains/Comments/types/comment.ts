@@ -14,6 +14,10 @@ export interface AdminCommentResponse {
   updatedAt?: string | null;
   deletedAt?: string | null;
   statusType?: string | null;
+  category?: string;
+  likeCount?: number;
+  postTitle?: string;
+  title?: string;
 }
 
 export interface AdminCommentSearchRequest {
