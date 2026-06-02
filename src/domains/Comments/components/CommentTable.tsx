@@ -81,51 +81,53 @@ export default function CommentTable({
         <div className='w-full overflow-x-auto'>
           <Table className='w-full min-w-[1250px] table-fixed text-[13px]'>
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
-              <Table.Head
-                style={{ width: '40px' }}
-                className='px-3 text-center'
-              >
-                <input
-                  type='checkbox'
-                  ref={selectAllRef}
-                  checked={isAllSelected}
-                  onChange={handleSelectAll}
-                  className='cursor-pointer rounded border-gray-300'
-                />
-              </Table.Head>
-              <Table.Head style={{ width: '180px' }} className='px-3 text-xs'>
-                게시 시각 (비공개일)
-              </Table.Head>
-              <Table.Head style={{ width: '110px' }} className='px-3 text-xs'>
-                게시판
-              </Table.Head>
-              <Table.Head style={{ width: '120px' }} className='px-3 text-xs'>
-                닉네임 (클릭 드롭다운)
-              </Table.Head>
-              <Table.Head style={{ width: '80px' }} className='px-3 text-xs'>
-                댓글 ID
-              </Table.Head>
-              <Table.Head style={{ width: '95px' }} className='px-3 text-xs'>
-                상위 댓글 ID
-              </Table.Head>
-              <Table.Head style={{ width: '85px' }} className='px-3 text-xs'>
-                게시글 ID
-              </Table.Head>
-              <Table.Head style={{ width: '330px' }} className='px-3 text-xs'>
-                내용 (더블클릭 상세조회)
-              </Table.Head>
-              <Table.Head
-                style={{ width: '120px' }}
-                className='px-3 text-center text-xs'
-              >
-                상태
-              </Table.Head>
-              <Table.Head
-                style={{ width: '100px' }}
-                className='px-3 text-center text-xs'
-              >
-                의심 키워드
-              </Table.Head>
+              <Table.Row>
+                <Table.Head
+                  style={{ width: '40px' }}
+                  className='px-3 text-center'
+                >
+                  <input
+                    type='checkbox'
+                    ref={selectAllRef}
+                    checked={isAllSelected}
+                    onChange={handleSelectAll}
+                    className='cursor-pointer rounded border-gray-300'
+                  />
+                </Table.Head>
+                <Table.Head style={{ width: '180px' }} className='px-3 text-xs'>
+                  게시 시각 (비공개일)
+                </Table.Head>
+                <Table.Head style={{ width: '110px' }} className='px-3 text-xs'>
+                  게시판
+                </Table.Head>
+                <Table.Head style={{ width: '120px' }} className='px-3 text-xs'>
+                  닉네임 (클릭 드롭다운)
+                </Table.Head>
+                <Table.Head style={{ width: '80px' }} className='px-3 text-xs'>
+                  댓글 ID
+                </Table.Head>
+                <Table.Head style={{ width: '95px' }} className='px-3 text-xs'>
+                  상위 댓글 ID
+                </Table.Head>
+                <Table.Head style={{ width: '85px' }} className='px-3 text-xs'>
+                  게시글 ID
+                </Table.Head>
+                <Table.Head style={{ width: '330px' }} className='px-3 text-xs'>
+                  내용 (더블클릭 상세조회)
+                </Table.Head>
+                <Table.Head
+                  style={{ width: '120px' }}
+                  className='px-3 text-center text-xs'
+                >
+                  상태
+                </Table.Head>
+                <Table.Head
+                  style={{ width: '100px' }}
+                  className='px-3 text-center text-xs'
+                >
+                  의심 키워드
+                </Table.Head>
+              </Table.Row>
             </Table.Header>
 
             <Table.Body>
