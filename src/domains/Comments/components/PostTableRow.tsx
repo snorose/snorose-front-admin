@@ -128,7 +128,9 @@ export default function PostTableRow({
 
       {/* 4. 게시판 */}
       <Table.Cell className='px-3'>
-        <span className={board.className}>{post.boardName || board.name}</span>
+        <Badge variant='unstyled' className={board.className}>
+          {post.boardName || board.name}
+        </Badge>
       </Table.Cell>
 
       {/* 5. 카테고리 */}
