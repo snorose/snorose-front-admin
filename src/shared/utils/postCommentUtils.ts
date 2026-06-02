@@ -1,74 +1,17 @@
-// 게시판 이름 매핑 및 배지 스타일 (함박눈방, 첫눈온방, 만년설방, 시험후기)
-export const getBoardBadge = (boardId: number) => {
-  const mapping: Record<number, { name: string; className: string }> = {
-    1: {
-      name: '함박눈방',
-      className:
-        'bg-[#F3E8FF] text-[#6B21A8] hover:bg-[#F3E8FF] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    11: {
-      name: '함박눈방',
-      className:
-        'bg-[#F3E8FF] text-[#6B21A8] hover:bg-[#F3E8FF] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    21: {
-      name: '함박눈방',
-      className:
-        'bg-[#F3E8FF] text-[#6B21A8] hover:bg-[#F3E8FF] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    2: {
-      name: '첫눈온방',
-      className:
-        'bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    12: {
-      name: '첫눈온방',
-      className:
-        'bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    22: {
-      name: '첫눈온방',
-      className:
-        'bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    3: {
-      name: '만년설방',
-      className:
-        'bg-[#E0F7FA] text-[#006064] hover:bg-[#E0F7FA] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    13: {
-      name: '만년설방',
-      className:
-        'bg-[#E0F7FA] text-[#006064] hover:bg-[#E0F7FA] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    23: {
-      name: '만년설방',
-      className:
-        'bg-[#E0F7FA] text-[#006064] hover:bg-[#E0F7FA] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    4: {
-      name: '시험후기',
-      className:
-        'bg-[#FCE7F3] text-[#9D174D] hover:bg-[#FCE7F3] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    14: {
-      name: '시험후기',
-      className:
-        'bg-[#FCE7F3] text-[#9D174D] hover:bg-[#FCE7F3] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    24: {
-      name: '시험후기',
-      className:
-        'bg-[#FCE7F3] text-[#9D174D] hover:bg-[#FCE7F3] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-  };
-  return (
-    mapping[boardId] || {
-      name: `게시판 ${boardId}`,
-      className:
-        'bg-gray-100 text-gray-700 font-semibold px-2 py-0.5 rounded-full',
-    }
-  );
+// boardId → 게시판 이름 (백엔드에서 boardName 내려오기 전까지 임시 사용)
+export const BOARD_NAMES: Record<number, string> = {
+  1: '함박눈방',
+  11: '함박눈방',
+  21: '함박눈방',
+  2: '첫눈온방',
+  12: '첫눈온방',
+  22: '첫눈온방',
+  3: '만년설방',
+  13: '만년설방',
+  23: '만년설방',
+  4: '시험후기',
+  14: '시험후기',
+  24: '시험후기',
 };
 
 export const getRowStyle = (status: string) => {
@@ -142,7 +85,7 @@ interface StatusBadgeInfo {
 }
 
 /**
- * 게시글에 대한 상태 배지 리스트 반환 (Notion 명세 기준 최대 3개)
+ * 게시글에 대한 상태 배지 리스트 반환
  */
 export function getPostStatusBadges(post: {
   isVisible?: boolean;
@@ -173,7 +116,7 @@ export function getPostStatusBadges(post: {
     });
   }
 
-  // 2. 징계 여부 (Sanction)
+  // 2. 징계 여부
   if (statuses.includes('SANCTIONED')) {
     badges.push({
       text: '징계',
@@ -182,7 +125,7 @@ export function getPostStatusBadges(post: {
     });
   }
 
-  // 3. 삭제 여부 (Delete)
+  // 3. 삭제 여부
   if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     badges.push({
       text: '리자 삭제',

@@ -15,7 +15,6 @@ import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import {
   formatPostId,
-  getBoardBadge,
   getPostStatus,
   getPostStatusBadges,
 } from '@/shared/utils/postCommentUtils';
@@ -49,7 +48,6 @@ export default function PostTableRow({
 }: PostTableRowProps) {
   const navigate = useNavigate();
   const status = getPostStatus(post);
-  const board = getBoardBadge(post.boardId);
 
   return (
     <Table.Row
@@ -79,9 +77,9 @@ export default function PostTableRow({
       {/* 2. 제목/내용 미리보기 */}
       <Table.Cell
         className='cursor-pointer px-3 py-2 select-text'
-        onDoubleClick={(e) => {
+        onClick={(e) => {
           e.stopPropagation();
-          navigate(`/posts/${post.postId}`);
+          navigate(`/posts/manage/${post.postId}`);
         }}
       >
         <div className='flex max-w-[380px] flex-col gap-1'>
@@ -128,9 +126,7 @@ export default function PostTableRow({
 
       {/* 4. 게시판 */}
       <Table.Cell className='px-3'>
-        <Badge variant='unstyled' className={board.className}>
-          {post.boardName || board.name}
-        </Badge>
+        <Badge variant='unstyled'>{post.boardName}</Badge>
       </Table.Cell>
 
       {/* 5. 카테고리 */}
