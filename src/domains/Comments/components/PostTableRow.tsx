@@ -34,7 +34,6 @@ interface PostTableRowProps {
   isUserLoading: boolean;
   onClosePopover: () => void;
   onPageChange: (page: number | ((prev: number) => number)) => void;
-  onSingleDelete: (postId: number) => void;
 }
 
 export default function PostTableRow({
@@ -47,7 +46,6 @@ export default function PostTableRow({
   isUserLoading,
   onClosePopover,
   onPageChange,
-  onSingleDelete,
 }: PostTableRowProps) {
   const navigate = useNavigate();
   const status = getPostStatus(post);
@@ -198,22 +196,8 @@ export default function PostTableRow({
       <Table.Cell className='px-3 text-center'>
         <div className='flex flex-wrap items-center justify-center gap-1'>
           {getPostStatusBadges(post).map((badge, idx) => {
-            const isClickable =
-              badge.text !== '리자 삭제' && badge.text !== '유저 삭제';
             return (
-              <Badge
-                key={idx}
-                className={cn(
-                  badge.className,
-                  isClickable && 'cursor-pointer hover:opacity-80'
-                )}
-                onClick={(e) => {
-                  if (isClickable) {
-                    e.stopPropagation();
-                    onSingleDelete(post.postId);
-                  }
-                }}
-              >
+              <Badge key={idx} className={badge.className}>
                 {badge.text}
               </Badge>
             );

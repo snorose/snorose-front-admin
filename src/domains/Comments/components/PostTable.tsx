@@ -45,7 +45,6 @@ export default function PostTable({
     handleBulkDelete,
     handleBulkVisibility,
     handleBulkRestore,
-    handleSingleDelete,
     isDeletePending,
     isVisibilityPending,
     hasNext,
@@ -175,7 +174,6 @@ export default function PostTable({
                     isUserLoading={isUserLoading}
                     onClosePopover={() => setActivePopoverId(null)}
                     onPageChange={onPageChange}
-                    onSingleDelete={handleSingleDelete}
                   />
                 ))
               )}
