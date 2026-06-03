@@ -1,5 +1,10 @@
 import { axiosInstance } from '@/shared/axios/instance';
 import type {
+  AdminInquiryCommentCreateRequest,
+  AdminInquiryCommentCreateResponse,
+  AdminInquiryCommentDeleteResponse,
+  AdminInquiryCommentUpdateRequest,
+  AdminInquiryCommentUpdateResponse,
   AdminInquiryDetailResponse,
   AdminInquiryListResponse,
   AdminInquiryStatusUpdateRequest,
@@ -46,5 +51,39 @@ export const updateAdminInquiryStatusAPI = async (
     `/v1/admin/inquiries/${inquiryId}/status`,
     data
   );
+  return response.data;
+};
+
+export const createInquiryCommentAPI = async (
+  postId: number,
+  data: AdminInquiryCommentCreateRequest
+): Promise<AdminInquiryCommentCreateResponse> => {
+  const response = await axiosInstance.post<AdminInquiryCommentCreateResponse>(
+    `/v1/posts/${postId}/comments`,
+    data
+  );
+  return response.data;
+};
+
+export const updateInquiryCommentAPI = async (
+  postId: number,
+  commentId: number,
+  data: AdminInquiryCommentUpdateRequest
+): Promise<AdminInquiryCommentUpdateResponse> => {
+  const response = await axiosInstance.patch<AdminInquiryCommentUpdateResponse>(
+    `/v1/posts/${postId}/comments/${commentId}`,
+    data
+  );
+  return response.data;
+};
+
+export const deleteInquiryCommentAPI = async (
+  postId: number,
+  commentId: number
+): Promise<AdminInquiryCommentDeleteResponse> => {
+  const response =
+    await axiosInstance.delete<AdminInquiryCommentDeleteResponse>(
+      `/v1/posts/${postId}/comments/${commentId}`
+    );
   return response.data;
 };
