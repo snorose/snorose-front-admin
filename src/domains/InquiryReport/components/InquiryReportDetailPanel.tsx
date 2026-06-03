@@ -102,19 +102,25 @@ export default function InquiryReportDetailPanel({
     commentInput.trim().length > 0 &&
     commentInput.trim().length <= INQUIRY_COMMENT_MAX_LENGTH;
 
-  const handleCommentSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleCommentSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedComment = commentInput.trim();
     if (!trimmedComment) return;
     if (trimmedComment.length > INQUIRY_COMMENT_MAX_LENGTH) return;
 
-    await createComment.mutateAsync({
-      parentId: replyParentId,
-      content: trimmedComment,
-    });
-    setCommentInput('');
-    setReplyParentId(null);
+    createComment.mutate(
+      {
+        parentId: replyParentId,
+        content: trimmedComment,
+      },
+      {
+        onSuccess: () => {
+          setCommentInput('');
+          setReplyParentId(null);
+        },
+      }
+    );
   };
 
   const handleReplyStart = (commentId: number) => {
@@ -137,32 +143,44 @@ export default function InquiryReportDetailPanel({
     setEditingCommentValue('');
   };
 
-  const handleCommentEditSubmit = async (commentId: number) => {
+  const handleCommentEditSubmit = (commentId: number) => {
     const editingComment = findComment(comments, commentId);
     if (!editingComment || !canManageComment(editingComment)) return;
 
     const trimmedComment = editingCommentValue.trim();
     if (!trimmedComment) return;
+    if (trimmedComment.length > INQUIRY_COMMENT_MAX_LENGTH) return;
 
-    await updateComment.mutateAsync({
-      commentId,
-      content: trimmedComment,
-    });
-    handleCommentEditCancel();
+    updateComment.mutate(
+      {
+        commentId,
+        content: trimmedComment,
+      },
+      {
+        onSuccess: handleCommentEditCancel,
+      }
+    );
   };
 
-  const handleCommentDelete = async (commentId: number) => {
+  const handleCommentDelete = (commentId: number) => {
     const targetComment = findComment(comments, commentId);
     if (!targetComment || !canManageComment(targetComment)) return;
 
-    await deleteComment.mutateAsync(commentId);
-    handleCommentEditCancel();
+    deleteComment.mutate(commentId, {
+      onSuccess: handleCommentEditCancel,
+    });
   };
 
   const handleAuthorLoginIdCopy = async () => {
     if (!canCopyAuthorLoginId) return;
 
-    await navigator.clipboard.writeText(detail.userLoginId);
+    if (!navigator.clipboard) return;
+
+    try {
+      await navigator.clipboard.writeText(detail.userLoginId);
+    } catch {
+      return;
+    }
   };
 
   return (
