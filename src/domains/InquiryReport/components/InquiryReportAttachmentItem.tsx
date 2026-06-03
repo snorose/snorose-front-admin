@@ -10,11 +10,20 @@ export default function InquiryReportAttachmentItem({
   if (attachment.type === 'PHOTO') {
     return (
       <li className='flex flex-col gap-1'>
-        <img
-          src={attachment.url}
-          alt={attachment.fileName}
-          className='w-full rounded border border-gray-200 object-contain'
-        />
+        <a
+          href={attachment.url}
+          target='_blank'
+          rel='noopener noreferrer'
+          aria-label={`${attachment.fileName} 새 창에서 보기`}
+          title='새 창에서 보기'
+          className='block rounded border border-gray-200 transition hover:border-slate-300 hover:shadow-sm'
+        >
+          <img
+            src={attachment.url}
+            alt={attachment.fileName}
+            className='w-full rounded object-contain'
+          />
+        </a>
         {attachment.fileComment && (
           <span className='text-[12px] text-gray-500'>
             {attachment.fileComment}

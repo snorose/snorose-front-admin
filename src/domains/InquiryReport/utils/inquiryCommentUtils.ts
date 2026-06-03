@@ -4,28 +4,6 @@ export function canManageComment(comment: InquiryComment) {
   return Boolean(comment.isWriter && comment.isVisible && !comment.isDeleted);
 }
 
-export function createMockAdminComment(
-  postId: number,
-  content: string
-): InquiryComment {
-  return {
-    id: Date.now(),
-    postId,
-    userId: 'admin',
-    userRoleId: 5,
-    userDisplay: 'admin',
-    isWriter: true,
-    isWriterWithdrawn: false,
-    content,
-    createdAt: new Date().toISOString(),
-    updatedAt: null,
-    isVisible: true,
-    isUpdated: false,
-    isDeleted: false,
-    children: [],
-  };
-}
-
 export function getCommentAuthorDisplay(comment: InquiryComment) {
   return comment.isWriterWithdrawn ? '탈퇴한 사용자' : comment.userDisplay;
 }
@@ -59,19 +37,4 @@ export function findComment(
   }
 
   return null;
-}
-
-export function updateCommentTree(
-  comments: InquiryComment[],
-  commentId: number,
-  updater: (comment: InquiryComment) => InquiryComment
-): InquiryComment[] {
-  return comments.map((comment) => {
-    if (comment.id === commentId) return updater(comment);
-
-    return {
-      ...comment,
-      children: updateCommentTree(comment.children, commentId, updater),
-    };
-  });
 }

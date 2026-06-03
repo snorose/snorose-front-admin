@@ -15,9 +15,8 @@ import {
   INQUIRY_GROUP_LABELS,
   INQUIRY_SUB_GROUP_LABELS,
 } from '@/domains/InquiryReport/constants/inquiryReportLabels';
+import { useInquiryList } from '@/domains/InquiryReport/hooks';
 import { ExamReviewTablePagination } from '@/domains/Reviews/components';
-
-import { INQUIRY_REPORT_SAMPLE_DATA } from '@/__mocks__';
 
 import InquiryStatusSelect from './InquiryStatusSelect';
 
@@ -26,7 +25,6 @@ interface InquiryReportTableProps {
   onPageChange: (page: number | ((prev: number) => number)) => void;
   selectedPostId: number | null;
   onRowSelect: (postId: number | null) => void;
-  statusByPostId: Record<number, InquiryStatus>;
   onStatusChange: (
     inquiryId: number,
     status: InquiryStatus
@@ -37,6 +35,7 @@ const GROUP_OPTIONS = [
   { label: '분류', value: 'ALL' },
   { label: '문의', value: 'INQUIRY' },
   { label: '신고', value: 'REPORT' },
+  { label: '기타', value: 'ETC' },
 ] as const;
 
 const INQUIRY_SUB_GROUP_OPTIONS = [
@@ -59,12 +58,13 @@ const STATUS_OPTIONS = [
   { label: '답변여부', value: 'ALL' },
   { label: '답변 전', value: 'PENDING' },
   { label: '답변 완료', value: 'COMPLETED' },
-  { label: '보류', value: 'HOLD' },
+  // TODO: 백엔드 HOLD 상태 지원 후 주석 해제
+  // { label: '보류', value: 'HOLD' },
 ] as const;
 
 const PAGE_SIZE = 10;
 
-type GroupFilter = (typeof GROUP_OPTIONS)[number]['value'];
+type GroupFilter = InquiryGroup | 'ALL';
 type StatusFilter = (typeof STATUS_OPTIONS)[number]['value'];
 type SubGroupFilter = InquirySubGroup | 'ALL';
 
@@ -73,13 +73,11 @@ export default function InquiryReportTable({
   onPageChange,
   selectedPostId,
   onRowSelect,
-  statusByPostId,
   onStatusChange,
 }: InquiryReportTableProps) {
   const [groupFilter, setGroupFilter] = useState<GroupFilter>('ALL');
   const [subGroupFilter, setSubGroupFilter] = useState<SubGroupFilter>('ALL');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
-  const [isLoading] = useState(false);
 
   const subGroupOptions = useMemo(() => {
     if (groupFilter === 'INQUIRY') return INQUIRY_SUB_GROUP_OPTIONS;
@@ -92,16 +90,17 @@ export default function InquiryReportTable({
     ];
   }, [groupFilter]);
 
+  const { data, isLoading } = useInquiryList();
+
   const filteredInquiries = useMemo(() => {
-    return INQUIRY_REPORT_SAMPLE_DATA.filter((inquiry) => {
-      const inquiryStatus = getInquiryStatus(inquiry, statusByPostId);
+    return (data ?? []).filter((inquiry) => {
       return (
         (groupFilter === 'ALL' || inquiry.group === groupFilter) &&
         (subGroupFilter === 'ALL' || inquiry.subGroup === subGroupFilter) &&
-        (statusFilter === 'ALL' || inquiryStatus === statusFilter)
+        (statusFilter === 'ALL' || inquiry.status === statusFilter)
       );
     });
-  }, [groupFilter, statusByPostId, statusFilter, subGroupFilter]);
+  }, [data, groupFilter, subGroupFilter, statusFilter]);
 
   const inquiries = useMemo(() => {
     const pageStartIndex = (currentPage - 1) * PAGE_SIZE;
@@ -109,7 +108,7 @@ export default function InquiryReportTable({
   }, [currentPage, filteredInquiries]);
 
   const totalPage = Math.ceil(filteredInquiries.length / PAGE_SIZE);
-  const hasNext = filteredInquiries.length > currentPage * PAGE_SIZE;
+  const hasNext = currentPage < totalPage;
   const pageStartNumber = (currentPage - 1) * PAGE_SIZE;
   const isEmpty = !isLoading && inquiries.length === 0;
   const isDetailOpen = selectedPostId !== null;
@@ -162,7 +161,7 @@ export default function InquiryReportTable({
 
         <div className='relative'>
           <Select
-            disabled={groupFilter === 'ALL'}
+            disabled={groupFilter === 'ALL' || groupFilter === 'ETC'}
             value={subGroupFilter}
             onValueChange={(value) => {
               setSubGroupFilter(value as SubGroupFilter);
@@ -170,7 +169,7 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[160px] ${groupFilter === 'ALL' ? 'bg-gray-50' : subGroupFilter !== 'ALL' ? 'bg-blue-50' : 'bg-white'}`}
+              className={`h-9 w-[160px] ${groupFilter === 'ALL' || groupFilter === 'ETC' ? 'bg-gray-50' : subGroupFilter !== 'ALL' ? 'bg-blue-50' : 'bg-white'}`}
             >
               <Select.Value />
             </Select.Trigger>
@@ -235,41 +234,41 @@ export default function InquiryReportTable({
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
-            className={`w-full ${isDetailOpen ? 'min-w-[608px]' : 'min-w-[1010px]'} table-fixed text-[13px]`}
+            className={`w-full ${isDetailOpen ? 'min-w-[560px]' : 'min-w-[1040px]'} table-fixed text-[13px]`}
           >
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
               <Table.Row>
                 <Table.Head
-                  style={{ width: '72px' }}
+                  style={{ width: '64px' }}
                   className='px-3 text-center'
                 >
                   번호
                 </Table.Head>
                 <Table.Head
-                  style={{ width: '96px' }}
+                  style={{ width: '88px' }}
                   className='px-3 text-center'
                 >
                   분류
                 </Table.Head>
-                <Table.Head style={{ width: '150px' }} className='px-3'>
+                <Table.Head style={{ width: '160px' }} className='px-3'>
                   중분류
                 </Table.Head>
-                <Table.Head style={{ width: '180px' }} className='px-3'>
+                <Table.Head style={{ width: '124px' }} className='px-3'>
                   아이디
                 </Table.Head>
                 <Table.Head
-                  style={{ width: '110px' }}
+                  style={{ width: '120px' }}
                   className='px-3 text-center'
                 >
                   답변여부
                 </Table.Head>
                 {!isDetailOpen && (
-                  <Table.Head style={{ width: '252px' }} className='px-3'>
+                  <Table.Head style={{ width: '328px' }} className='px-3'>
                     제목
                   </Table.Head>
                 )}
                 {!isDetailOpen && (
-                  <Table.Head style={{ width: '150px' }} className='px-3'>
+                  <Table.Head style={{ width: '156px' }} className='px-3'>
                     작성일
                   </Table.Head>
                 )}
@@ -302,10 +301,7 @@ export default function InquiryReportTable({
                 </Table.Row>
               ) : (
                 inquiries.map((inquiry, index) => {
-                  const inquiryStatus = getInquiryStatus(
-                    inquiry,
-                    statusByPostId
-                  );
+                  const inquiryStatus = inquiry.status;
 
                   return (
                     <Table.Row
@@ -395,12 +391,5 @@ function getSubGroupLabel(subGroup: InquirySubGroup) {
 }
 
 function getUserDisplay(inquiry: InquiryListItem) {
-  return `${inquiry.userLoginId}(${inquiry.userId})`;
-}
-
-function getInquiryStatus(
-  inquiry: InquiryListItem,
-  statusByPostId: Record<number, InquiryStatus>
-) {
-  return statusByPostId[inquiry.postId] ?? inquiry.status;
+  return inquiry.userLoginId;
 }

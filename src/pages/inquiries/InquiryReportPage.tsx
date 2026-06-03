@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { toast } from 'sonner';
-
 import { PageHeader } from '@/shared/components';
 import type { InquiryStatus } from '@/shared/types';
 
@@ -10,24 +8,13 @@ import {
   InquiryReportDetailPanel,
   InquiryReportTable,
 } from '@/domains/InquiryReport';
-
-import { INQUIRY_REPORT_SAMPLE_DATA } from '@/__mocks__';
+import { useUpdateInquiryStatus } from '@/domains/InquiryReport/hooks';
 
 export default function InquiryReportPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
-  const [statusByPostId, setStatusByPostId] = useState<
-    Record<number, InquiryStatus>
-  >(() =>
-    INQUIRY_REPORT_SAMPLE_DATA.reduce<Record<number, InquiryStatus>>(
-      (acc, inquiry) => {
-        acc[inquiry.postId] = inquiry.status;
-        return acc;
-      },
-      {}
-    )
-  );
+  const { mutateAsync: updateStatus } = useUpdateInquiryStatus();
 
   const handlePageChange = (
     pageOrUpdater: number | ((prev: number) => number)
@@ -46,14 +33,7 @@ export default function InquiryReportPage() {
     inquiryId: number,
     nextStatus: InquiryStatus
   ) => {
-    // TODO: API 완성 후 updateAdminInquiryStatusAPI(inquiryId, { status: nextStatus }) 호출로 전환
-    await new Promise((resolve) => setTimeout(resolve, 150));
-
-    setStatusByPostId((prev) => ({
-      ...prev,
-      [inquiryId]: nextStatus,
-    }));
-    toast.success('문의 및 신고 상태가 변경되었습니다.');
+    await updateStatus({ inquiryId, status: nextStatus });
   };
 
   return (
@@ -70,7 +50,6 @@ export default function InquiryReportPage() {
             onPageChange={handlePageChange}
             selectedPostId={selectedPostId}
             onRowSelect={setSelectedPostId}
-            statusByPostId={statusByPostId}
             onStatusChange={handleStatusChange}
           />
         </div>
@@ -79,7 +58,6 @@ export default function InquiryReportPage() {
             <InquiryReportDetailPanel
               postId={selectedPostId}
               onClose={() => setSelectedPostId(null)}
-              status={statusByPostId[selectedPostId]}
               onStatusChange={handleStatusChange}
             />
           </div>

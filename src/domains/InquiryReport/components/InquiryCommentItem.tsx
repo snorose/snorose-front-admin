@@ -4,6 +4,7 @@ import { Button, DropdownMenu, Textarea } from '@/shared/components/ui';
 import type { InquiryComment } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
+import { INQUIRY_COMMENT_MAX_LENGTH } from '@/domains/InquiryReport/constants/inquiryCommentValidation';
 import {
   canManageComment,
   getCommentDisplayContent,
@@ -45,6 +46,9 @@ export default function InquiryCommentItem({
     ? '탈퇴한 사용자'
     : comment.userDisplay;
   const isAdminComment = isCommentWrittenByAdmin(comment);
+  const isEditingCommentValid =
+    editingCommentValue.trim().length > 0 &&
+    editingCommentValue.trim().length <= INQUIRY_COMMENT_MAX_LENGTH;
 
   return (
     <li className={depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-3' : ''}>
@@ -118,26 +122,32 @@ export default function InquiryCommentItem({
             <Textarea
               value={editingCommentValue}
               onChange={(event) => onEditingValueChange(event.target.value)}
+              maxLength={INQUIRY_COMMENT_MAX_LENGTH}
               className='min-h-20 resize-none bg-white text-[13px]'
             />
-            <div className='flex justify-end gap-2'>
-              <Button
-                type='button'
-                size='sm'
-                variant='outline'
-                onClick={onEditCancel}
-              >
-                취소
-              </Button>
-              <Button
-                type='button'
-                size='sm'
-                disabled={!editingCommentValue.trim()}
-                className='bg-slate-900 text-white hover:bg-slate-700'
-                onClick={() => onEditSubmit(comment.id)}
-              >
-                저장
-              </Button>
+            <div className='flex items-center justify-between gap-2'>
+              <span className='text-[11px] text-gray-400'>
+                {editingCommentValue.length}/{INQUIRY_COMMENT_MAX_LENGTH}
+              </span>
+              <div className='flex justify-end gap-2'>
+                <Button
+                  type='button'
+                  size='sm'
+                  variant='outline'
+                  onClick={onEditCancel}
+                >
+                  취소
+                </Button>
+                <Button
+                  type='button'
+                  size='sm'
+                  disabled={!isEditingCommentValid}
+                  className='bg-slate-900 text-white hover:bg-slate-700'
+                  onClick={() => onEditSubmit(comment.id)}
+                >
+                  저장
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
