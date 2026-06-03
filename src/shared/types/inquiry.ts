@@ -1,3 +1,5 @@
+import type { ApiResponse } from './common';
+
 export type InquiryGroup = 'INQUIRY' | 'REPORT' | 'ETC';
 
 export type InquirySubGroup =
@@ -84,32 +86,63 @@ export type InquiryDetail = {
   attachments: InquiryAttachment[];
 };
 
-export type AdminInquiryListResponse = {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    hasNext: boolean;
-    data: InquiryListItem[];
-  };
+export type InquiryComment = {
+  id: number;
+  postId: number;
+  encryptedUserId?: string;
+  userId?: string;
+  userRoleId: number;
+  userDisplay: string;
+  isWriter: boolean;
+  isWriterWithdrawn: boolean;
+  content: string;
+  createdAt: string;
+  updatedAt: string | null;
+  isVisible: boolean;
+  isUpdated: boolean;
+  isDeleted: boolean;
+  children: InquiryComment[];
 };
 
-export type AdminInquiryDetailResponse = {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: InquiryDetail;
+export type AdminInquiryCommentListResponse = ApiResponse<{
+  hasNext: boolean;
+  data: InquiryComment[];
+}>;
+
+export type AdminInquiryCommentCreateRequest = {
+  parentId: number | null;
+  content: string;
 };
+
+export type AdminInquiryCommentMutationResult = InquiryComment & {
+  parentId: number | null;
+  pointDifference?: number;
+};
+
+export type AdminInquiryCommentCreateResponse =
+  ApiResponse<AdminInquiryCommentMutationResult>;
+
+export type AdminInquiryCommentUpdateRequest = {
+  content: string;
+};
+
+export type AdminInquiryCommentUpdateResponse =
+  ApiResponse<AdminInquiryCommentMutationResult>;
+
+export type AdminInquiryCommentDeleteResponse =
+  ApiResponse<AdminInquiryCommentMutationResult>;
+
+export type AdminInquiryListResponse = ApiResponse<{
+  hasNext: boolean;
+  data: InquiryListItem[];
+}>;
+
+export type AdminInquiryDetailResponse = ApiResponse<InquiryDetail>;
 
 export type AdminInquiryStatusUpdateRequest = {
   status: InquiryStatus;
 };
 
-export type AdminInquiryStatusUpdateResponse = {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    inquiryId: number;
-  };
-};
+export type AdminInquiryStatusUpdateResponse = ApiResponse<{
+  inquiryId: number;
+}>;
