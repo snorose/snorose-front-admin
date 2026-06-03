@@ -1,6 +1,9 @@
-import { ExternalLink, Paperclip, X } from 'lucide-react';
+import { type FormEvent, useEffect, useState } from 'react';
 
-import type { InquiryAttachment, InquiryStatus } from '@/shared/types';
+import { ExternalLink, Send, X } from 'lucide-react';
+
+import { Button, Textarea } from '@/shared/components/ui';
+import type { InquiryComment, InquiryStatus } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
@@ -9,8 +12,21 @@ import {
   INQUIRY_SUB_GROUP_LABELS,
 } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 
-import { INQUIRY_DETAIL_MOCK_DATA } from '@/__mocks__';
+import {
+  INQUIRY_COMMENT_MOCK_DATA,
+  INQUIRY_DETAIL_MOCK_DATA,
+} from '@/__mocks__';
 
+import {
+  canManageComment,
+  countComments,
+  createMockAdminComment,
+  findComment,
+  getCommentAuthorDisplay,
+  updateCommentTree,
+} from '../utils/inquiryCommentUtils';
+import InquiryCommentItem from './InquiryCommentItem';
+import InquiryReportAttachmentItem from './InquiryReportAttachmentItem';
 import InquiryStatusSelect from './InquiryStatusSelect';
 
 interface InquiryReportDetailPanelProps {
@@ -29,7 +45,20 @@ export default function InquiryReportDetailPanel({
   status,
   onStatusChange,
 }: InquiryReportDetailPanelProps) {
+  const [commentInput, setCommentInput] = useState('');
+  const [comments, setComments] = useState<InquiryComment[]>([]);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editingCommentValue, setEditingCommentValue] = useState('');
+  const [replyParentId, setReplyParentId] = useState<number | null>(null);
   const detail = INQUIRY_DETAIL_MOCK_DATA[postId];
+
+  useEffect(() => {
+    setComments(INQUIRY_COMMENT_MOCK_DATA[postId] ?? []);
+    setCommentInput('');
+    setEditingCommentId(null);
+    setEditingCommentValue('');
+    setReplyParentId(null);
+  }, [postId]);
 
   if (!detail) {
     return (
@@ -40,6 +69,87 @@ export default function InquiryReportDetailPanel({
   }
 
   const currentStatus = status ?? detail.status;
+  const commentCount = countComments(comments);
+  const replyParentComment = replyParentId
+    ? findComment(comments, replyParentId)
+    : null;
+
+  const handleCommentSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedComment = commentInput.trim();
+    if (!trimmedComment) return;
+
+    const newComment = createMockAdminComment(postId, trimmedComment);
+
+    if (replyParentId) {
+      setComments((prev) =>
+        updateCommentTree(prev, replyParentId, (comment) => ({
+          ...comment,
+          children: [...comment.children, newComment],
+        }))
+      );
+      setReplyParentId(null);
+    } else {
+      setComments((prev) => [...prev, newComment]);
+    }
+
+    setCommentInput('');
+  };
+
+  const handleReplyStart = (commentId: number) => {
+    setReplyParentId((prev) => (prev === commentId ? null : commentId));
+  };
+
+  const handleReplyCancel = () => {
+    setReplyParentId(null);
+  };
+
+  const handleCommentEditStart = (comment: InquiryComment) => {
+    if (!canManageComment(comment)) return;
+
+    setEditingCommentId(comment.id);
+    setEditingCommentValue(comment.content);
+  };
+
+  const handleCommentEditCancel = () => {
+    setEditingCommentId(null);
+    setEditingCommentValue('');
+  };
+
+  const handleCommentEditSubmit = (commentId: number) => {
+    const editingComment = findComment(comments, commentId);
+    if (!editingComment || !canManageComment(editingComment)) return;
+
+    const trimmedComment = editingCommentValue.trim();
+    if (!trimmedComment) return;
+
+    setComments((prev) =>
+      updateCommentTree(prev, commentId, (comment) => ({
+        ...comment,
+        content: trimmedComment,
+        updatedAt: new Date().toISOString(),
+        isUpdated: true,
+      }))
+    );
+    handleCommentEditCancel();
+  };
+
+  const handleCommentDelete = (commentId: number) => {
+    const targetComment = findComment(comments, commentId);
+    if (!targetComment || !canManageComment(targetComment)) return;
+
+    setComments((prev) =>
+      updateCommentTree(prev, commentId, (comment) => ({
+        ...comment,
+        content: '',
+        updatedAt: new Date().toISOString(),
+        isDeleted: true,
+      }))
+    );
+
+    handleCommentEditCancel();
+  };
 
   return (
     <div className='max-h-[calc(100vh-180px)] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
@@ -144,7 +254,7 @@ export default function InquiryReportDetailPanel({
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-500'>답변</span>
             <span className='min-w-0 break-words text-gray-800'>
-              {detail.commentCount}건
+              {commentCount}건
             </span>
           </div>
 
@@ -165,53 +275,91 @@ export default function InquiryReportDetailPanel({
         </div>
       </div>
 
+      {/* 댓글 */}
+      <div className='flex flex-col gap-3 border-b border-gray-100 px-4 py-3'>
+        <div className='flex items-center justify-between gap-2'>
+          <p className='text-[13px] font-medium text-gray-700'>댓글</p>
+          <span className='text-[12px] text-gray-400'>{commentCount}건</span>
+        </div>
+
+        {comments.length > 0 ? (
+          <ul className='flex flex-col gap-2'>
+            {comments.map((comment) => (
+              <InquiryCommentItem
+                key={comment.id}
+                comment={comment}
+                depth={0}
+                editingCommentId={editingCommentId}
+                editingCommentValue={editingCommentValue}
+                replyParentId={replyParentId}
+                onEditStart={handleCommentEditStart}
+                onEditCancel={handleCommentEditCancel}
+                onEditSubmit={handleCommentEditSubmit}
+                onDelete={handleCommentDelete}
+                onReplyStart={handleReplyStart}
+                onEditingValueChange={setEditingCommentValue}
+              />
+            ))}
+          </ul>
+        ) : (
+          <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
+            등록된 댓글이 없습니다.
+          </div>
+        )}
+
+        <form className='flex flex-col gap-2' onSubmit={handleCommentSubmit}>
+          {replyParentComment && (
+            <div className='flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-600'>
+              <span className='min-w-0 truncate'>
+                {getCommentAuthorDisplay(replyParentComment)} 댓글에 대댓글 작성
+              </span>
+              <button
+                type='button'
+                className='shrink-0 text-slate-400 hover:text-slate-700'
+                onClick={handleReplyCancel}
+              >
+                취소
+              </button>
+            </div>
+          )}
+          <Textarea
+            value={commentInput}
+            onChange={(event) => setCommentInput(event.target.value)}
+            placeholder={
+              replyParentComment
+                ? '대댓글을 입력하세요.'
+                : '관리자 댓글을 입력하세요.'
+            }
+            className='min-h-24 resize-none bg-white text-[13px]'
+          />
+          <div className='flex justify-end'>
+            <Button
+              type='submit'
+              size='sm'
+              disabled={!commentInput.trim()}
+              className='bg-slate-900 text-white hover:bg-slate-700'
+            >
+              <Send className='h-3.5 w-3.5' />
+              {replyParentComment ? '대댓글 등록' : '댓글 등록'}
+            </Button>
+          </div>
+        </form>
+      </div>
+
       {/* 첨부파일 */}
       {detail.attachments.length > 0 && (
         <div className='flex flex-col gap-2 px-4 py-3'>
           <p className='text-[13px] font-medium text-gray-700'>첨부파일</p>
           <ul className='flex flex-col gap-2'>
             {detail.attachments.map((attachment) => (
-              <AttachmentItem key={attachment.id} attachment={attachment} />
+              <InquiryReportAttachmentItem
+                key={attachment.id}
+                attachment={attachment}
+              />
             ))}
           </ul>
         </div>
       )}
     </div>
-  );
-}
-
-function AttachmentItem({ attachment }: { attachment: InquiryAttachment }) {
-  if (attachment.type === 'PHOTO') {
-    return (
-      <li className='flex flex-col gap-1'>
-        <img
-          src={attachment.url}
-          alt={attachment.fileName}
-          className='w-full rounded border border-gray-200 object-contain'
-        />
-        {attachment.fileComment && (
-          <span className='text-[12px] text-gray-500'>
-            {attachment.fileComment}
-          </span>
-        )}
-      </li>
-    );
-  }
-
-  return (
-    <li className='flex items-center gap-1.5 text-[13px] text-gray-700'>
-      <Paperclip className='h-3.5 w-3.5 shrink-0 text-gray-400' />
-      <a
-        href={attachment.url}
-        target='_blank'
-        rel='noopener noreferrer'
-        className='break-all text-blue-600 hover:underline'
-      >
-        {attachment.fileName}
-      </a>
-      {attachment.fileComment && (
-        <span className='text-gray-400'>({attachment.fileComment})</span>
-      )}
-    </li>
   );
 }
