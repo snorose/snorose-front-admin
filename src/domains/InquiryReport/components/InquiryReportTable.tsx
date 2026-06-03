@@ -341,7 +341,10 @@ export default function InquiryReportTable({
                       >
                         {getUserDisplay(inquiry)}
                       </Table.Cell>
-                      <Table.Cell className='px-3 text-center'>
+                      <Table.Cell
+                        className='px-3 text-center'
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <InquiryStatusSelect
                           ariaLabel={`${inquiry.title} 상태 변경`}
                           className='mx-auto'
