@@ -235,7 +235,7 @@ export default function InquiryReportTable({
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
-            className={`w-full ${isDetailOpen ? 'min-w-[498px]' : 'min-w-[1010px]'} table-fixed text-[13px]`}
+            className={`w-full ${isDetailOpen ? 'min-w-[608px]' : 'min-w-[1010px]'} table-fixed text-[13px]`}
           >
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
               <Table.Row>
@@ -257,14 +257,12 @@ export default function InquiryReportTable({
                 <Table.Head style={{ width: '180px' }} className='px-3'>
                   아이디
                 </Table.Head>
-                {!isDetailOpen && (
-                  <Table.Head
-                    style={{ width: '110px' }}
-                    className='px-3 text-center'
-                  >
-                    답변여부
-                  </Table.Head>
-                )}
+                <Table.Head
+                  style={{ width: '110px' }}
+                  className='px-3 text-center'
+                >
+                  답변여부
+                </Table.Head>
                 {!isDetailOpen && (
                   <Table.Head style={{ width: '252px' }} className='px-3'>
                     제목
@@ -282,7 +280,7 @@ export default function InquiryReportTable({
               {isLoading ? (
                 <Table.Row>
                   <Table.Cell
-                    colSpan={isDetailOpen ? 4 : 7}
+                    colSpan={isDetailOpen ? 5 : 7}
                     className='h-48 text-center'
                   >
                     <div className='flex items-center justify-center gap-2 text-gray-500'>
@@ -294,7 +292,7 @@ export default function InquiryReportTable({
               ) : isEmpty ? (
                 <Table.Row>
                   <Table.Cell
-                    colSpan={isDetailOpen ? 4 : 7}
+                    colSpan={isDetailOpen ? 5 : 7}
                     className='h-48 text-center text-sm text-gray-400'
                   >
                     {activeFilterCount > 0
@@ -343,18 +341,19 @@ export default function InquiryReportTable({
                       >
                         {getUserDisplay(inquiry)}
                       </Table.Cell>
-                      {!isDetailOpen && (
-                        <Table.Cell className='px-3 text-center'>
-                          <InquiryStatusSelect
-                            ariaLabel={`${inquiry.title} 상태 변경`}
-                            className='mx-auto'
-                            inquiryId={inquiry.postId}
-                            status={inquiryStatus}
-                            title={inquiry.title}
-                            onStatusChange={onStatusChange}
-                          />
-                        </Table.Cell>
-                      )}
+                      <Table.Cell
+                        className='px-3 text-center'
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <InquiryStatusSelect
+                          ariaLabel={`${inquiry.title} 상태 변경`}
+                          className='mx-auto'
+                          inquiryId={inquiry.postId}
+                          status={inquiryStatus}
+                          title={inquiry.title}
+                          onStatusChange={onStatusChange}
+                        />
+                      </Table.Cell>
                       {!isDetailOpen && (
                         <Table.Cell
                           className='truncate px-3 font-bold text-gray-900'
