@@ -1,38 +1,41 @@
 import { type FormEvent, useEffect, useState } from 'react';
 
-import { ExternalLink, Send, X } from 'lucide-react';
+import { Copy, ExternalLink, Send, X } from 'lucide-react';
 
 import { Button, Textarea } from '@/shared/components/ui';
 import type { InquiryComment, InquiryStatus } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
+import { INQUIRY_COMMENT_MAX_LENGTH } from '@/domains/InquiryReport/constants/inquiryCommentValidation';
 import {
   INQUIRY_GROUP_LABELS,
   INQUIRY_REPORT_CAUSE_LABELS,
   INQUIRY_SUB_GROUP_LABELS,
 } from '@/domains/InquiryReport/constants/inquiryReportLabels';
-
 import {
-  INQUIRY_COMMENT_MOCK_DATA,
-  INQUIRY_DETAIL_MOCK_DATA,
-} from '@/__mocks__';
+  useCreateInquiryComment,
+  useDeleteInquiryComment,
+  useInquiryComments,
+  useInquiryDetail,
+  useUpdateInquiryComment,
+} from '@/domains/InquiryReport/hooks';
 
 import {
   canManageComment,
   countComments,
-  createMockAdminComment,
   findComment,
   getCommentAuthorDisplay,
-  updateCommentTree,
 } from '../utils/inquiryCommentUtils';
 import InquiryCommentItem from './InquiryCommentItem';
 import InquiryReportAttachmentItem from './InquiryReportAttachmentItem';
 import InquiryStatusSelect from './InquiryStatusSelect';
 
+const SUPPORT_FRONT_BASE_URL =
+  'https://feature-support.snorose-front-react.pages.dev';
+
 interface InquiryReportDetailPanelProps {
   postId: number;
   onClose: () => void;
-  status: InquiryStatus;
   onStatusChange: (
     inquiryId: number,
     status: InquiryStatus
@@ -42,23 +45,40 @@ interface InquiryReportDetailPanelProps {
 export default function InquiryReportDetailPanel({
   postId,
   onClose,
-  status,
   onStatusChange,
 }: InquiryReportDetailPanelProps) {
   const [commentInput, setCommentInput] = useState('');
-  const [comments, setComments] = useState<InquiryComment[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingCommentValue, setEditingCommentValue] = useState('');
   const [replyParentId, setReplyParentId] = useState<number | null>(null);
-  const detail = INQUIRY_DETAIL_MOCK_DATA[postId];
+
+  const { data: detailData, isLoading: isDetailLoading } =
+    useInquiryDetail(postId);
+  const { data: commentsData, isLoading: isCommentsLoading } =
+    useInquiryComments(postId);
+  const createComment = useCreateInquiryComment(postId);
+  const updateComment = useUpdateInquiryComment(postId);
+  const deleteComment = useDeleteInquiryComment(postId);
+
+  const detail = detailData?.result;
+  const comments = commentsData?.result.data ?? [];
 
   useEffect(() => {
-    setComments(INQUIRY_COMMENT_MOCK_DATA[postId] ?? []);
     setCommentInput('');
     setEditingCommentId(null);
     setEditingCommentValue('');
     setReplyParentId(null);
   }, [postId]);
+
+  if (isDetailLoading) {
+    return (
+      <div className='flex h-40 w-full items-center justify-center overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
+        <p className='text-sm text-gray-400'>
+          문의 및 신고 상세를 불러오는 중입니다...
+        </p>
+      </div>
+    );
+  }
 
   if (!detail) {
     return (
@@ -68,33 +88,39 @@ export default function InquiryReportDetailPanel({
     );
   }
 
-  const currentStatus = status ?? detail.status;
+  const currentStatus = detail.status;
   const commentCount = countComments(comments);
   const replyParentComment = replyParentId
     ? findComment(comments, replyParentId)
     : null;
+  const inquiryPostUrl = `${SUPPORT_FRONT_BASE_URL}/report/${detail.inquiryId}`;
+  const reportTargetUrl = detail.target
+    ? `${SUPPORT_FRONT_BASE_URL}/post/${detail.target}`
+    : null;
+  const canCopyAuthorLoginId = !detail.isWriterWithdrawn && detail.userLoginId;
+  const isCommentInputValid =
+    commentInput.trim().length > 0 &&
+    commentInput.trim().length <= INQUIRY_COMMENT_MAX_LENGTH;
 
   const handleCommentSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedComment = commentInput.trim();
     if (!trimmedComment) return;
+    if (trimmedComment.length > INQUIRY_COMMENT_MAX_LENGTH) return;
 
-    const newComment = createMockAdminComment(postId, trimmedComment);
-
-    if (replyParentId) {
-      setComments((prev) =>
-        updateCommentTree(prev, replyParentId, (comment) => ({
-          ...comment,
-          children: [...comment.children, newComment],
-        }))
-      );
-      setReplyParentId(null);
-    } else {
-      setComments((prev) => [...prev, newComment]);
-    }
-
-    setCommentInput('');
+    createComment.mutate(
+      {
+        parentId: replyParentId,
+        content: trimmedComment,
+      },
+      {
+        onSuccess: () => {
+          setCommentInput('');
+          setReplyParentId(null);
+        },
+      }
+    );
   };
 
   const handleReplyStart = (commentId: number) => {
@@ -123,38 +149,44 @@ export default function InquiryReportDetailPanel({
 
     const trimmedComment = editingCommentValue.trim();
     if (!trimmedComment) return;
+    if (trimmedComment.length > INQUIRY_COMMENT_MAX_LENGTH) return;
 
-    setComments((prev) =>
-      updateCommentTree(prev, commentId, (comment) => ({
-        ...comment,
+    updateComment.mutate(
+      {
+        commentId,
         content: trimmedComment,
-        updatedAt: new Date().toISOString(),
-        isUpdated: true,
-      }))
+      },
+      {
+        onSuccess: handleCommentEditCancel,
+      }
     );
-    handleCommentEditCancel();
   };
 
   const handleCommentDelete = (commentId: number) => {
     const targetComment = findComment(comments, commentId);
     if (!targetComment || !canManageComment(targetComment)) return;
 
-    setComments((prev) =>
-      updateCommentTree(prev, commentId, (comment) => ({
-        ...comment,
-        content: '',
-        updatedAt: new Date().toISOString(),
-        isDeleted: true,
-      }))
-    );
+    deleteComment.mutate(commentId, {
+      onSuccess: handleCommentEditCancel,
+    });
+  };
 
-    handleCommentEditCancel();
+  const handleAuthorLoginIdCopy = async () => {
+    if (!canCopyAuthorLoginId) return;
+
+    if (!navigator.clipboard) return;
+
+    try {
+      await navigator.clipboard.writeText(detail.userLoginId);
+    } catch {
+      return;
+    }
   };
 
   return (
     <div className='max-h-[calc(100vh-180px)] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
       {/* 헤더 */}
-      <div className='flex items-start justify-between gap-2 border-b border-gray-100 px-4 py-3'>
+      <div className='flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3'>
         <p
           className='flex-1 truncate text-sm font-semibold text-gray-900'
           title={detail.title}
@@ -163,21 +195,33 @@ export default function InquiryReportDetailPanel({
         </p>
         <div className='flex shrink-0 items-center gap-2'>
           <InquiryStatusSelect
-            inquiryId={postId}
+            inquiryId={detail.inquiryId}
             status={currentStatus}
             title={detail.title}
             onStatusChange={onStatusChange}
           />
-          {detail.link && (
+          <a
+            href={inquiryPostUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            aria-label='문의 및 신고글 바로가기'
+            title='문의 및 신고글 바로가기'
+            className='flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[12px] font-medium !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
+          >
+            <ExternalLink className='h-3.5 w-3.5 shrink-0' />
+            문의글
+          </a>
+          {reportTargetUrl && (
             <a
-              href={detail.link}
+              href={reportTargetUrl}
               target='_blank'
               rel='noopener noreferrer'
-              aria-label='해당 글 바로가기'
-              title='해당 글 바로가기'
-              className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
+              aria-label='신고 대상 글 바로가기'
+              title='신고 대상 글 바로가기'
+              className='flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[12px] font-medium !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
             >
-              <ExternalLink className='h-4 w-4 shrink-0' />
+              <ExternalLink className='h-3.5 w-3.5 shrink-0' />
+              대상글
             </a>
           )}
           <button
@@ -230,8 +274,23 @@ export default function InquiryReportDetailPanel({
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-500'>작성자</span>
-            <span className='min-w-0 break-words text-gray-800'>
-              {detail.isWriterWithdrawn ? '탈퇴한 사용자' : detail.userDisplay}
+            <span className='flex min-w-0 items-center gap-1.5 text-gray-800'>
+              <span className='min-w-0 truncate'>
+                {detail.isWriterWithdrawn
+                  ? '탈퇴한 사용자'
+                  : detail.userLoginId}
+              </span>
+              {canCopyAuthorLoginId && (
+                <button
+                  type='button'
+                  onClick={handleAuthorLoginIdCopy}
+                  aria-label='작성자 아이디 복사'
+                  title='작성자 아이디 복사'
+                  className='flex h-6 w-6 shrink-0 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700'
+                >
+                  <Copy className='h-3.5 w-3.5' />
+                </button>
+              )}
             </span>
           </div>
 
@@ -282,7 +341,11 @@ export default function InquiryReportDetailPanel({
           <span className='text-[12px] text-gray-400'>{commentCount}건</span>
         </div>
 
-        {comments.length > 0 ? (
+        {isCommentsLoading ? (
+          <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
+            댓글을 불러오는 중입니다...
+          </div>
+        ) : comments.length > 0 ? (
           <ul className='flex flex-col gap-2'>
             {comments.map((comment) => (
               <InquiryCommentItem
@@ -325,18 +388,20 @@ export default function InquiryReportDetailPanel({
           <Textarea
             value={commentInput}
             onChange={(event) => setCommentInput(event.target.value)}
+            maxLength={INQUIRY_COMMENT_MAX_LENGTH}
             placeholder={
-              replyParentComment
-                ? '대댓글을 입력하세요.'
-                : '관리자 댓글을 입력하세요.'
+              replyParentComment ? '대댓글을 입력하세요.' : '댓글을 입력하세요.'
             }
             className='min-h-24 resize-none bg-white text-[13px]'
           />
-          <div className='flex justify-end'>
+          <div className='flex items-center justify-between gap-2'>
+            <span className='text-[11px] text-gray-400'>
+              {commentInput.length}/{INQUIRY_COMMENT_MAX_LENGTH}
+            </span>
             <Button
               type='submit'
               size='sm'
-              disabled={!commentInput.trim()}
+              disabled={!isCommentInputValid || createComment.isPending}
               className='bg-slate-900 text-white hover:bg-slate-700'
             >
               <Send className='h-3.5 w-3.5' />

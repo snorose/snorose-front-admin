@@ -47,9 +47,10 @@ export type InquiryCategory =
 export type InquiryListItem = {
   postId: number;
   title: string;
-  userId: number;
+  encryptedUserId: string;
   userLoginId: string;
   createdAt: string;
+  updatedAt: string | null;
   isEdited: boolean;
   status: InquiryStatus;
   group: InquiryGroup;
@@ -65,16 +66,16 @@ export type InquiryAttachment = {
 };
 
 export type InquiryDetail = {
-  postId: number;
+  inquiryId: number;
   userRoleId: number;
   isWriter: boolean;
-  userId: number;
-  userDisplay: string;
+  encryptedUserId: string;
+  userLoginId: string;
+  category: string;
   title: string;
   content: string;
   reportCause: InquiryCategory | null;
   target: string | null;
-  link: string | null;
   group: InquiryGroup;
   subGroup: InquirySubGroup;
   status: InquiryStatus;

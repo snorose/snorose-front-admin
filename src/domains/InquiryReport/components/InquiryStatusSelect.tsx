@@ -35,7 +35,8 @@ const STATUS_TRIGGER_CLASS_NAMES: Record<InquiryStatus, string> = {
 const STATUS_OPTIONS = [
   { label: '답변 전', value: 'PENDING' },
   { label: '답변 완료', value: 'COMPLETED' },
-  { label: '보류', value: 'HOLD' },
+  // TODO: 백엔드 HOLD 상태 지원 후 주석 해제
+  // { label: '보류', value: 'HOLD' },
 ] as const;
 
 export default function InquiryStatusSelect({

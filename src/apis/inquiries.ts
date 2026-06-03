@@ -3,6 +3,7 @@ import type {
   AdminInquiryCommentCreateRequest,
   AdminInquiryCommentCreateResponse,
   AdminInquiryCommentDeleteResponse,
+  AdminInquiryCommentListResponse,
   AdminInquiryCommentUpdateRequest,
   AdminInquiryCommentUpdateResponse,
   AdminInquiryDetailResponse,
@@ -50,6 +51,17 @@ export const updateAdminInquiryStatusAPI = async (
   const response = await axiosInstance.patch<AdminInquiryStatusUpdateResponse>(
     `/v1/admin/inquiries/${inquiryId}/status`,
     data
+  );
+  return response.data;
+};
+
+export const getAdminInquiryCommentsAPI = async (
+  postId: number,
+  params: { page?: number } = { page: 0 }
+): Promise<AdminInquiryCommentListResponse> => {
+  const response = await axiosInstance.get<AdminInquiryCommentListResponse>(
+    `/v1/posts/${postId}/comments`,
+    { params }
   );
   return response.data;
 };
