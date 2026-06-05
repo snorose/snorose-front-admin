@@ -17,10 +17,3 @@ body:
       description: 생각해보신 구체적인 구현 방법이나 대안이 있다면 작성해 주세요.
     validations:
       required: false
-  - type: textarea
-    id: additional_info
-    attributes:
-      label: 📋 추가 정보
-      description: 추가로 공유할 내용이 있다면 자유롭게 작성해 주세요.
-    validations:
-      required: false
