@@ -17,7 +17,6 @@ import type {
 // 시험후기 목록 조회 api
 export const getExamReviews = async (params: {
   page: number;
-  keyword?: string;
   startDate?: string;
   endDate?: string;
   keywordAuthor?: string;
@@ -27,6 +26,9 @@ export const getExamReviews = async (params: {
   semester?: string;
   examType?: string;
   isConfirmed?: boolean;
+  isDiscussed?: boolean;
+  isReported?: boolean;
+  statuses?: string;
 }): Promise<ExamReviewsResponse> => {
   const response = await axiosInstance.get(`/v1/admin/reviews`, {
     params,
