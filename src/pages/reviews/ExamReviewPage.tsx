@@ -110,6 +110,27 @@ export default function ExamReviewPage() {
       params.isConfirmed = false;
     }
 
+    const isDiscussed = searchParamsFromUrl.get('isDiscussed');
+    if (isDiscussed === 'true') {
+      params.isDiscussed = true;
+    }
+    if (isDiscussed === 'false') {
+      params.isDiscussed = false;
+    }
+
+    const isReported = searchParamsFromUrl.get('isReported');
+    if (isReported === 'true') {
+      params.isReported = true;
+    }
+    if (isReported === 'false') {
+      params.isReported = false;
+    }
+
+    const statuses = searchParamsFromUrl.get('statuses');
+    if (statuses) {
+      params.statuses = statuses;
+    }
+
     // 실제로 검색 파라미터가 변경되었는지 확인
     const hasChanged =
       params.startDate !== searchParams.startDate ||
@@ -120,7 +141,10 @@ export default function ExamReviewPage() {
       params.lectureYear !== searchParams.lectureYear ||
       params.semester !== searchParams.semester ||
       params.examType !== searchParams.examType ||
-      params.isConfirmed !== searchParams.isConfirmed;
+      params.isConfirmed !== searchParams.isConfirmed ||
+      params.isDiscussed !== searchParams.isDiscussed ||
+      params.isReported !== searchParams.isReported ||
+      params.statuses !== searchParams.statuses;
 
     if (hasChanged) {
       setSearchParams(params);
@@ -157,6 +181,15 @@ export default function ExamReviewPage() {
     }
     if (params.isConfirmed !== undefined) {
       newSearchParams.set('isConfirmed', String(params.isConfirmed));
+    }
+    if (params.isDiscussed !== undefined) {
+      newSearchParams.set('isDiscussed', String(params.isDiscussed));
+    }
+    if (params.isReported !== undefined) {
+      newSearchParams.set('isReported', String(params.isReported));
+    }
+    if (params.statuses) {
+      newSearchParams.set('statuses', params.statuses);
     }
     // 검색 시 첫 페이지로 이동
     newSearchParams.set('page', '1');
@@ -202,6 +235,9 @@ export default function ExamReviewPage() {
             searchParams.semester,
             searchParams.examType,
             searchParams.isConfirmed,
+            searchParams.isDiscussed,
+            searchParams.isReported,
+            searchParams.statuses,
             refreshKey,
           ];
 
@@ -391,6 +427,21 @@ export default function ExamReviewPage() {
                   ? false
                   : undefined
             }
+            initialIsDiscussed={
+              searchParamsFromUrl.get('isDiscussed') === 'true'
+                ? true
+                : searchParamsFromUrl.get('isDiscussed') === 'false'
+                  ? false
+                  : undefined
+            }
+            initialIsReported={
+              searchParamsFromUrl.get('isReported') === 'true'
+                ? true
+                : searchParamsFromUrl.get('isReported') === 'false'
+                  ? false
+                  : undefined
+            }
+            initialStatuses={searchParamsFromUrl.get('statuses') || ''}
             initialStartDate={searchParamsFromUrl.get('startDate') || ''}
           />
         </div>

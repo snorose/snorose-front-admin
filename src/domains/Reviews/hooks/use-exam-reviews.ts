@@ -72,6 +72,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     semester,
     examType,
     isConfirmed,
+    isDiscussed,
+    isReported,
+    statuses,
     enabled = true,
     refreshKey,
   } = params;
@@ -89,6 +92,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       semester,
       examType,
       isConfirmed,
+      isDiscussed,
+      isReported,
+      statuses,
       refreshKey,
     ],
     queryFn: async () => {
@@ -103,6 +109,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
         semester,
         examType,
         isConfirmed,
+        isDiscussed,
+        isReported,
+        statuses,
       });
 
       if (!response.isSuccess || !response.result) {

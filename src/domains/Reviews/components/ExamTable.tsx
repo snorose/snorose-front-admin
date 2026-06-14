@@ -94,6 +94,9 @@ export default function ExamTable({
     semester: searchParams.semester,
     examType: searchParams.examType,
     isConfirmed: searchParams.isConfirmed,
+    isDiscussed: searchParams.isDiscussed,
+    isReported: searchParams.isReported,
+    statuses: searchParams.statuses,
     enabled: !propData,
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });

@@ -33,6 +33,9 @@ export interface ExamReviewSearchParams {
   semester?: string;
   examType?: string;
   isConfirmed?: boolean;
+  isDiscussed?: boolean;
+  isReported?: boolean;
+  statuses?: string;
 }
 
 export interface ExamReview {
