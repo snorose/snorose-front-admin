@@ -36,6 +36,7 @@ import {
 } from '@/domains/Reviews/utils';
 
 import {
+  confirmExamReview,
   deleteExamReview,
   downloadExamReviewFile,
   updateExamReview,
@@ -385,9 +386,6 @@ export function ExamDetailSection({
         toast.error('분반을 입력해주세요.');
         return;
       }
-      if (formData.isConfirmed !== initialValues.isConfirmed) {
-        post.isConfirmed = formData.isConfirmed;
-      }
       if (formData.isDiscussed !== initialValues.isDiscussed) {
         post.isDiscussed = formData.isDiscussed;
       }
@@ -427,34 +425,60 @@ export function ExamDetailSection({
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
-      const hasUpdate = Object.keys(post).length > 0 || selectedFile;
+      const hasConfirmUpdate =
+        formData.isConfirmed !== initialValues.isConfirmed;
+      const hasDetailUpdate =
+        Object.keys(post).length > 0 || Boolean(selectedFile);
 
-      if (!hasUpdate) {
+      if (!hasConfirmUpdate && !hasDetailUpdate) {
         return;
       }
 
-      const updateData: UpdateExamReviewRequest = {
-        ...(selectedFile ? { file: selectedFile } : {}),
-        post,
-      };
+      let updatedDetail: ExamReviewDetailResult = selectedExamReviewDetail;
 
-      const response = await updateExamReview(
-        selectedExamReview.id,
-        updateData
-      );
+      if (hasDetailUpdate) {
+        const updateData: UpdateExamReviewRequest = {
+          ...(selectedFile ? { file: selectedFile } : {}),
+          post,
+        };
 
-      if (!response.isSuccess) {
-        toast.error(response.message || '시험 후기 수정에 실패했습니다.');
-        return;
+        const response = await updateExamReview(
+          selectedExamReview.id,
+          updateData
+        );
+
+        if (!response.isSuccess) {
+          toast.error(response.message || '시험 후기 수정에 실패했습니다.');
+          return;
+        }
+
+        updatedDetail = response.result;
+      }
+
+      if (hasConfirmUpdate) {
+        const response = await confirmExamReview(selectedExamReview.id, {
+          isConfirmed: formData.isConfirmed,
+        });
+
+        if (!response.isSuccess) {
+          toast.error(response.message || '시험 후기 확인처리에 실패했습니다.');
+          return;
+        }
+
+        updatedDetail = {
+          ...updatedDetail,
+          isConfirmed: response.result.isConfirmed,
+          status: response.result.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
+        };
       }
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
       setSelectedFile(null);
       setIsEditMode(false);
       setInitialValues({
-        isConfirmed: formData.isConfirmed,
-        isDiscussed: response.result.isDiscussed,
-        memo: response.result.memo,
+        isConfirmed: updatedDetail.isConfirmed,
+        isDiscussed: updatedDetail.isDiscussed,
+        memo: updatedDetail.memo,
         lectureName: formData.lectureName,
         professorName: formData.professorName,
         classNumber: formData.classNumber,
@@ -464,9 +488,9 @@ export function ExamDetailSection({
         isOnline: formData.isOnline,
         examType: formData.examType,
         questionDetail: formData.examTypeAndQuestions,
-        fileName: response.result.fileName,
+        fileName: updatedDetail.fileName,
       });
-      onSaveSuccess?.(response.result);
+      onSaveSuccess?.(updatedDetail);
     } catch (error: unknown) {
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||
