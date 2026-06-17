@@ -15,6 +15,7 @@ import {
 import {
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
+  ExamReviewLogSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
 } from '@/domains/Reviews/components';
@@ -119,9 +120,9 @@ export function ExamDetailSection({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
-  const [activeTab, setActiveTab] = useState<'review' | 'post' | 'comments'>(
-    'review'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'review' | 'post' | 'comments' | 'logs'
+  >('review');
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -522,7 +523,7 @@ export function ExamDetailSection({
           <Tabs
             value={activeTab}
             onValueChange={(value) =>
-              setActiveTab(value as 'review' | 'post' | 'comments')
+              setActiveTab(value as 'review' | 'post' | 'comments' | 'logs')
             }
             className='w-full p-4'
           >
@@ -537,6 +538,9 @@ export function ExamDetailSection({
                   </Tabs.Trigger>
                   <Tabs.Trigger value='comments' className='w-fit'>
                     댓글 목록 ({selectedExamReviewDetail?.commentCount ?? 0})
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='logs' className='w-fit'>
+                    관리 이력 ({selectedExamReviewDetail?.logs.length ?? 0})
                   </Tabs.Trigger>
                 </Tabs.List>
                 <div className='flex items-center gap-2'>
@@ -622,6 +626,16 @@ export function ExamDetailSection({
                 <Card>
                   <Card.Content className='p-4'>
                     <ExamReviewCommentSection postId={formData.postId} />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+
+              <Tabs.Content value='logs' className='min-h-[460px]'>
+                <Card>
+                  <Card.Content className='p-4'>
+                    <ExamReviewLogSection
+                      logs={selectedExamReviewDetail?.logs}
+                    />
                   </Card.Content>
                 </Card>
               </Tabs.Content>
