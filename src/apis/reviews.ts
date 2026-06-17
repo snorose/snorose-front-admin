@@ -9,25 +9,16 @@ import type {
   ConfirmExamReviewResponse,
   DeleteExamReviewResponse,
   ExamReviewDetailResponse,
+  ExamReviewSearchParams,
   ExamReviewsResponse,
   UpdateExamReviewRequest,
   UpdateExamReviewResponse,
 } from '@/domains/Reviews/types';
 
 // 시험후기 목록 조회 api
-export const getExamReviews = async (params: {
-  page: number;
-  keyword?: string;
-  startDate?: string;
-  endDate?: string;
-  keywordAuthor?: string;
-  keywordPost?: string;
-  sort?: string;
-  lectureYear?: number;
-  semester?: string;
-  examType?: string;
-  isConfirmed?: boolean;
-}): Promise<ExamReviewsResponse> => {
+export const getExamReviews = async (
+  params: ExamReviewSearchParams & { page: number }
+): Promise<ExamReviewsResponse> => {
   const response = await axiosInstance.get(`/v1/admin/reviews`, {
     params,
   });

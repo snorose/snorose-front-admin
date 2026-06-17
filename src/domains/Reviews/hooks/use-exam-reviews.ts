@@ -5,6 +5,7 @@ import { formatDateTimeToMinutes } from '@/shared/utils';
 import { STATUS } from '@/domains/Reviews/constants';
 import type {
   ExamReview,
+  ExamReviewProcessStatus,
   ExamReviewSearchParams,
   ExamReviews,
 } from '@/domains/Reviews/types';
@@ -20,6 +21,29 @@ interface UseExamReviewsParams extends ExamReviewSearchParams {
   enabled?: boolean;
   refreshKey?: number;
 }
+
+const isSanctioned = (value: ExamReviews['isSanctioned']): boolean =>
+  value === true || value === 'true';
+
+const getProcessStatuses = (
+  apiData: ExamReviews
+): ExamReviewProcessStatus[] => {
+  const processStatuses: ExamReviewProcessStatus[] = [];
+
+  if (apiData.deletionStatus && apiData.deletionStatus !== 'VISIBLE') {
+    processStatuses.push(apiData.deletionStatus);
+  }
+
+  if (apiData.visibilityStatus && apiData.visibilityStatus !== 'VISIBLE') {
+    processStatuses.push(apiData.visibilityStatus);
+  }
+
+  if (isSanctioned(apiData.isSanctioned)) {
+    processStatuses.push('SANCTIONED');
+  }
+
+  return processStatuses.length > 0 ? processStatuses : ['VISIBLE'];
+};
 
 const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
   const reviewTitle = apiData.title || apiData.content || '';
@@ -44,6 +68,7 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
         ? STATUS.UNCONFIRMED
         : apiData.status || STATUS.UNCONFIRMED;
   const userDisplay = apiData.userName || apiData.userDisplay || '';
+  const reportCount = apiData.reportCount ?? 0;
 
   return {
     id: apiData.postId,
@@ -57,6 +82,10 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
     questionDetail: '',
     uploadTime,
     userDisplay,
+    isDiscussed: apiData.isDiscussed ?? false,
+    isReported: reportCount > 0,
+    reportCount,
+    processStatuses: getProcessStatuses(apiData),
   };
 };
 
@@ -72,6 +101,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     semester,
     examType,
     isConfirmed,
+    isDiscussed,
+    isReported,
+    statuses,
     enabled = true,
     refreshKey,
   } = params;
@@ -89,6 +121,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       semester,
       examType,
       isConfirmed,
+      isDiscussed,
+      isReported,
+      statuses,
       refreshKey,
     ],
     queryFn: async () => {
@@ -103,6 +138,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
         semester,
         examType,
         isConfirmed,
+        isDiscussed,
+        isReported,
+        statuses,
       });
 
       if (!response.isSuccess || !response.result) {
