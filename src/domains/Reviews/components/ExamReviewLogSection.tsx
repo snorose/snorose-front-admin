@@ -59,7 +59,8 @@ const formatStatusValue = (value: string): string =>
 
 const formatChangeValue = (
   key: string,
-  value: string | number | boolean | null
+  value: string | number | boolean | null,
+  statusModifiedReason?: string | number | boolean | null
 ): string => {
   if (value === null) {
     return '-';
@@ -75,11 +76,19 @@ const formatChangeValue = (
   }
 
   if (key === 'status') {
-    return formatStatusValue(String(value));
+    const formattedStatus = formatStatusValue(String(value));
+    return statusModifiedReason
+      ? `${formattedStatus} (${String(statusModifiedReason)})`
+      : formattedStatus;
   }
 
   return String(value);
 };
+
+const getVisibleChanges = (changes?: ExamReviewDetailLog['changes'] | null) =>
+  Object.entries(changes ?? {}).filter(
+    ([key]) => key !== 'statusModifiedReason'
+  );
 
 export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
   const safeLogs = logs ?? [];
@@ -114,7 +123,7 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
               <Table.Cell>{log.adminName || '-'}</Table.Cell>
               <Table.Cell className='whitespace-normal'>
                 <div className='flex flex-col gap-1.5'>
-                  {Object.entries(log.changes).map(([key, value]) => (
+                  {getVisibleChanges(log.changes).map(([key, value]) => (
                     <div
                       key={key}
                       className='flex flex-wrap items-center gap-2'
@@ -126,7 +135,11 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
                         {CHANGE_FIELD_LABELS[key] ?? key}
                       </Badge>
                       <span className='text-sm break-all text-gray-700'>
-                        {formatChangeValue(key, value)}
+                        {formatChangeValue(
+                          key,
+                          value,
+                          log.changes?.statusModifiedReason
+                        )}
                       </span>
                     </div>
                   ))}

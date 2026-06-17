@@ -144,7 +144,7 @@ export interface DeleteExamReviewResponse {
 export interface ExamReviewDetailLog {
   encryptedAdminId: string | null;
   adminName: string | null;
-  changes: Record<string, string | number | boolean | null>;
+  changes?: Record<string, string | number | boolean | null> | null;
   createdAt: string;
 }
 
