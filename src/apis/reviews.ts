@@ -74,7 +74,7 @@ export const deleteExamReview = async (
 export const getExamReviewDetail = async (
   postId: number
 ): Promise<ExamReviewDetailResponse> => {
-  const response = await axiosInstance.get(`/v1/reviews/${postId}`);
+  const response = await axiosInstance.get(`/v1/admin/reviews/${postId}`);
   return response.data;
 };
 

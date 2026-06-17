@@ -1,5 +1,37 @@
 import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 
+import type { ExamReviewProcessStatus } from '@/domains/Reviews/types';
+
+interface ExamReviewProcessStatusSource {
+  deletionStatus?: ExamReviewProcessStatus | null;
+  visibilityStatus?: ExamReviewProcessStatus | null;
+  isSanctioned?: boolean | 'true' | 'false' | null;
+}
+
+export const isExamReviewSanctioned = (
+  value: ExamReviewProcessStatusSource['isSanctioned']
+): boolean => value === true || value === 'true';
+
+export const getExamReviewProcessStatuses = (
+  source: ExamReviewProcessStatusSource
+): ExamReviewProcessStatus[] => {
+  const processStatuses: ExamReviewProcessStatus[] = [];
+
+  if (source.deletionStatus && source.deletionStatus !== 'VISIBLE') {
+    processStatuses.push(source.deletionStatus);
+  }
+
+  if (source.visibilityStatus && source.visibilityStatus !== 'VISIBLE') {
+    processStatuses.push(source.visibilityStatus);
+  }
+
+  if (isExamReviewSanctioned(source.isSanctioned)) {
+    processStatuses.push('SANCTIONED');
+  }
+
+  return processStatuses.length > 0 ? processStatuses : ['VISIBLE'];
+};
+
 /**
  * lectureType enum을 문자열로 변환
  * @param lectureTypeEnum - 변환할 lectureType enum 값

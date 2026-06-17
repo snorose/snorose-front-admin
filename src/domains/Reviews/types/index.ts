@@ -3,6 +3,7 @@ export type {
   ConfirmExamReviewResponse,
   DeleteExamReviewResponse,
   ExamReview,
+  ExamReviewDetailLog,
   ExamReviewDetailResponse,
   ExamReviewDetailResult,
   ExamReviewProcessStatus,
