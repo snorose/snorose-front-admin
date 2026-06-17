@@ -3,6 +3,7 @@ export const PATHS = {
   LOGIN: '/login',
   POST_COMMENTS: '/posts/comments',
   POST_MANAGE: '/posts/manage',
+  POST_DETAIL: '/posts/manage/:postId',
   MEMBER_INFO: '/member/info',
   MEMBER_PENALTY: '/member/penalty',
   REVIEW_EXAM: '/reviews/exam',
