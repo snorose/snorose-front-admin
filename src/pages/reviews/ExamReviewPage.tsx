@@ -214,108 +214,93 @@ export default function ExamReviewPage() {
     });
   };
 
-  const handleSaveSuccess = async (nextStatus?: string) => {
+  const handleSaveSuccess = async (
+    updatedDetailFromSave?: ExamReviewDetailResult
+  ) => {
     // 쿼리 캐시를 직접 업데이트하여 스켈레톤 없이 즉시 반영
     if (selectedExamReview && selectedExamReviewDetail) {
-      // 저장 후 최신 상세 정보 가져오기 (백그라운드)
       try {
-        const response = await getExamReviewDetail(selectedExamReview.id);
-        if (response.isSuccess && response.result) {
-          const updatedDetail = response.result;
-
-          // 현재 검색 파라미터로 쿼리 키 생성
-          const queryKey = [
-            'examReviews',
-            currentPage,
-            searchParams.startDate,
-            searchParams.endDate,
-            searchParams.keywordAuthor,
-            searchParams.keywordPost,
-            searchParams.sort,
-            searchParams.lectureYear,
-            searchParams.semester,
-            searchParams.examType,
-            searchParams.isConfirmed,
-            searchParams.isDiscussed,
-            searchParams.isReported,
-            searchParams.statuses,
-            refreshKey,
-          ];
-
-          // 캐시에서 현재 데이터 가져오기
-          const cachedData = queryClient.getQueryData<{
-            data: ExamReview[];
-            hasNext: boolean;
-          }>(queryKey);
-
-          if (cachedData) {
-            // 선택된 항목의 인덱스 찾기
-            const itemIndex = cachedData.data.findIndex(
-              (item) => item.id === selectedExamReview.id
+        const updatedDetail = updatedDetailFromSave
+          ? updatedDetailFromSave
+          : await getExamReviewDetail(selectedExamReview.id).then(
+              (response) => {
+                if (!response.isSuccess || !response.result) {
+                  throw new Error(
+                    response.message ||
+                      '시험 후기 상세 정보를 불러오는데 실패했습니다.'
+                  );
+                }
+                return response.result;
+              }
             );
 
-            if (itemIndex !== -1) {
-              // 선택된 항목의 상태를 업데이트된 상태로 변경
-              const updatedData = [...cachedData.data];
+        // 현재 검색 파라미터로 쿼리 키 생성
+        const queryKey = [
+          'examReviews',
+          currentPage,
+          searchParams.startDate,
+          searchParams.endDate,
+          searchParams.keywordAuthor,
+          searchParams.keywordPost,
+          searchParams.sort,
+          searchParams.lectureYear,
+          searchParams.semester,
+          searchParams.examType,
+          searchParams.isConfirmed,
+          searchParams.isDiscussed,
+          searchParams.isReported,
+          searchParams.statuses,
+          refreshKey,
+        ];
 
-              const courseName = updatedDetail.lectureName || '';
-              const professor = updatedDetail.professor || '';
-              const semester = convertSemesterEnumToString(
-                updatedDetail.semester,
-                updatedDetail.lectureYear
-              );
-              const examType = convertExamTypeEnumToString(
-                updatedDetail.examType
-              );
-              const classNumber = String(updatedDetail.classNumber ?? '');
-              const uploadTime = formatDateTimeToMinutes(
-                updatedDetail.createdAt
-              );
+        const courseName = updatedDetail.lectureName || '';
+        const professor = updatedDetail.professor || '';
+        const semester = convertSemesterEnumToString(
+          updatedDetail.semester,
+          updatedDetail.lectureYear
+        );
+        const examType = convertExamTypeEnumToString(updatedDetail.examType);
+        const classNumber = String(updatedDetail.classNumber ?? '');
+        const uploadTime = formatDateTimeToMinutes(updatedDetail.createdAt);
 
-              const updatedItem: ExamReview = {
-                id: updatedDetail.postId,
-                status:
-                  nextStatus ??
-                  updatedDetail.status ??
-                  (updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'),
-                reviewTitle:
-                  updatedDetail.title ?? selectedExamReview.reviewTitle,
-                courseName,
-                professor,
-                semester,
-                examType,
-                classNumber,
-                questionDetail: updatedDetail.questionDetail,
-                uploadTime,
-                userDisplay: updatedDetail.userDisplay,
-                isDiscussed: updatedDetail.isDiscussed,
-                isReported: selectedExamReview.isReported,
-                reportCount: selectedExamReview.reportCount,
-                processStatuses: getExamReviewProcessStatuses(updatedDetail),
-              };
+        const updatedItem: ExamReview = {
+          id: updatedDetail.postId,
+          status:
+            updatedDetail.status ??
+            (updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'),
+          reviewTitle: updatedDetail.title ?? selectedExamReview.reviewTitle,
+          courseName,
+          professor,
+          semester,
+          examType,
+          classNumber,
+          questionDetail: updatedDetail.questionDetail,
+          uploadTime,
+          userDisplay: updatedDetail.userDisplay,
+          isDiscussed: updatedDetail.isDiscussed,
+          isReported: selectedExamReview.isReported,
+          reportCount: selectedExamReview.reportCount,
+          processStatuses: getExamReviewProcessStatuses(updatedDetail),
+        };
 
-              updatedData[itemIndex] = updatedItem;
+        // 캐시에서 현재 데이터 가져오기
+        const cachedData = queryClient.getQueryData<{
+          data: ExamReview[];
+          hasNext: boolean;
+        }>(queryKey);
 
-              // 캐시 업데이트 (스켈레톤 없이 즉시 반영)
-              queryClient.setQueryData(queryKey, {
-                ...cachedData,
-                data: updatedData,
-              });
-
-              // 선택된 항목도 업데이트
-              setSelectedExamReview(updatedItem);
-              setSelectedExamReviewDetail((prev) => {
-                if (!prev) return updatedDetail;
-                if (!nextStatus) return updatedDetail;
-                return {
-                  ...prev,
-                  ...updatedDetail,
-                  status: nextStatus,
-                } as ExamReviewDetailResult;
-              });
-            }
-          }
+        if (cachedData) {
+          queryClient.setQueryData(queryKey, {
+            ...cachedData,
+            data: cachedData.data.map((item) =>
+              item.id === selectedExamReview.id ? updatedItem : item
+            ),
+          });
         }
+
+        // 선택된 항목도 업데이트
+        setSelectedExamReview(updatedItem);
+        setSelectedExamReviewDetail(updatedDetail);
       } catch (error) {
         // 에러 발생 시 기존 방식으로 fallback
         console.error('Failed to update cache:', error);

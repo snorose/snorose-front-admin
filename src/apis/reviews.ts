@@ -48,16 +48,14 @@ export const updateExamReview = async (
     formData.append('file', data.file); // 파일이 있으면 추가
   }
 
-  formData.append('post', JSON.stringify(data.post));
+  formData.append(
+    'post',
+    new Blob([JSON.stringify(data.post)], { type: 'application/json' })
+  );
 
   const response = await axiosInstance.patch(
     `/v1/admin/reviews/${postId}`,
-    formData,
-    {
-      headers: {
-        'Content-Type': undefined,
-      },
-    }
+    formData
   );
   return response.data;
 };
