@@ -21,6 +21,7 @@ import {
 import type {
   ExamReview,
   ExamReviewDetailResult,
+  ExamReviewProcessStatus,
   LectureType,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
@@ -30,6 +31,7 @@ import {
   convertLectureTypeToString,
   convertSemesterEnumToString,
   convertSemesterToEnum,
+  isExamReviewSanctioned,
 } from '@/domains/Reviews/utils';
 
 import {
@@ -53,6 +55,10 @@ type FormData = {
   encryptedUserId: string;
   postId: number | null;
   isConfirmed: boolean;
+  isDiscussed: boolean;
+  deletionStatus: ExamReviewProcessStatus | null;
+  isSanctioned: boolean;
+  visibilityStatus: ExamReviewProcessStatus | null;
   examReviewName: string;
   uploadTime: string;
   lectureName: string;
@@ -85,6 +91,10 @@ const DEFAULT_FORM_DATA: FormData = {
   encryptedUserId: '',
   postId: null,
   isConfirmed: false,
+  isDiscussed: false,
+  deletionStatus: null,
+  isSanctioned: false,
+  visibilityStatus: null,
   examReviewName: '',
   uploadTime: '',
   lectureName: '',
@@ -146,6 +156,12 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: selectedExamReviewDetail.isConfirmed,
+        isDiscussed: selectedExamReviewDetail.isDiscussed,
+        deletionStatus: selectedExamReviewDetail.deletionStatus,
+        isSanctioned: isExamReviewSanctioned(
+          selectedExamReviewDetail.isSanctioned
+        ),
+        visibilityStatus: selectedExamReviewDetail.visibilityStatus,
         examReviewName:
           selectedExamReviewDetail.title ??
           selectedExamReview?.reviewTitle ??
@@ -189,6 +205,10 @@ export function ExamDetailSection({
         encryptedUserId: formInitialValues.encryptedUserId,
         postId: formInitialValues.postId,
         isConfirmed: formInitialValues.isConfirmed,
+        isDiscussed: formInitialValues.isDiscussed,
+        deletionStatus: formInitialValues.deletionStatus,
+        isSanctioned: formInitialValues.isSanctioned,
+        visibilityStatus: formInitialValues.visibilityStatus,
         examReviewName: formInitialValues.examReviewName,
         uploadTime: formInitialValues.uploadTime,
         lectureName: formInitialValues.lectureName,
