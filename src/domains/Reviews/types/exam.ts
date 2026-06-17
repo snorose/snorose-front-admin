@@ -105,6 +105,8 @@ export interface ConfirmExamReviewResponse {
 }
 
 export interface UpdateExamReviewPost {
+  isConfirmed?: boolean;
+  isDiscussed?: boolean;
   lectureName?: string;
   professor?: string;
   classNumber?: number;
@@ -116,6 +118,7 @@ export interface UpdateExamReviewPost {
   status?: string;
   examType?: ExamType;
   questionDetail?: string;
+  memo?: string | null;
 }
 
 export interface UpdateExamReviewRequest {
@@ -127,9 +130,7 @@ export interface UpdateExamReviewResponse {
   isSuccess: boolean;
   code: number;
   message: string;
-  result: {
-    postId: number;
-  };
+  result: ExamReviewDetailResult;
 }
 
 export interface DeleteExamReviewResponse {

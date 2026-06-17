@@ -36,7 +36,6 @@ import {
 } from '@/domains/Reviews/utils';
 
 import {
-  confirmExamReview,
   deleteExamReview,
   downloadExamReviewFile,
   updateExamReview,
@@ -48,7 +47,7 @@ interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
-  onSaveSuccess?: (status?: string) => void;
+  onSaveSuccess?: (updatedDetail?: ExamReviewDetailResult) => void;
   onDeleteSuccess?: () => void;
 }
 
@@ -78,6 +77,8 @@ type FormData = {
 
 type InitialValues = {
   isConfirmed: boolean;
+  isDiscussed: boolean;
+  memo: string | null;
   lectureName: string;
   professorName: string;
   classNumber: number | null;
@@ -87,6 +88,7 @@ type InitialValues = {
   isOnline: string;
   examType: string;
   questionDetail: string;
+  fileName: string;
 };
 
 const DEFAULT_FORM_DATA: FormData = {
@@ -184,6 +186,8 @@ export function ExamDetailSection({
         author: selectedExamReviewDetail.userDisplay,
         initialValues: {
           isConfirmed: selectedExamReviewDetail.isConfirmed,
+          isDiscussed: selectedExamReviewDetail.isDiscussed,
+          memo: selectedExamReviewDetail.memo,
           lectureName: selectedExamReviewDetail.lectureName,
           professorName: selectedExamReviewDetail.professor,
           classNumber: selectedExamReviewDetail.classNumber,
@@ -193,6 +197,7 @@ export function ExamDetailSection({
           isOnline: selectedExamReviewDetail.isOnline ? 'O' : 'X',
           examType: examTypeStr,
           questionDetail: selectedExamReviewDetail.questionDetail,
+          fileName: selectedExamReviewDetail.fileName,
         },
       };
     }
@@ -240,6 +245,8 @@ export function ExamDetailSection({
     if (!initialValues) return false;
     return (
       formData.isConfirmed !== initialValues.isConfirmed ||
+      formData.isDiscussed !== initialValues.isDiscussed ||
+      (formData.memo ?? '') !== (initialValues.memo ?? '') ||
       formData.lectureName !== initialValues.lectureName ||
       formData.professorName !== initialValues.professorName ||
       formData.classNumber !== initialValues.classNumber ||
@@ -267,6 +274,11 @@ export function ExamDetailSection({
       initialValues.isConfirmed ? '확인' : '미확인',
       formData.isConfirmed ? '확인' : '미확인'
     );
+    add(
+      '논의 여부',
+      initialValues.isDiscussed ? '논의 있음' : '논의 없음',
+      formData.isDiscussed ? '논의 있음' : '논의 없음'
+    );
 
     add('강의명', initialValues.lectureName, formData.lectureName);
     add('교수명', initialValues.professorName, formData.professorName);
@@ -289,9 +301,10 @@ export function ExamDetailSection({
       initialValues.questionDetail,
       formData.examTypeAndQuestions
     );
+    add('메모', initialValues.memo ?? '', formData.memo ?? '');
 
     if (selectedFile) {
-      add('업로드 파일', formData.fileName || '', selectedFile.name);
+      add('업로드 파일', initialValues.fileName || '', selectedFile.name);
     }
 
     return changes;
@@ -304,6 +317,8 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: initialValues.isConfirmed,
+        isDiscussed: initialValues.isDiscussed,
+        memo: initialValues.memo,
         lectureName: initialValues.lectureName,
         professorName: initialValues.professorName,
         classNumber: initialValues.classNumber,
@@ -313,7 +328,7 @@ export function ExamDetailSection({
         isOnline: initialValues.isOnline,
         examType: initialValues.examType,
         examTypeAndQuestions: initialValues.questionDetail,
-        fileName: selectedExamReviewDetail.fileName,
+        fileName: initialValues.fileName,
       }));
       setSelectedFile(null);
     }
@@ -366,6 +381,19 @@ export function ExamDetailSection({
     try {
       const post: UpdateExamReviewRequest['post'] = {};
 
+      if (formData.classNumber === null) {
+        toast.error('분반을 입력해주세요.');
+        return;
+      }
+      if (formData.isConfirmed !== initialValues.isConfirmed) {
+        post.isConfirmed = formData.isConfirmed;
+      }
+      if (formData.isDiscussed !== initialValues.isDiscussed) {
+        post.isDiscussed = formData.isDiscussed;
+      }
+      if ((formData.memo ?? '') !== (initialValues.memo ?? '')) {
+        post.memo = formData.memo === '' ? null : formData.memo;
+      }
       if (formData.lectureName !== initialValues.lectureName) {
         post.lectureName = formData.lectureName;
       }
@@ -373,9 +401,7 @@ export function ExamDetailSection({
         post.professor = formData.professorName;
       }
       if (formData.classNumber !== initialValues.classNumber) {
-        if (formData.classNumber !== null) {
-          post.classNumber = formData.classNumber;
-        }
+        post.classNumber = formData.classNumber;
       }
       if (formData.semester !== initialValues.semester) {
         const yearMatch = formData.semester.match(/^(\d{4})/);
@@ -401,36 +427,25 @@ export function ExamDetailSection({
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
-      const hasReviewUpdate = Object.keys(post).length > 0 || selectedFile;
-      const hasConfirmUpdate =
-        formData.isConfirmed !== initialValues.isConfirmed;
+      const hasUpdate = Object.keys(post).length > 0 || selectedFile;
 
-      if (hasReviewUpdate) {
-        const updateData: UpdateExamReviewRequest = {
-          ...(selectedFile ? { file: selectedFile } : {}),
-          post,
-        };
-
-        const response = await updateExamReview(
-          selectedExamReview.id,
-          updateData
-        );
-
-        if (!response.isSuccess) {
-          toast.error(response.message || '시험 후기 수정에 실패했습니다.');
-          return;
-        }
+      if (!hasUpdate) {
+        return;
       }
 
-      if (hasConfirmUpdate) {
-        const response = await confirmExamReview(selectedExamReview.id, {
-          isConfirmed: formData.isConfirmed,
-        });
+      const updateData: UpdateExamReviewRequest = {
+        ...(selectedFile ? { file: selectedFile } : {}),
+        post,
+      };
 
-        if (!response.isSuccess) {
-          toast.error(response.message || '확인여부 변경에 실패했습니다.');
-          return;
-        }
+      const response = await updateExamReview(
+        selectedExamReview.id,
+        updateData
+      );
+
+      if (!response.isSuccess) {
+        toast.error(response.message || '시험 후기 수정에 실패했습니다.');
+        return;
       }
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
@@ -438,6 +453,8 @@ export function ExamDetailSection({
       setIsEditMode(false);
       setInitialValues({
         isConfirmed: formData.isConfirmed,
+        isDiscussed: response.result.isDiscussed,
+        memo: response.result.memo,
         lectureName: formData.lectureName,
         professorName: formData.professorName,
         classNumber: formData.classNumber,
@@ -447,8 +464,9 @@ export function ExamDetailSection({
         isOnline: formData.isOnline,
         examType: formData.examType,
         questionDetail: formData.examTypeAndQuestions,
+        fileName: response.result.fileName,
       });
-      onSaveSuccess?.();
+      onSaveSuccess?.(response.result);
     } catch (error: unknown) {
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||

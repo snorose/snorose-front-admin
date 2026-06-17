@@ -105,25 +105,17 @@ export const convertExamTypeEnumToString = (
 export const convertSemesterToEnum = (
   semesterStr: string
 ): 'FIRST' | 'SECOND' | 'SUMMER' | 'WINTER' | 'OTHER' => {
-  if (
-    semesterStr.includes('1') &&
-    !semesterStr.includes('여름') &&
-    !semesterStr.includes('겨울')
-  ) {
-    return 'FIRST';
-  }
-  if (
-    semesterStr.includes('2') &&
-    !semesterStr.includes('여름') &&
-    !semesterStr.includes('겨울')
-  ) {
-    return 'SECOND';
-  }
   if (semesterStr.includes('여름')) {
     return 'SUMMER';
   }
   if (semesterStr.includes('겨울')) {
     return 'WINTER';
+  }
+  if (semesterStr.endsWith('-1')) {
+    return 'FIRST';
+  }
+  if (semesterStr.endsWith('-2')) {
+    return 'SECOND';
   }
   return 'OTHER';
 };

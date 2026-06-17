@@ -123,13 +123,37 @@ export function ExamReviewDetailInfoSection({
         <Field className='gap-0'>
           <Field.Label>논의 여부</Field.Label>
           <Field.Content>
-            <div className={STATUS_FIELD_CLASS_NAME}>
-              {renderStatusBadge(
-                formData.isDiscussed ? '논의 있음' : '논의 없음',
-                formData.isDiscussed,
-                'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-              )}
-            </div>
+            <Select
+              value={formData.isDiscussed ? 'true' : 'false'}
+              onValueChange={(value) =>
+                setFormData({ isDiscussed: value === 'true' })
+              }
+              disabled={isFormDisabled}
+            >
+              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+                {renderStatusBadge(
+                  formData.isDiscussed ? '논의 있음' : '논의 없음',
+                  formData.isDiscussed,
+                  'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                )}
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value='true'>
+                  {renderStatusBadge(
+                    '논의 있음',
+                    true,
+                    'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                  )}
+                </Select.Item>
+                <Select.Item value='false'>
+                  {renderStatusBadge(
+                    '논의 없음',
+                    false,
+                    'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                  )}
+                </Select.Item>
+              </Select.Content>
+            </Select>
           </Field.Content>
         </Field>
         <Field className='gap-0'>
@@ -372,9 +396,13 @@ export function ExamReviewDetailInfoSection({
         <Field className='gap-0 md:col-span-2'>
           <Field.Label>메모</Field.Label>
           <Field.Content>
-            <div className='min-h-[72px] rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm whitespace-pre-wrap text-gray-700'>
-              {formData.memo}
-            </div>
+            <Textarea
+              value={formData.memo ?? ''}
+              onChange={(e) => setFormData({ memo: e.target.value })}
+              disabled={isFormDisabled}
+              rows={3}
+              className='min-h-[96px] resize-none'
+            />
           </Field.Content>
         </Field>
       </div>
