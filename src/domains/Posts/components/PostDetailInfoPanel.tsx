@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
+import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Switch } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
@@ -13,7 +14,6 @@ import {
 } from '@/shared/utils/postCommentUtils';
 
 import type { AdminGetPostResponse } from '../types/post';
-import MemberInfoPopover from './MemberInfoPopover';
 
 interface PostDetailInfoPanelProps {
   post: AdminGetPostResponse;

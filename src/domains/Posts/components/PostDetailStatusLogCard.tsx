@@ -1,7 +1,7 @@
 import { Badge } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
-import { getCommentStatusBadge } from '../utils/commentUtils';
+import { getCommentStatusBadge } from '@/domains/Comments/utils/commentUtils';
 
 interface StatusLog {
   id: number;

@@ -8,16 +8,16 @@ import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
-import PostDetailActionModal from '@/domains/Comments/components/PostDetailActionModal';
-import PostDetailBlacklistCard from '@/domains/Comments/components/PostDetailBlacklistCard';
-import PostDetailCommentList from '@/domains/Comments/components/PostDetailCommentList';
-import PostDetailInfoPanel from '@/domains/Comments/components/PostDetailInfoPanel';
-import PostDetailManageCard from '@/domains/Comments/components/PostDetailManageCard';
-import PostDetailReportCard from '@/domains/Comments/components/PostDetailReportCard';
+import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
+import PostDetailActionModal from '@/domains/Posts/components/PostDetailActionModal';
+import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetailBlacklistCard';
+import PostDetailCommentList from '@/domains/Posts/components/PostDetailCommentList';
+import PostDetailInfoPanel from '@/domains/Posts/components/PostDetailInfoPanel';
+import PostDetailManageCard from '@/domains/Posts/components/PostDetailManageCard';
+import PostDetailReportCard from '@/domains/Posts/components/PostDetailReportCard';
 import PostDetailStatusLogCard, {
   type StatusLog,
-} from '@/domains/Comments/components/PostDetailStatusLogCard';
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
+} from '@/domains/Posts/components/PostDetailStatusLogCard';
 
 import {
   blacklistHistoryAPI,

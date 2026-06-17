@@ -4,11 +4,16 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { AlertTriangle, CornerDownRight, Heart, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResponse } from '@/domains/Comments/types/comment';
+import {
+  getCommentStatus,
+  getCommentStatusBadge,
+} from '@/domains/Comments/utils/commentUtils';
 import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import {
@@ -17,9 +22,6 @@ import {
   updateCommentVisibility,
 } from '@/apis/comments';
 import { searchUsersAPI } from '@/apis/users';
-
-import { getCommentStatus, getCommentStatusBadge } from '../utils/commentUtils';
-import MemberInfoPopover from './MemberInfoPopover';
 
 interface PostDetailCommentListProps {
   postId: number;
