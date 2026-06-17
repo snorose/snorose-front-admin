@@ -9,6 +9,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
+import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import type { MemberInfo } from '@/shared/types';
@@ -21,7 +22,6 @@ import {
 import { stripHtmlTags } from '@/shared/utils/postCommentUtils';
 
 import type { AdminGetPostResponse } from '../types/post';
-import MemberInfoPopover from './MemberInfoPopover';
 
 interface PostTableRowProps {
   post: AdminGetPostResponse;

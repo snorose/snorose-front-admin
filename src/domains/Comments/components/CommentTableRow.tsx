@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { AlertTriangle, Heart } from 'lucide-react';
 
+import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import type { MemberInfo } from '@/shared/types';
@@ -16,7 +17,6 @@ import {
   getCommentStatus,
   getCommentStatusBadge,
 } from '../utils/commentUtils';
-import MemberInfoPopover from './MemberInfoPopover';
 
 interface CommentTableRowProps {
   comment: AdminCommentResponse;

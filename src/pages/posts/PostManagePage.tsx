@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '@/shared/components';
 
-import PostTable from '@/domains/Comments/components/PostTable';
+import PostTable from '@/domains/Posts/components/PostTable';
 
 export default function PostManagePage() {
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();

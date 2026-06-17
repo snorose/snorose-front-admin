@@ -1,12 +1,12 @@
 import { ArrowRight } from 'lucide-react';
 
 import { PageHeader } from '@/shared/components';
+import BulkDeleteBar from '@/shared/components/BulkDeleteBar';
 import { Input, Pagination, Select } from '@/shared/components/ui';
 
-import type { AdminGetPostResponse } from '@/domains/Comments/types';
+import type { AdminGetPostResponse } from '@/domains/Posts/types';
 
 import usePostListFilter from '../hooks/usePostListFilter';
-import BulkDeleteBar from './BulkDeleteBar';
 import PostListItem from './PostListItem';
 
 interface PostListProps {
