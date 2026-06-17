@@ -5,46 +5,28 @@ comment: |
 
 labels:
   '✨ Feature':
-    - '.*\[FEAT\].*'
-    - '.*\[FEATURE\].*'
-    - '.*\[ADD\].*'
+    - '^feat: .+'
 
   '🐞 BugFix':
-    - '.*\[FIX\].*'
+    - '^fix: .+'
 
   '📄 Docs':
-    - '.*\[DOCS\].*'
+    - '^docs: .+'
 
   '🧹 Chore':
-    - '.*\[CHORE\].*'
+    - '^chore: .+'
 
   '🪄 Modify':
-    - '.*\[MODIFY\].*'
-    - '.*\[RENAME\].*'
-    - '.*\[CORRECT\].*'
+    - '^modify: .+'
 
   '🎨 UI':
-    - '.*\[DESIGN\].*'
-    - '.*\[UI\].*'
-
-  '🧚 Style':
-    - '.*\[STYLE\].*'
+    - '^style: .+'
 
   '❄️ Release':
-    - '.*\[MERGE\].*'
-
-  '⚙️ Setting':
-    - '.*\[SETTING\].*'
+    - '^merge: .+'
 
   '🛠️ Refactor':
-    - '.*\[REFACTOR\].*'
-
-  '⚡️ Performance':
-    - '.*\[PERF\].*'
-    - '.*\[PERFORMANCE\].*'
+    - '^refactor: .+'
 
   '🧪 Test':
-    - '.*\[TEST\].*'
-
-  '🔥 Hotfix':
-    - '.*\[HOTFIX\].*'
+    - '^test: .+'
