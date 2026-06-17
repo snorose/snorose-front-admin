@@ -9,7 +9,6 @@ interface MemberInfoPopoverProps {
   popoverUser: MemberInfo | null;
   isUserLoading: boolean;
   onClose: () => void;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
 }
 
 export default function MemberInfoPopover({
@@ -17,7 +16,6 @@ export default function MemberInfoPopover({
   popoverUser,
   isUserLoading,
   onClose,
-  onPageChange,
 }: MemberInfoPopoverProps) {
   const navigate = useNavigate();
 
@@ -98,7 +96,6 @@ export default function MemberInfoPopover({
           <button
             onClick={() => {
               onClose();
-              onPageChange(1);
               const params = new URLSearchParams();
               params.set('encryptedUserId', encryptedUserId);
               navigate(`?${params.toString()}`, { replace: true });

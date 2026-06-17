@@ -37,9 +37,6 @@ export default function PostDetailPage() {
   const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(false);
 
-  // 로컬 페이지 번호 상태
-  const [, setPopoverPage] = useState(1);
-
   // 게시글 상세조회 쿼리
   const {
     data: post,
@@ -263,7 +260,6 @@ export default function PostDetailPage() {
               setActivePopoverId(null);
               setPopoverUser(null);
             }}
-            onPageChange={setPopoverPage}
           />
 
           {/* 댓글 목록 */}

@@ -22,7 +22,6 @@ interface PostDetailInfoPanelProps {
   popoverUser: MemberInfo | null;
   isUserLoading: boolean;
   onClosePopover: () => void;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
 }
 
 export default function PostDetailInfoPanel({
@@ -32,7 +31,6 @@ export default function PostDetailInfoPanel({
   popoverUser,
   isUserLoading,
   onClosePopover,
-  onPageChange,
 }: PostDetailInfoPanelProps) {
   const [isNotice, setIsNotice] = useState(post.isNotice);
   const status = getPostStatus(post);
@@ -140,7 +138,6 @@ export default function PostDetailInfoPanel({
                   popoverUser={popoverUser}
                   isUserLoading={isUserLoading}
                   onClose={onClosePopover}
-                  onPageChange={onPageChange}
                 />
               </div>
             )}
