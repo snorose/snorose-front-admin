@@ -59,6 +59,7 @@ type FormData = {
   deletionStatus: ExamReviewProcessStatus | null;
   isSanctioned: boolean;
   visibilityStatus: ExamReviewProcessStatus | null;
+  memo: string | null;
   examReviewName: string;
   uploadTime: string;
   lectureName: string;
@@ -95,6 +96,7 @@ const DEFAULT_FORM_DATA: FormData = {
   deletionStatus: null,
   isSanctioned: false,
   visibilityStatus: null,
+  memo: null,
   examReviewName: '',
   uploadTime: '',
   lectureName: '',
@@ -162,6 +164,7 @@ export function ExamDetailSection({
           selectedExamReviewDetail.isSanctioned
         ),
         visibilityStatus: selectedExamReviewDetail.visibilityStatus,
+        memo: selectedExamReviewDetail.memo,
         examReviewName:
           selectedExamReviewDetail.title ??
           selectedExamReview?.reviewTitle ??
@@ -209,6 +212,7 @@ export function ExamDetailSection({
         deletionStatus: formInitialValues.deletionStatus,
         isSanctioned: formInitialValues.isSanctioned,
         visibilityStatus: formInitialValues.visibilityStatus,
+        memo: formInitialValues.memo,
         examReviewName: formInitialValues.examReviewName,
         uploadTime: formInitialValues.uploadTime,
         lectureName: formInitialValues.lectureName,

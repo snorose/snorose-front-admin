@@ -19,18 +19,19 @@ import { convertLectureTypeToString } from '@/domains/Reviews/utils';
 export interface ExamReviewDetailInfoSectionFormData {
   isConfirmed: boolean;
   isDiscussed: boolean;
+  lectureName: string;
+  professorName: string;
+  lectureType: LectureType;
+  semester: string;
+  classNumber: number | null;
+  examType: string;
+  isPF: string;
+  isOnline: string;
   deletionStatus: ExamReviewProcessStatus | null;
   isSanctioned: boolean;
   visibilityStatus: ExamReviewProcessStatus | null;
-  lectureName: string;
-  professorName: string;
+  memo: string | null;
   fileName: string;
-  semester: string;
-  examType: string;
-  lectureType: LectureType;
-  classNumber: number | null;
-  isPF: string;
-  isOnline: string;
   examTypeAndQuestions: string;
 }
 
@@ -366,6 +367,14 @@ export function ExamReviewDetailInfoSection({
               rows={3}
               className='min-h-[110px] resize-none'
             />
+          </Field.Content>
+        </Field>
+        <Field className='gap-0 md:col-span-2'>
+          <Field.Label>메모</Field.Label>
+          <Field.Content>
+            <div className='min-h-[72px] rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm whitespace-pre-wrap text-gray-700'>
+              {formData.memo}
+            </div>
           </Field.Content>
         </Field>
       </div>
