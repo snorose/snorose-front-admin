@@ -242,7 +242,7 @@ export default function CommentTableRow({
             } else if (status === '삭제됨' && comment.deletedAt) {
               changeDateStr = formatDateTimeWithAmPm(comment.deletedAt);
               label = '삭제됨';
-            } else if (status === '신고누적' && comment.updatedAt) {
+            } else if (status.startsWith('신고누적') && comment.updatedAt) {
               changeDateStr = formatDateTimeWithAmPm(comment.updatedAt);
               label = '신고누적';
             }
