@@ -18,6 +18,15 @@ export const EXAM_REVIEW_SORTS = ['ASC', 'DESC'] as const;
 
 export type ExamReviewSort = (typeof EXAM_REVIEW_SORTS)[number];
 
+export type ExamReviewProcessStatus =
+  | 'VISIBLE'
+  | 'USER_DELETED'
+  | 'ADMIN_DELETED'
+  | 'ADMIN_HIDDEN'
+  | 'AUTO_HIDDEN'
+  | 'SANCTIONED'
+  | 'DESANCTIONED';
+
 export const isExamReviewSort = (
   value?: string | null
 ): value is ExamReviewSort =>
@@ -50,6 +59,10 @@ export interface ExamReview {
   questionDetail: string;
   uploadTime: string;
   userDisplay: string;
+  isDiscussed: boolean;
+  isReported: boolean;
+  reportCount: number;
+  processStatuses: ExamReviewProcessStatus[];
 }
 
 export interface ExamReviews {
@@ -63,6 +76,11 @@ export interface ExamReviews {
   encryptedUserId: string | null;
   userDisplay?: string | null;
   userName: string | null;
+  reportCount?: number;
+  isDiscussed?: boolean;
+  deletionStatus?: ExamReviewProcessStatus | null;
+  isSanctioned?: boolean | 'true' | 'false' | null;
+  visibilityStatus?: ExamReviewProcessStatus | null;
   lectureYear?: number;
   lectureSemester?: Semester;
   examType?: ExamType;

@@ -5,6 +5,7 @@ export type {
   ExamReview,
   ExamReviewDetailResponse,
   ExamReviewDetailResult,
+  ExamReviewProcessStatus,
   ExamReviews,
   ExamReviewSearchParams,
   ExamReviewSort,

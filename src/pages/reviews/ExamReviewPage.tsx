@@ -286,6 +286,10 @@ export default function ExamReviewPage() {
                 questionDetail: updatedDetail.questionDetail,
                 uploadTime,
                 userDisplay: updatedDetail.userDisplay,
+                isDiscussed: selectedExamReview.isDiscussed,
+                isReported: selectedExamReview.isReported,
+                reportCount: selectedExamReview.reportCount,
+                processStatuses: selectedExamReview.processStatuses,
               };
 
               updatedData[itemIndex] = updatedItem;
