@@ -146,7 +146,10 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: selectedExamReviewDetail.isConfirmed,
-        examReviewName: selectedExamReviewDetail.title,
+        examReviewName:
+          selectedExamReviewDetail.title ??
+          selectedExamReview?.reviewTitle ??
+          '',
         uploadTime: uploadTimeStr,
         lectureName: selectedExamReviewDetail.lectureName,
         professorName: selectedExamReviewDetail.professor,
@@ -174,7 +177,7 @@ export function ExamDetailSection({
       };
     }
     return null;
-  }, [selectedExamReviewDetail]);
+  }, [selectedExamReview?.reviewTitle, selectedExamReviewDetail]);
 
   useEffect(() => {
     setIsEditMode(false);

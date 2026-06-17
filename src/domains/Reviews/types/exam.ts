@@ -141,20 +141,21 @@ export interface DeleteExamReviewResponse {
   };
 }
 
+export interface ExamReviewDetailLog {
+  encryptedAdminId: string | null;
+  adminName: string | null;
+  changes: Record<string, string | number | boolean | null>;
+  createdAt: string;
+}
+
 export interface ExamReviewDetailResult {
   encryptedUserId: string;
   userDisplay: string;
-  isWriter: boolean;
-  isWriterWithdrawn: boolean;
   postId: number;
-  title: string;
+  title?: string;
   commentCount: number;
-  scrapCount: number;
-  isScrapped: boolean;
   status?: string;
   createdAt: string;
-  isNotice: boolean;
-  isEdited: boolean;
   lectureName: string;
   professor: string;
   classNumber: number;
@@ -165,9 +166,14 @@ export interface ExamReviewDetailResult {
   isOnline: boolean;
   examType: ExamType;
   isConfirmed: boolean;
+  isDiscussed: boolean;
+  deletionStatus: ExamReviewProcessStatus | null;
+  isSanctioned: boolean | 'true' | 'false' | null;
+  visibilityStatus: ExamReviewProcessStatus | null;
+  memo: string | null;
   fileName: string;
   questionDetail: string;
-  isDownloaded: boolean;
+  logs: ExamReviewDetailLog[];
 }
 
 export interface ExamReviewDetailResponse {

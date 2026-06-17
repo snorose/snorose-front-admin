@@ -5,13 +5,13 @@ import { formatDateTimeToMinutes } from '@/shared/utils';
 import { STATUS } from '@/domains/Reviews/constants';
 import type {
   ExamReview,
-  ExamReviewProcessStatus,
   ExamReviewSearchParams,
   ExamReviews,
 } from '@/domains/Reviews/types';
 import {
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
+  getExamReviewProcessStatuses,
 } from '@/domains/Reviews/utils';
 
 import { getExamReviews } from '@/apis';
@@ -21,29 +21,6 @@ interface UseExamReviewsParams extends ExamReviewSearchParams {
   enabled?: boolean;
   refreshKey?: number;
 }
-
-const isSanctioned = (value: ExamReviews['isSanctioned']): boolean =>
-  value === true || value === 'true';
-
-const getProcessStatuses = (
-  apiData: ExamReviews
-): ExamReviewProcessStatus[] => {
-  const processStatuses: ExamReviewProcessStatus[] = [];
-
-  if (apiData.deletionStatus && apiData.deletionStatus !== 'VISIBLE') {
-    processStatuses.push(apiData.deletionStatus);
-  }
-
-  if (apiData.visibilityStatus && apiData.visibilityStatus !== 'VISIBLE') {
-    processStatuses.push(apiData.visibilityStatus);
-  }
-
-  if (isSanctioned(apiData.isSanctioned)) {
-    processStatuses.push('SANCTIONED');
-  }
-
-  return processStatuses.length > 0 ? processStatuses : ['VISIBLE'];
-};
 
 const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
   const reviewTitle = apiData.title || apiData.content || '';
@@ -85,7 +62,7 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
     isDiscussed: apiData.isDiscussed ?? false,
     isReported: reportCount > 0,
     reportCount,
-    processStatuses: getProcessStatuses(apiData),
+    processStatuses: getExamReviewProcessStatuses(apiData),
   };
 };
 
