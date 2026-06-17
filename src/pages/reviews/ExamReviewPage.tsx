@@ -220,19 +220,22 @@ export default function ExamReviewPage() {
     // 쿼리 캐시를 직접 업데이트하여 스켈레톤 없이 즉시 반영
     if (selectedExamReview && selectedExamReviewDetail) {
       try {
-        const updatedDetail = updatedDetailFromSave
-          ? updatedDetailFromSave
-          : await getExamReviewDetail(selectedExamReview.id).then(
-              (response) => {
-                if (!response.isSuccess || !response.result) {
-                  throw new Error(
-                    response.message ||
-                      '시험 후기 상세 정보를 불러오는데 실패했습니다.'
-                  );
-                }
-                return response.result;
-              }
+        let updatedDetail: ExamReviewDetailResult;
+
+        if (updatedDetailFromSave !== undefined) {
+          updatedDetail = updatedDetailFromSave;
+        } else {
+          const response = await getExamReviewDetail(selectedExamReview.id);
+
+          if (!response.isSuccess || !response.result) {
+            throw new Error(
+              response.message ||
+                '시험 후기 상세 정보를 불러오는데 실패했습니다.'
             );
+          }
+
+          updatedDetail = response.result;
+        }
 
         // 현재 검색 파라미터로 쿼리 키 생성
         const queryKey = [
