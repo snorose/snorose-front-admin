@@ -55,7 +55,12 @@ export const updateExamReview = async (
 
   const response = await axiosInstance.patch(
     `/v1/admin/reviews/${postId}`,
-    formData
+    formData,
+    {
+      headers: {
+        'Content-Type': undefined,
+      },
+    }
   );
   return response.data;
 };
