@@ -77,6 +77,8 @@ type FormData = {
 
 type InitialValues = {
   isConfirmed: boolean;
+  isDiscussed: boolean;
+  memo: string | null;
   lectureName: string;
   professorName: string;
   classNumber: number | null;
@@ -184,6 +186,8 @@ export function ExamDetailSection({
         author: selectedExamReviewDetail.userDisplay,
         initialValues: {
           isConfirmed: selectedExamReviewDetail.isConfirmed,
+          isDiscussed: selectedExamReviewDetail.isDiscussed,
+          memo: selectedExamReviewDetail.memo,
           lectureName: selectedExamReviewDetail.lectureName,
           professorName: selectedExamReviewDetail.professor,
           classNumber: selectedExamReviewDetail.classNumber,
@@ -241,6 +245,8 @@ export function ExamDetailSection({
     if (!initialValues) return false;
     return (
       formData.isConfirmed !== initialValues.isConfirmed ||
+      formData.isDiscussed !== initialValues.isDiscussed ||
+      (formData.memo ?? '') !== (initialValues.memo ?? '') ||
       formData.lectureName !== initialValues.lectureName ||
       formData.professorName !== initialValues.professorName ||
       formData.classNumber !== initialValues.classNumber ||
@@ -268,6 +274,11 @@ export function ExamDetailSection({
       initialValues.isConfirmed ? '확인' : '미확인',
       formData.isConfirmed ? '확인' : '미확인'
     );
+    add(
+      '논의 여부',
+      initialValues.isDiscussed ? '논의 있음' : '논의 없음',
+      formData.isDiscussed ? '논의 있음' : '논의 없음'
+    );
 
     add('강의명', initialValues.lectureName, formData.lectureName);
     add('교수명', initialValues.professorName, formData.professorName);
@@ -290,6 +301,7 @@ export function ExamDetailSection({
       initialValues.questionDetail,
       formData.examTypeAndQuestions
     );
+    add('메모', initialValues.memo ?? '', formData.memo ?? '');
 
     if (selectedFile) {
       add('업로드 파일', initialValues.fileName || '', selectedFile.name);
@@ -305,6 +317,8 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: initialValues.isConfirmed,
+        isDiscussed: initialValues.isDiscussed,
+        memo: initialValues.memo,
         lectureName: initialValues.lectureName,
         professorName: initialValues.professorName,
         classNumber: initialValues.classNumber,
@@ -374,6 +388,12 @@ export function ExamDetailSection({
       if (formData.isConfirmed !== initialValues.isConfirmed) {
         post.isConfirmed = formData.isConfirmed;
       }
+      if (formData.isDiscussed !== initialValues.isDiscussed) {
+        post.isDiscussed = formData.isDiscussed;
+      }
+      if ((formData.memo ?? '') !== (initialValues.memo ?? '')) {
+        post.memo = formData.memo === '' ? null : formData.memo;
+      }
       if (formData.lectureName !== initialValues.lectureName) {
         post.lectureName = formData.lectureName;
       }
@@ -433,6 +453,8 @@ export function ExamDetailSection({
       setIsEditMode(false);
       setInitialValues({
         isConfirmed: formData.isConfirmed,
+        isDiscussed: response.result.isDiscussed,
+        memo: response.result.memo,
         lectureName: formData.lectureName,
         professorName: formData.professorName,
         classNumber: formData.classNumber,
