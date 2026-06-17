@@ -4,7 +4,7 @@ import { Badge, Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import type { AdminGetPostResponse } from '@/domains/Comments/types';
+import type { AdminGetPostResponse } from '@/domains/Posts/types';
 
 interface PostListItemProps {
   post: AdminGetPostResponse;

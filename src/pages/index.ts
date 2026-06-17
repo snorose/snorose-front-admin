@@ -9,6 +9,7 @@ export { default as ExcelPointUploadPage } from './points/ExcelPointUploadPage';
 export { default as PointFreezePage } from './points/PointFreezePage';
 export { default as PointMultiplePage } from './points/PointMultiplePage';
 export { default as PostCommentPage } from './posts/PostCommentPage';
+export { default as PostDetailPage } from './posts/PostDetailPage';
 export { default as PostManagePage } from './posts/PostManagePage';
 export { default as ExamReviewPage } from './reviews/ExamReviewPage';
 export { default as ExamReviewPeriodPage } from './reviews/ExamReviewPeriodPage';

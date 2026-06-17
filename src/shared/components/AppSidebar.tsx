@@ -28,8 +28,17 @@ export const AppSidebar = ({
   const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const location = useLocation();
 
-  const isActive = (url: string) =>
-    location.pathname === url || location.pathname.startsWith(`${url}/`);
+  const isActive = (url: string) => {
+    if (
+      location.pathname.startsWith('/posts/manage/') &&
+      location.pathname !== '/posts/manage'
+    ) {
+      const isFromComments = location.state?.from === 'comments';
+      if (url === '/posts/comments') return isFromComments;
+      if (url === '/posts/manage') return !isFromComments;
+    }
+    return location.pathname === url || location.pathname.startsWith(`${url}/`);
+  };
 
   useEffect(() => {
     const stored = sessionStorage.getItem('sidebar-open-states');

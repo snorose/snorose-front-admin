@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import BulkDeleteBar from '@/shared/components/BulkDeleteBar';
 import { Input, Select } from '@/shared/components/ui';
 
 import { useCommentSearch } from '@/domains/Comments/hooks/useCommentSearch';
@@ -7,7 +8,6 @@ import { useDeleteComment } from '@/domains/Comments/hooks/useDeleteComment';
 
 import { useBulkDeleteComment } from '../hooks/useBulkDeleteComment';
 import type { AdminCommentSearchRequest } from '../types';
-import BulkDeleteBar from './BulkDeleteBar';
 import CommentListItem from './CommentListItem';
 import { useCommentVisibility } from './useCommentVisibility';
 

@@ -6,7 +6,7 @@ import type {
   AdminPostListResponse,
   AdminPostSearchRequest,
   DeletePostResponse,
-} from '@/domains/Comments/types/post';
+} from '@/domains/Posts/types/post';
 
 // 게시글 조건 조회 api
 export const searchPosts = async (

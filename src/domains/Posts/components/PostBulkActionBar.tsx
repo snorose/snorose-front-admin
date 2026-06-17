@@ -23,19 +23,25 @@ export default function PostBulkActionBar({
 
   return (
     <div className='flex items-center justify-between rounded-lg border border-red-200 bg-red-50/50 px-4 py-3 shadow-sm'>
-      <span className='text-sm font-medium text-red-800'>
-        선택된 <strong className='text-red-700'>{selectedCount}</strong>개의
-        게시글에 대해 일괄 동작을 적용할 수 있습니다.
-      </span>
+      <span className='text-sm font-bold text-red-800'>게시글 일괄 처리:</span>
       <div className='flex flex-wrap items-center gap-2'>
+        <Button
+          variant='destructive'
+          size='sm'
+          className='flex h-8 items-center gap-1 bg-red-600 text-xs hover:bg-red-700'
+          disabled={isDeletePending}
+          onClick={onBulkDelete}
+        >
+          <Trash2 className='h-3.5 w-3.5' /> 삭제
+        </Button>
         <Button
           variant='outline'
           size='sm'
           className='flex h-8 items-center gap-1 border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
           disabled={isVisibilityPending}
-          onClick={() => onBulkVisibility(true)}
+          onClick={onBulkRestore}
         >
-          <Eye className='h-3.5 w-3.5 text-blue-600' /> 비공개 해제
+          <RotateCcw className='h-3.5 w-3.5 text-gray-500' /> 복구
         </Button>
         <Button
           variant='outline'
@@ -51,18 +57,9 @@ export default function PostBulkActionBar({
           size='sm'
           className='flex h-8 items-center gap-1 border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
           disabled={isVisibilityPending}
-          onClick={onBulkRestore}
+          onClick={() => onBulkVisibility(true)}
         >
-          <RotateCcw className='text-green-650 h-3.5 w-3.5' /> 복구
-        </Button>
-        <Button
-          variant='destructive'
-          size='sm'
-          className='flex h-8 items-center gap-1 bg-red-600 text-xs hover:bg-red-700'
-          disabled={isDeletePending}
-          onClick={onBulkDelete}
-        >
-          <Trash2 className='h-3.5 w-3.5' /> 삭제
+          <Eye className='h-3.5 w-3.5 text-gray-500' /> 공개
         </Button>
       </div>
     </div>
