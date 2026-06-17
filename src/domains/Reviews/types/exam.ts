@@ -14,7 +14,7 @@ export type ExamType = (typeof EXAM_TYPE)[keyof typeof EXAM_TYPE];
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 
-export const EXAM_REVIEW_SORTS = ['ASC', 'DESC', 'REPORT'] as const;
+export const EXAM_REVIEW_SORTS = ['ASC', 'DESC'] as const;
 
 export type ExamReviewSort = (typeof EXAM_REVIEW_SORTS)[number];
 
