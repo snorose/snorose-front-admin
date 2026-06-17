@@ -1,5 +1,7 @@
 import { Skeleton, Table } from '@/shared/components/ui';
 
+const DEFAULT_EXAM_TABLE_COLUMN_COUNT = 8;
+
 // ======= types =======
 interface ExamTableSkeletonProps {
   itemsPerPage?: number;
@@ -18,7 +20,7 @@ interface ExamTableEmptyProps {
 // ======= components =======
 export function ExamTableSkeleton({
   itemsPerPage = 10,
-  columnCount = 5,
+  columnCount = DEFAULT_EXAM_TABLE_COLUMN_COUNT,
 }: ExamTableSkeletonProps) {
   return (
     <>
@@ -35,7 +37,9 @@ export function ExamTableSkeleton({
   );
 }
 
-export function ExamTableEmpty({ columnCount = 5 }: ExamTableEmptyProps) {
+export function ExamTableEmpty({
+  columnCount = DEFAULT_EXAM_TABLE_COLUMN_COUNT,
+}: ExamTableEmptyProps) {
   return (
     <Table.Row>
       <Table.Cell colSpan={columnCount} className='h-[240px] p-0 text-gray-500'>
@@ -49,7 +53,7 @@ export function ExamTableEmpty({ columnCount = 5 }: ExamTableEmptyProps) {
 
 export function ExamTableEmptyRows({
   count,
-  columnCount = 5,
+  columnCount = DEFAULT_EXAM_TABLE_COLUMN_COUNT,
 }: ExamTableEmptyRowsProps) {
   if (count <= 0) return null;
 
