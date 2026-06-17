@@ -8,7 +8,7 @@ import { formatDateTimeToMinutes } from '@/shared/utils';
 import type { ExamReviewDetailLog } from '@/domains/Reviews/types';
 
 interface ExamReviewLogSectionProps {
-  logs?: ExamReviewDetailLog[];
+  logs?: ExamReviewDetailLog[] | null;
 }
 
 const CHANGE_FIELD_LABELS: Record<string, string> = {
@@ -81,8 +81,10 @@ const formatChangeValue = (
   return String(value);
 };
 
-export function ExamReviewLogSection({ logs = [] }: ExamReviewLogSectionProps) {
-  if (logs.length === 0) {
+export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
+  const safeLogs = logs ?? [];
+
+  if (safeLogs.length === 0) {
     return (
       <div className='flex min-h-[240px] items-center justify-center rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-500'>
         관리 이력이 없습니다.
@@ -106,7 +108,7 @@ export function ExamReviewLogSection({ logs = [] }: ExamReviewLogSectionProps) {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {logs.map((log, index) => (
+          {safeLogs.map((log, index) => (
             <Table.Row key={`${log.createdAt}-${index}`}>
               <Table.Cell>{formatDateTimeToMinutes(log.createdAt)}</Table.Cell>
               <Table.Cell>{log.adminName || '-'}</Table.Cell>
