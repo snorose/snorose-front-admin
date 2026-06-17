@@ -6,6 +6,7 @@ export { default as ExamDiscussionPanel } from './ExamDiscussionPanel';
 export { ExamMultiSelect } from './ExamMultiSelect';
 export { ExamReviewCommentSection } from './ExamReviewCommentSection';
 export { ExamReviewDetailInfoSection } from './ExamReviewDetailInfoSection';
+export { ExamReviewLogSection } from './ExamReviewLogSection';
 export { ExamReviewPeriodDeleteConfirmModal } from './ExamReviewPeriodDeleteConfirmModal';
 export { ExamReviewPeriodListSection } from './ExamReviewPeriodListSection';
 export { ExamReviewPeriodScheduleForm } from './ExamReviewPeriodScheduleForm';

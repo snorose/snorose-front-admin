@@ -15,12 +15,14 @@ import {
 import {
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
+  ExamReviewLogSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
 } from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
+  ExamReviewProcessStatus,
   LectureType,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
@@ -30,6 +32,7 @@ import {
   convertLectureTypeToString,
   convertSemesterEnumToString,
   convertSemesterToEnum,
+  isExamReviewSanctioned,
 } from '@/domains/Reviews/utils';
 
 import {
@@ -53,6 +56,11 @@ type FormData = {
   encryptedUserId: string;
   postId: number | null;
   isConfirmed: boolean;
+  isDiscussed: boolean;
+  deletionStatus: ExamReviewProcessStatus | null;
+  isSanctioned: boolean;
+  visibilityStatus: ExamReviewProcessStatus | null;
+  memo: string | null;
   examReviewName: string;
   uploadTime: string;
   lectureName: string;
@@ -85,6 +93,11 @@ const DEFAULT_FORM_DATA: FormData = {
   encryptedUserId: '',
   postId: null,
   isConfirmed: false,
+  isDiscussed: false,
+  deletionStatus: null,
+  isSanctioned: false,
+  visibilityStatus: null,
+  memo: null,
   examReviewName: '',
   uploadTime: '',
   lectureName: '',
@@ -107,9 +120,9 @@ export function ExamDetailSection({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
-  const [activeTab, setActiveTab] = useState<'review' | 'post' | 'comments'>(
-    'review'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'review' | 'post' | 'comments' | 'logs'
+  >('review');
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -146,7 +159,17 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: selectedExamReviewDetail.isConfirmed,
-        examReviewName: selectedExamReviewDetail.title,
+        isDiscussed: selectedExamReviewDetail.isDiscussed,
+        deletionStatus: selectedExamReviewDetail.deletionStatus,
+        isSanctioned: isExamReviewSanctioned(
+          selectedExamReviewDetail.isSanctioned
+        ),
+        visibilityStatus: selectedExamReviewDetail.visibilityStatus,
+        memo: selectedExamReviewDetail.memo,
+        examReviewName:
+          selectedExamReviewDetail.title ??
+          selectedExamReview?.reviewTitle ??
+          '',
         uploadTime: uploadTimeStr,
         lectureName: selectedExamReviewDetail.lectureName,
         professorName: selectedExamReviewDetail.professor,
@@ -174,7 +197,7 @@ export function ExamDetailSection({
       };
     }
     return null;
-  }, [selectedExamReviewDetail]);
+  }, [selectedExamReview?.reviewTitle, selectedExamReviewDetail]);
 
   useEffect(() => {
     setIsEditMode(false);
@@ -186,6 +209,11 @@ export function ExamDetailSection({
         encryptedUserId: formInitialValues.encryptedUserId,
         postId: formInitialValues.postId,
         isConfirmed: formInitialValues.isConfirmed,
+        isDiscussed: formInitialValues.isDiscussed,
+        deletionStatus: formInitialValues.deletionStatus,
+        isSanctioned: formInitialValues.isSanctioned,
+        visibilityStatus: formInitialValues.visibilityStatus,
+        memo: formInitialValues.memo,
         examReviewName: formInitialValues.examReviewName,
         uploadTime: formInitialValues.uploadTime,
         lectureName: formInitialValues.lectureName,
@@ -495,7 +523,7 @@ export function ExamDetailSection({
           <Tabs
             value={activeTab}
             onValueChange={(value) =>
-              setActiveTab(value as 'review' | 'post' | 'comments')
+              setActiveTab(value as 'review' | 'post' | 'comments' | 'logs')
             }
             className='w-full p-4'
           >
@@ -510,6 +538,9 @@ export function ExamDetailSection({
                   </Tabs.Trigger>
                   <Tabs.Trigger value='comments' className='w-fit'>
                     댓글 목록 ({selectedExamReviewDetail?.commentCount ?? 0})
+                  </Tabs.Trigger>
+                  <Tabs.Trigger value='logs' className='w-fit'>
+                    관리 이력 ({selectedExamReviewDetail?.logs?.length ?? 0})
                   </Tabs.Trigger>
                 </Tabs.List>
                 <div className='flex items-center gap-2'>
@@ -595,6 +626,16 @@ export function ExamDetailSection({
                 <Card>
                   <Card.Content className='p-4'>
                     <ExamReviewCommentSection postId={formData.postId} />
+                  </Card.Content>
+                </Card>
+              </Tabs.Content>
+
+              <Tabs.Content value='logs' className='min-h-[460px]'>
+                <Card>
+                  <Card.Content className='p-4'>
+                    <ExamReviewLogSection
+                      logs={selectedExamReviewDetail?.logs}
+                    />
                   </Card.Content>
                 </Card>
               </Tabs.Content>

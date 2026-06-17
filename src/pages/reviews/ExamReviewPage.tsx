@@ -23,6 +23,7 @@ import type {
 import {
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
+  getExamReviewProcessStatuses,
 } from '@/domains/Reviews/utils';
 
 import { getExamReviewDetail } from '@/apis';
@@ -277,7 +278,8 @@ export default function ExamReviewPage() {
                   nextStatus ??
                   updatedDetail.status ??
                   (updatedDetail.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED'),
-                reviewTitle: updatedDetail.title,
+                reviewTitle:
+                  updatedDetail.title ?? selectedExamReview.reviewTitle,
                 courseName,
                 professor,
                 semester,
@@ -286,10 +288,10 @@ export default function ExamReviewPage() {
                 questionDetail: updatedDetail.questionDetail,
                 uploadTime,
                 userDisplay: updatedDetail.userDisplay,
-                isDiscussed: selectedExamReview.isDiscussed,
+                isDiscussed: updatedDetail.isDiscussed,
                 isReported: selectedExamReview.isReported,
                 reportCount: selectedExamReview.reportCount,
-                processStatuses: selectedExamReview.processStatuses,
+                processStatuses: getExamReviewProcessStatuses(updatedDetail),
               };
 
               updatedData[itemIndex] = updatedItem;
