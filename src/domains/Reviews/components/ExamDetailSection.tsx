@@ -540,7 +540,7 @@ export function ExamDetailSection({
                     댓글 목록 ({selectedExamReviewDetail?.commentCount ?? 0})
                   </Tabs.Trigger>
                   <Tabs.Trigger value='logs' className='w-fit'>
-                    관리 이력 ({selectedExamReviewDetail?.logs.length ?? 0})
+                    관리 이력 ({selectedExamReviewDetail?.logs?.length ?? 0})
                   </Tabs.Trigger>
                 </Tabs.List>
                 <div className='flex items-center gap-2'>

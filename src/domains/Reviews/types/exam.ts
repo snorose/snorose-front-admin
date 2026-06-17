@@ -173,7 +173,7 @@ export interface ExamReviewDetailResult {
   memo: string | null;
   fileName: string;
   questionDetail: string;
-  logs: ExamReviewDetailLog[];
+  logs: ExamReviewDetailLog[] | null;
 }
 
 export interface ExamReviewDetailResponse {
