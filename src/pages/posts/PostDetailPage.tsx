@@ -18,13 +18,9 @@ import PostDetailReportCard from '@/domains/Posts/components/PostDetailReportCar
 import PostDetailStatusLogCard, {
   type StatusLog,
 } from '@/domains/Posts/components/PostDetailStatusLogCard';
+import { usePost } from '@/domains/Posts/hooks/usePost';
 
-import {
-  blacklistHistoryAPI,
-  deletePost,
-  getPost,
-  updatePostVisibility,
-} from '@/apis';
+import { blacklistHistoryAPI, deletePost, updatePostVisibility } from '@/apis';
 import { searchUsersAPI } from '@/apis/users';
 
 export default function PostDetailPage() {
@@ -38,16 +34,7 @@ export default function PostDetailPage() {
   const [isUserLoading, setIsUserLoading] = useState(false);
 
   // 게시글 상세조회 쿼리
-  const {
-    data: post,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ['postDetail', numericPostId],
-    queryFn: () => getPost(numericPostId!),
-    enabled: !!numericPostId,
-  });
+  const { post: post, isLoading, error, refetch } = usePost(numericPostId);
 
   // 게시글 관리 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
