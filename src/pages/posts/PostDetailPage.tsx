@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -6,9 +6,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
-import type { MemberInfo } from '@/shared/types';
 
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
 import PostDetailActionModal from '@/domains/Posts/components/PostDetailActionModal';
 import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetailBlacklistCard';
 import PostDetailCommentList from '@/domains/Posts/components/PostDetailCommentList';
@@ -21,17 +19,11 @@ import PostDetailStatusLogCard, {
 import { usePost } from '@/domains/Posts/hooks/usePost';
 
 import { blacklistHistoryAPI, deletePost, updatePostVisibility } from '@/apis';
-import { searchUsersAPI } from '@/apis/users';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const numericPostId = postId ? parseInt(postId, 10) : null;
-
-  // 닉네임 팝오버 상태
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
 
   // 게시글 상세조회 쿼리
   const { post: post, isLoading, error, refetch } = usePost(numericPostId);
@@ -131,60 +123,6 @@ export default function PostDetailPage() {
     }
   };
 
-  // 작성자 닉네임 클릭 처리
-  const handleNicknameClick = useCallback(
-    async (
-      e: React.MouseEvent,
-      targetPost: { nickName?: string; encryptedUserId: string; postId: number }
-    ) => {
-      e.stopPropagation();
-
-      if (activePopoverId === targetPost.postId) {
-        setActivePopoverId(null);
-        setPopoverUser(null);
-        return;
-      }
-
-      setActivePopoverId(targetPost.postId);
-      setPopoverUser(null);
-      setIsUserLoading(true);
-
-      try {
-        const display = targetPost.nickName || '익명';
-        const res = await searchUsersAPI(display);
-        const member = extractFirstSearchMember(res?.result);
-        if (member) {
-          setPopoverUser(member);
-        } else {
-          setPopoverUser({
-            encryptedUserId: targetPost.encryptedUserId,
-            loginId: '정보 없음',
-            userName: display,
-            email: '',
-            nickname: display,
-            userRoleId: 1,
-            studentNumber: '정보 없음',
-            major: '정보 없음',
-            birthday: '',
-            pointBalance: 0,
-            createdAt: '',
-            authenticatedAt: null,
-            totalWarningCount: 0,
-            isBlacklist: false,
-            blacklistStartDate: null,
-            blacklistEndDate: null,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('회원 상세 조회에 실패했습니다.');
-      } finally {
-        setIsUserLoading(false);
-      }
-    },
-    [activePopoverId]
-  );
-
   // 신고 내역 목록
   const reportsList = useMemo(() => {
     if (!post || post.reportCount === 0) return [];
@@ -231,23 +169,7 @@ export default function PostDetailPage() {
       <div className='grid grid-cols-1 items-start gap-6 lg:grid-cols-3'>
         {/* 좌측 2/3 컬럼: 상세 카드 + 댓글 카드 리스트 */}
         <div className='flex flex-col gap-6 lg:col-span-2'>
-          <PostDetailInfoPanel
-            post={post}
-            activePopoverId={activePopoverId}
-            onNicknameClick={(e) =>
-              handleNicknameClick(e, {
-                nickName: post.nickName,
-                encryptedUserId: post.encryptedUserId,
-                postId: post.postId,
-              })
-            }
-            popoverUser={popoverUser}
-            isUserLoading={isUserLoading}
-            onClosePopover={() => {
-              setActivePopoverId(null);
-              setPopoverUser(null);
-            }}
-          />
+          <PostDetailInfoPanel post={post} />
 
           {/* 댓글 목록 */}
           <PostDetailCommentList
@@ -288,25 +210,15 @@ export default function PostDetailPage() {
     isLoading,
     error,
     post,
-    activePopoverId,
-    popoverUser,
-    isUserLoading,
     statusLogs,
     blacklistHistory,
     reportsList,
-    handleNicknameClick,
     navigate,
     refetch,
   ]);
 
   return (
-    <div
-      className='flex w-full flex-col gap-6 pb-12'
-      onClick={() => {
-        setActivePopoverId(null);
-        setPopoverUser(null);
-      }}
-    >
+    <div className='flex w-full flex-col gap-6 pb-12'>
       <div className='flex items-center gap-3'>
         <Button
           variant='outline'

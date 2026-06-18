@@ -330,7 +330,6 @@ export default function PostDetailCommentList({
                           setActivePopoverId(null);
                           setPopoverUser(null);
                         }}
-                        onPageChange={() => {}}
                       />
                     </div>
                   )}
