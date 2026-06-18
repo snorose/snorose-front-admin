@@ -190,14 +190,14 @@ export default function PostDetailPage() {
             }}
           />
 
-          {/* 카드 2: 신고 내역 */}
+          {/* 카드 2: 게시글 상태 변경 내역 */}
+          <PostDetailStatusLogCard statusLogs={statusLogs} />
+
+          {/* 카드 3: 신고 내역 */}
           <PostDetailReportCard
             reportCount={post.reportCount}
             reportsList={reportsList}
           />
-
-          {/* 카드 3: 게시글 상태 변경 내역 */}
-          <PostDetailStatusLogCard statusLogs={statusLogs} />
 
           {/* 카드 4: 징계 정보 */}
           <PostDetailBlacklistCard
