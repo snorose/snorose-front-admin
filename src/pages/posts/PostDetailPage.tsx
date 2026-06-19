@@ -23,7 +23,7 @@ export default function PostDetailPage() {
   // 상세 뷰 구성
   if (isLoading) {
     return (
-      <div className='flex h-60 items-center justify-center gap-2 text-gray-500'>
+      <div className='flex w-full items-center justify-center gap-2 text-gray-500'>
         <Loader2 className='h-6 w-6 animate-spin text-blue-600' />
         <span>게시글 상세 정보를 불러오는 중입니다...</span>
       </div>
