@@ -4,12 +4,12 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 
-import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetailBlacklistCard';
-import PostDetailCommentList from '@/domains/Posts/components/PostDetailCommentList';
-import PostDetailInfoPanel from '@/domains/Posts/components/PostDetailInfoPanel';
-import PostDetailManageCard from '@/domains/Posts/components/PostDetailManageCard';
-import PostDetailReportCard from '@/domains/Posts/components/PostDetailReportCard';
-import PostDetailStatusLogCard from '@/domains/Posts/components/PostDetailStatusLogCard';
+import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetail/PostDetailBlacklistCard';
+import PostDetailCommentList from '@/domains/Posts/components/PostDetail/PostDetailCommentList';
+import PostDetailInfoPanel from '@/domains/Posts/components/PostDetail/PostDetailInfoPanel';
+import PostDetailManageCard from '@/domains/Posts/components/PostDetail/PostDetailManageCard';
+import PostDetailReportCard from '@/domains/Posts/components/PostDetail/PostDetailReportCard';
+import PostDetailStatusLogCard from '@/domains/Posts/components/PostDetail/PostDetailStatusLogCard';
 import { usePost } from '@/domains/Posts/hooks/usePost';
 
 export default function PostDetailPage() {
