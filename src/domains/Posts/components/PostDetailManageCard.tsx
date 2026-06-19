@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
@@ -27,6 +27,7 @@ export default function PostDetailManageCard({
     post.adminCommonStatuses.includes('AUTO_HIDDEN') ||
     post.adminCommonStatuses.includes('SANCTIONED')
   );
+  const queryClient = useQueryClient();
 
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
@@ -41,6 +42,7 @@ export default function PostDetailManageCard({
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
     },
     onError: () => {
       toast.error('게시글 삭제에 실패했습니다.');
