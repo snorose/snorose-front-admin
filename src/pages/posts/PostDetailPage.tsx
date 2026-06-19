@@ -26,7 +26,7 @@ export default function PostDetailPage() {
   const numericPostId = postId ? parseInt(postId, 10) : null;
 
   // 게시글 상세조회 쿼리
-  const { post: post, isLoading, error, refetch } = usePost(numericPostId);
+  const { post, isLoading, error, refetch } = usePost(numericPostId);
 
   // 게시글 관리 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,6 +1,6 @@
 import { Button } from '@/shared/components/ui';
 
-import type { AdminGetPostResponse } from '../types/post';
+import type { AdminGetPostResponse } from '../types';
 
 interface PostDetailManageCardProps {
   post: AdminGetPostResponse;
@@ -11,8 +11,14 @@ export default function PostDetailManageCard({
   post,
   onActionTrigger,
 }: PostDetailManageCardProps) {
-  const isDeleted = !!post.deletedAt;
-  const isVisible = post.isVisible;
+  const isDeleted =
+    post.adminCommonStatuses.includes('ADMIN_DELETED') ||
+    post.adminCommonStatuses.includes('USER_DELETED');
+  const isVisible = !(
+    post.adminCommonStatuses.includes('ADMIN_HIDDEN') ||
+    post.adminCommonStatuses.includes('AUTO_HIDDEN') ||
+    post.adminCommonStatuses.includes('SANCTIONED')
+  );
 
   return (
     <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
