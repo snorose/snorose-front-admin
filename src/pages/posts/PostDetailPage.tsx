@@ -13,12 +13,10 @@ import PostDetailCommentList from '@/domains/Posts/components/PostDetailCommentL
 import PostDetailInfoPanel from '@/domains/Posts/components/PostDetailInfoPanel';
 import PostDetailManageCard from '@/domains/Posts/components/PostDetailManageCard';
 import PostDetailReportCard from '@/domains/Posts/components/PostDetailReportCard';
-import PostDetailStatusLogCard, {
-  type StatusLog,
-} from '@/domains/Posts/components/PostDetailStatusLogCard';
+import PostDetailStatusLogCard from '@/domains/Posts/components/PostDetailStatusLogCard';
 import { usePost } from '@/domains/Posts/hooks/usePost';
 
-import { deletePost, updatePostVisibility } from '@/apis';
+import { deletePost } from '@/apis';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -36,46 +34,6 @@ export default function PostDetailPage() {
   const [reason, setReason] = useState('');
   const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
 
-  // 상태 변경 로그 관리
-  const [statusLogs, setStatusLogs] = useState<StatusLog[]>([]);
-
-  const handleAddStatusLog = (newLog: Omit<StatusLog, 'id'>) => {
-    setStatusLogs((prev) => [
-      {
-        id: prev.length > 0 ? Math.max(...prev.map((l) => l.id)) + 1 : 1,
-        ...newLog,
-      },
-      ...prev,
-    ]);
-  };
-
-  // 게시물 가시성(노출/숨김) 변경 Mutation
-  const visibilityMutation = useMutation({
-    mutationFn: ({ isVisible }: { isVisible: boolean }) =>
-      updatePostVisibility([post!.postId], isVisible),
-    onSuccess: (_, variables) => {
-      toast.success(
-        variables.isVisible
-          ? '게시글이 공개되었습니다.'
-          : '게시글이 비공개 처리되었습니다.'
-      );
-      handleAddStatusLog({
-        changedAt: new Date().toISOString(),
-        admin: '관리자',
-        reason: variables.isVisible ? '비공개 해제' : '관리자비공개',
-        statusBefore: post!.isVisible ? '공개' : '비공개',
-        statusAfter: variables.isVisible ? '공개' : '비공개',
-        detailReason: reason,
-      });
-      refetch();
-      setIsModalOpen(false);
-      setReason('');
-    },
-    onError: () => {
-      toast.error('상태 변경에 실패했습니다.');
-    },
-  });
-
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
     mutationFn: () => deletePost(post!.postId),
@@ -85,15 +43,6 @@ export default function PostDetailPage() {
           ? '게시글과 관련 댓글이 모두 삭제되었습니다.'
           : '게시글이 삭제되었습니다.'
       );
-      handleAddStatusLog({
-        changedAt: new Date().toISOString(),
-        admin: '관리자',
-        reason: '관리자삭제',
-        statusBefore: post!.isVisible ? '공개' : '비공개',
-        statusAfter: '삭제',
-        detailReason:
-          reason + (deleteCommentsAlso ? ' (댓글 일괄 삭제 포함)' : ''),
-      });
       refetch();
       setIsModalOpen(false);
       setReason('');
@@ -107,11 +56,7 @@ export default function PostDetailPage() {
   // 모달 확인 클릭
   const handleConfirmAction = () => {
     if (!reason.trim()) return;
-    if (modalType === 'HIDE') {
-      visibilityMutation.mutate({ isVisible: false });
-    } else if (modalType === 'SHOW' || modalType === 'RESTORE') {
-      visibilityMutation.mutate({ isVisible: true });
-    } else if (modalType === 'DELETE') {
+    if (modalType === 'DELETE') {
       deleteMutation.mutate();
     }
   };
@@ -181,7 +126,7 @@ export default function PostDetailPage() {
             />
 
             {/* 카드 2: 게시글 상태 변경 내역 */}
-            <PostDetailStatusLogCard statusLogs={statusLogs} />
+            <PostDetailStatusLogCard statusLogs={[]} />
 
             {/* 카드 3: 신고 내역 */}
             <PostDetailReportCard reportCount={post.reportCount} />
