@@ -11,7 +11,6 @@ export { ExamReviewPeriodListSection } from './ExamReviewPeriodListSection';
 export { ExamReviewPeriodScheduleForm } from './ExamReviewPeriodScheduleForm';
 export { ExamReviewPeriodUpdateConfirmModal } from './ExamReviewPeriodUpdateConfirmModal';
 export { ExamReviewPostInfoSection } from './ExamReviewPostInfoSection';
-export { ExamReviewTablePagination } from './ExamReviewTablePagination';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamTable } from './ExamTable';

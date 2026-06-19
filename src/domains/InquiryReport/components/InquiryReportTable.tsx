@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { Loader2, X } from 'lucide-react';
 
+import { PaginationBar } from '@/shared/components';
 import { Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
@@ -16,7 +17,6 @@ import {
   INQUIRY_SUB_GROUP_LABELS,
 } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import { useInquiryList } from '@/domains/InquiryReport/hooks';
-import { ExamReviewTablePagination } from '@/domains/Reviews/components';
 
 import InquiryStatusSelect from './InquiryStatusSelect';
 
@@ -372,7 +372,7 @@ export default function InquiryReportTable({
         </div>
       </div>
 
-      <ExamReviewTablePagination
+      <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
         hasNext={hasNext}
