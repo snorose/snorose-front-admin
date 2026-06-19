@@ -12,12 +12,10 @@ import PostDetailActionModal from './PostDetailActionModal';
 
 interface PostDetailManageCardProps {
   post: AdminGetPostResponse;
-  refetch: () => void;
 }
 
 export default function PostDetailManageCard({
   post,
-  refetch,
 }: PostDetailManageCardProps) {
   const isDeleted =
     post.adminCommonStatuses.includes('ADMIN_DELETED') ||
@@ -38,7 +36,6 @@ export default function PostDetailManageCard({
           ? '게시글과 관련 댓글이 모두 삭제되었습니다.'
           : '게시글이 삭제되었습니다.'
       );
-      refetch();
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
