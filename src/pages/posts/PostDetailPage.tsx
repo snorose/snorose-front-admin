@@ -18,7 +18,7 @@ export default function PostDetailPage() {
   const numericPostId = postId ? parseInt(postId, 10) : null;
 
   // 게시글 상세조회 쿼리
-  const { post, isLoading, error, refetch } = usePost(numericPostId);
+  const { post, isLoading, error } = usePost(numericPostId);
 
   // 상세 뷰 구성
   if (isLoading) {
@@ -69,14 +69,14 @@ export default function PostDetailPage() {
             <PostDetailCommentList
               postId={post.postId}
               boardId={post.boardId}
-              onCommentCountChange={refetch}
+              commentCount={post.commentCount}
             />
           </div>
 
           {/* 우측 1/3 컬럼: 세로 카드 스택 */}
           <div className='flex flex-col gap-5 lg:col-span-1'>
             {/* 카드 1: 게시글 관리 */}
-            <PostDetailManageCard refetch={refetch} post={post} />
+            <PostDetailManageCard post={post} />
 
             {/* 카드 2: 게시글 상태 변경 내역 */}
             <PostDetailStatusLogCard statusLogs={[]} />
