@@ -1,15 +1,23 @@
+import { useState } from 'react';
+
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
 import { Button } from '@/shared/components/ui';
 
+import { deletePost } from '@/apis';
+
 import type { AdminGetPostResponse } from '../types';
+import PostDetailActionModal from './PostDetailActionModal';
 
 interface PostDetailManageCardProps {
   post: AdminGetPostResponse;
-  onActionTrigger: (type: 'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE') => void;
+  refetch: () => void;
 }
 
 export default function PostDetailManageCard({
   post,
-  onActionTrigger,
+  refetch,
 }: PostDetailManageCardProps) {
   const isDeleted =
     post.adminCommonStatuses.includes('ADMIN_DELETED') ||
@@ -20,6 +28,39 @@ export default function PostDetailManageCard({
     post.adminCommonStatuses.includes('SANCTIONED')
   );
 
+  // 게시물 삭제 Mutation
+  const deleteMutation = useMutation({
+    mutationFn: () => deletePost(post!.postId),
+    onSuccess: () => {
+      toast.success(
+        deleteCommentsAlso
+          ? '게시글과 관련 댓글이 모두 삭제되었습니다.'
+          : '게시글이 삭제되었습니다.'
+      );
+      refetch();
+      setIsModalOpen(false);
+      setReason('');
+      setDeleteCommentsAlso(false);
+    },
+    onError: () => {
+      toast.error('게시글 삭제에 실패했습니다.');
+    },
+  });
+  // 게시글 관리 모달 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<
+    'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE'
+  >('HIDE');
+  const [reason, setReason] = useState('');
+  const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
+  // 모달 확인 클릭
+  const handleConfirmAction = () => {
+    if (!reason.trim()) return;
+    if (modalType === 'DELETE') {
+      deleteMutation.mutate();
+    }
+  };
+
   return (
     <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
       <h3 className='text-[14px] font-bold text-gray-900'>게시글 관리</h3>
@@ -27,7 +68,10 @@ export default function PostDetailManageCard({
         {isDeleted ? (
           <Button
             variant='outline'
-            onClick={() => onActionTrigger('RESTORE')}
+            onClick={() => {
+              setModalType('RESTORE');
+              setIsModalOpen(true);
+            }}
             className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
           >
             게시글 복구
@@ -35,7 +79,10 @@ export default function PostDetailManageCard({
         ) : !isVisible ? (
           <Button
             variant='outline'
-            onClick={() => onActionTrigger('SHOW')}
+            onClick={() => {
+              setModalType('SHOW');
+              setIsModalOpen(true);
+            }}
             className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
           >
             게시글 공개
@@ -44,14 +91,20 @@ export default function PostDetailManageCard({
           <div className='flex w-full flex-col gap-2'>
             <Button
               variant='outline'
-              onClick={() => onActionTrigger('HIDE')}
+              onClick={() => {
+                setModalType('HIDE');
+                setIsModalOpen(true);
+              }}
               className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
             >
               게시글 비공개
             </Button>
             <Button
               variant='destructive'
-              onClick={() => onActionTrigger('DELETE')}
+              onClick={() => {
+                setModalType('DELETE');
+                setIsModalOpen(true);
+              }}
               className='flex h-10 w-full items-center justify-center rounded-lg bg-red-600 text-[13px] text-white hover:bg-red-700'
             >
               게시글 삭제
@@ -59,6 +112,21 @@ export default function PostDetailManageCard({
           </div>
         )}
       </div>
+      {/* 상태 변경 사유 모달 */}
+      <PostDetailActionModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setReason('');
+          setDeleteCommentsAlso(false);
+        }}
+        modalType={modalType}
+        reason={reason}
+        onReasonChange={setReason}
+        deleteCommentsAlso={deleteCommentsAlso}
+        onDeleteCommentsAlsoChange={setDeleteCommentsAlso}
+        onConfirm={handleConfirmAction}
+      />
     </div>
   );
 }

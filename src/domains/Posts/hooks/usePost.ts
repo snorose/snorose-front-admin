@@ -17,7 +17,7 @@ export const usePost = (postId: number | null, deletedAt?: string | null) => {
   });
 
   return {
-    post: firstQuery.data ?? secondQuery.data,
+    post: firstQuery.error ? secondQuery.data : firstQuery.data,
     isLoading: firstQuery.isLoading || secondQuery.isLoading,
     error: deletedAt === undefined ? secondQuery.error : firstQuery.error,
     refetch: () => {

@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { useMutation } from '@tanstack/react-query';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
 
-import PostDetailActionModal from '@/domains/Posts/components/PostDetailActionModal';
 import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetailBlacklistCard';
 import PostDetailCommentList from '@/domains/Posts/components/PostDetailCommentList';
 import PostDetailInfoPanel from '@/domains/Posts/components/PostDetailInfoPanel';
@@ -16,8 +12,6 @@ import PostDetailReportCard from '@/domains/Posts/components/PostDetailReportCar
 import PostDetailStatusLogCard from '@/domains/Posts/components/PostDetailStatusLogCard';
 import { usePost } from '@/domains/Posts/hooks/usePost';
 
-import { deletePost } from '@/apis';
-
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
@@ -25,41 +19,6 @@ export default function PostDetailPage() {
 
   // 게시글 상세조회 쿼리
   const { post, isLoading, error, refetch } = usePost(numericPostId);
-
-  // 게시글 관리 모달 상태
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<
-    'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE'
-  >('HIDE');
-  const [reason, setReason] = useState('');
-  const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
-
-  // 게시물 삭제 Mutation
-  const deleteMutation = useMutation({
-    mutationFn: () => deletePost(post!.postId),
-    onSuccess: () => {
-      toast.success(
-        deleteCommentsAlso
-          ? '게시글과 관련 댓글이 모두 삭제되었습니다.'
-          : '게시글이 삭제되었습니다.'
-      );
-      refetch();
-      setIsModalOpen(false);
-      setReason('');
-      setDeleteCommentsAlso(false);
-    },
-    onError: () => {
-      toast.error('게시글 삭제에 실패했습니다.');
-    },
-  });
-
-  // 모달 확인 클릭
-  const handleConfirmAction = () => {
-    if (!reason.trim()) return;
-    if (modalType === 'DELETE') {
-      deleteMutation.mutate();
-    }
-  };
 
   // 상세 뷰 구성
   if (isLoading) {
@@ -117,13 +76,7 @@ export default function PostDetailPage() {
           {/* 우측 1/3 컬럼: 세로 카드 스택 */}
           <div className='flex flex-col gap-5 lg:col-span-1'>
             {/* 카드 1: 게시글 관리 */}
-            <PostDetailManageCard
-              post={post}
-              onActionTrigger={(type) => {
-                setModalType(type);
-                setIsModalOpen(true);
-              }}
-            />
+            <PostDetailManageCard refetch={refetch} post={post} />
 
             {/* 카드 2: 게시글 상태 변경 내역 */}
             <PostDetailStatusLogCard statusLogs={[]} />
@@ -135,22 +88,6 @@ export default function PostDetailPage() {
             <PostDetailBlacklistCard />
           </div>
         </div>
-
-        {/* 상태 변경 사유 모달 */}
-        <PostDetailActionModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setReason('');
-            setDeleteCommentsAlso(false);
-          }}
-          modalType={modalType}
-          reason={reason}
-          onReasonChange={setReason}
-          deleteCommentsAlso={deleteCommentsAlso}
-          onDeleteCommentsAlsoChange={setDeleteCommentsAlso}
-          onConfirm={handleConfirmAction}
-        />
       </div>
     </div>
   );
