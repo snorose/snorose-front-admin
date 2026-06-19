@@ -13,7 +13,6 @@ interface PostDetailCommentListProps {
   postId: number;
   boardId?: number;
   commentCount: number;
-  onCommentCountChange?: () => void;
 }
 
 export default function PostDetailCommentList({
