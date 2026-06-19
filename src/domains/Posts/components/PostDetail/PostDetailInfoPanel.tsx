@@ -17,7 +17,7 @@ import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirec
 
 import { searchUsersAPI } from '@/apis';
 
-import type { AdminGetPostResponse } from '../types/post';
+import type { AdminGetPostResponse } from '../../types/post';
 
 interface PostDetailInfoPanelProps {
   post: AdminGetPostResponse;

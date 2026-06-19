@@ -7,7 +7,7 @@ import { Button } from '@/shared/components/ui';
 
 import { deletePost } from '@/apis';
 
-import type { AdminGetPostResponse } from '../types';
+import type { AdminGetPostResponse } from '../../types';
 import PostDetailActionModal from './PostDetailActionModal';
 
 interface PostDetailManageCardProps {
