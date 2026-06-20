@@ -2,12 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import type { MemberInfo } from '@/shared/types';
-
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
-
-import { searchUsersAPI } from '@/apis/users';
-
 import type { AdminGetPostResponse } from '../types/post';
 import { useBulkDeletePost } from './useBulkDeletePost';
 import { useDeletePost } from './useDeletePost';
@@ -35,13 +29,8 @@ export function usePostTableState({
 }: UsePostTableStateProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
-
   useEffect(() => {
     setSelectedIds([]);
-    setActivePopoverId(null);
   }, [
     searchParams.encryptedUserId,
     searchParams.boardId,
@@ -213,56 +202,6 @@ export function usePostTableState({
     }
   };
 
-  const handleNicknameClick = async (
-    e: React.MouseEvent,
-    post: AdminGetPostResponse
-  ) => {
-    e.stopPropagation();
-
-    if (activePopoverId === post.postId) {
-      setActivePopoverId(null);
-      setPopoverUser(null);
-      return;
-    }
-
-    setActivePopoverId(post.postId);
-    setPopoverUser(null);
-    setIsUserLoading(true);
-
-    try {
-      const display = post.nickName || '익명';
-      const res = await searchUsersAPI(display);
-      const member = extractFirstSearchMember(res?.result);
-      if (member) {
-        setPopoverUser(member);
-      } else {
-        setPopoverUser({
-          encryptedUserId: post.encryptedUserId,
-          loginId: '정보 없음',
-          userName: display,
-          email: '',
-          nickname: display,
-          userRoleId: 1,
-          studentNumber: '정보 없음',
-          major: '정보 없음',
-          birthday: '',
-          pointBalance: 0,
-          createdAt: '',
-          authenticatedAt: null,
-          totalWarningCount: 0,
-          isBlacklist: false,
-          blacklistStartDate: null,
-          blacklistEndDate: null,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('회원 상세 조회에 실패했습니다.');
-    } finally {
-      setIsUserLoading(false);
-    }
-  };
-
   return {
     posts,
     isLoading,
@@ -273,11 +212,6 @@ export function usePostTableState({
     isSomeSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleBulkDelete,
     handleBulkVisibility,
     handleBulkRestore,

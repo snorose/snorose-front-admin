@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -9,10 +8,9 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
+import { MemberInfoPopover } from '@/shared/components';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import {
   formatPostId,
@@ -27,23 +25,12 @@ interface PostTableRowProps {
   post: AdminGetPostResponse;
   isSelected: boolean;
   onSelectToggle: (id: number) => void;
-  activePopoverId: number | null;
-  onNicknameClick: (e: React.MouseEvent, post: AdminGetPostResponse) => void;
-  popoverUser: MemberInfo | null;
-  isUserLoading: boolean;
-  onClosePopover: () => void;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
 }
 
 export default function PostTableRow({
   post,
   isSelected,
   onSelectToggle,
-  activePopoverId,
-  onNicknameClick,
-  popoverUser,
-  isUserLoading,
-  onClosePopover,
 }: PostTableRowProps) {
   const navigate = useNavigate();
   const status = getPostStatus(post);
@@ -53,10 +40,7 @@ export default function PostTableRow({
       className={cn('border-b border-gray-100 last:border-0 [&_td]:h-[54px]')}
     >
       {/* 0. Checkbox */}
-      <Table.Cell
-        className='px-3 text-center'
-        onClick={(e) => e.stopPropagation()}
-      >
+      <Table.Cell className='px-3 text-center'>
         <input
           type='checkbox'
           checked={isSelected}
@@ -64,7 +48,7 @@ export default function PostTableRow({
             e.stopPropagation();
             onSelectToggle(post.postId);
           }}
-          className='cursor-pointer rounded border-gray-300'
+          className='rounded border-gray-300'
         />
       </Table.Cell>
 
@@ -105,21 +89,11 @@ export default function PostTableRow({
       </Table.Cell>
 
       {/* 3. 작성자(닉네임) */}
-      <Table.Cell
-        className='relative cursor-pointer px-3 font-bold text-gray-900 select-none'
-        onClick={(e) => onNicknameClick(e, post)}
-      >
-        <div className='truncate transition-colors hover:text-blue-700 hover:underline'>
-          {post.nickName || '익명송이'}
-        </div>
-        {activePopoverId === post.postId && (
-          <MemberInfoPopover
-            encryptedUserId={post.encryptedUserId}
-            popoverUser={popoverUser}
-            isUserLoading={isUserLoading}
-            onClose={onClosePopover}
-          />
-        )}
+      <Table.Cell className='relative cursor-pointer px-3 font-bold text-gray-900'>
+        <MemberInfoPopover
+          encryptedUserId={post.encryptedUserId}
+          displayName={post.nickName ?? '정보 없음'}
+        />
       </Table.Cell>
 
       {/* 4. 게시판 */}

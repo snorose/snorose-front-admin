@@ -36,11 +36,6 @@ export default function PostTable({
     isAllSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleBulkDelete,
     handleBulkVisibility,
     handleBulkRestore,
@@ -57,10 +52,7 @@ export default function PostTable({
   const isEmpty = !isLoading && posts.length === 0;
 
   return (
-    <div
-      className='flex flex-col gap-3'
-      onClick={() => setActivePopoverId(null)}
-    >
+    <div className='flex flex-col gap-3'>
       <PostBulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
@@ -167,12 +159,6 @@ export default function PostTable({
                           : [...prev, id]
                       );
                     }}
-                    activePopoverId={activePopoverId}
-                    onNicknameClick={handleNicknameClick}
-                    popoverUser={popoverUser}
-                    isUserLoading={isUserLoading}
-                    onClosePopover={() => setActivePopoverId(null)}
-                    onPageChange={onPageChange}
                   />
                 ))
               )}

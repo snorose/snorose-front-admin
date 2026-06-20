@@ -1,4 +1,4 @@
-import { type MouseEvent, useState } from 'react';
+import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AlertTriangle, CornerDownRight, Heart } from 'lucide-react';
@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 
 import { MemberInfoPopover } from '@/shared/components';
 import { Badge, Button } from '@/shared/components/ui';
-import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResponse } from '@/domains/Comments/types';
@@ -14,9 +13,8 @@ import {
   getCommentStatus,
   getCommentStatusBadge,
 } from '@/domains/Comments/utils/commentUtils';
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
 
-import { deleteComment, searchUsersAPI, updateCommentVisibility } from '@/apis';
+import { deleteComment, updateCommentVisibility } from '@/apis';
 
 interface PostDetailCommentItemProps {
   comment: AdminCommentResponse;
@@ -28,10 +26,6 @@ export default function PostDetailCommentItem({
   const queryClient = useQueryClient();
   const status = getCommentStatus(comment);
   const isSubComment = comment.parentId !== null;
-  // 회원 팝오버 상태
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
   // 댓글 상태 변경 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'HIDE' | 'SHOW' | 'DELETE'>(
@@ -39,53 +33,6 @@ export default function PostDetailCommentItem({
   );
   const [reason, setReason] = useState('');
 
-  // 작성자 닉네임 클릭 처리
-  const handleNicknameClick = async (e: MouseEvent) => {
-    e.stopPropagation();
-
-    if (activePopoverId === comment.commentId) {
-      setActivePopoverId(null);
-      setPopoverUser(null);
-      return;
-    }
-
-    setActivePopoverId(comment.commentId);
-    setPopoverUser(null);
-    setIsUserLoading(true);
-
-    try {
-      const display = comment.nickname || comment.userDisplay || '익명';
-      const res = await searchUsersAPI(display);
-      const member = extractFirstSearchMember(res?.result);
-      if (member) {
-        setPopoverUser(member);
-      } else {
-        setPopoverUser({
-          encryptedUserId: comment.encryptedUserId,
-          loginId: '정보 없음',
-          userName: display,
-          email: '',
-          nickname: display,
-          userRoleId: 1,
-          studentNumber: '정보 없음',
-          major: '정보 없음',
-          birthday: '',
-          pointBalance: 0,
-          createdAt: '',
-          authenticatedAt: null,
-          totalWarningCount: 0,
-          isBlacklist: false,
-          blacklistStartDate: null,
-          blacklistEndDate: null,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('회원 상세 조회에 실패했습니다.');
-    } finally {
-      setIsUserLoading(false);
-    }
-  };
   // 댓글 노출/숨김 변경 Mutation
   const visibilityMutation = useMutation({
     mutationFn: (isVisible: boolean) =>
@@ -131,10 +78,6 @@ export default function PostDetailCommentItem({
     <div
       key={comment.commentId}
       className={`flex items-start gap-3 ${isSubComment ? 'pl-8' : ''}`}
-      onClick={() => {
-        setActivePopoverId(null);
-        setPopoverUser(null);
-      }}
     >
       {isSubComment && (
         <CornerDownRight className='mt-2.5 h-4 w-4 shrink-0 text-gray-400' />
@@ -144,12 +87,10 @@ export default function PostDetailCommentItem({
         {/* 상단 헤더: 닉네임 + 일시 및 액션 버튼 */}
         <div className='flex items-start justify-between gap-4'>
           <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
-            <span
-              className='cursor-pointer text-sm font-bold text-gray-800 hover:text-blue-600 hover:underline'
-              onClick={handleNicknameClick}
-            >
-              {comment.nickname || comment.userDisplay || '익명'}
-            </span>
+            <MemberInfoPopover
+              encryptedUserId={comment.encryptedUserId}
+              displayName={comment.nickname}
+            />
             <span className='font-mono text-xs text-gray-400'>
               {formatDateTimeWithAmPm(comment.createdAt)}
             </span>
@@ -247,24 +188,6 @@ export default function PostDetailCommentItem({
             {comment.reportCount ?? 0}
           </span>
         </div>
-
-        {/* 닉네임 팝오버 렌더링 */}
-        {activePopoverId === comment.commentId && (
-          <div
-            className='absolute top-8 left-10 z-50'
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MemberInfoPopover
-              encryptedUserId={comment.encryptedUserId}
-              popoverUser={popoverUser}
-              isUserLoading={isUserLoading}
-              onClose={() => {
-                setActivePopoverId(null);
-                setPopoverUser(null);
-              }}
-            />
-          </div>
-        )}
       </div>
       {/* 댓글 조치 사유 기입 모달 */}
       {isModalOpen && comment && (

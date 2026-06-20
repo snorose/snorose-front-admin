@@ -39,11 +39,6 @@ export default function CommentTable({
     isAllSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleSingleVisibility,
     handleFilterByPostId,
     handleFilterByParentId,
@@ -64,10 +59,7 @@ export default function CommentTable({
   const isEmpty = !isLoading && comments.length === 0;
 
   return (
-    <div
-      className='flex flex-col gap-3'
-      onClick={() => setActivePopoverId(null)}
-    >
+    <div className='flex flex-col gap-3'>
       <CommentBulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
@@ -180,12 +172,6 @@ export default function CommentTable({
                           : [...prev, id]
                       );
                     }}
-                    activePopoverId={activePopoverId}
-                    onNicknameClick={handleNicknameClick}
-                    popoverUser={popoverUser}
-                    isUserLoading={isUserLoading}
-                    onClosePopover={() => setActivePopoverId(null)}
-                    onPageChange={onPageChange}
                     onSingleVisibilityToggle={handleSingleVisibility}
                     onFilterByPostId={handleFilterByPostId}
                     onFilterByParentId={handleFilterByParentId}

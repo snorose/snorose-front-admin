@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
@@ -6,16 +6,11 @@ import { toast } from 'sonner';
 
 import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Switch } from '@/shared/components/ui';
-import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import {
   getPostStatus,
   getPostStatusBadges,
 } from '@/shared/utils/postCommentUtils';
-
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
-
-import { searchUsersAPI } from '@/apis';
 
 import type { AdminGetPostResponse } from '../../types/post';
 
@@ -28,11 +23,6 @@ export default function PostDetailInfoPanel({
 }: PostDetailInfoPanelProps) {
   const [isNotice, setIsNotice] = useState(post.isNotice);
   const status = getPostStatus(post);
-  // 닉네임 팝오버 상태
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
-
   const handleNoticeToggle = (checked: boolean) => {
     setIsNotice(checked);
     toast.success(
@@ -41,60 +31,6 @@ export default function PostDetailInfoPanel({
         : '해당 게시글의 공지 등록이 해제되었습니다.'
     );
   };
-
-  // 작성자 닉네임 클릭 처리
-  const handleNicknameClick = useCallback(
-    async (
-      e: React.MouseEvent,
-      targetPost: { nickName?: string; encryptedUserId: string; postId: number }
-    ) => {
-      e.stopPropagation();
-
-      if (activePopoverId === targetPost.postId) {
-        setActivePopoverId(null);
-        setPopoverUser(null);
-        return;
-      }
-
-      setActivePopoverId(targetPost.postId);
-      setPopoverUser(null);
-      setIsUserLoading(true);
-
-      try {
-        const display = targetPost.nickName || '익명';
-        const res = await searchUsersAPI(display);
-        const member = extractFirstSearchMember(res?.result);
-        if (member) {
-          setPopoverUser(member);
-        } else {
-          setPopoverUser({
-            encryptedUserId: targetPost.encryptedUserId,
-            loginId: '정보 없음',
-            userName: display,
-            email: '',
-            nickname: display,
-            userRoleId: 1,
-            studentNumber: '정보 없음',
-            major: '정보 없음',
-            birthday: '',
-            pointBalance: 0,
-            createdAt: '',
-            authenticatedAt: null,
-            totalWarningCount: 0,
-            isBlacklist: false,
-            blacklistStartDate: null,
-            blacklistEndDate: null,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('회원 상세 조회에 실패했습니다.');
-      } finally {
-        setIsUserLoading(false);
-      }
-    },
-    [activePopoverId]
-  );
 
   return (
     <div className='relative flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm'>
@@ -164,12 +100,11 @@ export default function PostDetailInfoPanel({
           <div className='relative flex flex-col gap-1'>
             <span className='font-medium text-gray-400'>작성자</span>
             <div>
-              <span
-                className='cursor-pointer text-sm font-bold text-blue-600 underline transition-colors hover:text-blue-800'
-                onClick={(e) => handleNicknameClick(e, post)}
-              >
-                {post.nickName || '익명'}
-              </span>
+              <MemberInfoPopover
+                encryptedUserId={post.encryptedUserId}
+                displayName={post.nickName ?? '정보 없음'}
+              />
+
               <span className='ml-1 text-xs text-gray-400'>
                 (
                 {post.encryptedUserId
@@ -178,24 +113,6 @@ export default function PostDetailInfoPanel({
                 )
               </span>
             </div>
-
-            {/* 닉네임 팝오버 렌더링 */}
-            {activePopoverId === post.postId && (
-              <div
-                className='absolute top-12 left-0 z-50'
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MemberInfoPopover
-                  encryptedUserId={post.encryptedUserId}
-                  popoverUser={popoverUser}
-                  isUserLoading={isUserLoading}
-                  onClose={() => {
-                    setActivePopoverId(null);
-                    setPopoverUser(null);
-                  }}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>
