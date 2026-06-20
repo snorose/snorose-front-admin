@@ -14,9 +14,18 @@ export type ExamType = (typeof EXAM_TYPE)[keyof typeof EXAM_TYPE];
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 
-export const EXAM_REVIEW_SORTS = ['ASC', 'DESC', 'REPORT'] as const;
+export const EXAM_REVIEW_SORTS = ['ASC', 'DESC'] as const;
 
 export type ExamReviewSort = (typeof EXAM_REVIEW_SORTS)[number];
+
+export type ExamReviewProcessStatus =
+  | 'VISIBLE'
+  | 'USER_DELETED'
+  | 'ADMIN_DELETED'
+  | 'ADMIN_HIDDEN'
+  | 'AUTO_HIDDEN'
+  | 'SANCTIONED'
+  | 'DESANCTIONED';
 
 export const isExamReviewSort = (
   value?: string | null
@@ -33,6 +42,9 @@ export interface ExamReviewSearchParams {
   semester?: string;
   examType?: string;
   isConfirmed?: boolean;
+  isDiscussed?: boolean;
+  isReported?: boolean;
+  statuses?: string;
 }
 
 export interface ExamReview {
@@ -47,6 +59,10 @@ export interface ExamReview {
   questionDetail: string;
   uploadTime: string;
   userDisplay: string;
+  isDiscussed: boolean;
+  isReported: boolean;
+  reportCount: number;
+  processStatuses: ExamReviewProcessStatus[];
 }
 
 export interface ExamReviews {
@@ -60,6 +76,11 @@ export interface ExamReviews {
   encryptedUserId: string | null;
   userDisplay?: string | null;
   userName: string | null;
+  reportCount?: number;
+  isDiscussed?: boolean;
+  deletionStatus?: ExamReviewProcessStatus | null;
+  isSanctioned?: boolean | 'true' | 'false' | null;
+  visibilityStatus?: ExamReviewProcessStatus | null;
   lectureYear?: number;
   lectureSemester?: Semester;
   examType?: ExamType;
@@ -84,6 +105,8 @@ export interface ConfirmExamReviewResponse {
 }
 
 export interface UpdateExamReviewPost {
+  isConfirmed?: boolean;
+  isDiscussed?: boolean;
   lectureName?: string;
   professor?: string;
   classNumber?: number;
@@ -95,6 +118,7 @@ export interface UpdateExamReviewPost {
   status?: string;
   examType?: ExamType;
   questionDetail?: string;
+  memo?: string | null;
 }
 
 export interface UpdateExamReviewRequest {
@@ -106,9 +130,7 @@ export interface UpdateExamReviewResponse {
   isSuccess: boolean;
   code: number;
   message: string;
-  result: {
-    postId: number;
-  };
+  result: ExamReviewDetailResult;
 }
 
 export interface DeleteExamReviewResponse {
@@ -120,20 +142,21 @@ export interface DeleteExamReviewResponse {
   };
 }
 
+export interface ExamReviewDetailLog {
+  encryptedAdminId: string | null;
+  adminName: string | null;
+  changes?: Record<string, string | number | boolean | null> | null;
+  createdAt: string;
+}
+
 export interface ExamReviewDetailResult {
   encryptedUserId: string;
   userDisplay: string;
-  isWriter: boolean;
-  isWriterWithdrawn: boolean;
   postId: number;
-  title: string;
+  title?: string;
   commentCount: number;
-  scrapCount: number;
-  isScrapped: boolean;
   status?: string;
   createdAt: string;
-  isNotice: boolean;
-  isEdited: boolean;
   lectureName: string;
   professor: string;
   classNumber: number;
@@ -144,9 +167,14 @@ export interface ExamReviewDetailResult {
   isOnline: boolean;
   examType: ExamType;
   isConfirmed: boolean;
+  isDiscussed: boolean;
+  deletionStatus: ExamReviewProcessStatus | null;
+  isSanctioned: boolean | 'true' | 'false' | null;
+  visibilityStatus: ExamReviewProcessStatus | null;
+  memo: string | null;
   fileName: string;
   questionDetail: string;
-  isDownloaded: boolean;
+  logs: ExamReviewDetailLog[] | null;
 }
 
 export interface ExamReviewDetailResponse {

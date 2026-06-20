@@ -9,25 +9,16 @@ import type {
   ConfirmExamReviewResponse,
   DeleteExamReviewResponse,
   ExamReviewDetailResponse,
+  ExamReviewSearchParams,
   ExamReviewsResponse,
   UpdateExamReviewRequest,
   UpdateExamReviewResponse,
 } from '@/domains/Reviews/types';
 
 // 시험후기 목록 조회 api
-export const getExamReviews = async (params: {
-  page: number;
-  keyword?: string;
-  startDate?: string;
-  endDate?: string;
-  keywordAuthor?: string;
-  keywordPost?: string;
-  sort?: string;
-  lectureYear?: number;
-  semester?: string;
-  examType?: string;
-  isConfirmed?: boolean;
-}): Promise<ExamReviewsResponse> => {
+export const getExamReviews = async (
+  params: ExamReviewSearchParams & { page: number }
+): Promise<ExamReviewsResponse> => {
   const response = await axiosInstance.get(`/v1/admin/reviews`, {
     params,
   });
@@ -57,7 +48,10 @@ export const updateExamReview = async (
     formData.append('file', data.file); // 파일이 있으면 추가
   }
 
-  formData.append('post', JSON.stringify(data.post));
+  formData.append(
+    'post',
+    new Blob([JSON.stringify(data.post)], { type: 'application/json' })
+  );
 
   const response = await axiosInstance.patch(
     `/v1/admin/reviews/${postId}`,
@@ -83,7 +77,7 @@ export const deleteExamReview = async (
 export const getExamReviewDetail = async (
   postId: number
 ): Promise<ExamReviewDetailResponse> => {
-  const response = await axiosInstance.get(`/v1/reviews/${postId}`);
+  const response = await axiosInstance.get(`/v1/admin/reviews/${postId}`);
   return response.data;
 };
 

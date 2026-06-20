@@ -66,12 +66,12 @@ export const ExamMultiSelect = ({
           side={side}
           align={align}
           sideOffset={4}
-          className={`text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[200px] min-w-[8rem] origin-[var(--radix-select-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md border bg-blue-50 shadow-md ${contentClassName}`}
+          className={`bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-[200px] min-w-[8rem] origin-[var(--radix-select-content-transform-origin)] overflow-x-hidden overflow-y-auto rounded-md border shadow-md ${contentClassName}`}
         >
           <div className='p-1'>
             {/* 전체 선택/해제 체크박스 */}
             <div
-              className='relative mb-1 flex w-full cursor-default items-center rounded-sm border-b border-gray-200 px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
+              className='focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground relative mb-1 flex w-full cursor-default items-center rounded-sm border-b px-2 py-1.5 text-sm outline-none select-none'
               onClick={handleSelectAll}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -93,7 +93,7 @@ export const ExamMultiSelect = ({
                 }`}
                 tabIndex={-1}
               />
-              <span className='flex-1 font-medium'>전체 선택</span>
+              <span className='flex-1 text-left font-normal'>전체 선택</span>
             </div>
             {options.map((option) => {
               const isSelected = value.includes(option);
@@ -103,7 +103,7 @@ export const ExamMultiSelect = ({
               return (
                 <div
                   key={option}
-                  className='relative flex w-full cursor-default items-center rounded-sm px-1.5 py-1.5 text-xs outline-none select-none hover:bg-blue-100/50'
+                  className='focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground relative flex w-full cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none'
                   onClick={() => handleToggle(option)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -126,7 +126,7 @@ export const ExamMultiSelect = ({
                     }`}
                     tabIndex={-1}
                   />
-                  <span className='flex-1'>{option}</span>
+                  <span className='flex-1 text-left'>{option}</span>
                   {showStatusDot && statusOption && (
                     <div className='ml-2 h-2 w-2 shrink-0 rounded-full bg-blue-500' />
                   )}

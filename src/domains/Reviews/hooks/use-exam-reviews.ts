@@ -11,6 +11,7 @@ import type {
 import {
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
+  getExamReviewProcessStatuses,
 } from '@/domains/Reviews/utils';
 
 import { getExamReviews } from '@/apis';
@@ -44,6 +45,7 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
         ? STATUS.UNCONFIRMED
         : apiData.status || STATUS.UNCONFIRMED;
   const userDisplay = apiData.userName || apiData.userDisplay || '';
+  const reportCount = apiData.reportCount ?? 0;
 
   return {
     id: apiData.postId,
@@ -57,6 +59,10 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
     questionDetail: '',
     uploadTime,
     userDisplay,
+    isDiscussed: apiData.isDiscussed ?? false,
+    isReported: reportCount > 0,
+    reportCount,
+    processStatuses: getExamReviewProcessStatuses(apiData),
   };
 };
 
@@ -72,6 +78,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     semester,
     examType,
     isConfirmed,
+    isDiscussed,
+    isReported,
+    statuses,
     enabled = true,
     refreshKey,
   } = params;
@@ -89,6 +98,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       semester,
       examType,
       isConfirmed,
+      isDiscussed,
+      isReported,
+      statuses,
       refreshKey,
     ],
     queryFn: async () => {
@@ -103,6 +115,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
         semester,
         examType,
         isConfirmed,
+        isDiscussed,
+        isReported,
+        statuses,
       });
 
       if (!response.isSuccess || !response.result) {
