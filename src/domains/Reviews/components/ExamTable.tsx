@@ -118,7 +118,10 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
     label: '확인여부',
     width: '78px',
     render: (review: ExamReview) => (
-      <ExamConfirmStatusBadge status={review.status} />
+      <ExamConfirmStatusBadge
+        status={review.status}
+        className='justify-center'
+      />
     ),
   },
   { key: 'id', label: 'postId', width: '90px' },
@@ -235,7 +238,10 @@ export default function ExamTable({
               {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                 <Table.Head
                   key={column.key}
-                  className='relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+                  className={cn(
+                    'relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap',
+                    column.key === 'status' && 'text-center'
+                  )}
                 >
                   {column.label}
                 </Table.Head>
@@ -276,6 +282,7 @@ export default function ExamTable({
                           key={column.key}
                           className={cn(
                             'overflow-hidden text-ellipsis whitespace-nowrap',
+                            column.key === 'status' && 'text-center',
                             column.key === 'processStatuses' &&
                               'whitespace-normal'
                           )}
