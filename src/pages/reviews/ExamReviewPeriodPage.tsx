@@ -45,7 +45,7 @@ export default function ExamReviewPeriodPage() {
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
         title='시험 후기 작성 기간 관리'
-        description='시험 후기 작성 기간을 생성하고 조회·수정·삭제할 수 있어요. (중간고사 직후 1주간, 기말고사 직후 3주간)'
+        description='시험 후기 작성 기간을 생성하고 조회·수정·삭제할 수 있어요. (중간고사 직후 1주간, 기말고사(+계절학기) 직후 4주간)'
       />
 
       <ExamReviewPeriodScheduleForm onSuccess={getExamReviewPeriods} />
