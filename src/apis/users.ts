@@ -2,6 +2,7 @@ import { axiosInstance } from '@/shared/axios/instance';
 import type {
   AdminUserListResponse,
   EditMemberInfo,
+  MemberInfo,
   UpdateUserInfoResponse,
 } from '@/shared/types';
 
@@ -30,4 +31,13 @@ export const editUsersAPI = async (
     data
   );
   return response.data;
+};
+
+export const getUserDetailAPI = async (
+  encryptedUserId: string
+): Promise<MemberInfo> => {
+  const response = await axiosInstance.get(
+    `/v1/admin/users/${encryptedUserId}`
+  );
+  return response.data.result;
 };
