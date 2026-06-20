@@ -1,15 +1,12 @@
 import { useState } from 'react';
 
-import { ChevronDown, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button, Input, Select } from '@/shared/components/ui';
-import {
-  EXAM_REVIEW_PROCESS_STATUS,
-  EXAM_TYPE_LIST,
-  SEMESTER_LIST,
-} from '@/shared/constants';
+import { EXAM_TYPE_LIST, SEMESTER_LIST } from '@/shared/constants';
 
+import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
 import {
   type ExamReviewSearchParams,
   isExamReviewSort,
@@ -19,9 +16,6 @@ import {
   convertSemesterToEnum,
   extractYearFromSemester,
 } from '@/domains/Reviews/utils';
-
-import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
-import { ExamMultiSelect } from './ExamMultiSelect';
 
 interface ExamSearchProps {
   onSearchChange: (params: ExamReviewSearchParams) => void;
@@ -33,59 +27,7 @@ interface ExamSearchProps {
   initialSemester?: string;
   initialExamType?: string;
   initialIsConfirmed?: boolean;
-  initialIsDiscussed?: boolean;
-  initialIsReported?: boolean;
-  initialStatuses?: string;
 }
-
-const ALL_SELECTED = '전체';
-const TRUE_SELECTED = 'TRUE';
-const FALSE_SELECTED = 'FALSE';
-const CONFIRMED_SELECTED = 'CONFIRMED';
-const UNCONFIRMED_SELECTED = 'UNCONFIRMED';
-const PROCESS_STATUS_OPTIONS: string[] = EXAM_REVIEW_PROCESS_STATUS.map(
-  (status) => status.label
-);
-
-const isDefined = <T,>(value: T | undefined): value is T => value !== undefined;
-
-const getBooleanFilterValue = (value?: boolean): string => {
-  if (value === true) {
-    return TRUE_SELECTED;
-  }
-
-  if (value === false) {
-    return FALSE_SELECTED;
-  }
-
-  return ALL_SELECTED;
-};
-
-const getStatusLabelsFromCodes = (statuses?: string): string[] => {
-  if (!statuses) {
-    return [];
-  }
-
-  return statuses
-    .split(',')
-    .map((status) => status.trim())
-    .map((statusCode) => {
-      return EXAM_REVIEW_PROCESS_STATUS.find(
-        (status) => status.code === statusCode
-      )?.label;
-    })
-    .filter(isDefined);
-};
-
-const getStatusCodesFromLabels = (statusLabels: string[]): string =>
-  statusLabels
-    .map((statusLabel) => {
-      return EXAM_REVIEW_PROCESS_STATUS.find(
-        (status) => status.label === statusLabel
-      )?.code;
-    })
-    .filter(isDefined)
-    .join(',');
 
 export default function ExamSearch({
   onSearchChange,
@@ -97,12 +39,13 @@ export default function ExamSearch({
   initialSemester,
   initialExamType,
   initialIsConfirmed,
-  initialIsDiscussed,
-  initialIsReported,
-  initialStatuses,
 }: ExamSearchProps) {
+  const ALL_SELECTED = '전체';
+  const CONFIRMED_SELECTED = 'CONFIRMED';
+  const UNCONFIRMED_SELECTED = 'UNCONFIRMED';
+
   // key prop을 사용하여 prop 변경 시 컴포넌트 재초기화 (useEffect 대신)
-  const searchKey = `${initialStartDate}-${initialEndDate}-${initialKeywordAuthor}-${initialKeywordPost}-${initialSort}-${initialSemester}-${initialExamType}-${initialIsConfirmed}-${initialIsDiscussed}-${initialIsReported}-${initialStatuses}`;
+  const searchKey = `${initialStartDate}-${initialEndDate}-${initialKeywordAuthor}-${initialKeywordPost}-${initialSort}-${initialSemester}-${initialExamType}-${initialIsConfirmed}`;
 
   // 내부 상태는 사용자 입력용으로만 사용
   const [startDate, setStartDate] = useState<string>(initialStartDate);
@@ -126,15 +69,6 @@ export default function ExamSearch({
         ? UNCONFIRMED_SELECTED
         : ALL_SELECTED
   );
-  const [discussionStatus, setDiscussionStatus] = useState<string>(
-    getBooleanFilterValue(initialIsDiscussed)
-  );
-  const [reportStatus, setReportStatus] = useState<string>(
-    getBooleanFilterValue(initialIsReported)
-  );
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
-    getStatusLabelsFromCodes(initialStatuses)
-  );
 
   // 검색 실행 함수 (현재 상태 기반)
   const handleSearch = () => {
@@ -153,9 +87,6 @@ export default function ExamSearch({
         semester,
         examType,
         confirmStatus,
-        discussionStatus,
-        reportStatus,
-        selectedStatuses,
       })
     );
   };
@@ -169,9 +100,6 @@ export default function ExamSearch({
     semester: targetSemester,
     examType: targetExamType,
     confirmStatus: targetConfirmStatus,
-    discussionStatus: targetDiscussionStatus,
-    reportStatus: targetReportStatus,
-    selectedStatuses: targetSelectedStatuses,
   }: {
     startDate: string;
     endDate: string;
@@ -181,9 +109,6 @@ export default function ExamSearch({
     semester: string;
     examType: string;
     confirmStatus: string;
-    discussionStatus: string;
-    reportStatus: string;
-    selectedStatuses: string[];
   }) => {
     const params: ExamReviewSearchParams = {};
 
@@ -227,27 +152,6 @@ export default function ExamSearch({
       params.isConfirmed = false;
     }
 
-    if (targetDiscussionStatus === TRUE_SELECTED) {
-      params.isDiscussed = true;
-    }
-
-    if (targetDiscussionStatus === FALSE_SELECTED) {
-      params.isDiscussed = false;
-    }
-
-    if (targetReportStatus === TRUE_SELECTED) {
-      params.isReported = true;
-    }
-
-    if (targetReportStatus === FALSE_SELECTED) {
-      params.isReported = false;
-    }
-
-    const statuses = getStatusCodesFromLabels(targetSelectedStatuses);
-    if (statuses) {
-      params.statuses = statuses;
-    }
-
     return params;
   };
 
@@ -261,9 +165,6 @@ export default function ExamSearch({
       semester: string;
       examType: string;
       confirmStatus: string;
-      discussionStatus: string;
-      reportStatus: string;
-      selectedStatuses: string[];
     }>
   ) => {
     onSearchChange(
@@ -276,9 +177,6 @@ export default function ExamSearch({
         semester,
         examType,
         confirmStatus,
-        discussionStatus,
-        reportStatus,
-        selectedStatuses,
         ...nextParams,
       })
     );
@@ -312,9 +210,6 @@ export default function ExamSearch({
     setSemester(ALL_SELECTED);
     setExamType(ALL_SELECTED);
     setConfirmStatus(ALL_SELECTED);
-    setDiscussionStatus(ALL_SELECTED);
-    setReportStatus(ALL_SELECTED);
-    setSelectedStatuses([]);
     onSearchChange({});
   };
 
@@ -406,6 +301,9 @@ export default function ExamSearch({
             <Select.Item value='DESC' className='text-sm'>
               제목 내림차순
             </Select.Item>
+            <Select.Item value='REPORT' className='text-sm'>
+              신고순
+            </Select.Item>
           </Select.Content>
         </Select>
 
@@ -489,75 +387,6 @@ export default function ExamSearch({
             </Select.Item>
           </Select.Content>
         </Select>
-
-        <Select
-          value={discussionStatus}
-          onValueChange={(value) => {
-            setDiscussionStatus(value);
-            handleSearchWithParams({ discussionStatus: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              논의 여부 전체
-            </Select.Item>
-            <Select.Item value={TRUE_SELECTED} className='text-sm'>
-              논의 있음
-            </Select.Item>
-            <Select.Item value={FALSE_SELECTED} className='text-sm'>
-              논의 없음
-            </Select.Item>
-          </Select.Content>
-        </Select>
-
-        <Select
-          value={reportStatus}
-          onValueChange={(value) => {
-            setReportStatus(value);
-            handleSearchWithParams({ reportStatus: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              신고 여부 전체
-            </Select.Item>
-            <Select.Item value={TRUE_SELECTED} className='text-sm'>
-              신고 있음
-            </Select.Item>
-            <Select.Item value={FALSE_SELECTED} className='text-sm'>
-              신고 없음
-            </Select.Item>
-          </Select.Content>
-        </Select>
-
-        <ExamMultiSelect
-          value={selectedStatuses}
-          onValueChange={(value) => {
-            setSelectedStatuses(value);
-            handleSearchWithParams({ selectedStatuses: value });
-          }}
-          options={PROCESS_STATUS_OPTIONS}
-          contentClassName='w-[190px]'
-        >
-          <Button
-            type='button'
-            variant='outline'
-            className='border-input h-9 w-[190px] justify-between bg-transparent px-3 text-sm font-normal hover:bg-transparent'
-          >
-            <span className='truncate'>
-              {selectedStatuses.length > 0
-                ? `처리 상태 ${selectedStatuses.length}개`
-                : '처리 상태 전체'}
-            </span>
-            <ChevronDown className='size-4 opacity-50' />
-          </Button>
-        </ExamMultiSelect>
       </div>
     </div>
   );
