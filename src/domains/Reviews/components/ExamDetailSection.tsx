@@ -15,14 +15,12 @@ import {
 import {
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
-  ExamReviewLogSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
 } from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
-  ExamReviewProcessStatus,
   LectureType,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
@@ -32,7 +30,6 @@ import {
   convertLectureTypeToString,
   convertSemesterEnumToString,
   convertSemesterToEnum,
-  isExamReviewSanctioned,
 } from '@/domains/Reviews/utils';
 
 import {
@@ -48,7 +45,7 @@ interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
-  onSaveSuccess?: (updatedDetail?: ExamReviewDetailResult) => void;
+  onSaveSuccess?: (status?: string) => void;
   onDeleteSuccess?: () => void;
 }
 
@@ -56,11 +53,6 @@ type FormData = {
   encryptedUserId: string;
   postId: number | null;
   isConfirmed: boolean;
-  isDiscussed: boolean;
-  deletionStatus: ExamReviewProcessStatus | null;
-  isSanctioned: boolean;
-  visibilityStatus: ExamReviewProcessStatus | null;
-  memo: string | null;
   examReviewName: string;
   uploadTime: string;
   lectureName: string;
@@ -78,8 +70,6 @@ type FormData = {
 
 type InitialValues = {
   isConfirmed: boolean;
-  isDiscussed: boolean;
-  memo: string | null;
   lectureName: string;
   professorName: string;
   classNumber: number | null;
@@ -89,18 +79,12 @@ type InitialValues = {
   isOnline: string;
   examType: string;
   questionDetail: string;
-  fileName: string;
 };
 
 const DEFAULT_FORM_DATA: FormData = {
   encryptedUserId: '',
   postId: null,
   isConfirmed: false,
-  isDiscussed: false,
-  deletionStatus: null,
-  isSanctioned: false,
-  visibilityStatus: null,
-  memo: null,
   examReviewName: '',
   uploadTime: '',
   lectureName: '',
@@ -123,9 +107,9 @@ export function ExamDetailSection({
   onSaveSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
-  const [activeTab, setActiveTab] = useState<
-    'review' | 'post' | 'comments' | 'logs'
-  >('review');
+  const [activeTab, setActiveTab] = useState<'review' | 'post' | 'comments'>(
+    'review'
+  );
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -162,17 +146,7 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: selectedExamReviewDetail.isConfirmed,
-        isDiscussed: selectedExamReviewDetail.isDiscussed,
-        deletionStatus: selectedExamReviewDetail.deletionStatus,
-        isSanctioned: isExamReviewSanctioned(
-          selectedExamReviewDetail.isSanctioned
-        ),
-        visibilityStatus: selectedExamReviewDetail.visibilityStatus,
-        memo: selectedExamReviewDetail.memo,
-        examReviewName:
-          selectedExamReviewDetail.title ??
-          selectedExamReview?.reviewTitle ??
-          '',
+        examReviewName: selectedExamReviewDetail.title,
         uploadTime: uploadTimeStr,
         lectureName: selectedExamReviewDetail.lectureName,
         professorName: selectedExamReviewDetail.professor,
@@ -187,8 +161,6 @@ export function ExamDetailSection({
         author: selectedExamReviewDetail.userDisplay,
         initialValues: {
           isConfirmed: selectedExamReviewDetail.isConfirmed,
-          isDiscussed: selectedExamReviewDetail.isDiscussed,
-          memo: selectedExamReviewDetail.memo,
           lectureName: selectedExamReviewDetail.lectureName,
           professorName: selectedExamReviewDetail.professor,
           classNumber: selectedExamReviewDetail.classNumber,
@@ -198,12 +170,11 @@ export function ExamDetailSection({
           isOnline: selectedExamReviewDetail.isOnline ? 'O' : 'X',
           examType: examTypeStr,
           questionDetail: selectedExamReviewDetail.questionDetail,
-          fileName: selectedExamReviewDetail.fileName,
         },
       };
     }
     return null;
-  }, [selectedExamReview?.reviewTitle, selectedExamReviewDetail]);
+  }, [selectedExamReviewDetail]);
 
   useEffect(() => {
     setIsEditMode(false);
@@ -215,11 +186,6 @@ export function ExamDetailSection({
         encryptedUserId: formInitialValues.encryptedUserId,
         postId: formInitialValues.postId,
         isConfirmed: formInitialValues.isConfirmed,
-        isDiscussed: formInitialValues.isDiscussed,
-        deletionStatus: formInitialValues.deletionStatus,
-        isSanctioned: formInitialValues.isSanctioned,
-        visibilityStatus: formInitialValues.visibilityStatus,
-        memo: formInitialValues.memo,
         examReviewName: formInitialValues.examReviewName,
         uploadTime: formInitialValues.uploadTime,
         lectureName: formInitialValues.lectureName,
@@ -246,8 +212,6 @@ export function ExamDetailSection({
     if (!initialValues) return false;
     return (
       formData.isConfirmed !== initialValues.isConfirmed ||
-      formData.isDiscussed !== initialValues.isDiscussed ||
-      (formData.memo ?? '') !== (initialValues.memo ?? '') ||
       formData.lectureName !== initialValues.lectureName ||
       formData.professorName !== initialValues.professorName ||
       formData.classNumber !== initialValues.classNumber ||
@@ -275,11 +239,6 @@ export function ExamDetailSection({
       initialValues.isConfirmed ? '확인' : '미확인',
       formData.isConfirmed ? '확인' : '미확인'
     );
-    add(
-      '논의 여부',
-      initialValues.isDiscussed ? '논의 있음' : '논의 없음',
-      formData.isDiscussed ? '논의 있음' : '논의 없음'
-    );
 
     add('강의명', initialValues.lectureName, formData.lectureName);
     add('교수명', initialValues.professorName, formData.professorName);
@@ -302,10 +261,9 @@ export function ExamDetailSection({
       initialValues.questionDetail,
       formData.examTypeAndQuestions
     );
-    add('메모', initialValues.memo ?? '', formData.memo ?? '');
 
     if (selectedFile) {
-      add('업로드 파일', initialValues.fileName || '', selectedFile.name);
+      add('업로드 파일', formData.fileName || '', selectedFile.name);
     }
 
     return changes;
@@ -318,8 +276,6 @@ export function ExamDetailSection({
         encryptedUserId: selectedExamReviewDetail.encryptedUserId,
         postId: selectedExamReviewDetail.postId,
         isConfirmed: initialValues.isConfirmed,
-        isDiscussed: initialValues.isDiscussed,
-        memo: initialValues.memo,
         lectureName: initialValues.lectureName,
         professorName: initialValues.professorName,
         classNumber: initialValues.classNumber,
@@ -329,7 +285,7 @@ export function ExamDetailSection({
         isOnline: initialValues.isOnline,
         examType: initialValues.examType,
         examTypeAndQuestions: initialValues.questionDetail,
-        fileName: initialValues.fileName,
+        fileName: selectedExamReviewDetail.fileName,
       }));
       setSelectedFile(null);
     }
@@ -382,16 +338,6 @@ export function ExamDetailSection({
     try {
       const post: UpdateExamReviewRequest['post'] = {};
 
-      if (formData.classNumber === null) {
-        toast.error('분반을 입력해주세요.');
-        return;
-      }
-      if (formData.isDiscussed !== initialValues.isDiscussed) {
-        post.isDiscussed = formData.isDiscussed;
-      }
-      if ((formData.memo ?? '') !== (initialValues.memo ?? '')) {
-        post.memo = formData.memo === '' ? null : formData.memo;
-      }
       if (formData.lectureName !== initialValues.lectureName) {
         post.lectureName = formData.lectureName;
       }
@@ -399,7 +345,9 @@ export function ExamDetailSection({
         post.professor = formData.professorName;
       }
       if (formData.classNumber !== initialValues.classNumber) {
-        post.classNumber = formData.classNumber;
+        if (formData.classNumber !== null) {
+          post.classNumber = formData.classNumber;
+        }
       }
       if (formData.semester !== initialValues.semester) {
         const yearMatch = formData.semester.match(/^(\d{4})/);
@@ -425,18 +373,11 @@ export function ExamDetailSection({
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
+      const hasReviewUpdate = Object.keys(post).length > 0 || selectedFile;
       const hasConfirmUpdate =
         formData.isConfirmed !== initialValues.isConfirmed;
-      const hasDetailUpdate =
-        Object.keys(post).length > 0 || Boolean(selectedFile);
 
-      if (!hasConfirmUpdate && !hasDetailUpdate) {
-        return;
-      }
-
-      let updatedDetail: ExamReviewDetailResult = selectedExamReviewDetail;
-
-      if (hasDetailUpdate) {
+      if (hasReviewUpdate) {
         const updateData: UpdateExamReviewRequest = {
           ...(selectedFile ? { file: selectedFile } : {}),
           post,
@@ -451,8 +392,6 @@ export function ExamDetailSection({
           toast.error(response.message || '시험 후기 수정에 실패했습니다.');
           return;
         }
-
-        updatedDetail = response.result;
       }
 
       if (hasConfirmUpdate) {
@@ -461,24 +400,16 @@ export function ExamDetailSection({
         });
 
         if (!response.isSuccess) {
-          toast.error(response.message || '시험 후기 확인처리에 실패했습니다.');
+          toast.error(response.message || '확인여부 변경에 실패했습니다.');
           return;
         }
-
-        updatedDetail = {
-          ...updatedDetail,
-          isConfirmed: response.result.isConfirmed,
-          status: response.result.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
-        };
       }
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
       setSelectedFile(null);
       setIsEditMode(false);
       setInitialValues({
-        isConfirmed: updatedDetail.isConfirmed,
-        isDiscussed: updatedDetail.isDiscussed,
-        memo: updatedDetail.memo,
+        isConfirmed: formData.isConfirmed,
         lectureName: formData.lectureName,
         professorName: formData.professorName,
         classNumber: formData.classNumber,
@@ -488,9 +419,8 @@ export function ExamDetailSection({
         isOnline: formData.isOnline,
         examType: formData.examType,
         questionDetail: formData.examTypeAndQuestions,
-        fileName: updatedDetail.fileName,
       });
-      onSaveSuccess?.(updatedDetail);
+      onSaveSuccess?.();
     } catch (error: unknown) {
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||
@@ -565,7 +495,7 @@ export function ExamDetailSection({
           <Tabs
             value={activeTab}
             onValueChange={(value) =>
-              setActiveTab(value as 'review' | 'post' | 'comments' | 'logs')
+              setActiveTab(value as 'review' | 'post' | 'comments')
             }
             className='w-full p-4'
           >
@@ -580,9 +510,6 @@ export function ExamDetailSection({
                   </Tabs.Trigger>
                   <Tabs.Trigger value='comments' className='w-fit'>
                     댓글 목록 ({selectedExamReviewDetail?.commentCount ?? 0})
-                  </Tabs.Trigger>
-                  <Tabs.Trigger value='logs' className='w-fit'>
-                    관리 이력 ({selectedExamReviewDetail?.logs?.length ?? 0})
                   </Tabs.Trigger>
                 </Tabs.List>
                 <div className='flex items-center gap-2'>
@@ -668,16 +595,6 @@ export function ExamDetailSection({
                 <Card>
                   <Card.Content className='p-4'>
                     <ExamReviewCommentSection postId={formData.postId} />
-                  </Card.Content>
-                </Card>
-              </Tabs.Content>
-
-              <Tabs.Content value='logs' className='min-h-[460px]'>
-                <Card>
-                  <Card.Content className='p-4'>
-                    <ExamReviewLogSection
-                      logs={selectedExamReviewDetail?.logs}
-                    />
                   </Card.Content>
                 </Card>
               </Tabs.Content>
