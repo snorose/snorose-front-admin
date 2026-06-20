@@ -123,9 +123,6 @@ export default function ExamReviewPage() {
     if (isReported === 'true') {
       params.isReported = true;
     }
-    if (isReported === 'false') {
-      params.isReported = false;
-    }
 
     const statuses = searchParamsFromUrl.get('statuses');
     if (statuses) {
@@ -431,9 +428,7 @@ export default function ExamReviewPage() {
             initialIsReported={
               searchParamsFromUrl.get('isReported') === 'true'
                 ? true
-                : searchParamsFromUrl.get('isReported') === 'false'
-                  ? false
-                  : undefined
+                : undefined
             }
             initialStatuses={searchParamsFromUrl.get('statuses') || ''}
             initialStartDate={searchParamsFromUrl.get('startDate') || ''}

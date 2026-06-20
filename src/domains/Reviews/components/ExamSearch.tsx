@@ -130,7 +130,7 @@ export default function ExamSearch({
     getBooleanFilterValue(initialIsDiscussed)
   );
   const [reportStatus, setReportStatus] = useState<string>(
-    getBooleanFilterValue(initialIsReported)
+    initialIsReported === true ? TRUE_SELECTED : ALL_SELECTED
   );
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
     getStatusLabelsFromCodes(initialStatuses)
@@ -237,10 +237,6 @@ export default function ExamSearch({
 
     if (targetReportStatus === TRUE_SELECTED) {
       params.isReported = true;
-    }
-
-    if (targetReportStatus === FALSE_SELECTED) {
-      params.isReported = false;
     }
 
     const statuses = getStatusCodesFromLabels(targetSelectedStatuses);
@@ -513,29 +509,6 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={reportStatus}
-          onValueChange={(value) => {
-            setReportStatus(value);
-            handleSearchWithParams({ reportStatus: value });
-          }}
-        >
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              신고 여부 전체
-            </Select.Item>
-            <Select.Item value={TRUE_SELECTED} className='text-sm'>
-              신고 있음
-            </Select.Item>
-            <Select.Item value={FALSE_SELECTED} className='text-sm'>
-              신고 없음
-            </Select.Item>
-          </Select.Content>
-        </Select>
-
         <ExamMultiSelect
           value={selectedStatuses}
           onValueChange={(value) => {
@@ -558,6 +531,22 @@ export default function ExamSearch({
             <ChevronDown className='size-4 opacity-50' />
           </Button>
         </ExamMultiSelect>
+
+        <label className='border-input flex h-9 cursor-pointer items-center gap-2 rounded-md border bg-white px-3 text-sm font-normal'>
+          <input
+            type='checkbox'
+            checked={reportStatus === TRUE_SELECTED}
+            onChange={(e) => {
+              const nextReportStatus = e.target.checked
+                ? TRUE_SELECTED
+                : ALL_SELECTED;
+              setReportStatus(nextReportStatus);
+              handleSearchWithParams({ reportStatus: nextReportStatus });
+            }}
+            className='relative h-3.5 w-3.5 shrink-0 cursor-pointer appearance-none rounded border-2 border-gray-300 bg-transparent checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[9px] checked:before:text-white checked:before:content-["✓"]'
+          />
+          <span>신고 있음</span>
+        </label>
       </div>
     </div>
   );

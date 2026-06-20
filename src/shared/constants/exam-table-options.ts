@@ -1,6 +1,6 @@
 // 상태 리스트
 export const EXAM_CONFIRM_STATUS = [
-  { code: 'CONFIRMED', label: '확인완료' },
+  { code: 'CONFIRMED', label: '확인' },
   { code: 'UNCONFIRMED', label: '미확인' },
   { code: 'NEED_DISCUSS', label: '논의필요' },
   { code: 'NEED_ACTION', label: '징계필요' },
