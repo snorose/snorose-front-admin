@@ -38,6 +38,7 @@ export default function MemberInfoPopover({
 
   const fetchMemberInfo = async (): Promise<MemberInfo | null> => {
     if (memberInfo) return memberInfo;
+    if (isFetching) return null;
     setIsFetching(true);
     try {
       const member = await getUserDetailAPI(encryptedUserId);
