@@ -84,3 +84,26 @@ export interface AdminPostBulkDeleteResponse {
     }[];
   };
 }
+
+export interface PostSearchParams {
+  encryptedUserId?: string;
+  boardId?: number;
+  isNotice?: boolean;
+  isVisible?: boolean;
+  isKeywordExist?: boolean;
+  keywordAuthor?: string;
+  keywordPost?: string;
+  postSearchScope?: 'TITLE_AND_CONTENT' | 'TITLE' | 'CONTENT';
+  startDate?: string;
+  endDate?: string;
+  sortTypes?:
+    | 'CREATED_AT'
+    | 'UPDATED_AT'
+    | 'REPORT_COUNT'
+    | 'VIEW_COUNT'
+    | 'LIKE_COUNT'
+    | 'COMMENT_COUNT'
+    | 'SCRAP_COUNT';
+  sortDirection?: 'ASC' | 'DESC';
+  adminCommonStatuses?: string[];
+}
