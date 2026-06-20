@@ -1,10 +1,11 @@
 import axios, {
-  type AxiosInstance,
   type AxiosError,
+  type AxiosInstance,
   type InternalAxiosRequestConfig,
 } from 'axios';
-import { tokenStorage, executeTokenRefresh } from '@/shared/utils';
+
 import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
+import { executeTokenRefresh, tokenStorage } from '@/shared/utils';
 
 class AxiosInstanceManager {
   private static instance: AxiosInstance | null = null;
@@ -46,7 +47,11 @@ class AxiosInstanceManager {
         (config: InternalAxiosRequestConfig) => {
           const accessToken = tokenStorage.getAccessToken();
 
-          if (accessToken && config.headers) {
+          if (
+            accessToken &&
+            config.headers &&
+            config.url !== REISSUE_TOKEN_ENDPOINT
+          ) {
             config.headers.Authorization = `Bearer ${accessToken}`;
           }
 
