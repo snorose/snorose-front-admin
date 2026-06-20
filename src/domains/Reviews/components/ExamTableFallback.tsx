@@ -1,6 +1,6 @@
 import { Skeleton, Table } from '@/shared/components/ui';
 
-const DEFAULT_EXAM_TABLE_COLUMN_COUNT = 8;
+const DEFAULT_EXAM_TABLE_COLUMN_COUNT = 7;
 
 // ======= types =======
 interface ExamTableSkeletonProps {

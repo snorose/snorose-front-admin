@@ -75,18 +75,15 @@ const renderBooleanBadge = (
   </Badge>
 );
 
-const renderReportBadge = (review: ExamReview) => {
-  const label = review.isReported ? `신고 ${review.reportCount}` : '신고 없음';
+const renderReportedStatusBadge = (review: ExamReview) => {
+  if (!review.isReported) return null;
+
+  const label = `신고 ${review.reportCount}`;
 
   return (
     <Badge
       variant='outline'
-      className={cn(
-        'max-w-full truncate',
-        review.isReported
-          ? 'border-red-200 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
-          : 'text-gray-500 dark:text-gray-400'
-      )}
+      className='max-w-full truncate border-red-200 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
       title={label}
     >
       {label}
@@ -95,10 +92,13 @@ const renderReportBadge = (review: ExamReview) => {
 };
 
 const renderProcessStatusBadge = (review: ExamReview) => {
-  const label = review.processStatuses.map(getProcessStatusLabel).join(', ');
+  const statusLabels = review.processStatuses.map(getProcessStatusLabel);
+  const reportLabel = review.isReported ? `신고 ${review.reportCount}` : null;
+  const label = [reportLabel, ...statusLabels].filter(Boolean).join(', ');
 
   return (
     <div className='flex flex-wrap gap-1' title={label}>
+      {renderReportedStatusBadge(review)}
       {review.processStatuses.map((status) => (
         <Badge
           key={status}
@@ -132,15 +132,9 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       renderBooleanBadge(review.isDiscussed, '논의 있음', '논의 없음'),
   },
   {
-    key: 'isReported',
-    label: '신고 여부',
-    width: '92px',
-    render: renderReportBadge,
-  },
-  {
     key: 'processStatuses',
-    label: '처리상태',
-    width: '92px',
+    label: '관리 상태',
+    width: '150px',
     render: renderProcessStatusBadge,
   },
   { key: 'uploadTime', label: '작성일', width: '150px' },
