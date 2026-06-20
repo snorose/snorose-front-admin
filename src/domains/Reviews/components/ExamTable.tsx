@@ -7,12 +7,12 @@ import {
   useState,
 } from 'react';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 import {
   ExamConfirmStatusBadge,
-  ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
   ExamTableSkeleton,
@@ -196,7 +196,7 @@ export default function ExamTable({
         </Table>
       </div>
 
-      <ExamReviewTablePagination
+      <PaginationBar
         currentPage={currentPage}
         onPageChange={setCurrentPage}
         hasNext={hasNext}

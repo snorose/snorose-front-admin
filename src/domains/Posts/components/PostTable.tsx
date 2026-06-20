@@ -1,8 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
-
-import { ExamReviewTablePagination } from '@/domains/Reviews/components';
 
 import { usePostTableState } from '../hooks/usePostTableState';
 import PostBulkActionBar from './PostBulkActionBar';
@@ -182,7 +181,7 @@ export default function PostTable({
         </div>
       </div>
 
-      <ExamReviewTablePagination
+      <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
         hasNext={hasNext}

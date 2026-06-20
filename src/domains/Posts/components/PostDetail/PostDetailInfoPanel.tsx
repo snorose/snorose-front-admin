@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
@@ -13,29 +13,25 @@ import {
   getPostStatusBadges,
 } from '@/shared/utils/postCommentUtils';
 
-import type { AdminGetPostResponse } from '../types/post';
+import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
+
+import { searchUsersAPI } from '@/apis';
+
+import type { AdminGetPostResponse } from '../../types/post';
 
 interface PostDetailInfoPanelProps {
   post: AdminGetPostResponse;
-  activePopoverId: number | null;
-  onNicknameClick: (e: React.MouseEvent, post: AdminGetPostResponse) => void;
-  popoverUser: MemberInfo | null;
-  isUserLoading: boolean;
-  onClosePopover: () => void;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
 }
 
 export default function PostDetailInfoPanel({
   post,
-  activePopoverId,
-  onNicknameClick,
-  popoverUser,
-  isUserLoading,
-  onClosePopover,
-  onPageChange,
 }: PostDetailInfoPanelProps) {
   const [isNotice, setIsNotice] = useState(post.isNotice);
   const status = getPostStatus(post);
+  // 닉네임 팝오버 상태
+  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
+  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
+  const [isUserLoading, setIsUserLoading] = useState(false);
 
   const handleNoticeToggle = (checked: boolean) => {
     setIsNotice(checked);
@@ -45,6 +41,60 @@ export default function PostDetailInfoPanel({
         : '해당 게시글의 공지 등록이 해제되었습니다.'
     );
   };
+
+  // 작성자 닉네임 클릭 처리
+  const handleNicknameClick = useCallback(
+    async (
+      e: React.MouseEvent,
+      targetPost: { nickName?: string; encryptedUserId: string; postId: number }
+    ) => {
+      e.stopPropagation();
+
+      if (activePopoverId === targetPost.postId) {
+        setActivePopoverId(null);
+        setPopoverUser(null);
+        return;
+      }
+
+      setActivePopoverId(targetPost.postId);
+      setPopoverUser(null);
+      setIsUserLoading(true);
+
+      try {
+        const display = targetPost.nickName || '익명';
+        const res = await searchUsersAPI(display);
+        const member = extractFirstSearchMember(res?.result);
+        if (member) {
+          setPopoverUser(member);
+        } else {
+          setPopoverUser({
+            encryptedUserId: targetPost.encryptedUserId,
+            loginId: '정보 없음',
+            userName: display,
+            email: '',
+            nickname: display,
+            userRoleId: 1,
+            studentNumber: '정보 없음',
+            major: '정보 없음',
+            birthday: '',
+            pointBalance: 0,
+            createdAt: '',
+            authenticatedAt: null,
+            totalWarningCount: 0,
+            isBlacklist: false,
+            blacklistStartDate: null,
+            blacklistEndDate: null,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('회원 상세 조회에 실패했습니다.');
+      } finally {
+        setIsUserLoading(false);
+      }
+    },
+    [activePopoverId]
+  );
 
   return (
     <div className='relative flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm'>
@@ -116,7 +166,7 @@ export default function PostDetailInfoPanel({
             <div>
               <span
                 className='cursor-pointer text-sm font-bold text-blue-600 underline transition-colors hover:text-blue-800'
-                onClick={(e) => onNicknameClick(e, post)}
+                onClick={(e) => handleNicknameClick(e, post)}
               >
                 {post.nickName || '익명'}
               </span>
@@ -139,8 +189,10 @@ export default function PostDetailInfoPanel({
                   encryptedUserId={post.encryptedUserId}
                   popoverUser={popoverUser}
                   isUserLoading={isUserLoading}
-                  onClose={onClosePopover}
-                  onPageChange={onPageChange}
+                  onClose={() => {
+                    setActivePopoverId(null);
+                    setPopoverUser(null);
+                  }}
                 />
               </div>
             )}

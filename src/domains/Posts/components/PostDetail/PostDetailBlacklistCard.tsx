@@ -2,17 +2,8 @@ import { Badge } from '@/shared/components/ui';
 import type { UserBlacklistHistory } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
-export default function PostDetailBlacklistCard({
-  blacklistHistory,
-}: {
-  blacklistHistory: UserBlacklistHistory[];
-}) {
-  const historyData = blacklistHistory
-    ? Array.isArray(blacklistHistory)
-      ? blacklistHistory
-      : [blacklistHistory]
-    : [];
-
+export default function PostDetailBlacklistCard() {
+  const historyData: UserBlacklistHistory[] = [];
   return (
     <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
       <h3 className='text-[14px] font-bold text-gray-900'>징계 정보</h3>

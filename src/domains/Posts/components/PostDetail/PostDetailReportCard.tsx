@@ -10,13 +10,12 @@ interface ReportItem {
 
 interface PostDetailReportCardProps {
   reportCount: number;
-  reportsList: ReportItem[];
 }
 
 export default function PostDetailReportCard({
   reportCount,
-  reportsList,
 }: PostDetailReportCardProps) {
+  const reportsList: ReportItem[] = [];
   return (
     <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
       <div className='flex items-center justify-between'>

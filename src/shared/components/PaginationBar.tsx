@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Pagination } from '@/shared/components/ui';
 
-interface ExamReviewTablePaginationProps {
+interface PaginationBarProps {
   currentPage?: number;
   onPageChange?: (page: number | ((prev: number) => number)) => void;
   hasNext?: boolean;
@@ -13,12 +13,12 @@ function getBlockStartPage(page: number) {
   return Math.floor((page - 1) / 10) * 10 + 1;
 }
 
-export function ExamReviewTablePagination({
+export function PaginationBar({
   currentPage: propCurrentPage,
   onPageChange,
   hasNext = false,
   totalPage,
-}: ExamReviewTablePaginationProps) {
+}: PaginationBarProps) {
   const [internalCurrentPage, setInternalCurrentPage] = useState(1);
 
   const currentPage = propCurrentPage ?? internalCurrentPage;

@@ -44,7 +44,6 @@ export default function PostTableRow({
   popoverUser,
   isUserLoading,
   onClosePopover,
-  onPageChange,
 }: PostTableRowProps) {
   const navigate = useNavigate();
   const status = getPostStatus(post);
@@ -119,7 +118,6 @@ export default function PostTableRow({
             popoverUser={popoverUser}
             isUserLoading={isUserLoading}
             onClose={onClosePopover}
-            onPageChange={onPageChange}
           />
         )}
       </Table.Cell>

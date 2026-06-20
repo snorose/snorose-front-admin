@@ -42,7 +42,6 @@ export default function CommentTableRow({
   popoverUser,
   isUserLoading,
   onClosePopover,
-  onPageChange,
   onSingleVisibilityToggle,
   onFilterByPostId,
   onFilterByParentId,
@@ -149,7 +148,6 @@ export default function CommentTableRow({
             popoverUser={popoverUser}
             isUserLoading={isUserLoading}
             onClose={onClosePopover}
-            onPageChange={onPageChange}
           />
         )}
       </Table.Cell>

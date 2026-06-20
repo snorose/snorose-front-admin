@@ -1,8 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
-
-import { ExamReviewTablePagination } from '@/domains/Reviews/components';
 
 import { useCommentTableState } from '../hooks/useCommentTableState';
 import CommentBulkActionBar from './CommentBulkActionBar';
@@ -198,7 +197,7 @@ export default function CommentTable({
         </div>
       </div>
 
-      <ExamReviewTablePagination
+      <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
         hasNext={hasNext}

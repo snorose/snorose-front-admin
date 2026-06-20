@@ -5,5 +5,6 @@ export { default as Header } from './Header';
 export { default as MemberInfoPopover } from './MemberInfoPopover';
 export { NavUser } from './NavUser';
 export { default as PageHeader } from './PageHeader';
+export { PaginationBar } from './PaginationBar';
 export { PeriodStatusBadge } from './PeriodStatusBadge';
 export { ProtectedRoute } from './ProtectedRoute';
