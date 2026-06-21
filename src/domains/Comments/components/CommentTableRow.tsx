@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { AlertTriangle, Heart } from 'lucide-react';
+import { AlertTriangle, Eye, Heart, MessageSquare } from 'lucide-react';
 
 import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Table } from '@/shared/components/ui';
@@ -12,8 +12,7 @@ import {
   BOARD_NAMES,
   formatCommentId,
   formatPostId,
-  getCommentStatus,
-  getCommentStatusBadge,
+  getPostStatusBadges,
 } from '../utils/commentUtils';
 
 interface CommentTableRowProps {
@@ -34,7 +33,11 @@ export default function CommentTableRow({
   onFilterByParentId,
 }: CommentTableRowProps) {
   const navigate = useNavigate();
-  const status = getCommentStatus(comment);
+  const statuses = comment.adminCommonStatuses ?? [];
+  const isDeleted =
+    statuses.includes('ADMIN_DELETED') || statuses.includes('USER_DELETED');
+  const isHidden =
+    statuses.includes('ADMIN_HIDDEN') || statuses.includes('AUTO_HIDDEN');
 
   return (
     <Table.Row className='border-b border-gray-100 bg-white text-gray-800 last:border-0 hover:bg-gray-50/50 [&_td]:h-[54px]'>
@@ -105,9 +108,9 @@ export default function CommentTableRow({
         <div className='flex max-w-[380px] flex-col gap-1'>
           <span
             className='block truncate font-bold text-gray-900'
-            title={comment.postTitle || comment.title || ''}
+            title={comment.postTitle || comment.postTitle || ''}
           >
-            {comment.postTitle || comment.title || '제목 없음'}
+            {comment.postTitle || comment.postTitle || '제목 없음'}
           </span>
           <span
             className='block truncate text-xs text-gray-500'
@@ -147,10 +150,18 @@ export default function CommentTableRow({
 
       {/* 9. 통계 */}
       <Table.Cell className='px-3 py-1.5 text-center'>
-        <div className='mx-auto flex max-w-[110px] justify-center gap-x-3 font-mono text-[11px] text-gray-500'>
+        <div className='mx-auto grid max-w-[110px] grid-cols-2 justify-items-start gap-x-2 gap-y-1 pl-1 font-mono text-[11px] text-gray-500'>
+          <span className='flex items-center gap-0.5' title='조회수'>
+            <Eye className='h-3.5 w-3.5 text-gray-400' />
+            {comment.viewCount ?? 0}
+          </span>
           <span className='flex items-center gap-0.5' title='공감수'>
             <Heart className='h-3.5 w-3.5 fill-rose-50 text-rose-400' />
             {comment.likeCount ?? 0}
+          </span>
+          <span className='flex items-center gap-0.5' title='대댓글수'>
+            <MessageSquare className='h-3.5 w-3.5 text-blue-400' />
+            {comment.childCommentCount ?? 0}
           </span>
           <span
             className={cn(
@@ -185,53 +196,53 @@ export default function CommentTableRow({
 
       {/* 11. 상태 */}
       <Table.Cell className='px-3 text-center'>
-        <Badge
-          variant='unstyled'
-          className={cn(
-            getCommentStatusBadge(status).className,
-            'cursor-pointer hover:opacity-80'
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            onSingleVisibilityToggle(comment);
-          }}
-        >
-          {status}
-        </Badge>
+        <div className='flex flex-wrap items-center justify-center gap-1'>
+          {getPostStatusBadges(comment).map((badge, idx) => (
+            <Badge
+              key={idx}
+              variant='unstyled'
+              className={badge.className}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSingleVisibilityToggle(comment);
+              }}
+            >
+              {badge.text}
+            </Badge>
+          ))}
+        </div>
       </Table.Cell>
 
       {/* 12. 작성일 */}
       <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
         {(() => {
           const created = formatDateTimeWithAmPm(comment.createdAt);
-          if (status !== '정상' && status !== '비공개해제') {
-            let changeDateStr = '';
-            let label = '';
+          if (!isDeleted && !isHidden) return created;
 
-            if (status === '관리자삭제' && comment.deletedAt) {
-              changeDateStr = formatDateTimeWithAmPm(comment.deletedAt);
-              label = '관리자 삭제';
-            } else if (status === '관리자비공개' && comment.updatedAt) {
-              changeDateStr = formatDateTimeWithAmPm(comment.updatedAt);
-              label = '관리자 비공개';
-            } else if (status === '삭제됨' && comment.deletedAt) {
-              changeDateStr = formatDateTimeWithAmPm(comment.deletedAt);
-              label = '삭제됨';
-            } else if (status.startsWith('신고누적') && comment.updatedAt) {
-              changeDateStr = formatDateTimeWithAmPm(comment.updatedAt);
-              label = '신고누적';
-            }
+          let changeDateStr = '';
+          let label = '';
 
-            if (changeDateStr) {
-              return (
-                <div className='flex flex-col leading-tight'>
-                  <span className='font-semibold'>{created}</span>
-                  <span className='text-[10px] font-medium text-gray-400'>
-                    ({label}: {changeDateStr})
-                  </span>
-                </div>
-              );
-            }
+          if (isDeleted && comment.deletedAt) {
+            changeDateStr = formatDateTimeWithAmPm(comment.deletedAt);
+            label = statuses.includes('ADMIN_DELETED')
+              ? '관리자 삭제'
+              : '유저 삭제';
+          } else if (isHidden && comment.updatedAt) {
+            changeDateStr = formatDateTimeWithAmPm(comment.updatedAt);
+            label = statuses.includes('AUTO_HIDDEN')
+              ? '신고누적'
+              : '관리자 비공개';
+          }
+
+          if (changeDateStr) {
+            return (
+              <div className='flex flex-col leading-tight'>
+                <span className='font-semibold'>{created}</span>
+                <span className='text-[10px] font-medium text-gray-400'>
+                  ({label}: {changeDateStr})
+                </span>
+              </div>
+            );
           }
           return created;
         })()}
