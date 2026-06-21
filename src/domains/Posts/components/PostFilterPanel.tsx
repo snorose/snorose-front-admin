@@ -207,6 +207,41 @@ export const PostFilterPanel = ({
         공지만 보기
       </label>
 
+      {/* 게시판 필터 */}
+      <div className='flex flex-col gap-2'>
+        <label className='text-sm text-gray-600'>게시판 필터</label>
+        <div className='flex flex-wrap gap-2'>
+          <button
+            onClick={() =>
+              setFilters((prev) => ({
+                ...prev,
+                adminCommonStatuses: undefined,
+              }))
+            }
+            className={`rounded-full border px-3 py-1 text-sm ${
+              !filters.adminCommonStatuses?.length
+                ? 'border-gray-900 bg-gray-900 text-white'
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            전체
+          </button>
+          {STATUS_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleStatusToggle(option.value)}
+              className={`rounded-full border px-3 py-1 text-sm ${
+                filters.adminCommonStatuses?.includes(option.value)
+                  ? 'border-gray-900 bg-gray-900 text-white'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* 상태 필터 */}
       <div className='flex flex-col gap-2'>
         <label className='text-sm text-gray-600'>상태 필터</label>

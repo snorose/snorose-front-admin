@@ -1,23 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import type { AdminGetPostResponse } from '../types/post';
+import type { PostSearchParams } from '../types/post';
 import { useBulkDeletePost } from './useBulkDeletePost';
 import { useDeletePost } from './useDeletePost';
 import { usePostList } from './usePostList';
 import { useUpdatePostVisibility } from './useUpdatePostVisibility';
 
 interface UsePostTableStateProps {
-  searchParams: {
-    encryptedUserId?: string;
-    boardId?: number;
-    isVisible?: boolean;
-    isKeywordExist?: boolean;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-  };
+  searchParams: PostSearchParams;
   refreshKey?: number;
   currentPage: number;
 }
@@ -34,42 +26,18 @@ export function usePostTableState({
   }, [
     searchParams.encryptedUserId,
     searchParams.boardId,
+    searchParams.isNotice,
     searchParams.isVisible,
     searchParams.isKeywordExist,
+    searchParams.keywordAuthor,
+    searchParams.keywordPost,
+    searchParams.postSearchScope,
     searchParams.startDate,
     searchParams.endDate,
-    searchParams.status,
+    searchParams.sortTypes,
+    searchParams.sortDirection,
+    searchParams.adminCommonStatuses,
   ]);
-
-  const statusParams = useMemo(() => {
-    if (
-      !searchParams.status ||
-      searchParams.status === 'all' ||
-      searchParams.status === '전체'
-    ) {
-      return {};
-    }
-    const mapping: Record<
-      string,
-      { adminCommonStatuses?: string[]; isVisible?: boolean }
-    > = {
-      신고누적: { adminCommonStatuses: ['REPORTED'] },
-      리자삭제: { adminCommonStatuses: ['ADMIN_DELETED'] },
-      유저삭제: { adminCommonStatuses: ['USER_DELETED'] },
-      자동숨김: { adminCommonStatuses: ['AUTO_HIDDEN'] },
-      징계: { adminCommonStatuses: ['SANCTIONED'] },
-      리자비공개: { isVisible: false },
-      정상: { isVisible: true },
-
-      REPORTED: { adminCommonStatuses: ['REPORTED'] },
-      ADMIN_DELETED: { adminCommonStatuses: ['ADMIN_DELETED'] },
-      USER_DELETED: { adminCommonStatuses: ['USER_DELETED'] },
-      AUTO_HIDDEN: { adminCommonStatuses: ['AUTO_HIDDEN'] },
-      SANCTIONED: { adminCommonStatuses: ['SANCTIONED'] },
-      ADMIN_HIDDEN: { isVisible: false },
-    };
-    return mapping[searchParams.status] || {};
-  }, [searchParams.status]);
 
   const {
     data: rawPosts,
@@ -82,20 +50,18 @@ export function usePostTableState({
     page: currentPage,
     body: {
       encryptedUserId: searchParams.encryptedUserId,
-      boardId:
-        searchParams.boardId !== undefined &&
-        searchParams.boardId !== null &&
-        !isNaN(Number(searchParams.boardId))
-          ? Number(searchParams.boardId)
-          : undefined,
-      isVisible:
-        searchParams.isVisible !== undefined
-          ? searchParams.isVisible
-          : statusParams.isVisible,
+      boardId: searchParams.boardId,
+      isVisible: searchParams.isVisible,
       isKeywordExist: searchParams.isKeywordExist,
       startDate: searchParams.startDate || undefined,
       endDate: searchParams.endDate || undefined,
-      adminCommonStatuses: statusParams.adminCommonStatuses,
+      adminCommonStatuses: searchParams.adminCommonStatuses,
+      keywordAuthor: searchParams.keywordAuthor,
+      keywordPost: searchParams.keywordPost,
+      postSearchScope: searchParams.postSearchScope,
+      sortTypes: searchParams.sortTypes,
+      sortDirection: searchParams.sortDirection,
+      isNotice: searchParams.isNotice,
     },
   });
 
@@ -103,9 +69,7 @@ export function usePostTableState({
     if (refreshKey) void refetch();
   }, [refreshKey, refetch]);
 
-  const posts = useMemo<AdminGetPostResponse[]>(() => {
-    return rawPosts ?? [];
-  }, [rawPosts]);
+  const posts = rawPosts ?? [];
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeletePost();
