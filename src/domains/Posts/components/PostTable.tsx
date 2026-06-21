@@ -1,8 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
-
-import { ExamReviewTablePagination } from '@/domains/Reviews/components';
 
 import { usePostTableState } from '../hooks/usePostTableState';
 import PostBulkActionBar from './PostBulkActionBar';
@@ -37,11 +36,6 @@ export default function PostTable({
     isAllSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleBulkDelete,
     handleBulkVisibility,
     handleBulkRestore,
@@ -58,10 +52,7 @@ export default function PostTable({
   const isEmpty = !isLoading && posts.length === 0;
 
   return (
-    <div
-      className='flex flex-col gap-3'
-      onClick={() => setActivePopoverId(null)}
-    >
+    <div className='flex flex-col gap-3'>
       <PostBulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
@@ -168,12 +159,6 @@ export default function PostTable({
                           : [...prev, id]
                       );
                     }}
-                    activePopoverId={activePopoverId}
-                    onNicknameClick={handleNicknameClick}
-                    popoverUser={popoverUser}
-                    isUserLoading={isUserLoading}
-                    onClosePopover={() => setActivePopoverId(null)}
-                    onPageChange={onPageChange}
                   />
                 ))
               )}
@@ -182,7 +167,7 @@ export default function PostTable({
         </div>
       </div>
 
-      <ExamReviewTablePagination
+      <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
         hasNext={hasNext}

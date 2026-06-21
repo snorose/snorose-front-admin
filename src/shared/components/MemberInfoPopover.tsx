@@ -1,116 +1,131 @@
-import { useNavigate } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { Loader2, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import type { MemberInfo } from '@/shared/types';
 
+import { getUserDetailAPI } from '@/apis';
+
+import MemberInfoModal from './MemberInfoModal';
+import SanctionModal from './SanctionModal';
+
 interface MemberInfoPopoverProps {
   encryptedUserId: string;
-  popoverUser: MemberInfo | null;
-  isUserLoading: boolean;
-  onClose: () => void;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
+  displayName: string;
 }
 
 export default function MemberInfoPopover({
   encryptedUserId,
-  popoverUser,
-  isUserLoading,
-  onClose,
-  onPageChange,
+  displayName,
 }: MemberInfoPopoverProps) {
-  const navigate = useNavigate();
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
+  const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isSanctionModalOpen, setIsSanctionModalOpen] = useState(false);
+
+  const handleTriggerClick = () => {
+    if (!isPopoverOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPopoverPos({ top: rect.bottom + 4, left: rect.left });
+    }
+    setIsPopoverOpen((prev) => !prev);
+  };
+
+  const fetchMemberInfo = async (): Promise<MemberInfo | null> => {
+    if (memberInfo) return memberInfo;
+    if (isFetching) return null;
+    setIsFetching(true);
+    try {
+      const member = await getUserDetailAPI(encryptedUserId);
+      setMemberInfo(member);
+      return member;
+    } catch {
+      toast.error('회원 정보를 불러오지 못했습니다.');
+      return null;
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const handleInfoClick = async () => {
+    setIsPopoverOpen(false);
+    const member = await fetchMemberInfo();
+    if (member) setIsInfoModalOpen(true);
+  };
+
+  const handleSanctionClick = async () => {
+    setIsPopoverOpen(false);
+    const member = await fetchMemberInfo();
+    if (member) setIsSanctionModalOpen(true);
+  };
 
   return (
-    <div
-      className='border-gray-250 absolute top-10 left-3 z-50 w-72 rounded-lg border bg-white p-4 text-xs leading-relaxed font-normal text-gray-700 shadow-xl'
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className='mb-2 flex items-center justify-between border-b border-gray-100 pb-2'>
-        <span className='font-bold text-gray-900'>미니 회원 정보</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className='rounded p-0.5 hover:bg-gray-100'
-        >
-          <X className='h-3.5 w-3.5 text-gray-400' />
-        </button>
-      </div>
+    <div>
+      <span
+        ref={triggerRef}
+        onClick={handleTriggerClick}
+        className='cursor-pointer truncate transition-colors hover:text-blue-700 hover:underline'
+      >
+        {displayName}
+      </span>
 
-      {isUserLoading ? (
-        <div className='flex justify-center py-4'>
-          <Loader2 className='h-5 w-5 animate-spin text-blue-600' />
-        </div>
-      ) : popoverUser ? (
-        <div className='flex flex-col gap-2'>
-          <div className='mb-1 grid grid-cols-2 gap-x-2 gap-y-1 border-b border-gray-50 pb-2 text-gray-600'>
-            <div>
-              이름:{' '}
-              <strong className='text-gray-900'>
-                {popoverUser.userName || '미정'}
-              </strong>
-            </div>
-            <div>
-              아이디:{' '}
-              <strong className='font-mono text-gray-900'>
-                {popoverUser.loginId || '미정'}
-              </strong>
-            </div>
-            <div>
-              학번:{' '}
-              <strong className='font-mono text-gray-900'>
-                {popoverUser.studentNumber || '미정'}
-              </strong>
-            </div>
-            <div>
-              포인트:{' '}
-              <strong className='font-bold text-blue-600'>
-                {popoverUser.pointBalance || 0} P
-              </strong>
-            </div>
-            <div>
-              강등이력:{' '}
-              <strong
-                className={
-                  popoverUser.isBlacklist
-                    ? 'font-semibold text-red-600'
-                    : 'text-gray-900'
-                }
-              >
-                {popoverUser.isBlacklist ? '있음' : '없음'}
-              </strong>
-            </div>
-            <div>
-              경고횟수:{' '}
-              <strong
-                className={
-                  (popoverUser.totalWarningCount ?? 0) > 0
-                    ? 'font-semibold text-red-600'
-                    : 'text-gray-900'
-                }
-              >
-                {popoverUser.totalWarningCount ?? 0} 회
-              </strong>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              onClose();
-              onPageChange(1);
-              const params = new URLSearchParams();
-              params.set('encryptedUserId', encryptedUserId);
-              navigate(`?${params.toString()}`, { replace: true });
-            }}
-            className='w-full rounded px-2 py-1 text-left font-medium text-gray-800 hover:bg-blue-50 hover:text-blue-700'
-          >
-            작성한 댓글 검색 조회
-          </button>
-        </div>
-      ) : (
-        <p className='py-2 text-center text-gray-400'>사용자 상세 조회 실패</p>
+      {isFetching && (
+        <Loader2 className='ml-1 inline h-3 w-3 animate-spin text-gray-400' />
       )}
+
+      {isPopoverOpen &&
+        createPortal(
+          <>
+            <div
+              className='fixed inset-0 z-40'
+              onClick={() => setIsPopoverOpen(false)}
+            />
+            <div
+              className='fixed z-50 w-48 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg'
+              style={{ top: popoverPos.top, left: popoverPos.left }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className='w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50'
+                onClick={handleInfoClick}
+              >
+                회원 정보
+              </button>
+              <button className='w-full cursor-not-allowed px-3 py-2 text-left text-sm text-gray-400'>
+                작성한 게시글
+              </button>
+              <button className='w-full cursor-not-allowed px-3 py-2 text-left text-sm text-gray-400'>
+                작성한 댓글
+              </button>
+              <div className='border-t border-gray-100' />
+              <button
+                className='w-full px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50'
+                onClick={handleSanctionClick}
+              >
+                제재하기
+              </button>
+            </div>
+          </>,
+          document.body
+        )}
+
+      <MemberInfoModal
+        isOpen={isInfoModalOpen}
+        onClose={() => setIsInfoModalOpen(false)}
+        memberInfo={memberInfo}
+        encryptedUserId={encryptedUserId}
+      />
+
+      <SanctionModal
+        isOpen={isSanctionModalOpen}
+        onClose={() => setIsSanctionModalOpen(false)}
+        memberInfo={memberInfo}
+      />
     </div>
   );
 }

@@ -3,12 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
-import type { MemberInfo } from '@/shared/types';
-
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
-
-import { searchUsersAPI } from '@/apis/users';
-
 import type { AdminCommentResponse } from '../types/comment';
 import { getCommentStatus } from '../utils/commentUtils';
 import { useBulkDeleteComment } from './useBulkDeleteComment';
@@ -43,28 +37,6 @@ export function useCommentTableState({
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [sortBy] = useState<'reportCount' | 'createdAt'>('createdAt');
   const [sortDir] = useState<'asc' | 'desc'>('desc');
-
-  // 닉네임 클릭 팝오버 상태
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
-
-  // 검색 조건 변경 시 선택 초기화 및 팝오버 닫기
-  useEffect(() => {
-    setSelectedIds([]);
-    setActivePopoverId(null);
-  }, [
-    searchParams.content,
-    searchParams.postId,
-    searchParams.parentId,
-    searchParams.encryptedUserId,
-    searchParams.boardId,
-    searchParams.isVisible,
-    searchParams.isKeywordExist,
-    searchParams.startDate,
-    searchParams.endDate,
-    searchParams.status,
-  ]);
 
   const { data, isLoading, refetch } = useCommentList({
     page: currentPage,
@@ -199,56 +171,6 @@ export function useCommentTableState({
     }
   };
 
-  // 닉네임 클릭 핸들러
-  const handleNicknameClick = async (
-    e: React.MouseEvent,
-    comment: AdminCommentResponse
-  ) => {
-    e.stopPropagation();
-
-    if (activePopoverId === comment.commentId) {
-      setActivePopoverId(null);
-      setPopoverUser(null);
-      return;
-    }
-
-    setActivePopoverId(comment.commentId);
-    setPopoverUser(null);
-    setIsUserLoading(true);
-
-    try {
-      const res = await searchUsersAPI(comment.nickname || comment.userDisplay);
-      const member = extractFirstSearchMember(res?.result);
-      if (member) {
-        setPopoverUser(member);
-      } else {
-        setPopoverUser({
-          encryptedUserId: comment.encryptedUserId,
-          loginId: '정보 없음',
-          userName: comment.nickname || comment.userDisplay,
-          email: '',
-          nickname: comment.nickname || comment.userDisplay,
-          userRoleId: 1,
-          studentNumber: '정보 없음',
-          major: '정보 없음',
-          birthday: '',
-          pointBalance: 0,
-          createdAt: '',
-          authenticatedAt: null,
-          totalWarningCount: 0,
-          isBlacklist: false,
-          blacklistStartDate: null,
-          blacklistEndDate: null,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('회원 상세 조회에 실패했습니다.');
-    } finally {
-      setIsUserLoading(false);
-    }
-  };
-
   // 비공개 해제 / 삭제 복구 단건 토글 액션
   const handleSingleVisibility = (comment: AdminCommentResponse) => {
     const isCurrentlyVisible = comment.isVisible;
@@ -294,11 +216,6 @@ export function useCommentTableState({
     isSomeSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleSingleVisibility,
     handleFilterByPostId,
     handleFilterByParentId,

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { AlertTriangle, Heart } from 'lucide-react';
@@ -6,7 +5,6 @@ import { AlertTriangle, Heart } from 'lucide-react';
 import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-import type { MemberInfo } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResponse } from '../types/comment';
@@ -22,12 +20,6 @@ interface CommentTableRowProps {
   comment: AdminCommentResponse;
   isSelected: boolean;
   onSelectToggle: (id: number) => void;
-  activePopoverId: number | null;
-  onNicknameClick: (e: React.MouseEvent, comment: AdminCommentResponse) => void;
-  popoverUser: MemberInfo | null;
-  isUserLoading: boolean;
-  onClosePopover: () => void;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
   onSingleVisibilityToggle: (comment: AdminCommentResponse) => void;
   onFilterByPostId: (postId: number) => void;
   onFilterByParentId: (parentId: number) => void;
@@ -37,12 +29,6 @@ export default function CommentTableRow({
   comment,
   isSelected,
   onSelectToggle,
-  activePopoverId,
-  onNicknameClick,
-  popoverUser,
-  isUserLoading,
-  onClosePopover,
-  onPageChange,
   onSingleVisibilityToggle,
   onFilterByPostId,
   onFilterByParentId,
@@ -136,22 +122,11 @@ export default function CommentTableRow({
       </Table.Cell>
 
       {/* 6. 작성자(닉네임) */}
-      <Table.Cell
-        className='relative cursor-pointer px-3 font-bold text-gray-900 select-none'
-        onClick={(e) => onNicknameClick(e, comment)}
-      >
-        <div className='truncate transition-colors hover:text-blue-700 hover:underline'>
-          {comment.nickname || comment.userDisplay}
-        </div>
-        {activePopoverId === comment.commentId && (
-          <MemberInfoPopover
-            encryptedUserId={comment.encryptedUserId}
-            popoverUser={popoverUser}
-            isUserLoading={isUserLoading}
-            onClose={onClosePopover}
-            onPageChange={onPageChange}
-          />
-        )}
+      <Table.Cell className='relative cursor-pointer px-3 font-bold text-gray-900 select-none'>
+        <MemberInfoPopover
+          encryptedUserId={comment.encryptedUserId}
+          displayName={comment.nickname ?? '정보 없음'}
+        />
       </Table.Cell>
 
       {/* 7. 게시판 */}
