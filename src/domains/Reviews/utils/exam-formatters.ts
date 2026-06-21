@@ -1,4 +1,4 @@
-import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
+import { EXAM_CONFIRM_STATUS, LECTURE_TYPE_OPTIONS } from '@/shared/constants';
 
 import type { ExamReviewProcessStatus } from '@/domains/Reviews/types';
 
@@ -38,21 +38,12 @@ export const getExamReviewProcessStatuses = (
  * @returns 한국어 문자열
  */
 export const convertLectureTypeToString = (
-  lectureTypeEnum:
-    | 'MAJOR_REQUIRED'
-    | 'MAJOR_ELECTIVE'
-    | 'GENERAL_REQUIRED'
-    | 'GENERAL_ELECTIVE'
-    | 'OTHER'
+  lectureTypeEnum: (typeof LECTURE_TYPE_OPTIONS)[number]['value']
 ): string => {
-  const typeMap: Record<string, string> = {
-    MAJOR_REQUIRED: '전공필수',
-    MAJOR_ELECTIVE: '전공선택',
-    GENERAL_REQUIRED: '교양필수',
-    GENERAL_ELECTIVE: '교양선택',
-    OTHER: '기타',
-  };
-  return typeMap[lectureTypeEnum] || lectureTypeEnum;
+  return (
+    LECTURE_TYPE_OPTIONS.find((option) => option.value === lectureTypeEnum)
+      ?.label ?? lectureTypeEnum
+  );
 };
 
 /**
