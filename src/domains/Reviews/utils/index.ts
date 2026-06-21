@@ -5,6 +5,7 @@ export {
   convertSemesterEnumToString,
   convertSemesterToEnum,
   extractYearFromSemester,
+  formatExamReviewLogValue,
   getExamReviewProcessStatuses,
   getStatusName,
   isExamReviewSanctioned,

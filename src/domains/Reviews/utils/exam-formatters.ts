@@ -1,4 +1,8 @@
-import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
+import {
+  EXAM_CONFIRM_STATUS,
+  EXAM_REVIEW_PROCESS_STATUS,
+  LECTURE_TYPE_OPTIONS,
+} from '@/shared/constants';
 
 import type { ExamReviewProcessStatus } from '@/domains/Reviews/types';
 
@@ -7,6 +11,40 @@ interface ExamReviewProcessStatusSource {
   visibilityStatus?: ExamReviewProcessStatus | null;
   isSanctioned?: boolean | 'true' | 'false' | null;
 }
+
+const ACTION_LABELS: Record<string, string> = {
+  CREATED: '생성',
+  UPDATED: '수정',
+  DELETED: '삭제',
+  CONFIRMED: '확인',
+  UNCONFIRMED: '미확인',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  ...Object.fromEntries(
+    EXAM_CONFIRM_STATUS.map(({ code, label }) => [code, label])
+  ),
+  ...Object.fromEntries(
+    EXAM_REVIEW_PROCESS_STATUS.map(({ code, label }) => [code, label])
+  ),
+};
+
+const SEMESTER_LABELS: Record<string, string> = {
+  FIRST: '1학기',
+  SECOND: '2학기',
+  SUMMER: '여름계절',
+  WINTER: '겨울계절',
+  OTHER: '기타',
+};
+
+const formatStatusValue = (value: string): string =>
+  value
+    .split(/\s*->\s*/)
+    .map((status) => STATUS_LABELS[status] ?? status)
+    .join(' -> ');
+
+const isBooleanString = (value: string): value is 'true' | 'false' =>
+  value === 'true' || value === 'false';
 
 export const isExamReviewSanctioned = (
   value: ExamReviewProcessStatusSource['isSanctioned']
@@ -38,21 +76,12 @@ export const getExamReviewProcessStatuses = (
  * @returns 한국어 문자열
  */
 export const convertLectureTypeToString = (
-  lectureTypeEnum:
-    | 'MAJOR_REQUIRED'
-    | 'MAJOR_ELECTIVE'
-    | 'GENERAL_REQUIRED'
-    | 'GENERAL_ELECTIVE'
-    | 'OTHER'
+  lectureTypeEnum: (typeof LECTURE_TYPE_OPTIONS)[number]['value']
 ): string => {
-  const typeMap: Record<string, string> = {
-    MAJOR_REQUIRED: '전공필수',
-    MAJOR_ELECTIVE: '전공선택',
-    GENERAL_REQUIRED: '교양필수',
-    GENERAL_ELECTIVE: '교양선택',
-    OTHER: '기타',
-  };
-  return typeMap[lectureTypeEnum] || lectureTypeEnum;
+  return (
+    LECTURE_TYPE_OPTIONS.find((option) => option.value === lectureTypeEnum)
+      ?.label ?? lectureTypeEnum
+  );
 };
 
 /**
@@ -156,4 +185,78 @@ export const extractYearFromSemester = (
 export const getStatusName = (statusCode: string): string => {
   const statusOption = EXAM_CONFIRM_STATUS.find((s) => s.code === statusCode);
   return statusOption?.label || '확인';
+};
+
+export const formatExamReviewLogValue = (
+  key: string,
+  value: string | number | boolean | null,
+  statusModifiedReason?: string | number | boolean | null
+): string => {
+  if (value === null) {
+    return '-';
+  }
+
+  if (typeof value === 'boolean') {
+    if (key === 'isConfirmed') {
+      return value ? '확인' : '미확인';
+    }
+    if (key === 'isDiscussed') {
+      return value ? '논의 있음' : '논의 없음';
+    }
+    if (key === 'isPF' || key === 'isOnline') {
+      return value ? 'O' : 'X';
+    }
+    if (key === 'isSanctioned') {
+      return value ? '징계' : '징계 없음';
+    }
+    return value ? 'true' : 'false';
+  }
+
+  const stringValue = String(value);
+
+  if (stringValue.includes('->') && key !== 'status') {
+    return stringValue
+      .split(/\s*->\s*/)
+      .map((partialValue) => formatExamReviewLogValue(key, partialValue))
+      .join(' -> ');
+  }
+
+  if (key === 'action') {
+    return ACTION_LABELS[stringValue] ?? stringValue;
+  }
+
+  if (key === 'status') {
+    const formattedStatus = formatStatusValue(stringValue);
+    return statusModifiedReason
+      ? `${formattedStatus} (${String(statusModifiedReason)})`
+      : formattedStatus;
+  }
+
+  if (key === 'deletionStatus' || key === 'visibilityStatus') {
+    return formatStatusValue(stringValue);
+  }
+
+  if (key === 'lectureType') {
+    return (
+      LECTURE_TYPE_OPTIONS.find((option) => option.value === stringValue)
+        ?.label ?? stringValue
+    );
+  }
+
+  if (key === 'examType') {
+    if (stringValue === 'MIDTERM' || stringValue === 'FINALTERM') {
+      return convertExamTypeEnumToString(stringValue);
+    }
+    return stringValue;
+  }
+
+  if (isBooleanString(stringValue)) {
+    return formatExamReviewLogValue(key, stringValue === 'true');
+  }
+
+  if (key === 'semester') {
+    return SEMESTER_LABELS[stringValue] ?? stringValue;
+  }
+
+  return stringValue;
 };
