@@ -24,8 +24,12 @@ export default function PostDetailCommentList({
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['postComments', postId, currentPage],
     queryFn: async () => {
-      const payload: { postId: number } = { postId };
-      return await searchComments(currentPage - 1, payload);
+      return await searchComments(currentPage - 1, {
+        searchQuery: String(postId),
+        searchScope: 'POST_ID',
+        sortTypes: ['CREATED_AT'],
+        sortDirection: 'ASC',
+      });
     },
     enabled: !!postId,
   });
