@@ -130,6 +130,7 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
         data: response.result.data.map(transformApiResponseToExamReview),
         hasNext: response.result.hasNext,
         totalPage: response.result.totalPage,
+        totalCount: response.result.totalCount,
       };
     },
     enabled,
