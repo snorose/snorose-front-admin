@@ -43,6 +43,9 @@ const formatStatusValue = (value: string): string =>
     .map((status) => STATUS_LABELS[status] ?? status)
     .join(' -> ');
 
+const isBooleanString = (value: string): value is 'true' | 'false' =>
+  value === 'true' || value === 'false';
+
 export const isExamReviewSanctioned = (
   value: ExamReviewProcessStatusSource['isSanctioned']
 ): boolean => value === true || value === 'true';
@@ -211,6 +214,13 @@ export const formatExamReviewLogValue = (
 
   const stringValue = String(value);
 
+  if (stringValue.includes('->') && key !== 'status') {
+    return stringValue
+      .split(/\s*->\s*/)
+      .map((partialValue) => formatExamReviewLogValue(key, partialValue))
+      .join(' -> ');
+  }
+
   if (key === 'action') {
     return ACTION_LABELS[stringValue] ?? stringValue;
   }
@@ -238,6 +248,10 @@ export const formatExamReviewLogValue = (
       return convertExamTypeEnumToString(stringValue);
     }
     return stringValue;
+  }
+
+  if (isBooleanString(stringValue)) {
+    return formatExamReviewLogValue(key, stringValue === 'true');
   }
 
   if (key === 'semester') {
