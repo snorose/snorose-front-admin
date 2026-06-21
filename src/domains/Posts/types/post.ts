@@ -42,14 +42,15 @@ export interface AdminPostSearchRequest {
   postSearchScope?: 'TITLE_AND_CONTENT' | 'TITLE' | 'CONTENT';
   startDate?: string;
   endDate?: string;
-  sortTypes?:
+  sortTypes?: (
     | 'CREATED_AT'
     | 'UPDATED_AT'
     | 'REPORT_COUNT'
     | 'VIEW_COUNT'
     | 'LIKE_COUNT'
     | 'COMMENT_COUNT'
-    | 'SCRAP_COUNT';
+    | 'SCRAP_COUNT'
+  )[];
   sortDirection?: 'ASC' | 'DESC';
   adminCommonStatuses?: string[];
   content?: string;

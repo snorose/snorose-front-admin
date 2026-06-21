@@ -59,7 +59,7 @@ export function usePostTableState({
       keywordAuthor: searchParams.keywordAuthor,
       keywordPost: searchParams.keywordPost,
       postSearchScope: searchParams.postSearchScope,
-      sortTypes: searchParams.sortTypes,
+      sortTypes: searchParams.sortTypes ? [searchParams.sortTypes] : undefined,
       sortDirection: searchParams.sortDirection,
       isNotice: searchParams.isNotice,
     },
