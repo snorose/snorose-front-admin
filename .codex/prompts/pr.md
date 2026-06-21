@@ -66,20 +66,12 @@ PR로 만들 변경사항이 없습니다.
 
 ## 자동 라벨 규칙
 
-`.github/labeler.yml` 기준으로 PR 제목 prefix와 자동 라벨은 다음처럼 연결됩니다.
-
-- `feat:` -> `✨ Feature`
-- `fix:` -> `🐞 BugFix`
-- `docs:` -> `📄 Docs`
-- `chore:` -> `🧹 Chore`
-- `modify:` -> `🪄 Modify`
-- `style:` -> `🎨 UI`
-- `merge:` -> `❄️ Release`
-- `refactor:` -> `🛠️ Refactor`
-- `test:` -> `🧪 Test`
+`.github/labeler.yml`의 `labels` 항목을 분석해 PR 제목 prefix와 자동 라벨의 연결 관계를 동적으로 파악합니다.
 
 규칙:
 
+- 각 라벨 아래의 정규식 패턴에서 `^tag: .+` 형식을 찾아 PR 제목에 사용할 수 있는 prefix를 추출합니다.
+- 추출한 prefix 중 변경사항에 가장 정확히 맞는 하나를 선택합니다.
 - PR 제목 prefix로 자동 라벨이 부여되도록 만들고, `gh pr create`에서 `--label`은 직접 사용하지 않습니다.
 - 변경사항이 여러 라벨에 걸쳐 있더라도 가장 핵심적인 변경 목적 하나를 기준으로 prefix를 선택합니다.
 - 사용자가 추가 라벨을 명시적으로 요청한 경우에만 별도 라벨 적용 방법을 제안합니다.
