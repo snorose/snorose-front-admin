@@ -203,6 +203,8 @@ export default function ExamTable({
   const hasNext = queryData?.hasNext ?? false;
   const totalPage = queryData?.totalPage;
   const totalCount = queryData?.totalCount;
+  const totalCountText =
+    totalCount === undefined ? '-' : totalCount.toLocaleString();
   const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
@@ -229,7 +231,7 @@ export default function ExamTable({
       <div className='flex items-center justify-start text-sm text-gray-600'>
         총{' '}
         <span className='px-1 font-semibold text-gray-900'>
-          {totalCount?.toLocaleString() ?? 0}
+          {totalCountText}
         </span>
         개
       </div>
