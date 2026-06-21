@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { MoreHorizontalIcon } from 'lucide-react';
 
+import { PeriodStatusBadge } from '@/shared/components';
 import { Button, DropdownMenu, Table } from '@/shared/components/ui';
 import type { PointFreeze } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -48,6 +49,7 @@ export function PointFreezeListSection({
             <Table.Header>
               <Table.Row className='text-center'>
                 <Table.Head className='text-center'>번호</Table.Head>
+                <Table.Head className='text-center'>상태</Table.Head>
                 <Table.Head className='text-center'>일정 제목</Table.Head>
                 <Table.Head className='text-center'>시작 일시</Table.Head>
                 <Table.Head className='text-center'>종료 일시</Table.Head>
@@ -66,6 +68,9 @@ export function PointFreezeListSection({
                     <Table.Row key={id}>
                       <Table.Cell className='text-center'>
                         {index + 1}
+                      </Table.Cell>
+                      <Table.Cell className='text-center'>
+                        <PeriodStatusBadge startAt={startAt} endAt={endAt} />
                       </Table.Cell>
                       <Table.Cell className='text-center'>{title}</Table.Cell>
                       <Table.Cell className='text-center'>
