@@ -1,15 +1,29 @@
-import { useState } from 'react';
-
 import { PageHeader } from '@/shared/components';
+import { useManagePageUrl } from '@/shared/hooks/useManagePageUrl';
 
 import { PostFilterPanel } from '@/domains/Posts/components/PostFilterPanel';
 import PostTable from '@/domains/Posts/components/PostTable';
-import { usePostUrl } from '@/domains/Posts/hooks/usePostUrl';
+import type { PostSearchParams } from '@/domains/Posts/types';
+
+const POST_SCHEMA = {
+  encryptedUserId: 'string',
+  boardId: 'number',
+  isVisible: 'boolean',
+  isKeywordExist: 'boolean',
+  startDate: 'string',
+  endDate: 'string',
+  sortTypes: 'string',
+  sortDirection: 'string',
+  keywordAuthor: 'string',
+  keywordPost: 'string',
+  postSearchScope: 'string',
+  isNotice: 'boolean',
+  adminCommonStatuses: 'array',
+} as const;
 
 export default function PostManagePage() {
   const { searchParams, currentPage, handleSearchChange, handlePageChange } =
-    usePostUrl();
-  const [refreshKey] = useState(0);
+    useManagePageUrl<PostSearchParams>(POST_SCHEMA);
 
   return (
     <div className='flex w-full flex-col gap-6 pb-12'>
@@ -26,7 +40,7 @@ export default function PostManagePage() {
       <div className='flex flex-col gap-4'>
         <PostTable
           searchParams={searchParams}
-          refreshKey={refreshKey}
+          refreshKey={0}
           currentPage={currentPage}
           onPageChange={handlePageChange}
         />
