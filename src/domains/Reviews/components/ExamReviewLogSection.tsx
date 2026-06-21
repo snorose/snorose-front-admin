@@ -1,11 +1,8 @@
 import { Badge, Table } from '@/shared/components/ui';
-import {
-  EXAM_CONFIRM_STATUS,
-  EXAM_REVIEW_PROCESS_STATUS,
-} from '@/shared/constants';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { ExamReviewDetailLog } from '@/domains/Reviews/types';
+import { formatExamReviewLogValue } from '@/domains/Reviews/utils';
 
 interface ExamReviewLogSectionProps {
   logs?: ExamReviewDetailLog[] | null;
@@ -32,57 +29,6 @@ const CHANGE_FIELD_LABELS: Record<string, string> = {
   visibilityStatus: '공개 상태',
   memo: '메모',
   fileName: '파일명',
-};
-
-const ACTION_LABELS: Record<string, string> = {
-  CREATED: '생성',
-  UPDATED: '수정',
-  DELETED: '삭제',
-  CONFIRMED: '확인',
-  UNCONFIRMED: '미확인',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  ...Object.fromEntries(
-    EXAM_CONFIRM_STATUS.map(({ code, label }) => [code, label])
-  ),
-  ...Object.fromEntries(
-    EXAM_REVIEW_PROCESS_STATUS.map(({ code, label }) => [code, label])
-  ),
-};
-
-const formatStatusValue = (value: string): string =>
-  value
-    .split(/\s*->\s*/)
-    .map((status) => STATUS_LABELS[status] ?? status)
-    .join(' -> ');
-
-const formatChangeValue = (
-  key: string,
-  value: string | number | boolean | null,
-  statusModifiedReason?: string | number | boolean | null
-): string => {
-  if (value === null) {
-    return '-';
-  }
-
-  if (typeof value === 'boolean') {
-    return value ? 'true' : 'false';
-  }
-
-  if (key === 'action') {
-    const actionValue = String(value);
-    return ACTION_LABELS[actionValue] ?? actionValue;
-  }
-
-  if (key === 'status') {
-    const formattedStatus = formatStatusValue(String(value));
-    return statusModifiedReason
-      ? `${formattedStatus} (${String(statusModifiedReason)})`
-      : formattedStatus;
-  }
-
-  return String(value);
 };
 
 const getVisibleChanges = (changes?: ExamReviewDetailLog['changes'] | null) =>
@@ -135,7 +81,7 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
                         {CHANGE_FIELD_LABELS[key] ?? key}
                       </Badge>
                       <span className='text-sm break-all text-gray-700'>
-                        {formatChangeValue(
+                        {formatExamReviewLogValue(
                           key,
                           value,
                           log.changes?.statusModifiedReason
