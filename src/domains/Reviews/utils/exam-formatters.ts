@@ -72,12 +72,10 @@ export const getExamReviewProcessStatuses = (
 
 /**
  * lectureType enum을 문자열로 변환
- * @param lectureTypeEnum - 변환할 lectureType enum 값
+ * @param lectureTypeEnum - 변환할 lectureType 값
  * @returns 한국어 문자열
  */
-export const convertLectureTypeToString = (
-  lectureTypeEnum: (typeof LECTURE_TYPE_OPTIONS)[number]['value']
-): string => {
+export const convertLectureTypeToString = (lectureTypeEnum: string): string => {
   return (
     LECTURE_TYPE_OPTIONS.find((option) => option.value === lectureTypeEnum)
       ?.label ?? lectureTypeEnum
@@ -237,10 +235,7 @@ export const formatExamReviewLogValue = (
   }
 
   if (key === 'lectureType') {
-    return (
-      LECTURE_TYPE_OPTIONS.find((option) => option.value === stringValue)
-        ?.label ?? stringValue
-    );
+    return convertLectureTypeToString(stringValue);
   }
 
   if (key === 'examType') {
