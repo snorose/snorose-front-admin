@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { BOARD_OPTIONS } from '@/shared/utils/postCommentUtils';
+
 import type { PostSearchParams } from '../types';
 
 const STATUS_OPTIONS = [
@@ -15,13 +17,15 @@ const STATUS_OPTIONS = [
 interface PostFilterPanelProps {
   onFilterChange: (filters: PostSearchParams) => void;
   totalCount?: number;
+  initialFilters?: PostSearchParams;
 }
 
 export const PostFilterPanel = ({
   onFilterChange,
   totalCount,
+  initialFilters = {},
 }: PostFilterPanelProps) => {
-  const [filters, setFilters] = useState<PostSearchParams>({});
+  const [filters, setFilters] = useState<PostSearchParams>(initialFilters);
 
   const handleStatusToggle = (status: string) => {
     setFilters((prev) => {
@@ -34,6 +38,13 @@ export const PostFilterPanel = ({
           : [...current, status],
       };
     });
+  };
+
+  const handleBoardToggle = (boardId: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      boardId: prev.boardId === boardId ? undefined : boardId,
+    }));
   };
 
   const handleReset = () => {
@@ -140,6 +151,11 @@ export const PostFilterPanel = ({
         <div className='flex flex-1 flex-col gap-1'>
           <label className='text-sm text-gray-600'>정렬</label>
           <select
+            value={
+              filters.sortTypes && filters.sortDirection
+                ? `${filters.sortTypes}|${filters.sortDirection}`
+                : 'CREATED_AT|DESC'
+            }
             onChange={(e) => {
               const [sortTypes, sortDirection] = e.target.value.split('|');
               setFilters((prev) => ({
@@ -215,23 +231,23 @@ export const PostFilterPanel = ({
             onClick={() =>
               setFilters((prev) => ({
                 ...prev,
-                adminCommonStatuses: undefined,
+                boardId: undefined,
               }))
             }
             className={`rounded-full border px-3 py-1 text-sm ${
-              !filters.adminCommonStatuses?.length
+              filters.boardId === undefined
                 ? 'border-gray-900 bg-gray-900 text-white'
                 : 'border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >
             전체
           </button>
-          {STATUS_OPTIONS.map((option) => (
+          {BOARD_OPTIONS.map((option) => (
             <button
               key={option.value}
-              onClick={() => handleStatusToggle(option.value)}
+              onClick={() => handleBoardToggle(option.value)}
               className={`rounded-full border px-3 py-1 text-sm ${
-                filters.adminCommonStatuses?.includes(option.value)
+                filters.boardId === option.value
                   ? 'border-gray-900 bg-gray-900 text-white'
                   : 'border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
