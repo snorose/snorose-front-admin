@@ -189,10 +189,10 @@ export const getStatusName = (statusCode: string): string => {
 
 export const formatExamReviewLogValue = (
   key: string,
-  value: string | number | boolean | null,
+  value: string | number | boolean | null | undefined,
   statusModifiedReason?: string | number | boolean | null
 ): string => {
-  if (value === null) {
+  if (value == null) {
     return '-';
   }
 
