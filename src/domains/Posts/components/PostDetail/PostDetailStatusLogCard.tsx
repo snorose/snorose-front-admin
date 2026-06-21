@@ -1,7 +1,7 @@
 import { Badge } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
-import { getCommentStatusBadge } from '@/domains/Comments/utils/commentUtils';
+import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
 
 interface StatusLog {
   id: number;
@@ -39,12 +39,20 @@ export default function PostDetailStatusLogCard({
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2'>
                 <span className='font-medium text-gray-400'>사유</span>
                 <div>
-                  <Badge
-                    variant='unstyled'
-                    className={getCommentStatusBadge(log.reason).className}
-                  >
-                    {log.reason}
-                  </Badge>
+                  <div className='flex flex-wrap gap-1'>
+                    {getPostStatusBadges({
+                      reportCount: 0,
+                      adminCommonStatuses: [log.reason],
+                    }).map((badge, idx) => (
+                      <Badge
+                        key={idx}
+                        variant='unstyled'
+                        className={badge.className}
+                      >
+                        {badge.text}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>

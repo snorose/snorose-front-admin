@@ -95,7 +95,7 @@ export default function CommentTable({
                   상위 댓글 ID
                 </Table.Head>
                 <Table.Head style={{ width: '400px' }} className='px-3 text-xs'>
-                  제목/내용 미리보기
+                  제목/내용
                 </Table.Head>
                 <Table.Head style={{ width: '120px' }} className='px-3 text-xs'>
                   작성자(닉네임)
