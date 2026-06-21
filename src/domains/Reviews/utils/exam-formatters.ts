@@ -46,6 +46,8 @@ const formatStatusValue = (value: string): string =>
 const isBooleanString = (value: string): value is 'true' | 'false' =>
   value === 'true' || value === 'false';
 
+type LectureTypeValue = (typeof LECTURE_TYPE_OPTIONS)[number]['value'];
+
 export const isExamReviewSanctioned = (
   value: ExamReviewProcessStatusSource['isSanctioned']
 ): boolean => value === true || value === 'true';
@@ -75,7 +77,9 @@ export const getExamReviewProcessStatuses = (
  * @param lectureTypeEnum - 변환할 lectureType 값
  * @returns 한국어 문자열
  */
-export const convertLectureTypeToString = (lectureTypeEnum: string): string => {
+export const convertLectureTypeToString = (
+  lectureTypeEnum: LectureTypeValue | (string & {})
+): string => {
   return (
     LECTURE_TYPE_OPTIONS.find((option) => option.value === lectureTypeEnum)
       ?.label ?? lectureTypeEnum
