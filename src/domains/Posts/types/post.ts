@@ -2,7 +2,6 @@ export interface AdminGetPostResponse {
   postId: number;
   encryptedUserId: string;
   boardName: string;
-  boardId: number;
   nickName?: string;
   category?: string;
   title: string;
@@ -18,8 +17,6 @@ export interface AdminGetPostResponse {
   isKeywordExist: boolean;
   adminCommonStatuses: string[];
   createdAt: string;
-  updatedAt?: string;
-  deletedAt?: string | null;
 }
 
 export interface AdminPostListResponse {

@@ -68,7 +68,6 @@ export default function PostDetailPage() {
             {/* 댓글 목록 */}
             <PostDetailCommentList
               postId={post.postId}
-              boardId={post.boardId}
               commentCount={post.commentCount}
             />
           </div>

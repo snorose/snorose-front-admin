@@ -1,19 +1,3 @@
-// boardId → 게시판 이름 (백엔드에서 boardName 내려오기 전까지 임시 사용)
-export const BOARD_NAMES: Record<number, string> = {
-  1: '함박눈방',
-  11: '함박눈방',
-  21: '함박눈방',
-  2: '첫눈온방',
-  12: '첫눈온방',
-  22: '첫눈온방',
-  3: '만년설방',
-  13: '만년설방',
-  23: '만년설방',
-  4: '시험후기',
-  14: '시험후기',
-  24: '시험후기',
-};
-
 export const getRowStyle = (status: string) => {
   if (status.startsWith('신고누적')) {
     return 'bg-[#FFF9E6] hover:bg-[#FFF2CC] border-b border-gray-100 transition-colors text-yellow-950';
@@ -67,8 +51,14 @@ export const getPostStatus = (post: {
   if (statuses.includes('AUTO_HIDDEN')) {
     return '자동숨김';
   }
+  if (statuses.includes('ADMIN_HIDDEN')) {
+    return '관리자비공개';
+  }
   if (statuses.includes('SANCTIONED')) {
     return '징계';
+  }
+  if (statuses.includes('DESANCTIONED')) {
+    return '징계해제';
   }
   if (statuses.includes('REPORTED') || post.reportCount > 0) {
     return `신고누적 (${post.reportCount})`;

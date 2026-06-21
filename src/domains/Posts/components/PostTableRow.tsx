@@ -14,7 +14,6 @@ import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import {
   formatPostId,
-  getPostStatus,
   getPostStatusBadges,
 } from '@/shared/utils/postCommentUtils';
 import { stripHtmlTags } from '@/shared/utils/postCommentUtils';
@@ -33,8 +32,6 @@ export default function PostTableRow({
   onSelectToggle,
 }: PostTableRowProps) {
   const navigate = useNavigate();
-  const status = getPostStatus(post);
-
   return (
     <Table.Row
       className={cn('border-b border-gray-100 last:border-0 [&_td]:h-[54px]')}
@@ -177,36 +174,7 @@ export default function PostTableRow({
 
       {/* 9. 작성일 */}
       <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {(() => {
-          const created = formatDateTimeWithAmPm(post.createdAt);
-          if (status !== '정상') {
-            let changeDateStr = '';
-            let label = '';
-
-            if (status === '관리자삭제' && post.deletedAt) {
-              changeDateStr = formatDateTimeWithAmPm(post.deletedAt);
-              label = '관리자 삭제';
-            } else if (status === '관리자비공개' && post.updatedAt) {
-              changeDateStr = formatDateTimeWithAmPm(post.updatedAt);
-              label = '관리자 비공개';
-            } else if (status.startsWith('신고누적') && post.updatedAt) {
-              changeDateStr = formatDateTimeWithAmPm(post.updatedAt);
-              label = '신고누적';
-            }
-
-            if (changeDateStr) {
-              return (
-                <div className='flex flex-col leading-tight'>
-                  <span className='font-semibold'>{created}</span>
-                  <span className='text-[10px] font-medium text-gray-400'>
-                    ({label}: {changeDateStr})
-                  </span>
-                </div>
-              );
-            }
-          }
-          return created;
-        })()}
+        {formatDateTimeWithAmPm(post.createdAt)}
       </Table.Cell>
     </Table.Row>
   );

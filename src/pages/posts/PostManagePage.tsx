@@ -36,12 +36,6 @@ export default function PostManagePage() {
     const encryptedUserId = searchParamsFromUrl.get('encryptedUserId');
     if (encryptedUserId) params.encryptedUserId = encryptedUserId;
 
-    const boardId = searchParamsFromUrl.get('boardId');
-    if (boardId) {
-      const parsed = parseInt(boardId, 10);
-      if (!isNaN(parsed)) params.boardId = parsed;
-    }
-
     const isVisible = searchParamsFromUrl.get('isVisible');
     if (isVisible === 'true') {
       params.isVisible = true;

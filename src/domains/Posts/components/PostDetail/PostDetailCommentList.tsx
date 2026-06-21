@@ -11,23 +11,20 @@ import PostDetailCommentItem from './PostDetailCommentItem';
 
 interface PostDetailCommentListProps {
   postId: number;
-  boardId?: number;
   commentCount: number;
 }
 
 export default function PostDetailCommentList({
   postId,
-  boardId,
   commentCount,
 }: PostDetailCommentListProps) {
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 댓글 목록 조회 (postId만으로 조회, boardId는 있을 때만 포함)
+  // 댓글 목록 조회 (postId만으로 조회)
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['postComments', postId, currentPage, boardId],
+    queryKey: ['postComments', postId, currentPage],
     queryFn: async () => {
-      const payload: { postId: number; boardId?: number } = { postId };
-      if (boardId !== undefined) payload.boardId = boardId;
+      const payload: { postId: number } = { postId };
       return await searchComments(currentPage - 1, payload);
     },
     enabled: !!postId,
