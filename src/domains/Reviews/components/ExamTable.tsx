@@ -202,6 +202,7 @@ export default function ExamTable({
   );
   const hasNext = queryData?.hasNext ?? false;
   const totalPage = queryData?.totalPage;
+  const totalCount = queryData?.totalCount;
   const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
@@ -225,6 +226,14 @@ export default function ExamTable({
 
   return (
     <>
+      <div className='flex items-center justify-start text-sm text-gray-600'>
+        총{' '}
+        <span className='px-1 font-semibold text-gray-900'>
+          {totalCount?.toLocaleString() ?? 0}
+        </span>
+        개
+      </div>
+
       <div className='w-full overflow-x-auto rounded-md border'>
         <Table className='w-full table-fixed rounded-lg bg-white shadow'>
           <colgroup>
