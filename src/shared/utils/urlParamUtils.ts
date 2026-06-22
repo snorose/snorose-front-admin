@@ -1,4 +1,9 @@
-type ParamType = 'string' | 'number' | 'boolean' | 'array';
+export type ParamType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'array'
+  | 'number-array';
 
 export function parseUrlParams<T extends object>(
   urlParams: URLSearchParams,
@@ -20,6 +25,12 @@ export function parseUrlParams<T extends object>(
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v !== '');
+      if (arr.length > 0) params[key] = arr;
+    } else if (type === 'number-array') {
+      const arr = rawValue
+        .split(',')
+        .map((v) => parseInt(v.trim(), 10))
+        .filter((v) => !isNaN(v));
       if (arr.length > 0) params[key] = arr;
     } else {
       // string
