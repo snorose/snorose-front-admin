@@ -237,11 +237,12 @@ export const CommentFilterPanel = ({
                 boardIds: undefined,
               }))
             }
-            className={`rounded-full border px-3 py-1 text-sm ${
-              filters.boardIds === undefined
+            className={
+              'rounded-full border px-3 py-1 text-sm' +
+              (!filters.boardIds?.length
                 ? 'border-gray-900 bg-gray-900 text-white'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-            }`}
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50')
+            }
           >
             전체
           </button>
@@ -249,11 +250,12 @@ export const CommentFilterPanel = ({
             <button
               key={option.value}
               onClick={() => handleBoardToggle(option.value)}
-              className={`rounded-full border px-3 py-1 text-sm ${
-                filters.boardIds?.includes(option.value)
+              className={
+                'rounded-full border px-3 py-1 text-sm' +
+                (filters.boardIds?.includes(option.value)
                   ? 'border-gray-900 bg-gray-900 text-white'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50')
+              }
             >
               {option.label}
             </button>
@@ -301,7 +303,7 @@ export const CommentFilterPanel = ({
         {totalCount !== undefined && (
           <span className='text-sm text-gray-500'>
             총 <span className='font-semibold text-blue-600'>{totalCount}</span>
-            개의 게시글
+            개의 댓글
           </span>
         )}
         <button

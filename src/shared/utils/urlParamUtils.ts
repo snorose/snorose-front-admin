@@ -24,7 +24,8 @@ export function parseUrlParams<T extends object>(
       const arr = rawValue
         .split(',')
         .map((v) => v.trim())
-        .filter((v) => v !== '');
+        .filter((v) => v !== '')
+        .map((v) => (isNaN(Number(v)) ? v : Number(v)));
       if (arr.length > 0) params[key] = arr;
     } else if (type === 'number-array') {
       const arr = rawValue
