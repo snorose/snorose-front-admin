@@ -237,12 +237,11 @@ export const CommentFilterPanel = ({
                 boardIds: undefined,
               }))
             }
-            className={
-              'rounded-full border px-3 py-1 text-sm' +
-              (!filters.boardIds?.length
+            className={`rounded-full border px-3 py-1 text-sm ${
+              !filters.boardIds?.length
                 ? 'border-gray-900 bg-gray-900 text-white'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50')
-            }
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
           >
             전체
           </button>
@@ -250,12 +249,11 @@ export const CommentFilterPanel = ({
             <button
               key={option.value}
               onClick={() => handleBoardToggle(option.value)}
-              className={
-                'rounded-full border px-3 py-1 text-sm' +
-                (filters.boardIds?.includes(option.value)
+              className={`rounded-full border px-3 py-1 text-sm ${
+                filters.boardIds?.includes(option.value)
                   ? 'border-gray-900 bg-gray-900 text-white'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50')
-              }
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
             >
               {option.label}
             </button>
