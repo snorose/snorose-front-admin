@@ -90,7 +90,7 @@ export default function PostTable({
                 <Table.Head style={{ width: '120px' }} className='px-3 text-xs'>
                   작성자(닉네임)
                 </Table.Head>
-                <Table.Head style={{ width: '110px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '150px' }} className='px-3 text-xs'>
                   게시판
                 </Table.Head>
                 <Table.Head style={{ width: '90px' }} className='px-3 text-xs'>
