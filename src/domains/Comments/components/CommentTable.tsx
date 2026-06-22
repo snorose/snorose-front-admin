@@ -4,22 +4,12 @@ import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 
 import { useCommentTableState } from '../hooks/useCommentTableState';
+import type { CommentSearchParams } from '../types';
 import CommentBulkActionBar from './CommentBulkActionBar';
 import CommentTableRow from './CommentTableRow';
 
 interface CommentTableProps {
-  searchParams?: {
-    content?: string;
-    postId?: number;
-    parentId?: number | null;
-    encryptedUserId?: string;
-    boardId?: number;
-    isVisible?: boolean;
-    isKeywordExist?: boolean;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-  };
+  searchParams?: CommentSearchParams;
   refreshKey?: number;
   currentPage: number;
   onPageChange: (page: number | ((prev: number) => number)) => void;
@@ -105,7 +95,7 @@ export default function CommentTable({
                   상위 댓글 ID
                 </Table.Head>
                 <Table.Head style={{ width: '400px' }} className='px-3 text-xs'>
-                  제목/내용 미리보기
+                  제목/내용
                 </Table.Head>
                 <Table.Head style={{ width: '120px' }} className='px-3 text-xs'>
                   작성자(닉네임)

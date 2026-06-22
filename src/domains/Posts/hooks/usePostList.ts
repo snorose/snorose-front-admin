@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useQuery } from '@tanstack/react-query';
 
 import { searchPosts } from '@/apis';
@@ -19,13 +17,7 @@ export const usePostList = (params: usePostListParams) => {
     queryFn: () => searchPosts(page, { ...body }),
   });
 
-  const sorted = useMemo(() => {
-    return [...(normalResult.data?.data ?? [])].sort(
-      (a, b) =>
-        (new Date(b.createdAt).getTime() || 0) -
-        (new Date(a.createdAt).getTime() || 0)
-    );
-  }, [normalResult.data]);
+  const sorted = normalResult.data?.data ?? [];
 
   return {
     data: sorted,

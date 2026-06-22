@@ -74,7 +74,7 @@ export const searchComments = async (
   body: AdminCommentSearchRequest
 ): Promise<AdminCommentListResponse> => {
   const response = await axiosInstance.post('/v1/admin/comments/search', body, {
-    params: { page },
+    params: { page: page - 1 },
   });
   return response.data.result;
 };

@@ -4,19 +4,12 @@ import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 
 import { usePostTableState } from '../hooks/usePostTableState';
+import type { PostSearchParams } from '../types';
 import PostBulkActionBar from './PostBulkActionBar';
 import PostTableRow from './PostTableRow';
 
 interface PostTableProps {
-  searchParams?: {
-    encryptedUserId?: string;
-    boardId?: number;
-    isVisible?: boolean;
-    isKeywordExist?: boolean;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-  };
+  searchParams?: PostSearchParams;
   refreshKey?: number;
   currentPage: number;
   onPageChange: (page: number | ((prev: number) => number)) => void;

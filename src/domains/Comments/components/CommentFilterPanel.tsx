@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import { BOARD_OPTIONS } from '@/shared/utils/postCommentUtils';
 
-import type { PostSearchParams } from '../types';
+import type { CommentSearchParams } from '../types';
+import type { AdminCommentStatus } from '../types/comment';
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: { label: string; value: AdminCommentStatus }[] = [
   { label: '유저 삭제', value: 'USER_DELETED' },
   { label: '어드민 삭제', value: 'ADMIN_DELETED' },
   { label: '징계', value: 'SANCTIONED' },
@@ -14,20 +15,23 @@ const STATUS_OPTIONS = [
   { label: '징계없음', value: 'DESANCTIONED' },
 ];
 
-interface PostFilterPanelProps {
-  onFilterChange: (filters: PostSearchParams) => void;
+interface CommentFilterPanelProps {
+  onFilterChange: (filters: CommentSearchParams) => void;
   totalCount?: number;
-  initialFilters?: PostSearchParams;
+  initialFilters?: CommentSearchParams;
 }
 
-export const PostFilterPanel = ({
+export const CommentFilterPanel = ({
   onFilterChange,
   totalCount,
   initialFilters = {},
-}: PostFilterPanelProps) => {
-  const [filters, setFilters] = useState<PostSearchParams>(initialFilters);
+}: CommentFilterPanelProps) => {
+  const [filters, setFilters] = useState<CommentSearchParams>({
+    searchScope: 'CONTENT',
+    ...initialFilters,
+  });
 
-  const handleStatusToggle = (status: string) => {
+  const handleStatusToggle = (status: AdminCommentStatus) => {
     setFilters((prev) => {
       const current = prev.adminCommonStatuses ?? [];
       const exists = current.includes(status);
@@ -41,10 +45,17 @@ export const PostFilterPanel = ({
   };
 
   const handleBoardToggle = (boardId: number) => {
-    setFilters((prev) => ({
-      ...prev,
-      boardId: prev.boardId === boardId ? undefined : boardId,
-    }));
+    setFilters((prev) => {
+      const current = prev.boardIds ?? [];
+      const exists = current.includes(boardId);
+
+      return {
+        ...prev,
+        boardIds: exists
+          ? current.filter((id) => id !== boardId)
+          : [...current, boardId],
+      };
+    });
   };
 
   const handleReset = () => {
@@ -116,30 +127,39 @@ export const PostFilterPanel = ({
           <label className='text-sm text-gray-600'>게시글 검색</label>
           <div className='flex gap-2'>
             <select
-              value={filters.postSearchScope ?? 'TITLE_AND_CONTENT'}
+              value={filters.searchScope ?? 'CONTENT'}
               onChange={(e) =>
                 setFilters((prev) => ({
                   ...prev,
-                  postSearchScope: e.target
-                    .value as PostSearchParams['postSearchScope'],
+                  searchScope: e.target
+                    .value as CommentSearchParams['searchScope'],
                 }))
               }
               className='rounded border border-gray-200 bg-gray-50 px-2 py-2 text-sm'
             >
-              <option value='TITLE_AND_CONTENT'>제목+내용</option>
-              <option value='TITLE'>제목</option>
               <option value='CONTENT'>내용</option>
+              <option value='COMMENT_ID'>댓글 ID</option>
+              <option value='PARENT_COMMENT_ID'>상위 댓글 ID</option>
+              <option value='POST_ID'>게시글 ID</option>
             </select>
             <input
               type='text'
-              placeholder='검색어 입력...'
-              value={filters.keywordPost ?? ''}
-              onChange={(e) =>
+              placeholder={
+                filters.searchScope === 'COMMENT_ID'
+                  ? '댓글 ID (숫자만)'
+                  : filters.searchScope === 'PARENT_COMMENT_ID'
+                    ? '상위 댓글 ID (숫자만)'
+                    : filters.searchScope === 'POST_ID'
+                      ? '게시글 ID (숫자만)'
+                      : '검색어 입력...'
+              }
+              value={filters.searchQuery ?? ''}
+              onChange={(e) => {
                 setFilters((prev) => ({
                   ...prev,
-                  keywordPost: e.target.value || undefined,
-                }))
-              }
+                  searchQuery: e.target.value || undefined,
+                }));
+              }}
               className='flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
             />
           </div>
@@ -152,17 +172,17 @@ export const PostFilterPanel = ({
           <label className='text-sm text-gray-600'>정렬</label>
           <select
             value={
-              filters.sortTypes && filters.sortDirection
-                ? `${filters.sortTypes}|${filters.sortDirection}`
+              filters.sortTypes?.[0] && filters.sortDirection
+                ? `${filters.sortTypes[0]}|${filters.sortDirection}`
                 : 'CREATED_AT|DESC'
             }
             onChange={(e) => {
-              const [sortTypes, sortDirection] = e.target.value.split('|');
+              const [sortType, sortDirection] = e.target.value.split('|');
               setFilters((prev) => ({
                 ...prev,
-                sortTypes: sortTypes as PostSearchParams['sortTypes'],
+                sortTypes: [sortType] as CommentSearchParams['sortTypes'],
                 sortDirection:
-                  sortDirection as PostSearchParams['sortDirection'],
+                  sortDirection as CommentSearchParams['sortDirection'],
               }));
             }}
             className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
@@ -170,10 +190,8 @@ export const PostFilterPanel = ({
             <option value='CREATED_AT|DESC'>최신순</option>
             <option value='CREATED_AT|ASC'>오래된순</option>
             <option value='REPORT_COUNT|DESC'>신고 수</option>
-            <option value='VIEW_COUNT|DESC'>조회 수</option>
             <option value='LIKE_COUNT|DESC'>좋아요 수</option>
-            <option value='COMMENT_COUNT|DESC'>댓글 수</option>
-            <option value='SCRAP_COUNT|DESC'>스크랩 수</option>
+            <option value='CHILD_COMMENT_COUNT|DESC'>댓글 수</option>
           </select>
         </div>
         <div className='flex flex-1 flex-col gap-1'>
@@ -208,21 +226,6 @@ export const PostFilterPanel = ({
         초기화
       </button>
 
-      {/* 공지만 보기 */}
-      <label className='flex items-center gap-2 text-sm text-gray-700'>
-        <input
-          type='checkbox'
-          checked={filters.isNotice ?? false}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              isNotice: e.target.checked || undefined,
-            }))
-          }
-        />
-        공지만 보기
-      </label>
-
       {/* 게시판 필터 */}
       <div className='flex flex-col gap-2'>
         <label className='text-sm text-gray-600'>게시판 필터</label>
@@ -231,14 +234,15 @@ export const PostFilterPanel = ({
             onClick={() =>
               setFilters((prev) => ({
                 ...prev,
-                boardId: undefined,
+                boardIds: undefined,
               }))
             }
-            className={`rounded-full border px-3 py-1 text-sm ${
-              filters.boardId === undefined
+            className={
+              'rounded-full border px-3 py-1 text-sm' +
+              (!filters.boardIds?.length
                 ? 'border-gray-900 bg-gray-900 text-white'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-            }`}
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50')
+            }
           >
             전체
           </button>
@@ -246,11 +250,12 @@ export const PostFilterPanel = ({
             <button
               key={option.value}
               onClick={() => handleBoardToggle(option.value)}
-              className={`rounded-full border px-3 py-1 text-sm ${
-                filters.boardId === option.value
+              className={
+                'rounded-full border px-3 py-1 text-sm' +
+                (filters.boardIds?.includes(option.value)
                   ? 'border-gray-900 bg-gray-900 text-white'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50')
+              }
             >
               {option.label}
             </button>
@@ -298,7 +303,7 @@ export const PostFilterPanel = ({
         {totalCount !== undefined && (
           <span className='text-sm text-gray-500'>
             총 <span className='font-semibold text-blue-600'>{totalCount}</span>
-            개의 게시글
+            개의 댓글
           </span>
         )}
         <button

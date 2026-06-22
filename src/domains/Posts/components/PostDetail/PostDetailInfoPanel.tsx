@@ -7,10 +7,7 @@ import { toast } from 'sonner';
 import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
 import { Badge, Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
-import {
-  getPostStatus,
-  getPostStatusBadges,
-} from '@/shared/utils/postCommentUtils';
+import { getPostStatusBadges } from '@/shared/utils/postCommentUtils';
 
 import type { AdminGetPostResponse } from '../../types/post';
 
@@ -22,7 +19,6 @@ export default function PostDetailInfoPanel({
   post,
 }: PostDetailInfoPanelProps) {
   const [isNotice, setIsNotice] = useState(post.isNotice);
-  const status = getPostStatus(post);
   const handleNoticeToggle = (checked: boolean) => {
     setIsNotice(checked);
     toast.success(
@@ -45,16 +41,6 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-400'>게시일자</span>
             <div className='flex flex-col font-mono text-[12px] leading-tight text-gray-800'>
               <span>{formatDateTimeWithAmPm(post.createdAt)}</span>
-              {status !== '정상' && (post.deletedAt || post.updatedAt) && (
-                <span className='mt-0.5 text-[10px] font-semibold text-gray-400'>
-                  {status === '관리자삭제' &&
-                    post.deletedAt &&
-                    ` (어드민 삭제 ${post.deletedAt.substring(0, 19)}, ${formatDateTimeWithAmPm(post.deletedAt)})`}
-                  {status === '관리자비공개' &&
-                    post.updatedAt &&
-                    ` (어드민 비공개 ${post.updatedAt.substring(0, 19)}, ${formatDateTimeWithAmPm(post.updatedAt)})`}
-                </span>
-              )}
             </div>
           </div>
 

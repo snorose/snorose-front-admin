@@ -1,7 +1,13 @@
 import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, CornerDownRight, Heart } from 'lucide-react';
+import {
+  AlertTriangle,
+  CornerDownRight,
+  Eye,
+  Heart,
+  MessageSquare,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { MemberInfoPopover } from '@/shared/components';
@@ -9,10 +15,7 @@ import { Badge, Button } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResponse } from '@/domains/Comments/types';
-import {
-  getCommentStatus,
-  getCommentStatusBadge,
-} from '@/domains/Comments/utils/commentUtils';
+import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
 
 import { deleteComment, updateCommentVisibility } from '@/apis';
 
@@ -24,7 +27,13 @@ export default function PostDetailCommentItem({
   comment,
 }: PostDetailCommentItemProps) {
   const queryClient = useQueryClient();
-  const status = getCommentStatus(comment);
+  const badges = getPostStatusBadges(comment);
+  const statuses = comment.adminCommonStatuses ?? [];
+  const isNormal = badges.length === 1 && badges[0].text === '노출';
+  const isHidden =
+    statuses.includes('ADMIN_HIDDEN') || statuses.includes('AUTO_HIDDEN');
+  const isDeleted =
+    statuses.includes('ADMIN_DELETED') || statuses.includes('USER_DELETED');
   const isSubComment = comment.parentId !== null;
   // 댓글 상태 변경 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,19 +103,29 @@ export default function PostDetailCommentItem({
             <span className='font-mono text-xs text-gray-400'>
               {formatDateTimeWithAmPm(comment.createdAt)}
             </span>
-            {status !== '정상' && (
-              <Badge
-                variant='unstyled'
-                className={getCommentStatusBadge(status).className}
-              >
-                {status}
-              </Badge>
+            {comment.category && (
+              <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-500'>
+                {comment.category}
+              </span>
+            )}
+            {badges.length > 0 && !isNormal && (
+              <div className='flex flex-wrap gap-1'>
+                {badges.map((badge, idx) => (
+                  <Badge
+                    key={idx}
+                    variant='unstyled'
+                    className={badge.className}
+                  >
+                    {badge.text}
+                  </Badge>
+                ))}
+              </div>
             )}
           </div>
 
           {/* 액션 버튼 */}
           <div className='flex shrink-0 items-center gap-1.5'>
-            {status === '정상' && (
+            {isNormal && (
               <>
                 <Button
                   variant='outline'
@@ -134,7 +153,7 @@ export default function PostDetailCommentItem({
                 </Button>
               </>
             )}
-            {(status === '비공개' || status === '관리자비공개') && (
+            {isHidden && (
               <Button
                 variant='outline'
                 size='sm'
@@ -148,9 +167,7 @@ export default function PostDetailCommentItem({
                 공개
               </Button>
             )}
-            {(status === '삭제됨' ||
-              status === '관리자삭제' ||
-              status === '리자삭제') && (
+            {isDeleted && (
               <Button
                 variant='outline'
                 size='sm'
@@ -174,9 +191,17 @@ export default function PostDetailCommentItem({
 
         {/* 하단 통계 */}
         <div className='mt-3 flex items-center gap-3 font-mono text-xs text-gray-400'>
+          <span className='flex items-center gap-0.5' title='조회수'>
+            <Eye className='h-3.5 w-3.5 text-gray-400' />
+            {comment.viewCount ?? 0}
+          </span>
           <span className='flex items-center gap-0.5' title='공감수'>
             <Heart className='h-3.5 w-3.5 fill-rose-50 text-rose-400' />
             {comment.likeCount ?? 0}
+          </span>
+          <span className='flex items-center gap-0.5' title='대댓글수'>
+            <MessageSquare className='h-3.5 w-3.5 text-blue-400' />
+            {comment.childCommentCount ?? 0}
           </span>
           <span
             className={`flex items-center gap-0.5 ${comment.reportCount > 0 ? 'font-bold text-red-600' : ''}`}

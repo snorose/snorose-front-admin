@@ -1,18 +1,32 @@
-// boardId → 게시판 이름 (백엔드에서 boardName 내려오기 전까지 임시 사용)
 export const BOARD_NAMES: Record<number, string> = {
-  1: '함박눈방',
-  11: '함박눈방',
-  21: '함박눈방',
-  2: '첫눈온방',
-  12: '첫눈온방',
-  22: '첫눈온방',
-  3: '만년설방',
-  13: '만년설방',
+  11: 'about 스노로즈',
+  12: '공지사항',
+  13: '문의게시판/신고게시판',
+  14: '이벤트',
+  20: '베숙트',
+  21: '첫눈온방',
+  22: '함박눈방',
   23: '만년설방',
-  4: '시험후기',
-  14: '시험후기',
-  24: '시험후기',
+  24: '달글게시판',
+  31: '강의후기',
+  32: '시험후기',
+  41: '주거',
+  42: '벼룩장터',
+  43: '속플페이스',
+  51: '알바 및 채용',
+  52: '취업후기',
+  53: '취업준비',
+  60: '총학생회',
+  61: '졸업준비위원회',
+  62: '재정감사위원회',
+  70: '교환학생/어학연수',
+  91: '홍보게시판',
 };
+
+export const BOARD_OPTIONS = [11, 12, 21, 22, 23, 32, 60, 61, 62].map((id) => ({
+  label: BOARD_NAMES[id] ?? `게시판 ${id}`,
+  value: id,
+}));
 
 export const getRowStyle = (status: string) => {
   if (status.startsWith('신고누적')) {
@@ -45,9 +59,8 @@ export const stripHtmlTags = (html: string | null | undefined): string => {
 };
 
 // ID 포맷터
-export const formatCommentId = (id: number) =>
-  `C${String(id).padStart(3, '0')}`;
-export const formatPostId = (id: number) => `P${String(id).padStart(3, '0')}`;
+export const formatCommentId = (id: number) => String(id).padStart(3, '0');
+export const formatPostId = (id: number) => String(id).padStart(3, '0');
 
 // 게시글 상태 결정 헬퍼 함수
 export const getPostStatus = (post: {
@@ -67,8 +80,14 @@ export const getPostStatus = (post: {
   if (statuses.includes('AUTO_HIDDEN')) {
     return '자동숨김';
   }
+  if (statuses.includes('ADMIN_HIDDEN')) {
+    return '관리자비공개';
+  }
   if (statuses.includes('SANCTIONED')) {
     return '징계';
+  }
+  if (statuses.includes('DESANCTIONED')) {
+    return '징계해제';
   }
   if (statuses.includes('REPORTED') || post.reportCount > 0) {
     return `신고누적 (${post.reportCount})`;
