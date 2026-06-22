@@ -64,7 +64,7 @@ export default function PostTable({
 
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
-          <Table className='w-full min-w-[1340px] table-fixed text-[13px]'>
+          <Table className='w-full min-w-[1380px] table-fixed text-[13px]'>
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
               <Table.Row>
                 <Table.Head
