@@ -15,7 +15,7 @@ const COMMENT_SCHEMA = {
   sortTypes: 'array',
   isKeywordExist: 'boolean',
   isReported: 'boolean',
-  boardIds: 'array',
+  boardIds: 'number-array',
   adminCommonStatuses: 'array',
 } as const;
 
