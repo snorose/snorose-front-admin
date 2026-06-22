@@ -58,9 +58,7 @@ export default function PostTable({
       <div className='flex items-center justify-between px-1 text-xs text-gray-500'>
         <span>
           총 <span className='font-bold text-blue-600'>{totalCount ?? 0}</span>
-          개의 게시물 (
-          <span className='font-bold text-gray-700'>{posts.length}</span>개
-          표시)
+          개의 게시물
         </span>
       </div>
 
