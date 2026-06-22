@@ -24,7 +24,7 @@ export default function PostDetailCommentList({
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['postComments', postId, currentPage],
     queryFn: async () => {
-      return await searchComments(currentPage - 1, {
+      return await searchComments(currentPage, {
         searchQuery: String(postId),
         searchScope: 'POST_ID',
         sortTypes: ['CREATED_AT'],
