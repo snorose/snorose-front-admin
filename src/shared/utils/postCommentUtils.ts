@@ -59,9 +59,8 @@ export const stripHtmlTags = (html: string | null | undefined): string => {
 };
 
 // ID 포맷터
-export const formatCommentId = (id: number) =>
-  `C${String(id).padStart(3, '0')}`;
-export const formatPostId = (id: number) => `P${String(id).padStart(3, '0')}`;
+export const formatCommentId = (id: number) => String(id).padStart(3, '0');
+export const formatPostId = (id: number) => String(id).padStart(3, '0');
 
 // 게시글 상태 결정 헬퍼 함수
 export const getPostStatus = (post: {
