@@ -1,8 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 
-import { parseUrlParams } from '@/shared/utils/urlParamUtils';
-
-type ParamType = 'string' | 'number' | 'boolean' | 'array';
+import { type ParamType, parseUrlParams } from '@/shared/utils/urlParamUtils';
 
 export function useManagePageUrl<T extends object>(
   schema: Record<string, ParamType>
