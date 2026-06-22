@@ -26,7 +26,10 @@ export const CommentFilterPanel = ({
   totalCount,
   initialFilters = {},
 }: CommentFilterPanelProps) => {
-  const [filters, setFilters] = useState<CommentSearchParams>(initialFilters);
+  const [filters, setFilters] = useState<CommentSearchParams>({
+    searchScope: 'CONTENT',
+    ...initialFilters,
+  });
 
   const handleStatusToggle = (status: AdminCommentStatus) => {
     setFilters((prev) => {
@@ -134,20 +137,29 @@ export const CommentFilterPanel = ({
               }
               className='rounded border border-gray-200 bg-gray-50 px-2 py-2 text-sm'
             >
-              <option value='TITLE_AND_CONTENT'>제목+내용</option>
-              <option value='TITLE'>제목</option>
               <option value='CONTENT'>내용</option>
+              <option value='COMMENT_ID'>댓글 ID</option>
+              <option value='PARENT_COMMENT_ID'>상위 댓글 ID</option>
+              <option value='POST_ID'>게시글 ID</option>
             </select>
             <input
               type='text'
-              placeholder='검색어 입력...'
+              placeholder={
+                filters.searchScope === 'COMMENT_ID'
+                  ? '댓글 ID (숫자만)'
+                  : filters.searchScope === 'PARENT_COMMENT_ID'
+                    ? '상위 댓글 ID (숫자만)'
+                    : filters.searchScope === 'POST_ID'
+                      ? '게시글 ID (숫자만)'
+                      : '검색어 입력...'
+              }
               value={filters.searchQuery ?? ''}
-              onChange={(e) =>
+              onChange={(e) => {
                 setFilters((prev) => ({
                   ...prev,
                   searchQuery: e.target.value || undefined,
-                }))
-              }
+                }));
+              }}
               className='flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
             />
           </div>
@@ -178,10 +190,8 @@ export const CommentFilterPanel = ({
             <option value='CREATED_AT|DESC'>최신순</option>
             <option value='CREATED_AT|ASC'>오래된순</option>
             <option value='REPORT_COUNT|DESC'>신고 수</option>
-            <option value='VIEW_COUNT|DESC'>조회 수</option>
             <option value='LIKE_COUNT|DESC'>좋아요 수</option>
-            <option value='COMMENT_COUNT|DESC'>댓글 수</option>
-            <option value='SCRAP_COUNT|DESC'>스크랩 수</option>
+            <option value='CHILD_COMMENT_COUNT|DESC'>댓글 수</option>
           </select>
         </div>
         <div className='flex flex-1 flex-col gap-1'>
