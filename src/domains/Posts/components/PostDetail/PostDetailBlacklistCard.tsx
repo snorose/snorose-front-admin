@@ -9,7 +9,9 @@ export default function PostDetailBlacklistCard() {
       <h3 className='text-[14px] font-bold text-gray-900'>징계 정보</h3>
       {historyData.length === 0 ? (
         <div className='py-4 text-center text-xs text-gray-400'>
-          작성자의 징계 이력이 없습니다.
+          {/* TODO: 징계 내역 API 연동 시 주석 해제 및 '개발 중입니다.' 삭제 */}
+          {/* 작성자의 징계 이력이 없습니다. */}
+          개발 중입니다.
         </div>
       ) : (
         <div className='flex flex-col gap-3 text-xs leading-relaxed'>

@@ -26,7 +26,9 @@ export default function PostDetailReportCard({
       </div>
       {reportsList.length === 0 ? (
         <div className='py-4 text-center text-xs text-gray-400'>
-          신고 내역이 없습니다.
+          {/* TODO: 신고 내역 API 연동 시 주석 해제 및 '개발 중입니다.' 삭제 */}
+          {/* 신고 내역이 없습니다. */}
+          개발 중입니다.
         </div>
       ) : (
         <div className='flex flex-col gap-3 text-xs leading-relaxed'>

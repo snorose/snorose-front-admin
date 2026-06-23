@@ -174,6 +174,14 @@ export default function PostDetailCommentItem({
                 className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
                 onClick={(e) => {
                   e.stopPropagation();
+
+                  // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
+                  const IS_READY = false;
+                  if (!IS_READY) {
+                    toast.info('댓글 복구 API 연동 예정입니다.');
+                    return;
+                  }
+
                   setModalType('SHOW');
                   setIsModalOpen(true);
                 }}
