@@ -2,7 +2,6 @@ export interface AdminGetPostResponse {
   postId: number;
   encryptedUserId: string;
   boardName: string;
-  boardId: number;
   nickName?: string;
   category?: string;
   title: string;
@@ -18,8 +17,6 @@ export interface AdminGetPostResponse {
   isKeywordExist: boolean;
   adminCommonStatuses: string[];
   createdAt: string;
-  updatedAt?: string;
-  deletedAt?: string | null;
 }
 
 export interface AdminPostListResponse {
@@ -45,14 +42,15 @@ export interface AdminPostSearchRequest {
   postSearchScope?: 'TITLE_AND_CONTENT' | 'TITLE' | 'CONTENT';
   startDate?: string;
   endDate?: string;
-  sortTypes?:
+  sortTypes?: (
     | 'CREATED_AT'
     | 'UPDATED_AT'
     | 'REPORT_COUNT'
     | 'VIEW_COUNT'
     | 'LIKE_COUNT'
     | 'COMMENT_COUNT'
-    | 'SCRAP_COUNT';
+    | 'SCRAP_COUNT'
+  )[];
   sortDirection?: 'ASC' | 'DESC';
   adminCommonStatuses?: string[];
   content?: string;
@@ -83,4 +81,27 @@ export interface AdminPostBulkDeleteResponse {
       reason: string;
     }[];
   };
+}
+
+export interface PostSearchParams {
+  encryptedUserId?: string;
+  boardId?: number;
+  isNotice?: boolean;
+  isVisible?: boolean;
+  isKeywordExist?: boolean;
+  keywordAuthor?: string;
+  keywordPost?: string;
+  postSearchScope?: 'TITLE_AND_CONTENT' | 'TITLE' | 'CONTENT';
+  startDate?: string;
+  endDate?: string;
+  sortTypes?:
+    | 'CREATED_AT'
+    | 'UPDATED_AT'
+    | 'REPORT_COUNT'
+    | 'VIEW_COUNT'
+    | 'LIKE_COUNT'
+    | 'COMMENT_COUNT'
+    | 'SCRAP_COUNT';
+  sortDirection?: 'ASC' | 'DESC';
+  adminCommonStatuses?: string[];
 }

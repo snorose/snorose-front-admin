@@ -3,31 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
-import type { MemberInfo } from '@/shared/types';
-
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
-
-import { searchUsersAPI } from '@/apis/users';
-
+import type { CommentSearchParams } from '../types';
 import type { AdminCommentResponse } from '../types/comment';
-import { getCommentStatus } from '../utils/commentUtils';
 import { useBulkDeleteComment } from './useBulkDeleteComment';
 import { useCommentList } from './useCommentList';
 import { useUpdateCommentVisibility } from './useUpdateCommentVisibility';
 
 interface UseCommentTableStateProps {
-  searchParams: {
-    content?: string;
-    postId?: number;
-    parentId?: number | null;
-    encryptedUserId?: string;
-    boardId?: number;
-    isVisible?: boolean;
-    isKeywordExist?: boolean;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-  };
+  searchParams: CommentSearchParams;
   refreshKey?: number;
   currentPage: number;
   onPageChange: (page: number | ((prev: number) => number)) => void;
@@ -41,69 +24,20 @@ export function useCommentTableState({
 }: UseCommentTableStateProps) {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [sortBy] = useState<'reportCount' | 'createdAt'>('createdAt');
-  const [sortDir] = useState<'asc' | 'desc'>('desc');
-
-  // 닉네임 클릭 팝오버 상태
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
-
-  // 검색 조건 변경 시 선택 초기화 및 팝오버 닫기
-  useEffect(() => {
-    setSelectedIds([]);
-    setActivePopoverId(null);
-  }, [
-    searchParams.content,
-    searchParams.postId,
-    searchParams.parentId,
-    searchParams.encryptedUserId,
-    searchParams.boardId,
-    searchParams.isVisible,
-    searchParams.isKeywordExist,
-    searchParams.startDate,
-    searchParams.endDate,
-    searchParams.status,
-  ]);
 
   const { data, isLoading, refetch } = useCommentList({
     page: currentPage,
-    body: {
-      content: searchParams.content,
-      postId: searchParams.postId,
-      parentId: searchParams.parentId,
-      encryptedUserId: searchParams.encryptedUserId,
-      boardId: searchParams.boardId,
-      isVisible: searchParams.isVisible,
-      isKeywordExist: searchParams.isKeywordExist,
-      startDate: searchParams.startDate,
-      endDate: searchParams.endDate,
-    },
+    body: searchParams,
   });
 
   useEffect(() => {
     if (refreshKey) void refetch();
   }, [refreshKey, refetch]);
 
-  const comments = useMemo<AdminCommentResponse[]>(() => {
-    let list = data?.data ?? [];
-
-    // 상태 필터링 (클라이언트 보완 필터)
-    if (searchParams.status && searchParams.status !== '전체') {
-      list = list.filter((c) => getCommentStatus(c) === searchParams.status);
-    }
-
-    return [...list].sort((a, b) => {
-      if (sortBy === 'reportCount') {
-        return sortDir === 'asc'
-          ? a.reportCount - b.reportCount
-          : b.reportCount - a.reportCount;
-      }
-      const ta = new Date(a.createdAt).getTime();
-      const tb = new Date(b.createdAt).getTime();
-      return sortDir === 'asc' ? ta - tb : tb - ta;
-    });
-  }, [data, sortBy, sortDir, searchParams.status]);
+  const comments = useMemo<AdminCommentResponse[]>(
+    () => data?.data ?? [],
+    [data]
+  );
 
   const hasNext = data?.hasNext ?? false;
 
@@ -159,6 +93,13 @@ export function useCommentTableState({
   };
 
   const handleBulkRestore = () => {
+    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
+    const IS_READY = false;
+    if (!IS_READY) {
+      toast.info('개발 중입니다.');
+      return;
+    }
+
     if (selectedIds.length === 0) return;
     bulkVisibility(
       { commentIds: selectedIds, isVisible: true },
@@ -196,56 +137,6 @@ export function useCommentTableState({
       setSelectedIds((prev) =>
         Array.from(new Set([...prev, ...allCommentIds]))
       );
-    }
-  };
-
-  // 닉네임 클릭 핸들러
-  const handleNicknameClick = async (
-    e: React.MouseEvent,
-    comment: AdminCommentResponse
-  ) => {
-    e.stopPropagation();
-
-    if (activePopoverId === comment.commentId) {
-      setActivePopoverId(null);
-      setPopoverUser(null);
-      return;
-    }
-
-    setActivePopoverId(comment.commentId);
-    setPopoverUser(null);
-    setIsUserLoading(true);
-
-    try {
-      const res = await searchUsersAPI(comment.nickname || comment.userDisplay);
-      const member = extractFirstSearchMember(res?.result);
-      if (member) {
-        setPopoverUser(member);
-      } else {
-        setPopoverUser({
-          encryptedUserId: comment.encryptedUserId,
-          loginId: '정보 없음',
-          userName: comment.nickname || comment.userDisplay,
-          email: '',
-          nickname: comment.nickname || comment.userDisplay,
-          userRoleId: 1,
-          studentNumber: '정보 없음',
-          major: '정보 없음',
-          birthday: '',
-          pointBalance: 0,
-          createdAt: '',
-          authenticatedAt: null,
-          totalWarningCount: 0,
-          isBlacklist: false,
-          blacklistStartDate: null,
-          blacklistEndDate: null,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('회원 상세 조회에 실패했습니다.');
-    } finally {
-      setIsUserLoading(false);
     }
   };
 
@@ -294,11 +185,6 @@ export function useCommentTableState({
     isSomeSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleSingleVisibility,
     handleFilterByPostId,
     handleFilterByParentId,
@@ -308,5 +194,6 @@ export function useCommentTableState({
     isDeletePending,
     isVisibilityPending,
     hasNext,
+    totalCount: data?.totalCount,
   };
 }

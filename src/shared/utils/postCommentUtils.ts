@@ -1,75 +1,32 @@
-// 게시판 이름 매핑 및 배지 스타일 (함박눈방, 첫눈온방, 만년설방, 시험후기)
-export const getBoardBadge = (boardId: number) => {
-  const mapping: Record<number, { name: string; className: string }> = {
-    1: {
-      name: '함박눈방',
-      className:
-        'bg-[#F3E8FF] text-[#6B21A8] hover:bg-[#F3E8FF] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    11: {
-      name: '함박눈방',
-      className:
-        'bg-[#F3E8FF] text-[#6B21A8] hover:bg-[#F3E8FF] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    21: {
-      name: '함박눈방',
-      className:
-        'bg-[#F3E8FF] text-[#6B21A8] hover:bg-[#F3E8FF] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    2: {
-      name: '첫눈온방',
-      className:
-        'bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    12: {
-      name: '첫눈온방',
-      className:
-        'bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    22: {
-      name: '첫눈온방',
-      className:
-        'bg-[#E0F2FE] text-[#0369A1] hover:bg-[#E0F2FE] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    3: {
-      name: '만년설방',
-      className:
-        'bg-[#E0F7FA] text-[#006064] hover:bg-[#E0F7FA] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    13: {
-      name: '만년설방',
-      className:
-        'bg-[#E0F7FA] text-[#006064] hover:bg-[#E0F7FA] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    23: {
-      name: '만년설방',
-      className:
-        'bg-[#E0F7FA] text-[#006064] hover:bg-[#E0F7FA] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    4: {
-      name: '시험후기',
-      className:
-        'bg-[#FCE7F3] text-[#9D174D] hover:bg-[#FCE7F3] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    14: {
-      name: '시험후기',
-      className:
-        'bg-[#FCE7F3] text-[#9D174D] hover:bg-[#FCE7F3] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-    24: {
-      name: '시험후기',
-      className:
-        'bg-[#FCE7F3] text-[#9D174D] hover:bg-[#FCE7F3] border-none font-semibold px-2.5 py-0.5 rounded-full',
-    },
-  };
-  return (
-    mapping[boardId] || {
-      name: `게시판 ${boardId}`,
-      className:
-        'bg-gray-100 text-gray-700 font-semibold px-2 py-0.5 rounded-full',
-    }
-  );
+export const BOARD_NAMES: Record<number, string> = {
+  11: 'about 스노로즈',
+  12: '공지사항',
+  13: '문의게시판/신고게시판',
+  14: '이벤트',
+  20: '베숙트',
+  21: '첫눈온방',
+  22: '함박눈방',
+  23: '만년설방',
+  24: '달글게시판',
+  31: '강의후기',
+  32: '시험후기',
+  41: '주거',
+  42: '벼룩장터',
+  43: '속플페이스',
+  51: '알바 및 채용',
+  52: '취업후기',
+  53: '취업준비',
+  60: '총학생회',
+  61: '졸업준비위원회',
+  62: '재정감사위원회',
+  70: '교환학생/어학연수',
+  91: '홍보게시판',
 };
+
+export const BOARD_OPTIONS = [11, 12, 21, 22, 23, 32, 60, 61, 62].map((id) => ({
+  label: BOARD_NAMES[id] ?? `게시판 ${id}`,
+  value: id,
+}));
 
 export const getRowStyle = (status: string) => {
   if (status.startsWith('신고누적')) {
@@ -102,9 +59,8 @@ export const stripHtmlTags = (html: string | null | undefined): string => {
 };
 
 // ID 포맷터
-export const formatCommentId = (id: number) =>
-  `C${String(id).padStart(3, '0')}`;
-export const formatPostId = (id: number) => `P${String(id).padStart(3, '0')}`;
+export const formatCommentId = (id: number) => String(id).padStart(3, '0');
+export const formatPostId = (id: number) => String(id).padStart(3, '0');
 
 // 게시글 상태 결정 헬퍼 함수
 export const getPostStatus = (post: {
@@ -124,8 +80,14 @@ export const getPostStatus = (post: {
   if (statuses.includes('AUTO_HIDDEN')) {
     return '자동숨김';
   }
+  if (statuses.includes('ADMIN_HIDDEN')) {
+    return '관리자비공개';
+  }
   if (statuses.includes('SANCTIONED')) {
     return '징계';
+  }
+  if (statuses.includes('DESANCTIONED')) {
+    return '징계해제';
   }
   if (statuses.includes('REPORTED') || post.reportCount > 0) {
     return `신고누적 (${post.reportCount})`;
@@ -142,7 +104,7 @@ interface StatusBadgeInfo {
 }
 
 /**
- * 게시글에 대한 상태 배지 리스트 반환 (Notion 명세 기준 최대 3개)
+ * 게시글에 대한 상태 배지 리스트 반환
  */
 export function getPostStatusBadges(post: {
   isVisible?: boolean;
@@ -173,7 +135,7 @@ export function getPostStatusBadges(post: {
     });
   }
 
-  // 2. 징계 여부 (Sanction)
+  // 2. 징계 여부
   if (statuses.includes('SANCTIONED')) {
     badges.push({
       text: '징계',
@@ -182,7 +144,7 @@ export function getPostStatusBadges(post: {
     });
   }
 
-  // 3. 삭제 여부 (Delete)
+  // 3. 삭제 여부
   if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     badges.push({
       text: '리자 삭제',

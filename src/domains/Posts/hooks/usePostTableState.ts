@@ -1,29 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import type { MemberInfo } from '@/shared/types';
-
-import { extractFirstSearchMember } from '@/domains/MemberInfo/utils/memberDirectory';
-
-import { searchUsersAPI } from '@/apis/users';
-
-import type { AdminGetPostResponse } from '../types/post';
+import type { PostSearchParams } from '../types/post';
 import { useBulkDeletePost } from './useBulkDeletePost';
 import { useDeletePost } from './useDeletePost';
 import { usePostList } from './usePostList';
 import { useUpdatePostVisibility } from './useUpdatePostVisibility';
 
 interface UsePostTableStateProps {
-  searchParams: {
-    encryptedUserId?: string;
-    boardId?: number;
-    isVisible?: boolean;
-    isKeywordExist?: boolean;
-    startDate?: string;
-    endDate?: string;
-    status?: string;
-  };
+  searchParams: PostSearchParams;
   refreshKey?: number;
   currentPage: number;
 }
@@ -35,52 +21,23 @@ export function usePostTableState({
 }: UsePostTableStateProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const [activePopoverId, setActivePopoverId] = useState<number | null>(null);
-  const [popoverUser, setPopoverUser] = useState<MemberInfo | null>(null);
-  const [isUserLoading, setIsUserLoading] = useState(false);
-
   useEffect(() => {
     setSelectedIds([]);
-    setActivePopoverId(null);
   }, [
     searchParams.encryptedUserId,
     searchParams.boardId,
+    searchParams.isNotice,
     searchParams.isVisible,
     searchParams.isKeywordExist,
+    searchParams.keywordAuthor,
+    searchParams.keywordPost,
+    searchParams.postSearchScope,
     searchParams.startDate,
     searchParams.endDate,
-    searchParams.status,
+    searchParams.sortTypes,
+    searchParams.sortDirection,
+    searchParams.adminCommonStatuses,
   ]);
-
-  const statusParams = useMemo(() => {
-    if (
-      !searchParams.status ||
-      searchParams.status === 'all' ||
-      searchParams.status === '전체'
-    ) {
-      return {};
-    }
-    const mapping: Record<
-      string,
-      { adminCommonStatuses?: string[]; isVisible?: boolean }
-    > = {
-      신고누적: { adminCommonStatuses: ['REPORTED'] },
-      리자삭제: { adminCommonStatuses: ['ADMIN_DELETED'] },
-      유저삭제: { adminCommonStatuses: ['USER_DELETED'] },
-      자동숨김: { adminCommonStatuses: ['AUTO_HIDDEN'] },
-      징계: { adminCommonStatuses: ['SANCTIONED'] },
-      리자비공개: { isVisible: false },
-      정상: { isVisible: true },
-
-      REPORTED: { adminCommonStatuses: ['REPORTED'] },
-      ADMIN_DELETED: { adminCommonStatuses: ['ADMIN_DELETED'] },
-      USER_DELETED: { adminCommonStatuses: ['USER_DELETED'] },
-      AUTO_HIDDEN: { adminCommonStatuses: ['AUTO_HIDDEN'] },
-      SANCTIONED: { adminCommonStatuses: ['SANCTIONED'] },
-      ADMIN_HIDDEN: { isVisible: false },
-    };
-    return mapping[searchParams.status] || {};
-  }, [searchParams.status]);
 
   const {
     data: rawPosts,
@@ -93,20 +50,18 @@ export function usePostTableState({
     page: currentPage,
     body: {
       encryptedUserId: searchParams.encryptedUserId,
-      boardId:
-        searchParams.boardId !== undefined &&
-        searchParams.boardId !== null &&
-        !isNaN(Number(searchParams.boardId))
-          ? Number(searchParams.boardId)
-          : undefined,
-      isVisible:
-        searchParams.isVisible !== undefined
-          ? searchParams.isVisible
-          : statusParams.isVisible,
+      boardId: searchParams.boardId,
+      isVisible: searchParams.isVisible,
       isKeywordExist: searchParams.isKeywordExist,
       startDate: searchParams.startDate || undefined,
       endDate: searchParams.endDate || undefined,
-      adminCommonStatuses: statusParams.adminCommonStatuses,
+      adminCommonStatuses: searchParams.adminCommonStatuses,
+      keywordAuthor: searchParams.keywordAuthor,
+      keywordPost: searchParams.keywordPost,
+      postSearchScope: searchParams.postSearchScope,
+      sortTypes: searchParams.sortTypes ? [searchParams.sortTypes] : undefined,
+      sortDirection: searchParams.sortDirection,
+      isNotice: searchParams.isNotice,
     },
   });
 
@@ -114,9 +69,7 @@ export function usePostTableState({
     if (refreshKey) void refetch();
   }, [refreshKey, refetch]);
 
-  const posts = useMemo<AdminGetPostResponse[]>(() => {
-    return rawPosts ?? [];
-  }, [rawPosts]);
+  const posts = rawPosts ?? [];
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeletePost();
@@ -149,6 +102,13 @@ export function usePostTableState({
   };
 
   const handleBulkVisibility = (isVisible: boolean) => {
+    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
+    const IS_READY = false;
+    if (!IS_READY) {
+      toast.info('개발 중입니다');
+      return;
+    }
+
     if (selectedIds.length === 0) return;
     bulkVisibility(
       { postIds: selectedIds, isVisible },
@@ -168,6 +128,13 @@ export function usePostTableState({
   };
 
   const handleBulkRestore = () => {
+    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
+    const IS_READY = false;
+    if (!IS_READY) {
+      toast.info('개발 중입니다');
+      return;
+    }
+
     if (selectedIds.length === 0) return;
     bulkVisibility(
       { postIds: selectedIds, isVisible: true },
@@ -213,56 +180,6 @@ export function usePostTableState({
     }
   };
 
-  const handleNicknameClick = async (
-    e: React.MouseEvent,
-    post: AdminGetPostResponse
-  ) => {
-    e.stopPropagation();
-
-    if (activePopoverId === post.postId) {
-      setActivePopoverId(null);
-      setPopoverUser(null);
-      return;
-    }
-
-    setActivePopoverId(post.postId);
-    setPopoverUser(null);
-    setIsUserLoading(true);
-
-    try {
-      const display = post.nickName || '익명';
-      const res = await searchUsersAPI(display);
-      const member = extractFirstSearchMember(res?.result);
-      if (member) {
-        setPopoverUser(member);
-      } else {
-        setPopoverUser({
-          encryptedUserId: post.encryptedUserId,
-          loginId: '정보 없음',
-          userName: display,
-          email: '',
-          nickname: display,
-          userRoleId: 1,
-          studentNumber: '정보 없음',
-          major: '정보 없음',
-          birthday: '',
-          pointBalance: 0,
-          createdAt: '',
-          authenticatedAt: null,
-          totalWarningCount: 0,
-          isBlacklist: false,
-          blacklistStartDate: null,
-          blacklistEndDate: null,
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('회원 상세 조회에 실패했습니다.');
-    } finally {
-      setIsUserLoading(false);
-    }
-  };
-
   return {
     posts,
     isLoading,
@@ -273,11 +190,6 @@ export function usePostTableState({
     isSomeSelected,
     selectAllRef,
     handleSelectAll,
-    activePopoverId,
-    setActivePopoverId,
-    popoverUser,
-    isUserLoading,
-    handleNicknameClick,
     handleBulkDelete,
     handleBulkVisibility,
     handleBulkRestore,
