@@ -102,6 +102,13 @@ export function usePostTableState({
   };
 
   const handleBulkVisibility = (isVisible: boolean) => {
+    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
+    const IS_READY = false;
+    if (!IS_READY) {
+      toast.info('개발 중입니다');
+      return;
+    }
+
     if (selectedIds.length === 0) return;
     bulkVisibility(
       { postIds: selectedIds, isVisible },
@@ -121,6 +128,13 @@ export function usePostTableState({
   };
 
   const handleBulkRestore = () => {
+    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
+    const IS_READY = false;
+    if (!IS_READY) {
+      toast.info('개발 중입니다');
+      return;
+    }
+
     if (selectedIds.length === 0) return;
     bulkVisibility(
       { postIds: selectedIds, isVisible: true },

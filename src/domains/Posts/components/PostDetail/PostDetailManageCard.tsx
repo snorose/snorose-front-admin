@@ -57,6 +57,12 @@ export default function PostDetailManageCard({
     if (!reason.trim()) return;
     if (modalType === 'DELETE') {
       deleteMutation.mutate();
+    } else {
+      // TODO: DELETE 외(RESTORE, HIDE) API 연동 시 아래 로직 구현
+      toast.info('개발 중입니다');
+      setIsModalOpen(false);
+      setReason('');
+      setDeleteCommentsAlso(false);
     }
   };
 
