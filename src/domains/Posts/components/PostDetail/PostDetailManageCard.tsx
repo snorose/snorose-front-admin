@@ -29,11 +29,11 @@ export default function PostDetailManageCard({
 
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
-    mutationFn: () => deletePost(post!.postId),
+    mutationFn: () => deletePost(post.postId),
     onSuccess: () => {
-      toast.success(
+      toast.info(
         deleteCommentsAlso
-          ? '게시글과 관련 댓글이 모두 삭제되었습니다.'
+          ? '게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.'
           : '게시글이 삭제되었습니다.'
       );
       setIsModalOpen(false);
