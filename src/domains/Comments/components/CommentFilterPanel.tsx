@@ -59,8 +59,9 @@ export const CommentFilterPanel = ({
   };
 
   const handleReset = () => {
-    setFilters({});
-    onFilterChange({});
+    const defaultFilters = { searchScope: 'CONTENT' as const };
+    setFilters(defaultFilters);
+    onFilterChange(defaultFilters);
   };
 
   return (

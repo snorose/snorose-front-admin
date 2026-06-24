@@ -108,9 +108,9 @@ export default function CommentTableRow({
         <div className='flex max-w-[380px] flex-col gap-1'>
           <span
             className='block truncate font-bold text-gray-900'
-            title={comment.postTitle || comment.postTitle || ''}
+            title={comment.postTitle || ''}
           >
-            {comment.postTitle || comment.postTitle || '제목 없음'}
+            {comment.postTitle || '제목 없음'}
           </span>
           <span
             className='block truncate text-xs text-gray-500'
