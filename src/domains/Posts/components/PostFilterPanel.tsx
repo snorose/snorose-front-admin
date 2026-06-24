@@ -1,18 +1,8 @@
 import { useState } from 'react';
 
-import { BOARD_OPTIONS } from '@/shared/utils/postCommentUtils';
+import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils/postCommentUtils';
 
 import type { PostSearchParams } from '../types';
-
-const STATUS_OPTIONS = [
-  { label: '유저 삭제', value: 'USER_DELETED' },
-  { label: '어드민 삭제', value: 'ADMIN_DELETED' },
-  { label: '징계', value: 'SANCTIONED' },
-  { label: '신고다수+비공개', value: 'AUTO_HIDDEN' },
-  { label: '어드민 비공개', value: 'ADMIN_HIDDEN' },
-  { label: '노출', value: 'VISIBLE' },
-  { label: '징계없음', value: 'DESANCTIONED' },
-];
 
 interface PostFilterPanelProps {
   onFilterChange: (filters: PostSearchParams) => void;
