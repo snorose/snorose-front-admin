@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, FileX, Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 
@@ -32,15 +32,16 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className='flex h-60 flex-col items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white p-6 text-gray-500 shadow-sm'>
-        <span className='text-sm font-semibold text-red-500'>
+      <div className='flex h-full w-full flex-col items-center justify-center gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm'>
+        <FileX className='h-12 w-12 text-gray-300' />
+        <p className='text-base font-semibold text-gray-700'>
           게시글 정보를 찾을 수 없거나 불러오지 못했습니다.
-        </span>
+        </p>
         <Button
-          variant='outline'
+          variant='default'
           size='sm'
           onClick={() => navigate(-1)}
-          className='mt-2'
+          className='mt-1'
         >
           이전 화면으로 돌아가기
         </Button>

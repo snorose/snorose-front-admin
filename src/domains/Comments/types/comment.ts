@@ -1,3 +1,5 @@
+import type { AdminStatus } from '@/shared/utils/postCommentUtils';
+
 export interface AdminCommentResponse {
   encryptedUserId: string;
   boardId: number;
@@ -12,7 +14,7 @@ export interface AdminCommentResponse {
   likeCount?: number;
   reportCount: number;
   childCommentCount?: number;
-  adminCommonStatuses?: AdminCommentStatus[];
+  adminCommonStatuses?: AdminStatus[];
   isVisible: boolean;
   isKeywordExist: boolean;
   createdAt: string;
@@ -34,7 +36,7 @@ export interface AdminCommentSearchRequest {
   isKeywordExist?: boolean;
   isReported?: boolean;
   boardIds?: number[];
-  adminCommonStatuses?: AdminCommentStatus[];
+  adminCommonStatuses?: AdminStatus[];
 }
 
 export interface AdminCommentListResponse {
@@ -71,14 +73,6 @@ export interface AdminCommentVisibilityUpdateRequest {
   isVisible: boolean;
 }
 
-export type AdminCommentStatus =
-  | 'USER_DELETED'
-  | 'ADMIN_DELETED'
-  | 'SANCTIONED'
-  | 'AUTO_HIDDEN'
-  | 'ADMIN_HIDDEN'
-  | 'VISIBLE'
-  | 'DESANCTIONED';
 export interface CommentSearchParams {
   startDate?: string;
   endDate?: string;
@@ -92,5 +86,5 @@ export interface CommentSearchParams {
   isKeywordExist?: boolean;
   isReported?: boolean;
   boardIds?: number[];
-  adminCommonStatuses?: AdminCommentStatus[];
+  adminCommonStatuses?: AdminStatus[];
 }

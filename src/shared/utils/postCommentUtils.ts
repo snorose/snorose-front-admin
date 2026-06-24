@@ -28,26 +28,6 @@ export const BOARD_OPTIONS = [11, 12, 21, 22, 23, 32, 60, 61, 62].map((id) => ({
   value: id,
 }));
 
-export const getRowStyle = (status: string) => {
-  if (status.startsWith('신고누적')) {
-    return 'bg-[#FFF9E6] hover:bg-[#FFF2CC] border-b border-gray-100 transition-colors text-yellow-950';
-  }
-  switch (status) {
-    case '삭제됨':
-      return 'bg-[#FFF0F0] hover:bg-[#FFE3E3] border-b border-gray-100 transition-colors text-gray-500 opacity-90';
-    case '관리자삭제':
-      return 'bg-[#FFEBEB] hover:bg-[#FFD6D6] border-b border-gray-100 transition-colors text-red-950';
-    case '관리자비공개':
-      return 'bg-[#F5F7FA] hover:bg-[#E4E8ED] border-b border-gray-100 transition-colors text-slate-900';
-    case '복구':
-      return 'bg-[#EBF7EE] hover:bg-[#D5EEDC] border-b border-gray-100 transition-colors text-green-950';
-    case '비공개해제':
-      return 'bg-[#EBF3FC] hover:bg-[#D5E4F9] border-b border-gray-100 transition-colors text-blue-950';
-    default:
-      return 'bg-white hover:bg-gray-50/50 border-b border-gray-100 text-gray-800';
-  }
-};
-
 export const stripHtmlTags = (html: string | null | undefined): string => {
   if (!html) return '-';
   return (
@@ -61,47 +41,29 @@ export const stripHtmlTags = (html: string | null | undefined): string => {
 // ID 포맷터
 export const formatCommentId = (id: number) => String(id).padStart(3, '0');
 export const formatPostId = (id: number) => String(id).padStart(3, '0');
-
-// 게시글 상태 결정 헬퍼 함수
-export const getPostStatus = (post: {
-  isVisible?: boolean;
-  deletedAt?: string | null;
-  reportCount: number;
-  adminCommonStatuses?: string[];
-}): string => {
-  const statuses = post.adminCommonStatuses || [];
-
-  if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
-    return '관리자삭제';
-  }
-  if (statuses.includes('USER_DELETED')) {
-    return '유저 삭제';
-  }
-  if (statuses.includes('AUTO_HIDDEN')) {
-    return '자동숨김';
-  }
-  if (statuses.includes('ADMIN_HIDDEN')) {
-    return '관리자비공개';
-  }
-  if (statuses.includes('SANCTIONED')) {
-    return '징계';
-  }
-  if (statuses.includes('DESANCTIONED')) {
-    return '징계해제';
-  }
-  if (statuses.includes('REPORTED') || post.reportCount > 0) {
-    return `신고누적 (${post.reportCount})`;
-  }
-  if (post.isVisible === false) {
-    return '관리자비공개';
-  }
-  return '정상';
-};
-
 interface StatusBadgeInfo {
   text: string;
   className: string;
 }
+
+export type AdminStatus =
+  | 'USER_DELETED'
+  | 'ADMIN_DELETED'
+  | 'SANCTIONED'
+  | 'AUTO_HIDDEN'
+  | 'ADMIN_HIDDEN'
+  | 'VISIBLE'
+  | 'DESANCTIONED';
+
+export const STATUS_OPTIONS: { label: string; value: AdminStatus }[] = [
+  { label: '유저 삭제', value: 'USER_DELETED' },
+  { label: '어드민 삭제', value: 'ADMIN_DELETED' },
+  { label: '징계', value: 'SANCTIONED' },
+  { label: '신고다수+비공개', value: 'AUTO_HIDDEN' },
+  { label: '어드민 비공개', value: 'ADMIN_HIDDEN' },
+  { label: '노출', value: 'VISIBLE' },
+  { label: '징계없음', value: 'DESANCTIONED' },
+];
 
 /**
  * 게시글에 대한 상태 배지 리스트 반환
@@ -127,7 +89,7 @@ export function getPostStatusBadges(post: {
       className:
         'bg-[#FEF9C3] text-[#A16207] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FEF9C3]',
     });
-  } else if (post.isVisible === false) {
+  } else if (post.isVisible === false && statuses.includes('ADMIN_HIDDEN')) {
     badges.push({
       text: '리자 비공개',
       className:
