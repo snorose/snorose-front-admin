@@ -33,11 +33,6 @@ export default function CommentTableRow({
   onFilterByParentId,
 }: CommentTableRowProps) {
   const navigate = useNavigate();
-  const statuses = comment.adminCommonStatuses ?? [];
-  const isDeleted =
-    statuses.includes('ADMIN_DELETED') || statuses.includes('USER_DELETED');
-  const isHidden =
-    statuses.includes('ADMIN_HIDDEN') || statuses.includes('AUTO_HIDDEN');
 
   return (
     <Table.Row className='border-b border-gray-100 bg-white text-gray-800 last:border-0 hover:bg-gray-50/50 [&_td]:h-[54px]'>
@@ -215,37 +210,7 @@ export default function CommentTableRow({
 
       {/* 12. 작성일 */}
       <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {(() => {
-          const created = formatDateTimeWithAmPm(comment.createdAt);
-          if (!isDeleted && !isHidden) return created;
-
-          let changeDateStr = '';
-          let label = '';
-
-          if (isDeleted && comment.deletedAt) {
-            changeDateStr = formatDateTimeWithAmPm(comment.deletedAt);
-            label = statuses.includes('ADMIN_DELETED')
-              ? '관리자 삭제'
-              : '유저 삭제';
-          } else if (isHidden && comment.updatedAt) {
-            changeDateStr = formatDateTimeWithAmPm(comment.updatedAt);
-            label = statuses.includes('AUTO_HIDDEN')
-              ? '신고누적'
-              : '관리자 비공개';
-          }
-
-          if (changeDateStr) {
-            return (
-              <div className='flex flex-col leading-tight'>
-                <span className='font-semibold'>{created}</span>
-                <span className='text-[10px] font-medium text-gray-400'>
-                  ({label}: {changeDateStr})
-                </span>
-              </div>
-            );
-          }
-          return created;
-        })()}
+        {formatDateTimeWithAmPm(comment.createdAt)}
       </Table.Cell>
     </Table.Row>
   );

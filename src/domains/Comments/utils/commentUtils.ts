@@ -3,5 +3,4 @@ export {
   formatCommentId,
   formatPostId,
   getPostStatusBadges,
-  getRowStyle,
 } from '@/shared/utils/postCommentUtils';
