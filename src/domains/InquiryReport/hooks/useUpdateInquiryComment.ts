@@ -24,11 +24,9 @@ export const useUpdateInquiryComment = (postId: number) => {
         );
       }
 
-      const response = await updateInquiryCommentAPI(postId, commentId, {
+      return await updateInquiryCommentAPI(postId, commentId, {
         content: trimmedContent,
       });
-      if (!response.isSuccess) throw new Error(response.message);
-      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inquiryComments', postId] });

@@ -7,7 +7,6 @@ export const useInquiryDetail = (postId: number | null) => {
     queryKey: ['inquiryDetail', postId],
     queryFn: async () => {
       const response = await getAdminInquiryDetailAPI(postId!);
-      if (!response.isSuccess) throw new Error(response.message);
       return response;
     },
     enabled: postId !== null,

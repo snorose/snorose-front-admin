@@ -442,33 +442,21 @@ export function ExamDetailSection({
           post,
         };
 
-        const response = await updateExamReview(
+        updatedDetail = await updateExamReview(
           selectedExamReview.id,
           updateData
         );
-
-        if (!response.isSuccess) {
-          toast.error(response.message || '시험 후기 수정에 실패했습니다.');
-          return;
-        }
-
-        updatedDetail = response.result;
       }
 
       if (hasConfirmUpdate) {
-        const response = await confirmExamReview(selectedExamReview.id, {
+        const confirmResult = await confirmExamReview(selectedExamReview.id, {
           isConfirmed: formData.isConfirmed,
         });
 
-        if (!response.isSuccess) {
-          toast.error(response.message || '시험 후기 확인처리에 실패했습니다.');
-          return;
-        }
-
         updatedDetail = {
           ...updatedDetail,
-          isConfirmed: response.result.isConfirmed,
-          status: response.result.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
+          isConfirmed: confirmResult.isConfirmed,
+          status: confirmResult.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
         };
       }
 
@@ -507,15 +495,11 @@ export function ExamDetailSection({
         toast.error('선택된 시험 후기가 없습니다.');
         return;
       }
-      const response = await deleteExamReview(selectedExamReview.id);
-      if (response.isSuccess) {
-        toast.success('시험 후기가 성공적으로 삭제되었습니다.');
-        setIsDeleteModalOpen(false);
-        resetForm();
-        onDeleteSuccess?.();
-      } else {
-        toast.error(response.message || '시험 후기 삭제에 실패했습니다.');
-      }
+      await deleteExamReview(selectedExamReview.id);
+      toast.success('시험 후기가 성공적으로 삭제되었습니다.');
+      setIsDeleteModalOpen(false);
+      resetForm();
+      onDeleteSuccess?.();
     } catch (error: unknown) {
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||

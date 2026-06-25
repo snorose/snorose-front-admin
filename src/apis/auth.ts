@@ -1,16 +1,17 @@
 import { axiosInstance } from '@/shared/axios/instance';
+import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
+import type { BaseResponse } from '@/shared/types';
 import type {
   LoginRequest,
-  LoginResponse,
+  LoginResult,
   ReissueTokenRequest,
-  ReissueTokenResponse,
+  TokenResponse,
 } from '@/shared/types';
-import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
 
 export const loginAPI = async (
   credentials: LoginRequest
-): Promise<LoginResponse> => {
-  const response = await axiosInstance.post<LoginResponse>(
+): Promise<BaseResponse<LoginResult>> => {
+  const response = await axiosInstance.post<BaseResponse<LoginResult>>(
     '/v1/users/login',
     credentials
   );
@@ -19,8 +20,8 @@ export const loginAPI = async (
 
 export const reissueTokenAPI = async (
   request: ReissueTokenRequest
-): Promise<ReissueTokenResponse> => {
-  const response = await axiosInstance.post<ReissueTokenResponse>(
+): Promise<BaseResponse<TokenResponse>> => {
+  const response = await axiosInstance.post<BaseResponse<TokenResponse>>(
     REISSUE_TOKEN_ENDPOINT,
     request
   );

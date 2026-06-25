@@ -16,9 +16,7 @@ export const useUpdateInquiryStatus = () => {
       inquiryId: number;
       status: InquiryStatus;
     }) => {
-      const response = await updateAdminInquiryStatusAPI(inquiryId, { status });
-      if (!response.isSuccess) throw new Error(response.message);
-      return response;
+      return await updateAdminInquiryStatusAPI(inquiryId, { status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inquiries'] });

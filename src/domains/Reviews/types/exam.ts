@@ -94,16 +94,6 @@ export interface ConfirmExamReviewRequest {
   isConfirmed: boolean;
 }
 
-export interface ConfirmExamReviewResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    postId: number;
-    isConfirmed: boolean;
-  };
-}
-
 export interface UpdateExamReviewPost {
   isConfirmed?: boolean;
   isDiscussed?: boolean;
@@ -124,22 +114,6 @@ export interface UpdateExamReviewPost {
 export interface UpdateExamReviewRequest {
   file?: File;
   post: UpdateExamReviewPost;
-}
-
-export interface UpdateExamReviewResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: ExamReviewDetailResult;
-}
-
-export interface DeleteExamReviewResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    postId: number;
-  };
 }
 
 export interface ExamReviewDetailLog {
@@ -177,21 +151,9 @@ export interface ExamReviewDetailResult {
   logs: ExamReviewDetailLog[] | null;
 }
 
-export interface ExamReviewDetailResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: ExamReviewDetailResult;
-}
-
-export interface ExamReviewsResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    data: ExamReviews[];
-    hasNext: boolean;
-    totalPage?: number;
-    totalCount?: number;
-  };
+export interface ExamReviewsResult {
+  data: ExamReviews[];
+  hasNext: boolean;
+  totalPage?: number;
+  totalCount?: number;
 }

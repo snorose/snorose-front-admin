@@ -7,7 +7,7 @@ import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
-import type { AdminCommentResponse } from '../types/comment';
+import type { AdminCommentResult } from '../types/comment';
 import {
   BOARD_NAMES,
   formatCommentId,
@@ -16,10 +16,10 @@ import {
 } from '../utils/commentUtils';
 
 interface CommentTableRowProps {
-  comment: AdminCommentResponse;
+  comment: AdminCommentResult;
   isSelected: boolean;
   onSelectToggle: (id: number) => void;
-  onSingleVisibilityToggle: (comment: AdminCommentResponse) => void;
+  onSingleVisibilityToggle: (comment: AdminCommentResult) => void;
   onFilterByPostId: (postId: number) => void;
   onFilterByParentId: (parentId: number) => void;
 }

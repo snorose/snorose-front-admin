@@ -14,13 +14,13 @@ import { MemberInfoPopover } from '@/shared/components';
 import { Badge, Button } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
-import type { AdminCommentResponse } from '@/domains/Comments/types';
+import type { AdminCommentResult } from '@/domains/Comments/types';
 import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
 
 import { deleteComment, updateCommentVisibility } from '@/apis';
 
 interface PostDetailCommentItemProps {
-  comment: AdminCommentResponse;
+  comment: AdminCommentResult;
 }
 
 export default function PostDetailCommentItem({

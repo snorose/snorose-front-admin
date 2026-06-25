@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import type { CommentSearchParams } from '../types';
-import type { AdminCommentResponse } from '../types/comment';
+import type { AdminCommentResult } from '../types/comment';
 import { useBulkDeleteComment } from './useBulkDeleteComment';
 import { useCommentList } from './useCommentList';
 import { useUpdateCommentVisibility } from './useUpdateCommentVisibility';
@@ -34,7 +34,7 @@ export function useCommentTableState({
     if (refreshKey) void refetch();
   }, [refreshKey, refetch]);
 
-  const comments = useMemo<AdminCommentResponse[]>(
+  const comments = useMemo<AdminCommentResult[]>(
     () => data?.data ?? [],
     [data]
   );
@@ -141,7 +141,7 @@ export function useCommentTableState({
   };
 
   // 비공개 해제 / 삭제 복구 단건 토글 액션
-  const handleSingleVisibility = (comment: AdminCommentResponse) => {
+  const handleSingleVisibility = (comment: AdminCommentResult) => {
     const isCurrentlyVisible = comment.isVisible;
     bulkVisibility(
       { commentIds: [comment.commentId], isVisible: !isCurrentlyVisible },

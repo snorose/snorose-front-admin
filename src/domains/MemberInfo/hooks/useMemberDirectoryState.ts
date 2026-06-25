@@ -108,7 +108,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     setIsSearching(true);
     try {
       const response = await searchUsersAPI(searchQuery.trim());
-      const resultMembers = normalizeSearchResultMembers(response?.result);
+      const resultMembers = normalizeSearchResultMembers(response);
       if (resultMembers.length === 0) {
         toast.error('회원 검색 결과가 없습니다.');
         return;

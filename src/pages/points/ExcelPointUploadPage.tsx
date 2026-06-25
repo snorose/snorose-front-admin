@@ -370,7 +370,7 @@ export default function ExcelPointUploadPage() {
         uploadedFile.name
       );
 
-      const response = await postExcelPointBulkRewardAPI({
+      const result = await postExcelPointBulkRewardAPI({
         file: submitFile,
         request: {
           paymentMethod:
@@ -382,15 +382,8 @@ export default function ExcelPointUploadPage() {
         },
       });
 
-      if (!response.isSuccess || !response.result) {
-        toast.error(response.message || '처리에 실패했습니다.');
-        return;
-      }
-
-      setUploadResult(
-        remapUploadResultRowNumbers(response.result, submittedRows)
-      );
-      toast.success(response.message || '처리가 완료되었습니다.');
+      setUploadResult(remapUploadResultRowNumbers(result, submittedRows));
+      toast.success('처리가 완료되었습니다.');
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '엑셀 업로드 처리에 실패했습니다.'));
     } finally {
