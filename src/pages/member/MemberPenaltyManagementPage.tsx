@@ -36,10 +36,10 @@ export default function MemberPenaltyManagementPage() {
     }
 
     try {
-      const data = await searchUsersAPI(query);
+      const member = await searchUsersAPI(query);
 
-      if (data?.result) {
-        setSelectedMember(data.result);
+      if (member) {
+        setSelectedMember(member);
         setErrorMessage('');
         return;
       }

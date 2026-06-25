@@ -72,7 +72,7 @@ export type AdminUserListItem = {
   createdAt: string; // YYYY-MM-DD HH:MM:SS
 };
 
-export type AdminUserListResponse = {
+export type AdminUserListResult = {
   hasNext: boolean;
   data: AdminUserListItem[];
 };
@@ -100,12 +100,6 @@ export interface EditMemberInfo {
   userRoleId?: number;
 }
 
-export interface UpdateUserInfoResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-}
-
 export interface BlacklistHistoryItem {
   id?: number;
   encryptedUserId: string;
@@ -124,16 +118,11 @@ export interface BlacklistHistoryItem {
   deletedBy?: string | null;
 }
 
-export interface AdminBlacklistResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    hasNext: boolean;
-    totalPage: number;
-    totalCount: number;
-    data: UserBlacklistHistory[];
-  };
+export interface AdminBlacklistResult {
+  hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  data: UserBlacklistHistory[];
 }
 
 export interface AdminBlacklistReq {

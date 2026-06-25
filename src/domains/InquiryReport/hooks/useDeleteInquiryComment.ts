@@ -8,9 +8,7 @@ export const useDeleteInquiryComment = (postId: number) => {
 
   return useMutation({
     mutationFn: async (commentId: number) => {
-      const response = await deleteInquiryCommentAPI(postId, commentId);
-      if (!response.isSuccess) throw new Error(response.message);
-      return response;
+      return await deleteInquiryCommentAPI(postId, commentId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inquiryComments', postId] });

@@ -120,17 +120,11 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
         statuses,
       });
 
-      if (!response.isSuccess || !response.result) {
-        throw new Error(
-          response.message || '시험 후기 목록을 불러오는데 실패했습니다.'
-        );
-      }
-
       return {
-        data: response.result.data.map(transformApiResponseToExamReview),
-        hasNext: response.result.hasNext,
-        totalPage: response.result.totalPage,
-        totalCount: response.result.totalCount,
+        data: response.data.map(transformApiResponseToExamReview),
+        hasNext: response.hasNext,
+        totalPage: response.totalPage,
+        totalCount: response.totalCount,
       };
     },
     enabled,

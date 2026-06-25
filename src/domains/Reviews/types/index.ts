@@ -1,22 +1,18 @@
 export type {
   ConfirmExamReviewRequest,
-  ConfirmExamReviewResponse,
-  DeleteExamReviewResponse,
   ExamReview,
   ExamReviewDetailLog,
-  ExamReviewDetailResponse,
   ExamReviewDetailResult,
   ExamReviewProcessStatus,
   ExamReviews,
   ExamReviewSearchParams,
   ExamReviewSort,
-  ExamReviewsResponse,
+  ExamReviewsResult,
   ExamType,
   LectureType,
   Semester,
   Status,
   UpdateExamReviewPost,
   UpdateExamReviewRequest,
-  UpdateExamReviewResponse,
 } from './exam';
 export { EXAM_REVIEW_SORTS, isExamReviewSort } from './exam';

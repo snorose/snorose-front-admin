@@ -58,7 +58,7 @@ export function useMemberDetailState({
       if (!keyword.trim()) continue;
       try {
         const response = await searchUsersAPI(keyword);
-        const resolvedMember = extractFirstSearchMember(response?.result);
+        const resolvedMember = extractFirstSearchMember(response);
         if (resolvedMember) return resolvedMember;
       } catch (error) {
         latestError = error;
@@ -88,7 +88,7 @@ export function useMemberDetailState({
       const response = await blacklistHistoryAPI(encryptedUserId, {
         page,
       });
-      const history = response.result.data.map((item) =>
+      const history = response.data.map((item) =>
         toBlacklistHistoryItem(item, {
           encryptedUserId,
           studentNumber,
@@ -201,8 +201,8 @@ export function useMemberDetailState({
         setPenaltyHistory(history);
         setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
         setPenaltyHistoryPage(0);
-        setHasNextPenaltyHistory(response.result.hasNext);
-        setPenaltyHistoryTotalCount(response.result.totalCount);
+        setHasNextPenaltyHistory(response.hasNext);
+        setPenaltyHistoryTotalCount(response.totalCount);
       } catch (error) {
         if (!isMounted) return;
         toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
@@ -242,8 +242,8 @@ export function useMemberDetailState({
 
       setPenaltyHistory((prev) => [...prev, ...nextHistory]);
       setPenaltyHistoryPage(nextPage);
-      setHasNextPenaltyHistory(response.result.hasNext);
-      setPenaltyHistoryTotalCount(response.result.totalCount);
+      setHasNextPenaltyHistory(response.hasNext);
+      setPenaltyHistoryTotalCount(response.totalCount);
     } catch (error) {
       toast.error(
         getErrorMessage(error, '다음 제재 이력을 불러오지 못했습니다.')
@@ -272,8 +272,8 @@ export function useMemberDetailState({
       setPenaltyHistory(history);
       setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
       setPenaltyHistoryPage(0);
-      setHasNextPenaltyHistory(response.result.hasNext);
-      setPenaltyHistoryTotalCount(response.result.totalCount);
+      setHasNextPenaltyHistory(response.hasNext);
+      setPenaltyHistoryTotalCount(response.totalCount);
     } catch (error) {
       toast.error(
         getErrorMessage(error, '제재 이력을 다시 불러오지 못했습니다.')
@@ -294,15 +294,7 @@ export function useMemberDetailState({
           return;
         }
 
-        const editResponse = await editUsersAPI(
-          selectedMember.encryptedUserId,
-          diffPayload
-        );
-        if (!editResponse?.isSuccess || editResponse.code !== 1000) {
-          throw new Error(
-            editResponse?.message || '회원 정보 수정에 실패했습니다.'
-          );
-        }
+        await editUsersAPI(selectedMember.encryptedUserId, diffPayload);
 
         const nextSelectedMember = { ...selectedMember, ...updated };
         setSelectedMember(nextSelectedMember);

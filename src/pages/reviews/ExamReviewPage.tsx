@@ -222,16 +222,7 @@ export default function ExamReviewPage() {
         if (updatedDetailFromSave !== undefined) {
           updatedDetail = updatedDetailFromSave;
         } else {
-          const response = await getExamReviewDetail(selectedExamReview.id);
-
-          if (!response.isSuccess || !response.result) {
-            throw new Error(
-              response.message ||
-                '시험 후기 상세 정보를 불러오는데 실패했습니다.'
-            );
-          }
-
-          updatedDetail = response.result;
+          updatedDetail = await getExamReviewDetail(selectedExamReview.id);
         }
 
         // 현재 검색 파라미터로 쿼리 키 생성
@@ -343,15 +334,7 @@ export default function ExamReviewPage() {
 
         // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
         if (fetchingIdRef.current === examId) {
-          if (response.isSuccess && response.result) {
-            setSelectedExamReviewDetail(response.result);
-          } else {
-            toast.error(
-              response.message ||
-                '시험 후기 상세 정보를 불러오는데 실패했습니다.'
-            );
-            setSelectedExamReviewDetail(null);
-          }
+          setSelectedExamReviewDetail(response);
         }
       } catch (error: unknown) {
         // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인

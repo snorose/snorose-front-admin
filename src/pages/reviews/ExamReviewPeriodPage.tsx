@@ -27,7 +27,7 @@ export default function ExamReviewPeriodPage() {
 
     try {
       const data = await getExamReviewPeriodsAPI();
-      setExamReviewPeriods(data.result as ExamReviewPeriod[]);
+      setExamReviewPeriods(data);
     } catch (error: unknown) {
       toast.error(
         getErrorMessage(error, '시험 후기 작성 기간 조회에 실패했습니다.')

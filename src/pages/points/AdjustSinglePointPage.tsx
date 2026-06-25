@@ -36,8 +36,8 @@ export default function AdjustSinglePointPage() {
 
     setIsSearching(true);
     try {
-      const data = await searchUsersAPI(searchQuery.trim());
-      setSearchedMember(data.result);
+      const member = await searchUsersAPI(searchQuery.trim());
+      setSearchedMember(member);
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
       setSearchedMember(null);

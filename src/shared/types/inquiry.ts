@@ -1,5 +1,3 @@
-import type { ApiResponse } from './common';
-
 export type InquiryGroup = 'INQUIRY' | 'REPORT' | 'ETC';
 
 export type InquirySubGroup =
@@ -105,10 +103,10 @@ export type InquiryComment = {
   children: InquiryComment[];
 };
 
-export type AdminInquiryCommentListResponse = ApiResponse<{
+export type AdminInquiryCommentListResult = {
   hasNext: boolean;
   data: InquiryComment[];
-}>;
+};
 
 export type AdminInquiryCommentCreateRequest = {
   parentId: number | null;
@@ -120,30 +118,26 @@ export type AdminInquiryCommentMutationResult = InquiryComment & {
   pointDifference?: number;
 };
 
-export type AdminInquiryCommentCreateResponse =
-  ApiResponse<AdminInquiryCommentMutationResult>;
+export type AdminInquiryCommentCreateResult = AdminInquiryCommentMutationResult;
 
 export type AdminInquiryCommentUpdateRequest = {
   content: string;
 };
 
-export type AdminInquiryCommentUpdateResponse =
-  ApiResponse<AdminInquiryCommentMutationResult>;
+export type AdminInquiryCommentUpdateResult = AdminInquiryCommentMutationResult;
+export type AdminInquiryCommentDeleteResult = AdminInquiryCommentMutationResult;
 
-export type AdminInquiryCommentDeleteResponse =
-  ApiResponse<AdminInquiryCommentMutationResult>;
-
-export type AdminInquiryListResponse = ApiResponse<{
+export type AdminInquiryListResult = {
   hasNext: boolean;
   data: InquiryListItem[];
-}>;
+};
 
-export type AdminInquiryDetailResponse = ApiResponse<InquiryDetail>;
+export type AdminInquiryDetailResult = InquiryDetail;
 
 export type AdminInquiryStatusUpdateRequest = {
   status: InquiryStatus;
 };
 
-export type AdminInquiryStatusUpdateResponse = ApiResponse<{
+export type AdminInquiryStatusUpdateResult = {
   inquiryId: number;
-}>;
+};

@@ -16,9 +16,8 @@ export const useInquiryList = () => {
 
       while (hasNext && page < MAX_INQUIRY_LIST_PAGE_REQUESTS) {
         const response = await getAdminInquiriesAPI({ page });
-        if (!response.isSuccess) throw new Error(response.message);
-        allData.push(...response.result.data);
-        hasNext = response.result.hasNext;
+        allData.push(...response.data);
+        hasNext = response.hasNext;
         page += 1;
       }
 

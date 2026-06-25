@@ -19,16 +19,11 @@ export interface AdminGetPostResponse {
   createdAt: string;
 }
 
-export interface AdminPostListResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    hasNext: boolean;
-    totalPage?: number;
-    totalCount?: number;
-    data: AdminGetPostResponse[];
-  };
+export interface AdminPostListResult {
+  hasNext: boolean;
+  totalPage?: number;
+  totalCount?: number;
+  data: AdminGetPostResponse[];
 }
 
 export interface AdminPostSearchRequest {
@@ -56,31 +51,19 @@ export interface AdminPostSearchRequest {
   content?: string;
 }
 
-export interface DeletePostResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: AdminGetPostResponse;
-}
-
 export interface AdminPostBulkDeleteRequest {
   postIds: number[];
 }
 
-export interface AdminPostBulkDeleteResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    requestedCount: number;
-    deletedCount: number;
-    failedCount: number;
-    deletedPostIds: number[];
-    notDeletedPosts: {
-      postId: number;
-      reason: string;
-    }[];
-  };
+export interface AdminPostBulkDeleteResult {
+  requestedCount: number;
+  deletedCount: number;
+  failedCount: number;
+  deletedPostIds: number[];
+  notDeletedPosts: {
+    postId: number;
+    reason: string;
+  }[];
 }
 
 export interface PostSearchParams {

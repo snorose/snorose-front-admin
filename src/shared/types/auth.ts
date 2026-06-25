@@ -18,28 +18,8 @@ export type LoginResult = {
   birthday: string;
 };
 
-export type LoginResponse = {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: LoginResult;
-};
-
 export type ReissueTokenRequest = {
   refreshToken: string;
-};
-
-export type ReissueTokenResponse = {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: TokenResponse;
-};
-
-export type ApiErrorResponse = {
-  isSuccess: boolean;
-  code: number;
-  message: string;
 };
 
 export type User = {

@@ -60,8 +60,8 @@ export default function InquiryReportDetailPanel({
   const updateComment = useUpdateInquiryComment(postId);
   const deleteComment = useDeleteInquiryComment(postId);
 
-  const detail = detailData?.result;
-  const comments = commentsData?.result.data ?? [];
+  const detail = detailData;
+  const comments = commentsData?.data ?? [];
 
   useEffect(() => {
     setCommentInput('');

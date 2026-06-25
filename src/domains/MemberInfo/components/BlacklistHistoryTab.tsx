@@ -45,9 +45,9 @@ export default function BlacklistHistoryTab({
         setCurrentPage(1);
         const data = await blacklistHistoryAPI(encryptedUserId);
 
-        if (data?.result?.data) {
+        if (data?.data) {
           setHistoryData(
-            data.result.data.map((history) =>
+            data.data.map((history) =>
               toBlacklistHistoryItem(history, {
                 encryptedUserId,
                 studentNumber,

@@ -1,32 +1,31 @@
 import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  type ReactNode,
   type JSX,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { isAxiosError } from 'axios';
-import { AuthContext } from './AuthContext';
-import type {
-  User,
-  LoginRequest,
-  AuthContextType,
-  ApiErrorResponse,
-} from '@/shared/types';
-import {
-  tokenStorage,
-  TokenRefreshManager,
-  executeTokenRefresh,
-  userStorage,
-} from '@/shared/utils';
+
 import {
   ACCESS_TOKEN_EXPIRE_MINUTES,
-  REFRESH_TOKEN_EXPIRE_DAYS,
   ADMIN_ROLE_ID,
+  REFRESH_TOKEN_EXPIRE_DAYS,
 } from '@/shared/constants';
+import type { AuthContextType, LoginRequest, User } from '@/shared/types';
+import {
+  TokenRefreshManager,
+  executeTokenRefresh,
+  tokenStorage,
+  userStorage,
+} from '@/shared/utils';
+
 import { loginAPI } from '@/apis';
+
+import { AuthContext } from './AuthContext';
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -141,7 +140,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         }
       } catch (error: unknown) {
         const errorMessage =
-          (isAxiosError<ApiErrorResponse>(error) &&
+          (isAxiosError<{ message?: string }>(error) &&
             error.response?.data?.message) ||
           '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
 

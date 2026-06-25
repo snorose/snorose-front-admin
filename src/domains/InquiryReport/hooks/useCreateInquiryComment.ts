@@ -20,12 +20,10 @@ export const useCreateInquiryComment = (postId: number) => {
         );
       }
 
-      const response = await createInquiryCommentAPI(postId, {
+      return await createInquiryCommentAPI(postId, {
         ...data,
         content,
       });
-      if (!response.isSuccess) throw new Error(response.message);
-      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inquiryComments', postId] });

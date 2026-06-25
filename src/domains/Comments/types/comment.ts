@@ -1,6 +1,6 @@
 import type { AdminStatus } from '@/shared/utils/postCommentUtils';
 
-export interface AdminCommentResponse {
+export interface AdminCommentResult {
   encryptedUserId: string;
   boardId: number;
   boardName?: string;
@@ -39,14 +39,14 @@ export interface AdminCommentSearchRequest {
   adminCommonStatuses?: AdminStatus[];
 }
 
-export interface AdminCommentListResponse {
+export interface AdminCommentListResult {
   hasNext: boolean;
   totalPage?: number;
   totalCount?: number;
-  data: AdminCommentResponse[];
+  data: AdminCommentResult[];
 }
 
-export interface AdminDeleteCommentResponse {
+export interface AdminDeleteCommentResult {
   id: number;
   encryptedUserId: string;
   postId: number;
@@ -57,7 +57,7 @@ export interface AdminCommentBulkDeleteRequest {
   commentIds: number[];
 }
 
-export interface AdminCommentBulkDeleteResponse {
+export interface AdminCommentBulkDeleteResult {
   requestedCount: number;
   deletedCount: number;
   failedCount: number;

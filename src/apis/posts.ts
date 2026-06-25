@@ -1,21 +1,25 @@
 import { axiosInstance } from '@/shared/axios/instance';
+import type { BaseResponse } from '@/shared/types';
 
 import type {
   AdminGetPostResponse,
-  AdminPostBulkDeleteResponse,
-  AdminPostListResponse,
+  AdminPostBulkDeleteResult,
+  AdminPostListResult,
   AdminPostSearchRequest,
-  DeletePostResponse,
 } from '@/domains/Posts/types/post';
 
 // 게시글 조건 조회 api
 export const searchPosts = async (
   page: number,
   body: AdminPostSearchRequest
-): Promise<AdminPostListResponse['result']> => {
-  const response = await axiosInstance.post('/v1/admin/posts/search', body, {
-    params: { page: page - 1 },
-  });
+): Promise<AdminPostListResult> => {
+  const response = await axiosInstance.post<BaseResponse<AdminPostListResult>>(
+    '/v1/admin/posts/search',
+    body,
+    {
+      params: { page: page - 1 },
+    }
+  );
   return response.data.result;
 };
 
@@ -23,7 +27,9 @@ export const searchPosts = async (
 export const getPost = async (
   postId: number
 ): Promise<AdminGetPostResponse> => {
-  const response = await axiosInstance.get(`/v1/admin/posts/${postId}`);
+  const response = await axiosInstance.get<BaseResponse<AdminGetPostResponse>>(
+    `/v1/admin/posts/${postId}`
+  );
   return response.data.result;
 };
 
@@ -31,23 +37,29 @@ export const getPost = async (
 export const getDeletedPost = async (
   postId: number
 ): Promise<AdminGetPostResponse> => {
-  const response = await axiosInstance.get(`/v1/admin/posts/deleted/${postId}`);
+  const response = await axiosInstance.get<BaseResponse<AdminGetPostResponse>>(
+    `/v1/admin/posts/deleted/${postId}`
+  );
   return response.data.result;
 };
 
 // 게시글 삭제 api
 export const deletePost = async (
   postId: number
-): Promise<DeletePostResponse['result']> => {
-  const response = await axiosInstance.delete(`/v1/admin/posts/${postId}`);
+): Promise<AdminGetPostResponse> => {
+  const response = await axiosInstance.delete<
+    BaseResponse<AdminGetPostResponse>
+  >(`/v1/admin/posts/${postId}`);
   return response.data.result;
 };
 
 // 여러 게시글 선택 삭제 api
 export const bulkDeletePosts = async (
   postIds: number[]
-): Promise<AdminPostBulkDeleteResponse['result']> => {
-  const response = await axiosInstance.delete('/v1/admin/posts', {
+): Promise<AdminPostBulkDeleteResult> => {
+  const response = await axiosInstance.delete<
+    BaseResponse<AdminPostBulkDeleteResult>
+  >('/v1/admin/posts', {
     data: { postIds },
   });
   return response.data.result;
@@ -58,9 +70,12 @@ export const updatePostVisibility = async (
   postIds: number[],
   isVisible: boolean
 ): Promise<string> => {
-  const response = await axiosInstance.patch(`/v1/admin/posts/visibility`, {
-    postIds,
-    isVisible,
-  });
+  const response = await axiosInstance.patch<BaseResponse<string>>(
+    `/v1/admin/posts/visibility`,
+    {
+      postIds,
+      isVisible,
+    }
+  );
   return response.data.result;
 };

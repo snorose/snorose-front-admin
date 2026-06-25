@@ -1,15 +1,16 @@
 import { axiosInstance } from '@/shared/axios/instance';
+import type { BaseResponse } from '@/shared/types';
 import type {
   AdminInquiryCommentCreateRequest,
-  AdminInquiryCommentCreateResponse,
-  AdminInquiryCommentDeleteResponse,
-  AdminInquiryCommentListResponse,
+  AdminInquiryCommentCreateResult,
+  AdminInquiryCommentDeleteResult,
+  AdminInquiryCommentListResult,
   AdminInquiryCommentUpdateRequest,
-  AdminInquiryCommentUpdateResponse,
-  AdminInquiryDetailResponse,
-  AdminInquiryListResponse,
+  AdminInquiryCommentUpdateResult,
+  AdminInquiryDetailResult,
+  AdminInquiryListResult,
   AdminInquiryStatusUpdateRequest,
-  AdminInquiryStatusUpdateResponse,
+  AdminInquiryStatusUpdateResult,
   InquiryGroup,
   InquiryStatus,
   InquirySubGroup,
@@ -25,77 +26,69 @@ export type AdminInquiryListParams = {
 
 export const getAdminInquiriesAPI = async (
   params: AdminInquiryListParams = { page: 0 }
-): Promise<AdminInquiryListResponse> => {
-  const response = await axiosInstance.get<AdminInquiryListResponse>(
-    '/v1/admin/inquiries',
-    {
-      params,
-    }
-  );
-  return response.data;
+): Promise<AdminInquiryListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminInquiryListResult>
+  >('/v1/admin/inquiries', { params });
+  return response.data.result;
 };
 
 export const getAdminInquiryDetailAPI = async (
   inquiryId: number
-): Promise<AdminInquiryDetailResponse> => {
-  const response = await axiosInstance.get<AdminInquiryDetailResponse>(
-    `/v1/admin/inquiries/${inquiryId}`
-  );
-  return response.data;
+): Promise<AdminInquiryDetailResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminInquiryDetailResult>
+  >(`/v1/admin/inquiries/${inquiryId}`);
+  return response.data.result;
 };
 
 export const updateAdminInquiryStatusAPI = async (
   inquiryId: number,
   data: AdminInquiryStatusUpdateRequest
-): Promise<AdminInquiryStatusUpdateResponse> => {
-  const response = await axiosInstance.patch<AdminInquiryStatusUpdateResponse>(
-    `/v1/admin/inquiries/${inquiryId}/status`,
-    data
-  );
-  return response.data;
+): Promise<AdminInquiryStatusUpdateResult> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<AdminInquiryStatusUpdateResult>
+  >(`/v1/admin/inquiries/${inquiryId}/status`, data);
+  return response.data.result;
 };
 
 export const getAdminInquiryCommentsAPI = async (
   postId: number,
   params: { page?: number } = { page: 0 }
-): Promise<AdminInquiryCommentListResponse> => {
-  const response = await axiosInstance.get<AdminInquiryCommentListResponse>(
-    `/v1/posts/${postId}/comments`,
-    { params }
-  );
-  return response.data;
+): Promise<AdminInquiryCommentListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminInquiryCommentListResult>
+  >(`/v1/posts/${postId}/comments`, { params });
+  return response.data.result;
 };
 
 export const createInquiryCommentAPI = async (
   postId: number,
   data: AdminInquiryCommentCreateRequest
-): Promise<AdminInquiryCommentCreateResponse> => {
-  const response = await axiosInstance.post<AdminInquiryCommentCreateResponse>(
-    `/v1/posts/${postId}/comments`,
-    data
-  );
-  return response.data;
+): Promise<AdminInquiryCommentCreateResult> => {
+  const response = await axiosInstance.post<
+    BaseResponse<AdminInquiryCommentCreateResult>
+  >(`/v1/posts/${postId}/comments`, data);
+  return response.data.result;
 };
 
 export const updateInquiryCommentAPI = async (
   postId: number,
   commentId: number,
   data: AdminInquiryCommentUpdateRequest
-): Promise<AdminInquiryCommentUpdateResponse> => {
-  const response = await axiosInstance.patch<AdminInquiryCommentUpdateResponse>(
-    `/v1/posts/${postId}/comments/${commentId}`,
-    data
-  );
-  return response.data;
+): Promise<AdminInquiryCommentUpdateResult> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<AdminInquiryCommentUpdateResult>
+  >(`/v1/posts/${postId}/comments/${commentId}`, data);
+  return response.data.result;
 };
 
 export const deleteInquiryCommentAPI = async (
   postId: number,
   commentId: number
-): Promise<AdminInquiryCommentDeleteResponse> => {
-  const response =
-    await axiosInstance.delete<AdminInquiryCommentDeleteResponse>(
-      `/v1/posts/${postId}/comments/${commentId}`
-    );
-  return response.data;
+): Promise<AdminInquiryCommentDeleteResult> => {
+  const response = await axiosInstance.delete<
+    BaseResponse<AdminInquiryCommentDeleteResult>
+  >(`/v1/posts/${postId}/comments/${commentId}`);
+  return response.data.result;
 };
