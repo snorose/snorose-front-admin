@@ -51,7 +51,7 @@ export const postFooAPI = async (data: FooRequest): Promise<void> => {
 
 ## Git 컨벤션
 
-커밋 메시지: `tag: 한국어 설명 (#이슈번호)`
+커밋 메시지: `tag: 한국어 설명`
 
 허용 태그: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `merge`
 
