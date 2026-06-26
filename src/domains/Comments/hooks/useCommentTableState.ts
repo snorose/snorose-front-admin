@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
@@ -26,10 +26,9 @@ export function useCommentTableState({
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const parentIdStr = urlParams.get('parentId');
+  const [urlSearchParams] = useSearchParams();
+  const parentIdStr = urlSearchParams.get('parentId');
   const parentId = parentIdStr ? Number(parentIdStr) : null;
-
   const {
     data: totalCommentData,
     isLoading: isTotalLoading,
@@ -37,7 +36,7 @@ export function useCommentTableState({
   } = useCommentList({
     page: currentPage,
     body: searchParams,
-    enabled: !parentId,
+    enabled: parentId === null,
   });
 
   const {
@@ -45,12 +44,12 @@ export function useCommentTableState({
     isLoading: isChildLoading,
     refetch: refetchChild,
   } = useCommentChildrenList({
-    commentId: parentId!,
+    commentId: parentId,
     page: currentPage,
     enabled: parentId !== null,
   });
 
-  const refetch = parentId ? refetchChild : refetchTotal;
+  const refetch = parentId !== null ? refetchChild : refetchTotal;
 
   useEffect(() => {
     if (refreshKey) void refetch();
@@ -196,7 +195,7 @@ export function useCommentTableState({
   // 더블클릭 필터 적용 유틸리티
   const handleFilterByPostId = (postId: number) => {
     onPageChange(1);
-    const newParams = new URLSearchParams(window.location.search);
+    const newParams = new URLSearchParams(urlSearchParams);
     newParams.delete('parentId');
     newParams.set('searchScope', 'POST_ID');
     newParams.set('searchQuery', String(postId));
