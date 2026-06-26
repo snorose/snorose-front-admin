@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
 import type { CommentSearchParams } from '../types';
 import type { AdminCommentResult } from '../types/comment';
 import { useBulkDeleteComment } from './useBulkDeleteComment';
+import { useCommentChildrenList } from './useCommentChildrenList';
 import { useCommentList } from './useCommentList';
 import { useUpdateCommentVisibility } from './useUpdateCommentVisibility';
 
@@ -25,21 +26,53 @@ export function useCommentTableState({
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const { data, isLoading, refetch } = useCommentList({
+  const [urlSearchParams] = useSearchParams();
+  const parentIdStr = urlSearchParams.get('parentId');
+  const parentId = parentIdStr ? Number(parentIdStr) : null;
+  const {
+    data: totalCommentData,
+    isLoading: isTotalLoading,
+    refetch: refetchTotal,
+  } = useCommentList({
     page: currentPage,
     body: searchParams,
+    enabled: parentId === null,
   });
+
+  const {
+    data: childCommentData,
+    isLoading: isChildLoading,
+    refetch: refetchChild,
+  } = useCommentChildrenList({
+    commentId: parentId,
+    page: currentPage,
+    enabled: parentId !== null,
+  });
+
+  const refetch = parentId !== null ? refetchChild : refetchTotal;
 
   useEffect(() => {
     if (refreshKey) void refetch();
   }, [refreshKey, refetch]);
 
-  const comments = useMemo<AdminCommentResult[]>(
-    () => data?.data ?? [],
-    [data]
-  );
+  const comments = useMemo<AdminCommentResult[]>(() => {
+    if (parentId !== null) {
+      return childCommentData?.data ?? [];
+    }
+    return totalCommentData?.data ?? [];
+  }, [parentId, totalCommentData, childCommentData]);
 
-  const hasNext = data?.hasNext ?? false;
+  const hasNext =
+    parentId !== null
+      ? (childCommentData?.hasNext ?? false)
+      : (totalCommentData?.hasNext ?? false);
+
+  const totalCount =
+    parentId !== null
+      ? childCommentData?.totalCount
+      : totalCommentData?.totalCount;
+
+  const isLoading = parentId !== null ? isChildLoading : isTotalLoading;
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeleteComment();
@@ -162,8 +195,10 @@ export function useCommentTableState({
   // 더블클릭 필터 적용 유틸리티
   const handleFilterByPostId = (postId: number) => {
     onPageChange(1);
-    const newParams = new URLSearchParams(window.location.search);
-    newParams.set('postId', String(postId));
+    const newParams = new URLSearchParams(urlSearchParams);
+    newParams.delete('parentId');
+    newParams.set('searchScope', 'POST_ID');
+    newParams.set('searchQuery', String(postId));
     newParams.set('page', '1');
     navigate(`?${newParams.toString()}`, { replace: true });
   };
@@ -194,6 +229,6 @@ export function useCommentTableState({
     isDeletePending,
     isVisibilityPending,
     hasNext,
-    totalCount: data?.totalCount,
+    totalCount,
   };
 }
