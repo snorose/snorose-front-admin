@@ -197,7 +197,9 @@ export function useCommentTableState({
   const handleFilterByPostId = (postId: number) => {
     onPageChange(1);
     const newParams = new URLSearchParams(window.location.search);
-    newParams.set('postId', String(postId));
+    newParams.delete('parentId');
+    newParams.set('searchScope', 'POST_ID');
+    newParams.set('searchQuery', String(postId));
     newParams.set('page', '1');
     navigate(`?${newParams.toString()}`, { replace: true });
   };
