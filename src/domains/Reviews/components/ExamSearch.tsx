@@ -402,9 +402,6 @@ export default function ExamSearch({
             <Select.Item value='DESC' className='text-sm'>
               제목 내림차순
             </Select.Item>
-            <Select.Item value='REPORT' className='text-sm'>
-              신고순
-            </Select.Item>
           </Select.Content>
         </Select>
 
