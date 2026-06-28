@@ -1,0 +1,53 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  # 1. 타입 검사 (Type Check) Job
+  type-check:
+    name: 🔍 TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Type Check
+        run: npx tsc -b
+
+  # 2. 번들 사이즈 검사 (Bundle Size Check) Job
+  bundle-size:
+    name: 📦 Bundle Size Check
+    needs: type-check
+    runs-on: ubuntu-latest
+    # PR 댓글 작성을 위한 권한 부여
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Track and Compare Bundle Size
+        uses: preactjs/compressed-size-action@v2
+        with:
+          pattern: 'dist/**/*.{js,css,html}'
+          build-script: 'build'
+          exclude: '{**/*.map,**/node_modules/**}'

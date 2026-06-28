@@ -1,36 +1,47 @@
-import { useState } from 'react';
+import { PageHeader } from '@/shared/components';
+import { useManagePageUrl } from '@/shared/hooks/useManagePageUrl';
 
-import CommentList from '@/domains/Comments/components/CommentList';
-import PostDetailModal from '@/domains/Comments/components/PostDetailModal';
-import PostList from '@/domains/Comments/components/PostList';
-import type { AdminGetPostResponse } from '@/domains/Comments/types';
+import { CommentFilterPanel } from '@/domains/Comments/components/CommentFilterPanel';
+import CommentTable from '@/domains/Comments/components/CommentTable';
+import type { CommentSearchParams } from '@/domains/Comments/types';
+
+const COMMENT_SCHEMA = {
+  startDate: 'string',
+  endDate: 'string',
+  keywordAuthor: 'string',
+  searchQuery: 'string',
+  searchScope: 'string',
+  sortDirection: 'string',
+  sortTypes: 'array',
+  isKeywordExist: 'boolean',
+  isReported: 'boolean',
+  boardIds: 'number-array',
+  adminCommonStatuses: 'array',
+} as const;
 
 export default function PostCommentPage() {
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
-  const [modalPostId, setModalPostId] = useState<AdminGetPostResponse | null>(
-    null
-  );
-
-  const handleSelectPost = (post: AdminGetPostResponse | null) => {
-    setSelectedPostId(post?.postId ?? null);
-  };
+  const { searchParams, currentPage, handleSearchChange, handlePageChange } =
+    useManagePageUrl<CommentSearchParams>(COMMENT_SCHEMA);
 
   return (
-    <div className='grid w-full grid-cols-2 gap-6'>
-      <PostList
-        selectedPostId={selectedPostId}
-        onSelectPost={handleSelectPost}
-        onOpenModal={(post: AdminGetPostResponse) => setModalPostId(post)}
+    <div className='flex w-full flex-col gap-6 pb-12'>
+      <PageHeader
+        title='댓글 관리'
+        description='커뮤니티에 등록된 댓글을 편집하거나 삭제하고, 더블클릭 및 필터 검색을 활용해 상세 내역을 파악할 수 있습니다.'
       />
-      <CommentList
-        key={selectedPostId ?? 'none'}
-        selectedPostId={selectedPostId}
+      <CommentFilterPanel
+        key={JSON.stringify(searchParams)}
+        initialFilters={searchParams}
+        onFilterChange={handleSearchChange}
       />
-      <PostDetailModal
-        postId={modalPostId?.postId ?? null}
-        deletedAt={modalPostId ? (modalPostId.deletedAt ?? null) : null}
-        onClose={() => setModalPostId(null)}
-      />
+      <div className='flex flex-col gap-4'>
+        <CommentTable
+          searchParams={searchParams}
+          refreshKey={0}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 }

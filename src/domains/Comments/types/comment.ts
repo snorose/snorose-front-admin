@@ -1,38 +1,52 @@
-export interface AdminCommentResponse {
+import type { AdminStatus } from '@/shared/utils/postCommentUtils';
+
+export interface AdminCommentResult {
   encryptedUserId: string;
   boardId: number;
+  boardName?: string;
   commentId: number;
   postId: number;
+  postTitle?: string;
   parentId: number | null;
+  nickname: string;
+  category?: string;
+  viewCount?: number;
+  likeCount?: number;
+  reportCount: number;
+  childCommentCount?: number;
+  adminCommonStatuses?: AdminStatus[];
   isVisible: boolean;
   isKeywordExist: boolean;
   createdAt: string;
-  userDisplay: string;
-  nickname: string;
   content: string;
-  reportCount: number;
+  updatedAt?: string | null;
+  deletedAt?: string | null;
 }
 
 export interface AdminCommentSearchRequest {
-  encryptedUserId?: string;
-  boardId?: number;
-  postId?: number;
-  parentId?: number | null;
-  isVisible?: boolean;
-  isKeywordExist?: boolean;
   startDate?: string;
   endDate?: string;
-  content?: string;
+  keywordAuthor?: string;
+  searchQuery?: string;
+  searchScope?: 'CONTENT' | 'COMMENT_ID' | 'PARENT_COMMENT_ID' | 'POST_ID';
+  sortDirection?: 'ASC' | 'DESC';
+  sortTypes?: Array<
+    'LIKE_COUNT' | 'REPORT_COUNT' | 'CHILD_COMMENT_COUNT' | 'CREATED_AT'
+  >;
+  isKeywordExist?: boolean;
+  isReported?: boolean;
+  boardIds?: number[];
+  adminCommonStatuses?: AdminStatus[];
 }
 
-export interface AdminCommentListResponse {
+export interface AdminCommentListResult {
   hasNext: boolean;
   totalPage?: number;
   totalCount?: number;
-  data: AdminCommentResponse[];
+  data: AdminCommentResult[];
 }
 
-export interface AdminDeleteCommentResponse {
+export interface AdminDeleteCommentResult {
   id: number;
   encryptedUserId: string;
   postId: number;
@@ -43,7 +57,7 @@ export interface AdminCommentBulkDeleteRequest {
   commentIds: number[];
 }
 
-export interface AdminCommentBulkDeleteResponse {
+export interface AdminCommentBulkDeleteResult {
   requestedCount: number;
   deletedCount: number;
   failedCount: number;
@@ -57,4 +71,20 @@ export interface AdminCommentBulkDeleteResponse {
 export interface AdminCommentVisibilityUpdateRequest {
   commentIds: number[];
   isVisible: boolean;
+}
+
+export interface CommentSearchParams {
+  startDate?: string;
+  endDate?: string;
+  keywordAuthor?: string;
+  searchQuery?: string;
+  searchScope?: 'CONTENT' | 'COMMENT_ID' | 'PARENT_COMMENT_ID' | 'POST_ID';
+  sortDirection?: 'ASC' | 'DESC';
+  sortTypes?: Array<
+    'CREATED_AT' | 'LIKE_COUNT' | 'REPORT_COUNT' | 'CHILD_COMMENT_COUNT'
+  >;
+  isKeywordExist?: boolean;
+  isReported?: boolean;
+  boardIds?: number[];
+  adminCommonStatuses?: AdminStatus[];
 }

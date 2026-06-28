@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import { type PostCommentResponse, getPostCommentsAPI } from '@/apis';
+import { type PostCommentResult, getPostCommentsAPI } from '@/apis';
 
 interface ExamReviewCommentSectionProps {
   postId: number | null;
@@ -21,13 +21,7 @@ export function ExamReviewCommentSection({
     enabled: Boolean(postId),
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const response = await getPostCommentsAPI(postId!, pageParam);
-
-      if (!response.isSuccess || !response.result) {
-        throw new Error(response.message || '댓글 목록을 불러오지 못했습니다.');
-      }
-
-      return response.result;
+      return await getPostCommentsAPI(postId!, pageParam);
     },
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage.hasNext) return undefined;
@@ -66,10 +60,7 @@ export function ExamReviewCommentSection({
 
   if (!postId) return null;
 
-  const renderComment = (
-    comment: PostCommentResponse,
-    depth = 0
-  ): ReactNode => {
+  const renderComment = (comment: PostCommentResult, depth = 0): ReactNode => {
     return (
       <div key={comment.id} className='flex flex-col gap-2'>
         <article
@@ -91,7 +82,9 @@ export function ExamReviewCommentSection({
 
         {comment.children?.length > 0 && (
           <div className='flex flex-col gap-2'>
-            {comment.children.map((child) => renderComment(child, depth + 1))}
+            {comment.children.map((child: PostCommentResult) =>
+              renderComment(child, depth + 1)
+            )}
           </div>
         )}
       </div>

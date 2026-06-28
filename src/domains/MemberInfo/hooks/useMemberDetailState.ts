@@ -14,6 +14,7 @@ import { getErrorMessage } from '@/shared/utils';
 import {
   createMemberDiffPayload,
   extractFirstSearchMember,
+  toBlacklistHistoryItem,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { blacklistHistoryAPI, editUsersAPI, searchUsersAPI } from '@/apis';
@@ -40,6 +41,13 @@ export function useMemberDetailState({
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
   const [latestPenaltyHistory, setLatestPenaltyHistory] =
     useState<BlacklistHistoryItem | null>(null);
+  const [penaltyHistory, setPenaltyHistory] = useState<BlacklistHistoryItem[]>(
+    []
+  );
+  const [penaltyHistoryPage, setPenaltyHistoryPage] = useState(0);
+  const [hasNextPenaltyHistory, setHasNextPenaltyHistory] = useState(false);
+  const [isPenaltyHistoryLoading, setIsPenaltyHistoryLoading] = useState(false);
+  const [penaltyHistoryTotalCount, setPenaltyHistoryTotalCount] = useState(0);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -50,7 +58,7 @@ export function useMemberDetailState({
       if (!keyword.trim()) continue;
       try {
         const response = await searchUsersAPI(keyword);
-        const resolvedMember = extractFirstSearchMember(response?.result);
+        const resolvedMember = extractFirstSearchMember(response);
         if (resolvedMember) return resolvedMember;
       } catch (error) {
         latestError = error;
@@ -75,10 +83,31 @@ export function useMemberDetailState({
     [members, searchResultMembers]
   );
 
+  const fetchPenaltyHistoryPage = useCallback(
+    async (encryptedUserId: string, studentNumber: string, page: number) => {
+      const response = await blacklistHistoryAPI(encryptedUserId, {
+        page,
+      });
+      const history = response.data.map((item) =>
+        toBlacklistHistoryItem(item, {
+          encryptedUserId,
+          studentNumber,
+        })
+      );
+
+      return { history, response };
+    },
+    []
+  );
+
   useEffect(() => {
     if (!memberKey) {
       setSelectedMember(null);
       setLatestPenaltyHistory(null);
+      setPenaltyHistory([]);
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(false);
+      setPenaltyHistoryTotalCount(0);
       setIsEdit(false);
       return;
     }
@@ -147,30 +176,112 @@ export function useMemberDetailState({
   ]);
 
   useEffect(() => {
-    if (!selectedMember?.encryptedUserId) {
+    const encryptedUserId = selectedMember?.encryptedUserId;
+    const studentNumber = selectedMember?.studentNumber;
+
+    if (!encryptedUserId || !studentNumber) {
       setLatestPenaltyHistory(null);
+      setPenaltyHistory([]);
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(false);
+      setPenaltyHistoryTotalCount(0);
       return;
     }
 
     let isMounted = true;
     void (async () => {
       try {
-        const response = await blacklistHistoryAPI(
-          selectedMember.encryptedUserId
+        setIsPenaltyHistoryLoading(true);
+        const { history, response } = await fetchPenaltyHistoryPage(
+          encryptedUserId,
+          studentNumber,
+          0
         );
-        const history = Array.isArray(response?.result) ? response.result : [];
         if (!isMounted) return;
+        setPenaltyHistory(history);
         setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
-      } catch {
+        setPenaltyHistoryPage(0);
+        setHasNextPenaltyHistory(response.hasNext);
+        setPenaltyHistoryTotalCount(response.totalCount);
+      } catch (error) {
         if (!isMounted) return;
+        toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
+        setPenaltyHistory([]);
         setLatestPenaltyHistory(null);
+        setPenaltyHistoryPage(0);
+        setHasNextPenaltyHistory(false);
+        setPenaltyHistoryTotalCount(0);
+      } finally {
+        if (isMounted) setIsPenaltyHistoryLoading(false);
       }
     })();
 
     return () => {
       isMounted = false;
     };
-  }, [selectedMember?.encryptedUserId]);
+  }, [
+    fetchPenaltyHistoryPage,
+    selectedMember?.encryptedUserId,
+    selectedMember?.studentNumber,
+  ]);
+
+  const handleLoadMorePenaltyHistory = useCallback(async () => {
+    if (!selectedMember || isPenaltyHistoryLoading || !hasNextPenaltyHistory) {
+      return;
+    }
+
+    const nextPage = penaltyHistoryPage + 1;
+
+    try {
+      setIsPenaltyHistoryLoading(true);
+      const { history: nextHistory, response } = await fetchPenaltyHistoryPage(
+        selectedMember.encryptedUserId,
+        selectedMember.studentNumber,
+        nextPage
+      );
+
+      setPenaltyHistory((prev) => [...prev, ...nextHistory]);
+      setPenaltyHistoryPage(nextPage);
+      setHasNextPenaltyHistory(response.hasNext);
+      setPenaltyHistoryTotalCount(response.totalCount);
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, '다음 제재 이력을 불러오지 못했습니다.')
+      );
+    } finally {
+      setIsPenaltyHistoryLoading(false);
+    }
+  }, [
+    fetchPenaltyHistoryPage,
+    hasNextPenaltyHistory,
+    isPenaltyHistoryLoading,
+    penaltyHistoryPage,
+    selectedMember,
+  ]);
+
+  const handleRefreshPenaltyHistory = useCallback(async () => {
+    if (!selectedMember) return;
+
+    try {
+      setIsPenaltyHistoryLoading(true);
+      const { history, response } = await fetchPenaltyHistoryPage(
+        selectedMember.encryptedUserId,
+        selectedMember.studentNumber,
+        0
+      );
+      setPenaltyHistory(history);
+      setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(response.hasNext);
+      setPenaltyHistoryTotalCount(response.totalCount);
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, '제재 이력을 다시 불러오지 못했습니다.')
+      );
+    } finally {
+      setIsPenaltyHistoryLoading(false);
+    }
+  }, [fetchPenaltyHistoryPage, selectedMember]);
 
   const handleSaveEdit = useCallback(
     async (updated: MemberInfo) => {
@@ -183,15 +294,7 @@ export function useMemberDetailState({
           return;
         }
 
-        const editResponse = await editUsersAPI(
-          selectedMember.encryptedUserId,
-          diffPayload
-        );
-        if (!editResponse?.isSuccess || editResponse.code !== 1000) {
-          throw new Error(
-            editResponse?.message || '회원 정보 수정에 실패했습니다.'
-          );
-        }
+        await editUsersAPI(selectedMember.encryptedUserId, diffPayload);
 
         const nextSelectedMember = { ...selectedMember, ...updated };
         setSelectedMember(nextSelectedMember);
@@ -205,6 +308,40 @@ export function useMemberDetailState({
     },
     [currentPage, loadMembers, selectedMember, updateCachedMember]
   );
+
+  const handleRefreshMemberDetail = useCallback(async () => {
+    if (!selectedMember) return;
+
+    setIsDetailLoading(true);
+    try {
+      const refreshedMember = await fetchMemberDetail([
+        selectedMember.loginId,
+        selectedMember.studentNumber,
+        selectedMember.userName,
+      ]);
+
+      if (!refreshedMember) {
+        toast.error('회원 상세 정보를 다시 불러오지 못했습니다.');
+        return;
+      }
+
+      setSelectedMember(refreshedMember);
+      updateCachedMember(refreshedMember);
+      await loadMembers(currentPage);
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, '회원 상세 정보를 다시 불러오지 못했습니다.')
+      );
+    } finally {
+      setIsDetailLoading(false);
+    }
+  }, [
+    currentPage,
+    fetchMemberDetail,
+    loadMembers,
+    selectedMember,
+    updateCachedMember,
+  ]);
 
   const handleCopy = useCallback(async (value: string) => {
     await navigator.clipboard.writeText(value);
@@ -225,10 +362,17 @@ export function useMemberDetailState({
   return {
     handleBack,
     handleCopy,
+    handleLoadMorePenaltyHistory,
+    handleRefreshMemberDetail,
+    handleRefreshPenaltyHistory,
     handleSaveEdit,
+    hasNextPenaltyHistory,
     isDetailLoading,
     isEdit,
+    isPenaltyHistoryLoading,
     latestPenaltyHistory,
+    penaltyHistory,
+    penaltyHistoryTotalCount,
     selectedMember,
     setIsEdit,
   };

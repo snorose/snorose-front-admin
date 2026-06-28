@@ -1,15 +1,16 @@
 import { axiosInstance } from '@/shared/axios/instance';
+import type { BaseResponse } from '@/shared/types';
 
 import type {
-  AdminCommentBulkDeleteResponse,
-  AdminCommentListResponse,
-  AdminCommentResponse,
+  AdminCommentBulkDeleteResult,
+  AdminCommentListResult,
+  AdminCommentResult,
   AdminCommentSearchRequest,
   AdminCommentVisibilityUpdateRequest,
-  AdminDeleteCommentResponse,
+  AdminDeleteCommentResult,
 } from '@/domains/Comments/types/comment';
 
-export interface PostCommentResponse {
+export interface PostCommentResult {
   id: number;
   postId: number;
   encryptedUserId: string;
@@ -25,37 +26,26 @@ export interface PostCommentResponse {
   isUpdated: boolean;
   isDeleted: boolean;
   isLiked: boolean;
-  children: PostCommentResponse[];
-}
-
-export interface GetPostCommentsResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: {
-    hasNext: boolean;
-    data: PostCommentResponse[];
-  };
+  children: PostCommentResult[];
 }
 
 export const getPostCommentsAPI = async (
   postId: number,
   page: number
-): Promise<GetPostCommentsResponse> => {
-  const response = await axiosInstance.get(`/v1/posts/${postId}/comments`, {
-    params: {
-      page,
-    },
-  });
-
-  return response.data;
+): Promise<{ hasNext: boolean; data: PostCommentResult[] }> => {
+  const response = await axiosInstance.get<
+    BaseResponse<{ hasNext: boolean; data: PostCommentResult[] }>
+  >(`/v1/posts/${postId}/comments`, { params: { page } });
+  return response.data.result;
 };
 
 // 댓글 상세 조회 api
 export const getComment = async (
   commentId: number
-): Promise<AdminCommentResponse> => {
-  const response = await axiosInstance.get(`/v1/admin/comments/${commentId}`);
+): Promise<AdminCommentResult> => {
+  const response = await axiosInstance.get<BaseResponse<AdminCommentResult>>(
+    `/v1/admin/comments/${commentId}`
+  );
   return response.data.result;
 };
 
@@ -63,13 +53,10 @@ export const getComment = async (
 export const getCommentChildrenList = async (
   commentId: number,
   page: number
-): Promise<AdminCommentListResponse> => {
-  const response = await axiosInstance.get(
-    `/v1/admin/comments/${commentId}/children`,
-    {
-      params: { page },
-    }
-  );
+): Promise<AdminCommentListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminCommentListResult>
+  >(`/v1/admin/comments/${commentId}/children`, { params: { page } });
   return response.data.result;
 };
 
@@ -77,9 +64,11 @@ export const getCommentChildrenList = async (
 export const searchComments = async (
   page: number,
   body: AdminCommentSearchRequest
-): Promise<AdminCommentListResponse> => {
-  const response = await axiosInstance.post('/v1/admin/comments/search', body, {
-    params: { page },
+): Promise<AdminCommentListResult> => {
+  const response = await axiosInstance.post<
+    BaseResponse<AdminCommentListResult>
+  >('/v1/admin/comments/search', body, {
+    params: { page: page - 1 },
   });
   return response.data.result;
 };
@@ -87,18 +76,20 @@ export const searchComments = async (
 // 댓글 삭제 api
 export const deleteComment = async (
   commentId: number
-): Promise<AdminDeleteCommentResponse> => {
-  const response = await axiosInstance.delete(
-    `/v1/admin/comments/${commentId}`
-  );
+): Promise<AdminDeleteCommentResult> => {
+  const response = await axiosInstance.delete<
+    BaseResponse<AdminDeleteCommentResult>
+  >(`/v1/admin/comments/${commentId}`);
   return response.data.result;
 };
 
 // 댓글 일괄 삭제 api
 export const bulkDeleteComments = async (
   commentIds: number[]
-): Promise<AdminCommentBulkDeleteResponse> => {
-  const response = await axiosInstance.delete(`/v1/admin/comments`, {
+): Promise<AdminCommentBulkDeleteResult> => {
+  const response = await axiosInstance.delete<
+    BaseResponse<AdminCommentBulkDeleteResult>
+  >(`/v1/admin/comments`, {
     data: { commentIds },
   });
   return response.data.result;
@@ -108,7 +99,7 @@ export const bulkDeleteComments = async (
 export const updateCommentVisibility = async (
   body: AdminCommentVisibilityUpdateRequest
 ): Promise<string> => {
-  const response = await axiosInstance.patch(
+  const response = await axiosInstance.patch<BaseResponse<string>>(
     `/v1/admin/comments/visibility`,
     body
   );

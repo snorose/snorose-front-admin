@@ -28,9 +28,18 @@ export async function executeTokenRefresh(): Promise<{
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
         response.result;
 
+      if (!newAccessToken) {
+        return { success: false };
+      }
+
       // 새로운 토큰 저장
       tokenStorage.setAccessToken(newAccessToken, ACCESS_TOKEN_EXPIRE_MINUTES);
-      tokenStorage.setRefreshToken(newRefreshToken, REFRESH_TOKEN_EXPIRE_DAYS);
+      if (newRefreshToken) {
+        tokenStorage.setRefreshToken(
+          newRefreshToken,
+          REFRESH_TOKEN_EXPIRE_DAYS
+        );
+      }
 
       return { success: true, accessToken: newAccessToken };
     }

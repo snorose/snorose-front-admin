@@ -62,10 +62,3 @@ export interface ExcelPointBulkRewardResult {
   successRows: ExcelPointBulkSuccessRow[];
   notProcessedRows: ExcelPointBulkNotProcessedRow[];
 }
-
-export interface ExcelPointBulkRewardResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-  result: ExcelPointBulkRewardResult;
-}

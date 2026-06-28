@@ -327,7 +327,7 @@ describe('PushNotificationPage', () => {
   });
 
   test('모달에서 확인 버튼을 클릭하면 API가 호출되고 성공 토스트가 표시된다', async () => {
-    vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+    vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
@@ -366,7 +366,7 @@ describe('PushNotificationPage', () => {
   });
 
   test('API 호출 성공 시 폼이 초기화된다', async () => {
-    vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+    vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
@@ -419,7 +419,7 @@ describe('PushNotificationPage', () => {
   });
 
   test('모달에서 확인 버튼 클릭 시 올바른 데이터가 전달된다', async () => {
-    vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+    vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(<PushNotificationPage />);
 
@@ -592,7 +592,7 @@ describe('PushNotificationPage', () => {
     });
 
     test('URL에 특수 문자가 포함되어도 알림 전송이 가능해야 한다', async () => {
-      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+      vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
@@ -669,8 +669,8 @@ describe('PushNotificationPage', () => {
     });
 
     test('API 호출 중에 다시 확인 버튼을 클릭해도 중복 호출되지 않아야 한다', async () => {
-      let resolvePromise: (value: unknown) => void;
-      const promise = new Promise((resolve) => {
+      let resolvePromise: (value: void) => void;
+      const promise = new Promise<void>((resolve) => {
         resolvePromise = resolve;
       });
       vi.mocked(postPushNotificationAPI).mockReturnValue(promise);
@@ -699,7 +699,7 @@ describe('PushNotificationPage', () => {
       expect(postPushNotificationAPI).toHaveBeenCalledTimes(1);
 
       // Promise 해결
-      resolvePromise!({});
+      resolvePromise!(undefined);
       await promise;
     });
 
@@ -741,7 +741,7 @@ describe('PushNotificationPage', () => {
     );
 
     test('외부 URL 모드에서 스노로즈 전체(https) 주소를 입력하면 모달이 열리고 API 호출 시 그대로 전달된다', async () => {
-      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+      vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
@@ -783,7 +783,7 @@ describe('PushNotificationPage', () => {
     });
 
     test('외부 URL 모드에서 스노로즈 전체(http) 주소를 입력하면 모달이 열리고 API 호출 시 그대로 전달된다', async () => {
-      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+      vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 
@@ -895,7 +895,7 @@ describe('PushNotificationPage', () => {
     });
 
     test('URL이 빈 문자열일 때 API 호출 시 절대 경로로 전달된다', async () => {
-      vi.mocked(postPushNotificationAPI).mockResolvedValue({});
+      vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
       const user = userEvent.setup();
       render(<PushNotificationPage />);
 

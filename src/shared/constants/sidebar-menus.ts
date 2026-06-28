@@ -1,9 +1,10 @@
 import {
   // Bell,
   BookOpen,
-  // FileText,
+  FileText,
   HandCoins,
   type LucideIcon,
+  MessageSquareWarning,
   User,
 } from 'lucide-react';
 
@@ -36,16 +37,20 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       // },
     ],
   },
-  // {
-  //   title: '게시글 관리',
-  //   icon: FileText,
-  //   items: [
-  //     {
-  //       title: '댓글 관리',
-  //       url: PATHS.POST_COMMENTS,
-  //     },
-  //   ],
-  // },
+  {
+    title: '게시글 관리',
+    icon: FileText,
+    items: [
+      {
+        title: '게시글 관리',
+        url: PATHS.POST_MANAGE,
+      },
+      {
+        title: '댓글 관리',
+        url: PATHS.POST_COMMENTS,
+      },
+    ],
+  },
   {
     title: '시험후기',
     icon: BookOpen,
@@ -82,20 +87,16 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       },
     ],
   },
-  // {
-  //   title: '문의 및 신고',
-  //   url: '/report',
-  //   items: [
-  //     {
-  //       title: '문의 및 신고',
-  //       url: '/report/inquiry',
-  //     },
-  //     {
-  //       title: '신고 글/댓글 조회',
-  //       url: '/report/report',
-  //     },
-  //   ],
-  // },
+  {
+    title: '문의 및 신고',
+    icon: MessageSquareWarning,
+    items: [
+      {
+        title: '문의 및 신고',
+        url: PATHS.INQUIRY_REPORT,
+      },
+    ],
+  },
   // {
   //   title: '알림',
   //   icon: Bell,

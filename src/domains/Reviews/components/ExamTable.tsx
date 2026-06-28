@@ -7,7 +7,8 @@ import {
   useState,
 } from 'react';
 
-import { Table } from '@/shared/components/ui';
+import { Badge, Table } from '@/shared/components/ui';
+import { EXAM_REVIEW_PROCESS_STATUS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 
 import {
@@ -20,6 +21,7 @@ import {
 import { useExamReviews } from '@/domains/Reviews/hooks';
 import type {
   ExamReview,
+  ExamReviewProcessStatus,
   ExamReviewSearchParams,
 } from '@/domains/Reviews/types';
 
@@ -33,18 +35,111 @@ interface ExamReviewTableColumn {
   render?: (review: ExamReview) => ReactNode;
 }
 
+const PROCESS_STATUS_BADGE_CLASS_NAMES: Record<
+  ExamReviewProcessStatus,
+  string
+> = {
+  VISIBLE: 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300',
+  USER_DELETED:
+    'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-300',
+  ADMIN_DELETED: 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300',
+  ADMIN_HIDDEN:
+    'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
+  AUTO_HIDDEN:
+    'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
+  SANCTIONED: 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300',
+  DESANCTIONED:
+    'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+};
+
+const getProcessStatusLabel = (status: ExamReviewProcessStatus): string =>
+  EXAM_REVIEW_PROCESS_STATUS.find((option) => option.code === status)?.label ??
+  status;
+
+const renderBooleanBadge = (
+  value: boolean,
+  trueLabel: string,
+  falseLabel: string
+) => (
+  <Badge
+    variant='outline'
+    className={cn(
+      'max-w-full truncate',
+      value
+        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+        : 'text-gray-500 dark:text-gray-400'
+    )}
+    title={value ? trueLabel : falseLabel}
+  >
+    {value ? trueLabel : falseLabel}
+  </Badge>
+);
+
+const renderReportedStatusBadge = (review: ExamReview) => {
+  if (!review.isReported) return null;
+
+  const label = `신고 ${review.reportCount}`;
+
+  return (
+    <Badge
+      variant='outline'
+      className='max-w-full truncate border-red-200 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
+      title={label}
+    >
+      {label}
+    </Badge>
+  );
+};
+
+const renderProcessStatusBadge = (review: ExamReview) => {
+  const statusLabels = review.processStatuses.map(getProcessStatusLabel);
+  const reportLabel = review.isReported ? `신고 ${review.reportCount}` : null;
+  const label = [reportLabel, ...statusLabels].filter(Boolean).join(', ');
+
+  return (
+    <div className='flex flex-wrap gap-1' title={label}>
+      {renderReportedStatusBadge(review)}
+      {review.processStatuses.map((status) => (
+        <Badge
+          key={status}
+          variant='outline'
+          className={PROCESS_STATUS_BADGE_CLASS_NAMES[status]}
+        >
+          {getProcessStatusLabel(status)}
+        </Badge>
+      ))}
+    </div>
+  );
+};
+
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
   {
     key: 'status',
     label: '확인여부',
     width: '78px',
     render: (review: ExamReview) => (
-      <ExamConfirmStatusBadge status={review.status} />
+      <ExamConfirmStatusBadge
+        status={review.status}
+        className='justify-center'
+      />
     ),
   },
   { key: 'id', label: 'postId', width: '90px' },
-  { key: 'reviewTitle', label: '시험후기명' },
+  { key: 'reviewTitle', label: '시험후기명', width: '320px' },
   { key: 'userDisplay', label: '작성자', width: '120px' },
+  {
+    key: 'isDiscussed',
+    label: '논의 여부',
+    width: '92px',
+    render: (review: ExamReview) =>
+      renderBooleanBadge(review.isDiscussed, '논의 있음', '논의 없음'),
+  },
+  {
+    key: 'processStatuses',
+    label: '관리 상태',
+    width: '150px',
+    render: renderProcessStatusBadge,
+  },
   { key: 'uploadTime', label: '작성일', width: '150px' },
 ];
 
@@ -94,6 +189,9 @@ export default function ExamTable({
     semester: searchParams.semester,
     examType: searchParams.examType,
     isConfirmed: searchParams.isConfirmed,
+    isDiscussed: searchParams.isDiscussed,
+    isReported: searchParams.isReported,
+    statuses: searchParams.statuses,
     enabled: !propData,
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
@@ -104,6 +202,10 @@ export default function ExamTable({
   );
   const hasNext = queryData?.hasNext ?? false;
   const totalPage = queryData?.totalPage;
+  const totalCount = queryData?.totalCount;
+  const totalCountText =
+    totalCount === undefined ? '-' : totalCount.toLocaleString();
+  const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
   useEffect(() => {
@@ -126,7 +228,15 @@ export default function ExamTable({
 
   return (
     <>
-      <div className='w-full overflow-hidden rounded-md border'>
+      <div className='flex items-center justify-start text-sm text-gray-600'>
+        총{' '}
+        <span className='px-1 font-semibold text-gray-900'>
+          {totalCountText}
+        </span>
+        개
+      </div>
+
+      <div className='w-full overflow-x-auto rounded-md border'>
         <Table className='w-full table-fixed rounded-lg bg-white shadow'>
           <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
@@ -139,7 +249,10 @@ export default function ExamTable({
               {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                 <Table.Head
                   key={column.key}
-                  className='relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+                  className={cn(
+                    'relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap',
+                    column.key === 'status' && 'text-center'
+                  )}
                 >
                   {column.label}
                 </Table.Head>
@@ -149,9 +262,12 @@ export default function ExamTable({
 
           <Table.Body>
             {isLoading ? (
-              <ExamTableSkeleton itemsPerPage={ITEMS_PER_PAGE} />
+              <ExamTableSkeleton
+                itemsPerPage={ITEMS_PER_PAGE}
+                columnCount={columnCount}
+              />
             ) : currentPageData.length === 0 ? (
-              <ExamTableEmpty />
+              <ExamTableEmpty columnCount={columnCount} />
             ) : (
               <>
                 {currentPageData.map((review: ExamReview) => {
@@ -175,7 +291,12 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
-                          className='overflow-hidden text-ellipsis whitespace-nowrap'
+                          className={cn(
+                            'overflow-hidden text-ellipsis whitespace-nowrap',
+                            column.key === 'status' && 'text-center',
+                            column.key === 'processStatuses' &&
+                              'whitespace-normal'
+                          )}
                         >
                           {column.render
                             ? column.render(review)
@@ -189,6 +310,7 @@ export default function ExamTable({
                 })}
                 <ExamTableEmptyRows
                   count={ITEMS_PER_PAGE - currentPageData.length}
+                  columnCount={columnCount}
                 />
               </>
             )}

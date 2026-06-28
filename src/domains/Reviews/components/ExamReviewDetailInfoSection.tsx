@@ -1,27 +1,37 @@
 import { type RefObject } from 'react';
 
-import { Field, Input, Select, Textarea } from '@/shared/components/ui';
+import { Badge, Field, Input, Select, Textarea } from '@/shared/components/ui';
 import {
+  EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
   SEMESTER_LIST,
 } from '@/shared/constants';
+import { cn } from '@/shared/lib';
 
 import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
-import type { LectureType } from '@/domains/Reviews/types';
+import type {
+  ExamReviewProcessStatus,
+  LectureType,
+} from '@/domains/Reviews/types';
 import { convertLectureTypeToString } from '@/domains/Reviews/utils';
 
 export interface ExamReviewDetailInfoSectionFormData {
   isConfirmed: boolean;
+  isDiscussed: boolean;
   lectureName: string;
   professorName: string;
-  fileName: string;
-  semester: string;
-  examType: string;
   lectureType: LectureType;
+  semester: string;
   classNumber: number | null;
+  examType: string;
   isPF: string;
   isOnline: string;
+  deletionStatus: ExamReviewProcessStatus | null;
+  isSanctioned: boolean;
+  visibilityStatus: ExamReviewProcessStatus | null;
+  memo: string | null;
+  fileName: string;
   examTypeAndQuestions: string;
 }
 
@@ -35,6 +45,39 @@ export interface ExamReviewDetailInfoSectionProps {
   setSelectedFile: (file: File | null) => void;
 }
 
+const STATUS_FIELD_CLASS_NAME =
+  'flex min-h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3';
+
+const getProcessStatusLabel = (
+  status: ExamReviewProcessStatus | null
+): string => {
+  if (!status) {
+    return '-';
+  }
+
+  return (
+    EXAM_REVIEW_PROCESS_STATUS.find((option) => option.code === status)
+      ?.label ?? status
+  );
+};
+
+const renderStatusBadge = (
+  label: string,
+  isActive: boolean,
+  activeClassName: string
+) => (
+  <Badge
+    variant='outline'
+    className={cn(
+      'max-w-full truncate',
+      isActive ? activeClassName : 'text-gray-500 dark:text-gray-400'
+    )}
+    title={label}
+  >
+    {label}
+  </Badge>
+);
+
 export function ExamReviewDetailInfoSection({
   formData,
   setFormData,
@@ -45,6 +88,10 @@ export function ExamReviewDetailInfoSection({
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
+  const deletionStatusLabel = getProcessStatusLabel(formData.deletionStatus);
+  const visibilityStatusLabel = getProcessStatusLabel(
+    formData.visibilityStatus
+  );
 
   return (
     <div className='space-y-4'>
@@ -71,6 +118,80 @@ export function ExamReviewDetailInfoSection({
                 </Select.Item>
               </Select.Content>
             </Select>
+          </Field.Content>
+        </Field>
+        <Field className='gap-0'>
+          <Field.Label>논의 여부</Field.Label>
+          <Field.Content>
+            <Select
+              value={formData.isDiscussed ? 'true' : 'false'}
+              onValueChange={(value) =>
+                setFormData({ isDiscussed: value === 'true' })
+              }
+              disabled={isFormDisabled}
+            >
+              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+                {renderStatusBadge(
+                  formData.isDiscussed ? '논의 있음' : '논의 없음',
+                  formData.isDiscussed,
+                  'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                )}
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value='true'>
+                  {renderStatusBadge(
+                    '논의 있음',
+                    true,
+                    'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                  )}
+                </Select.Item>
+                <Select.Item value='false'>
+                  {renderStatusBadge(
+                    '논의 없음',
+                    false,
+                    'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                  )}
+                </Select.Item>
+              </Select.Content>
+            </Select>
+          </Field.Content>
+        </Field>
+        <Field className='gap-0'>
+          <Field.Label>삭제 상태</Field.Label>
+          <Field.Content>
+            <div className={STATUS_FIELD_CLASS_NAME}>
+              {renderStatusBadge(
+                deletionStatusLabel,
+                formData.deletionStatus !== null &&
+                  formData.deletionStatus !== 'VISIBLE',
+                'border-red-200 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
+              )}
+            </div>
+          </Field.Content>
+        </Field>
+        <Field className='gap-0'>
+          <Field.Label>징계 여부</Field.Label>
+          <Field.Content>
+            <div className={STATUS_FIELD_CLASS_NAME}>
+              {renderStatusBadge(
+                formData.isSanctioned ? '징계' : '징계 없음',
+                formData.isSanctioned,
+                'border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+              )}
+            </div>
+          </Field.Content>
+        </Field>
+        <Field className='gap-0'>
+          <Field.Label>공개 상태</Field.Label>
+          <Field.Content>
+            <div className={STATUS_FIELD_CLASS_NAME}>
+              {renderStatusBadge(
+                visibilityStatusLabel,
+                formData.visibilityStatus !== null &&
+                  formData.visibilityStatus !== 'VISIBLE',
+                'border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+              )}
+            </div>
           </Field.Content>
         </Field>
         <Field className='gap-0'>
@@ -269,6 +390,18 @@ export function ExamReviewDetailInfoSection({
               disabled={isFormDisabled}
               rows={3}
               className='min-h-[110px] resize-none'
+            />
+          </Field.Content>
+        </Field>
+        <Field className='gap-0 md:col-span-2'>
+          <Field.Label>메모</Field.Label>
+          <Field.Content>
+            <Textarea
+              value={formData.memo ?? ''}
+              onChange={(e) => setFormData({ memo: e.target.value })}
+              disabled={isFormDisabled}
+              rows={3}
+              className='min-h-[96px] resize-none'
             />
           </Field.Content>
         </Field>

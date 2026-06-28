@@ -44,12 +44,20 @@ export type UserPointHistory = {
 
 export type UserBlacklistHistory = {
   loginId?: string;
-  encryptedUserId: string;
-  studentNumber: string;
+  encryptedUserId?: string;
+  studentNumber?: string;
   type: string;
+  reasonType?: string;
+  warningCount?: number;
   blackReason: string;
+  memo?: string | null;
   createdAt: string; // YYYY-MM-DD HH:MM:SS
+  blacklistStartDate?: string | null;
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
+  adminId?: string;
+  deletedAt?: string | null;
+  deletedReason?: string | null;
+  deletedBy?: string | null;
 };
 
 export type AdminUserListItem = {
@@ -64,7 +72,7 @@ export type AdminUserListItem = {
   createdAt: string; // YYYY-MM-DD HH:MM:SS
 };
 
-export type AdminUserListResponse = {
+export type AdminUserListResult = {
   hasNext: boolean;
   data: AdminUserListItem[];
 };
@@ -92,26 +100,37 @@ export interface EditMemberInfo {
   userRoleId?: number;
 }
 
-export interface UpdateUserInfoResponse {
-  isSuccess: boolean;
-  code: number;
-  message: string;
-}
-
 export interface BlacklistHistoryItem {
+  id?: number;
   encryptedUserId: string;
   studentNumber: string;
   type: string;
+  reasonType?: string;
+  warningCount?: number;
   blackReason: string;
   createdAt: string;
+  blacklistStartDate?: string | null;
   blacklistDeadline: string | null;
+  adminId?: string;
+  operatorMemo?: string;
+  deletedAt?: string | null;
+  deletedReason?: string | null;
+  deletedBy?: string | null;
+}
+
+export interface AdminBlacklistResult {
+  hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  data: UserBlacklistHistory[];
 }
 
 export interface AdminBlacklistReq {
   encryptedUserId: string;
   type: 'WARNING' | 'RELEGATION' | 'BLACKLIST';
   reason: string;
-  customReason?: string;
-  warningCount?: number;
-  relegationMonth?: number;
+  customReason?: string | null;
+  warningCount?: number | null;
+  relegationMonth?: number | null;
+  memo?: string | null;
 }

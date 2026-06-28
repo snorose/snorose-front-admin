@@ -6,6 +6,8 @@ import { Table } from '@/shared/components/ui';
 import type { BlacklistHistoryItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
+import { toBlacklistHistoryItem } from '@/domains/MemberInfo/utils/memberDirectory';
+
 import { blacklistHistoryAPI } from '@/apis';
 
 import MemberInfoPagination from './MemberInfoTablePagenation';
@@ -13,7 +15,7 @@ import MemberInfoPagination from './MemberInfoTablePagenation';
 interface BlacklistHistoryTabProps {
   loginId?: string;
   encryptedUserId?: string;
-  studentNumber?: string; // mock fallback용
+  studentNumber?: string;
   groupSize?: number;
   refreshKey?: number;
 }
@@ -43,8 +45,15 @@ export default function BlacklistHistoryTab({
         setCurrentPage(1);
         const data = await blacklistHistoryAPI(encryptedUserId);
 
-        if (data?.result) {
-          setHistoryData(data.result);
+        if (data?.data) {
+          setHistoryData(
+            data.data.map((history) =>
+              toBlacklistHistoryItem(history, {
+                encryptedUserId,
+                studentNumber,
+              })
+            )
+          );
           return;
         }
 

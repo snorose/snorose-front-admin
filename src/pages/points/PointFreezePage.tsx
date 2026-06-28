@@ -25,7 +25,7 @@ export default function PointFreezePage() {
 
     try {
       const data = await getPointFreezesAPI();
-      setPointFreezes(data.result as PointFreeze[]);
+      setPointFreezes(data);
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '미지급 일정 조회에 실패했습니다.'));
     } finally {

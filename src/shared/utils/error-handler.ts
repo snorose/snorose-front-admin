@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios';
 
-import type { ApiErrorResponse } from '@/shared/types';
+import type { BaseResponse } from '@/shared/types';
 
 /**
  * API 에러에서 메시지를 추출하는 유틸리티 함수
@@ -12,7 +12,7 @@ export function getErrorMessage(
   error: unknown,
   defaultMessage: string = '요청 처리 중 오류가 발생했습니다.'
 ): string {
-  if (isAxiosError<ApiErrorResponse>(error)) {
+  if (isAxiosError<BaseResponse<unknown>>(error)) {
     return error.response?.data?.message || defaultMessage;
   }
 

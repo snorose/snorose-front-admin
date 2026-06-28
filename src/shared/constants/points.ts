@@ -1,5 +1,10 @@
 export const POINT_CATEGORY_OPTIONS = Object.freeze([
   {
+    value: 'ATTENDANCE',
+    label: '출석체크',
+    points: null,
+  },
+  {
     value: 'POINT_REWARD_REPORT_GENERAL',
     label: '일반 신고 보상 (호칭, 도배 등)',
     points: 10,
@@ -27,7 +32,7 @@ export const POINT_CATEGORY_OPTIONS = Object.freeze([
   },
   {
     value: 'POINT_DEDUCTION_FLOODING',
-    label: '포인트 차감 - 글/댓글 도배 적발',
+    label: '포인트 차감 - 도배',
     points: null,
   },
   {
@@ -37,12 +42,12 @@ export const POINT_CATEGORY_OPTIONS = Object.freeze([
   },
   {
     value: 'EVENT',
-    label: '이벤트 참여',
+    label: '이벤트',
     points: null,
   },
   {
     value: 'ETC',
-    label: '기타 사유',
+    label: '기타',
     points: null,
   },
 ]);

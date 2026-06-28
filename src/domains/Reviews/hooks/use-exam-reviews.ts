@@ -11,6 +11,7 @@ import type {
 import {
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
+  getExamReviewProcessStatuses,
 } from '@/domains/Reviews/utils';
 
 import { getExamReviews } from '@/apis';
@@ -44,6 +45,7 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
         ? STATUS.UNCONFIRMED
         : apiData.status || STATUS.UNCONFIRMED;
   const userDisplay = apiData.userName || apiData.userDisplay || '';
+  const reportCount = apiData.reportCount ?? 0;
 
   return {
     id: apiData.postId,
@@ -57,6 +59,10 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
     questionDetail: '',
     uploadTime,
     userDisplay,
+    isDiscussed: apiData.isDiscussed ?? false,
+    isReported: reportCount > 0,
+    reportCount,
+    processStatuses: getExamReviewProcessStatuses(apiData),
   };
 };
 
@@ -72,6 +78,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
     semester,
     examType,
     isConfirmed,
+    isDiscussed,
+    isReported,
+    statuses,
     enabled = true,
     refreshKey,
   } = params;
@@ -89,6 +98,9 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
       semester,
       examType,
       isConfirmed,
+      isDiscussed,
+      isReported,
+      statuses,
       refreshKey,
     ],
     queryFn: async () => {
@@ -103,18 +115,16 @@ export const useExamReviews = (params: UseExamReviewsParams) => {
         semester,
         examType,
         isConfirmed,
+        isDiscussed,
+        isReported,
+        statuses,
       });
 
-      if (!response.isSuccess || !response.result) {
-        throw new Error(
-          response.message || '시험 후기 목록을 불러오는데 실패했습니다.'
-        );
-      }
-
       return {
-        data: response.result.data.map(transformApiResponseToExamReview),
-        hasNext: response.result.hasNext,
-        totalPage: response.result.totalPage,
+        data: response.data.map(transformApiResponseToExamReview),
+        hasNext: response.hasNext,
+        totalPage: response.totalPage,
+        totalCount: response.totalCount,
       };
     },
     enabled,

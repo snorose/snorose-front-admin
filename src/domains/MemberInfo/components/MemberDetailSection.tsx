@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   ArrowLeft,
   Check,
@@ -15,6 +17,7 @@ import { SectionCard } from '@/domains/MemberInfo/components/MemberDetailCard';
 import MemberDetailInfoGrid from '@/domains/MemberInfo/components/MemberDetailInfoGrid';
 import MemberInfoEditForm from '@/domains/MemberInfo/components/MemberInfoEditForm';
 import MemberPenaltySummaryCard from '@/domains/MemberInfo/components/MemberPenaltySummaryCard';
+import MemberPointAdjustmentDialog from '@/domains/MemberInfo/components/MemberPointAdjustmentDialog';
 import MemberWithdrawalSection from '@/domains/MemberInfo/components/MemberWithdrawalSection';
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
 import {
@@ -26,26 +29,41 @@ import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFo
 type MemberDetailSectionProps = {
   isDetailLoading: boolean;
   isEdit: boolean;
+  isPenaltyHistoryLoading: boolean;
   member: MemberInfo;
+  penaltyHistory: BlacklistHistoryItem[];
+  penaltyHistoryTotalCount: number;
+  hasNextPenaltyHistory: boolean;
   latestPenaltyHistory: BlacklistHistoryItem | null;
   onBack: () => void;
   onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
+  onChangedPenaltyHistory?: () => void | Promise<void>;
+  onLoadMorePenaltyHistory: () => void | Promise<void>;
+  onPointAdjusted: () => void | Promise<void>;
   onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
 };
 
 export default function MemberDetailSection({
   isDetailLoading,
   isEdit,
+  isPenaltyHistoryLoading,
+  hasNextPenaltyHistory,
   latestPenaltyHistory,
   member,
+  penaltyHistory,
+  penaltyHistoryTotalCount,
   onBack,
   onCopy,
+  onChangedPenaltyHistory,
   onEditCancel,
   onEditStart,
+  onLoadMorePenaltyHistory,
+  onPointAdjusted,
   onSaveEdit,
 }: MemberDetailSectionProps) {
+  const [isPointDialogOpen, setIsPointDialogOpen] = useState(false);
   const roleLabel = convertUserRoleIdToEnum(member.userRoleId);
 
   return (
@@ -132,6 +150,7 @@ export default function MemberDetailSection({
             <MemberDetailInfoGrid
               member={member}
               onCopy={onCopy}
+              onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
               roleLabel={roleLabel}
             />
           ) : (
@@ -145,13 +164,26 @@ export default function MemberDetailSection({
         </SectionCard>
 
         <MemberPenaltySummaryCard
+          hasNextPenaltyHistory={hasNextPenaltyHistory}
+          isPenaltyHistoryLoading={isPenaltyHistoryLoading}
           latestPenaltyHistory={latestPenaltyHistory}
           member={member}
+          onChangedPenaltyHistory={onChangedPenaltyHistory}
+          onLoadMorePenaltyHistory={onLoadMorePenaltyHistory}
+          penaltyHistory={penaltyHistory}
+          penaltyHistoryTotalCount={penaltyHistoryTotalCount}
         />
       </div>
 
       <MemberActivitySection />
       <MemberWithdrawalSection />
+
+      <MemberPointAdjustmentDialog
+        member={member}
+        onAdjusted={onPointAdjusted}
+        open={isPointDialogOpen}
+        onOpenChange={setIsPointDialogOpen}
+      />
     </article>
   );
 }

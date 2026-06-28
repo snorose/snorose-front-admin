@@ -9,6 +9,7 @@ export const useDeleteComment = () => {
     mutationFn: (commentId: number) => deleteComment(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commentSearch'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
     },
     onError: (error) => {
       console.error('댓글 삭제 중 오류 발생:', error);

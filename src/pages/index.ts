@@ -1,4 +1,5 @@
 export { default as PushNotificationPage } from './alerts/PushNotificationPage';
+export { default as InquiryReportPage } from './inquiries/InquiryReportPage';
 export { default as LogInPage } from './login/LogInPage';
 export { default as MemberInfoPage } from './member/MemberInfoPage';
 export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
@@ -8,5 +9,7 @@ export { default as ExcelPointUploadPage } from './points/ExcelPointUploadPage';
 export { default as PointFreezePage } from './points/PointFreezePage';
 export { default as PointMultiplePage } from './points/PointMultiplePage';
 export { default as PostCommentPage } from './posts/PostCommentPage';
+export { default as PostDetailPage } from './posts/PostDetailPage';
+export { default as PostManagePage } from './posts/PostManagePage';
 export { default as ExamReviewPage } from './reviews/ExamReviewPage';
 export { default as ExamReviewPeriodPage } from './reviews/ExamReviewPeriodPage';
