@@ -24,13 +24,24 @@ export type AdminInquiryListParams = {
   userId?: number;
 };
 
+// group이 'Report'처럼 올 수 있어 대문자로 통일 (전역에서 대문자 기준 비교)
+const normalizeGroup = (group: InquiryGroup): InquiryGroup =>
+  (typeof group === 'string' ? group.toUpperCase() : group) as InquiryGroup;
+
 export const getAdminInquiriesAPI = async (
   params: AdminInquiryListParams = { page: 0 }
 ): Promise<AdminInquiryListResult> => {
   const response = await axiosInstance.get<
     BaseResponse<AdminInquiryListResult>
   >('/v1/admin/inquiries', { params });
-  return response.data.result;
+  const result = response.data.result;
+  return {
+    ...result,
+    data: result.data.map((item) => ({
+      ...item,
+      group: normalizeGroup(item.group),
+    })),
+  };
 };
 
 export const getAdminInquiryDetailAPI = async (
@@ -39,7 +50,8 @@ export const getAdminInquiryDetailAPI = async (
   const response = await axiosInstance.get<
     BaseResponse<AdminInquiryDetailResult>
   >(`/v1/admin/inquiries/${inquiryId}`);
-  return response.data.result;
+  const result = response.data.result;
+  return { ...result, group: normalizeGroup(result.group) };
 };
 
 export const updateAdminInquiryStatusAPI = async (

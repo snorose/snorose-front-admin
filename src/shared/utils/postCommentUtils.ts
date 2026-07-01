@@ -28,6 +28,24 @@ export const BOARD_OPTIONS = [11, 12, 21, 22, 23, 32, 60, 61, 62].map((id) => ({
   value: id,
 }));
 
+// boardId → URL board key (예: 22 → large-snow). 출처: snorose-front board-registry.ts
+export const BOARD_KEYS: Record<number, string> = {
+  12: 'notice',
+  13: 'support',
+  14: 'event',
+  20: 'besookt',
+  21: 'first-snow',
+  22: 'large-snow',
+  23: 'permanent-snow',
+  32: 'exam-review',
+  60: 'student-council',
+  61: 'graduation-preparation',
+  62: 'finance-audit',
+};
+
+export const getBoardKey = (boardId: number): string | undefined =>
+  BOARD_KEYS[boardId];
+
 export const stripHtmlTags = (html: string | null | undefined): string => {
   if (!html) return '-';
   return (
