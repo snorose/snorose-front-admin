@@ -1,6 +1,7 @@
 import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
 import { Button, Input, Select, Table } from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
 import type { AdminUserListItem } from '@/shared/types';
 
 import MemberDirectoryActionBar from '@/domains/MemberInfo/components/MemberDirectoryActionBar';
@@ -8,18 +9,31 @@ import MemberDirectoryPagination from '@/domains/MemberInfo/components/MemberDir
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
 import {
   formatDate,
+  formatPoint,
   getRoleBadgeClassName,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
+const DEFAULT_SORT_TYPE = 'CREATED_AT';
+const DEFAULT_SORT_DIRECTION = 'DESC';
+
+const SORT_TYPE_OPTIONS: DirectoryFilterOption[] = [
+  { value: 'CREATED_AT', label: '가입일' },
+  { value: 'POINT_BALANCE', label: '보유 포인트' },
+  { value: 'AUTHENTICATED_AT', label: '등업일' },
+];
+
+const SORT_DIRECTION_OPTIONS: DirectoryFilterOption[] = [
+  { value: 'DESC', label: '내림차순' },
+  { value: 'ASC', label: '오름차순' },
+];
+
 interface MemberDirectorySectionProps {
   currentPage: number;
-  filteredMembers: AdminUserListItem[];
+  members: AdminUserListItem[];
   hasNextPage: boolean;
   isAllVisibleSelected: boolean;
   isListLoading: boolean;
-  isSearchMode: boolean;
-  isSearching: boolean;
   majorOptions: DirectoryFilterOption[];
   onOpenMemberDetail: (member: AdminUserListItem) => void | Promise<void>;
   onPageChange: (page: number) => void;
@@ -29,26 +43,29 @@ interface MemberDirectorySectionProps {
   onSelectedAdmissionYearChange: (value: string) => void;
   onSelectedMajorChange: (value: string) => void;
   onSelectedRoleChange: (value: string) => void;
+  onSortTypeChange: (value: string) => void;
+  onSortDirectionChange: (value: string) => void;
   onToggleAllVisibleRows: () => void;
   onToggleRow: (encryptedUserId: string) => void;
-  onResetFilters: () => void;
   roleOptions: DirectoryFilterOption[];
   searchQuery: string;
   selectedAdmissionYear: string;
   selectedIds: string[];
   selectedMajor: string;
   selectedRole: string;
+  sortType: string;
+  sortDirection: string;
+  totalCount: number;
+  totalPage: number;
   admissionYearOptions: DirectoryFilterOption[];
 }
 
 export default function MemberDirectorySection({
   currentPage,
-  filteredMembers,
+  members,
   hasNextPage,
   isAllVisibleSelected,
   isListLoading,
-  isSearchMode,
-  isSearching,
   majorOptions,
   onOpenMemberDetail,
   onPageChange,
@@ -58,15 +75,20 @@ export default function MemberDirectorySection({
   onSelectedAdmissionYearChange,
   onSelectedMajorChange,
   onSelectedRoleChange,
+  onSortTypeChange,
+  onSortDirectionChange,
   onToggleAllVisibleRows,
   onToggleRow,
-  onResetFilters,
   roleOptions,
   searchQuery,
   selectedAdmissionYear,
   selectedIds,
   selectedMajor,
   selectedRole,
+  sortType,
+  sortDirection,
+  totalCount,
+  totalPage,
   admissionYearOptions,
 }: MemberDirectorySectionProps) {
   return (
@@ -100,9 +122,9 @@ export default function MemberDirectorySection({
               variant='outline'
               className='h-12 rounded-2xl border-slate-200 px-6'
               onClick={() => void onSearch()}
-              disabled={isSearching}
+              disabled={isListLoading}
             >
-              {isSearching ? (
+              {isListLoading ? (
                 <Loader2 className='h-4 w-4 animate-spin' />
               ) : (
                 <Search className='h-4 w-4' />
@@ -111,13 +133,14 @@ export default function MemberDirectorySection({
             </Button>
           </div>
 
-          <div className='grid gap-4 xl:grid-cols-[repeat(3,minmax(0,1fr))_220px]'>
+          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(5,minmax(0,1fr))_auto]'>
             <FilterSelect
               label='등급'
               value={selectedRole}
               placeholder='전체'
               options={roleOptions}
               onValueChange={onSelectedRoleChange}
+              isActive={selectedRole !== 'ALL'}
             />
             <FilterSelect
               label='학번 (입학년도)'
@@ -125,6 +148,7 @@ export default function MemberDirectorySection({
               placeholder='전체'
               options={admissionYearOptions}
               onValueChange={onSelectedAdmissionYearChange}
+              isActive={selectedAdmissionYear !== 'ALL'}
             />
             <FilterSelect
               label='전공'
@@ -132,15 +156,36 @@ export default function MemberDirectorySection({
               placeholder='전체'
               options={majorOptions}
               onValueChange={onSelectedMajorChange}
+              isActive={selectedMajor !== 'ALL'}
+            />
+            <FilterSelect
+              label='정렬 기준'
+              value={sortType}
+              placeholder='가입일'
+              options={SORT_TYPE_OPTIONS}
+              onValueChange={onSortTypeChange}
+              includeAllOption={false}
+              isActive={sortType !== DEFAULT_SORT_TYPE}
+            />
+            <FilterSelect
+              label='정렬 방향'
+              value={sortDirection}
+              placeholder='내림차순'
+              options={SORT_DIRECTION_OPTIONS}
+              onValueChange={onSortDirectionChange}
+              includeAllOption={false}
+              isActive={sortDirection !== DEFAULT_SORT_DIRECTION}
             />
             <div className='flex items-end'>
               <Button
                 type='button'
                 variant='outline'
-                className='h-11 w-full rounded-2xl border-slate-200'
-                onClick={onResetFilters}
+                className='h-11 w-full rounded-2xl border-slate-200 px-6 whitespace-nowrap text-slate-600'
+                onClick={onRefreshDirectory}
+                disabled={isListLoading}
               >
-                필터 초기화
+                <RotateCcw className='h-4 w-4' />
+                초기화
               </Button>
             </div>
           </div>
@@ -148,16 +193,9 @@ export default function MemberDirectorySection({
           <div className='flex flex-wrap items-center justify-between gap-3'>
             <MemberDirectoryActionBar hasSelection={selectedIds.length > 0} />
 
-            <Button
-              type='button'
-              variant='outline'
-              className='h-9 rounded-full border-slate-200 px-4 text-slate-600'
-              onClick={onRefreshDirectory}
-              disabled={isListLoading}
-            >
-              <RotateCcw className='h-4 w-4' />
-              {isSearchMode ? '검색 해제' : '새로고침'}
-            </Button>
+            <span className='text-sm text-slate-500'>
+              총 {totalCount.toLocaleString()}명
+            </span>
           </div>
 
           <div className='overflow-hidden rounded-2xl border border-slate-200'>
@@ -179,15 +217,17 @@ export default function MemberDirectorySection({
                   <Table.Head className='px-4'>학번</Table.Head>
                   <Table.Head className='px-4'>전공</Table.Head>
                   <Table.Head className='px-4'>등급</Table.Head>
+                  <Table.Head className='px-4'>보유 포인트</Table.Head>
                   <Table.Head className='px-4'>가입일</Table.Head>
+                  <Table.Head className='px-4'>등업일</Table.Head>
                 </Table.Row>
               </Table.Header>
 
               <Table.Body>
-                {filteredMembers.length === 0 ? (
+                {members.length === 0 ? (
                   <Table.Row className='hover:bg-transparent'>
                     <Table.Cell
-                      colSpan={8}
+                      colSpan={10}
                       className='px-4 py-16 text-center text-sm text-slate-500'
                     >
                       {isListLoading
@@ -196,7 +236,7 @@ export default function MemberDirectorySection({
                     </Table.Cell>
                   </Table.Row>
                 ) : (
-                  filteredMembers.map((member) => {
+                  members.map((member) => {
                     const isSelected = selectedIds.includes(
                       member.encryptedUserId
                     );
@@ -246,7 +286,13 @@ export default function MemberDirectorySection({
                           </span>
                         </Table.Cell>
                         <Table.Cell className='px-4 text-slate-700'>
+                          {formatPoint(member.pointBalance)}
+                        </Table.Cell>
+                        <Table.Cell className='px-4 text-slate-700'>
                           {formatDate(member.createdAt)}
+                        </Table.Cell>
+                        <Table.Cell className='px-4 text-slate-700'>
+                          {formatDate(member.authenticatedAt)}
                         </Table.Cell>
                       </Table.Row>
                     );
@@ -256,13 +302,12 @@ export default function MemberDirectorySection({
             </Table>
           </div>
 
-          {!isSearchMode && (
-            <MemberDirectoryPagination
-              currentPage={currentPage}
-              hasNextPage={hasNextPage}
-              onPageChange={onPageChange}
-            />
-          )}
+          <MemberDirectoryPagination
+            currentPage={currentPage}
+            hasNextPage={hasNextPage}
+            totalPage={totalPage}
+            onPageChange={onPageChange}
+          />
         </div>
       </section>
     </article>
@@ -275,22 +320,31 @@ function FilterSelect({
   options,
   placeholder,
   value,
+  includeAllOption = true,
+  isActive = false,
 }: {
   label: string;
   onValueChange: (value: string) => void;
   options: DirectoryFilterOption[];
   placeholder: string;
   value: string;
+  includeAllOption?: boolean;
+  isActive?: boolean;
 }) {
   return (
     <label className='space-y-2'>
       <span className='text-sm font-medium text-slate-700'>{label}</span>
       <Select value={value} onValueChange={onValueChange}>
-        <Select.Trigger className='h-11 w-full rounded-2xl border-slate-200 bg-white px-4 shadow-none'>
+        <Select.Trigger
+          className={cn(
+            'h-11 w-full rounded-2xl border-slate-200 px-4 shadow-none',
+            isActive ? 'bg-blue-50' : 'bg-white'
+          )}
+        >
           <Select.Value placeholder={placeholder} />
         </Select.Trigger>
         <Select.Content>
-          <Select.Item value='ALL'>전체</Select.Item>
+          {includeAllOption && <Select.Item value='ALL'>전체</Select.Item>}
           {options.map((option) => (
             <Select.Item key={option.value} value={option.value}>
               {option.label}

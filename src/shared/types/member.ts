@@ -65,17 +65,40 @@ export type AdminUserListItem = {
   loginId: string;
   userName: string;
   nickname: string;
+  email: string;
   studentNumber: string;
   major: string;
   userRoleId: number;
   userRoleName: string;
-  createdAt: string; // YYYY-MM-DD HH:MM:SS
+  pointBalance: number;
+  createdAt: string; // YYYY-MM-DD
+  authenticatedAt: string | null; // YYYY-MM-DD
 };
 
 export type AdminUserListResult = {
   hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  currentCount: number;
   data: AdminUserListItem[];
 };
+
+export type AdminUserSortType =
+  | 'CREATED_AT'
+  | 'POINT_BALANCE'
+  | 'AUTHENTICATED_AT';
+
+export type SortDirection = 'ASC' | 'DESC';
+
+export interface AdminUserListParams {
+  page?: number;
+  keyword?: string;
+  userRoleId?: number;
+  major?: string;
+  admissionYear?: number;
+  sortType?: AdminUserSortType;
+  sortDirection?: SortDirection;
+}
 
 export type PenaltyUserInfo = {
   loginId: string;

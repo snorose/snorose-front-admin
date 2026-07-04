@@ -71,16 +71,7 @@ export default function MemberInfoModal({
           <Button
             onClick={() => {
               onClose();
-              navigate(`/member/info/${encryptedUserId}`, {
-                state: {
-                  prefetchedMember: memberInfo,
-                  detailKeywords: [
-                    memberInfo.loginId,
-                    memberInfo.studentNumber,
-                    memberInfo.userName,
-                  ],
-                },
-              });
+              navigate(`/member/info/${encryptedUserId}`);
             }}
           >
             유저 상세 페이지로 이동

@@ -13,8 +13,6 @@ export function useMemberInfoPageState() {
     currentPage: directoryState.currentPage,
     loadMembers: directoryState.loadMembers,
     memberKey,
-    members: directoryState.members,
-    searchResultMembers: directoryState.searchResultMembers,
     updateCachedMember: directoryState.updateCachedMember,
   });
 

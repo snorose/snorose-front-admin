@@ -10,7 +10,7 @@ export default function MemberInfoPage() {
   const {
     admissionYearOptions,
     currentPage,
-    filteredMembers,
+    members,
     handleBack,
     handleCopy,
     handleLoadMorePenaltyHistory,
@@ -18,9 +18,13 @@ export default function MemberInfoPage() {
     handleRefreshDirectory,
     handleRefreshMemberDetail,
     handleRefreshPenaltyHistory,
-    handleResetFilters,
     handleSaveEdit,
     handleSearch,
+    handleSelectedAdmissionYearChange,
+    handleSelectedMajorChange,
+    handleSelectedRoleChange,
+    handleSortDirectionChange,
+    handleSortTypeChange,
     handleToggleAllVisibleRows,
     handleToggleRow,
     hasNextPenaltyHistory,
@@ -31,8 +35,6 @@ export default function MemberInfoPage() {
     isEdit,
     isListLoading,
     isPenaltyHistoryLoading,
-    isSearchMode,
-    isSearching,
     latestPenaltyHistory,
     penaltyHistory,
     majorOptions,
@@ -43,13 +45,14 @@ export default function MemberInfoPage() {
     selectedMajor,
     selectedMember,
     selectedRole,
+    sortDirection,
+    sortType,
+    totalCount,
+    totalPage,
     penaltyHistoryTotalCount,
     setCurrentPage,
     setIsEdit,
     setSearchQuery,
-    setSelectedAdmissionYear,
-    setSelectedMajor,
-    setSelectedRole,
   } = useMemberInfoPageState();
 
   return (
@@ -92,22 +95,21 @@ export default function MemberInfoPage() {
       ) : (
         <MemberDirectorySection
           currentPage={currentPage}
-          filteredMembers={filteredMembers}
+          members={members}
           hasNextPage={hasNextPage}
           isAllVisibleSelected={isAllVisibleSelected}
           isListLoading={isListLoading}
-          isSearchMode={isSearchMode}
-          isSearching={isSearching}
           majorOptions={majorOptions}
           onOpenMemberDetail={handleOpenMemberDetail}
           onPageChange={setCurrentPage}
           onRefreshDirectory={handleRefreshDirectory}
-          onResetFilters={handleResetFilters}
           onSearch={handleSearch}
           onSearchQueryChange={setSearchQuery}
-          onSelectedAdmissionYearChange={setSelectedAdmissionYear}
-          onSelectedMajorChange={setSelectedMajor}
-          onSelectedRoleChange={setSelectedRole}
+          onSelectedAdmissionYearChange={handleSelectedAdmissionYearChange}
+          onSelectedMajorChange={handleSelectedMajorChange}
+          onSelectedRoleChange={handleSelectedRoleChange}
+          onSortTypeChange={handleSortTypeChange}
+          onSortDirectionChange={handleSortDirectionChange}
           onToggleAllVisibleRows={handleToggleAllVisibleRows}
           onToggleRow={handleToggleRow}
           roleOptions={roleOptions}
@@ -116,6 +118,10 @@ export default function MemberInfoPage() {
           selectedIds={selectedIds}
           selectedMajor={selectedMajor}
           selectedRole={selectedRole}
+          sortType={sortType}
+          sortDirection={sortDirection}
+          totalCount={totalCount}
+          totalPage={totalPage}
           admissionYearOptions={admissionYearOptions}
         />
       )}
