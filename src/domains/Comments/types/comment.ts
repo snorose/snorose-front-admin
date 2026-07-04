@@ -55,6 +55,7 @@ export interface AdminDeleteCommentResult {
 
 export interface AdminCommentBulkDeleteRequest {
   commentIds: number[];
+  memo: string;
 }
 
 export interface AdminCommentBulkDeleteResult {
@@ -64,7 +65,7 @@ export interface AdminCommentBulkDeleteResult {
   deletedCommentIds: number[];
   notDeletedComments: {
     commentId: number;
-    reason: string;
+    memo: string;
   }[];
 }
 
