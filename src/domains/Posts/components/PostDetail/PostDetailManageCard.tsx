@@ -29,7 +29,7 @@ export default function PostDetailManageCard({
 
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
-    mutationFn: () => deletePost(post.postId),
+    mutationFn: (memo: string) => deletePost(post.postId, memo),
     onSuccess: () => {
       toast.info(
         deleteCommentsAlso
@@ -56,7 +56,7 @@ export default function PostDetailManageCard({
   const handleConfirmAction = () => {
     if (!reason.trim()) return;
     if (modalType === 'DELETE') {
-      deleteMutation.mutate();
+      deleteMutation.mutate(reason);
     } else {
       // TODO: DELETE 외(RESTORE, HIDE) API 연동 시 아래 로직 구현
       toast.info('개발 중입니다');

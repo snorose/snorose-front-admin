@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
 import { PaginationBar } from '@/shared/components';
+import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
 
 import { usePostTableState } from '../hooks/usePostTableState';
@@ -30,6 +31,9 @@ export default function PostTable({
     selectAllRef,
     handleSelectAll,
     handleBulkDelete,
+    handleConfirmBulkDelete,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
     isDeletePending,
@@ -163,6 +167,15 @@ export default function PostTable({
         onPageChange={onPageChange}
         hasNext={hasNext}
       />
+
+      {isDeleteModalOpen && (
+        <StatusChangeModal
+          target='POST'
+          modalType='DELETE'
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirmAction={handleConfirmBulkDelete}
+        />
+      )}
     </div>
   );
 }
