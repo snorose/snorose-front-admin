@@ -320,7 +320,7 @@ export default function ExamSearch({
         <div className='relative w-[220px]'>
           <input
             type='text'
-            placeholder='시험후기명 검색'
+            placeholder='시험후기명 또는 postId 검색'
             value={keywordPost}
             onChange={(e) => setKeywordPost(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -372,12 +372,6 @@ export default function ExamSearch({
           className='h-9 w-[150px] text-[13px]'
           aria-label='검색 종료일'
         />
-        <div className='flex items-center gap-2'>
-          <Button onClick={handleSearch}>조회</Button>
-          <Button variant='outline' onClick={handleSearchOptionReset}>
-            검색 옵션 초기화
-          </Button>
-        </div>
       </div>
 
       {/* 필터 Select들 */}
@@ -550,6 +544,19 @@ export default function ExamSearch({
           />
           <span>신고 있음</span>
         </label>
+      </div>
+
+      <div className='flex w-fit items-center gap-2'>
+        <Button className='min-w-[72px]' onClick={handleSearch}>
+          조회
+        </Button>
+        <Button
+          className='min-w-[136px]'
+          variant='outline'
+          onClick={handleSearchOptionReset}
+        >
+          검색 옵션 초기화
+        </Button>
       </div>
     </div>
   );

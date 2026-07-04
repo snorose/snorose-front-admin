@@ -393,7 +393,7 @@ export function ExamReviewDetailInfoSection({
             />
           </Field.Content>
         </Field>
-        <Field className='gap-0 md:col-span-2'>
+        <Field className='gap-0'>
           <Field.Label>메모</Field.Label>
           <Field.Content>
             <Textarea
@@ -401,7 +401,7 @@ export function ExamReviewDetailInfoSection({
               onChange={(e) => setFormData({ memo: e.target.value })}
               disabled={isFormDisabled}
               rows={3}
-              className='min-h-[96px] resize-none'
+              className='min-h-[110px] resize-none'
             />
           </Field.Content>
         </Field>
