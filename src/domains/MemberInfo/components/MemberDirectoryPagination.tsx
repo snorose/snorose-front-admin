@@ -2,23 +2,29 @@ import { Pagination } from '@/shared/components/ui';
 
 type MemberDirectoryPaginationProps = {
   currentPage: number;
-  hasNextPage: boolean;
+  totalPage: number;
   onPageChange: (page: number) => void;
 };
 
+const PAGE_BLOCK_SIZE = 10;
+
 export default function MemberDirectoryPagination({
   currentPage,
-  hasNextPage,
+  totalPage,
   onPageChange,
 }: MemberDirectoryPaginationProps) {
   const currentPageNumber = currentPage + 1;
-  const startPage = Math.floor((currentPageNumber - 1) / 10) * 10 + 1;
+  const lastPage = Math.max(totalPage, 1);
+  const startPage =
+    Math.floor((currentPageNumber - 1) / PAGE_BLOCK_SIZE) * PAGE_BLOCK_SIZE + 1;
+  const endPage = Math.min(startPage + PAGE_BLOCK_SIZE - 1, lastPage);
   const pageNumbers = Array.from(
-    { length: 10 },
+    { length: endPage - startPage + 1 },
     (_, index) => startPage + index
   );
-  const previousBlockPage = Math.max(1, startPage - 10);
-  const nextBlockPage = startPage + 10;
+  const previousBlockPage = Math.max(1, startPage - PAGE_BLOCK_SIZE);
+  const nextBlockPage = Math.min(startPage + PAGE_BLOCK_SIZE, lastPage);
+  const hasNextBlock = endPage < lastPage;
 
   return (
     <Pagination className='py-2'>
@@ -38,43 +44,32 @@ export default function MemberDirectoryPagination({
           />
         </Pagination.Item>
 
-        {pageNumbers.map((page) => {
-          const isKnownPage =
-            page <= currentPageNumber ||
-            (page === currentPageNumber + 1 && hasNextPage);
-
-          return (
-            <Pagination.Item key={page}>
-              <Pagination.Link
-                href='#'
-                isActive={page === currentPageNumber}
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (isKnownPage) {
-                    onPageChange(page - 1);
-                  }
-                }}
-                className={
-                  !isKnownPage ? 'pointer-events-none opacity-40' : undefined
-                }
-              >
-                {page}
-              </Pagination.Link>
-            </Pagination.Item>
-          );
-        })}
+        {pageNumbers.map((page) => (
+          <Pagination.Item key={page}>
+            <Pagination.Link
+              href='#'
+              isActive={page === currentPageNumber}
+              onClick={(event) => {
+                event.preventDefault();
+                onPageChange(page - 1);
+              }}
+            >
+              {page}
+            </Pagination.Link>
+          </Pagination.Item>
+        ))}
 
         <Pagination.Item>
           <Pagination.Next
             href='#'
             onClick={(event) => {
               event.preventDefault();
-              if (hasNextPage) {
+              if (hasNextBlock) {
                 onPageChange(nextBlockPage - 1);
               }
             }}
             className={
-              !hasNextPage ? 'pointer-events-none opacity-50' : undefined
+              !hasNextBlock ? 'pointer-events-none opacity-50' : undefined
             }
           />
         </Pagination.Item>
