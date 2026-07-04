@@ -28,7 +28,6 @@ export default function MemberInfoPage() {
     handleToggleAllVisibleRows,
     handleToggleRow,
     hasNextPenaltyHistory,
-    hasNextPage,
     isAllVisibleSelected,
     isDetailLoading,
     isDetailRoute,
@@ -96,7 +95,6 @@ export default function MemberInfoPage() {
         <MemberDirectorySection
           currentPage={currentPage}
           members={members}
-          hasNextPage={hasNextPage}
           isAllVisibleSelected={isAllVisibleSelected}
           isListLoading={isListLoading}
           majorOptions={majorOptions}

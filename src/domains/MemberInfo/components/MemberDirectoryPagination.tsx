@@ -2,7 +2,6 @@ import { Pagination } from '@/shared/components/ui';
 
 type MemberDirectoryPaginationProps = {
   currentPage: number;
-  hasNextPage: boolean;
   totalPage: number;
   onPageChange: (page: number) => void;
 };
@@ -11,7 +10,6 @@ const PAGE_BLOCK_SIZE = 10;
 
 export default function MemberDirectoryPagination({
   currentPage,
-  hasNextPage,
   totalPage,
   onPageChange,
 }: MemberDirectoryPaginationProps) {
@@ -26,7 +24,7 @@ export default function MemberDirectoryPagination({
   );
   const previousBlockPage = Math.max(1, startPage - PAGE_BLOCK_SIZE);
   const nextBlockPage = Math.min(startPage + PAGE_BLOCK_SIZE, lastPage);
-  const hasNextBlock = hasNextPage || endPage < lastPage;
+  const hasNextBlock = endPage < lastPage;
 
   return (
     <Pagination className='py-2'>

@@ -42,7 +42,6 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     DEFAULT_SORT_DIRECTION
   );
   const [currentPage, setCurrentPage] = useState(0);
-  const [hasNextPage, setHasNextPage] = useState(false);
   const [totalPage, setTotalPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -63,7 +62,6 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
 
         const response = await getAllUsersAPI(params);
         setMembers(response.data);
-        setHasNextPage(response.hasNext);
         setTotalPage(response.totalPage);
         setTotalCount(response.totalCount);
         setSelectedIds([]);
@@ -105,13 +103,8 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     members.every((member) => selectedIds.includes(member.encryptedUserId));
 
   const handleSearch = useCallback(() => {
-    const trimmed = searchQuery.trim();
-    if (!trimmed) {
-      toast.info('검색어를 입력해주세요.');
-      return;
-    }
-
-    setAppliedKeyword(trimmed);
+    // 빈 검색어로 검색하면 다른 필터는 유지한 채 검색 조건만 해제한다.
+    setAppliedKeyword(searchQuery.trim());
     setCurrentPage(0);
   }, [searchQuery]);
 
@@ -200,7 +193,6 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     handleSortTypeChange,
     handleToggleAllVisibleRows,
     handleToggleRow,
-    hasNextPage,
     isAllVisibleSelected,
     isListLoading,
     loadMembers,

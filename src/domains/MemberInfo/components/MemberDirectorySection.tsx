@@ -31,7 +31,6 @@ const SORT_DIRECTION_OPTIONS: DirectoryFilterOption[] = [
 interface MemberDirectorySectionProps {
   currentPage: number;
   members: AdminUserListItem[];
-  hasNextPage: boolean;
   isAllVisibleSelected: boolean;
   isListLoading: boolean;
   majorOptions: DirectoryFilterOption[];
@@ -63,7 +62,6 @@ interface MemberDirectorySectionProps {
 export default function MemberDirectorySection({
   currentPage,
   members,
-  hasNextPage,
   isAllVisibleSelected,
   isListLoading,
   majorOptions,
@@ -304,7 +302,6 @@ export default function MemberDirectorySection({
 
           <MemberDirectoryPagination
             currentPage={currentPage}
-            hasNextPage={hasNextPage}
             totalPage={totalPage}
             onPageChange={onPageChange}
           />

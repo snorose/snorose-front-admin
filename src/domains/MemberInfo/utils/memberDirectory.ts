@@ -206,11 +206,12 @@ const ADMISSION_YEAR_RANGE = 20;
 // 서버사이드 필터로 전환되어 현재 페이지 회원에서 추출할 수 없으므로,
 // 학번 앞 2자리(예: '25')를 value로 하는 최근 N개년 목록을 정적으로 생성한다.
 export function getAdmissionYearOptions(): DirectoryFilterOption[] {
-  const currentTwoDigit = new Date().getFullYear() % 100;
+  const currentYear = new Date().getFullYear();
 
+  // 연도 전체로 뺀 뒤 % 100을 적용해 세기 전환(예: 2005 - 10 → 1995 → '95')과
+  // 음수 학번을 방지한다.
   return Array.from({ length: ADMISSION_YEAR_RANGE }, (_, index) => {
-    const twoDigit = currentTwoDigit - index;
-    const value = String(twoDigit).padStart(2, '0');
+    const value = String((currentYear - index) % 100).padStart(2, '0');
     return { value, label: `${value}학번` };
   });
 }
