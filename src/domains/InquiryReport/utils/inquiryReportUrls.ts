@@ -1,8 +1,8 @@
 import type { InquiryDetail } from '@/shared/types';
 import { getBoardKey } from '@/shared/utils/postCommentUtils';
 
-const SUPPORT_FRONT_BASE_URL = import.meta.env.VITE_SUPPORT_FRONT_BASE_URL; // 문의/신고 글이 있는 서포트 프론트
-const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL; // 신고 대상 글이 있는 유저 사이트
+// 문의/신고 글 위치
+const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL;
 
 // 신고 여부는 group으로만 판단 (category/subGroup은 문의·신고 공용이라 제외)
 export function isReportInquiry(detail: InquiryDetail): boolean {
@@ -12,7 +12,7 @@ export function isReportInquiry(detail: InquiryDetail): boolean {
 // 신고 → /report, 문의·기타 → /inquiry
 export function buildInquiryPostUrl(detail: InquiryDetail): string {
   const path = isReportInquiry(detail) ? 'report' : 'inquiry';
-  return `${SUPPORT_FRONT_BASE_URL}/${path}/${detail.inquiryId}`;
+  return `${USER_FRONT_BASE_URL}/${path}/${detail.inquiryId}`;
 }
 
 // 신고 대상 글 URL. 유형별로 postId 출처가 다름 (board는 targetBoardId 공통)
