@@ -320,7 +320,7 @@ export default function ExamSearch({
         <div className='relative w-[220px]'>
           <input
             type='text'
-            placeholder='시험후기명 검색'
+            placeholder='시험후기명 또는 postId 검색'
             value={keywordPost}
             onChange={(e) => setKeywordPost(e.target.value)}
             onKeyDown={handleKeyDown}
