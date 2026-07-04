@@ -74,6 +74,8 @@ export type InquiryDetail = {
   content: string;
   reportCause: InquiryCategory | null;
   target: string | null;
+  targetPostId: number; // 신고 댓글이 달린 글 (없으면 0)
+  targetBoardId: number; // 신고 글/댓글의 게시판 (없으면 0)
   group: InquiryGroup;
   subGroup: InquirySubGroup;
   status: InquiryStatus;
