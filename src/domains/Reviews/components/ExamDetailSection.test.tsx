@@ -167,4 +167,41 @@ describe('ExamDetailSection', () => {
     });
     expect(deleteExamReview).toHaveBeenCalledWith(101);
   });
+
+  test('기존 메모에 같은 삭제 사유가 있으면 중복으로 추가하지 않는다', async () => {
+    const user = userEvent.setup();
+    const memoWithDeleteReason =
+      '기존 운영자 메모\n\n[삭제 사유]\n부적절한 시험후기';
+    vi.mocked(updateExamReview).mockResolvedValue({
+      ...selectedExamReviewDetailWithMemo,
+      memo: memoWithDeleteReason,
+    });
+    vi.mocked(deleteExamReview).mockResolvedValue({ postId: 101 });
+
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetailWithMemo,
+          memo: memoWithDeleteReason,
+        }}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '시험 후기 삭제' }));
+
+    const dialog = screen.getByRole('dialog', { name: '시험 후기 삭제' });
+    await user.type(
+      within(dialog).getByLabelText('삭제 사유'),
+      '부적절한 시험후기'
+    );
+    await user.click(within(dialog).getByRole('button', { name: '삭제' }));
+
+    await waitFor(() => {
+      expect(updateExamReview).toHaveBeenCalledWith(101, {
+        post: { memo: memoWithDeleteReason },
+      });
+    });
+    expect(deleteExamReview).toHaveBeenCalledWith(101);
+  });
 });

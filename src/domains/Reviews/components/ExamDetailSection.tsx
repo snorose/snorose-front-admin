@@ -504,21 +504,23 @@ export function ExamDetailSection({
 
   const handleDeleteClick = async () => {
     const trimmedDeleteReason = deleteReason.trim();
-    const existingMemo = selectedExamReviewDetail?.memo?.trim();
-    const deleteMemo = existingMemo
-      ? `${existingMemo}\n\n[삭제 사유]\n${trimmedDeleteReason}`
-      : `[삭제 사유]\n${trimmedDeleteReason}`;
-
     if (!trimmedDeleteReason) {
       toast.error('삭제 사유를 입력해주세요.');
       return;
     }
 
+    if (!selectedExamReview?.id) {
+      toast.error('선택된 시험 후기가 없습니다.');
+      return;
+    }
+
+    const existingMemo = selectedExamReviewDetail?.memo?.trim();
+    const deleteReasonMarker = `[삭제 사유]\n${trimmedDeleteReason}`;
+    const deleteMemo = existingMemo?.includes(deleteReasonMarker)
+      ? existingMemo
+      : [existingMemo, deleteReasonMarker].filter(Boolean).join('\n\n');
+
     try {
-      if (!selectedExamReview?.id) {
-        toast.error('선택된 시험 후기가 없습니다.');
-        return;
-      }
       setIsDeleting(true);
       await updateExamReview(selectedExamReview.id, {
         post: { memo: deleteMemo },
