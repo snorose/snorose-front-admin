@@ -8,6 +8,7 @@ interface ConfirmModalProps {
   onClose: () => void;
   confirmText?: string;
   confirmButtonClassName?: string;
+  confirmDisabled?: boolean;
   closeText?: string;
   children?: React.ReactNode;
 }
@@ -20,6 +21,7 @@ export function ConfirmModal({
   onClose,
   confirmText = '확인',
   confirmButtonClassName,
+  confirmDisabled = false,
   closeText = '취소',
   children,
 }: ConfirmModalProps) {
@@ -43,6 +45,7 @@ export function ConfirmModal({
             type='button'
             onClick={onConfirm}
             className={confirmButtonClassName}
+            disabled={confirmDisabled}
           >
             {confirmText}
           </Button>

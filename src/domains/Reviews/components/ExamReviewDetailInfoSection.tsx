@@ -401,7 +401,7 @@ export function ExamReviewDetailInfoSection({
               onChange={(e) => setFormData({ memo: e.target.value })}
               disabled={isFormDisabled}
               rows={3}
-              className='min-h-[96px] resize-none'
+              className='min-h-[110px] resize-none'
             />
           </Field.Content>
         </Field>

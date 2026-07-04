@@ -63,4 +63,19 @@ describe('ExamReviewDetailInfoSection', () => {
     expect(examTypeAndQuestionsField.nextElementSibling).toBe(memoField);
     expect(memoField).not.toHaveClass('md:col-span-2');
   });
+
+  test('메모 입력란은 시험 유형 및 문항수 입력란과 같은 높이를 사용한다', () => {
+    renderExamReviewDetailInfoSection();
+
+    const examTypeAndQuestionsField = getFieldByLabel('시험 유형 및 문항수');
+    const memoField = getFieldByLabel('메모');
+    const examTypeAndQuestionsTextarea =
+      examTypeAndQuestionsField.querySelector('textarea');
+    const memoTextarea = memoField.querySelector('textarea');
+
+    expect(examTypeAndQuestionsTextarea).not.toBeNull();
+    expect(memoTextarea).not.toBeNull();
+    expect(examTypeAndQuestionsTextarea).toHaveClass('min-h-[110px]');
+    expect(memoTextarea).toHaveClass('min-h-[110px]');
+  });
 });
