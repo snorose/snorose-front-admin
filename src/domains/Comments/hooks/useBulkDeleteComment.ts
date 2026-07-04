@@ -2,11 +2,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { bulkDeleteComments } from '@/apis';
 
+interface BulkDeleteCommentVariables {
+  commentIds: number[];
+  memo: string;
+}
+
 export const useBulkDeleteComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (commentIds: number[]) => bulkDeleteComments(commentIds),
+    mutationFn: ({ commentIds, memo }: BulkDeleteCommentVariables) =>
+      bulkDeleteComments(commentIds, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commentSearch'] });
     },

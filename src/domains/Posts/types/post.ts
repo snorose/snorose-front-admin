@@ -53,6 +53,7 @@ export interface AdminPostSearchRequest {
 
 export interface AdminPostBulkDeleteRequest {
   postIds: number[];
+  memo: string;
 }
 
 export interface AdminPostBulkDeleteResult {

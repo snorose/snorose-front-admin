@@ -20,6 +20,7 @@ export function usePostTableState({
   currentPage,
 }: UsePostTableStateProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     setSelectedIds([]);
@@ -79,26 +80,23 @@ export function usePostTableState({
 
   const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
+    setIsDeleteModalOpen(true);
+  };
 
-    const message = `선택한 ${selectedIds.length}개의 게시글을 삭제하시겠습니까?`;
-    if (!window.confirm(message)) return;
-
-    const deleteComments = window.confirm('댓글도 모두 삭제하시겠습니까?');
-
-    bulkDelete(selectedIds, {
-      onSuccess: (res) => {
-        const deletedCount = res?.deletedCount ?? selectedIds.length;
-        if (deleteComments) {
-          toast.success(
-            `${deletedCount}개의 게시글과 관련 댓글이 삭제되었습니다.`
-          );
-        } else {
+  const handleConfirmBulkDelete = (memo: string) => {
+    if (selectedIds.length === 0) return;
+    bulkDelete(
+      { postIds: selectedIds, memo },
+      {
+        onSuccess: (res) => {
+          const deletedCount = res?.deletedCount ?? selectedIds.length;
           toast.success(`${deletedCount}개의 게시글이 삭제되었습니다.`);
-        }
-        setSelectedIds([]);
-      },
-      onError: () => toast.error('게시글 일괄 삭제 중 오류가 발생했습니다.'),
-    });
+          setSelectedIds([]);
+          setIsDeleteModalOpen(false);
+        },
+        onError: () => toast.error('게시글 일괄 삭제 중 오류가 발생했습니다.'),
+      }
+    );
   };
 
   const handleBulkVisibility = (isVisible: boolean) => {
@@ -151,13 +149,16 @@ export function usePostTableState({
   const handleSingleDelete = (postId: number) => {
     if (!window.confirm('이 게시글을 삭제하시겠습니까?')) return;
 
-    singleDelete(postId, {
-      onSuccess: () => {
-        toast.success('게시글이 삭제되었습니다.');
-        setSelectedIds((prev) => prev.filter((id) => id !== postId));
-      },
-      onError: () => toast.error('게시글 삭제 중 오류가 발생했습니다.'),
-    });
+    singleDelete(
+      { postId, memo: '' },
+      {
+        onSuccess: () => {
+          toast.success('게시글이 삭제되었습니다.');
+          setSelectedIds((prev) => prev.filter((id) => id !== postId));
+        },
+        onError: () => toast.error('게시글 삭제 중 오류가 발생했습니다.'),
+      }
+    );
   };
 
   const allPostIds = posts.map((p) => p.postId);
@@ -191,6 +192,9 @@ export function usePostTableState({
     selectAllRef,
     handleSelectAll,
     handleBulkDelete,
+    handleConfirmBulkDelete,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
     handleSingleDelete,

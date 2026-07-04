@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
 import { PaginationBar } from '@/shared/components';
+import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
 
 import { useCommentTableState } from '../hooks/useCommentTableState';
@@ -33,6 +34,9 @@ export default function CommentTable({
     handleFilterByPostId,
     handleFilterByParentId,
     handleBulkDelete,
+    handleConfirmBulkDelete,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
     isDeletePending,
@@ -176,6 +180,15 @@ export default function CommentTable({
         onPageChange={onPageChange}
         hasNext={hasNext}
       />
+
+      {isDeleteModalOpen && (
+        <StatusChangeModal
+          target='COMMENT'
+          modalType='DELETE'
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirmAction={handleConfirmBulkDelete}
+        />
+      )}
     </div>
   );
 }
