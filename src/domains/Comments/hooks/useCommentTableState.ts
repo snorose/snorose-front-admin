@@ -25,6 +25,7 @@ export function useCommentTableState({
 }: UseCommentTableStateProps) {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [urlSearchParams] = useSearchParams();
   const parentIdStr = urlSearchParams.get('parentId');
@@ -81,7 +82,11 @@ export function useCommentTableState({
 
   const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleConfirmBulkDelete = (memo: string) => {
+    if (selectedIds.length === 0) return;
     const hasSelectedParentWithChildren = comments.some(
       (c) =>
         selectedIds.includes(c.commentId) &&
@@ -89,20 +94,22 @@ export function useCommentTableState({
         comments.some((child) => child.parentId === c.commentId)
     );
 
-    const message = hasSelectedParentWithChildren
-      ? '하위댓글도 모두 삭제하시겠습니까?'
-      : `선택한 ${selectedIds.length}개의 댓글을 삭제하시겠습니까?`;
+    if (hasSelectedParentWithChildren) {
+      toast.info('선택한 상위 댓글의 하위 댓글도 함께 삭제됩니다.');
+    }
 
-    if (!window.confirm(message)) return;
-
-    bulkDelete(selectedIds, {
-      onSuccess: (res) => {
-        toast.success(`${res.deletedCount}개의 댓글이 삭제되었습니다.`);
-        setSelectedIds([]);
-        void refetch();
-      },
-      onError: () => toast.error('댓글 일괄 삭제 중 오류가 발생했습니다.'),
-    });
+    bulkDelete(
+      { commentIds: selectedIds, memo },
+      {
+        onSuccess: (res) => {
+          toast.success(`${res.deletedCount}개의 댓글이 삭제되었습니다.`);
+          setSelectedIds([]);
+          setIsDeleteModalOpen(false);
+          void refetch();
+        },
+        onError: () => toast.error('댓글 일괄 삭제 중 오류가 발생했습니다.'),
+      }
+    );
   };
 
   const handleBulkVisibility = (isVisible: boolean) => {
@@ -224,6 +231,9 @@ export function useCommentTableState({
     handleFilterByPostId,
     handleFilterByParentId,
     handleBulkDelete,
+    handleConfirmBulkDelete,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
     isDeletePending,
