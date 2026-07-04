@@ -393,7 +393,7 @@ export function ExamReviewDetailInfoSection({
             />
           </Field.Content>
         </Field>
-        <Field className='gap-0 md:col-span-2'>
+        <Field className='gap-0'>
           <Field.Label>메모</Field.Label>
           <Field.Content>
             <Textarea
