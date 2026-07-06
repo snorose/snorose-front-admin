@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 
 import type { PostSearchParams } from '../types/post';
 import { useBulkDeletePost } from './useBulkDeletePost';
-import { useDeletePost } from './useDeletePost';
 import { usePostList } from './usePostList';
 import { useUpdatePostVisibility } from './useUpdatePostVisibility';
 
@@ -74,7 +73,6 @@ export function usePostTableState({
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeletePost();
-  const { mutate: singleDelete } = useDeletePost();
   const { mutate: bulkVisibility, isPending: isVisibilityPending } =
     useUpdatePostVisibility();
 
@@ -146,21 +144,6 @@ export function usePostTableState({
     );
   };
 
-  const handleSingleDelete = (postId: number) => {
-    if (!window.confirm('이 게시글을 삭제하시겠습니까?')) return;
-
-    singleDelete(
-      { postId, memo: '' },
-      {
-        onSuccess: () => {
-          toast.success('게시글이 삭제되었습니다.');
-          setSelectedIds((prev) => prev.filter((id) => id !== postId));
-        },
-        onError: () => toast.error('게시글 삭제 중 오류가 발생했습니다.'),
-      }
-    );
-  };
-
   const allPostIds = posts.map((p) => p.postId);
   const isAllSelected =
     allPostIds.length > 0 && allPostIds.every((id) => selectedIds.includes(id));
@@ -197,7 +180,6 @@ export function usePostTableState({
     setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
-    handleSingleDelete,
     isDeletePending,
     isVisibilityPending,
     hasNext: hasNext ?? posts.length > 0,
