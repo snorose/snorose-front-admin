@@ -31,11 +31,12 @@ export default function PostDetailManageCard({
   const deleteMutation = useMutation({
     mutationFn: (memo: string) => deletePost(post.postId, memo),
     onSuccess: () => {
-      toast.info(
-        deleteCommentsAlso
-          ? '게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.'
-          : '게시글이 삭제되었습니다.'
-      );
+      if (deleteCommentsAlso) {
+        toast.info('게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.');
+      } else {
+        toast.success('게시글이 삭제되었습니다.');
+      }
+
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
