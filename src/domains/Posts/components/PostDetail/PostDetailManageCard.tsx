@@ -30,8 +30,11 @@ export default function PostDetailManageCard({
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
     mutationFn: (memo: string) => deletePost(post.postId, memo),
-    onSuccess: () => {
-      if (deleteCommentsAlso) {
+    onMutate: () => {
+      return { deleteCommentsAlsoAtMutation: deleteCommentsAlso };
+    },
+    onSuccess: (_data, _variables, context) => {
+      if (context?.deleteCommentsAlsoAtMutation) {
         toast.info('게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.');
       } else {
         toast.success('게시글이 삭제되었습니다.');
