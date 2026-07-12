@@ -190,14 +190,6 @@ export const PostFilterPanel = ({
         </div>
       </div>
 
-      {/* 초기화 */}
-      <button
-        onClick={handleReset}
-        className='w-full rounded border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50'
-      >
-        초기화
-      </button>
-
       {/* 공지만 보기 */}
       <label className='flex items-center gap-2 text-sm text-gray-700'>
         <input
@@ -291,12 +283,20 @@ export const PostFilterPanel = ({
             개의 게시글
           </span>
         )}
-        <button
-          onClick={() => onFilterChange(filters)}
-          className='rounded bg-gray-900 px-6 py-2 text-sm font-semibold text-white hover:bg-gray-700'
-        >
-          검색
-        </button>
+        <div className='flex w-full gap-4'>
+          <button
+            onClick={handleReset}
+            className='w-full rounded border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50'
+          >
+            초기화
+          </button>
+          <button
+            onClick={() => onFilterChange(filters)}
+            className='w-full rounded bg-gray-900 py-2 text-sm font-semibold text-white hover:bg-gray-700'
+          >
+            검색
+          </button>
+        </div>
       </div>
     </div>
   );
