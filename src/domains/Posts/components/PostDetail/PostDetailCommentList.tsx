@@ -35,7 +35,6 @@ export default function PostDetailCommentList({
   });
 
   const comments = useMemo(() => data?.data ?? [], [data]);
-  const hasNext = data?.hasNext ?? false;
   const totalPage = data?.totalPage ?? 1;
 
   return (
@@ -67,7 +66,7 @@ export default function PostDetailCommentList({
         </div>
       )}
 
-      {!isLoading && (currentPage > 1 || hasNext) && (
+      {!isLoading && totalPage > 1 && (
         <PaginationBar
           currentPage={currentPage}
           onPageChange={setCurrentPage}
