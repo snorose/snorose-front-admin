@@ -212,14 +212,6 @@ export const CommentFilterPanel = ({
         </div>
       </div>
 
-      {/* 초기화 */}
-      <button
-        onClick={handleReset}
-        className='w-full rounded border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50'
-      >
-        초기화
-      </button>
-
       {/* 게시판 필터 */}
       <div className='flex flex-col gap-2'>
         <label className='text-sm text-gray-600'>게시판 필터</label>
@@ -290,21 +282,26 @@ export const CommentFilterPanel = ({
         </div>
       </div>
 
-      {/* 검색 버튼 + 총 개수 */}
-      <div className='flex items-center justify-between'>
-        {totalCount !== undefined && (
-          <span className='text-sm text-gray-500'>
-            총 <span className='font-semibold text-blue-600'>{totalCount}</span>
-            개의 댓글
-          </span>
-        )}
+      <div className='flex w-full gap-4'>
+        <button
+          onClick={handleReset}
+          className='w-full rounded border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50'
+        >
+          초기화
+        </button>
         <button
           onClick={() => onFilterChange(filters)}
-          className='rounded bg-gray-900 px-6 py-2 text-sm font-semibold text-white hover:bg-gray-700'
+          className='w-full rounded bg-gray-900 py-2 text-sm font-semibold text-white hover:bg-gray-700'
         >
           검색
         </button>
       </div>
+      {totalCount !== undefined && (
+        <span className='text-sm text-gray-500'>
+          총 <span className='font-semibold text-blue-600'>{totalCount}</span>
+          개의 댓글
+        </span>
+      )}
     </div>
   );
 };
