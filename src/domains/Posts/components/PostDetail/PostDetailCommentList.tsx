@@ -36,6 +36,7 @@ export default function PostDetailCommentList({
 
   const comments = useMemo(() => data?.data ?? [], [data]);
   const hasNext = data?.hasNext ?? false;
+  const totalPage = data?.totalPage ?? 1;
 
   return (
     <div className='mt-6 flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm'>
@@ -70,6 +71,7 @@ export default function PostDetailCommentList({
         <PaginationBar
           currentPage={currentPage}
           onPageChange={setCurrentPage}
+          totalPage={totalPage}
         />
       )}
     </div>
