@@ -276,9 +276,9 @@ describe('ExamDetailSection', () => {
     await user.click(screen.getByRole('button', { name: '편집 모드' }));
     await user.click(screen.getByRole('button', { name: '강의명 비우기' }));
     await user.click(screen.getByRole('button', { name: '저장' }));
-    await user.click(screen.getByRole('button', { name: '수정 확인' }));
 
     expect(toast.error).toHaveBeenCalledWith('강의명을 입력해주세요.');
+    expect(screen.queryByRole('button', { name: '수정 확인' })).toBeNull();
     expect(updateExamReview).not.toHaveBeenCalled();
   });
 });

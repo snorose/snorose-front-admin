@@ -384,6 +384,13 @@ export function ExamDetailSection({
 
   const openSaveModal = () => {
     if (!isDirty) return;
+
+    const requiredFieldErrorMessage = getRequiredFieldErrorMessage(formData);
+    if (requiredFieldErrorMessage) {
+      toast.error(requiredFieldErrorMessage);
+      return;
+    }
+
     setIsSaveModalOpen(true);
   };
 
