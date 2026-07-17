@@ -1,5 +1,4 @@
 export type {
-  ConfirmExamReviewRequest,
   ExamReview,
   ExamReviewDetailLog,
   ExamReviewDetailResult,

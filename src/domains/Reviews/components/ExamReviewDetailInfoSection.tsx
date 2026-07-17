@@ -70,7 +70,7 @@ const renderStatusBadge = (
     variant='outline'
     className={cn(
       'max-w-full truncate',
-      isActive ? activeClassName : 'text-gray-500 dark:text-gray-400'
+      isActive ? activeClassName : 'text-gray-500'
     )}
     title={label}
   >
@@ -97,7 +97,7 @@ export function ExamReviewDetailInfoSection({
     <div className='space-y-4'>
       <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-4'>
         <Field className='gap-0'>
-          <Field.Label>확인여부</Field.Label>
+          <Field.Label required>확인여부</Field.Label>
           <Field.Content>
             <Select
               value={formData.isConfirmed ? 'true' : 'false'}
@@ -121,7 +121,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>논의 여부</Field.Label>
+          <Field.Label required>논의 여부</Field.Label>
           <Field.Content>
             <Select
               value={formData.isDiscussed ? 'true' : 'false'}
@@ -134,7 +134,7 @@ export function ExamReviewDetailInfoSection({
                 {renderStatusBadge(
                   formData.isDiscussed ? '논의 있음' : '논의 없음',
                   formData.isDiscussed,
-                  'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                  'border-blue-200 bg-blue-50 text-blue-700'
                 )}
               </Select.Trigger>
               <Select.Content>
@@ -142,14 +142,14 @@ export function ExamReviewDetailInfoSection({
                   {renderStatusBadge(
                     '논의 있음',
                     true,
-                    'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                    'border-blue-200 bg-blue-50 text-blue-700'
                   )}
                 </Select.Item>
                 <Select.Item value='false'>
                   {renderStatusBadge(
                     '논의 없음',
                     false,
-                    'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                    'border-blue-200 bg-blue-50 text-blue-700'
                   )}
                 </Select.Item>
               </Select.Content>
@@ -164,7 +164,7 @@ export function ExamReviewDetailInfoSection({
                 deletionStatusLabel,
                 formData.deletionStatus !== null &&
                   formData.deletionStatus !== 'VISIBLE',
-                'border-red-200 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
+                'border-red-200 bg-red-50 text-red-700'
               )}
             </div>
           </Field.Content>
@@ -176,7 +176,7 @@ export function ExamReviewDetailInfoSection({
               {renderStatusBadge(
                 formData.isSanctioned ? '징계' : '징계 없음',
                 formData.isSanctioned,
-                'border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                'border-rose-200 bg-rose-50 text-rose-700'
               )}
             </div>
           </Field.Content>
@@ -189,13 +189,13 @@ export function ExamReviewDetailInfoSection({
                 visibilityStatusLabel,
                 formData.visibilityStatus !== null &&
                   formData.visibilityStatus !== 'VISIBLE',
-                'border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                'border-amber-200 bg-amber-50 text-amber-700'
               )}
             </div>
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>강의명</Field.Label>
+          <Field.Label required>강의명</Field.Label>
           <Field.Content>
             <Input
               value={formData.lectureName}
@@ -205,7 +205,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>교수명</Field.Label>
+          <Field.Label required>교수명</Field.Label>
           <Field.Content>
             <Input
               value={formData.professorName}
@@ -215,7 +215,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>업로드 파일</Field.Label>
+          <Field.Label required>업로드 파일</Field.Label>
           <Field.Content>
             <div className='flex items-center gap-2'>
               <button
@@ -253,7 +253,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>수강학기</Field.Label>
+          <Field.Label required>수강학기</Field.Label>
           <Field.Content>
             <Select
               value={formData.semester}
@@ -274,7 +274,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>시험 종류</Field.Label>
+          <Field.Label required>시험 종류</Field.Label>
           <Field.Content>
             <Select
               value={formData.examType}
@@ -295,7 +295,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>강의 종류</Field.Label>
+          <Field.Label required>강의 종류</Field.Label>
           <Field.Content>
             <Select
               value={formData.lectureType}
@@ -323,7 +323,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>분반</Field.Label>
+          <Field.Label required>분반</Field.Label>
           <Field.Content>
             <Input
               type='number'
@@ -344,7 +344,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>P/F</Field.Label>
+          <Field.Label required>P/F</Field.Label>
           <Field.Content>
             <Select
               value={formData.isPF}
@@ -362,7 +362,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>온라인 강의 여부</Field.Label>
+          <Field.Label required>온라인 강의 여부</Field.Label>
           <Field.Content>
             <Select
               value={formData.isOnline}
@@ -380,7 +380,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>시험 유형 및 문항수</Field.Label>
+          <Field.Label required>시험 유형 및 문항수</Field.Label>
           <Field.Content>
             <Textarea
               value={formData.examTypeAndQuestions}
@@ -393,7 +393,7 @@ export function ExamReviewDetailInfoSection({
             />
           </Field.Content>
         </Field>
-        <Field className='gap-0 md:col-span-2'>
+        <Field className='gap-0'>
           <Field.Label>메모</Field.Label>
           <Field.Content>
             <Textarea
@@ -401,7 +401,7 @@ export function ExamReviewDetailInfoSection({
               onChange={(e) => setFormData({ memo: e.target.value })}
               disabled={isFormDisabled}
               rows={3}
-              className='min-h-[96px] resize-none'
+              className='min-h-[110px] resize-none'
             />
           </Field.Content>
         </Field>

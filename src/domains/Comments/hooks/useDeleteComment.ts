@@ -2,11 +2,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { deleteComment } from '@/apis';
 
+interface DeleteCommentVariables {
+  commentId: number;
+  memo: string;
+}
+
 export const useDeleteComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (commentId: number) => deleteComment(commentId),
+    mutationFn: ({ commentId, memo }: DeleteCommentVariables) =>
+      deleteComment(commentId, memo),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['commentSearch'] });
       queryClient.invalidateQueries({ queryKey: ['comments'] });

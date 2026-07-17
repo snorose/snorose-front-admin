@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 
 import { MemberInfoPopover } from '@/shared/components';
+import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Badge, Button } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
@@ -40,7 +41,6 @@ export default function PostDetailCommentItem({
   const [modalType, setModalType] = useState<'HIDE' | 'SHOW' | 'DELETE'>(
     'HIDE'
   );
-  const [reason, setReason] = useState('');
 
   // 댓글 노출/숨김 변경 Mutation
   const visibilityMutation = useMutation({
@@ -55,7 +55,6 @@ export default function PostDetailCommentItem({
       );
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
       setIsModalOpen(false);
-      setReason('');
     },
     onError: () => {
       toast.error('댓글 상태 변경에 실패했습니다.');
@@ -64,23 +63,22 @@ export default function PostDetailCommentItem({
 
   // 댓글 삭제 Mutation
   const deleteMutation = useMutation({
-    mutationFn: () => deleteComment(comment.commentId),
+    mutationFn: (memo: string) => deleteComment(comment.commentId, memo),
     onSuccess: () => {
       toast.success('댓글이 삭제되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
       setIsModalOpen(false);
-      setReason('');
     },
     onError: () => {
       toast.error('댓글 삭제에 실패했습니다.');
     },
   });
-  const handleConfirmAction = () => {
-    if (!reason.trim()) return;
+  const handleConfirmAction = (memo: string) => {
+    if (!memo.trim()) return;
     if (modalType === 'HIDE') visibilityMutation.mutate(false);
     else if (modalType === 'SHOW') visibilityMutation.mutate(true);
-    else if (modalType === 'DELETE') deleteMutation.mutate();
+    else if (modalType === 'DELETE') deleteMutation.mutate(memo);
   };
 
   return (
@@ -224,57 +222,14 @@ export default function PostDetailCommentItem({
       </div>
       {/* 댓글 조치 사유 기입 모달 */}
       {isModalOpen && comment && (
-        <div
-          className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className='animate-in fade-in zoom-in-95 w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-lg duration-150'>
-            <h3 className='mb-2 text-base font-bold text-gray-900'>
-              댓글{' '}
-              {modalType === 'HIDE'
-                ? '비공개'
-                : modalType === 'SHOW'
-                  ? '공개/복구'
-                  : '삭제'}{' '}
-              처리
-            </h3>
-            <p className='mb-4 text-xs text-gray-500'>
-              상태를 변경하는 사유를 작성해 주세요. (필수 입력)
-            </p>
-
-            <div className='flex flex-col gap-4'>
-              <textarea
-                className='min-h-[100px] w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
-                placeholder='사유를 입력하세요...'
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-              />
-
-              <div className='mt-2 flex justify-end gap-2'>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setReason('');
-                  }}
-                  className='border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
-                >
-                  취소
-                </Button>
-                <Button
-                  variant={modalType === 'DELETE' ? 'destructive' : 'default'}
-                  size='sm'
-                  onClick={handleConfirmAction}
-                  disabled={!reason.trim()}
-                  className={`text-xs ${modalType === 'DELETE' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
-                >
-                  확인
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatusChangeModal
+          target='COMMENT'
+          modalType={modalType}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+          onConfirmAction={handleConfirmAction}
+        />
       )}
     </div>
   );

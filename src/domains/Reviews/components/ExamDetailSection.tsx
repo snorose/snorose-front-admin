@@ -10,6 +10,7 @@ import {
   ConfirmModal,
   Skeleton,
   Tabs,
+  Textarea,
 } from '@/shared/components/ui';
 
 import {
@@ -36,7 +37,6 @@ import {
 } from '@/domains/Reviews/utils';
 
 import {
-  confirmExamReview,
   deleteExamReview,
   downloadExamReviewFile,
   updateExamReview,
@@ -116,6 +116,50 @@ const DEFAULT_FORM_DATA: FormData = {
   author: '',
 };
 
+const getRequiredFieldErrorMessage = (formData: FormData): string | null => {
+  if (formData.lectureName.trim() === '') {
+    return '강의명을 입력해주세요.';
+  }
+
+  if (formData.professorName.trim() === '') {
+    return '교수명을 입력해주세요.';
+  }
+
+  if (formData.fileName.trim() === '') {
+    return '업로드 파일을 등록해주세요.';
+  }
+
+  if (formData.semester.trim() === '') {
+    return '수강학기를 선택해주세요.';
+  }
+
+  if (formData.examType.trim() === '') {
+    return '시험 종류를 선택해주세요.';
+  }
+
+  if (!formData.lectureType) {
+    return '강의 종류를 선택해주세요.';
+  }
+
+  if (formData.classNumber === null || formData.classNumber < 1) {
+    return '분반을 입력해주세요.';
+  }
+
+  if (formData.isPF.trim() === '') {
+    return 'P/F를 선택해주세요.';
+  }
+
+  if (formData.isOnline.trim() === '') {
+    return '온라인 강의 여부를 선택해주세요.';
+  }
+
+  if (formData.examTypeAndQuestions.trim() === '') {
+    return '시험 유형 및 문항수를 입력해주세요.';
+  }
+
+  return null;
+};
+
 export function ExamDetailSection({
   selectedExamReview,
   selectedExamReviewDetail,
@@ -128,6 +172,8 @@ export function ExamDetailSection({
   >('review');
   const [formData, setFormData] = useState<FormData>(DEFAULT_FORM_DATA);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -338,7 +384,24 @@ export function ExamDetailSection({
 
   const openSaveModal = () => {
     if (!isDirty) return;
+
+    const requiredFieldErrorMessage = getRequiredFieldErrorMessage(formData);
+    if (requiredFieldErrorMessage) {
+      toast.error(requiredFieldErrorMessage);
+      return;
+    }
+
     setIsSaveModalOpen(true);
+  };
+
+  const openDeleteModal = () => {
+    setDeleteReason('');
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteReason('');
   };
 
   const handleFileDownload = async () => {
@@ -378,13 +441,17 @@ export function ExamDetailSection({
       return;
     }
 
+    const requiredFieldErrorMessage = getRequiredFieldErrorMessage(formData);
+    if (requiredFieldErrorMessage) {
+      toast.error(requiredFieldErrorMessage);
+      return;
+    }
+
     setIsSaving(true);
     try {
       const post: UpdateExamReviewRequest['post'] = {};
-
-      if (formData.classNumber === null) {
-        toast.error('분반을 입력해주세요.');
-        return;
+      if (formData.isConfirmed !== initialValues.isConfirmed) {
+        post.isConfirmed = formData.isConfirmed;
       }
       if (formData.isDiscussed !== initialValues.isDiscussed) {
         post.isDiscussed = formData.isDiscussed;
@@ -399,7 +466,7 @@ export function ExamDetailSection({
         post.professor = formData.professorName;
       }
       if (formData.classNumber !== initialValues.classNumber) {
-        post.classNumber = formData.classNumber;
+        post.classNumber = formData.classNumber!;
       }
       if (formData.semester !== initialValues.semester) {
         const yearMatch = formData.semester.match(/^(\d{4})/);
@@ -425,40 +492,22 @@ export function ExamDetailSection({
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
-      const hasConfirmUpdate =
-        formData.isConfirmed !== initialValues.isConfirmed;
       const hasDetailUpdate =
         Object.keys(post).length > 0 || Boolean(selectedFile);
 
-      if (!hasConfirmUpdate && !hasDetailUpdate) {
+      if (!hasDetailUpdate) {
         return;
       }
 
-      let updatedDetail: ExamReviewDetailResult = selectedExamReviewDetail;
+      const updateData: UpdateExamReviewRequest = {
+        ...(selectedFile ? { file: selectedFile } : {}),
+        post,
+      };
 
-      if (hasDetailUpdate) {
-        const updateData: UpdateExamReviewRequest = {
-          ...(selectedFile ? { file: selectedFile } : {}),
-          post,
-        };
-
-        updatedDetail = await updateExamReview(
-          selectedExamReview.id,
-          updateData
-        );
-      }
-
-      if (hasConfirmUpdate) {
-        const confirmResult = await confirmExamReview(selectedExamReview.id, {
-          isConfirmed: formData.isConfirmed,
-        });
-
-        updatedDetail = {
-          ...updatedDetail,
-          isConfirmed: confirmResult.isConfirmed,
-          status: confirmResult.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
-        };
-      }
+      const updatedDetail = await updateExamReview(
+        selectedExamReview.id,
+        updateData
+      );
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
       setSelectedFile(null);
@@ -490,14 +539,31 @@ export function ExamDetailSection({
   };
 
   const handleDeleteClick = async () => {
+    const trimmedDeleteReason = deleteReason.trim();
+    if (!trimmedDeleteReason) {
+      toast.error('삭제 사유를 입력해주세요.');
+      return;
+    }
+
+    if (!selectedExamReview?.id) {
+      toast.error('선택된 시험 후기가 없습니다.');
+      return;
+    }
+
+    const existingMemo = selectedExamReviewDetail?.memo?.trim();
+    const deleteReasonMarker = `[삭제 사유]\n${trimmedDeleteReason}`;
+    const deleteMemo = existingMemo?.includes(deleteReasonMarker)
+      ? existingMemo
+      : [existingMemo, deleteReasonMarker].filter(Boolean).join('\n\n');
+
     try {
-      if (!selectedExamReview?.id) {
-        toast.error('선택된 시험 후기가 없습니다.');
-        return;
-      }
+      setIsDeleting(true);
+      await updateExamReview(selectedExamReview.id, {
+        post: { memo: deleteMemo },
+      });
       await deleteExamReview(selectedExamReview.id);
       toast.success('시험 후기가 성공적으로 삭제되었습니다.');
-      setIsDeleteModalOpen(false);
+      closeDeleteModal();
       resetForm();
       onDeleteSuccess?.();
     } catch (error: unknown) {
@@ -505,6 +571,8 @@ export function ExamDetailSection({
         (isAxiosError(error) && error.response?.data?.message) ||
         '시험 후기 삭제에 실패했습니다.';
       toast.error(errorMessage);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -523,8 +591,9 @@ export function ExamDetailSection({
           {selectedExamReview && (
             <button
               type='button'
+              aria-label='시험 후기 삭제'
               className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-              onClick={() => setIsDeleteModalOpen(true)}
+              onClick={openDeleteModal}
               disabled={isDisabled}
             >
               <Trash2 className='h-4 w-4 text-red-500' />
@@ -682,13 +751,49 @@ export function ExamDetailSection({
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
-        confirmText='삭제'
+        confirmText={isDeleting ? '삭제 중' : '삭제'}
+        confirmButtonClassName='bg-red-600 text-white hover:bg-red-700'
+        confirmDisabled={!deleteReason.trim() || isDeleting}
         closeText='취소'
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={closeDeleteModal}
         onConfirm={handleDeleteClick}
         title='시험 후기 삭제'
-        description='시험 후기를 삭제하시겠습니까?'
-      />
+        description='기존 메모 아래에 삭제 사유를 추가해 저장합니다.'
+      >
+        <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-2'>
+            <label
+              htmlFor='exam-review-existing-memo'
+              className='text-sm font-medium text-gray-700'
+            >
+              기존 메모
+            </label>
+            <Textarea
+              id='exam-review-existing-memo'
+              value={selectedExamReviewDetail?.memo ?? ''}
+              placeholder='기존 메모가 없습니다.'
+              className='min-h-[96px] resize-none bg-gray-50'
+              readOnly
+            />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label
+              htmlFor='exam-review-delete-reason'
+              className='text-sm font-medium text-gray-700'
+            >
+              삭제 사유
+            </label>
+            <Textarea
+              id='exam-review-delete-reason'
+              value={deleteReason}
+              onChange={(event) => setDeleteReason(event.target.value)}
+              placeholder='삭제 사유를 입력해주세요.'
+              className='min-h-[120px] resize-none'
+              disabled={isDeleting}
+            />
+          </div>
+        </div>
+      </ConfirmModal>
     </article>
   );
 }

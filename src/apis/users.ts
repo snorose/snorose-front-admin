@@ -1,18 +1,19 @@
 import { axiosInstance } from '@/shared/axios/instance';
 import type { BaseResponse } from '@/shared/types';
 import type {
+  AdminUserListParams,
   AdminUserListResult,
   EditMemberInfo,
   MemberInfo,
 } from '@/shared/types';
 
 export const getAllUsersAPI = async (
-  page: number = 0
+  params: AdminUserListParams = {}
 ): Promise<AdminUserListResult> => {
   const response = await axiosInstance.get<BaseResponse<AdminUserListResult>>(
-    `/v1/admin/users`,
+    `/v2/admin/users`,
     {
-      params: { page },
+      params,
     }
   );
   return response.data.result;

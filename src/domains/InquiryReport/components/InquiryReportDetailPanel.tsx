@@ -26,12 +26,14 @@ import {
   findComment,
   getCommentAuthorDisplay,
 } from '../utils/inquiryCommentUtils';
+import {
+  buildInquiryPostUrl,
+  buildReportTargetUrl,
+  isReportInquiry,
+} from '../utils/inquiryReportUrls';
 import InquiryCommentItem from './InquiryCommentItem';
 import InquiryReportAttachmentItem from './InquiryReportAttachmentItem';
 import InquiryStatusSelect from './InquiryStatusSelect';
-
-const SUPPORT_FRONT_BASE_URL =
-  'https://feature-support.snorose-front-react.pages.dev';
 
 interface InquiryReportDetailPanelProps {
   postId: number;
@@ -93,10 +95,9 @@ export default function InquiryReportDetailPanel({
   const replyParentComment = replyParentId
     ? findComment(comments, replyParentId)
     : null;
-  const inquiryPostUrl = `${SUPPORT_FRONT_BASE_URL}/report/${detail.inquiryId}`;
-  const reportTargetUrl = detail.target
-    ? `${SUPPORT_FRONT_BASE_URL}/post/${detail.target}`
-    : null;
+  const inquiryPostUrl = buildInquiryPostUrl(detail);
+  const inquiryPostLabel = isReportInquiry(detail) ? '신고글' : '문의글';
+  const reportTargetUrl = buildReportTargetUrl(detail);
   const canCopyAuthorLoginId = !detail.isWriterWithdrawn && detail.userLoginId;
   const isCommentInputValid =
     commentInput.trim().length > 0 &&
@@ -204,12 +205,12 @@ export default function InquiryReportDetailPanel({
             href={inquiryPostUrl}
             target='_blank'
             rel='noopener noreferrer'
-            aria-label='문의 및 신고글 바로가기'
-            title='문의 및 신고글 바로가기'
+            aria-label={`${inquiryPostLabel} 바로가기`}
+            title={`${inquiryPostLabel} 바로가기`}
             className='flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[12px] font-medium !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
           >
             <ExternalLink className='h-3.5 w-3.5 shrink-0' />
-            문의글
+            {inquiryPostLabel}
           </a>
           {reportTargetUrl && (
             <a

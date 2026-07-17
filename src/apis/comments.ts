@@ -75,22 +75,26 @@ export const searchComments = async (
 
 // 댓글 삭제 api
 export const deleteComment = async (
-  commentId: number
+  commentId: number,
+  memo: string
 ): Promise<AdminDeleteCommentResult> => {
   const response = await axiosInstance.delete<
     BaseResponse<AdminDeleteCommentResult>
-  >(`/v1/admin/comments/${commentId}`);
+  >(`/v1/admin/comments/${commentId}`, {
+    data: { memo },
+  });
   return response.data.result;
 };
 
 // 댓글 일괄 삭제 api
 export const bulkDeleteComments = async (
-  commentIds: number[]
+  commentIds: number[],
+  memo: string
 ): Promise<AdminCommentBulkDeleteResult> => {
   const response = await axiosInstance.delete<
     BaseResponse<AdminCommentBulkDeleteResult>
   >(`/v1/admin/comments`, {
-    data: { commentIds },
+    data: { commentIds, memo },
   });
   return response.data.result;
 };

@@ -1,8 +1,11 @@
 import type {
   AdminUserListItem,
+  AdminUserListParams,
+  AdminUserSortType,
   BlacklistHistoryItem,
   EditMemberInfo,
   MemberInfo,
+  SortDirection,
   UserBlacklistHistory,
 } from '@/shared/types';
 
@@ -12,6 +15,41 @@ import {
 } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 export type FilterValue = 'ALL' | string;
+
+export type AdminUserListFilters = {
+  page: number;
+  keyword: string;
+  selectedRole: FilterValue;
+  selectedMajor: FilterValue;
+  selectedAdmissionYear: FilterValue;
+  sortType: AdminUserSortType;
+  sortDirection: SortDirection;
+};
+
+// 디렉토리 필터/검색/정렬 상태를 v2 요청 쿼리 파라미터로 변환한다.
+// 'ALL' 및 빈 검색어는 undefined로 만들어 요청에서 생략되도록 한다.
+export function buildAdminUserListParams({
+  page,
+  keyword,
+  selectedRole,
+  selectedMajor,
+  selectedAdmissionYear,
+  sortType,
+  sortDirection,
+}: AdminUserListFilters): AdminUserListParams {
+  return {
+    page,
+    keyword: keyword.trim() || undefined,
+    userRoleId: selectedRole === 'ALL' ? undefined : Number(selectedRole),
+    major: selectedMajor === 'ALL' ? undefined : selectedMajor,
+    admissionYear:
+      selectedAdmissionYear === 'ALL'
+        ? undefined
+        : Number(selectedAdmissionYear),
+    sortType,
+    sortDirection,
+  };
+}
 
 export type DirectoryFilterOption = {
   label: string;
@@ -35,14 +73,6 @@ const EDIT_KEYS: (keyof EditMemberInfo)[] = [
   'email',
   'birthday',
 ];
-
-export function extractFirstSearchMember(result: unknown): MemberInfo | null {
-  if (Array.isArray(result)) {
-    return (result[0] as MemberInfo | undefined) ?? null;
-  }
-
-  return (result as MemberInfo | null) ?? null;
-}
 
 export function formatDisplayValue(value: string | null | undefined) {
   if (!value) return EMPTY_TEXT;
@@ -93,21 +123,6 @@ export function toBlacklistHistoryItem(
     deletedReason: history.deletedReason,
     deletedBy: history.deletedBy,
   };
-}
-
-export function getAdmissionYear(studentNumber: string) {
-  const digitsOnly = studentNumber.replace(/\D/g, '');
-
-  if (digitsOnly.length < 2) {
-    return EMPTY_TEXT;
-  }
-
-  const firstFour = digitsOnly.slice(0, 4);
-  if (/^(19|20)\d{2}$/.test(firstFour)) {
-    return firstFour;
-  }
-
-  return `20${digitsOnly.slice(0, 2)}`;
 }
 
 export function getRoleBadgeClassName(userRoleId: number) {
@@ -185,28 +200,20 @@ export function getRoleOptions(): DirectoryFilterOption[] {
   ];
 }
 
-export function getAdmissionYearOptions(
-  members: AdminUserListItem[]
-): DirectoryFilterOption[] {
-  const years = Array.from(
-    new Set(
-      members
-        .map((member) => getAdmissionYear(member.studentNumber))
-        .filter((year) => year !== EMPTY_TEXT)
-    )
-  ).sort((a, b) => Number(b) - Number(a));
+// 입학년도 필터 옵션 개수 (최근 N개년)
+const ADMISSION_YEAR_RANGE = 20;
 
-  return years.map((value) => ({ value, label: value }));
-}
+// 서버사이드 필터로 전환되어 현재 페이지 회원에서 추출할 수 없으므로,
+// 학번 앞 2자리(예: '25')를 value로 하는 최근 N개년 목록을 정적으로 생성한다.
+export function getAdmissionYearOptions(): DirectoryFilterOption[] {
+  const currentYear = new Date().getFullYear();
 
-export function getMajorOptions(
-  members: AdminUserListItem[]
-): DirectoryFilterOption[] {
-  const majors = Array.from(
-    new Set(members.map((member) => member.major).filter(Boolean))
-  ).sort((a, b) => a.localeCompare(b, 'ko'));
-
-  return majors.map((value) => ({ value, label: value }));
+  // 연도 전체로 뺀 뒤 % 100을 적용해 세기 전환(예: 2005 - 10 → 1995 → '95')과
+  // 음수 학번을 방지한다.
+  return Array.from({ length: ADMISSION_YEAR_RANGE }, (_, index) => {
+    const value = String((currentYear - index) % 100).padStart(2, '0');
+    return { value, label: `${value}학번` };
+  });
 }
 
 export function createMemberDiffPayload(
@@ -251,22 +258,13 @@ export function mapMemberInfoToAdminUserListItem(
     loginId: member.loginId,
     userName: member.userName,
     nickname: member.nickname,
+    email: member.email,
     studentNumber: member.studentNumber,
     major: member.major,
     userRoleId: member.userRoleId,
     userRoleName: convertUserRoleIdToEnum(member.userRoleId),
+    pointBalance: member.pointBalance,
     createdAt: member.createdAt,
+    authenticatedAt: member.authenticatedAt,
   };
-}
-
-export function normalizeSearchResultMembers(result: unknown): MemberInfo[] {
-  if (Array.isArray(result)) {
-    return result as MemberInfo[];
-  }
-
-  if (result) {
-    return [result as MemberInfo];
-  }
-
-  return [];
 }

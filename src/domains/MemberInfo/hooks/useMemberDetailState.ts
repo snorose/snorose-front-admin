@@ -1,30 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
 import { PATHS } from '@/shared/constants/paths';
-import type {
-  AdminUserListItem,
-  BlacklistHistoryItem,
-  MemberInfo,
-} from '@/shared/types';
+import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
   createMemberDiffPayload,
-  extractFirstSearchMember,
   toBlacklistHistoryItem,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
-import { blacklistHistoryAPI, editUsersAPI, searchUsersAPI } from '@/apis';
+import { blacklistHistoryAPI, editUsersAPI, getUserDetailAPI } from '@/apis';
 
 type UseMemberDetailStateParams = {
   currentPage: number;
   loadMembers: (page: number) => Promise<void>;
   memberKey: string | null;
-  members: AdminUserListItem[];
-  searchResultMembers: AdminUserListItem[] | null;
   updateCachedMember: (member: MemberInfo) => void;
 };
 
@@ -32,11 +25,8 @@ export function useMemberDetailState({
   currentPage,
   loadMembers,
   memberKey,
-  members,
-  searchResultMembers,
   updateCachedMember,
 }: UseMemberDetailStateParams) {
-  const location = useLocation();
   const navigate = useNavigate();
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
   const [latestPenaltyHistory, setLatestPenaltyHistory] =
@@ -51,36 +41,10 @@ export function useMemberDetailState({
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
-  const fetchMemberDetail = useCallback(async (keywords: string[]) => {
-    let latestError: unknown = null;
-
-    for (const keyword of keywords) {
-      if (!keyword.trim()) continue;
-      try {
-        const response = await searchUsersAPI(keyword);
-        const resolvedMember = extractFirstSearchMember(response);
-        if (resolvedMember) return resolvedMember;
-      } catch (error) {
-        latestError = error;
-      }
-    }
-
-    if (latestError) throw latestError;
-    return null;
-  }, []);
-
-  const findMemberListItemByEncryptedUserId = useCallback(
-    async (encryptedUserId: string) => {
-      const cachedMember =
-        members.find((member) => member.encryptedUserId === encryptedUserId) ??
-        searchResultMembers?.find(
-          (member) => member.encryptedUserId === encryptedUserId
-        ) ??
-        null;
-
-      return cachedMember;
-    },
-    [members, searchResultMembers]
+  // 상세 페이지는 encryptedUserId를 이미 알고 있으므로 단건 조회 API를 그대로 사용한다.
+  const fetchMemberDetail = useCallback(
+    (encryptedUserId: string) => getUserDetailAPI(encryptedUserId),
+    []
   );
 
   const fetchPenaltyHistoryPage = useCallback(
@@ -112,38 +76,14 @@ export function useMemberDetailState({
       return;
     }
 
-    const locationState = location.state as {
-      detailKeywords?: string[];
-      prefetchedMember?: MemberInfo;
-    } | null;
-    const prefetchedMember = locationState?.prefetchedMember;
-    const detailKeywords = locationState?.detailKeywords ?? [];
-
-    setSelectedMember(
-      prefetchedMember?.encryptedUserId === memberKey ? prefetchedMember : null
-    );
+    setSelectedMember(null);
 
     let isMounted = true;
     setIsDetailLoading(true);
 
     void (async () => {
       try {
-        let resultMember =
-          prefetchedMember?.encryptedUserId === memberKey
-            ? prefetchedMember
-            : await fetchMemberDetail(detailKeywords);
-
-        if (!resultMember) {
-          const matchedListMember =
-            await findMemberListItemByEncryptedUserId(memberKey);
-          if (matchedListMember) {
-            resultMember = await fetchMemberDetail([
-              matchedListMember.loginId,
-              matchedListMember.studentNumber,
-              matchedListMember.userName,
-            ]);
-          }
-        }
+        const resultMember = await fetchMemberDetail(memberKey);
 
         if (!isMounted) return;
         if (!resultMember) {
@@ -167,13 +107,7 @@ export function useMemberDetailState({
     return () => {
       isMounted = false;
     };
-  }, [
-    fetchMemberDetail,
-    findMemberListItemByEncryptedUserId,
-    location.state,
-    memberKey,
-    navigate,
-  ]);
+  }, [fetchMemberDetail, memberKey, navigate]);
 
   useEffect(() => {
     const encryptedUserId = selectedMember?.encryptedUserId;
@@ -314,11 +248,9 @@ export function useMemberDetailState({
 
     setIsDetailLoading(true);
     try {
-      const refreshedMember = await fetchMemberDetail([
-        selectedMember.loginId,
-        selectedMember.studentNumber,
-        selectedMember.userName,
-      ]);
+      const refreshedMember = await fetchMemberDetail(
+        selectedMember.encryptedUserId
+      );
 
       if (!refreshedMember) {
         toast.error('회원 상세 정보를 다시 불러오지 못했습니다.');

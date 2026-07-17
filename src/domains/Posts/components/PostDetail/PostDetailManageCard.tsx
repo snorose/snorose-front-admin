@@ -29,13 +29,17 @@ export default function PostDetailManageCard({
 
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
-    mutationFn: () => deletePost(post.postId),
-    onSuccess: () => {
-      toast.info(
-        deleteCommentsAlso
-          ? '게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.'
-          : '게시글이 삭제되었습니다.'
-      );
+    mutationFn: (memo: string) => deletePost(post.postId, memo),
+    onMutate: () => {
+      return { deleteCommentsAlsoAtMutation: deleteCommentsAlso };
+    },
+    onSuccess: (_data, _variables, context) => {
+      if (context?.deleteCommentsAlsoAtMutation) {
+        toast.info('게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.');
+      } else {
+        toast.success('게시글이 삭제되었습니다.');
+      }
+
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
@@ -56,7 +60,7 @@ export default function PostDetailManageCard({
   const handleConfirmAction = () => {
     if (!reason.trim()) return;
     if (modalType === 'DELETE') {
-      deleteMutation.mutate();
+      deleteMutation.mutate(reason);
     } else {
       // TODO: DELETE 외(RESTORE, HIDE) API 연동 시 아래 로직 구현
       toast.info('개발 중입니다');
