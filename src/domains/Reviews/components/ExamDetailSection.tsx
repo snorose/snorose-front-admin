@@ -37,7 +37,6 @@ import {
 } from '@/domains/Reviews/utils';
 
 import {
-  confirmExamReview,
   deleteExamReview,
   downloadExamReviewFile,
   updateExamReview,
@@ -115,6 +114,50 @@ const DEFAULT_FORM_DATA: FormData = {
   fileName: '',
   examTypeAndQuestions: '',
   author: '',
+};
+
+const getRequiredFieldErrorMessage = (formData: FormData): string | null => {
+  if (formData.lectureName.trim() === '') {
+    return '강의명을 입력해주세요.';
+  }
+
+  if (formData.professorName.trim() === '') {
+    return '교수명을 입력해주세요.';
+  }
+
+  if (formData.fileName.trim() === '') {
+    return '업로드 파일을 등록해주세요.';
+  }
+
+  if (formData.semester.trim() === '') {
+    return '수강학기를 선택해주세요.';
+  }
+
+  if (formData.examType.trim() === '') {
+    return '시험 종류를 선택해주세요.';
+  }
+
+  if (!formData.lectureType) {
+    return '강의 종류를 선택해주세요.';
+  }
+
+  if (formData.classNumber === null || formData.classNumber < 1) {
+    return '분반을 입력해주세요.';
+  }
+
+  if (formData.isPF.trim() === '') {
+    return 'P/F를 선택해주세요.';
+  }
+
+  if (formData.isOnline.trim() === '') {
+    return '온라인 강의 여부를 선택해주세요.';
+  }
+
+  if (formData.examTypeAndQuestions.trim() === '') {
+    return '시험 유형 및 문항수를 입력해주세요.';
+  }
+
+  return null;
 };
 
 export function ExamDetailSection({
@@ -341,6 +384,13 @@ export function ExamDetailSection({
 
   const openSaveModal = () => {
     if (!isDirty) return;
+
+    const requiredFieldErrorMessage = getRequiredFieldErrorMessage(formData);
+    if (requiredFieldErrorMessage) {
+      toast.error(requiredFieldErrorMessage);
+      return;
+    }
+
     setIsSaveModalOpen(true);
   };
 
@@ -391,13 +441,17 @@ export function ExamDetailSection({
       return;
     }
 
+    const requiredFieldErrorMessage = getRequiredFieldErrorMessage(formData);
+    if (requiredFieldErrorMessage) {
+      toast.error(requiredFieldErrorMessage);
+      return;
+    }
+
     setIsSaving(true);
     try {
       const post: UpdateExamReviewRequest['post'] = {};
-
-      if (formData.classNumber === null) {
-        toast.error('분반을 입력해주세요.');
-        return;
+      if (formData.isConfirmed !== initialValues.isConfirmed) {
+        post.isConfirmed = formData.isConfirmed;
       }
       if (formData.isDiscussed !== initialValues.isDiscussed) {
         post.isDiscussed = formData.isDiscussed;
@@ -412,7 +466,7 @@ export function ExamDetailSection({
         post.professor = formData.professorName;
       }
       if (formData.classNumber !== initialValues.classNumber) {
-        post.classNumber = formData.classNumber;
+        post.classNumber = formData.classNumber!;
       }
       if (formData.semester !== initialValues.semester) {
         const yearMatch = formData.semester.match(/^(\d{4})/);
@@ -438,40 +492,22 @@ export function ExamDetailSection({
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
-      const hasConfirmUpdate =
-        formData.isConfirmed !== initialValues.isConfirmed;
       const hasDetailUpdate =
         Object.keys(post).length > 0 || Boolean(selectedFile);
 
-      if (!hasConfirmUpdate && !hasDetailUpdate) {
+      if (!hasDetailUpdate) {
         return;
       }
 
-      let updatedDetail: ExamReviewDetailResult = selectedExamReviewDetail;
+      const updateData: UpdateExamReviewRequest = {
+        ...(selectedFile ? { file: selectedFile } : {}),
+        post,
+      };
 
-      if (hasDetailUpdate) {
-        const updateData: UpdateExamReviewRequest = {
-          ...(selectedFile ? { file: selectedFile } : {}),
-          post,
-        };
-
-        updatedDetail = await updateExamReview(
-          selectedExamReview.id,
-          updateData
-        );
-      }
-
-      if (hasConfirmUpdate) {
-        const confirmResult = await confirmExamReview(selectedExamReview.id, {
-          isConfirmed: formData.isConfirmed,
-        });
-
-        updatedDetail = {
-          ...updatedDetail,
-          isConfirmed: confirmResult.isConfirmed,
-          status: confirmResult.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
-        };
-      }
+      const updatedDetail = await updateExamReview(
+        selectedExamReview.id,
+        updateData
+      );
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
       setSelectedFile(null);

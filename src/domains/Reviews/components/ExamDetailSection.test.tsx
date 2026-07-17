@@ -13,7 +13,6 @@ import { deleteExamReview, updateExamReview } from '@/apis/reviews';
 import { ExamDetailSection } from './ExamDetailSection';
 
 vi.mock('@/apis/reviews', () => ({
-  confirmExamReview: vi.fn(),
   deleteExamReview: vi.fn(),
   downloadExamReviewFile: vi.fn(),
   updateExamReview: vi.fn(),
@@ -28,10 +27,38 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/domains/Reviews/components', () => ({
   ExamReviewCommentSection: () => <div>댓글 목록</div>,
-  ExamReviewDetailInfoSection: () => <div>시험후기 상세정보 내용</div>,
+  ExamReviewDetailInfoSection: ({
+    setFormData,
+  }: {
+    setFormData: (partial: {
+      isConfirmed?: boolean;
+      lectureName?: string;
+    }) => void;
+  }) => (
+    <div>
+      <div>시험후기 상세정보 내용</div>
+      <button type='button' onClick={() => setFormData({ isConfirmed: true })}>
+        확인 상태로 변경
+      </button>
+      <button type='button' onClick={() => setFormData({ lectureName: ' ' })}>
+        강의명 비우기
+      </button>
+    </div>
+  ),
   ExamReviewLogSection: () => <div>관리 이력 내용</div>,
   ExamReviewPostInfoSection: () => <div>게시글 및 작성자 정보 내용</div>,
-  ExamReviewUpdateConfirmModal: () => null,
+  ExamReviewUpdateConfirmModal: ({
+    isOpen,
+    onConfirm,
+  }: {
+    isOpen: boolean;
+    onConfirm: () => void;
+  }) =>
+    isOpen ? (
+      <button type='button' onClick={onConfirm}>
+        수정 확인
+      </button>
+    ) : null,
 }));
 
 const selectedExamReview: ExamReview = {
@@ -203,5 +230,55 @@ describe('ExamDetailSection', () => {
       });
     });
     expect(deleteExamReview).toHaveBeenCalledWith(101);
+  });
+
+  test('확인여부 변경을 시험후기 수정 API payload에 포함한다', async () => {
+    const user = userEvent.setup();
+    const onSaveSuccess = vi.fn();
+    const updatedDetail = {
+      ...selectedExamReviewDetail,
+      isConfirmed: true,
+      status: 'CONFIRMED',
+    };
+    vi.mocked(updateExamReview).mockResolvedValue(updatedDetail);
+
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+        onSaveSuccess={onSaveSuccess}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
+    await user.click(screen.getByRole('button', { name: '저장' }));
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+
+    await waitFor(() => {
+      expect(updateExamReview).toHaveBeenCalledWith(101, {
+        post: { isConfirmed: true },
+      });
+    });
+    expect(onSaveSuccess).toHaveBeenCalledWith(updatedDetail);
+  });
+
+  test('필수값이 비어 있으면 시험후기 수정 API를 호출하지 않는다', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '강의명 비우기' }));
+    await user.click(screen.getByRole('button', { name: '저장' }));
+
+    expect(toast.error).toHaveBeenCalledWith('강의명을 입력해주세요.');
+    expect(screen.queryByRole('button', { name: '수정 확인' })).toBeNull();
+    expect(updateExamReview).not.toHaveBeenCalled();
   });
 });

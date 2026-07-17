@@ -39,17 +39,13 @@ const PROCESS_STATUS_BADGE_CLASS_NAMES: Record<
   ExamReviewProcessStatus,
   string
 > = {
-  VISIBLE: 'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300',
-  USER_DELETED:
-    'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-300',
-  ADMIN_DELETED: 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300',
-  ADMIN_HIDDEN:
-    'bg-orange-50 text-orange-700 dark:bg-orange-950 dark:text-orange-300',
-  AUTO_HIDDEN:
-    'bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
-  SANCTIONED: 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300',
-  DESANCTIONED:
-    'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+  VISIBLE: 'bg-gray-100 text-gray-700',
+  USER_DELETED: 'bg-slate-100 text-slate-700',
+  ADMIN_DELETED: 'bg-red-50 text-red-700',
+  ADMIN_HIDDEN: 'bg-orange-50 text-orange-700',
+  AUTO_HIDDEN: 'bg-amber-50 text-amber-700',
+  SANCTIONED: 'bg-rose-50 text-rose-700',
+  DESANCTIONED: 'bg-emerald-50 text-emerald-700',
 };
 
 const getProcessStatusLabel = (status: ExamReviewProcessStatus): string =>
@@ -65,9 +61,7 @@ const renderBooleanBadge = (
     variant='outline'
     className={cn(
       'max-w-full truncate',
-      value
-        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-        : 'text-gray-500 dark:text-gray-400'
+      value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'text-gray-500'
     )}
     title={value ? trueLabel : falseLabel}
   >
@@ -83,7 +77,7 @@ const renderReportedStatusBadge = (review: ExamReview) => {
   return (
     <Badge
       variant='outline'
-      className='max-w-full truncate border-red-200 bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
+      className='max-w-full truncate border-red-200 bg-red-50 text-red-700'
       title={label}
     >
       {label}

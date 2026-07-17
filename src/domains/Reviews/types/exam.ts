@@ -90,10 +90,6 @@ export interface ExamReviews {
   adminName: string | null;
 }
 
-export interface ConfirmExamReviewRequest {
-  isConfirmed: boolean;
-}
-
 export interface UpdateExamReviewPost {
   isConfirmed?: boolean;
   isDiscussed?: boolean;
