@@ -116,6 +116,50 @@ const DEFAULT_FORM_DATA: FormData = {
   author: '',
 };
 
+const getRequiredFieldErrorMessage = (formData: FormData): string | null => {
+  if (formData.lectureName.trim() === '') {
+    return '강의명을 입력해주세요.';
+  }
+
+  if (formData.professorName.trim() === '') {
+    return '교수명을 입력해주세요.';
+  }
+
+  if (formData.fileName.trim() === '') {
+    return '업로드 파일을 등록해주세요.';
+  }
+
+  if (formData.semester.trim() === '') {
+    return '수강학기를 선택해주세요.';
+  }
+
+  if (formData.examType.trim() === '') {
+    return '시험 종류를 선택해주세요.';
+  }
+
+  if (!formData.lectureType) {
+    return '강의 종류를 선택해주세요.';
+  }
+
+  if (formData.classNumber === null || formData.classNumber < 1) {
+    return '분반을 입력해주세요.';
+  }
+
+  if (formData.isPF.trim() === '') {
+    return 'P/F를 선택해주세요.';
+  }
+
+  if (formData.isOnline.trim() === '') {
+    return '온라인 강의 여부를 선택해주세요.';
+  }
+
+  if (formData.examTypeAndQuestions.trim() === '') {
+    return '시험 유형 및 문항수를 입력해주세요.';
+  }
+
+  return null;
+};
+
 export function ExamDetailSection({
   selectedExamReview,
   selectedExamReviewDetail,
@@ -390,14 +434,15 @@ export function ExamDetailSection({
       return;
     }
 
+    const requiredFieldErrorMessage = getRequiredFieldErrorMessage(formData);
+    if (requiredFieldErrorMessage) {
+      toast.error(requiredFieldErrorMessage);
+      return;
+    }
+
     setIsSaving(true);
     try {
       const post: UpdateExamReviewRequest['post'] = {};
-
-      if (formData.classNumber === null) {
-        toast.error('분반을 입력해주세요.');
-        return;
-      }
       if (formData.isConfirmed !== initialValues.isConfirmed) {
         post.isConfirmed = formData.isConfirmed;
       }
@@ -414,7 +459,7 @@ export function ExamDetailSection({
         post.professor = formData.professorName;
       }
       if (formData.classNumber !== initialValues.classNumber) {
-        post.classNumber = formData.classNumber;
+        post.classNumber = formData.classNumber!;
       }
       if (formData.semester !== initialValues.semester) {
         const yearMatch = formData.semester.match(/^(\d{4})/);

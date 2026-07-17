@@ -30,12 +30,18 @@ vi.mock('@/domains/Reviews/components', () => ({
   ExamReviewDetailInfoSection: ({
     setFormData,
   }: {
-    setFormData: (partial: { isConfirmed: boolean }) => void;
+    setFormData: (partial: {
+      isConfirmed?: boolean;
+      lectureName?: string;
+    }) => void;
   }) => (
     <div>
       <div>시험후기 상세정보 내용</div>
       <button type='button' onClick={() => setFormData({ isConfirmed: true })}>
         확인 상태로 변경
+      </button>
+      <button type='button' onClick={() => setFormData({ lectureName: ' ' })}>
+        강의명 비우기
       </button>
     </div>
   ),
@@ -255,5 +261,24 @@ describe('ExamDetailSection', () => {
       });
     });
     expect(onSaveSuccess).toHaveBeenCalledWith(updatedDetail);
+  });
+
+  test('필수값이 비어 있으면 시험후기 수정 API를 호출하지 않는다', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '강의명 비우기' }));
+    await user.click(screen.getByRole('button', { name: '저장' }));
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+
+    expect(toast.error).toHaveBeenCalledWith('강의명을 입력해주세요.');
+    expect(updateExamReview).not.toHaveBeenCalled();
   });
 });
