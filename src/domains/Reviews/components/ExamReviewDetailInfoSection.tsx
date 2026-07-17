@@ -97,7 +97,7 @@ export function ExamReviewDetailInfoSection({
     <div className='space-y-4'>
       <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-4'>
         <Field className='gap-0'>
-          <Field.Label>확인여부</Field.Label>
+          <Field.Label required>확인여부</Field.Label>
           <Field.Content>
             <Select
               value={formData.isConfirmed ? 'true' : 'false'}
@@ -121,7 +121,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>논의 여부</Field.Label>
+          <Field.Label required>논의 여부</Field.Label>
           <Field.Content>
             <Select
               value={formData.isDiscussed ? 'true' : 'false'}
@@ -195,7 +195,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>강의명</Field.Label>
+          <Field.Label required>강의명</Field.Label>
           <Field.Content>
             <Input
               value={formData.lectureName}
@@ -205,7 +205,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>교수명</Field.Label>
+          <Field.Label required>교수명</Field.Label>
           <Field.Content>
             <Input
               value={formData.professorName}
@@ -215,7 +215,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>업로드 파일</Field.Label>
+          <Field.Label required>업로드 파일</Field.Label>
           <Field.Content>
             <div className='flex items-center gap-2'>
               <button
@@ -253,7 +253,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>수강학기</Field.Label>
+          <Field.Label required>수강학기</Field.Label>
           <Field.Content>
             <Select
               value={formData.semester}
@@ -274,7 +274,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>시험 종류</Field.Label>
+          <Field.Label required>시험 종류</Field.Label>
           <Field.Content>
             <Select
               value={formData.examType}
@@ -295,7 +295,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>강의 종류</Field.Label>
+          <Field.Label required>강의 종류</Field.Label>
           <Field.Content>
             <Select
               value={formData.lectureType}
@@ -323,7 +323,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>분반</Field.Label>
+          <Field.Label required>분반</Field.Label>
           <Field.Content>
             <Input
               type='number'
@@ -344,7 +344,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>P/F</Field.Label>
+          <Field.Label required>P/F</Field.Label>
           <Field.Content>
             <Select
               value={formData.isPF}
@@ -362,7 +362,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>온라인 강의 여부</Field.Label>
+          <Field.Label required>온라인 강의 여부</Field.Label>
           <Field.Content>
             <Select
               value={formData.isOnline}
@@ -380,7 +380,7 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>시험 유형 및 문항수</Field.Label>
+          <Field.Label required>시험 유형 및 문항수</Field.Label>
           <Field.Content>
             <Textarea
               value={formData.examTypeAndQuestions}

@@ -40,7 +40,12 @@ function renderExamReviewDetailInfoSection() {
 }
 
 function getFieldByLabel(label: string) {
-  const field = screen.getByText(label).closest('[data-slot="field"]');
+  const field = screen
+    .getByText(label, {
+      exact: false,
+      selector: '[data-slot="field-label"]',
+    })
+    .closest('[data-slot="field"]');
 
   expect(field).not.toBeNull();
 
@@ -48,6 +53,27 @@ function getFieldByLabel(label: string) {
 }
 
 describe('ExamReviewDetailInfoSection', () => {
+  test('필수 입력값 라벨에 필수 표시를 보여준다', () => {
+    renderExamReviewDetailInfoSection();
+
+    [
+      '확인여부',
+      '논의 여부',
+      '강의명',
+      '교수명',
+      '업로드 파일',
+      '수강학기',
+      '시험 종류',
+      '강의 종류',
+      '분반',
+      'P/F',
+      '온라인 강의 여부',
+      '시험 유형 및 문항수',
+    ].forEach((label) => {
+      expect(getFieldByLabel(label)).toHaveTextContent(`${label}*`);
+    });
+  });
+
   test('메모 입력란은 시험 유형 및 문항수 오른쪽 칸에 배치된다', () => {
     renderExamReviewDetailInfoSection();
 
