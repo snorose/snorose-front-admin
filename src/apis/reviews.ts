@@ -7,7 +7,6 @@ import type {
 } from '@/shared/types';
 
 import type {
-  ConfirmExamReviewRequest,
   ExamReviewDetailResult,
   ExamReviewSearchParams,
   ExamReviewsResult,
@@ -24,17 +23,6 @@ export const getExamReviews = async (
       params,
     }
   );
-  return response.data.result;
-};
-
-// 시험후기 확인 처리 (isConfirmed 변경) api
-export const confirmExamReview = async (
-  postId: number,
-  data: ConfirmExamReviewRequest
-): Promise<{ postId: number; isConfirmed: boolean }> => {
-  const response = await axiosInstance.put<
-    BaseResponse<{ postId: number; isConfirmed: boolean }>
-  >(`/v1/admin/reviews/confirm/${postId}`, data);
   return response.data.result;
 };
 

@@ -37,7 +37,6 @@ import {
 } from '@/domains/Reviews/utils';
 
 import {
-  confirmExamReview,
   deleteExamReview,
   downloadExamReviewFile,
   updateExamReview,
@@ -399,6 +398,9 @@ export function ExamDetailSection({
         toast.error('분반을 입력해주세요.');
         return;
       }
+      if (formData.isConfirmed !== initialValues.isConfirmed) {
+        post.isConfirmed = formData.isConfirmed;
+      }
       if (formData.isDiscussed !== initialValues.isDiscussed) {
         post.isDiscussed = formData.isDiscussed;
       }
@@ -438,40 +440,22 @@ export function ExamDetailSection({
         post.questionDetail = formData.examTypeAndQuestions;
       }
 
-      const hasConfirmUpdate =
-        formData.isConfirmed !== initialValues.isConfirmed;
       const hasDetailUpdate =
         Object.keys(post).length > 0 || Boolean(selectedFile);
 
-      if (!hasConfirmUpdate && !hasDetailUpdate) {
+      if (!hasDetailUpdate) {
         return;
       }
 
-      let updatedDetail: ExamReviewDetailResult = selectedExamReviewDetail;
+      const updateData: UpdateExamReviewRequest = {
+        ...(selectedFile ? { file: selectedFile } : {}),
+        post,
+      };
 
-      if (hasDetailUpdate) {
-        const updateData: UpdateExamReviewRequest = {
-          ...(selectedFile ? { file: selectedFile } : {}),
-          post,
-        };
-
-        updatedDetail = await updateExamReview(
-          selectedExamReview.id,
-          updateData
-        );
-      }
-
-      if (hasConfirmUpdate) {
-        const confirmResult = await confirmExamReview(selectedExamReview.id, {
-          isConfirmed: formData.isConfirmed,
-        });
-
-        updatedDetail = {
-          ...updatedDetail,
-          isConfirmed: confirmResult.isConfirmed,
-          status: confirmResult.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED',
-        };
-      }
+      const updatedDetail = await updateExamReview(
+        selectedExamReview.id,
+        updateData
+      );
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
       setSelectedFile(null);
