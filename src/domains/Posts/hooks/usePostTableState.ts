@@ -130,9 +130,17 @@ export function usePostTableState({
   const handleBulkRestore = () => {
     if (selectedIds.length === 0) return;
     restorePost(selectedIds, {
-      onSuccess: (res) => {
-        toast.success(`${res.length}개의 게시글이 복구되었습니다.`);
-        setSelectedIds([]);
+      onSuccess: ({ restored, restoredIds, failedIds }) => {
+        if (failedIds.length > 0) {
+          toast.warning(
+            `${restored.length}개의 게시글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
+          );
+        } else {
+          toast.success(`${restored.length}개의 게시글이 복구되었습니다.`);
+        }
+
+        const restoredIdSet = new Set(restoredIds);
+        setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
       },
       onError: () => toast.error('게시글 복구 중 오류가 발생했습니다.'),
     });

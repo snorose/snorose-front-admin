@@ -138,9 +138,17 @@ export function useCommentTableState({
   const handleBulkRestore = () => {
     if (selectedIds.length === 0) return;
     restoreComment(selectedIds, {
-      onSuccess: (res) => {
-        toast.success(`${res.length}개의 댓글이 복구되었습니다.`);
-        setSelectedIds([]);
+      onSuccess: ({ restored, restoredIds, failedIds }) => {
+        if (failedIds.length > 0) {
+          toast.warning(
+            `${restored.length}개의 댓글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
+          );
+        } else {
+          toast.success(`${restored.length}개의 댓글이 복구되었습니다.`);
+        }
+
+        const restoredIdSet = new Set(restoredIds);
+        setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
         void refetch();
       },
       onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
