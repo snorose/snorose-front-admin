@@ -759,6 +759,23 @@ describe('PushNotificationPage', () => {
       expect(internalUrlRadio).toBeChecked();
     });
 
+    test('URL 타입을 변경해도 입력한 URL은 유지된다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.clear(urlInput);
+      await user.type(urlInput, '/board/notice/post/123');
+      await user.click(screen.getByLabelText(/외부 URL/));
+
+      expect(urlInput).toHaveValue('/board/notice/post/123');
+
+      await user.click(screen.getByLabelText(/스노로즈 내부 URL/));
+
+      expect(urlInput).toHaveValue('/board/notice/post/123');
+    });
+
     test.each([
       ['base URL', 'https://www.snorose.com'],
       ['https 전체 URL', 'https://www.snorose.com/board/notice/post/1869958'],
@@ -876,6 +893,32 @@ describe('PushNotificationPage', () => {
           })
         );
       });
+    });
+
+    test('외부 URL 모드에서 내부 경로를 입력하면 토스트만 뜨고 모달은 열리지 않는다', async () => {
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.clear(urlInput);
+      await user.type(urlInput, '/board/notice/post/123');
+      await user.click(screen.getByLabelText(/외부 URL/));
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      expect(toast.info).toHaveBeenCalledWith(
+        '외부 URL은 도메인을 포함한 주소를 입력해 주세요. (예: https://example.com)'
+      );
+      expect(urlInput).toHaveValue('/board/notice/post/123');
+      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
     });
 
     test('외부 URL 모드에서 프로토콜 없이 입력하면 https를 붙여 전달된다', async () => {

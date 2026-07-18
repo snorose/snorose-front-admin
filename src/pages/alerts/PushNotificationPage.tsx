@@ -127,7 +127,6 @@ export default function PushNotificationPage() {
     setUrlInputType(nextUrlInputType);
     setFormData((prev) => ({
       ...prev,
-      url: '',
       isExternal: nextUrlInputType === 'external',
     }));
   };
@@ -164,6 +163,13 @@ export default function PushNotificationPage() {
         return;
       }
     } else {
+      if (urlToCheck.startsWith('/')) {
+        toast.info(
+          '외부 URL은 도메인을 포함한 주소를 입력해 주세요. (예: https://example.com)'
+        );
+        return;
+      }
+
       const httpsExternalUrl = toPushApiUrl(formData.url ?? '', urlInputType);
 
       if (httpsExternalUrl === '') {
