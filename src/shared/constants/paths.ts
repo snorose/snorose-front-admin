@@ -15,4 +15,5 @@ export const PATHS = {
   POINT_UPLOAD_EXCEL: '/point/excel-upload',
   INQUIRY_REPORT: '/report/inquiry',
   ALERTS: '/alerts',
+  POPUPS: '/operation/popup',
 } as const;
