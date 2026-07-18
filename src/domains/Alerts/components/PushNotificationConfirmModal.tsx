@@ -5,6 +5,7 @@ import type { PushNotification } from '@/shared/types';
 
 interface PushNotificationConfirmModalProps {
   isOpen: boolean;
+  isLoading: boolean;
   onClose: () => void;
   onConfirm: () => void;
   data: PushNotification;
@@ -12,6 +13,7 @@ interface PushNotificationConfirmModalProps {
 
 export function PushNotificationConfirmModal({
   isOpen,
+  isLoading,
   onClose,
   onConfirm,
   data,
@@ -22,6 +24,10 @@ export function PushNotificationConfirmModal({
       { label: '알림 제목', value: data.title },
       { label: '알림 내용', value: data.body },
       { label: 'URL', value: data.url },
+      {
+        label: 'URL 타입',
+        value: data.isExternal ? '외부 URL' : '스노로즈 내부 URL',
+      },
       {
         label: '메시지 유형',
         value: data.isMarketing ? '광고성' : '정보성',
@@ -37,8 +43,15 @@ export function PushNotificationConfirmModal({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <Dialog.Content>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open && !isLoading) {
+          onClose();
+        }
+      }}
+    >
+      <Dialog.Content showCloseButton={!isLoading}>
         <Dialog.Header>
           <Dialog.Title>푸시 알림 전송 확인</Dialog.Title>
           <Dialog.Description>
@@ -56,12 +69,25 @@ export function PushNotificationConfirmModal({
           ))}
         </div>
 
-        <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={onClose}>
+        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2 sm:justify-normal'>
+          <Button
+            type='button'
+            variant='outline'
+            size='lg'
+            disabled={isLoading}
+            onClick={onClose}
+            className='w-full'
+          >
             취소
           </Button>
-          <Button type='button' onClick={onConfirm}>
-            확인
+          <Button
+            type='button'
+            size='lg'
+            disabled={isLoading}
+            onClick={onConfirm}
+            className='w-full'
+          >
+            {isLoading ? '발송 중...' : '즉시 발송'}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>
