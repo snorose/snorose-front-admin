@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 import * as Popover from '@radix-ui/react-popover';
 
@@ -12,7 +12,8 @@ export interface ExamMultiSelectProps {
   side?: 'top' | 'bottom' | 'left' | 'right';
   align?: 'start' | 'center' | 'end';
   showStatusDot?: boolean;
-  children: React.ReactNode;
+  renderOption?: (option: string) => ReactNode;
+  children: ReactNode;
 }
 
 export const ExamMultiSelect = ({
@@ -23,6 +24,7 @@ export const ExamMultiSelect = ({
   side = 'bottom',
   align = 'start',
   showStatusDot = false,
+  renderOption,
   children,
 }: ExamMultiSelectProps) => {
   const [open, setOpen] = useState(false);
@@ -126,7 +128,9 @@ export const ExamMultiSelect = ({
                     }`}
                     tabIndex={-1}
                   />
-                  <span className='flex-1 text-left'>{option}</span>
+                  <span className='flex-1 text-left'>
+                    {renderOption ? renderOption(option) : option}
+                  </span>
                   {showStatusDot && statusOption && (
                     <div className='ml-2 h-2 w-2 shrink-0 rounded-full bg-blue-500' />
                   )}

@@ -7,6 +7,7 @@ export {
   extractYearFromSemester,
   formatExamReviewLogValue,
   getExamReviewProcessStatuses,
+  getExamReviewProcessStatusLabel,
   getStatusName,
   isExamReviewSanctioned,
 } from './exam-formatters';

@@ -29,6 +29,12 @@ const STATUS_LABELS: Record<string, string> = {
   ),
 };
 
+export const getExamReviewProcessStatusLabel = (
+  status: ExamReviewProcessStatus
+): string =>
+  EXAM_REVIEW_PROCESS_STATUS.find((option) => option.code === status)?.label ??
+  status;
+
 const SEMESTER_LABELS: Record<string, string> = {
   FIRST: '1학기',
   SECOND: '2학기',

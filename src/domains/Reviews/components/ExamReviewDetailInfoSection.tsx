@@ -64,13 +64,14 @@ const getProcessStatusLabel = (
 const renderStatusBadge = (
   label: string,
   isActive: boolean,
-  activeClassName: string
+  activeClassName: string,
+  inactiveClassName = 'bg-gray-100 text-gray-700'
 ) => (
   <Badge
-    variant='outline'
+    variant='default'
     className={cn(
       'max-w-full truncate',
-      isActive ? activeClassName : 'text-gray-500'
+      isActive ? activeClassName : inactiveClassName
     )}
     title={label}
   >
@@ -134,7 +135,7 @@ export function ExamReviewDetailInfoSection({
                 {renderStatusBadge(
                   formData.isDiscussed ? '논의 있음' : '논의 없음',
                   formData.isDiscussed,
-                  'border-blue-200 bg-blue-50 text-blue-700'
+                  'bg-blue-50 text-blue-700'
                 )}
               </Select.Trigger>
               <Select.Content>
@@ -142,14 +143,14 @@ export function ExamReviewDetailInfoSection({
                   {renderStatusBadge(
                     '논의 있음',
                     true,
-                    'border-blue-200 bg-blue-50 text-blue-700'
+                    'bg-blue-50 text-blue-700'
                   )}
                 </Select.Item>
                 <Select.Item value='false'>
                   {renderStatusBadge(
                     '논의 없음',
                     false,
-                    'border-blue-200 bg-blue-50 text-blue-700'
+                    'bg-blue-50 text-blue-700'
                   )}
                 </Select.Item>
               </Select.Content>
@@ -164,7 +165,7 @@ export function ExamReviewDetailInfoSection({
                 deletionStatusLabel,
                 formData.deletionStatus !== null &&
                   formData.deletionStatus !== 'VISIBLE',
-                'border-red-200 bg-red-50 text-red-700'
+                'bg-red-50 text-red-700'
               )}
             </div>
           </Field.Content>
@@ -175,8 +176,10 @@ export function ExamReviewDetailInfoSection({
             <div className={STATUS_FIELD_CLASS_NAME}>
               {renderStatusBadge(
                 formData.isSanctioned ? '징계' : '징계 없음',
-                formData.isSanctioned,
-                'border-rose-200 bg-rose-50 text-rose-700'
+                true,
+                formData.isSanctioned
+                  ? 'bg-violet-50 text-violet-700'
+                  : 'bg-emerald-50 text-emerald-700'
               )}
             </div>
           </Field.Content>
@@ -189,7 +192,7 @@ export function ExamReviewDetailInfoSection({
                 visibilityStatusLabel,
                 formData.visibilityStatus !== null &&
                   formData.visibilityStatus !== 'VISIBLE',
-                'border-amber-200 bg-amber-50 text-amber-700'
+                'bg-amber-50 text-amber-700'
               )}
             </div>
           </Field.Content>
