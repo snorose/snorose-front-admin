@@ -64,13 +64,14 @@ const getProcessStatusLabel = (
 const renderStatusBadge = (
   label: string,
   isActive: boolean,
-  activeClassName: string
+  activeClassName: string,
+  inactiveClassName = 'bg-gray-100 text-gray-500'
 ) => (
   <Badge
-    variant='outline'
+    variant='default'
     className={cn(
       'max-w-full truncate',
-      isActive ? activeClassName : 'text-gray-500'
+      isActive ? activeClassName : inactiveClassName
     )}
     title={label}
   >
@@ -89,10 +90,6 @@ export function ExamReviewDetailInfoSection({
 }: ExamReviewDetailInfoSectionProps) {
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
   const deletionStatusLabel = getProcessStatusLabel(formData.deletionStatus);
-  const deletionStatusClassName =
-    formData.deletionStatus === 'USER_DELETED'
-      ? 'border-orange-200 bg-orange-50 text-orange-700'
-      : 'border-red-200 bg-red-50 text-red-700';
   const visibilityStatusLabel = getProcessStatusLabel(
     formData.visibilityStatus
   );
@@ -168,7 +165,7 @@ export function ExamReviewDetailInfoSection({
                 deletionStatusLabel,
                 formData.deletionStatus !== null &&
                   formData.deletionStatus !== 'VISIBLE',
-                deletionStatusClassName
+                'bg-red-50 text-red-700'
               )}
             </div>
           </Field.Content>
@@ -179,8 +176,10 @@ export function ExamReviewDetailInfoSection({
             <div className={STATUS_FIELD_CLASS_NAME}>
               {renderStatusBadge(
                 formData.isSanctioned ? '징계' : '징계 없음',
-                formData.isSanctioned,
-                'border-rose-200 bg-rose-50 text-rose-700'
+                true,
+                formData.isSanctioned
+                  ? 'bg-violet-50 text-violet-700'
+                  : 'bg-emerald-50 text-emerald-700'
               )}
             </div>
           </Field.Content>
@@ -193,7 +192,7 @@ export function ExamReviewDetailInfoSection({
                 visibilityStatusLabel,
                 formData.visibilityStatus !== null &&
                   formData.visibilityStatus !== 'VISIBLE',
-                'border-amber-200 bg-amber-50 text-amber-700'
+                'bg-amber-50 text-amber-700'
               )}
             </div>
           </Field.Content>

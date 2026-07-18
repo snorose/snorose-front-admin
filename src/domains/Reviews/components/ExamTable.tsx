@@ -8,11 +8,11 @@ import {
 } from 'react';
 
 import { Badge, Table } from '@/shared/components/ui';
-import { EXAM_REVIEW_PROCESS_STATUS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 
 import {
   ExamConfirmStatusBadge,
+  ExamReviewProcessStatusBadge,
   ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
@@ -21,9 +21,9 @@ import {
 import { useExamReviews } from '@/domains/Reviews/hooks';
 import type {
   ExamReview,
-  ExamReviewProcessStatus,
   ExamReviewSearchParams,
 } from '@/domains/Reviews/types';
+import { getExamReviewProcessStatusLabel } from '@/domains/Reviews/utils';
 
 // 페이지네이션 설정
 const ITEMS_PER_PAGE = 10;
@@ -34,23 +34,6 @@ interface ExamReviewTableColumn {
   width?: string;
   render?: (review: ExamReview) => ReactNode;
 }
-
-const PROCESS_STATUS_BADGE_CLASS_NAMES: Record<
-  ExamReviewProcessStatus,
-  string
-> = {
-  VISIBLE: 'bg-gray-100 text-gray-700',
-  USER_DELETED: 'border-orange-200 bg-orange-50 text-orange-700',
-  ADMIN_DELETED: 'border-red-200 bg-red-50 text-red-700',
-  ADMIN_HIDDEN: 'bg-orange-50 text-orange-700',
-  AUTO_HIDDEN: 'bg-amber-50 text-amber-700',
-  SANCTIONED: 'bg-rose-50 text-rose-700',
-  DESANCTIONED: 'bg-emerald-50 text-emerald-700',
-};
-
-const getProcessStatusLabel = (status: ExamReviewProcessStatus): string =>
-  EXAM_REVIEW_PROCESS_STATUS.find((option) => option.code === status)?.label ??
-  status;
 
 const renderBooleanBadge = (
   value: boolean,
@@ -86,7 +69,9 @@ const renderReportedStatusBadge = (review: ExamReview) => {
 };
 
 const renderProcessStatusBadge = (review: ExamReview) => {
-  const statusLabels = review.processStatuses.map(getProcessStatusLabel);
+  const statusLabels = review.processStatuses.map(
+    getExamReviewProcessStatusLabel
+  );
   const reportLabel = review.isReported ? `신고 ${review.reportCount}` : null;
   const label = [reportLabel, ...statusLabels].filter(Boolean).join(', ');
 
@@ -94,13 +79,7 @@ const renderProcessStatusBadge = (review: ExamReview) => {
     <div className='flex flex-wrap gap-1' title={label}>
       {renderReportedStatusBadge(review)}
       {review.processStatuses.map((status) => (
-        <Badge
-          key={status}
-          variant='outline'
-          className={PROCESS_STATUS_BADGE_CLASS_NAMES[status]}
-        >
-          {getProcessStatusLabel(status)}
-        </Badge>
+        <ExamReviewProcessStatusBadge key={status} status={status} />
       ))}
     </div>
   );

@@ -22,6 +22,7 @@ import {
 
 import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
 import { ExamMultiSelect } from './ExamMultiSelect';
+import { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
 
 interface ExamSearchProps {
   onSearchChange: (params: ExamReviewSearchParams) => void;
@@ -86,6 +87,10 @@ const getStatusCodesFromLabels = (statusLabels: string[]): string =>
     })
     .filter(isDefined)
     .join(',');
+
+const getStatusCodeFromLabel = (statusLabel: string) =>
+  EXAM_REVIEW_PROCESS_STATUS.find((status) => status.label === statusLabel)
+    ?.code;
 
 export default function ExamSearch({
   onSearchChange,
@@ -481,6 +486,15 @@ export default function ExamSearch({
           onValueChange={setSelectedStatuses}
           options={PROCESS_STATUS_OPTIONS}
           contentClassName='w-[190px]'
+          renderOption={(option) => {
+            const statusCode = getStatusCodeFromLabel(option);
+
+            return statusCode ? (
+              <ExamReviewProcessStatusBadge status={statusCode} />
+            ) : (
+              option
+            );
+          }}
         >
           <Button
             type='button'
