@@ -5,4 +5,5 @@ export interface PushNotification {
   url: string;
   isMarketing: boolean;
   isTest: boolean;
+  isExternal: boolean;
 }

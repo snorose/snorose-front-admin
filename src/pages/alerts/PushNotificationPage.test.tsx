@@ -353,6 +353,7 @@ describe('PushNotificationPage', () => {
         url: '/',
         isMarketing: true,
         isTest: true,
+        isExternal: false,
       });
     });
 
@@ -459,6 +460,53 @@ describe('PushNotificationPage', () => {
         url: '/board/notice/post/123',
         isMarketing: false,
         isTest: false,
+        isExternal: false,
+      });
+    });
+  });
+
+  test('외부 URL 선택 후 확인하면 isExternal true로 전달된다', async () => {
+    vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<PushNotificationPage />);
+
+    const nameInput = screen.getByLabelText(/알림명/);
+    const titleInput = screen.getByLabelText(/알림 제목/);
+    const bodyInput = screen.getByLabelText(/알림 내용/);
+    const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+    await user.click(screen.getByLabelText(/외부 URL/));
+
+    await user.type(nameInput, '리뉴얼 포인트 지급 안내');
+    await user.type(titleInput, '리뉴얼 포인트');
+    await user.type(bodyInput, '10포인트 지급 안내입니다.');
+    await user.clear(urlInput);
+    await user.type(urlInput, 'https://www.snorose.com/point/history');
+
+    await user.click(
+      screen.getByLabelText(
+        /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+      )
+    );
+    await user.click(
+      screen.getByLabelText(/푸시 알림 허용 회원 전체에게 발송/)
+    );
+
+    const applyButton = screen.getByRole('button', { name: '알림 전송' });
+    await user.click(applyButton);
+
+    const confirmButton = screen.getByRole('button', { name: '확인' });
+    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(postPushNotificationAPI).toHaveBeenCalledWith({
+        name: '리뉴얼 포인트 지급 안내',
+        title: '리뉴얼 포인트',
+        body: '10포인트 지급 안내입니다.',
+        url: 'https://www.snorose.com/point/history',
+        isMarketing: false,
+        isTest: false,
+        isExternal: true,
       });
     });
   });
@@ -617,6 +665,7 @@ describe('PushNotificationPage', () => {
         expect(postPushNotificationAPI).toHaveBeenCalledWith(
           expect.objectContaining({
             url: '/board/notice?page=1&id=123',
+            isExternal: false,
           })
         );
       });
@@ -711,10 +760,11 @@ describe('PushNotificationPage', () => {
     });
 
     test.each([
-      ['https', 'https://www.snorose.com/board/notice/post/1869958'],
-      ['http', 'http://www.snorose.com/board/notice/post/1869958'],
+      ['base URL', 'https://www.snorose.com'],
+      ['https 전체 URL', 'https://www.snorose.com/board/notice/post/1869958'],
+      ['http 전체 URL', 'http://www.snorose.com/board/notice/post/1869958'],
     ])(
-      '내부 URL 모드에서 스노로즈 전체(%s) 주소를 입력하면 토스트만 뜨고 모달은 열리지 않는다',
+      '내부 URL 모드에서 스노로즈 %s를 입력하면 토스트만 뜨고 모달은 열리지 않는다',
       async (_, url) => {
         const user = userEvent.setup();
         render(<PushNotificationPage />);
@@ -729,6 +779,8 @@ describe('PushNotificationPage', () => {
         await user.type(bodyInput, '테스트 내용');
         await user.clear(urlInput);
         await user.type(urlInput, url);
+
+        expect(screen.getByLabelText(/스노로즈 내부 URL/)).toBeChecked();
 
         const applyButton = screen.getByRole('button', { name: '알림 전송' });
         await user.click(applyButton);
@@ -777,12 +829,13 @@ describe('PushNotificationPage', () => {
         expect(postPushNotificationAPI).toHaveBeenCalledWith(
           expect.objectContaining({
             url: 'https://www.snorose.com/board/notice/post/1869958',
+            isExternal: true,
           })
         );
       });
     });
 
-    test('외부 URL 모드에서 스노로즈 전체(http) 주소를 입력하면 모달이 열리고 API 호출 시 그대로 전달된다', async () => {
+    test('외부 URL 모드에서 스노로즈 전체(http) 주소를 입력하면 https로 변환되어 전달된다', async () => {
       vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
       const user = userEvent.setup();
       render(<PushNotificationPage />);
@@ -807,6 +860,10 @@ describe('PushNotificationPage', () => {
       await user.click(applyButton);
 
       expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+      const modalUrl = screen.getByTestId('modal-url');
+      expect(modalUrl).toHaveTextContent(
+        'URL: https://www.snorose.com/board/notice/post/1869958'
+      );
 
       const confirmButton = screen.getByRole('button', { name: '확인' });
       await user.click(confirmButton);
@@ -814,7 +871,46 @@ describe('PushNotificationPage', () => {
       await waitFor(() => {
         expect(postPushNotificationAPI).toHaveBeenCalledWith(
           expect.objectContaining({
-            url: 'http://www.snorose.com/board/notice/post/1869958',
+            url: 'https://www.snorose.com/board/notice/post/1869958',
+            isExternal: true,
+          })
+        );
+      });
+    });
+
+    test('외부 URL 모드에서 프로토콜 없이 입력하면 https를 붙여 전달된다', async () => {
+      vi.mocked(postPushNotificationAPI).mockResolvedValue(undefined);
+      const user = userEvent.setup();
+      render(<PushNotificationPage />);
+
+      const nameInput = screen.getByLabelText(/알림명/);
+      const titleInput = screen.getByLabelText(/알림 제목/);
+      const bodyInput = screen.getByLabelText(/알림 내용/);
+      const urlInput = screen.getByLabelText(/알림 클릭 시 연결되는 주소/);
+
+      await user.click(screen.getByLabelText(/외부 URL/));
+
+      await user.type(nameInput, '테스트 알림');
+      await user.type(titleInput, '테스트 제목');
+      await user.type(bodyInput, '테스트 내용');
+      await user.clear(urlInput);
+      await user.type(urlInput, 'example.com/some/path');
+
+      const applyButton = screen.getByRole('button', { name: '알림 전송' });
+      await user.click(applyButton);
+
+      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+      const modalUrl = screen.getByTestId('modal-url');
+      expect(modalUrl).toHaveTextContent('URL: https://example.com/some/path');
+
+      const confirmButton = screen.getByRole('button', { name: '확인' });
+      await user.click(confirmButton);
+
+      await waitFor(() => {
+        expect(postPushNotificationAPI).toHaveBeenCalledWith(
+          expect.objectContaining({
+            url: 'https://example.com/some/path',
+            isExternal: true,
           })
         );
       });
@@ -834,6 +930,8 @@ describe('PushNotificationPage', () => {
       await user.type(bodyInput, '테스트 내용');
       await user.clear(urlInput);
       await user.type(urlInput, 'https://example.com/some/path');
+
+      expect(screen.getByLabelText(/스노로즈 내부 URL/)).toBeChecked();
 
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
@@ -924,6 +1022,7 @@ describe('PushNotificationPage', () => {
           url: '/',
           isMarketing: true,
           isTest: true,
+          isExternal: false,
         });
       });
     });

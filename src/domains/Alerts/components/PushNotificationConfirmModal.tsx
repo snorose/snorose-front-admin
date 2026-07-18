@@ -23,6 +23,10 @@ export function PushNotificationConfirmModal({
       { label: '알림 내용', value: data.body },
       { label: 'URL', value: data.url },
       {
+        label: 'URL 타입',
+        value: data.isExternal ? '외부 URL' : '스노로즈 내부 URL',
+      },
+      {
         label: '메시지 유형',
         value: data.isMarketing ? '광고성' : '정보성',
       },

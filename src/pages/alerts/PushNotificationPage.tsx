@@ -20,10 +20,14 @@ import { postPushNotificationAPI } from '@/apis';
 /** 알림 링크: 스노로즈 내부(경로만) vs 외부(전체 URL) */
 type UrlInputType = 'internal' | 'external';
 
+function isHttpUrl(url: string): boolean {
+  return url.startsWith('http://') || url.startsWith('https://');
+}
+
 /** 내부 URL 모드에서 도메인까지 붙여 입력한 경우 (경로만 보내야 함) */
 function isSnoroseSiteAbsoluteUrl(url: string): boolean {
   const trimmed = url.trim();
-  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+  if (!isHttpUrl(trimmed)) {
     return false;
   }
   try {
@@ -37,20 +41,40 @@ function isSnoroseSiteAbsoluteUrl(url: string): boolean {
 /**
  * API로 보낼 `url` 필드.
  * 내부: 경로만 보낸다. 기본 도메인은 서버에서 붙인다.
- * 외부: 입력한 http(s) URL 전체를 그대로 보낸다.
+ * 외부: 항상 https://로 시작하는 전체 URL을 보낸다.
  */
 function toPushApiUrl(url: string, urlInputType: UrlInputType): string {
   const trimmed = (url ?? '').trim();
   if (urlInputType === 'external') {
-    return trimmed;
+    if (trimmed === '') {
+      return '';
+    }
+    if (trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('http://')) {
+      return `https://${trimmed.slice('http://'.length)}`;
+    }
+    return `https://${trimmed}`;
   }
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+  if (isHttpUrl(trimmed)) {
     return trimmed;
   }
   if (trimmed === '') {
     return '/';
   }
   return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+}
+
+function toPushApiData(
+  data: PushNotification,
+  urlInputType: UrlInputType
+): PushNotification {
+  return {
+    ...data,
+    url: toPushApiUrl(data.url ?? '', urlInputType),
+    isExternal: urlInputType === 'external',
+  };
 }
 
 const INITIAL_FORM_DATA: PushNotification = {
@@ -60,6 +84,7 @@ const INITIAL_FORM_DATA: PushNotification = {
   url: '',
   isMarketing: true,
   isTest: true,
+  isExternal: false,
 };
 
 export default function PushNotificationPage() {
@@ -88,12 +113,23 @@ export default function PushNotificationPage() {
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, url: e.target.value });
+    const nextUrl = e.target.value;
+
+    setFormData({
+      ...formData,
+      url: nextUrl,
+      isExternal: urlInputType === 'external',
+    });
   };
 
   const handleUrlInputTypeChange = (selectedUrlType: string) => {
-    setUrlInputType(selectedUrlType as UrlInputType);
-    setFormData((prev) => ({ ...prev, url: '' }));
+    const nextUrlInputType = selectedUrlType as UrlInputType;
+    setUrlInputType(nextUrlInputType);
+    setFormData((prev) => ({
+      ...prev,
+      url: '',
+      isExternal: nextUrlInputType === 'external',
+    }));
   };
 
   const handleApplyButtonClick = () => {
@@ -115,9 +151,7 @@ export default function PushNotificationPage() {
         );
         return;
       }
-      const isHttpUrl =
-        urlToCheck.startsWith('http://') || urlToCheck.startsWith('https://');
-      if (isHttpUrl) {
+      if (isHttpUrl(urlToCheck)) {
         toast.info(
           '내부 URL 모드에서는 경로만 입력할 수 있습니다. (예: /board/notice)'
         );
@@ -130,12 +164,21 @@ export default function PushNotificationPage() {
         return;
       }
     } else {
-      if (
-        !urlToCheck.startsWith('http://') &&
-        !urlToCheck.startsWith('https://')
-      ) {
+      const httpsExternalUrl = toPushApiUrl(formData.url ?? '', urlInputType);
+
+      if (httpsExternalUrl === '') {
+        toast.info('외부 URL을 입력해 주세요.');
+        return;
+      }
+
+      try {
+        const { protocol, hostname } = new URL(httpsExternalUrl);
+        if (protocol !== 'https:' || !hostname) {
+          throw new Error('Invalid external URL');
+        }
+      } catch {
         toast.info(
-          '외부 URL은 http:// 또는 https://로 시작하는 전체 주소를 입력해 주세요.'
+          '외부 URL은 도메인을 포함한 주소를 입력해 주세요. (예: https://example.com)'
         );
         return;
       }
@@ -151,10 +194,7 @@ export default function PushNotificationPage() {
 
     setIsLoading(true);
     try {
-      await postPushNotificationAPI({
-        ...formData,
-        url: toPushApiUrl(formData.url ?? '', urlInputType),
-      });
+      await postPushNotificationAPI(toPushApiData(formData, urlInputType));
       toast.success('푸시 알림 전송이 완료되었어요.');
       handleResetButtonClick();
     } catch (error: unknown) {
@@ -277,7 +317,7 @@ export default function PushNotificationPage() {
                     주세요.
                   </>
                 ) : (
-                  '전체 URL을 입력해 주세요.'
+                  '전송 시 https://로 시작하는 전체 URL로 전달돼요.'
                 )}
               </p>
             </div>
@@ -364,10 +404,7 @@ export default function PushNotificationPage() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleConfirmModalButtonClick}
-        data={{
-          ...formData,
-          url: toPushApiUrl(formData.url ?? '', urlInputType),
-        }}
+        data={toPushApiData(formData, urlInputType)}
       />
 
       <div className='flex justify-end gap-2'>
