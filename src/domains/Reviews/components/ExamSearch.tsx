@@ -376,13 +376,7 @@ export default function ExamSearch({
 
       {/* 필터 Select들 */}
       <div className='flex flex-wrap items-center gap-2'>
-        <Select
-          value={sort}
-          onValueChange={(value) => {
-            setSort(value);
-            handleSearchWithParams({ sort: value });
-          }}
-        >
+        <Select value={sort} onValueChange={setSort}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -402,13 +396,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={semester}
-          onValueChange={(value) => {
-            setSemester(value);
-            handleSearchWithParams({ semester: value });
-          }}
-        >
+        <Select value={semester} onValueChange={setSemester}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -427,13 +415,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={examType}
-          onValueChange={(value) => {
-            setExamType(value);
-            handleSearchWithParams({ examType: value });
-          }}
-        >
+        <Select value={examType} onValueChange={setExamType}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -452,13 +434,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={confirmStatus}
-          onValueChange={(value) => {
-            setConfirmStatus(value);
-            handleSearchWithParams({ confirmStatus: value });
-          }}
-        >
+        <Select value={confirmStatus} onValueChange={setConfirmStatus}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -483,13 +459,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={discussionStatus}
-          onValueChange={(value) => {
-            setDiscussionStatus(value);
-            handleSearchWithParams({ discussionStatus: value });
-          }}
-        >
+        <Select value={discussionStatus} onValueChange={setDiscussionStatus}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -508,10 +478,7 @@ export default function ExamSearch({
 
         <ExamMultiSelect
           value={selectedStatuses}
-          onValueChange={(value) => {
-            setSelectedStatuses(value);
-            handleSearchWithParams({ selectedStatuses: value });
-          }}
+          onValueChange={setSelectedStatuses}
           options={PROCESS_STATUS_OPTIONS}
           contentClassName='w-[190px]'
         >
