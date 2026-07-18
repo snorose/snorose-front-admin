@@ -44,7 +44,7 @@ const renderBooleanBadge = (
     variant='default'
     className={cn(
       'max-w-full truncate',
-      value ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-500'
+      value ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-700'
     )}
     title={value ? trueLabel : falseLabel}
   >

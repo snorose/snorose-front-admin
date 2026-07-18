@@ -117,7 +117,7 @@ const renderDiscussionStatusBadge = (status: string) => {
       className={
         status === TRUE_SELECTED
           ? 'bg-blue-50 text-blue-700'
-          : 'bg-gray-100 text-gray-500'
+          : 'bg-gray-100 text-gray-700'
       }
       title={label}
     >
