@@ -40,8 +40,8 @@ const PROCESS_STATUS_BADGE_CLASS_NAMES: Record<
   string
 > = {
   VISIBLE: 'bg-gray-100 text-gray-700',
-  USER_DELETED: 'bg-slate-100 text-slate-700',
-  ADMIN_DELETED: 'bg-red-50 text-red-700',
+  USER_DELETED: 'border-orange-200 bg-orange-50 text-orange-700',
+  ADMIN_DELETED: 'border-red-200 bg-red-50 text-red-700',
   ADMIN_HIDDEN: 'bg-orange-50 text-orange-700',
   AUTO_HIDDEN: 'bg-amber-50 text-amber-700',
   SANCTIONED: 'bg-rose-50 text-rose-700',

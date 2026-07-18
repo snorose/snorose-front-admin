@@ -89,6 +89,10 @@ export function ExamReviewDetailInfoSection({
 }: ExamReviewDetailInfoSectionProps) {
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
   const deletionStatusLabel = getProcessStatusLabel(formData.deletionStatus);
+  const deletionStatusClassName =
+    formData.deletionStatus === 'USER_DELETED'
+      ? 'border-orange-200 bg-orange-50 text-orange-700'
+      : 'border-red-200 bg-red-50 text-red-700';
   const visibilityStatusLabel = getProcessStatusLabel(
     formData.visibilityStatus
   );
@@ -164,7 +168,7 @@ export function ExamReviewDetailInfoSection({
                 deletionStatusLabel,
                 formData.deletionStatus !== null &&
                   formData.deletionStatus !== 'VISIBLE',
-                'border-red-200 bg-red-50 text-red-700'
+                deletionStatusClassName
               )}
             </div>
           </Field.Content>
