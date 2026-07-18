@@ -69,17 +69,25 @@ export function PushNotificationConfirmModal({
           ))}
         </div>
 
-        <Dialog.Footer>
+        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2 sm:justify-normal'>
           <Button
             type='button'
             variant='outline'
+            size='lg'
             disabled={isLoading}
             onClick={onClose}
+            className='w-full'
           >
             취소
           </Button>
-          <Button type='button' disabled={isLoading} onClick={onConfirm}>
-            확인
+          <Button
+            type='button'
+            size='lg'
+            disabled={isLoading}
+            onClick={onConfirm}
+            className='w-full'
+          >
+            {isLoading ? '발송 중...' : '즉시 발송'}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>

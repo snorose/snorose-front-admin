@@ -51,7 +51,7 @@ vi.mock('@/domains/Alerts/components', () => ({
           취소
         </button>
         <button disabled={isLoading} onClick={onConfirm}>
-          확인
+          {isLoading ? '발송 중...' : '즉시 발송'}
         </button>
       </div>
     );
@@ -348,7 +348,7 @@ describe('PushNotificationPage', () => {
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
 
-    const confirmButton = screen.getByRole('button', { name: '확인' });
+    const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -388,7 +388,7 @@ describe('PushNotificationPage', () => {
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
 
-    const confirmButton = screen.getByRole('button', { name: '확인' });
+    const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -415,7 +415,7 @@ describe('PushNotificationPage', () => {
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
 
-    const confirmButton = screen.getByRole('button', { name: '확인' });
+    const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -455,7 +455,7 @@ describe('PushNotificationPage', () => {
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
 
-    const confirmButton = screen.getByRole('button', { name: '확인' });
+    const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -501,7 +501,7 @@ describe('PushNotificationPage', () => {
     const applyButton = screen.getByRole('button', { name: '알림 전송' });
     await user.click(applyButton);
 
-    const confirmButton = screen.getByRole('button', { name: '확인' });
+    const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
     await user.click(confirmButton);
 
     await waitFor(() => {
@@ -664,7 +664,7 @@ describe('PushNotificationPage', () => {
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
 
-      const confirmButton = screen.getByRole('button', { name: '확인' });
+      const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
       await user.click(confirmButton);
 
       await waitFor(() => {
@@ -744,11 +744,13 @@ describe('PushNotificationPage', () => {
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
 
-      const confirmButton = screen.getByRole('button', { name: '확인' });
+      const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
       await user.click(confirmButton);
 
       await waitFor(() => {
-        expect(confirmButton).toBeDisabled();
+        expect(
+          screen.getByRole('button', { name: '발송 중...' })
+        ).toBeDisabled();
       });
 
       // API 호출 중에 다시 클릭 시도
@@ -851,7 +853,7 @@ describe('PushNotificationPage', () => {
         'URL: https://www.snorose.com/board/notice/post/1869958'
       );
 
-      const confirmButton = screen.getByRole('button', { name: '확인' });
+      const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
       await user.click(confirmButton);
 
       await waitFor(() => {
@@ -894,7 +896,7 @@ describe('PushNotificationPage', () => {
         'URL: https://www.snorose.com/board/notice/post/1869958'
       );
 
-      const confirmButton = screen.getByRole('button', { name: '확인' });
+      const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
       await user.click(confirmButton);
 
       await waitFor(() => {
@@ -958,7 +960,7 @@ describe('PushNotificationPage', () => {
       const modalUrl = screen.getByTestId('modal-url');
       expect(modalUrl).toHaveTextContent('URL: https://example.com/some/path');
 
-      const confirmButton = screen.getByRole('button', { name: '확인' });
+      const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
       await user.click(confirmButton);
 
       await waitFor(() => {
@@ -1065,7 +1067,7 @@ describe('PushNotificationPage', () => {
       const applyButton = screen.getByRole('button', { name: '알림 전송' });
       await user.click(applyButton);
 
-      const confirmButton = screen.getByRole('button', { name: '확인' });
+      const confirmButton = screen.getByRole('button', { name: '즉시 발송' });
       await user.click(confirmButton);
 
       // API 호출 시 URL이 절대 경로로 전달되어야 함
