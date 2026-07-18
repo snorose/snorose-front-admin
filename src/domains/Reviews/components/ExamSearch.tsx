@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Input, Select } from '@/shared/components/ui';
+import { Badge, Button, Input, Select } from '@/shared/components/ui';
 import {
   EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
@@ -22,6 +22,7 @@ import {
 
 import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
 import { ExamMultiSelect } from './ExamMultiSelect';
+import { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
 
 interface ExamSearchProps {
   onSearchChange: (params: ExamReviewSearchParams) => void;
@@ -86,6 +87,44 @@ const getStatusCodesFromLabels = (statusLabels: string[]): string =>
     })
     .filter(isDefined)
     .join(',');
+
+const getStatusCodeFromLabel = (statusLabel: string) =>
+  EXAM_REVIEW_PROCESS_STATUS.find((status) => status.label === statusLabel)
+    ?.code;
+
+const getDiscussionStatusLabel = (status: string) => {
+  if (status === TRUE_SELECTED) {
+    return '논의 있음';
+  }
+
+  if (status === FALSE_SELECTED) {
+    return '논의 없음';
+  }
+
+  return '논의 여부 전체';
+};
+
+const renderDiscussionStatusBadge = (status: string) => {
+  const label = getDiscussionStatusLabel(status);
+
+  if (status === ALL_SELECTED) {
+    return label;
+  }
+
+  return (
+    <Badge
+      variant='default'
+      className={
+        status === TRUE_SELECTED
+          ? 'bg-blue-50 text-blue-700'
+          : 'bg-gray-100 text-gray-700'
+      }
+      title={label}
+    >
+      {label}
+    </Badge>
+  );
+};
 
 export default function ExamSearch({
   onSearchChange,
@@ -376,13 +415,7 @@ export default function ExamSearch({
 
       {/* 필터 Select들 */}
       <div className='flex flex-wrap items-center gap-2'>
-        <Select
-          value={sort}
-          onValueChange={(value) => {
-            setSort(value);
-            handleSearchWithParams({ sort: value });
-          }}
-        >
+        <Select value={sort} onValueChange={setSort}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -402,13 +435,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={semester}
-          onValueChange={(value) => {
-            setSemester(value);
-            handleSearchWithParams({ semester: value });
-          }}
-        >
+        <Select value={semester} onValueChange={setSemester}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -427,13 +454,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={examType}
-          onValueChange={(value) => {
-            setExamType(value);
-            handleSearchWithParams({ examType: value });
-          }}
-        >
+        <Select value={examType} onValueChange={setExamType}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -452,13 +473,7 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={confirmStatus}
-          onValueChange={(value) => {
-            setConfirmStatus(value);
-            handleSearchWithParams({ confirmStatus: value });
-          }}
-        >
+        <Select value={confirmStatus} onValueChange={setConfirmStatus}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
             <Select.Value />
           </Select.Trigger>
@@ -483,37 +498,45 @@ export default function ExamSearch({
           </Select.Content>
         </Select>
 
-        <Select
-          value={discussionStatus}
-          onValueChange={(value) => {
-            setDiscussionStatus(value);
-            handleSearchWithParams({ discussionStatus: value });
-          }}
-        >
+        <Select value={discussionStatus} onValueChange={setDiscussionStatus}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
+            {renderDiscussionStatusBadge(discussionStatus)}
           </Select.Trigger>
           <Select.Content align='start'>
             <Select.Item value={ALL_SELECTED} className='text-sm'>
               논의 여부 전체
             </Select.Item>
-            <Select.Item value={TRUE_SELECTED} className='text-sm'>
-              논의 있음
+            <Select.Item
+              value={TRUE_SELECTED}
+              className='text-sm'
+              textValue='논의 있음'
+            >
+              {renderDiscussionStatusBadge(TRUE_SELECTED)}
             </Select.Item>
-            <Select.Item value={FALSE_SELECTED} className='text-sm'>
-              논의 없음
+            <Select.Item
+              value={FALSE_SELECTED}
+              className='text-sm'
+              textValue='논의 없음'
+            >
+              {renderDiscussionStatusBadge(FALSE_SELECTED)}
             </Select.Item>
           </Select.Content>
         </Select>
 
         <ExamMultiSelect
           value={selectedStatuses}
-          onValueChange={(value) => {
-            setSelectedStatuses(value);
-            handleSearchWithParams({ selectedStatuses: value });
-          }}
+          onValueChange={setSelectedStatuses}
           options={PROCESS_STATUS_OPTIONS}
           contentClassName='w-[190px]'
+          renderOption={(option) => {
+            const statusCode = getStatusCodeFromLabel(option);
+
+            return statusCode ? (
+              <ExamReviewProcessStatusBadge status={statusCode} />
+            ) : (
+              option
+            );
+          }}
         >
           <Button
             type='button'
@@ -522,8 +545,8 @@ export default function ExamSearch({
           >
             <span className='truncate'>
               {selectedStatuses.length > 0
-                ? `처리 상태 ${selectedStatuses.length}개`
-                : '처리 상태 전체'}
+                ? `관리 상태 ${selectedStatuses.length}개`
+                : '관리 상태 전체'}
             </span>
             <ChevronDown className='size-4 opacity-50' />
           </Button>

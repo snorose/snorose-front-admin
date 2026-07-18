@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
 
-import { deletePost } from '@/apis';
+import { deletePost, restorePost } from '@/apis';
 
 import type { AdminGetPostResponse } from '../../types';
 import PostDetailActionModal from './PostDetailActionModal';
@@ -49,6 +49,21 @@ export default function PostDetailManageCard({
       toast.error('게시글 삭제에 실패했습니다.');
     },
   });
+
+  const restoreMutation = useMutation({
+    mutationFn: () => restorePost(post.postId),
+    onSuccess: () => {
+      toast.success('게시글이 복구되었습니다.');
+      setIsModalOpen(false);
+      setReason('');
+      setDeleteCommentsAlso(false);
+      void queryClient.invalidateQueries({ queryKey: ['posts'] });
+      void queryClient.invalidateQueries({ queryKey: ['post', post.postId] });
+    },
+    onError: () => {
+      toast.error('게시글 복구에 실패했습니다.');
+    },
+  });
   // 게시글 관리 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<
@@ -58,9 +73,11 @@ export default function PostDetailManageCard({
   const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
   // 모달 확인 클릭
   const handleConfirmAction = () => {
-    if (!reason.trim()) return;
     if (modalType === 'DELETE') {
+      if (!reason.trim()) return;
       deleteMutation.mutate(reason);
+    } else if (modalType === 'RESTORE') {
+      restoreMutation.mutate();
     } else {
       // TODO: DELETE 외(RESTORE, HIDE) API 연동 시 아래 로직 구현
       toast.info('개발 중입니다');

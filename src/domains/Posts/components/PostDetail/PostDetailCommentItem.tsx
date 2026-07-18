@@ -18,7 +18,7 @@ import { formatDateTimeWithAmPm } from '@/shared/utils';
 import type { AdminCommentResult } from '@/domains/Comments/types';
 import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
 
-import { deleteComment, updateCommentVisibility } from '@/apis';
+import { deleteComment, restoreComment, updateCommentVisibility } from '@/apis';
 
 interface PostDetailCommentItemProps {
   comment: AdminCommentResult;
@@ -74,6 +74,20 @@ export default function PostDetailCommentItem({
       toast.error('댓글 삭제에 실패했습니다.');
     },
   });
+
+  // 댓글 복구 Mutation
+  const restoreMutation = useMutation({
+    mutationFn: () => restoreComment(comment.commentId),
+    onSuccess: () => {
+      toast.success('댓글이 복구되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
+    },
+    onError: () => {
+      toast.error('댓글 복구에 실패했습니다.');
+    },
+  });
+
   const handleConfirmAction = (memo: string) => {
     if (!memo.trim()) return;
     if (modalType === 'HIDE') visibilityMutation.mutate(false);
@@ -170,18 +184,10 @@ export default function PostDetailCommentItem({
                 variant='outline'
                 size='sm'
                 className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                disabled={restoreMutation.isPending}
                 onClick={(e) => {
                   e.stopPropagation();
-
-                  // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
-                  const IS_READY = false;
-                  if (!IS_READY) {
-                    toast.info('댓글 복구 API 연동 예정입니다.');
-                    return;
-                  }
-
-                  setModalType('SHOW');
-                  setIsModalOpen(true);
+                  restoreMutation.mutate();
                 }}
               >
                 복구
