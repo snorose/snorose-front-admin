@@ -545,8 +545,8 @@ export default function ExamSearch({
           >
             <span className='truncate'>
               {selectedStatuses.length > 0
-                ? `처리 상태 ${selectedStatuses.length}개`
-                : '처리 상태 전체'}
+                ? `관리 상태 ${selectedStatuses.length}개`
+                : '관리 상태 전체'}
             </span>
             <ChevronDown className='size-4 opacity-50' />
           </Button>
