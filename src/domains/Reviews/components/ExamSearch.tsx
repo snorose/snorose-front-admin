@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Input, Select } from '@/shared/components/ui';
+import { Badge, Button, Input, Select } from '@/shared/components/ui';
 import {
   EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
@@ -91,6 +91,40 @@ const getStatusCodesFromLabels = (statusLabels: string[]): string =>
 const getStatusCodeFromLabel = (statusLabel: string) =>
   EXAM_REVIEW_PROCESS_STATUS.find((status) => status.label === statusLabel)
     ?.code;
+
+const getDiscussionStatusLabel = (status: string) => {
+  if (status === TRUE_SELECTED) {
+    return '논의 있음';
+  }
+
+  if (status === FALSE_SELECTED) {
+    return '논의 없음';
+  }
+
+  return '논의 여부 전체';
+};
+
+const renderDiscussionStatusBadge = (status: string) => {
+  const label = getDiscussionStatusLabel(status);
+
+  if (status === ALL_SELECTED) {
+    return label;
+  }
+
+  return (
+    <Badge
+      variant='default'
+      className={
+        status === TRUE_SELECTED
+          ? 'bg-blue-50 text-blue-700'
+          : 'bg-gray-100 text-gray-500'
+      }
+      title={label}
+    >
+      {label}
+    </Badge>
+  );
+};
 
 export default function ExamSearch({
   onSearchChange,
@@ -466,17 +500,25 @@ export default function ExamSearch({
 
         <Select value={discussionStatus} onValueChange={setDiscussionStatus}>
           <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
+            {renderDiscussionStatusBadge(discussionStatus)}
           </Select.Trigger>
           <Select.Content align='start'>
             <Select.Item value={ALL_SELECTED} className='text-sm'>
               논의 여부 전체
             </Select.Item>
-            <Select.Item value={TRUE_SELECTED} className='text-sm'>
-              논의 있음
+            <Select.Item
+              value={TRUE_SELECTED}
+              className='text-sm'
+              textValue='논의 있음'
+            >
+              {renderDiscussionStatusBadge(TRUE_SELECTED)}
             </Select.Item>
-            <Select.Item value={FALSE_SELECTED} className='text-sm'>
-              논의 없음
+            <Select.Item
+              value={FALSE_SELECTED}
+              className='text-sm'
+              textValue='논의 없음'
+            >
+              {renderDiscussionStatusBadge(FALSE_SELECTED)}
             </Select.Item>
           </Select.Content>
         </Select>
