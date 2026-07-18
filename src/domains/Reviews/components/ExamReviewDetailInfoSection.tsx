@@ -135,7 +135,7 @@ export function ExamReviewDetailInfoSection({
                 {renderStatusBadge(
                   formData.isDiscussed ? '논의 있음' : '논의 없음',
                   formData.isDiscussed,
-                  'border-blue-200 bg-blue-50 text-blue-700'
+                  'bg-blue-50 text-blue-700'
                 )}
               </Select.Trigger>
               <Select.Content>
@@ -143,14 +143,14 @@ export function ExamReviewDetailInfoSection({
                   {renderStatusBadge(
                     '논의 있음',
                     true,
-                    'border-blue-200 bg-blue-50 text-blue-700'
+                    'bg-blue-50 text-blue-700'
                   )}
                 </Select.Item>
                 <Select.Item value='false'>
                   {renderStatusBadge(
                     '논의 없음',
                     false,
-                    'border-blue-200 bg-blue-50 text-blue-700'
+                    'bg-blue-50 text-blue-700'
                   )}
                 </Select.Item>
               </Select.Content>

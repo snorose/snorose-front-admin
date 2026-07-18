@@ -41,10 +41,10 @@ const renderBooleanBadge = (
   falseLabel: string
 ) => (
   <Badge
-    variant='outline'
+    variant='default'
     className={cn(
       'max-w-full truncate',
-      value ? 'border-blue-200 bg-blue-50 text-blue-700' : 'text-gray-500'
+      value ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-500'
     )}
     title={value ? trueLabel : falseLabel}
   >
@@ -59,8 +59,8 @@ const renderReportedStatusBadge = (review: ExamReview) => {
 
   return (
     <Badge
-      variant='outline'
-      className='max-w-full truncate border-red-200 bg-red-50 text-red-700'
+      variant='default'
+      className='max-w-full truncate bg-red-50 text-red-700'
       title={label}
     >
       {label}
