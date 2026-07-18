@@ -8,6 +8,7 @@ import type { AdminCommentResult } from '../types/comment';
 import { useBulkDeleteComment } from './useBulkDeleteComment';
 import { useCommentChildrenList } from './useCommentChildrenList';
 import { useCommentList } from './useCommentList';
+import { useRestoreComment } from './useRestoreComment';
 import { useUpdateCommentVisibility } from './useUpdateCommentVisibility';
 
 interface UseCommentTableStateProps {
@@ -77,6 +78,8 @@ export function useCommentTableState({
 
   const { mutate: bulkDelete, isPending: isDeletePending } =
     useBulkDeleteComment();
+  const { mutate: restoreComment, isPending: isRestorePending } =
+    useRestoreComment();
   const { mutate: bulkVisibility, isPending: isVisibilityPending } =
     useUpdateCommentVisibility();
 
@@ -133,25 +136,23 @@ export function useCommentTableState({
   };
 
   const handleBulkRestore = () => {
-    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
-    const IS_READY = false;
-    if (!IS_READY) {
-      toast.info('개발 중입니다.');
-      return;
-    }
-
     if (selectedIds.length === 0) return;
-    bulkVisibility(
-      { commentIds: selectedIds, isVisible: true },
-      {
-        onSuccess: () => {
-          toast.success('선택한 댓글이 성공적으로 복구되었습니다.');
-          setSelectedIds([]);
-          void refetch();
-        },
-        onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
-      }
-    );
+    restoreComment(selectedIds, {
+      onSuccess: ({ restored, restoredIds, failedIds }) => {
+        if (failedIds.length > 0) {
+          toast.warning(
+            `${restored.length}개의 댓글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
+          );
+        } else {
+          toast.success(`${restored.length}개의 댓글이 복구되었습니다.`);
+        }
+
+        const restoredIdSet = new Set(restoredIds);
+        setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
+        void refetch();
+      },
+      onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
+    });
   };
 
   // 체크박스 제어
@@ -237,7 +238,7 @@ export function useCommentTableState({
     handleBulkVisibility,
     handleBulkRestore,
     isDeletePending,
-    isVisibilityPending,
+    isVisibilityPending: isVisibilityPending || isRestorePending,
     hasNext,
     totalCount,
   };

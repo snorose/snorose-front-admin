@@ -31,6 +31,7 @@ export default function PostDetailActionModal({
         : modalType === 'RESTORE'
           ? '복구'
           : '삭제';
+  const requiresReason = modalType !== 'RESTORE';
 
   return (
     <div
@@ -42,16 +43,20 @@ export default function PostDetailActionModal({
           게시글 {actionText} 처리
         </h3>
         <p className='mb-4 text-xs text-gray-500'>
-          상태를 변경하는 사유를 작성해 주세요. (필수 입력)
+          {requiresReason
+            ? '상태를 변경하는 사유를 작성해 주세요. (필수 입력)'
+            : '삭제된 게시글을 공개 상태로 복구합니다.'}
         </p>
 
         <div className='flex flex-col gap-4'>
-          <textarea
-            className='min-h-[100px] w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
-            placeholder='변경 사유를 입력하세요...'
-            value={reason}
-            onChange={(e) => onReasonChange(e.target.value)}
-          />
+          {requiresReason && (
+            <textarea
+              className='min-h-[100px] w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
+              placeholder='변경 사유를 입력하세요...'
+              value={reason}
+              onChange={(e) => onReasonChange(e.target.value)}
+            />
+          )}
 
           {modalType === 'DELETE' && (
             <label className='mt-1 flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-600 select-none'>
@@ -78,7 +83,7 @@ export default function PostDetailActionModal({
               variant={modalType === 'DELETE' ? 'destructive' : 'default'}
               size='sm'
               onClick={onConfirm}
-              disabled={!reason.trim()}
+              disabled={requiresReason && !reason.trim()}
               className={`text-xs ${modalType === 'DELETE' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
             >
               확인

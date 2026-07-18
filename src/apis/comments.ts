@@ -86,6 +86,16 @@ export const deleteComment = async (
   return response.data.result;
 };
 
+// 댓글 복구 api
+export const restoreComment = async (
+  commentId: number
+): Promise<AdminDeleteCommentResult> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<AdminDeleteCommentResult>
+  >(`/v1/admin/comments/${commentId}/restore`);
+  return response.data.result;
+};
+
 // 댓글 일괄 삭제 api
 export const bulkDeleteComments = async (
   commentIds: number[],

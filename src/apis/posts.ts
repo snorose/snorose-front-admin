@@ -56,6 +56,16 @@ export const deletePost = async (
   return response.data.result;
 };
 
+// 게시글 복구 api
+export const restorePost = async (
+  postId: number
+): Promise<AdminGetPostResponse> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<AdminGetPostResponse>
+  >(`/v1/admin/posts/${postId}/restore`);
+  return response.data.result;
+};
+
 // 여러 게시글 선택 삭제 api
 export const bulkDeletePosts = async (
   postIds: number[],
