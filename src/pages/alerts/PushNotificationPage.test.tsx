@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
@@ -28,11 +28,13 @@ vi.mock('@/shared/utils', () => ({
 vi.mock('@/domains/Alerts/components', () => ({
   PushNotificationConfirmModal: ({
     isOpen,
+    isLoading,
     onClose,
     onConfirm,
     data,
   }: {
     isOpen: boolean;
+    isLoading: boolean;
     onClose: () => void;
     onConfirm: () => void;
     data: PushNotification;
@@ -45,8 +47,12 @@ vi.mock('@/domains/Alerts/components', () => ({
         <div>알림 제목: {data.title}</div>
         <div>알림 내용: {data.body}</div>
         <div data-testid='modal-url'>URL: {data.url}</div>
-        <button onClick={onClose}>취소</button>
-        <button onClick={onConfirm}>확인</button>
+        <button disabled={isLoading} onClick={onClose}>
+          취소
+        </button>
+        <button disabled={isLoading} onClick={onConfirm}>
+          확인
+        </button>
       </div>
     );
   },
@@ -741,6 +747,10 @@ describe('PushNotificationPage', () => {
       const confirmButton = screen.getByRole('button', { name: '확인' });
       await user.click(confirmButton);
 
+      await waitFor(() => {
+        expect(confirmButton).toBeDisabled();
+      });
+
       // API 호출 중에 다시 클릭 시도
       await user.click(confirmButton);
 
@@ -748,8 +758,10 @@ describe('PushNotificationPage', () => {
       expect(postPushNotificationAPI).toHaveBeenCalledTimes(1);
 
       // Promise 해결
-      resolvePromise!(undefined);
-      await promise;
+      await act(async () => {
+        resolvePromise!(undefined);
+        await promise;
+      });
     });
 
     test('URL 입력 타입 기본값은 스노로즈 내부 URL이다', () => {

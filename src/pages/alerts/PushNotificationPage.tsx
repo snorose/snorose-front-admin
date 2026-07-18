@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -92,6 +92,7 @@ export default function PushNotificationPage() {
   const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
   const [isLoading, setIsLoading] = useState(false);
   const [urlInputType, setUrlInputType] = useState<UrlInputType>('internal');
+  const isSubmittingRef = useRef(false);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -193,11 +194,20 @@ export default function PushNotificationPage() {
     setIsOpen(true);
   };
 
-  const handleConfirmModalButtonClick = async () => {
+  const handleConfirmModalClose = () => {
     if (isLoading) {
       return;
     }
 
+    setIsOpen(false);
+  };
+
+  const handleConfirmModalButtonClick = async () => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+
+    isSubmittingRef.current = true;
     setIsLoading(true);
     try {
       await postPushNotificationAPI(toPushApiData(formData, urlInputType));
@@ -206,6 +216,7 @@ export default function PushNotificationPage() {
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '푸시 알림 전송에 실패했어요.'));
     } finally {
+      isSubmittingRef.current = false;
       setIsLoading(false);
       setIsOpen(false);
     }
@@ -408,7 +419,8 @@ export default function PushNotificationPage() {
 
       <PushNotificationConfirmModal
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        isLoading={isLoading}
+        onClose={handleConfirmModalClose}
         onConfirm={handleConfirmModalButtonClick}
         data={toPushApiData(formData, urlInputType)}
       />

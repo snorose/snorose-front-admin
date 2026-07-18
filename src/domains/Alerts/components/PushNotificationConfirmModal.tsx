@@ -5,6 +5,7 @@ import type { PushNotification } from '@/shared/types';
 
 interface PushNotificationConfirmModalProps {
   isOpen: boolean;
+  isLoading: boolean;
   onClose: () => void;
   onConfirm: () => void;
   data: PushNotification;
@@ -12,6 +13,7 @@ interface PushNotificationConfirmModalProps {
 
 export function PushNotificationConfirmModal({
   isOpen,
+  isLoading,
   onClose,
   onConfirm,
   data,
@@ -41,8 +43,15 @@ export function PushNotificationConfirmModal({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <Dialog.Content>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open && !isLoading) {
+          onClose();
+        }
+      }}
+    >
+      <Dialog.Content showCloseButton={!isLoading}>
         <Dialog.Header>
           <Dialog.Title>푸시 알림 전송 확인</Dialog.Title>
           <Dialog.Description>
@@ -61,10 +70,15 @@ export function PushNotificationConfirmModal({
         </div>
 
         <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={onClose}>
+          <Button
+            type='button'
+            variant='outline'
+            disabled={isLoading}
+            onClick={onClose}
+          >
             취소
           </Button>
-          <Button type='button' onClick={onConfirm}>
+          <Button type='button' disabled={isLoading} onClick={onConfirm}>
             확인
           </Button>
         </Dialog.Footer>
