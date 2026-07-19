@@ -19,6 +19,7 @@ export type MemberInfo = {
   totalWarningCount: number;
   isBlacklist: boolean | null;
   blacklistType?: string | null;
+  blacklistReason?: string | null;
   blacklistStartDate: string | null; // YYYY-MM-DDTHH:MM:SS
   blacklistEndDate: string | null; // YYYY-MM-DDTHH:MM:SS
 };
@@ -54,6 +55,7 @@ export type UserBlacklistHistory = {
   createdAt: string; // YYYY-MM-DD HH:MM:SS
   blacklistStartDate?: string | null;
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
+  adminLoginId?: string;
   adminId?: string;
   deletedAt?: string | null;
   deletedReason?: string | null;
