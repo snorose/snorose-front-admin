@@ -39,6 +39,9 @@ export function useMemberDetailState({
   const [penaltyHistoryTotalCount, setPenaltyHistoryTotalCount] = useState(0);
   // 중복 호출 방지용 in-flight 가드(state는 비동기라 같은 틱 연타를 못 막는다).
   const isPenaltyHistoryFetchingRef = useRef(false);
+  // 응답 도착 시점의 현재 회원과 비교해, 회원 전환 후 늦게 온 응답이 덮어쓰는 것을 막는다.
+  const selectedMemberRef = useRef(selectedMember);
+  selectedMemberRef.current = selectedMember;
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -129,22 +132,28 @@ export function useMemberDetailState({
       return;
     }
 
+    const targetUserId = selectedMember.encryptedUserId;
     isPenaltyHistoryFetchingRef.current = true;
     try {
       setIsPenaltyHistoryLoading(true);
       const { history, response } = await fetchPenaltyHistoryPage(
-        selectedMember.encryptedUserId,
+        targetUserId,
         selectedMember.studentNumber,
         0
       );
+      // 응답 도착 사이에 다른 회원으로 전환됐다면 현재 화면을 덮어쓰지 않는다.
+      if (selectedMemberRef.current?.encryptedUserId !== targetUserId) return;
       setPenaltyHistory(history);
       setPenaltyHistoryPage(0);
       setHasNextPenaltyHistory(response.hasNext);
       setPenaltyHistoryTotalCount(response.totalCount);
       setIsPenaltyHistoryLoaded(true);
     } catch (error) {
-      toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
+      if (selectedMemberRef.current?.encryptedUserId === targetUserId) {
+        toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
+      }
     } finally {
+      // in-flight 가드는 회원 전환 여부와 무관하게 항상 해제한다(재진입 차단 방지).
       isPenaltyHistoryFetchingRef.current = false;
       setIsPenaltyHistoryLoading(false);
     }

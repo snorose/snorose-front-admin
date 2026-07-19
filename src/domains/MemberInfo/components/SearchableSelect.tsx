@@ -91,6 +91,8 @@ export default function SearchableSelect({
                 placeholder='검색...'
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(event) => {
+                  // 한글 등 IME 조합 확정용 Enter는 선택으로 처리하지 않는다.
+                  if (event.nativeEvent.isComposing) return;
                   if (event.key === 'Enter' && filtered.length > 0) {
                     event.preventDefault();
                     handleSelect(filtered[0].value);
