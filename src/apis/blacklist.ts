@@ -16,7 +16,16 @@ export const blacklistHistoryAPI = async (
     `/v1/admin/blacklists/${encryptedUserId}`,
     { params }
   );
-  return response.data.result;
+  // result는 페이지네이션 객체({ hasNext, totalPage, totalCount, data }).
+  // 이력이 없거나 응답이 비면 data가 배열이 아닐 수 있어 방어적으로 정규화한다.
+  const result = response.data.result;
+
+  return {
+    hasNext: result?.hasNext ?? false,
+    totalPage: result?.totalPage ?? 0,
+    totalCount: result?.totalCount ?? 0,
+    data: Array.isArray(result?.data) ? result.data : [],
+  };
 };
 
 // 경고 및 강등 부여
