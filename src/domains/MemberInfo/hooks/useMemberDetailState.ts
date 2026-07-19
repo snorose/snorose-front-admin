@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
@@ -29,15 +29,16 @@ export function useMemberDetailState({
 }: UseMemberDetailStateParams) {
   const navigate = useNavigate();
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
-  const [latestPenaltyHistory, setLatestPenaltyHistory] =
-    useState<BlacklistHistoryItem | null>(null);
   const [penaltyHistory, setPenaltyHistory] = useState<BlacklistHistoryItem[]>(
     []
   );
   const [penaltyHistoryPage, setPenaltyHistoryPage] = useState(0);
   const [hasNextPenaltyHistory, setHasNextPenaltyHistory] = useState(false);
   const [isPenaltyHistoryLoading, setIsPenaltyHistoryLoading] = useState(false);
+  const [isPenaltyHistoryLoaded, setIsPenaltyHistoryLoaded] = useState(false);
   const [penaltyHistoryTotalCount, setPenaltyHistoryTotalCount] = useState(0);
+  // 중복 호출 방지용 in-flight 가드(state는 비동기라 같은 틱 연타를 못 막는다).
+  const isPenaltyHistoryFetchingRef = useRef(false);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -67,7 +68,6 @@ export function useMemberDetailState({
   useEffect(() => {
     if (!memberKey) {
       setSelectedMember(null);
-      setLatestPenaltyHistory(null);
       setPenaltyHistory([]);
       setPenaltyHistoryPage(0);
       setHasNextPenaltyHistory(false);
@@ -109,55 +109,46 @@ export function useMemberDetailState({
     };
   }, [fetchMemberDetail, memberKey, navigate]);
 
+  // 회원이 바뀌면 제재 이력 상태를 초기화한다.
+  // 실제 조회는 히스토리 아이콘 클릭 시(handleLoadPenaltyHistory)에만 수행한다.
   useEffect(() => {
-    const encryptedUserId = selectedMember?.encryptedUserId;
-    const studentNumber = selectedMember?.studentNumber;
+    setPenaltyHistory([]);
+    setPenaltyHistoryPage(0);
+    setHasNextPenaltyHistory(false);
+    setPenaltyHistoryTotalCount(0);
+    setIsPenaltyHistoryLoaded(false);
+  }, [selectedMember?.encryptedUserId]);
 
-    if (!encryptedUserId || !studentNumber) {
-      setLatestPenaltyHistory(null);
-      setPenaltyHistory([]);
-      setPenaltyHistoryPage(0);
-      setHasNextPenaltyHistory(false);
-      setPenaltyHistoryTotalCount(0);
+  // 히스토리 아이콘을 눌렀을 때만 첫 페이지를 조회한다(회원당 1회).
+  const handleLoadPenaltyHistory = useCallback(async () => {
+    if (
+      !selectedMember ||
+      isPenaltyHistoryLoaded ||
+      isPenaltyHistoryFetchingRef.current
+    ) {
       return;
     }
 
-    let isMounted = true;
-    void (async () => {
-      try {
-        setIsPenaltyHistoryLoading(true);
-        const { history, response } = await fetchPenaltyHistoryPage(
-          encryptedUserId,
-          studentNumber,
-          0
-        );
-        if (!isMounted) return;
-        setPenaltyHistory(history);
-        setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
-        setPenaltyHistoryPage(0);
-        setHasNextPenaltyHistory(response.hasNext);
-        setPenaltyHistoryTotalCount(response.totalCount);
-      } catch (error) {
-        if (!isMounted) return;
-        toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
-        setPenaltyHistory([]);
-        setLatestPenaltyHistory(null);
-        setPenaltyHistoryPage(0);
-        setHasNextPenaltyHistory(false);
-        setPenaltyHistoryTotalCount(0);
-      } finally {
-        if (isMounted) setIsPenaltyHistoryLoading(false);
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [
-    fetchPenaltyHistoryPage,
-    selectedMember?.encryptedUserId,
-    selectedMember?.studentNumber,
-  ]);
+    isPenaltyHistoryFetchingRef.current = true;
+    try {
+      setIsPenaltyHistoryLoading(true);
+      const { history, response } = await fetchPenaltyHistoryPage(
+        selectedMember.encryptedUserId,
+        selectedMember.studentNumber,
+        0
+      );
+      setPenaltyHistory(history);
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(response.hasNext);
+      setPenaltyHistoryTotalCount(response.totalCount);
+      setIsPenaltyHistoryLoaded(true);
+    } catch (error) {
+      toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
+    } finally {
+      isPenaltyHistoryFetchingRef.current = false;
+      setIsPenaltyHistoryLoading(false);
+    }
+  }, [fetchPenaltyHistoryPage, isPenaltyHistoryLoaded, selectedMember]);
 
   const handleLoadMorePenaltyHistory = useCallback(async () => {
     if (!selectedMember || isPenaltyHistoryLoading || !hasNextPenaltyHistory) {
@@ -204,10 +195,10 @@ export function useMemberDetailState({
         0
       );
       setPenaltyHistory(history);
-      setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
       setPenaltyHistoryPage(0);
       setHasNextPenaltyHistory(response.hasNext);
       setPenaltyHistoryTotalCount(response.totalCount);
+      setIsPenaltyHistoryLoaded(true);
     } catch (error) {
       toast.error(
         getErrorMessage(error, '제재 이력을 다시 불러오지 못했습니다.')
@@ -295,6 +286,7 @@ export function useMemberDetailState({
     handleBack,
     handleCopy,
     handleLoadMorePenaltyHistory,
+    handleLoadPenaltyHistory,
     handleRefreshMemberDetail,
     handleRefreshPenaltyHistory,
     handleSaveEdit,
@@ -302,25 +294,9 @@ export function useMemberDetailState({
     isDetailLoading,
     isEdit,
     isPenaltyHistoryLoading,
-    latestPenaltyHistory,
     penaltyHistory,
     penaltyHistoryTotalCount,
     selectedMember,
     setIsEdit,
   };
-}
-
-function resolveLatestPenaltyHistory(history: BlacklistHistoryItem[]) {
-  if (history.length === 0) return null;
-
-  const sortedHistory = [...history].sort(
-    (left, right) =>
-      new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-  );
-
-  return (
-    sortedHistory.find(
-      (item) => item.type !== '경고' && item.type !== 'WARNING'
-    ) ?? sortedHistory[0]
-  );
 }

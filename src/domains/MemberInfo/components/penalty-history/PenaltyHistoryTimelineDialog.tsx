@@ -143,6 +143,8 @@ function PenaltyHistoryCard({
   onEdit: (history: BlacklistHistoryItem) => void;
 }) {
   const isOngoing = isOngoingPenalty(history);
+  // 경고 항목에는 강등 시작일/종료일이 없으므로(항상 '-') 해당 필드를 숨긴다.
+  const isWarning = history.type === '경고' || history.type === 'WARNING';
 
   return (
     <li className='relative'>
@@ -210,8 +212,12 @@ function PenaltyHistoryCard({
         <div className='mt-5 grid gap-4 sm:grid-cols-2'>
           <Info label='제재 사유' value={history.blackReason} />
           <Info label='관리자 ID' value={history.adminId} />
-          <Info label='강등 시작일' value={history.blacklistStartDate} />
-          <Info label='강등 종료일' value={history.blacklistDeadline} />
+          {!isWarning ? (
+            <>
+              <Info label='강등 시작일' value={history.blacklistStartDate} />
+              <Info label='강등 종료일' value={history.blacklistDeadline} />
+            </>
+          ) : null}
         </div>
 
         <div className='mt-5 space-y-2'>

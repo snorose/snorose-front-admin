@@ -117,7 +117,7 @@ export function toBlacklistHistoryItem(
       ? null
       : (history.blacklistStartDate ?? history.createdAt),
     blacklistDeadline: history.blacklistDeadline,
-    adminId: history.adminId,
+    adminId: history.adminLoginId ?? history.adminId,
     operatorMemo: history.memo ?? '',
     deletedAt: history.deletedAt,
     deletedReason: history.deletedReason,
@@ -144,6 +144,14 @@ export function getRoleBadgeClassName(userRoleId: number) {
   }
 }
 
+// 현재 활성 제재가 '경고'인지 판별한다(강등 vs 경고 규칙의 단일 출처).
+export function isWarningPenalty(member: MemberInfo): boolean {
+  return (
+    Boolean(member.isBlacklist) &&
+    (member.blacklistType === 'WARNING' || member.blacklistType === '경고')
+  );
+}
+
 export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
   if (!member.isBlacklist) {
     return {
@@ -156,8 +164,15 @@ export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
     };
   }
 
+  const baseLabel = convertBlacklistTypeToLabel(member.blacklistType);
+  // 경고 상태는 횟수까지 노출한다(예: '경고 2회'). 3회면 자동 강등되므로 1·2회만 나타난다.
+  const label =
+    baseLabel === '경고' && typeof member.currentWarningCount === 'number'
+      ? `경고 ${member.currentWarningCount}회`
+      : baseLabel;
+
   return {
-    label: convertBlacklistTypeToLabel(member.blacklistType),
+    label,
     tone: 'border border-rose-200 bg-rose-50 text-rose-700',
     summary: '현재 제재 상태가 적용 중입니다.',
   };
@@ -200,19 +215,21 @@ export function getRoleOptions(): DirectoryFilterOption[] {
   ];
 }
 
-// 입학년도 필터 옵션 개수 (최근 N개년)
-const ADMISSION_YEAR_RANGE = 20;
+const MIN_ADMISSION_YEAR = 1900;
 
 // 서버사이드 필터로 전환되어 현재 페이지 회원에서 추출할 수 없으므로,
-// 학번 앞 2자리(예: '25')를 value로 하는 최근 N개년 목록을 정적으로 생성한다.
+// API 계약에 맞춰 4자리 입학 연도를 value로 사용한다.
 export function getAdmissionYearOptions(): DirectoryFilterOption[] {
   const currentYear = new Date().getFullYear();
+  const optionCount = currentYear - MIN_ADMISSION_YEAR + 1;
 
-  // 연도 전체로 뺀 뒤 % 100을 적용해 세기 전환(예: 2005 - 10 → 1995 → '95')과
-  // 음수 학번을 방지한다.
-  return Array.from({ length: ADMISSION_YEAR_RANGE }, (_, index) => {
-    const value = String((currentYear - index) % 100).padStart(2, '0');
-    return { value, label: `${value}학번` };
+  return Array.from({ length: optionCount }, (_, index) => {
+    const year = currentYear - index;
+
+    return {
+      value: String(year),
+      label: String(year),
+    };
   });
 }
 

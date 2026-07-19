@@ -14,6 +14,7 @@ import {
   formatDateTime,
   getPenaltyStatus,
   getRemainingPenaltyLabel,
+  isWarningPenalty,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type MemberPenaltySummaryCardProps = {
@@ -21,10 +22,10 @@ type MemberPenaltySummaryCardProps = {
   isPenaltyHistoryLoading: boolean;
   penaltyHistory: BlacklistHistoryItem[];
   penaltyHistoryTotalCount: number;
-  latestPenaltyHistory: BlacklistHistoryItem | null;
   member: MemberInfo;
   onChangedPenaltyHistory?: () => void | Promise<void>;
   onLoadMorePenaltyHistory: () => void | Promise<void>;
+  onOpenPenaltyHistory?: () => void | Promise<void>;
 };
 
 export default function MemberPenaltySummaryCard({
@@ -32,14 +33,18 @@ export default function MemberPenaltySummaryCard({
   isPenaltyHistoryLoading,
   penaltyHistory,
   penaltyHistoryTotalCount,
-  latestPenaltyHistory,
   member,
   onChangedPenaltyHistory,
   onLoadMorePenaltyHistory,
+  onOpenPenaltyHistory,
 }: MemberPenaltySummaryCardProps) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const penaltyStatus = getPenaltyStatus(member);
   const hasActivePenalty = Boolean(member.isBlacklist);
+  // users API의 blacklistReason/blacklistStartDate는 '현재 활성 제재'의 정보다.
+  // 경고면 경고 사유/마지막 경고일, 강등이면 강등 사유/시작일이 담긴다.
+  const isWarning = isWarningPenalty(member);
+  const isDemotion = hasActivePenalty && !isWarning;
   const remainingPenaltyLabel = getRemainingPenaltyLabel(
     member.blacklistEndDate
   );
@@ -54,7 +59,10 @@ export default function MemberPenaltySummaryCard({
             type='button'
             variant='ghost'
             size='icon'
-            onClick={() => setIsHistoryOpen(true)}
+            onClick={() => {
+              void onOpenPenaltyHistory?.();
+              setIsHistoryOpen(true);
+            }}
             className='rounded-xl text-slate-600'
             aria-label='강등/경고 히스토리 열기'
           >
@@ -72,15 +80,30 @@ export default function MemberPenaltySummaryCard({
             </span>
           </div>
 
-          {hasActivePenalty && latestPenaltyHistory?.blackReason ? (
+          {isWarning && member.blacklistReason ? (
             <InfoBlock
-              label='강등 사유'
-              value={latestPenaltyHistory.blackReason}
+              label='경고 사유'
+              value={member.blacklistReason}
               tone='muted'
             />
           ) : null}
 
-          {hasActivePenalty && member.blacklistStartDate ? (
+          {isWarning && member.blacklistStartDate ? (
+            <InfoBlock
+              label='마지막 경고일'
+              value={formatDateTime(member.blacklistStartDate)}
+            />
+          ) : null}
+
+          {isDemotion && member.blacklistReason ? (
+            <InfoBlock
+              label='강등 사유'
+              value={member.blacklistReason}
+              tone='muted'
+            />
+          ) : null}
+
+          {isDemotion && member.blacklistStartDate ? (
             <InfoBlock
               label='강등 시작일'
               value={formatDateTime(member.blacklistStartDate)}
@@ -88,14 +111,14 @@ export default function MemberPenaltySummaryCard({
             />
           ) : null}
 
-          {hasActivePenalty && member.blacklistEndDate ? (
+          {isDemotion && member.blacklistEndDate ? (
             <InfoBlock
               label='강등 종료일'
               value={formatDateTime(member.blacklistEndDate)}
             />
           ) : null}
 
-          {hasActivePenalty && member.blacklistEndDate ? (
+          {isDemotion && member.blacklistEndDate ? (
             <InfoBlock label='남은 기간' value={remainingPenaltyLabel} />
           ) : null}
 
