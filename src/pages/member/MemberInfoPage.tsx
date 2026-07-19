@@ -14,6 +14,7 @@ export default function MemberInfoPage() {
     handleBack,
     handleCopy,
     handleLoadMorePenaltyHistory,
+    handleLoadPenaltyHistory,
     handleOpenMemberDetail,
     handleRefreshDirectory,
     handleRefreshMemberDetail,
@@ -23,8 +24,7 @@ export default function MemberInfoPage() {
     handleSelectedAdmissionYearChange,
     handleSelectedMajorChange,
     handleSelectedRoleChange,
-    handleSortDirectionChange,
-    handleSortTypeChange,
+    handleHeaderSort,
     handleToggleAllVisibleRows,
     handleToggleRow,
     hasNextPenaltyHistory,
@@ -33,8 +33,8 @@ export default function MemberInfoPage() {
     isDetailRoute,
     isEdit,
     isListLoading,
+    isSortActive,
     isPenaltyHistoryLoading,
-    latestPenaltyHistory,
     penaltyHistory,
     majorOptions,
     roleOptions,
@@ -67,7 +67,6 @@ export default function MemberInfoPage() {
             member={selectedMember}
             isEdit={isEdit}
             isDetailLoading={isDetailLoading}
-            latestPenaltyHistory={latestPenaltyHistory}
             hasNextPenaltyHistory={hasNextPenaltyHistory}
             onBack={handleBack}
             onCopy={handleCopy}
@@ -80,6 +79,7 @@ export default function MemberInfoPage() {
               ]);
             }}
             onLoadMorePenaltyHistory={handleLoadMorePenaltyHistory}
+            onOpenPenaltyHistory={handleLoadPenaltyHistory}
             onPointAdjusted={handleRefreshMemberDetail}
             onSaveEdit={handleSaveEdit}
             penaltyHistory={penaltyHistory}
@@ -106,8 +106,7 @@ export default function MemberInfoPage() {
           onSelectedAdmissionYearChange={handleSelectedAdmissionYearChange}
           onSelectedMajorChange={handleSelectedMajorChange}
           onSelectedRoleChange={handleSelectedRoleChange}
-          onSortTypeChange={handleSortTypeChange}
-          onSortDirectionChange={handleSortDirectionChange}
+          onHeaderSort={handleHeaderSort}
           onToggleAllVisibleRows={handleToggleAllVisibleRows}
           onToggleRow={handleToggleRow}
           roleOptions={roleOptions}
@@ -118,6 +117,7 @@ export default function MemberInfoPage() {
           selectedRole={selectedRole}
           sortType={sortType}
           sortDirection={sortDirection}
+          isSortActive={isSortActive}
           totalCount={totalCount}
           totalPage={totalPage}
           admissionYearOptions={admissionYearOptions}

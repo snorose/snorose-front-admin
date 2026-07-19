@@ -41,6 +41,8 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(
     DEFAULT_SORT_DIRECTION
   );
+  // 사용자가 헤더 정렬을 직접 선택했는지 여부(초기/초기화 상태에서는 헤더를 중립으로 표시).
+  const [isSortActive, setIsSortActive] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -123,15 +125,20 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     setCurrentPage(0);
   }, []);
 
-  const handleSortTypeChange = useCallback((value: string) => {
-    setSortType(value as AdminUserSortType);
-    setCurrentPage(0);
-  }, []);
-
-  const handleSortDirectionChange = useCallback((value: string) => {
-    setSortDirection(value as SortDirection);
-    setCurrentPage(0);
-  }, []);
+  // 헤더 클릭 정렬: 같은 컬럼이면 방향 토글, 다른 컬럼이면 그 컬럼 내림차순.
+  const handleHeaderSort = useCallback(
+    (columnType: string) => {
+      setIsSortActive(true);
+      setCurrentPage(0);
+      if (sortType === columnType) {
+        setSortDirection((prev) => (prev === 'ASC' ? 'DESC' : 'ASC'));
+      } else {
+        setSortType(columnType as AdminUserSortType);
+        setSortDirection('DESC');
+      }
+    },
+    [sortType]
+  );
 
   const handleOpenMemberDetail = useCallback(
     (member: AdminUserListItem) => {
@@ -150,6 +157,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     setSelectedMajor('ALL');
     setSortType(DEFAULT_SORT_TYPE);
     setSortDirection(DEFAULT_SORT_DIRECTION);
+    setIsSortActive(false);
     setSelectedIds([]);
     setCurrentPage(0);
   }, []);
@@ -189,12 +197,12 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     handleSelectedAdmissionYearChange,
     handleSelectedMajorChange,
     handleSelectedRoleChange,
-    handleSortDirectionChange,
-    handleSortTypeChange,
+    handleHeaderSort,
     handleToggleAllVisibleRows,
     handleToggleRow,
     isAllVisibleSelected,
     isListLoading,
+    isSortActive,
     loadMembers,
     majorOptions,
     members,
