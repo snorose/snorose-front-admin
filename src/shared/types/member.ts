@@ -54,7 +54,7 @@ export type UserBlacklistHistory = {
   createdAt: string; // YYYY-MM-DD HH:MM:SS
   blacklistStartDate?: string | null;
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
-  adminName?: string;
+  adminName?: string | null;
   deletedAt?: string | null;
   deletedReason?: string | null;
   deletedBy?: string | null;
@@ -138,7 +138,7 @@ export interface BlacklistHistoryItem {
   createdAt: string;
   blacklistStartDate?: string | null;
   blacklistDeadline: string | null;
-  adminName?: string;
+  adminName: string;
   operatorMemo?: string;
   deletedAt?: string | null;
   deletedReason?: string | null;
