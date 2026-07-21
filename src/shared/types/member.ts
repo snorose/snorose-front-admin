@@ -44,7 +44,6 @@ export type UserPointHistory = {
 };
 
 export type UserBlacklistHistory = {
-  loginId?: string;
   encryptedUserId?: string;
   studentNumber?: string;
   type: string;
@@ -55,33 +54,35 @@ export type UserBlacklistHistory = {
   createdAt: string; // YYYY-MM-DD HH:MM:SS
   blacklistStartDate?: string | null;
   blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
-  adminLoginId?: string;
-  adminId?: string;
+  adminName?: string;
   deletedAt?: string | null;
   deletedReason?: string | null;
   deletedBy?: string | null;
 };
 
-export type AdminUserListItem = {
-  encryptedUserId: string;
-  loginId: string;
-  userName: string;
-  nickname: string;
-  email: string;
-  studentNumber: string;
-  major: string;
-  userRoleId: number;
-  userRoleName: string;
-  pointBalance: number;
-  createdAt: string; // YYYY-MM-DD
-  authenticatedAt: string | null; // YYYY-MM-DD
+// 회원 목록 응답. MemberInfo의 부분집합이라 Pick으로 파생한다.
+// (createdAt/authenticatedAt은 목록에선 YYYY-MM-DD로 내려온다)
+export type AdminUserListItem = Pick<
+  MemberInfo,
+  | 'encryptedUserId'
+  | 'loginId'
+  | 'userName'
+  | 'nickname'
+  | 'email'
+  | 'studentNumber'
+  | 'major'
+  | 'userRoleId'
+  | 'pointBalance'
+  | 'createdAt'
+  | 'authenticatedAt'
+> & {
+  userRoleName: string; // 목록 응답에서는 항상 내려온다
 };
 
 export type AdminUserListResult = {
   hasNext: boolean;
   totalPage: number;
   totalCount: number;
-  currentCount: number;
   data: AdminUserListItem[];
 };
 
@@ -102,18 +103,20 @@ export interface AdminUserListParams {
   sortDirection?: SortDirection;
 }
 
-export type PenaltyUserInfo = {
-  loginId: string;
-  encryptedUserId: string;
-  userName: string;
-  studentNumber: string;
-  userRoleId: number;
-  totalWarningCount: number;
-  isBlacklist: boolean | null;
-  blacklistType?: string | null;
-  blacklistStartDate: string | null; // YYYY-MM-DDTHH:MM:SS
-  blacklistEndDate: string | null; // YYYY-MM-DDTHH:MM:SS
-};
+// 페널티 화면용 회원 정보. MemberInfo의 부분집합이라 Pick으로 파생한다.
+export type PenaltyUserInfo = Pick<
+  MemberInfo,
+  | 'loginId'
+  | 'encryptedUserId'
+  | 'userName'
+  | 'studentNumber'
+  | 'userRoleId'
+  | 'totalWarningCount'
+  | 'isBlacklist'
+  | 'blacklistType'
+  | 'blacklistStartDate'
+  | 'blacklistEndDate'
+>;
 
 export interface EditMemberInfo {
   userName?: string;
@@ -126,7 +129,6 @@ export interface EditMemberInfo {
 }
 
 export interface BlacklistHistoryItem {
-  id?: number;
   encryptedUserId: string;
   studentNumber: string;
   type: string;
@@ -136,7 +138,7 @@ export interface BlacklistHistoryItem {
   createdAt: string;
   blacklistStartDate?: string | null;
   blacklistDeadline: string | null;
-  adminId?: string;
+  adminName?: string;
   operatorMemo?: string;
   deletedAt?: string | null;
   deletedReason?: string | null;
