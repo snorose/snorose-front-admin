@@ -117,7 +117,7 @@ export function toBlacklistHistoryItem(
       ? null
       : (history.blacklistStartDate ?? history.createdAt),
     blacklistDeadline: history.blacklistDeadline,
-    adminId: history.adminLoginId ?? history.adminId,
+    adminName: history.adminName ?? '',
     operatorMemo: history.memo ?? '',
     deletedAt: history.deletedAt,
     deletedReason: history.deletedReason,

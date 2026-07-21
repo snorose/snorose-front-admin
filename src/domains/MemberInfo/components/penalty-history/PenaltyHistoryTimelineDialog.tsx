@@ -211,7 +211,7 @@ function PenaltyHistoryCard({
 
         <div className='mt-5 grid gap-4 sm:grid-cols-2'>
           <Info label='제재 사유' value={history.blackReason} />
-          <Info label='관리자 ID' value={history.adminId} />
+          <Info label='관리자명' value={history.adminName} />
           {!isWarning ? (
             <>
               <Info label='강등 시작일' value={history.blacklistStartDate} />
