@@ -102,46 +102,42 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
 
       try {
         const response = await loginAPI(credentials);
+        const { tokenResponse, ...userData } = response;
 
-        if (response.isSuccess) {
-          const { tokenResponse, ...userData } = response.result;
+        if (userData.userRoleId !== ADMIN_ROLE_ID) {
+          const errorMessage = '접근 권한이 없습니다.';
 
-          if (userData.userRoleId !== ADMIN_ROLE_ID) {
-            const errorMessage = '접근 권한이 없습니다.';
-
-            userStorage.removeUser();
-            setIsLoading(false);
-            setError(errorMessage);
-
-            return { success: false, error: errorMessage };
-          }
-
-          tokenStorage.setAccessToken(
-            tokenResponse.accessToken,
-            ACCESS_TOKEN_EXPIRE_MINUTES
-          );
-          tokenStorage.setRefreshToken(
-            tokenResponse.refreshToken,
-            REFRESH_TOKEN_EXPIRE_DAYS
-          );
-
-          // 사용자 정보 상태 업데이트
-          setUser(userData);
-          userStorage.setUser(userData);
-          setIsAuthenticated(true);
+          userStorage.removeUser();
           setIsLoading(false);
+          setError(errorMessage);
 
-          // 로그인 성공 시 리다이렉트
-          navigate('/member/info');
-
-          return { success: true };
-        } else {
-          throw new Error(response.message || '로그인에 실패했습니다.');
+          return { success: false, error: errorMessage };
         }
+
+        tokenStorage.setAccessToken(
+          tokenResponse.accessToken,
+          ACCESS_TOKEN_EXPIRE_MINUTES
+        );
+        tokenStorage.setRefreshToken(
+          tokenResponse.refreshToken,
+          REFRESH_TOKEN_EXPIRE_DAYS
+        );
+
+        // 사용자 정보 상태 업데이트
+        setUser(userData);
+        userStorage.setUser(userData);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+
+        // 로그인 성공 시 리다이렉트
+        navigate('/member/info');
+
+        return { success: true };
       } catch (error: unknown) {
         const errorMessage =
           (isAxiosError<{ message?: string }>(error) &&
             error.response?.data?.message) ||
+          (error instanceof Error && error.message) ||
           '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
 
         setUser(null);
