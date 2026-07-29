@@ -16,7 +16,7 @@ interface MemberInfoPopoverProps {
   displayName: string;
 }
 
-export default function MemberInfoPopover({
+export function MemberInfoPopover({
   encryptedUserId,
   displayName,
 }: MemberInfoPopoverProps) {

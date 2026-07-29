@@ -1,10 +1,10 @@
 export { AppSidebar } from './AppSidebar';
-export { default as BulkDeleteBar } from './BulkDeleteBar';
+export { BulkActionBar } from './BulkActionBar';
 export { DateTimePicker } from './DateTimePicker';
-export { default as Header } from './Header';
-export { default as MemberInfoPopover } from './MemberInfoPopover';
+export { Header } from './Header';
+export { MemberInfoPopover } from './MemberInfoPopover';
 export { NavUser } from './NavUser';
-export { default as PageHeader } from './PageHeader';
+export { PageHeader } from './PageHeader';
 export { PaginationBar } from './PaginationBar';
 export { PeriodStatusBadge } from './PeriodStatusBadge';
 export { ProtectedRoute } from './ProtectedRoute';

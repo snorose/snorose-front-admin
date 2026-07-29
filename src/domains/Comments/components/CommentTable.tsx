@@ -1,12 +1,12 @@
 import { Loader2 } from 'lucide-react';
 
 import { PaginationBar } from '@/shared/components';
+import { BulkActionBar } from '@/shared/components';
 import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
 
 import { useCommentTableState } from '../hooks/useCommentTableState';
 import type { CommentSearchParams } from '../types';
-import CommentBulkActionBar from './CommentBulkActionBar';
 import CommentTableRow from './CommentTableRow';
 
 interface CommentTableProps {
@@ -54,13 +54,14 @@ export default function CommentTable({
 
   return (
     <div className='flex flex-col gap-3'>
-      <CommentBulkActionBar
+      <BulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
         isDeletePending={isDeletePending}
         onBulkVisibility={handleBulkVisibility}
         onBulkRestore={handleBulkRestore}
         onBulkDelete={handleBulkDelete}
+        label='댓글'
       />
 
       <div className='flex items-center justify-between px-1 text-xs text-gray-500'>

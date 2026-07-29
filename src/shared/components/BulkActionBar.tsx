@@ -2,28 +2,30 @@ import { Eye, EyeOff, RotateCcw, Trash2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 
-interface PostBulkActionBarProps {
+interface BulkActionBarProps {
   selectedCount: number;
   isVisibilityPending: boolean;
   isDeletePending: boolean;
   onBulkVisibility: (visible: boolean) => void;
   onBulkRestore: () => void;
   onBulkDelete: () => void;
+  label: string;
 }
 
-export default function PostBulkActionBar({
+export function BulkActionBar({
   selectedCount,
   isVisibilityPending,
   isDeletePending,
   onBulkVisibility,
   onBulkRestore,
   onBulkDelete,
-}: PostBulkActionBarProps) {
+  label,
+}: BulkActionBarProps) {
   if (selectedCount === 0) return null;
 
   return (
     <div className='flex items-center justify-between rounded-lg border border-red-200 bg-red-50/50 px-4 py-3 shadow-sm'>
-      <span className='text-sm font-bold text-red-800'>게시글 일괄 처리:</span>
+      <span className='text-sm font-bold text-red-800'>{label} 일괄 처리:</span>
       <div className='flex flex-wrap items-center gap-2'>
         <Button
           variant='destructive'

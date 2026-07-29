@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { AlertTriangle, Eye, Heart, MessageSquare } from 'lucide-react';
 
-import MemberInfoPopover from '@/shared/components/MemberInfoPopover';
+import { MemberInfoPopover } from '@/shared/components';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';

@@ -14,7 +14,6 @@ export const useDeleteComment = () => {
     mutationFn: ({ commentId, memo }: DeleteCommentVariables) =>
       deleteComment(commentId, memo),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['commentSearch'] });
       queryClient.invalidateQueries({ queryKey: ['comments'] });
     },
     onError: (error) => {
