@@ -1,5 +1,5 @@
 export { AppSidebar } from './AppSidebar';
-export { default as BulkDeleteBar } from './BulkDeleteBar';
+export { BulkActionBar } from './BulkActionBar';
 export { DateTimePicker } from './DateTimePicker';
 export { Header } from './Header';
 export { MemberInfoPopover } from './MemberInfoPopover';
