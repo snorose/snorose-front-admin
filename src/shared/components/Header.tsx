@@ -1,6 +1,6 @@
 import { snoroseLogo } from '@/assets';
 
-export default function Header() {
+export function Header() {
   return (
     <header className='bg-background fixed top-0 right-0 left-0 z-10 h-14 w-screen border-b border-gray-200'>
       <div className='mx-auto flex h-full max-w-[1440px] items-center justify-between p-4 px-6'>
