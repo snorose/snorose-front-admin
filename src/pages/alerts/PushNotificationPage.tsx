@@ -50,10 +50,11 @@ function toPushApiUrl(url: string, urlInputType: UrlInputType): string {
     if (trimmed === '') {
       return '';
     }
-    if (trimmed.startsWith('https://')) {
+    const lowerTrimmed = trimmed.toLowerCase();
+    if (lowerTrimmed.startsWith('https://')) {
       return trimmed;
     }
-    if (trimmed.startsWith('http://')) {
+    if (lowerTrimmed.startsWith('http://')) {
       return `https://${trimmed.slice('http://'.length)}`;
     }
     return `https://${trimmed}`;
