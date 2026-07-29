@@ -21,7 +21,8 @@ import { postPushNotificationAPI } from '@/apis';
 type UrlInputType = 'internal' | 'external';
 
 function isHttpUrl(url: string): boolean {
-  return url.startsWith('http://') || url.startsWith('https://');
+  const lowerUrl = url.toLowerCase();
+  return lowerUrl.startsWith('http://') || lowerUrl.startsWith('https://');
 }
 
 /** 내부 URL 모드에서 도메인까지 붙여 입력한 경우 (경로만 보내야 함) */
