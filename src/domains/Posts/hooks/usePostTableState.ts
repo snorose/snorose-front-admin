@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useBulkDelete } from '@/shared/hooks';
+
+import { bulkDeletePosts } from '@/apis';
+
 import type { PostSearchParams } from '../types/post';
-import { useBulkDeletePost } from './useBulkDeletePost';
 import { useDeletePost } from './useDeletePost';
 import { usePostList } from './usePostList';
 import { useRestorePost } from './useRestorePost';
@@ -73,8 +76,10 @@ export function usePostTableState({
 
   const posts = rawPosts ?? [];
 
-  const { mutate: bulkDelete, isPending: isDeletePending } =
-    useBulkDeletePost();
+  const { mutate: bulkDelete, isPending: isDeletePending } = useBulkDelete({
+    deleteFn: bulkDeletePosts,
+    queryKey: ['posts'],
+  });
   const { mutate: singleDelete } = useDeletePost();
   const { mutate: restorePost, isPending: isRestorePending } = useRestorePost();
   const { mutate: bulkVisibility, isPending: isVisibilityPending } =
@@ -88,7 +93,7 @@ export function usePostTableState({
   const handleConfirmBulkDelete = (memo: string) => {
     if (selectedIds.length === 0) return;
     bulkDelete(
-      { postIds: selectedIds, memo },
+      { ids: selectedIds, memo },
       {
         onSuccess: (res) => {
           const deletedCount = res?.deletedCount ?? selectedIds.length;
