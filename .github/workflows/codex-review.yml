@@ -144,44 +144,64 @@ jobs:
             </pull_request_diff>
             `;
 
-            const response = await fetch('https://api.openai.com/v1/responses', {
-              method: 'POST',
-              headers: {
-                authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-                'content-type': 'application/json',
-              },
-              body: JSON.stringify({
-                model: modelName,
-                input: prompt,
-                reasoning: { effort: 'high' },
-              }),
-            });
+            const basePayload = {
+              model: modelName,
+              input: prompt,
+            };
 
-            if (!response.ok) {
-              const errorBodyText = await response.text();
-              const errorBody = (() => {
-                try {
-                  return JSON.parse(errorBodyText);
-                } catch {
-                  return { error: { message: errorBodyText } };
-                }
-              })();
-              const isQuotaError =
-                response.status === 429 ||
-                errorBody?.error?.code === 'insufficient_quota';
+            const reasonPayload = {
+              ...basePayload,
+              reasoning: { effort: 'high' },
+            };
 
-              if (isQuotaError) {
-                core.warning(`OpenAI API request skipped due to quota issue: ${errorBodyText}`);
+            const callOpenAI = async (payload) => {
+              const apiResponse = await fetch('https://api.openai.com/v1/responses', {
+                method: 'POST',
+                headers: {
+                  authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                  'content-type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+              });
+              const text = await apiResponse.text();
+              let parsed = {};
+              try {
+                parsed = JSON.parse(text);
+              } catch {
+                parsed = {};
+              }
+              return { apiResponse, text, parsed };
+            };
+
+            const isUnsupportedReasoningError = (status, err) =>
+              status === 400 &&
+              err?.error?.code === 'unsupported_parameter' &&
+              err?.error?.param === 'reasoning.effort';
+
+            const isQuotaError = (status, err) =>
+              status === 429 ||
+              err?.error?.code === 'insufficient_quota';
+
+            let { apiResponse, parsed, text } = await callOpenAI(reasonPayload);
+
+            if (!apiResponse.ok && isUnsupportedReasoningError(apiResponse.status, parsed)) {
+              core.warning(`Model ${modelName} does not support reasoning.effort. Retrying without reasoning parameter.`);
+              ({ apiResponse, parsed, text } = await callOpenAI(basePayload));
+            }
+
+            if (!apiResponse.ok) {
+              if (isQuotaError(apiResponse.status, parsed)) {
+                core.warning(`OpenAI API request skipped due to quota issue: ${text}`);
                 const quotaFallback = `${marker}\n## Codex 코드 리뷰\n### 요약\nOpenAI API 할당량이 소진되어 자동 리뷰를 생성하지 못했습니다.\n\n### 확인이 필요한 문제\n- 해당 PR의 AI 코드리뷰를 진행하려면 OpenAI 계정의 사용량/결제 상태를 확인해야 합니다.\n- 필요 시 모델 비용이 낮은 정책으로 재설정하거나 일시적으로 리뷰 자동화를 비활성화하세요.\n\n---\n_모델: \`${modelName}\` · 커밋: \`${pr.head.sha.slice(0, 7)}\`_`;
                 await postReviewComment(quotaFallback);
                 return;
               }
 
-              core.setFailed(`OpenAI API request failed (${response.status}): ${errorBodyText}`);
+              core.setFailed(`OpenAI API request failed (${apiResponse.status}): ${text}`);
               return;
             }
 
-            const result = await response.json();
+            const result = parsed;
             const review = result.output_text?.trim();
 
             if (!review) {
