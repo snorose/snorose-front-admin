@@ -26,7 +26,7 @@ jobs:
         uses: actions/github-script@v8
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: gpt-5.6
+          OPENAI_MODEL: gpt-4o-mini
           MAX_DIFF_CHARS: '120000'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -34,7 +34,7 @@ jobs:
             const marker = '<!-- codex-pr-review -->';
             const { owner, repo } = context.repo;
             const pullNumber = context.payload.pull_request.number;
-            const modelName = process.env.OPENAI_MODEL || 'gpt-5.6';
+            const modelName = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
             const postReviewComment = async (content) => {
               const comments = await github.paginate(
