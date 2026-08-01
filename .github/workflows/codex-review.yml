@@ -34,6 +34,43 @@ jobs:
             const marker = '<!-- codex-pr-review -->';
             const { owner, repo } = context.repo;
             const pullNumber = context.payload.pull_request.number;
+            const modelName = process.env.OPENAI_MODEL || 'gpt-5.6';
+
+            const postReviewComment = async (content) => {
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                {
+                  owner,
+                  repo,
+                  issue_number: pullNumber,
+                  per_page: 100,
+                },
+              );
+
+              const previousComment = comments.find(
+                (comment) =>
+                  comment.user?.type === 'Bot' &&
+                  comment.body?.includes(marker),
+              );
+
+              if (previousComment) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: previousComment.id,
+                  body: content,
+                });
+                core.info(`Updated review comment ${previousComment.id}.`);
+              } else {
+                const created = await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pullNumber,
+                  body: content,
+                });
+                core.info(`Created review comment ${created.data.id}.`);
+              }
+            };
 
             if (!process.env.OPENAI_API_KEY) {
               core.setFailed('OPENAI_API_KEY repository secret is not configured.');
@@ -114,15 +151,33 @@ jobs:
                 'content-type': 'application/json',
               },
               body: JSON.stringify({
-                model: process.env.OPENAI_MODEL || 'gpt-5.6',
+                model: modelName,
                 input: prompt,
                 reasoning: { effort: 'high' },
               }),
             });
 
             if (!response.ok) {
-              const errorBody = await response.text();
-              core.setFailed(`OpenAI API request failed (${response.status}): ${errorBody}`);
+              const errorBodyText = await response.text();
+              const errorBody = (() => {
+                try {
+                  return JSON.parse(errorBodyText);
+                } catch {
+                  return { error: { message: errorBodyText } };
+                }
+              })();
+              const isQuotaError =
+                response.status === 429 ||
+                errorBody?.error?.code === 'insufficient_quota';
+
+              if (isQuotaError) {
+                core.warning(`OpenAI API request skipped due to quota issue: ${errorBodyText}`);
+                const quotaFallback = `${marker}\n## Codex 코드 리뷰\n### 요약\nOpenAI API 할당량이 소진되어 자동 리뷰를 생성하지 못했습니다.\n\n### 확인이 필요한 문제\n- 해당 PR의 AI 코드리뷰를 진행하려면 OpenAI 계정의 사용량/결제 상태를 확인해야 합니다.\n- 필요 시 모델 비용이 낮은 정책으로 재설정하거나 일시적으로 리뷰 자동화를 비활성화하세요.\n\n---\n_모델: \`${modelName}\` · 커밋: \`${pr.head.sha.slice(0, 7)}\`_`;
+                await postReviewComment(quotaFallback);
+                return;
+              }
+
+              core.setFailed(`OpenAI API request failed (${response.status}): ${errorBodyText}`);
               return;
             }
 
@@ -134,39 +189,7 @@ jobs:
               return;
             }
 
-            const body = `${marker}\n${review}\n\n---\n_모델: \`${process.env.OPENAI_MODEL || 'gpt-5.6'}\` · 커밋: \`${pr.head.sha.slice(0, 7)}\`_`;
+            const body = `${marker}\n${review}\n\n---\n_모델: \`${modelName}\` · 커밋: \`${pr.head.sha.slice(0, 7)}\`_`;
 
             // Update the previous bot comment instead of adding a new comment per push.
-            const comments = await github.paginate(
-              github.rest.issues.listComments,
-              {
-                owner,
-                repo,
-                issue_number: pullNumber,
-                per_page: 100,
-              },
-            );
-
-            const previousComment = comments.find(
-              (comment) =>
-                comment.user?.type === 'Bot' &&
-                comment.body?.includes(marker),
-            );
-
-            if (previousComment) {
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                comment_id: previousComment.id,
-                body,
-              });
-              core.info(`Updated review comment ${previousComment.id}.`);
-            } else {
-              const created = await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pullNumber,
-                body,
-              });
-              core.info(`Created review comment ${created.data.id}.`);
-            }
+            await postReviewComment(body);
