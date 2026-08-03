@@ -10,20 +10,30 @@ import type {
 
 export const loginAPI = async (
   credentials: LoginRequest
-): Promise<BaseResponse<LoginResult>> => {
+): Promise<LoginResult> => {
   const response = await axiosInstance.post<BaseResponse<LoginResult>>(
     '/v1/users/login',
     credentials
   );
-  return response.data;
+
+  if (!response.data.isSuccess) {
+    throw new Error(response.data.message || '로그인에 실패했습니다.');
+  }
+
+  return response.data.result;
 };
 
 export const reissueTokenAPI = async (
   request: ReissueTokenRequest
-): Promise<BaseResponse<TokenResponse>> => {
+): Promise<TokenResponse> => {
   const response = await axiosInstance.post<BaseResponse<TokenResponse>>(
     REISSUE_TOKEN_ENDPOINT,
     request
   );
-  return response.data;
+
+  if (!response.data.isSuccess) {
+    throw new Error(response.data.message || '토큰 재발급에 실패했습니다.');
+  }
+
+  return response.data.result;
 };

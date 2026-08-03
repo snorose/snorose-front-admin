@@ -34,13 +34,13 @@ type MemberDetailSectionProps = {
   penaltyHistory: BlacklistHistoryItem[];
   penaltyHistoryTotalCount: number;
   hasNextPenaltyHistory: boolean;
-  latestPenaltyHistory: BlacklistHistoryItem | null;
   onBack: () => void;
   onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
   onChangedPenaltyHistory?: () => void | Promise<void>;
   onLoadMorePenaltyHistory: () => void | Promise<void>;
+  onOpenPenaltyHistory?: () => void | Promise<void>;
   onPointAdjusted: () => void | Promise<void>;
   onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
 };
@@ -50,7 +50,6 @@ export default function MemberDetailSection({
   isEdit,
   isPenaltyHistoryLoading,
   hasNextPenaltyHistory,
-  latestPenaltyHistory,
   member,
   penaltyHistory,
   penaltyHistoryTotalCount,
@@ -60,6 +59,7 @@ export default function MemberDetailSection({
   onEditCancel,
   onEditStart,
   onLoadMorePenaltyHistory,
+  onOpenPenaltyHistory,
   onPointAdjusted,
   onSaveEdit,
 }: MemberDetailSectionProps) {
@@ -166,10 +166,10 @@ export default function MemberDetailSection({
         <MemberPenaltySummaryCard
           hasNextPenaltyHistory={hasNextPenaltyHistory}
           isPenaltyHistoryLoading={isPenaltyHistoryLoading}
-          latestPenaltyHistory={latestPenaltyHistory}
           member={member}
           onChangedPenaltyHistory={onChangedPenaltyHistory}
           onLoadMorePenaltyHistory={onLoadMorePenaltyHistory}
+          onOpenPenaltyHistory={onOpenPenaltyHistory}
           penaltyHistory={penaltyHistory}
           penaltyHistoryTotalCount={penaltyHistoryTotalCount}
         />

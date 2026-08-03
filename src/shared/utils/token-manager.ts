@@ -23,28 +23,20 @@ export async function executeTokenRefresh(): Promise<{
 
   try {
     const response = await reissueTokenAPI({ refreshToken });
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+      response;
 
-    if (response.isSuccess) {
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-        response.result;
-
-      if (!newAccessToken) {
-        return { success: false };
-      }
-
-      // 새로운 토큰 저장
-      tokenStorage.setAccessToken(newAccessToken, ACCESS_TOKEN_EXPIRE_MINUTES);
-      if (newRefreshToken) {
-        tokenStorage.setRefreshToken(
-          newRefreshToken,
-          REFRESH_TOKEN_EXPIRE_DAYS
-        );
-      }
-
-      return { success: true, accessToken: newAccessToken };
+    if (!newAccessToken) {
+      return { success: false };
     }
 
-    return { success: false };
+    // 새로운 토큰 저장
+    tokenStorage.setAccessToken(newAccessToken, ACCESS_TOKEN_EXPIRE_MINUTES);
+    if (newRefreshToken) {
+      tokenStorage.setRefreshToken(newRefreshToken, REFRESH_TOKEN_EXPIRE_DAYS);
+    }
+
+    return { success: true, accessToken: newAccessToken };
   } catch {
     return { success: false };
   }

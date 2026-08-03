@@ -5,7 +5,12 @@ import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
 
-import { deletePost, restorePost } from '@/apis';
+import {
+  bulkDeleteComments,
+  deletePost,
+  restorePost,
+  searchComments,
+} from '@/apis';
 
 import type { AdminGetPostResponse } from '../../types';
 import PostDetailActionModal from './PostDetailActionModal';
@@ -29,23 +34,55 @@ export default function PostDetailManageCard({
 
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
-    mutationFn: (memo: string) => deletePost(post.postId, memo),
-    onMutate: () => {
-      return { deleteCommentsAlsoAtMutation: deleteCommentsAlso };
-    },
-    onSuccess: (_data, _variables, context) => {
-      if (context?.deleteCommentsAlsoAtMutation) {
-        toast.info('게시글은 삭제되었지만 댓글 삭제 기능은 개발 중입니다.');
-      } else {
-        toast.success('게시글이 삭제되었습니다.');
+    mutationFn: async (memo: string) => {
+      if (deleteCommentsAlso) {
+        const commentIds: number[] = [];
+        let page = 1;
+        let totalPage = 1;
+
+        do {
+          const result = await searchComments(page, {
+            searchQuery: String(post.postId),
+            searchScope: 'POST_ID',
+            sortTypes: ['CREATED_AT'],
+            sortDirection: 'ASC',
+          });
+          const aliveCommentIds = result.data
+            .filter(
+              (comment) =>
+                comment.deletedAt == null &&
+                !comment.adminCommonStatuses?.includes('ADMIN_DELETED') &&
+                !comment.adminCommonStatuses?.includes('USER_DELETED')
+            )
+            .map((comment) => comment.commentId);
+          commentIds.push(...aliveCommentIds);
+          totalPage = result.totalPage ?? 1;
+          page += 1;
+        } while (page <= totalPage);
+
+        if (commentIds.length > 0) {
+          const bulkResult = await bulkDeleteComments(commentIds, memo);
+          if (bulkResult.failedCount > 0) {
+            throw new Error('댓글 일부 삭제에 실패했습니다.');
+          }
+        }
       }
 
+      return deletePost(post.postId, memo);
+    },
+    onSuccess: () => {
+      toast.success('게시글이 삭제되었습니다.');
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
       queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['post', post.postId] });
+      queryClient.invalidateQueries({
+        queryKey: ['postComments', post.postId],
+      });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('게시글 삭제 중 오류 발생:', error);
       toast.error('게시글 삭제에 실패했습니다.');
     },
   });

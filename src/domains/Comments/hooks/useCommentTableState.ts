@@ -3,9 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
+import { useBulkDelete } from '@/shared/hooks';
+
+import { bulkDeleteComments } from '@/apis';
+
 import type { CommentSearchParams } from '../types';
 import type { AdminCommentResult } from '../types/comment';
-import { useBulkDeleteComment } from './useBulkDeleteComment';
 import { useCommentChildrenList } from './useCommentChildrenList';
 import { useCommentList } from './useCommentList';
 import { useRestoreComment } from './useRestoreComment';
@@ -76,8 +79,10 @@ export function useCommentTableState({
 
   const isLoading = parentId !== null ? isChildLoading : isTotalLoading;
 
-  const { mutate: bulkDelete, isPending: isDeletePending } =
-    useBulkDeleteComment();
+  const { mutate: bulkDelete, isPending: isDeletePending } = useBulkDelete({
+    deleteFn: bulkDeleteComments,
+    queryKey: ['comments'],
+  });
   const { mutate: restoreComment, isPending: isRestorePending } =
     useRestoreComment();
   const { mutate: bulkVisibility, isPending: isVisibilityPending } =
@@ -102,13 +107,12 @@ export function useCommentTableState({
     }
 
     bulkDelete(
-      { commentIds: selectedIds, memo },
+      { ids: selectedIds, memo },
       {
         onSuccess: (res) => {
           toast.success(`${res.deletedCount}개의 댓글이 삭제되었습니다.`);
           setSelectedIds([]);
           setIsDeleteModalOpen(false);
-          void refetch();
         },
         onError: () => toast.error('댓글 일괄 삭제 중 오류가 발생했습니다.'),
       }
@@ -127,7 +131,6 @@ export function useCommentTableState({
               : '선택한 댓글이 비공개 처리되었습니다.'
           );
           setSelectedIds([]);
-          void refetch();
         },
         onError: () =>
           toast.error('노출 상태 일괄 변경 중 오류가 발생했습니다.'),
@@ -149,7 +152,6 @@ export function useCommentTableState({
 
         const restoredIdSet = new Set(restoredIds);
         setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
-        void refetch();
       },
       onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
     });
@@ -193,7 +195,6 @@ export function useCommentTableState({
               ? '댓글이 공개로 전환되었습니다.'
               : '댓글이 비공개 처리되었습니다.'
           );
-          void refetch();
         },
         onError: () => toast.error('상태 변경 실패'),
       }

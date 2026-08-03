@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
@@ -29,15 +29,19 @@ export function useMemberDetailState({
 }: UseMemberDetailStateParams) {
   const navigate = useNavigate();
   const [selectedMember, setSelectedMember] = useState<MemberInfo | null>(null);
-  const [latestPenaltyHistory, setLatestPenaltyHistory] =
-    useState<BlacklistHistoryItem | null>(null);
   const [penaltyHistory, setPenaltyHistory] = useState<BlacklistHistoryItem[]>(
     []
   );
   const [penaltyHistoryPage, setPenaltyHistoryPage] = useState(0);
   const [hasNextPenaltyHistory, setHasNextPenaltyHistory] = useState(false);
   const [isPenaltyHistoryLoading, setIsPenaltyHistoryLoading] = useState(false);
+  const [isPenaltyHistoryLoaded, setIsPenaltyHistoryLoaded] = useState(false);
   const [penaltyHistoryTotalCount, setPenaltyHistoryTotalCount] = useState(0);
+  // 중복 호출 방지용 in-flight 가드(state는 비동기라 같은 틱 연타를 못 막는다).
+  const isPenaltyHistoryFetchingRef = useRef(false);
+  // 응답 도착 시점의 현재 회원과 비교해, 회원 전환 후 늦게 온 응답이 덮어쓰는 것을 막는다.
+  const selectedMemberRef = useRef(selectedMember);
+  selectedMemberRef.current = selectedMember;
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -67,7 +71,6 @@ export function useMemberDetailState({
   useEffect(() => {
     if (!memberKey) {
       setSelectedMember(null);
-      setLatestPenaltyHistory(null);
       setPenaltyHistory([]);
       setPenaltyHistoryPage(0);
       setHasNextPenaltyHistory(false);
@@ -109,55 +112,52 @@ export function useMemberDetailState({
     };
   }, [fetchMemberDetail, memberKey, navigate]);
 
+  // 회원이 바뀌면 제재 이력 상태를 초기화한다.
+  // 실제 조회는 히스토리 아이콘 클릭 시(handleLoadPenaltyHistory)에만 수행한다.
   useEffect(() => {
-    const encryptedUserId = selectedMember?.encryptedUserId;
-    const studentNumber = selectedMember?.studentNumber;
+    setPenaltyHistory([]);
+    setPenaltyHistoryPage(0);
+    setHasNextPenaltyHistory(false);
+    setPenaltyHistoryTotalCount(0);
+    setIsPenaltyHistoryLoaded(false);
+  }, [selectedMember?.encryptedUserId]);
 
-    if (!encryptedUserId || !studentNumber) {
-      setLatestPenaltyHistory(null);
-      setPenaltyHistory([]);
-      setPenaltyHistoryPage(0);
-      setHasNextPenaltyHistory(false);
-      setPenaltyHistoryTotalCount(0);
+  // 히스토리 아이콘을 눌렀을 때만 첫 페이지를 조회한다(회원당 1회).
+  const handleLoadPenaltyHistory = useCallback(async () => {
+    if (
+      !selectedMember ||
+      isPenaltyHistoryLoaded ||
+      isPenaltyHistoryFetchingRef.current
+    ) {
       return;
     }
 
-    let isMounted = true;
-    void (async () => {
-      try {
-        setIsPenaltyHistoryLoading(true);
-        const { history, response } = await fetchPenaltyHistoryPage(
-          encryptedUserId,
-          studentNumber,
-          0
-        );
-        if (!isMounted) return;
-        setPenaltyHistory(history);
-        setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
-        setPenaltyHistoryPage(0);
-        setHasNextPenaltyHistory(response.hasNext);
-        setPenaltyHistoryTotalCount(response.totalCount);
-      } catch (error) {
-        if (!isMounted) return;
+    const targetUserId = selectedMember.encryptedUserId;
+    isPenaltyHistoryFetchingRef.current = true;
+    try {
+      setIsPenaltyHistoryLoading(true);
+      const { history, response } = await fetchPenaltyHistoryPage(
+        targetUserId,
+        selectedMember.studentNumber,
+        0
+      );
+      // 응답 도착 사이에 다른 회원으로 전환됐다면 현재 화면을 덮어쓰지 않는다.
+      if (selectedMemberRef.current?.encryptedUserId !== targetUserId) return;
+      setPenaltyHistory(history);
+      setPenaltyHistoryPage(0);
+      setHasNextPenaltyHistory(response.hasNext);
+      setPenaltyHistoryTotalCount(response.totalCount);
+      setIsPenaltyHistoryLoaded(true);
+    } catch (error) {
+      if (selectedMemberRef.current?.encryptedUserId === targetUserId) {
         toast.error(getErrorMessage(error, '제재 이력 조회에 실패했습니다.'));
-        setPenaltyHistory([]);
-        setLatestPenaltyHistory(null);
-        setPenaltyHistoryPage(0);
-        setHasNextPenaltyHistory(false);
-        setPenaltyHistoryTotalCount(0);
-      } finally {
-        if (isMounted) setIsPenaltyHistoryLoading(false);
       }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [
-    fetchPenaltyHistoryPage,
-    selectedMember?.encryptedUserId,
-    selectedMember?.studentNumber,
-  ]);
+    } finally {
+      // in-flight 가드는 회원 전환 여부와 무관하게 항상 해제한다(재진입 차단 방지).
+      isPenaltyHistoryFetchingRef.current = false;
+      setIsPenaltyHistoryLoading(false);
+    }
+  }, [fetchPenaltyHistoryPage, isPenaltyHistoryLoaded, selectedMember]);
 
   const handleLoadMorePenaltyHistory = useCallback(async () => {
     if (!selectedMember || isPenaltyHistoryLoading || !hasNextPenaltyHistory) {
@@ -204,10 +204,10 @@ export function useMemberDetailState({
         0
       );
       setPenaltyHistory(history);
-      setLatestPenaltyHistory(resolveLatestPenaltyHistory(history));
       setPenaltyHistoryPage(0);
       setHasNextPenaltyHistory(response.hasNext);
       setPenaltyHistoryTotalCount(response.totalCount);
+      setIsPenaltyHistoryLoaded(true);
     } catch (error) {
       toast.error(
         getErrorMessage(error, '제재 이력을 다시 불러오지 못했습니다.')
@@ -295,6 +295,7 @@ export function useMemberDetailState({
     handleBack,
     handleCopy,
     handleLoadMorePenaltyHistory,
+    handleLoadPenaltyHistory,
     handleRefreshMemberDetail,
     handleRefreshPenaltyHistory,
     handleSaveEdit,
@@ -302,25 +303,9 @@ export function useMemberDetailState({
     isDetailLoading,
     isEdit,
     isPenaltyHistoryLoading,
-    latestPenaltyHistory,
     penaltyHistory,
     penaltyHistoryTotalCount,
     selectedMember,
     setIsEdit,
   };
-}
-
-function resolveLatestPenaltyHistory(history: BlacklistHistoryItem[]) {
-  if (history.length === 0) return null;
-
-  const sortedHistory = [...history].sort(
-    (left, right) =>
-      new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-  );
-
-  return (
-    sortedHistory.find(
-      (item) => item.type !== '경고' && item.type !== 'WARNING'
-    ) ?? sortedHistory[0]
-  );
 }
