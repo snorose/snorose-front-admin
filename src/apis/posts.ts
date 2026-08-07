@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/shared/axios/instance';
-import type { BaseResponse } from '@/shared/types';
+import type { AdminSanctionListResult, BaseResponse } from '@/shared/types';
 
 import type {
   AdminGetPostResponse,
@@ -91,5 +91,17 @@ export const updatePostVisibility = async (
       isVisible,
     }
   );
+  return response.data.result;
+};
+
+export const getPostSanction = async (
+  postId: number,
+  page: number
+): Promise<AdminSanctionListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminSanctionListResult>
+  >(`/v1/admin/posts/${postId}/sanctions`, {
+    params: { page: page - 1 },
+  });
   return response.data.result;
 };

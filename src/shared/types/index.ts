@@ -5,3 +5,4 @@ export * from './inquiry';
 export * from './member';
 export * from './points';
 export * from './reviews';
+export * from './sanction';
