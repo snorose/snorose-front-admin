@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
-import { Plus } from 'lucide-react';
+import { Megaphone, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, ConfirmModal } from '@/shared/components/ui';
+import { Alert, Button, ConfirmModal } from '@/shared/components/ui';
 
 import {
   PopupEditorDialog,
@@ -218,6 +218,30 @@ export default function PopupManagementPage() {
         title='팝업창 관리'
         description='사용자 홈 화면에 노출되는 공지 팝업 콘텐츠와 노출 기간을 관리할 수 있어요.'
       />
+
+      <Alert>
+        <Megaphone />
+        <Alert.Title>안내 사항</Alert.Title>
+        <Alert.Description>
+          <ul className='list-inside list-disc text-sm'>
+            <li>설정한 게시 기간에만 사용자 홈 화면에 노출됩니다.</li>
+            <li>
+              노출 순서 값이 작을수록 먼저 표시되며, 같은 값은 등록순으로
+              정렬됩니다.
+            </li>
+            <li>
+              게시 기간에 따라 예약·진행 중·종료 상태가 자동으로 표시됩니다.
+            </li>
+            <li>
+              본문에서 <code>**굵은 글씨**</code>, <code>- 항목</code>,{' '}
+              <code>1. 항목</code> 형식의 마크다운을 사용할 수 있습니다.
+            </li>
+            <li>
+              <code>[링크명](URL)</code> 형식으로 링크를 추가할 수 있습니다.
+            </li>
+          </ul>
+        </Alert.Description>
+      </Alert>
 
       <section className='flex flex-col gap-4'>
         <div className='flex gap-2'>

@@ -18,12 +18,12 @@ function createPopup(displayPriority: number): PopupContent {
   };
 }
 
-describe('팝업 노출 우선순위 검증', () => {
+describe('팝업 노출 순서 검증', () => {
   test.each([Number.NaN, 0, -1, 1.5])(
-    '우선순위가 1 이상의 정수가 아니면 저장을 거부한다: %s',
+    '노출 순서가 1 이상의 정수가 아니면 저장을 거부한다: %s',
     (displayPriority) => {
       expect(validatePopupContent(createPopup(displayPriority))).toBe(
-        '노출 우선순위는 1 이상의 정수로 입력해주세요.'
+        '노출 순서는 1 이상의 정수로 입력해주세요.'
       );
     }
   );

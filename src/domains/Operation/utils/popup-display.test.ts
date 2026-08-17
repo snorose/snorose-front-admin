@@ -24,7 +24,7 @@ function createPopup(overrides: Partial<PopupContent> = {}): PopupContent {
 }
 
 describe('팝업 노출 순서', () => {
-  test('우선순위, 생성 일시, id 오름차순으로 정렬한다', () => {
+  test('노출 순서, 생성 일시, id 오름차순으로 정렬한다', () => {
     const popups = [
       createPopup({ id: 4, displayPriority: 20 }),
       createPopup({ id: 3, createdAt: '2026-08-02 09:00' }),
@@ -93,12 +93,12 @@ describe('팝업 노출 순서', () => {
   });
 });
 
-describe('신규 팝업 우선순위', () => {
+describe('신규 팝업 노출 순서', () => {
   test('팝업이 없으면 10을 반환한다', () => {
     expect(getNextPopupDisplayPriority([])).toBe(10);
   });
 
-  test('기존 최대 우선순위에 10을 더한다', () => {
+  test('기존 최대 노출 순서에 10을 더한다', () => {
     const popups = [
       createPopup({ id: 1, displayPriority: 10 }),
       createPopup({ id: 2, displayPriority: 30 }),
