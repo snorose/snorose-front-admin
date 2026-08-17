@@ -61,11 +61,12 @@ export function PopupEditorDialog({
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor='popup-start-date' required>
-                게시 시작일
+                게시 시작일시
               </Label>
               <Input
                 id='popup-start-date'
-                type='date'
+                type='datetime-local'
+                step={60}
                 value={popup.startDate}
                 onChange={(event) =>
                   onPopupChange('startDate', event.target.value)
@@ -75,11 +76,12 @@ export function PopupEditorDialog({
 
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor='popup-end-date' required>
-                게시 종료일
+                게시 종료일시
               </Label>
               <Input
                 id='popup-end-date'
-                type='date'
+                type='datetime-local'
+                step={60}
                 value={popup.endDate}
                 onChange={(event) =>
                   onPopupChange('endDate', event.target.value)

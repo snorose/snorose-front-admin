@@ -41,13 +41,13 @@ export function sortPopupsByDisplayOrder(popups: PopupContent[]) {
   return [...popups].sort(comparePopupDisplayOrder);
 }
 
-export function getVisiblePopupsForDate(
+export function getVisiblePopupsForDateTime(
   popups: PopupContent[],
-  referenceDate: string
+  referenceDateTime: string
 ) {
   const visiblePopups = popups.filter(
     (popup) =>
-      popup.startDate <= referenceDate && referenceDate <= popup.endDate
+      popup.startDate <= referenceDateTime && referenceDateTime <= popup.endDate
   );
 
   return sortPopupsByDisplayOrder(visiblePopups);

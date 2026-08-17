@@ -4,7 +4,7 @@ import type { PopupContent } from '@/domains/Operation/types';
 
 import {
   getNextPopupDisplayPriority,
-  getVisiblePopupsForDate,
+  getVisiblePopupsForDateTime,
   sortPopupsByDisplayOrder,
 } from './popup-display';
 
@@ -14,8 +14,8 @@ function createPopup(overrides: Partial<PopupContent> = {}): PopupContent {
     title: '팝업',
     bodyMarkdown: '본문',
     imageFileName: '',
-    startDate: '2026-08-01',
-    endDate: '2026-08-31',
+    startDate: '2026-08-01T09:00',
+    endDate: '2026-08-31T18:00',
     displayPriority: 10,
     createdAt: '2026-08-01 09:00',
     updatedAt: '2026-08-01 09:00',
@@ -38,43 +38,57 @@ describe('팝업 노출 순서', () => {
     expect(popups.map((popup) => popup.id)).toEqual([4, 3, 2, 1]);
   });
 
-  test('기준 날짜가 게시 시작일 또는 종료일과 같아도 노출한다', () => {
+  test('기준 일시가 게시 시작일시 또는 종료일시와 같아도 노출한다', () => {
     const popup = createPopup({
-      startDate: '2026-08-10',
-      endDate: '2026-08-20',
+      startDate: '2026-08-10T09:00',
+      endDate: '2026-08-20T18:00',
     });
 
-    expect(getVisiblePopupsForDate([popup], '2026-08-10')).toEqual([popup]);
-    expect(getVisiblePopupsForDate([popup], '2026-08-20')).toEqual([popup]);
+    expect(getVisiblePopupsForDateTime([popup], '2026-08-10T09:00')).toEqual([
+      popup,
+    ]);
+    expect(getVisiblePopupsForDateTime([popup], '2026-08-20T18:00')).toEqual([
+      popup,
+    ]);
+    expect(getVisiblePopupsForDateTime([popup], '2026-08-10T08:59')).toEqual(
+      []
+    );
+    expect(getVisiblePopupsForDateTime([popup], '2026-08-20T18:01')).toEqual(
+      []
+    );
   });
 
   test('게시 기간을 먼저 적용하고 노출 대상만 순서대로 반환한다', () => {
     const popups = [
       createPopup({
         id: 1,
-        startDate: '2026-08-01',
-        endDate: '2026-08-10',
+        startDate: '2026-08-01T09:00',
+        endDate: '2026-08-10T18:00',
         displayPriority: 10,
       }),
       createPopup({
         id: 2,
-        startDate: '2026-08-05',
-        endDate: '2026-08-20',
+        startDate: '2026-08-05T09:00',
+        endDate: '2026-08-20T18:00',
         displayPriority: 20,
       }),
       createPopup({
         id: 3,
-        startDate: '2026-08-11',
-        endDate: '2026-08-30',
+        startDate: '2026-08-11T09:00',
+        endDate: '2026-08-30T18:00',
         displayPriority: 10,
       }),
     ];
 
     expect(
-      getVisiblePopupsForDate(popups, '2026-08-07').map((popup) => popup.id)
+      getVisiblePopupsForDateTime(popups, '2026-08-07T12:00').map(
+        (popup) => popup.id
+      )
     ).toEqual([1, 2]);
     expect(
-      getVisiblePopupsForDate(popups, '2026-08-12').map((popup) => popup.id)
+      getVisiblePopupsForDateTime(popups, '2026-08-12T12:00').map(
+        (popup) => popup.id
+      )
     ).toEqual([3, 2]);
   });
 });

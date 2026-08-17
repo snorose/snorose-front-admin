@@ -12,6 +12,10 @@ type PopupManagementTableProps = {
   onDelete: (id: number) => void;
 };
 
+function formatPopupDateTime(dateTime: string) {
+  return dateTime ? dateTime.replace('T', ' ') : '-';
+}
+
 export function PopupManagementTable({
   popups,
   getStatusLabel,
@@ -52,7 +56,8 @@ export function PopupManagementTable({
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  {popup.startDate || '-'} ~ {popup.endDate || '-'}
+                  {formatPopupDateTime(popup.startDate)} ~{' '}
+                  {formatPopupDateTime(popup.endDate)}
                 </Table.Cell>
                 <Table.Cell>{popup.createdAt || '-'}</Table.Cell>
                 <Table.Cell>{popup.updatedAt || '-'}</Table.Cell>

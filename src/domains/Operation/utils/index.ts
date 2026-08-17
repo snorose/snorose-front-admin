@@ -5,7 +5,7 @@ export {
 } from './markdown';
 export {
   getNextPopupDisplayPriority,
-  getVisiblePopupsForDate,
+  getVisiblePopupsForDateTime,
   sortPopupsByDisplayOrder,
 } from './popup-display';
 export { validatePopupContent } from './validate-popup';
