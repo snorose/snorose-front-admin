@@ -28,8 +28,8 @@ export function PopupManagementTable({
       <Table>
         <Table.Header>
           <Table.Row>
-            <Table.Head>상태</Table.Head>
-            <Table.Head>노출 우선순위</Table.Head>
+            <Table.Head className='text-center'>상태</Table.Head>
+            <Table.Head className='text-center'>노출 순서</Table.Head>
             <Table.Head>팝업명</Table.Head>
             <Table.Head>게시 기간</Table.Head>
             <Table.Head>생성일시</Table.Head>
@@ -41,7 +41,7 @@ export function PopupManagementTable({
           {popups.length > 0 ? (
             popups.map((popup) => (
               <Table.Row key={popup.id}>
-                <Table.Cell>
+                <Table.Cell className='text-center'>
                   <Badge
                     variant='outline'
                     className={getStatusClassName(popup)}
@@ -49,7 +49,9 @@ export function PopupManagementTable({
                     {getStatusLabel(popup)}
                   </Badge>
                 </Table.Cell>
-                <Table.Cell>{popup.displayPriority}</Table.Cell>
+                <Table.Cell className='text-center'>
+                  {popup.displayPriority}
+                </Table.Cell>
                 <Table.Cell className='max-w-[280px]'>
                   <div className='truncate font-medium'>
                     {popup.title || '제목 없는 팝업'}

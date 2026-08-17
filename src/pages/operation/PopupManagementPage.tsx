@@ -51,7 +51,7 @@ function getPopupStatus(popup: PopupContent): PopupStatus {
 
 function getStatusLabel(status: PopupStatus) {
   const statusMap = {
-    active: '진행 중',
+    active: '진행중',
     reserved: '예약',
     ended: '종료',
   } as const;
