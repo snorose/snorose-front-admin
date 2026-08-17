@@ -11,6 +11,7 @@ export type PopupContent = {
   imageFileName: string;
   startDate: string;
   endDate: string;
+  displayPriority: number;
   createdAt: string;
   updatedAt: string;
 };
