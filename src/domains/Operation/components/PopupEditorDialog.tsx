@@ -108,7 +108,7 @@ export function PopupEditorDialog({
 
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor='popup-display-priority' required>
-                노출 우선순위
+                노출 순서
               </Label>
               <Input
                 id='popup-display-priority'
@@ -134,7 +134,7 @@ export function PopupEditorDialog({
                 id='popup-display-priority-description'
                 className='text-xs leading-5 text-gray-500'
               >
-                작은 숫자부터 상단에 표시되며, 같은 숫자는 등록일으로
+                작은 숫자부터 상단에 표시되며, 같은 숫자는 등록순으로
                 정렬됩니다.
               </p>
             </div>

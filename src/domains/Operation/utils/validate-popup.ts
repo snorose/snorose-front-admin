@@ -33,7 +33,7 @@ export function validatePopupContent(popup: PopupContent) {
   }
 
   if (!Number.isInteger(popup.displayPriority) || popup.displayPriority < 1) {
-    return '노출 우선순위는 1 이상의 정수로 입력해주세요.';
+    return '노출 순서는 1 이상의 정수로 입력해주세요.';
   }
 
   if (!popup.bodyMarkdown.trim() && !popup.imageFileName.trim()) {
