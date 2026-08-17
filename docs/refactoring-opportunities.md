@@ -47,6 +47,8 @@ domain이 담당하는 것
 
 ## 1. 페이지네이션 통합
 
+> 현재 사용 화면, 기준 컴포넌트, 교체 범위와 단계별 체크리스트는 [`pagination-consolidation-plan.md`](./pagination-consolidation-plan.md)에 정리되어 있다.
+
 ### 현재 문제
 
 - [`PaginationBar`](../src/shared/components/PaginationBar.tsx)와 [`ExamReviewTablePagination`](../src/domains/Reviews/components/ExamReviewTablePagination.tsx)은 실질적으로 동일한 99줄 구현이다.
