@@ -25,11 +25,11 @@ export function validatePopupContent(popup: PopupContent) {
   }
 
   if (!popup.startDate || !popup.endDate) {
-    return '게시 시작일과 종료일을 입력해주세요.';
+    return '게시 시작일시와 종료일시를 입력해주세요.';
   }
 
   if (popup.startDate > popup.endDate) {
-    return '게시 종료일은 시작일보다 빠를 수 없습니다.';
+    return '게시 종료일시는 시작일시보다 빠를 수 없습니다.';
   }
 
   if (!Number.isInteger(popup.displayPriority) || popup.displayPriority < 1) {

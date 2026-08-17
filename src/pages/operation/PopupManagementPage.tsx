@@ -34,15 +34,15 @@ const EMPTY_POPUP: PopupContent = {
 };
 
 function getPopupStatus(popup: PopupContent): PopupStatus {
-  const today = new Date();
-  const startDate = new Date(`${popup.startDate}T00:00:00`);
-  const endDate = new Date(`${popup.endDate}T23:59:59`);
+  const now = new Date();
+  const startDate = new Date(popup.startDate);
+  const endDate = new Date(popup.endDate);
 
-  if (today < startDate) {
+  if (now < startDate) {
     return 'reserved';
   }
 
-  if (today > endDate) {
+  if (now > endDate) {
     return 'ended';
   }
 
