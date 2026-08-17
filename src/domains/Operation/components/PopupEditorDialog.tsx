@@ -143,6 +143,7 @@ export function PopupEditorDialog({
                   type='button'
                   className='h-full min-w-0 flex-1 cursor-pointer px-3 text-left text-sm focus-visible:outline-none'
                   aria-label='이미지 첨부'
+                  aria-describedby='popup-image-file-description'
                   onClick={() => imageInputRef.current?.click()}
                 >
                   <span
@@ -166,6 +167,12 @@ export function PopupEditorDialog({
                   </button>
                 )}
               </div>
+              <p
+                id='popup-image-file-description'
+                className='text-xs leading-5 text-gray-500'
+              >
+                첨부한 이미지는 본문 가장 아래에 표시됩니다.
+              </p>
             </div>
           </div>
 
