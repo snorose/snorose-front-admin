@@ -1,8 +1,10 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { X } from 'lucide-react';
 
+import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
+import { useDateTimeField } from '@/shared/hooks';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
@@ -36,6 +38,31 @@ export function PopupEditorDialog({
   onSave,
 }: PopupEditorDialogProps) {
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const {
+    date: startDate,
+    time: startTime,
+    onDateSelect: onStartDateSelect,
+    onTimeChange: onStartTimeChange,
+    setDateTime: setStartDateTime,
+  } = useDateTimeField({
+    initialDateTime: popup.startDate,
+    onDateTimeChange: (dateTime) => onPopupChange('startDate', dateTime),
+  });
+  const {
+    date: endDate,
+    time: endTime,
+    onDateSelect: onEndDateSelect,
+    onTimeChange: onEndTimeChange,
+    setDateTime: setEndDateTime,
+  } = useDateTimeField({
+    initialDateTime: popup.endDate,
+    onDateTimeChange: (dateTime) => onPopupChange('endDate', dateTime),
+  });
+
+  useEffect(() => {
+    setStartDateTime(popup.startDate);
+    setEndDateTime(popup.endDate);
+  }, [popup.startDate, popup.endDate, setStartDateTime, setEndDateTime]);
 
   const handleImageRemove = () => {
     onImageRemove();
@@ -59,35 +86,25 @@ export function PopupEditorDialog({
 
         <div className='flex min-w-0 flex-col gap-5'>
           <div className='grid gap-4 md:grid-cols-2'>
-            <div className='flex min-w-0 flex-col gap-1'>
-              <Label htmlFor='popup-start-date' required>
-                게시 시작일시
-              </Label>
-              <Input
-                id='popup-start-date'
-                type='datetime-local'
-                step={60}
-                value={popup.startDate}
-                onChange={(event) =>
-                  onPopupChange('startDate', event.target.value)
-                }
-              />
-            </div>
+            <DateTimePicker
+              className='min-w-0'
+              label='게시 시작일시'
+              date={startDate}
+              time={startTime}
+              onDateSelect={onStartDateSelect}
+              onTimeChange={onStartTimeChange}
+              required
+            />
 
-            <div className='flex min-w-0 flex-col gap-1'>
-              <Label htmlFor='popup-end-date' required>
-                게시 종료일시
-              </Label>
-              <Input
-                id='popup-end-date'
-                type='datetime-local'
-                step={60}
-                value={popup.endDate}
-                onChange={(event) =>
-                  onPopupChange('endDate', event.target.value)
-                }
-              />
-            </div>
+            <DateTimePicker
+              className='min-w-0'
+              label='게시 종료일시'
+              date={endDate}
+              time={endTime}
+              onDateSelect={onEndDateSelect}
+              onTimeChange={onEndTimeChange}
+              required
+            />
 
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor='popup-display-priority' required>
