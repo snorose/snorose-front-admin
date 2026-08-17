@@ -12,7 +12,11 @@ import {
 } from '@/domains/Operation/components';
 import { MOCK_POPUP_CONTENTS } from '@/domains/Operation/mocks';
 import type { PopupContent } from '@/domains/Operation/types';
-import { validatePopupContent } from '@/domains/Operation/utils';
+import {
+  getNextPopupDisplayPriority,
+  sortPopupsByDisplayOrder,
+  validatePopupContent,
+} from '@/domains/Operation/utils';
 
 type PopupStatus = 'active' | 'reserved' | 'ended';
 type PopupEditorMode = 'create' | 'edit';
@@ -24,6 +28,7 @@ const EMPTY_POPUP: PopupContent = {
   imageFileName: '',
   startDate: '',
   endDate: '',
+  displayPriority: 10,
   createdAt: '',
   updatedAt: '',
 };
@@ -64,10 +69,11 @@ function getStatusClassName(status: PopupStatus) {
   return statusClassNameMap[status];
 }
 
-function createEmptyPopup() {
+function createEmptyPopup(popups: PopupContent[]) {
   return {
     ...EMPTY_POPUP,
     id: Date.now(),
+    displayPriority: getNextPopupDisplayPriority(popups),
   };
 }
 
@@ -134,7 +140,7 @@ export default function PopupManagementPage() {
 
   const handleNewPopupButtonClick = () => {
     setEditorMode('create');
-    setEditingPopup(createEmptyPopup());
+    setEditingPopup(createEmptyPopup(popups));
     setEditingImagePreviewUrl('');
     setIsEditorOpen(true);
   };
@@ -234,7 +240,7 @@ export default function PopupManagementPage() {
         </div>
 
         <PopupManagementTable
-          popups={popups}
+          popups={sortPopupsByDisplayOrder(popups)}
           getStatusLabel={(popup) => getStatusLabel(getPopupStatus(popup))}
           getStatusClassName={(popup) =>
             getStatusClassName(getPopupStatus(popup))

@@ -32,6 +32,10 @@ export function validatePopupContent(popup: PopupContent) {
     return '게시 종료일은 시작일보다 빠를 수 없습니다.';
   }
 
+  if (!Number.isInteger(popup.displayPriority) || popup.displayPriority < 1) {
+    return '노출 우선순위는 1 이상의 정수로 입력해주세요.';
+  }
+
   if (!popup.bodyMarkdown.trim() && !popup.imageFileName.trim()) {
     return '본문 또는 이미지를 하나 이상 입력해주세요.';
   }
