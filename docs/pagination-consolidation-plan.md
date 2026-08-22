@@ -127,6 +127,8 @@ MemberInfoPage / useMemberDirectoryState
 
 `hasNext`는 도메인에서 별도로 필요할 때 응답 정보로 사용할 수 있지만, `PaginationBar`의 페이지 계산에는 전달하지 않는다. 두 값을 함께 받아 분기하는 것보다 `totalPage` 하나를 기준으로 삼는 편이 동작 계약이 단순하고 명확하다.
 
+페이지 이동 중 새 응답을 기다리는 동안 쿼리 데이터가 일시적으로 `undefined`가 될 수 있다. 이때 현재 페이지를 임시 `totalPage`로 사용하면 뒤쪽 페이지 번호가 잠시 사라지므로, 마지막으로 응답받은 `totalPage`를 유지하고 새 응답이 도착했을 때 갱신한다.
+
 따라서 다음 순서를 권장한다.
 
 1. 게시글: `usePostList`가 이미 꺼내는 `totalPage`를 `usePostTableState`와 `PostTable`까지 전달한다.

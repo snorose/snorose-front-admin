@@ -6,6 +6,7 @@ import { PaginationBar } from '@/shared/components';
 import { BulkActionBar } from '@/shared/components';
 import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
+import { useStableTotalPage } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
 
 import { usePostTableState } from '../hooks/usePostTableState';
@@ -48,6 +49,7 @@ export default function PostTable({
     refreshKey,
     currentPage,
   });
+  const paginationTotalPage = useStableTotalPage(totalPage, currentPage);
 
   useEffect(() => {
     if (isLoading || totalPage === undefined) return;
@@ -176,7 +178,7 @@ export default function PostTable({
       <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
-        totalPage={totalPage ?? currentPage}
+        totalPage={paginationTotalPage}
       />
 
       {isDeleteModalOpen && (

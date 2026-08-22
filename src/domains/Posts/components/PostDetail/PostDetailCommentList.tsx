@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 import { PaginationBar } from '@/shared/components';
+import { useStableTotalPage } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
 
 import { searchComments } from '@/apis/comments';
@@ -36,7 +37,7 @@ export default function PostDetailCommentList({
   });
 
   const comments = useMemo(() => data?.data ?? [], [data]);
-  const totalPage = data?.totalPage ?? 1;
+  const totalPage = useStableTotalPage(data?.totalPage, currentPage);
 
   useEffect(() => {
     if (isLoading) return;
@@ -74,7 +75,7 @@ export default function PostDetailCommentList({
         </div>
       )}
 
-      {!isLoading && totalPage > 1 && (
+      {totalPage > 1 && (
         <PaginationBar
           currentPage={currentPage}
           onPageChange={setCurrentPage}
