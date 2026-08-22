@@ -1,9 +1,13 @@
+import { useEffect } from 'react';
+
 import { Loader2 } from 'lucide-react';
 
 import { PaginationBar } from '@/shared/components';
 import { BulkActionBar } from '@/shared/components';
 import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
+import { useStableTotalPage } from '@/shared/hooks';
+import { clampOneBasedPage } from '@/shared/utils';
 
 import { usePostTableState } from '../hooks/usePostTableState';
 import type { PostSearchParams } from '../types';
@@ -13,7 +17,7 @@ interface PostTableProps {
   searchParams?: PostSearchParams;
   refreshKey?: number;
   currentPage: number;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
+  onPageChange: (page: number) => void;
 }
 
 export default function PostTable({
@@ -38,13 +42,21 @@ export default function PostTable({
     handleBulkRestore,
     isDeletePending,
     isVisibilityPending,
-    hasNext,
+    totalPage,
     totalCount,
   } = usePostTableState({
     searchParams,
     refreshKey,
     currentPage,
   });
+  const paginationTotalPage = useStableTotalPage(totalPage, currentPage);
+
+  useEffect(() => {
+    if (isLoading || totalPage === undefined) return;
+
+    const validPage = clampOneBasedPage(currentPage, totalPage);
+    if (validPage !== currentPage) onPageChange(validPage);
+  }, [currentPage, isLoading, onPageChange, totalPage]);
 
   const isEmpty = !isLoading && posts.length === 0;
 
@@ -166,7 +178,7 @@ export default function PostTable({
       <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
-        hasNext={hasNext}
+        totalPage={paginationTotalPage}
       />
 
       {isDeleteModalOpen && (

@@ -6,7 +6,7 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { formatDateTimeToMinutes } from '@/shared/utils';
+import { formatDateTimeToMinutes, parseOneBasedPage } from '@/shared/utils';
 
 import {
   ExamDetailSection,
@@ -41,21 +41,25 @@ export default function ExamReviewPage() {
   const [searchParams, setSearchParams] = useState<ExamReviewSearchParams>({});
 
   // URL에서 페이지 번호 읽기
-  const currentPageFromUrl = parseInt(
-    searchParamsFromUrl.get('page') || '1',
-    10
-  );
-  const [currentPage, setCurrentPage] = useState<number>(
-    currentPageFromUrl || 1
-  );
+  const currentPageFromUrl = parseOneBasedPage(searchParamsFromUrl.get('page'));
+  const [currentPage, setCurrentPage] = useState<number>(currentPageFromUrl);
 
   // URL의 페이지 번호가 변경되면 state 업데이트
   useEffect(() => {
-    const pageFromUrl = parseInt(searchParamsFromUrl.get('page') || '1', 10);
+    const rawPage = searchParamsFromUrl.get('page');
+    const pageFromUrl = parseOneBasedPage(rawPage);
+
+    if (rawPage !== null && rawPage !== String(pageFromUrl)) {
+      const normalizedSearchParams = new URLSearchParams(searchParamsFromUrl);
+      normalizedSearchParams.set('page', String(pageFromUrl));
+      setSearchParamsFromUrl(normalizedSearchParams, { replace: true });
+      return;
+    }
+
     if (pageFromUrl !== currentPage) {
       setCurrentPage(pageFromUrl);
     }
-  }, [searchParamsFromUrl, currentPage]);
+  }, [searchParamsFromUrl, currentPage, setSearchParamsFromUrl]);
 
   // URL 쿼리 파라미터를 searchParams로 변환 (검색 파라미터만, page 제외)
   useEffect(() => {
@@ -196,19 +200,11 @@ export default function ExamReviewPage() {
     setCurrentPage(1);
   };
 
-  const handlePageChange = (
-    pageOrUpdater: number | ((prev: number) => number)
-  ) => {
-    setCurrentPage((prev) => {
-      const next =
-        typeof pageOrUpdater === 'function'
-          ? pageOrUpdater(prev)
-          : pageOrUpdater;
-      const newSearchParams = new URLSearchParams(searchParamsFromUrl);
-      newSearchParams.set('page', next.toString());
-      setSearchParamsFromUrl(newSearchParams, { replace: true });
-      return next;
-    });
+  const handlePageChange = (page: number) => {
+    const newSearchParams = new URLSearchParams(searchParamsFromUrl);
+    newSearchParams.set('page', String(page));
+    setSearchParamsFromUrl(newSearchParams, { replace: true });
+    setCurrentPage(page);
   };
 
   const handleSaveSuccess = async (
