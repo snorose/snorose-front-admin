@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
+
 import { Loader2 } from 'lucide-react';
 
 import { PaginationBar } from '@/shared/components';
 import { BulkActionBar } from '@/shared/components';
 import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
+import { clampOneBasedPage } from '@/shared/utils';
 
 import { useCommentTableState } from '../hooks/useCommentTableState';
 import type { CommentSearchParams } from '../types';
@@ -13,7 +16,7 @@ interface CommentTableProps {
   searchParams?: CommentSearchParams;
   refreshKey?: number;
   currentPage: number;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
+  onPageChange: (page: number) => void;
 }
 
 export default function CommentTable({
@@ -42,6 +45,7 @@ export default function CommentTable({
     isDeletePending,
     isVisibilityPending,
     hasNext,
+    totalPage,
     totalCount,
   } = useCommentTableState({
     searchParams,
@@ -49,6 +53,13 @@ export default function CommentTable({
     currentPage,
     onPageChange,
   });
+
+  useEffect(() => {
+    if (isLoading || totalPage === undefined) return;
+
+    const validPage = clampOneBasedPage(currentPage, totalPage);
+    if (validPage !== currentPage) onPageChange(validPage);
+  }, [currentPage, isLoading, onPageChange, totalPage]);
 
   const isEmpty = !isLoading && comments.length === 0;
 
@@ -180,6 +191,7 @@ export default function CommentTable({
         currentPage={currentPage}
         onPageChange={onPageChange}
         hasNext={hasNext}
+        totalPage={totalPage}
       />
 
       {isDeleteModalOpen && (

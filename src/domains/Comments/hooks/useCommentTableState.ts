@@ -18,7 +18,7 @@ interface UseCommentTableStateProps {
   searchParams: CommentSearchParams;
   refreshKey?: number;
   currentPage: number;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
+  onPageChange: (page: number) => void;
 }
 
 export function useCommentTableState({
@@ -71,6 +71,11 @@ export function useCommentTableState({
     parentId !== null
       ? (childCommentData?.hasNext ?? false)
       : (totalCommentData?.hasNext ?? false);
+
+  const totalPage =
+    parentId !== null
+      ? childCommentData?.totalPage
+      : totalCommentData?.totalPage;
 
   const totalCount =
     parentId !== null
@@ -241,6 +246,7 @@ export function useCommentTableState({
     isDeletePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
     hasNext,
+    totalPage,
     totalCount,
   };
 }
