@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
-import { Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { PageHeader } from '@/shared/components';
-import { Alert, Button } from '@/shared/components/ui';
+import { NoticePanel, PageHeader } from '@/shared/components';
+import { Button } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -72,16 +71,12 @@ export default function AdjustAllMemberPointPage() {
         description='모든 정회원에게 포인트를 지급/차감할 수 있어요.'
       />
 
-      <Alert>
-        <Megaphone />
-        <Alert.Title>안내 사항</Alert.Title>
-        <Alert.Description>
-          <ul className='list-inside list-disc text-sm'>
-            <li>포인트 카테고리, 메모, 지급/차감량을 설정할 수 있어요.</li>
-            <li>포인트 지급/차감은 즉시 적용되므로 신중히 진행해 주세요.</li>
-          </ul>
-        </Alert.Description>
-      </Alert>
+      <NoticePanel
+        items={[
+          '포인트 카테고리, 메모, 지급/차감량을 설정할 수 있어요.',
+          '포인트 지급/차감은 즉시 적용되므로 신중히 진행해 주세요.',
+        ]}
+      />
 
       <PointDetailSection
         selectedCategory={selectedCategory}
