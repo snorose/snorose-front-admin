@@ -12,13 +12,14 @@ import type {
 } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import {
-  INQUIRY_GROUP_LABELS,
-  INQUIRY_SUB_GROUP_LABELS,
-} from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import { useInquiryList } from '@/domains/InquiryReport/hooks';
 
+import {
+  InquiryGroupBadge,
+  InquirySubGroupBadge,
+} from './InquiryClassificationBadge';
 import InquiryStatusSelect from './InquiryStatusSelect';
+import WithdrawnUserBadge from './WithdrawnUserBadge';
 
 interface InquiryReportTableProps {
   currentPage: number;
@@ -79,7 +80,9 @@ export default function InquiryReportTable({
   const [subGroupFilter, setSubGroupFilter] = useState<SubGroupFilter>('ALL');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
 
-  const subGroupOptions = useMemo(() => {
+  const subGroupOptions = useMemo<
+    ReadonlyArray<{ label: string; value: SubGroupFilter }>
+  >(() => {
     if (groupFilter === 'INQUIRY') return INQUIRY_SUB_GROUP_OPTIONS;
     if (groupFilter === 'REPORT') return REPORT_SUB_GROUP_OPTIONS;
 
@@ -138,8 +141,16 @@ export default function InquiryReportTable({
             </Select.Trigger>
             <Select.Content align='start'>
               {GROUP_OPTIONS.map((option) => (
-                <Select.Item key={option.value} value={option.value}>
-                  {option.label}
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  textValue={option.label}
+                >
+                  {option.value === 'ALL' ? (
+                    option.label
+                  ) : (
+                    <InquiryGroupBadge group={option.value} />
+                  )}
                 </Select.Item>
               ))}
             </Select.Content>
@@ -175,7 +186,11 @@ export default function InquiryReportTable({
             </Select.Trigger>
             <Select.Content align='start'>
               {subGroupOptions.map((option) => (
-                <Select.Item key={option.value} value={option.value}>
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  textValue={option.label}
+                >
                   {option.label}
                 </Select.Item>
               ))}
@@ -323,19 +338,21 @@ export default function InquiryReportTable({
                         {pageStartNumber + index + 1}
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
-                        {getGroupLabel(inquiry.group)}
+                        <div className='flex justify-center'>
+                          <InquiryGroupBadge group={inquiry.group} />
+                        </div>
                       </Table.Cell>
-                      <Table.Cell
-                        className='truncate px-3 text-gray-700'
-                        title={getSubGroupLabel(inquiry.subGroup)}
-                      >
-                        {getSubGroupLabel(inquiry.subGroup)}
+                      <Table.Cell className='px-3'>
+                        <InquirySubGroupBadge subGroup={inquiry.subGroup} />
                       </Table.Cell>
-                      <Table.Cell
-                        className='truncate px-3 text-gray-900'
-                        title={getUserDisplay(inquiry)}
-                      >
-                        {getUserDisplay(inquiry)}
+                      <Table.Cell className='truncate px-3 text-gray-900'>
+                        {isWithdrawnUser(inquiry) ? (
+                          <WithdrawnUserBadge />
+                        ) : (
+                          <span title={inquiry.userLoginId}>
+                            {inquiry.userLoginId}
+                          </span>
+                        )}
                       </Table.Cell>
                       <Table.Cell
                         className='px-3 text-center'
@@ -382,14 +399,8 @@ export default function InquiryReportTable({
   );
 }
 
-function getGroupLabel(group: InquiryGroup) {
-  return INQUIRY_GROUP_LABELS[group] ?? group;
-}
-
-function getSubGroupLabel(subGroup: InquirySubGroup) {
-  return INQUIRY_SUB_GROUP_LABELS[subGroup] ?? subGroup;
-}
-
-function getUserDisplay(inquiry: InquiryListItem) {
-  return inquiry.userLoginId;
+function isWithdrawnUser(inquiry: InquiryListItem) {
+  return (
+    inquiry.userLoginId === '탈퇴한 사용자' || inquiry.userLoginId === '탈퇴'
+  );
 }

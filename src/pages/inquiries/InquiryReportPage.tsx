@@ -54,7 +54,7 @@ export default function InquiryReportPage() {
           />
         </div>
         {selectedPostId !== null && (
-          <div className='w-full min-w-0 xl:sticky xl:top-4 xl:mt-[48px] xl:w-[min(520px,34vw)] xl:shrink-0'>
+          <div className='w-full min-w-0 xl:sticky xl:top-4 xl:mt-[48px] xl:flex-1 xl:basis-0'>
             <InquiryReportDetailPanel
               postId={selectedPostId}
               onClose={() => setSelectedPostId(null)}
