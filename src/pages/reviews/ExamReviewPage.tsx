@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { UsersRoundIcon } from 'lucide-react';
 
 import { PageHeader } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
@@ -13,6 +14,8 @@ import {
 
 import {
   ExamDetailSection,
+  ExamReviewAdminStatusDialog,
+  ExamReviewAdminStatusPeriodDialog,
   ExamSearch,
   ExamTable,
 } from '@/domains/Reviews/components';
@@ -65,6 +68,11 @@ export default function ExamReviewPage() {
   const selectedReviewIdRef = useRef<number | null>(null);
   selectedReviewIdRef.current = selectedExamReview?.id ?? null;
   const [searchParams, setSearchParams] = useState<ExamReviewSearchParams>({});
+  const [adminStatusDialog, setAdminStatusDialog] = useState<
+    'closed' | 'status' | 'period-editor'
+  >('closed');
+  const [selectedAdminStatusPeriodId, setSelectedAdminStatusPeriodId] =
+    useState<number | null>(null);
 
   // URL에서 페이지 번호 읽기
   const currentPageFromUrl = parseOneBasedPage(searchParamsFromUrl.get('page'));
@@ -373,10 +381,20 @@ export default function ExamReviewPage() {
 
   return (
     <div className='flex w-full min-w-0 flex-col gap-6'>
-      <PageHeader
-        title='시험후기 관리'
-        description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
-      />
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between'>
+        <PageHeader
+          title='시험후기 관리'
+          description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
+        />
+        <Button
+          type='button'
+          variant='outline'
+          onClick={() => setAdminStatusDialog('status')}
+        >
+          <UsersRoundIcon />
+          담당 관리자 현황
+        </Button>
+      </div>
 
       <div className='flex min-w-0 flex-col gap-6'>
         <ExamSearch
@@ -475,6 +493,24 @@ export default function ExamReviewPage() {
         onFileNameChangeSuccess={handleFileNameChangeSuccess}
         onDeleteSuccess={handleDeleteSuccess}
         onRestoreSuccess={handleRestoreSuccess}
+      />
+
+      <ExamReviewAdminStatusDialog
+        open={adminStatusDialog === 'status'}
+        onOpenChange={(open) =>
+          setAdminStatusDialog(open ? 'status' : 'closed')
+        }
+        selectedPeriodId={selectedAdminStatusPeriodId}
+        onSelectedPeriodChange={setSelectedAdminStatusPeriodId}
+        onOpenPeriodEditor={() => setAdminStatusDialog('period-editor')}
+      />
+
+      <ExamReviewAdminStatusPeriodDialog
+        open={adminStatusDialog === 'period-editor'}
+        onOpenChange={(open) =>
+          setAdminStatusDialog(open ? 'period-editor' : 'status')
+        }
+        onSelectedPeriodChange={setSelectedAdminStatusPeriodId}
       />
     </div>
   );
