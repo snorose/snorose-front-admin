@@ -11,6 +11,8 @@ import {
   isCommentWrittenByAdmin,
 } from '@/domains/InquiryReport/utils/inquiryCommentUtils';
 
+import WithdrawnUserBadge from './WithdrawnUserBadge';
+
 interface InquiryCommentItemProps {
   comment: InquiryComment;
   depth: number;
@@ -42,9 +44,6 @@ export default function InquiryCommentItem({
   const isManageable = canManageComment(comment);
   const canReply = depth === 0 && comment.isVisible && !comment.isDeleted;
   const isReplying = replyParentId === comment.id;
-  const authorDisplay = comment.isWriterWithdrawn
-    ? '탈퇴한 사용자'
-    : comment.userDisplay;
   const isAdminComment = isCommentWrittenByAdmin(comment);
   const isEditingCommentValid =
     editingCommentValue.trim().length > 0 &&
@@ -61,9 +60,13 @@ export default function InquiryCommentItem({
       >
         <div className='mb-1 flex flex-wrap items-center justify-between gap-2'>
           <div className='flex min-w-0 items-center gap-1.5'>
-            <span className='truncate text-[12px] font-semibold text-gray-800'>
-              {authorDisplay}
-            </span>
+            {comment.isWriterWithdrawn ? (
+              <WithdrawnUserBadge />
+            ) : (
+              <span className='truncate text-[12px] font-semibold text-gray-800'>
+                {comment.userDisplay}
+              </span>
+            )}
             {isAdminComment && (
               <span className='rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600'>
                 관리자
