@@ -4,6 +4,7 @@ export { DateTimePicker } from './DateTimePicker';
 export { Header } from './Header';
 export { MemberInfoPopover } from './MemberInfoPopover';
 export { NavUser } from './NavUser';
+export { NoticePanel } from './NoticePanel';
 export { PageHeader } from './PageHeader';
 export { PaginationBar } from './PaginationBar';
 export { PeriodStatusBadge } from './PeriodStatusBadge';

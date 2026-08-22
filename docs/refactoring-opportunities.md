@@ -1,6 +1,8 @@
 # 프런트엔드 공통화 및 리팩터링 제안
 
 > 조사 기준: 2026-08-17의 `src` 구현
+>
+> 갱신: 2026-08-22, 공통 `NoticePanel` 도입 현황 반영
 
 ## 한눈에 보기
 
@@ -14,8 +16,9 @@
    - 상태 배지
    - 테이블 로딩·빈 상태
 3. **사용처가 더 늘 때 공통화하면 좋은 영역**
-   - 안내 사항
    - 폼 섹션
+
+안내 사항은 두 포인트 화면의 중복을 [`NoticePanel`](../src/shared/components/NoticePanel.tsx)로 통합했다. 공통 컴포넌트는 제목과 목록 구조만 담당하고, 안내 문구는 각 화면에 유지한다.
 
 가장 먼저 할 작업으로는 `ExamReviewTablePagination`을 기존 `PaginationBar`로 교체하는 것을 권장한다. 두 파일은 이름을 제외하면 사실상 같은 구현이다.
 
@@ -29,7 +32,8 @@
 | 4        | 상태 배지        | 상태별 색상과 크기가 제각각            | 의미 기반 `StatusBadge` 도입        |
 | 5        | 테이블 상태      | 로딩·빈 결과 UI가 화면마다 다름        | `TableStateRow` 공통화              |
 | 6        | 날짜/시간        | 빈 값·초 단위·API 형식 정책이 다름     | 표시용과 전송용 함수 분리           |
-| 7        | 안내/폼 섹션     | 비슷한 마크업 반복                     | 사용처가 늘 때 얇게 공통화          |
+| 완료     | 안내 사항        | 두 포인트 화면의 안내 구조가 반복      | `NoticePanel`로 통합                |
+| 7        | 폼 섹션          | 비슷한 마크업 반복                     | 사용처가 늘 때 얇게 공통화          |
 
 ## 공통화 기준
 
@@ -298,39 +302,30 @@ useTableSelection({ visibleIds, resetKeys });
 
 공통 컴포넌트는 `loading`, `empty`, `error`의 기본 아이콘과 높이만 관리한다. 복잡한 스켈레톤이 필요한 테이블은 기존 `ExamTableFallback`처럼 별도로 유지한다.
 
-## 7. 안내 사항
+## 7. 안내 사항 공통화 (완료)
 
 ### 현재 상태
 
-[`AdjustAllMemberPointPage`](../src/pages/points/AdjustAllMemberPointPage.tsx)와 [`ExcelPointUploadPage`](../src/pages/points/ExcelPointUploadPage.tsx)는 동일한 안내 구조를 사용한다.
+[`AdjustAllMemberPointPage`](../src/pages/points/AdjustAllMemberPointPage.tsx)와 [`ExcelPointUploadPage`](../src/pages/points/ExcelPointUploadPage.tsx)의 반복 안내 구조를 공통 [`NoticePanel`](../src/shared/components/NoticePanel.tsx)로 교체했다.
 
 ```tsx
-<Alert>
-  <Megaphone />
-  <Alert.Title>안내 사항</Alert.Title>
-  <Alert.Description>
-    <ul>...</ul>
-  </Alert.Description>
-</Alert>
-```
-
-다만 기반이 되는 [`Alert`](../src/shared/components/ui/alert.tsx)는 이미 공통 컴포넌트이고 동일 사용처도 현재 두 곳이다.
-
-### 제안
-
-안내 화면이 더 늘어날 때 `NoticeList`를 얇게 추가한다.
-
-```tsx
-<NoticeList
-  title='안내 사항'
+<NoticePanel
   items={[
     '포인트 지급은 즉시 적용됩니다.',
-    '처리 전에 대상과 금액을 확인해 주세요.',
+    <>
+      처리 전에 <strong>대상과 금액</strong>을 확인해 주세요.
+    </>,
   ]}
 />
 ```
 
-필요한 props는 `title`, `items`, `tone`, `icon` 정도로 제한한다.
+`NoticePanel`은 다음 표현만 담당한다.
+
+- 기본 제목 `안내 사항`과 선택적 사용자 지정 제목
+- 확성기 아이콘과 목록 레이아웃
+- 문자열 또는 강조 요소를 포함한 안내 항목 렌더링
+
+업무별 안내 문구는 각 페이지에 남겨 공통 UI와 도메인 문구의 경계를 유지한다. 기본 제목, 여러 안내 항목, 강조 요소, 사용자 지정 제목은 [`NoticePanel.test.tsx`](../src/shared/components/NoticePanel.test.tsx)에서 검증한다.
 
 ### 접근성 확인
 
@@ -404,7 +399,9 @@ API 전송용   각 API adapter의 serializeDateTime
 - [ ] `StatusBadge` tone 정의
 - [ ] 기간 상태부터 적용
 - [ ] 시험후기, 게시글/댓글, 제재 상태에 점진 적용
-- [ ] 신규 화면부터 `NoticeList`, `FormSection` 적용
+- [x] 포인트 안내 UI를 `NoticePanel`로 통합
+- [ ] 정적 안내에 사용할 `role` 정책 결정
+- [ ] 같은 구조가 더 반복되면 `FormSection` 적용
 
 ## 피해야 할 공통화
 
@@ -424,6 +421,6 @@ API 전송용   각 API adapter의 serializeDateTime
 2. 구조가 거의 같은 두 기간 관리 화면을 통합한다.
 3. 게시글/댓글 화면에서는 선택·필터·테이블 상태처럼 작은 단위만 분리한다.
 4. 상태 배지는 업무 코드는 그대로 두고 색상 규칙만 통일한다.
-5. 안내 사항과 폼 섹션은 사용처가 늘 때 얇게 추가한다.
+5. 안내 사항은 얇은 `NoticePanel`을 유지하고, 폼 섹션은 사용처가 늘 때 공통화한다.
 
 핵심 원칙은 **공통 UI는 표현을 담당하고, 도메인은 업무 규칙과 API를 담당하는 것**이다.
