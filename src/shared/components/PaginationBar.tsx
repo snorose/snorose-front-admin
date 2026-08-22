@@ -1,10 +1,10 @@
-import { useState } from 'react';
-
 import { Pagination } from '@/shared/components/ui';
 
 interface PaginationBarProps {
-  currentPage?: number;
-  onPageChange?: (page: number | ((prev: number) => number)) => void;
+  /** 1부터 시작하는 현재 페이지 */
+  currentPage: number;
+  /** 1부터 시작하는 페이지 번호를 전달한다. */
+  onPageChange: (page: number) => void;
   hasNext?: boolean;
   totalPage?: number;
 }
@@ -14,23 +14,11 @@ function getBlockStartPage(page: number) {
 }
 
 export function PaginationBar({
-  currentPage: propCurrentPage,
+  currentPage,
   onPageChange,
   hasNext = false,
   totalPage,
 }: PaginationBarProps) {
-  const [internalCurrentPage, setInternalCurrentPage] = useState(1);
-
-  const currentPage = propCurrentPage ?? internalCurrentPage;
-
-  const setCurrentPage = (page: number | ((prev: number) => number)) => {
-    if (onPageChange) {
-      onPageChange(page);
-    } else {
-      setInternalCurrentPage(page);
-    }
-  };
-
   const blockStart = getBlockStartPage(currentPage);
   const prevBlockStart = Math.max(1, blockStart - 10);
   const nextBlockStart = blockStart + 10;
@@ -47,7 +35,7 @@ export function PaginationBar({
             href='#'
             onClick={(e) => {
               e.preventDefault();
-              if (canGoPrevious) setCurrentPage(prevBlockStart);
+              if (canGoPrevious) onPageChange(prevBlockStart);
             }}
             className={
               !canGoPrevious ? 'pointer-events-none opacity-50' : undefined
@@ -72,7 +60,7 @@ export function PaginationBar({
                 href='#'
                 onClick={(e) => {
                   e.preventDefault();
-                  setCurrentPage(page);
+                  onPageChange(page);
                 }}
                 className={currentPage === page ? 'cursor-default' : undefined}
               >
@@ -86,7 +74,7 @@ export function PaginationBar({
             href='#'
             onClick={(e) => {
               e.preventDefault();
-              if (canGoNext) setCurrentPage(nextBlockStart);
+              if (canGoNext) onPageChange(nextBlockStart);
             }}
             className={
               !canGoNext ? 'pointer-events-none opacity-50' : undefined
