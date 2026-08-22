@@ -6,13 +6,13 @@ import { PaginationBar } from '@/shared/components';
 import { Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
-  InquiryListItem,
   InquiryStatus,
   InquirySubGroup,
 } from '@/shared/types';
 import { clampOneBasedPage, formatDateTimeToMinutes } from '@/shared/utils';
 
 import { useInquiryList } from '@/domains/InquiryReport/hooks';
+import { isWithdrawnInquiryAuthor } from '@/domains/InquiryReport/utils/inquiryAuthorUtils';
 
 import {
   InquiryGroupBadge,
@@ -352,7 +352,7 @@ export default function InquiryReportTable({
                         <InquirySubGroupBadge subGroup={inquiry.subGroup} />
                       </Table.Cell>
                       <Table.Cell className='truncate px-3 text-gray-900'>
-                        {isWithdrawnUser(inquiry) ? (
+                        {isWithdrawnInquiryAuthor(inquiry) ? (
                           <WithdrawnUserBadge />
                         ) : (
                           <span title={inquiry.userLoginId}>
@@ -401,11 +401,5 @@ export default function InquiryReportTable({
         totalPage={totalPage}
       />
     </div>
-  );
-}
-
-function isWithdrawnUser(inquiry: InquiryListItem) {
-  return (
-    inquiry.userLoginId === '탈퇴한 사용자' || inquiry.userLoginId === '탈퇴'
   );
 }

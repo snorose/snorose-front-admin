@@ -15,6 +15,7 @@ import {
   useInquiryDetail,
   useUpdateInquiryComment,
 } from '@/domains/InquiryReport/hooks';
+import { isWithdrawnInquiryAuthor } from '@/domains/InquiryReport/utils/inquiryAuthorUtils';
 
 import {
   canManageComment,
@@ -101,7 +102,8 @@ export default function InquiryReportDetailPanel({
   const inquiryPostUrl = buildInquiryPostUrl(detail);
   const inquiryPostLabel = isReportInquiry(detail) ? '신고글' : '문의글';
   const reportTargetUrl = buildReportTargetUrl(detail);
-  const canCopyAuthorLoginId = !detail.isWriterWithdrawn && detail.userLoginId;
+  const isWriterWithdrawn = isWithdrawnInquiryAuthor(detail);
+  const canCopyAuthorLoginId = !isWriterWithdrawn && detail.userLoginId;
   const isCommentInputValid =
     commentInput.trim().length > 0 &&
     commentInput.trim().length <= INQUIRY_COMMENT_MAX_LENGTH;
@@ -290,7 +292,7 @@ export default function InquiryReportDetailPanel({
             <span className='shrink-0 text-gray-500'>작성자</span>
             <span className='flex min-w-0 items-center gap-1.5 text-gray-800'>
               <span className='min-w-0 truncate'>
-                {detail.isWriterWithdrawn ? (
+                {isWriterWithdrawn ? (
                   <WithdrawnUserBadge />
                 ) : (
                   detail.userLoginId
