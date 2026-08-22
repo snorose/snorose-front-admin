@@ -1,14 +1,28 @@
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { type ParamType, parseUrlParams } from '@/shared/utils/urlParamUtils';
+import {
+  type ParamType,
+  parseOneBasedPage,
+  parseUrlParams,
+} from '@/shared/utils';
 
 export function useManagePageUrl<T extends object>(
   schema: Record<string, ParamType>
 ) {
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
 
-  const currentPage = parseInt(searchParamsFromUrl.get('page') || '1', 10);
+  const rawPage = searchParamsFromUrl.get('page');
+  const currentPage = parseOneBasedPage(rawPage);
   const searchParams = parseUrlParams<T>(searchParamsFromUrl, schema);
+
+  useEffect(() => {
+    if (rawPage === null || rawPage === String(currentPage)) return;
+
+    const normalizedSearchParams = new URLSearchParams(searchParamsFromUrl);
+    normalizedSearchParams.set('page', String(currentPage));
+    setSearchParamsFromUrl(normalizedSearchParams, { replace: true });
+  }, [currentPage, rawPage, searchParamsFromUrl, setSearchParamsFromUrl]);
 
   const handleSearchChange = (params: T) => {
     const newSearchParams = new URLSearchParams();
@@ -28,15 +42,9 @@ export function useManagePageUrl<T extends object>(
     setSearchParamsFromUrl(newSearchParams, { replace: true });
   };
 
-  const handlePageChange = (
-    pageOrUpdater: number | ((prev: number) => number)
-  ) => {
-    const next =
-      typeof pageOrUpdater === 'function'
-        ? pageOrUpdater(currentPage)
-        : pageOrUpdater;
+  const handlePageChange = (page: number) => {
     const newSearchParams = new URLSearchParams(searchParamsFromUrl);
-    newSearchParams.set('page', next.toString());
+    newSearchParams.set('page', String(Math.max(1, page)));
     setSearchParamsFromUrl(newSearchParams, { replace: true });
   };
 
