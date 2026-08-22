@@ -77,7 +77,7 @@ shared/components/PaginationBar
 
 ### 3.3 사용되지 않는 구현
 
-[`ExamTablePagination`](../src/domains/Reviews/components/ExamTablePagination.tsx)은 [`Reviews/components/index.ts`](../src/domains/Reviews/components/index.ts)에서 export만 되고 실제 렌더링 사용처는 없다.
+`ExamTablePagination`은 `Reviews/components/index.ts`에서 export만 되고 실제 렌더링 사용처가 없어 통합 과정에서 삭제했다.
 
 이 컴포넌트는 공통화 과정에서 삭제할 수 있다. 삭제할 때 barrel export도 같이 제거해야 한다.
 
@@ -214,8 +214,8 @@ type PaginationBarProps = {
 
 ### 6.4 삭제할 파일과 export
 
-- [`src/domains/Reviews/components/ExamReviewTablePagination.tsx`](../src/domains/Reviews/components/ExamReviewTablePagination.tsx)
-- [`src/domains/Reviews/components/ExamTablePagination.tsx`](../src/domains/Reviews/components/ExamTablePagination.tsx)
+- `src/domains/Reviews/components/ExamReviewTablePagination.tsx` (삭제 완료)
+- `src/domains/Reviews/components/ExamTablePagination.tsx` (삭제 완료)
 - [`src/domains/MemberInfo/components/MemberDirectoryPagination.tsx`](../src/domains/MemberInfo/components/MemberDirectoryPagination.tsx)
 - [`src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx`](../src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx)
 - [`src/domains/Reviews/components/index.ts`](../src/domains/Reviews/components/index.ts)의 두 시험후기 페이지네이션 export
@@ -297,12 +297,12 @@ type PaginationBarProps = {
 
 ### 시험후기
 
-- [ ] `ExamTable`이 `PaginationBar`를 import한다.
-- [ ] 시험후기 1페이지가 서버의 0페이지를 요청한다.
-- [ ] URL의 `page` 값과 선택된 페이지가 동기화된다.
-- [ ] 검색 시 URL과 화면이 모두 1페이지로 초기화된다.
-- [ ] `ExamReviewTablePagination` 파일과 export를 삭제한다.
-- [ ] 미사용 `ExamTablePagination` 파일과 export를 삭제한다.
+- [x] `ExamTable`이 `PaginationBar`를 import한다.
+- [x] 시험후기 1페이지가 서버의 0페이지를 요청한다.
+- [x] URL의 `page` 값과 선택된 페이지가 동기화된다.
+- [x] 검색 시 URL과 화면이 모두 1페이지로 초기화된다.
+- [x] `ExamReviewTablePagination` 파일과 export를 삭제한다.
+- [x] 미사용 `ExamTablePagination` 파일과 export를 삭제한다.
 
 ### 게시글·댓글
 

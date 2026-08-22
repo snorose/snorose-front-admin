@@ -7,13 +7,15 @@ import {
   useState,
 } from 'react';
 
+import { PaginationBar } from '@/shared/components';
 import { Badge, Table } from '@/shared/components/ui';
+import { useStableTotalPage } from '@/shared/hooks';
 import { cn } from '@/shared/lib';
+import { clampOneBasedPage } from '@/shared/utils';
 
 import {
   ExamConfirmStatusBadge,
   ExamReviewProcessStatusBadge,
-  ExamReviewTablePagination,
   ExamTableEmpty,
   ExamTableEmptyRows,
   ExamTableSkeleton,
@@ -123,7 +125,7 @@ interface ExamTableProps {
   selectedId?: number | null;
   searchParams?: ExamReviewSearchParams;
   currentPage?: number;
-  onPageChange?: (page: number | ((prev: number) => number)) => void;
+  onPageChange?: (page: number) => void;
 }
 
 export default function ExamTable({
@@ -141,11 +143,11 @@ export default function ExamTable({
   const currentPage = propCurrentPage ?? internalPage;
 
   const setCurrentPage = useCallback(
-    (pageOrUpdater: number | ((prev: number) => number)) => {
+    (page: number) => {
       if (propOnPageChange) {
-        propOnPageChange(pageOrUpdater);
+        propOnPageChange(page);
       } else {
-        setInternalPage(pageOrUpdater);
+        setInternalPage(page);
       }
     },
     [propOnPageChange]
@@ -173,12 +175,19 @@ export default function ExamTable({
     () => propData ?? queryData?.data ?? [],
     [propData, queryData?.data]
   );
-  const hasNext = queryData?.hasNext ?? false;
-  const totalPage = queryData?.totalPage;
+  const responseTotalPage = queryData?.totalPage;
+  const totalPage = useStableTotalPage(responseTotalPage, currentPage);
   const totalCount = queryData?.totalCount;
   const totalCountText =
     totalCount === undefined ? '-' : totalCount.toLocaleString();
   const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
+
+  useEffect(() => {
+    if (isLoading || responseTotalPage === undefined) return;
+
+    const validPage = clampOneBasedPage(currentPage, responseTotalPage);
+    if (validPage !== currentPage) setCurrentPage(validPage);
+  }, [currentPage, isLoading, responseTotalPage, setCurrentPage]);
 
   // 선택된 행이 있으면 업데이트된 데이터로 자동 선택
   useEffect(() => {
@@ -291,10 +300,9 @@ export default function ExamTable({
         </Table>
       </div>
 
-      <ExamReviewTablePagination
+      <PaginationBar
         currentPage={currentPage}
         onPageChange={setCurrentPage}
-        hasNext={hasNext}
         totalPage={totalPage}
       />
     </>
