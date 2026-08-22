@@ -49,6 +49,7 @@ export function usePostTableState({
     isLoading,
     error,
     hasNext,
+    totalPage,
     totalCount,
     refetch,
   } = usePostList({
@@ -206,6 +207,7 @@ export function usePostTableState({
     isDeletePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
     hasNext: hasNext ?? posts.length > 0,
+    totalPage,
     totalCount,
   };
 }
