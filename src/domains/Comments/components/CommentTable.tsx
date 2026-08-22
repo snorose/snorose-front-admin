@@ -44,7 +44,6 @@ export default function CommentTable({
     handleBulkRestore,
     isDeletePending,
     isVisibilityPending,
-    hasNext,
     totalPage,
     totalCount,
   } = useCommentTableState({
@@ -190,8 +189,7 @@ export default function CommentTable({
       <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
-        hasNext={hasNext}
-        totalPage={totalPage}
+        totalPage={totalPage ?? currentPage}
       />
 
       {isDeleteModalOpen && (

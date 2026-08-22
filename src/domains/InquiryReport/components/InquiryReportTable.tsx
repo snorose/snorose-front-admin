@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Loader2, X } from 'lucide-react';
 
@@ -10,7 +10,7 @@ import type {
   InquiryStatus,
   InquirySubGroup,
 } from '@/shared/types';
-import { formatDateTimeToMinutes } from '@/shared/utils';
+import { clampOneBasedPage, formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   INQUIRY_GROUP_LABELS,
@@ -22,7 +22,7 @@ import InquiryStatusSelect from './InquiryStatusSelect';
 
 interface InquiryReportTableProps {
   currentPage: number;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
+  onPageChange: (page: number) => void;
   selectedPostId: number | null;
   onRowSelect: (postId: number | null) => void;
   onStatusChange: (
@@ -108,10 +108,16 @@ export default function InquiryReportTable({
   }, [currentPage, filteredInquiries]);
 
   const totalPage = Math.ceil(filteredInquiries.length / PAGE_SIZE);
-  const hasNext = currentPage < totalPage;
   const pageStartNumber = (currentPage - 1) * PAGE_SIZE;
   const isEmpty = !isLoading && inquiries.length === 0;
   const isDetailOpen = selectedPostId !== null;
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const validPage = clampOneBasedPage(currentPage, totalPage);
+    if (validPage !== currentPage) onPageChange(validPage);
+  }, [currentPage, isLoading, onPageChange, totalPage]);
 
   const activeFilterCount = [
     groupFilter !== 'ALL',
@@ -375,7 +381,6 @@ export default function InquiryReportTable({
       <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
-        hasNext={hasNext}
         totalPage={totalPage}
       />
     </div>

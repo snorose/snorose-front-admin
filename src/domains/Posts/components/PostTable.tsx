@@ -41,7 +41,6 @@ export default function PostTable({
     handleBulkRestore,
     isDeletePending,
     isVisibilityPending,
-    hasNext,
     totalPage,
     totalCount,
   } = usePostTableState({
@@ -177,8 +176,7 @@ export default function PostTable({
       <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
-        hasNext={hasNext}
-        totalPage={totalPage}
+        totalPage={totalPage ?? currentPage}
       />
 
       {isDeleteModalOpen && (

@@ -38,7 +38,7 @@ shared/components/PaginationBar
 | 현재 사용량   | 실제 화면 7곳 중 4곳에서 이미 사용한다.                                            |
 | 공통 UI 체계  | shadcn 기반 [`Pagination`](../src/shared/components/ui/pagination.tsx)을 사용한다. |
 | 시험후기 중복 | `ExamReviewTablePagination`과 이름을 제외한 구현이 같다.                           |
-| 확장 가능성   | `totalPage`가 있는 경우와 `hasNext`만 있는 경우를 모두 받을 수 있다.               |
+| 응답 계약     | 서버 페이지네이션 응답에 항상 포함되는 `totalPage`를 공통 기준으로 사용할 수 있다. |
 | 위치          | 특정 도메인이 아닌 `shared/components`에 있어 공통 정책을 두기에 적합하다.         |
 
 `shared/components/ui/Pagination`은 교체 대상이 아니다. 이 컴포넌트는 링크와 아이콘 같은 표현만 담당하고, 실제 페이지 계산 정책은 `PaginationBar`가 담당하도록 계층을 유지한다.
@@ -85,7 +85,7 @@ shared/components/PaginationBar
 
 | 구현                        |              페이지 기준 |              번호 묶음 | 왼쪽/오른쪽 이동                       | `totalPage` | 특이사항                                  |
 | --------------------------- | -----------------------: | ---------------------: | -------------------------------------- | ----------- | ----------------------------------------- |
-| `PaginationBar`             |                   1 기반 |              고정 10개 | 이전/다음 **묶음**                     | 선택        | 현재 공통 기준                            |
+| `PaginationBar`             |                   1 기반 |              고정 10개 | 이전/다음 **묶음**                     | 필수        | 현재 공통 기준                            |
 | `ExamReviewTablePagination` |                   1 기반 |              고정 10개 | 이전/다음 **묶음**                     | 선택        | `PaginationBar`와 동일한 복제 코드        |
 | `MemberDirectoryPagination` | 입력 0 기반, 표시 1 기반 |              고정 10개 | 이전/다음 **묶음**                     | 필수        | 컴포넌트 내부에서 `+1`, 클릭 시 `-1` 변환 |
 | `MemberInfoTablePagenation` |                   1 기반 | `groupSize`, 기본 10개 | 한 페이지 이동과 묶음 이동을 모두 제공 | 필수        | 파일명 오타, 자체 버튼 스타일 사용        |
@@ -121,20 +121,17 @@ MemberInfoPage / useMemberDirectoryState
             └─ API 요청 직전 page - 1
 ```
 
-### 5.2 `totalPage`를 알 수 있으면 반드시 전달한다
+### 5.2 `totalPage`를 반드시 전달한다
 
-게시글과 댓글 응답 타입에는 `totalPage`가 있지만 현재 테이블 상태 훅에서 버려지고, `PaginationBar`에는 `hasNext`만 전달된다.
+서버 페이지네이션 응답에는 `hasNext`, `totalPage`, `totalCount`, `currentCount`가 항상 함께 포함된다. 페이지 번호와 묶음 이동은 정확한 마지막 페이지를 알아야 하므로 `PaginationBar`는 `totalPage`를 필수 입력으로 사용한다.
 
-현재 `PaginationBar`는 `totalPage` 없이 `hasNext`만 받으면 현재 묶음의 페이지 번호 10개를 모두 만든다. 예를 들어 실제 페이지가 2개여도 1~10 버튼이 보일 수 있다. `hasNext`는 보통 “바로 다음 페이지가 있는가”만 알려 주므로 10개 페이지의 존재를 보장하지 않는다.
+`hasNext`는 도메인에서 별도로 필요할 때 응답 정보로 사용할 수 있지만, `PaginationBar`의 페이지 계산에는 전달하지 않는다. 두 값을 함께 받아 분기하는 것보다 `totalPage` 하나를 기준으로 삼는 편이 동작 계약이 단순하고 명확하다.
 
 따라서 다음 순서를 권장한다.
 
 1. 게시글: `usePostList`가 이미 꺼내는 `totalPage`를 `usePostTableState`와 `PostTable`까지 전달한다.
 2. 댓글: 일반 댓글과 대댓글 응답의 `totalPage`를 `useCommentTableState`와 `CommentTable`까지 전달한다.
-3. 시험후기: 현재처럼 `totalPage`와 `hasNext`를 함께 유지한다.
-4. 응답에서 정말 `totalPage`가 없는 경우에만 `hasNext` 전용 모드를 사용한다.
-
-`hasNext` 전용 모드는 존재가 확인되지 않은 번호를 만들지 않도록 별도 동작을 정의해야 한다. 권장 동작은 **현재 페이지 번호와 한 페이지 이전/다음만 제공**하는 것이다.
+3. 시험후기: `totalPage`를 유지하고 공통 컴포넌트에 전달한다.
 
 ### 5.3 페이지 묶음 크기와 데이터 개수를 분리한다
 
@@ -149,8 +146,7 @@ MemberInfoPage / useMemberDirectoryState
 type PaginationBarProps = {
   currentPage: number;
   onPageChange: (page: number) => void;
-  totalPage?: number;
-  hasNext?: boolean;
+  totalPage: number;
   pageBlockSize?: number; // 기본값 10
 };
 ```
@@ -168,7 +164,6 @@ type PaginationBarProps = {
 권장 정책은 다음과 같다.
 
 - `totalPage <= 1`이면 페이지네이션을 숨긴다.
-- `totalPage`가 없고 `hasNext` 전용 모드라면 첫 페이지의 `hasNext=false`일 때 숨긴다.
 
 이 정책은 통합 자체와 별도로 사용자에게 보이는 변화이므로, 첫 교체 PR에서 같이 적용할지 결정하고 스냅샷 또는 화면 테스트로 고정한다.
 
@@ -178,8 +173,8 @@ type PaginationBarProps = {
 
 - [`src/shared/components/PaginationBar.tsx`](../src/shared/components/PaginationBar.tsx)
   - 1 기반 입력 계약을 명시한다.
-  - `totalPage` 우선 동작을 테스트한다.
-  - 필요하면 `pageBlockSize`와 안전한 `hasNext` 전용 모드를 추가한다.
+  - 필수 입력인 `totalPage`를 기준으로 한 동작을 테스트한다.
+  - 필요하면 `pageBlockSize`를 추가한다.
 - [`src/shared/components/ui/pagination.tsx`](../src/shared/components/ui/pagination.tsx)
   - UI 원시 컴포넌트로 유지한다.
   - 통합 범위에서는 구조 변경이 필요하지 않다.
@@ -236,7 +231,6 @@ type PaginationBarProps = {
 - 전체 페이지가 10, 20처럼 묶음 크기의 배수여도 다음 묶음 버튼이 비활성화된다.
 - 번호, 이전 묶음, 다음 묶음을 클릭하면 정확한 1 기반 페이지를 전달한다.
 - `totalPage=0`과 `totalPage=1`의 노출 정책이 의도대로 동작한다.
-- `hasNext` 전용 모드에서 확인되지 않은 페이지 번호를 만들지 않는다.
 - `pageBlockSize`를 도입하면 5개 묶음과 10개 묶음을 각각 검증한다.
 
 ### 2단계: 완전히 같은 시험후기 중복 제거
@@ -253,8 +247,6 @@ type PaginationBarProps = {
 1. 게시글의 `totalPage`를 공통 컴포넌트까지 전달한다.
 2. 일반 댓글과 대댓글의 `totalPage`를 공통 컴포넌트까지 전달한다.
 3. 빈 결과, 마지막 페이지, 필터 후 1페이지 초기화를 확인한다.
-
-API가 실제 응답에서 `totalPage`를 생략할 수 있다면 안전한 `hasNext` 전용 모드도 이 단계에서 적용한다.
 
 ### 4단계: 1 기반 회원 이력 교체
 
@@ -281,22 +273,20 @@ API가 실제 응답에서 `totalPage`를 생략할 수 있다면 안전한 `has
 
 아래 표는 체크리스트 작성 시점의 `PaginationBar` 구현 상태다. `현재 충족`은 기존 동작을 테스트로 고정하면 되는 항목이고, `수정 필요`와 `결정 필요`는 통합 과정에서 추가 작업이 필요한 항목이다.
 
-| 항목                       | 상태                    | 현재 구현과 필요한 작업                                                                                                                                                   |
-| -------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 기반 페이지 계산         | **현재 충족**           | 내부 계산은 1 기반을 전제로 한다. 타입 주석이나 컴포넌트 문서에 이 계약을 명시해야 한다.                                                                                  |
-| `totalPage` 우선 사용      | **현재 충족**           | `totalPage`가 전달되면 마지막 페이지와 다음 묶음 이동을 제한한다. 경계 테스트를 추가해야 한다.                                                                            |
-| 안전한 `hasNext` 전용 모드 | **수정 필요**           | 현재는 `totalPage`가 없으면 존재 여부를 알 수 없는 페이지 번호도 현재 묶음에 10개 표시한다. 확인된 현재 페이지와 한 페이지 이전·다음만 제공하도록 보완하는 것을 권장한다. |
-| 5개 페이지 묶음 지원       | **결정 필요**           | 현재 묶음 크기는 10으로 고정되어 있다. `/member/penalty`의 기존 5개 묶음을 유지할지 결정해야 한다.                                                                        |
-| `pageBlockSize` prop       | **수정 필요 또는 생략** | 5개 묶음을 유지한다면 선택 prop을 추가해야 한다. 모든 화면을 10개 묶음으로 통일하면 추가하지 않아도 된다.                                                                 |
-| 빈 결과·한 페이지 노출     | **결정 및 수정 필요**   | 현재 `totalPage=0`도 1페이지로 보정해 1번 버튼을 표시하며, 화면마다 숨김 조건이 다르다. 공통 노출 정책을 정해야 한다.                                                     |
-| 비활성 링크 접근성         | **수정 필요**           | 현재 CSS의 `pointer-events-none`과 투명도만 사용한다. `aria-disabled`와 키보드 접근 차단 여부를 검토해야 한다.                                                            |
-| 이전·다음 버튼 언어        | **결정 필요**           | 현재 화면 문구와 `aria-label`은 `Previous`, `Next` 등 영문이다. 프로젝트 언어 정책에 맞춰 한글화할지 결정해야 한다.                                                       |
+| 항목                   | 상태                    | 현재 구현과 필요한 작업                                                                                               |
+| ---------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1 기반 페이지 계산     | **현재 충족**           | 내부 계산은 1 기반을 전제로 한다. 타입 주석이나 컴포넌트 문서에 이 계약을 명시해야 한다.                              |
+| `totalPage` 우선 사용  | **현재 충족**           | `totalPage`가 전달되면 마지막 페이지와 다음 묶음 이동을 제한한다. 경계 테스트를 추가해야 한다.                        |
+| 5개 페이지 묶음 지원   | **결정 필요**           | 현재 묶음 크기는 10으로 고정되어 있다. `/member/penalty`의 기존 5개 묶음을 유지할지 결정해야 한다.                    |
+| `pageBlockSize` prop   | **수정 필요 또는 생략** | 5개 묶음을 유지한다면 선택 prop을 추가해야 한다. 모든 화면을 10개 묶음으로 통일하면 추가하지 않아도 된다.             |
+| 빈 결과·한 페이지 노출 | **결정 및 수정 필요**   | 현재 `totalPage=0`도 1페이지로 보정해 1번 버튼을 표시하며, 화면마다 숨김 조건이 다르다. 공통 노출 정책을 정해야 한다. |
+| 비활성 링크 접근성     | **수정 필요**           | 현재 CSS의 `pointer-events-none`과 투명도만 사용한다. `aria-disabled`와 키보드 접근 차단 여부를 검토해야 한다.        |
+| 이전·다음 버튼 언어    | **결정 필요**           | 현재 화면 문구와 `aria-label`은 `Previous`, `Next` 등 영문이다. 프로젝트 언어 정책에 맞춰 한글화할지 결정해야 한다.   |
 
 ### 공통 컴포넌트
 
-- [ ] `PaginationBar`의 입력 페이지가 1 기반임을 타입 주석 또는 문서로 명시한다.
-- [ ] `totalPage`가 있으면 이를 최우선 기준으로 사용한다.
-- [ ] `hasNext`만 있을 때 존재하지 않는 번호를 노출하지 않는다.
+- [x] `PaginationBar`의 입력 페이지가 1 기반임을 타입 주석 또는 문서로 명시한다.
+- [x] `totalPage`를 필수 입력으로 사용한다.
 - [ ] 5개 페이지 묶음을 유지해야 하는지 결정한다.
 - [ ] 필요하면 `pageBlockSize`를 추가하고 기본값은 10으로 둔다.
 - [ ] 빈 결과와 한 페이지 결과의 노출 정책을 결정한다.
@@ -314,9 +304,9 @@ API가 실제 응답에서 `totalPage`를 생략할 수 있다면 안전한 `has
 
 ### 게시글·댓글
 
-- [ ] 게시글 `totalPage`가 `PaginationBar`까지 전달된다.
-- [ ] 일반 댓글 `totalPage`가 `PaginationBar`까지 전달된다.
-- [ ] 대댓글 `totalPage`가 `PaginationBar`까지 전달된다.
+- [x] 게시글 `totalPage`가 `PaginationBar`까지 전달된다.
+- [x] 일반 댓글 `totalPage`가 `PaginationBar`까지 전달된다.
+- [x] 대댓글 `totalPage`가 `PaginationBar`까지 전달된다.
 - [ ] 게시글/댓글 URL의 페이지는 계속 1 기반이다.
 - [ ] 게시글/댓글 API 요청은 계속 0 기반으로 변환된다.
 - [ ] 필터 적용과 게시글 ID/상위 댓글 ID 이동 시 1페이지로 초기화된다.

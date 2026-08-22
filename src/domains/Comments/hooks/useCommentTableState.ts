@@ -67,11 +67,6 @@ export function useCommentTableState({
     return totalCommentData?.data ?? [];
   }, [parentId, totalCommentData, childCommentData]);
 
-  const hasNext =
-    parentId !== null
-      ? (childCommentData?.hasNext ?? false)
-      : (totalCommentData?.hasNext ?? false);
-
   const totalPage =
     parentId !== null
       ? childCommentData?.totalPage
@@ -245,7 +240,6 @@ export function useCommentTableState({
     handleBulkRestore,
     isDeletePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
-    hasNext,
     totalPage,
     totalCount,
   };
