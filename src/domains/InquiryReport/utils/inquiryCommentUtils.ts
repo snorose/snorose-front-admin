@@ -5,7 +5,7 @@ export function canManageComment(comment: InquiryComment) {
 }
 
 export function getCommentAuthorDisplay(comment: InquiryComment) {
-  return comment.isWriterWithdrawn ? '탈퇴한 사용자' : comment.userDisplay;
+  return comment.isWriterWithdrawn ? '탈퇴' : comment.userDisplay;
 }
 
 export function isCommentWrittenByAdmin(comment: InquiryComment) {
@@ -16,6 +16,17 @@ export function getCommentDisplayContent(comment: InquiryComment) {
   if (comment.isDeleted) return '삭제된 댓글입니다.';
   if (!comment.isVisible) return '숨김 처리된 댓글입니다.';
   return comment.content;
+}
+
+export function filterVisibleComments(
+  comments: InquiryComment[]
+): InquiryComment[] {
+  return comments
+    .filter((comment) => comment.isVisible)
+    .map((comment) => ({
+      ...comment,
+      children: filterVisibleComments(comment.children),
+    }));
 }
 
 export function countComments(comments: InquiryComment[]): number {
