@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, Eye, Heart, MessageSquare } from 'lucide-react';
 
 import { MemberInfoPopover, StatusBadge } from '@/shared/components';
-import { Badge, Table } from '@/shared/components/ui';
+import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
@@ -207,13 +207,9 @@ export default function CommentTableRow({
       {/* 12. 의심 키워드 */}
       <Table.Cell className='px-3 text-center'>
         {comment.isKeywordExist ? (
-          <Badge className='rounded border-none bg-[#F5F3FF] px-2 py-0.5 text-[11px] font-bold text-[#7C3AED] hover:bg-[#F5F3FF]'>
-            Y
-          </Badge>
+          <StatusBadge tone='warning'>Y</StatusBadge>
         ) : (
-          <Badge className='rounded border-none bg-[#F3F4F6] px-2 py-0.5 text-[11px] font-bold text-[#9CA3AF] hover:bg-[#F3F4F6]'>
-            N
-          </Badge>
+          <StatusBadge tone='neutral'>N</StatusBadge>
         )}
       </Table.Cell>
     </Table.Row>

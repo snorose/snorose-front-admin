@@ -5,7 +5,7 @@ import { Bookmark, Heart, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { MemberInfoPopover, StatusBadge } from '@/shared/components';
-import { Badge, Switch } from '@/shared/components/ui';
+import { Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import { getPostStatusBadges } from '@/shared/utils/postCommentUtils';
 
@@ -70,11 +70,7 @@ export default function PostDetailInfoPanel({
                   {badge.label}
                 </StatusBadge>
               ))}
-              {post.isNotice && (
-                <Badge className='rounded border-none bg-[#FEE2E2] px-1.5 py-0.5 text-[10px] font-bold text-[#991B1B] hover:bg-[#FEE2E2]'>
-                  공지
-                </Badge>
-              )}
+              {post.isNotice && <StatusBadge tone='info'>공지</StatusBadge>}
             </div>
           </div>
         </div>
