@@ -9,8 +9,12 @@ export { downloadNotProcessedRowsExcel } from './download-not-processed-excel';
 export { getErrorMessage } from './error-handler';
 export { getPeriodStatus, type PeriodStatus } from './periodStatusUtils';
 export {
+  type AdminStatus,
+  BOARD_NAMES,
   BOARD_OPTIONS,
+  formatCommentId,
   formatPostId,
+  getBoardKey,
   getPostStatusBadges,
   STATUS_OPTIONS,
   stripHtmlTags,

@@ -1,4 +1,4 @@
-import type { StatusBadgeTone } from '@/shared/components/StatusBadge';
+import type { StatusBadgeTone } from '@/shared/components';
 
 export const BOARD_NAMES: Record<number, string> = {
   11: 'about 스노로즈',

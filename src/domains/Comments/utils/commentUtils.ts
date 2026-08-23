@@ -3,4 +3,4 @@ export {
   formatCommentId,
   formatPostId,
   getPostStatusBadges,
-} from '@/shared/utils/postCommentUtils';
+} from '@/shared/utils';

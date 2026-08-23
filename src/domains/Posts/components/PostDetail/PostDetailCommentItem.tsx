@@ -10,8 +10,11 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { MemberInfoPopover, StatusBadge } from '@/shared/components';
-import StatusChangeModal from '@/shared/components/StatusChangeModal';
+import {
+  MemberInfoPopover,
+  StatusBadge,
+  StatusChangeModal,
+} from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
