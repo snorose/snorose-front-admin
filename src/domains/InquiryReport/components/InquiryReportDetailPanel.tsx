@@ -2,16 +2,12 @@ import { type FormEvent, useEffect, useState } from 'react';
 
 import { Copy, ExternalLink, Send, X } from 'lucide-react';
 
-import { Button, Textarea } from '@/shared/components/ui';
+import { Badge, Button, Textarea } from '@/shared/components/ui';
 import type { InquiryComment, InquiryStatus } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { INQUIRY_COMMENT_MAX_LENGTH } from '@/domains/InquiryReport/constants/inquiryCommentValidation';
-import {
-  INQUIRY_GROUP_LABELS,
-  INQUIRY_REPORT_CAUSE_LABELS,
-  INQUIRY_SUB_GROUP_LABELS,
-} from '@/domains/InquiryReport/constants/inquiryReportLabels';
+import { INQUIRY_REPORT_CAUSE_LABELS } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import {
   useCreateInquiryComment,
   useDeleteInquiryComment,
@@ -19,10 +15,12 @@ import {
   useInquiryDetail,
   useUpdateInquiryComment,
 } from '@/domains/InquiryReport/hooks';
+import { isWithdrawnInquiryAuthor } from '@/domains/InquiryReport/utils/inquiryAuthorUtils';
 
 import {
   canManageComment,
   countComments,
+  filterVisibleComments,
   findComment,
   getCommentAuthorDisplay,
 } from '../utils/inquiryCommentUtils';
@@ -31,9 +29,14 @@ import {
   buildReportTargetUrl,
   isReportInquiry,
 } from '../utils/inquiryReportUrls';
+import {
+  InquiryGroupBadge,
+  InquirySubGroupBadge,
+} from './InquiryClassificationBadge';
 import InquiryCommentItem from './InquiryCommentItem';
 import InquiryReportAttachmentItem from './InquiryReportAttachmentItem';
 import InquiryStatusSelect from './InquiryStatusSelect';
+import WithdrawnUserBadge from './WithdrawnUserBadge';
 
 interface InquiryReportDetailPanelProps {
   postId: number;
@@ -64,6 +67,7 @@ export default function InquiryReportDetailPanel({
 
   const detail = detailData;
   const comments = commentsData?.data ?? [];
+  const visibleComments = filterVisibleComments(comments);
 
   useEffect(() => {
     setCommentInput('');
@@ -91,14 +95,15 @@ export default function InquiryReportDetailPanel({
   }
 
   const currentStatus = detail.status;
-  const commentCount = countComments(comments);
+  const commentCount = countComments(visibleComments);
   const replyParentComment = replyParentId
-    ? findComment(comments, replyParentId)
+    ? findComment(visibleComments, replyParentId)
     : null;
   const inquiryPostUrl = buildInquiryPostUrl(detail);
   const inquiryPostLabel = isReportInquiry(detail) ? '신고글' : '문의글';
   const reportTargetUrl = buildReportTargetUrl(detail);
-  const canCopyAuthorLoginId = !detail.isWriterWithdrawn && detail.userLoginId;
+  const isWriterWithdrawn = isWithdrawnInquiryAuthor(detail);
+  const canCopyAuthorLoginId = !isWriterWithdrawn && detail.userLoginId;
   const isCommentInputValid =
     commentInput.trim().length > 0 &&
     commentInput.trim().length <= INQUIRY_COMMENT_MAX_LENGTH;
@@ -188,12 +193,22 @@ export default function InquiryReportDetailPanel({
     <div className='max-h-[calc(100vh-180px)] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
       {/* 헤더 */}
       <div className='flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3'>
-        <p
-          className='flex-1 truncate text-sm font-semibold text-gray-900'
-          title={detail.title}
-        >
-          {detail.title}
-        </p>
+        <div className='flex min-w-0 flex-1 items-center gap-2'>
+          <p
+            className='truncate text-sm font-semibold text-gray-900'
+            title={detail.title}
+          >
+            {detail.title}
+          </p>
+          {detail.isEdited && (
+            <Badge
+              variant='unstyled'
+              className='border-transparent bg-gray-100 text-gray-600'
+            >
+              수정됨
+            </Badge>
+          )}
+        </div>
         <div className='flex shrink-0 items-center gap-2'>
           <InquiryStatusSelect
             inquiryId={detail.inquiryId}
@@ -240,15 +255,15 @@ export default function InquiryReportDetailPanel({
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-500'>분류</span>
-            <span className='min-w-0 break-words text-gray-800'>
-              {INQUIRY_GROUP_LABELS[detail.group] ?? detail.group}
+            <span className='flex min-w-0 items-center'>
+              <InquiryGroupBadge group={detail.group} />
             </span>
           </div>
 
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-500'>중분류</span>
-            <span className='min-w-0 break-words text-gray-800'>
-              {INQUIRY_SUB_GROUP_LABELS[detail.subGroup] ?? detail.subGroup}
+            <span className='flex min-w-0 items-center'>
+              <InquirySubGroupBadge subGroup={detail.subGroup} />
             </span>
           </div>
 
@@ -277,9 +292,11 @@ export default function InquiryReportDetailPanel({
             <span className='shrink-0 text-gray-500'>작성자</span>
             <span className='flex min-w-0 items-center gap-1.5 text-gray-800'>
               <span className='min-w-0 truncate'>
-                {detail.isWriterWithdrawn
-                  ? '탈퇴한 사용자'
-                  : detail.userLoginId}
+                {isWriterWithdrawn ? (
+                  <WithdrawnUserBadge />
+                ) : (
+                  detail.userLoginId
+                )}
               </span>
               {canCopyAuthorLoginId && (
                 <button
@@ -317,13 +334,6 @@ export default function InquiryReportDetailPanel({
               {commentCount}건
             </span>
           </div>
-
-          {detail.isEdited && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-500'>수정 여부</span>
-              <span className='min-w-0 break-words text-gray-800'>수정됨</span>
-            </div>
-          )}
         </div>
       </div>
 
@@ -346,9 +356,9 @@ export default function InquiryReportDetailPanel({
           <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
             댓글을 불러오는 중입니다...
           </div>
-        ) : comments.length > 0 ? (
+        ) : visibleComments.length > 0 ? (
           <ul className='flex flex-col gap-2'>
-            {comments.map((comment) => (
+            {visibleComments.map((comment) => (
               <InquiryCommentItem
                 key={comment.id}
                 comment={comment}
@@ -371,7 +381,10 @@ export default function InquiryReportDetailPanel({
           </div>
         )}
 
-        <form className='flex flex-col gap-2' onSubmit={handleCommentSubmit}>
+        <form
+          className='flex flex-col gap-2 rounded-md border border-slate-200 bg-slate-50 p-3'
+          onSubmit={handleCommentSubmit}
+        >
           {replyParentComment && (
             <div className='flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-600'>
               <span className='min-w-0 truncate'>

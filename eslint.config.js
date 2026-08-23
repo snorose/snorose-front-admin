@@ -35,6 +35,15 @@ export default defineConfig([
       'simple-import-sort/exports': 'warn',
     },
   },
+  {
+    files: ['playwright.config.ts', 'e2e/**/*.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
   // shadcn/ui 컴포넌트는 variants를 함께 export하는 패턴을 사용하므로 react-refresh 규칙 비활성화
   {
     files: ['src/shared/components/ui/**/*.{ts,tsx}'],

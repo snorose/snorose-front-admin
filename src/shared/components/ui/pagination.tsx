@@ -13,7 +13,7 @@ function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
     <nav
       role='navigation'
-      aria-label='pagination'
+      aria-label='페이지네이션'
       data-slot='pagination'
       className={cn('mx-auto flex w-full justify-center', className)}
       {...props}
@@ -74,13 +74,13 @@ Pagination.Previous = function PaginationPrevious({
 }: React.ComponentProps<typeof Pagination.Link>) {
   return (
     <Pagination.Link
-      aria-label='Go to previous page'
+      aria-label='이전 페이지'
       size='default'
       className={cn('gap-1 px-2.5 sm:pl-2.5', className)}
       {...props}
     >
       <ChevronLeftIcon />
-      <span className='hidden sm:block'>Previous</span>
+      <span className='hidden sm:block'>이전</span>
     </Pagination.Link>
   );
 };
@@ -91,12 +91,12 @@ Pagination.Next = function PaginationNext({
 }: React.ComponentProps<typeof Pagination.Link>) {
   return (
     <Pagination.Link
-      aria-label='Go to next page'
+      aria-label='다음 페이지'
       size='default'
       className={cn('gap-1 px-2.5 sm:pr-2.5', className)}
       {...props}
     >
-      <span className='hidden sm:block'>Next</span>
+      <span className='hidden sm:block'>다음</span>
       <ChevronRightIcon />
     </Pagination.Link>
   );
@@ -114,7 +114,7 @@ Pagination.Ellipsis = function PaginationEllipsis({
       {...props}
     >
       <MoreHorizontalIcon className='size-4' />
-      <span className='sr-only'>More pages</span>
+      <span className='sr-only'>더 많은 페이지</span>
     </span>
   );
 };

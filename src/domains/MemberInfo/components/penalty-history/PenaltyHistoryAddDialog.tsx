@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { AlertTriangle, Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -26,7 +26,9 @@ import {
   getRelegationEndDateTimeLabel,
   getWarningCountByReason,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-add-utils';
+import { isPositiveInteger } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import { BLACKLIST_DEMOTE_OPTIONS } from '@/domains/MemberInfo/constants/memberInfo';
+import { isPermanentDemotionPenalty } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { warnPenaltyAPI } from '@/apis';
 
@@ -60,6 +62,8 @@ export default function PenaltyHistoryAddDialog({
   const [memo, setMemo] = useState('');
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [invalidFieldName, setInvalidFieldName] = useState<string>();
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const isWarningMode = mode === 'WARNING';
   const isOpen = mode !== null;
@@ -85,6 +89,7 @@ export default function PenaltyHistoryAddDialog({
     setRelegationMonth(DEFAULT_RELEGATION_REASON?.month ?? 1);
     setCustomReason('');
     setMemo('');
+    setInvalidFieldName(undefined);
     setIsConfirmOpen(false);
   };
 
@@ -94,6 +99,7 @@ export default function PenaltyHistoryAddDialog({
   };
 
   const handleChangeWarningReason = (value: string) => {
+    setInvalidFieldName(undefined);
     setWarningReason(value);
     setWarningCount(getWarningCountByReason(value));
     setCustomReason('');
@@ -103,6 +109,7 @@ export default function PenaltyHistoryAddDialog({
     if (value !== 'RELEGATION' && value !== 'BLACKLIST') return;
 
     setDemotionType(value);
+    setInvalidFieldName(undefined);
     setCustomReason('');
 
     if (value === 'RELEGATION') {
@@ -116,6 +123,7 @@ export default function PenaltyHistoryAddDialog({
 
   const handleChangeDemotionReason = (value: string) => {
     setDemotionReason(value);
+    setInvalidFieldName(undefined);
     setCustomReason('');
 
     if (demotionType !== 'RELEGATION') return;
@@ -129,35 +137,58 @@ export default function PenaltyHistoryAddDialog({
   const validate = () => {
     if (!mode) return false;
 
+    if (isWarningMode && isPermanentDemotionPenalty(member)) {
+      toast.error('영구강등 회원에게는 경고를 추가할 수 없습니다.');
+      return false;
+    }
+
     if (!selectedReason) {
-      toast.error(
+      showValidationError(
         isWarningMode
           ? '경고 사유를 선택해주세요.'
-          : '강등 사유를 선택해주세요.'
+          : '강등 사유를 선택해주세요.',
+        isWarningMode ? 'warningReason' : 'demotionReason'
       );
       return false;
     }
 
     if (needsCustomReason && customReason.trim() === '') {
-      toast.error('상세 사유를 입력해주세요.');
+      showValidationError('상세 사유를 입력해주세요.', 'customReason');
       return false;
     }
 
-    if (isWarningMode && warningCount < 1) {
-      toast.error('경고 횟수는 1 이상이어야 합니다.');
+    if (isWarningMode && !isPositiveInteger(warningCount)) {
+      showValidationError(
+        '경고 횟수는 1 이상의 정수여야 합니다.',
+        'warningCount'
+      );
       return false;
     }
 
     if (
       !isWarningMode &&
       demotionType === 'RELEGATION' &&
-      relegationMonth < 1
+      !isPositiveInteger(relegationMonth)
     ) {
-      toast.error('강등 기간은 1개월 이상이어야 합니다.');
+      showValidationError(
+        '강등 기간은 1개월 이상의 정수여야 합니다.',
+        'relegationMonth'
+      );
       return false;
     }
 
     return true;
+  };
+
+  const showValidationError = (message: string, fieldName: string) => {
+    toast.error(message);
+    setInvalidFieldName(fieldName);
+    const field = contentRef.current?.querySelector<HTMLElement>(
+      `[name="${fieldName}"], [data-field-name="${fieldName}"]`
+    );
+
+    field?.focus({ preventScroll: true });
+    field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
   const handleRequestSubmit = () => {
@@ -218,7 +249,7 @@ export default function PenaltyHistoryAddDialog({
         if (!nextOpen) closeDialog();
       }}
     >
-      <Dialog.Content className='rounded-2xl p-0 sm:max-w-xl'>
+      <Dialog.Content ref={contentRef} className='rounded-2xl p-0 sm:max-w-xl'>
         <div className='space-y-8 px-8 py-8'>
           <Dialog.Header className='gap-3'>
             <Dialog.Title className='flex items-center gap-3 text-2xl font-bold text-slate-950'>
@@ -234,10 +265,17 @@ export default function PenaltyHistoryAddDialog({
             {isWarningMode ? (
               <WarningFields
                 customReason={customReason}
+                invalidFieldName={invalidFieldName}
                 needsCustomReason={needsCustomReason}
-                onCustomReasonChange={setCustomReason}
+                onCustomReasonChange={(value) => {
+                  setCustomReason(value);
+                  setInvalidFieldName(undefined);
+                }}
                 onReasonChange={handleChangeWarningReason}
-                onWarningCountChange={setWarningCount}
+                onWarningCountChange={(value) => {
+                  setWarningCount(value);
+                  setInvalidFieldName(undefined);
+                }}
                 reason={warningReason}
                 warningCount={warningCount}
               />
@@ -247,11 +285,18 @@ export default function PenaltyHistoryAddDialog({
                 demotionReason={demotionReason}
                 demotionReasonOptions={demotionReasonOptions}
                 demotionType={demotionType}
+                invalidFieldName={invalidFieldName}
                 needsCustomReason={needsCustomReason}
-                onCustomReasonChange={setCustomReason}
+                onCustomReasonChange={(value) => {
+                  setCustomReason(value);
+                  setInvalidFieldName(undefined);
+                }}
                 onDemotionReasonChange={handleChangeDemotionReason}
                 onDemotionTypeChange={handleChangeDemotionType}
-                onRelegationMonthChange={setRelegationMonth}
+                onRelegationMonthChange={(value) => {
+                  setRelegationMonth(value);
+                  setInvalidFieldName(undefined);
+                }}
                 relegationEndDateTime={relegationEndDateTime}
                 relegationMonth={relegationMonth}
               />
@@ -344,7 +389,9 @@ function buildPayload({
   };
 
   if (isWarningMode) {
-    payload.warningCount = warningCount;
+    payload.warningCount = needsCustomReason
+      ? warningCount
+      : getWarningCountByReason(selectedReason);
   }
 
   if (!isWarningMode && demotionType === 'RELEGATION') {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import type { BlacklistHistoryItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
@@ -9,8 +10,6 @@ import { getErrorMessage } from '@/shared/utils';
 import { toBlacklistHistoryItem } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { blacklistHistoryAPI } from '@/apis';
-
-import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface BlacklistHistoryTabProps {
   loginId?: string;
@@ -76,6 +75,7 @@ export default function BlacklistHistoryTab({
     (currentPage - 1) * groupSize,
     currentPage * groupSize
   );
+  const totalPage = Math.ceil(downloadedData.length / groupSize);
   const emptyCount = groupSize - pageData.length;
 
   return (
@@ -162,11 +162,11 @@ export default function BlacklistHistoryTab({
       </Table>
 
       {encryptedUserId && downloadedData.length > 0 && (
-        <MemberInfoPagination
+        <PaginationBar
           currentPage={currentPage}
-          totalPages={Math.ceil(downloadedData.length / groupSize)}
+          totalPage={totalPage}
           onPageChange={setCurrentPage}
-          groupSize={groupSize}
+          pageBlockSize={5}
         />
       )}
     </div>

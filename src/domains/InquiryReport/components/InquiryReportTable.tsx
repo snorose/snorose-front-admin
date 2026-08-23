@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Loader2, X } from 'lucide-react';
 
@@ -6,23 +6,24 @@ import { PaginationBar } from '@/shared/components';
 import { Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
-  InquiryListItem,
   InquiryStatus,
   InquirySubGroup,
 } from '@/shared/types';
-import { formatDateTimeToMinutes } from '@/shared/utils';
+import { clampOneBasedPage, formatDateTimeToMinutes } from '@/shared/utils';
+
+import { useInquiryList } from '@/domains/InquiryReport/hooks';
+import { isWithdrawnInquiryAuthor } from '@/domains/InquiryReport/utils/inquiryAuthorUtils';
 
 import {
-  INQUIRY_GROUP_LABELS,
-  INQUIRY_SUB_GROUP_LABELS,
-} from '@/domains/InquiryReport/constants/inquiryReportLabels';
-import { useInquiryList } from '@/domains/InquiryReport/hooks';
-
+  InquiryGroupBadge,
+  InquirySubGroupBadge,
+} from './InquiryClassificationBadge';
 import InquiryStatusSelect from './InquiryStatusSelect';
+import WithdrawnUserBadge from './WithdrawnUserBadge';
 
 interface InquiryReportTableProps {
   currentPage: number;
-  onPageChange: (page: number | ((prev: number) => number)) => void;
+  onPageChange: (page: number) => void;
   selectedPostId: number | null;
   onRowSelect: (postId: number | null) => void;
   onStatusChange: (
@@ -79,7 +80,9 @@ export default function InquiryReportTable({
   const [subGroupFilter, setSubGroupFilter] = useState<SubGroupFilter>('ALL');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
 
-  const subGroupOptions = useMemo(() => {
+  const subGroupOptions = useMemo<
+    ReadonlyArray<{ label: string; value: SubGroupFilter }>
+  >(() => {
     if (groupFilter === 'INQUIRY') return INQUIRY_SUB_GROUP_OPTIONS;
     if (groupFilter === 'REPORT') return REPORT_SUB_GROUP_OPTIONS;
 
@@ -108,10 +111,16 @@ export default function InquiryReportTable({
   }, [currentPage, filteredInquiries]);
 
   const totalPage = Math.ceil(filteredInquiries.length / PAGE_SIZE);
-  const hasNext = currentPage < totalPage;
   const pageStartNumber = (currentPage - 1) * PAGE_SIZE;
   const isEmpty = !isLoading && inquiries.length === 0;
   const isDetailOpen = selectedPostId !== null;
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const validPage = clampOneBasedPage(currentPage, totalPage);
+    if (validPage !== currentPage) onPageChange(validPage);
+  }, [currentPage, isLoading, onPageChange, totalPage]);
 
   const activeFilterCount = [
     groupFilter !== 'ALL',
@@ -138,8 +147,16 @@ export default function InquiryReportTable({
             </Select.Trigger>
             <Select.Content align='start'>
               {GROUP_OPTIONS.map((option) => (
-                <Select.Item key={option.value} value={option.value}>
-                  {option.label}
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  textValue={option.label}
+                >
+                  {option.value === 'ALL' ? (
+                    option.label
+                  ) : (
+                    <InquiryGroupBadge group={option.value} />
+                  )}
                 </Select.Item>
               ))}
             </Select.Content>
@@ -175,7 +192,11 @@ export default function InquiryReportTable({
             </Select.Trigger>
             <Select.Content align='start'>
               {subGroupOptions.map((option) => (
-                <Select.Item key={option.value} value={option.value}>
+                <Select.Item
+                  key={option.value}
+                  value={option.value}
+                  textValue={option.label}
+                >
                   {option.label}
                 </Select.Item>
               ))}
@@ -323,19 +344,21 @@ export default function InquiryReportTable({
                         {pageStartNumber + index + 1}
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
-                        {getGroupLabel(inquiry.group)}
+                        <div className='flex justify-center'>
+                          <InquiryGroupBadge group={inquiry.group} />
+                        </div>
                       </Table.Cell>
-                      <Table.Cell
-                        className='truncate px-3 text-gray-700'
-                        title={getSubGroupLabel(inquiry.subGroup)}
-                      >
-                        {getSubGroupLabel(inquiry.subGroup)}
+                      <Table.Cell className='px-3'>
+                        <InquirySubGroupBadge subGroup={inquiry.subGroup} />
                       </Table.Cell>
-                      <Table.Cell
-                        className='truncate px-3 text-gray-900'
-                        title={getUserDisplay(inquiry)}
-                      >
-                        {getUserDisplay(inquiry)}
+                      <Table.Cell className='truncate px-3 text-gray-900'>
+                        {isWithdrawnInquiryAuthor(inquiry) ? (
+                          <WithdrawnUserBadge />
+                        ) : (
+                          <span title={inquiry.userLoginId}>
+                            {inquiry.userLoginId}
+                          </span>
+                        )}
                       </Table.Cell>
                       <Table.Cell
                         className='px-3 text-center'
@@ -375,21 +398,8 @@ export default function InquiryReportTable({
       <PaginationBar
         currentPage={currentPage}
         onPageChange={onPageChange}
-        hasNext={hasNext}
         totalPage={totalPage}
       />
     </div>
   );
-}
-
-function getGroupLabel(group: InquiryGroup) {
-  return INQUIRY_GROUP_LABELS[group] ?? group;
-}
-
-function getSubGroupLabel(subGroup: InquirySubGroup) {
-  return INQUIRY_SUB_GROUP_LABELS[subGroup] ?? subGroup;
-}
-
-function getUserDisplay(inquiry: InquiryListItem) {
-  return inquiry.userLoginId;
 }

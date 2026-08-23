@@ -1,4 +1,7 @@
-import { findReasonLabel } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
+import {
+  findReasonLabel,
+  getWarningCountByReason,
+} from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import {
   BLACKLIST_DEMOTE_OPTIONS,
   RELEGATION_DEMOTE_OPTIONS,
@@ -27,12 +30,7 @@ export function getReasonLabel(
   return findReasonLabel(isWarningMode ? 'WARNING' : demotionType, reason);
 }
 
-export function getWarningCountByReason(reason: string) {
-  return (
-    WARNING_REASON_OPTIONS.find((option) => option.value === reason)
-      ?.warnCount ?? 1
-  );
-}
+export { getWarningCountByReason };
 
 export function getDemotionTypeLabel(demotionType: DemotionType) {
   return demotionType === 'BLACKLIST' ? '영구강등' : '일반강등';

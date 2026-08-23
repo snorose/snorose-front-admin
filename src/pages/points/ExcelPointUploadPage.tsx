@@ -1,18 +1,11 @@
 import { useRef, useState } from 'react';
 
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Download,
-  Info,
-  Megaphone,
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Download, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
-import { DateTimePicker, PageHeader } from '@/shared/components';
+import { DateTimePicker, NoticePanel, PageHeader } from '@/shared/components';
 import {
-  Alert,
   Button,
   InputGroup,
   Label,
@@ -417,26 +410,16 @@ export default function ExcelPointUploadPage() {
           description='엑셀 파일을 업로드하면 학번을 기준으로 회원을 매칭하여 포인트를 일괄 지급합니다.'
         />
 
-        <Alert>
-          <Megaphone />
-          <Alert.Title>안내 사항</Alert.Title>
-          <Alert.Description>
-            <ul className='list-inside list-disc text-sm'>
-              <li>
-                포인트 지급 템플릿 파일을 다운로드하여 형식에 맞게 작성해
-                주세요.
-              </li>
-              <li>
-                처리되지 않은 회원은 다시 조회할 수 없으므로, 사유를 즉시
-                확인하신 후 해당 회원만 별도로 업로드해 주세요.
-              </li>
-              <li>
-                미리보기와 결과에 표시되는 행 번호는 엑셀 기준{' '}
-                <strong>2번 행부터</strong>입니다. 1번 행은 제목 줄입니다.
-              </li>
-            </ul>
-          </Alert.Description>
-        </Alert>
+        <NoticePanel
+          items={[
+            '포인트 지급 템플릿 파일을 다운로드하여 형식에 맞게 작성해 주세요.',
+            '처리되지 않은 회원은 다시 조회할 수 없으므로, 사유를 즉시 확인하신 후 해당 회원만 별도로 업로드해 주세요.',
+            <>
+              미리보기와 결과에 표시되는 행 번호는 엑셀 기준{' '}
+              <strong>2번 행부터</strong>입니다. 1번 행은 제목 줄입니다.
+            </>,
+          ]}
+        />
 
         <section className='flex flex-col gap-6'>
           <div className='flex flex-col gap-2'>

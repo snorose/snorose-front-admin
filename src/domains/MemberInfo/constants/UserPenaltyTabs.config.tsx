@@ -7,7 +7,7 @@ export const getPenaltyTabs = ({
   onApplied,
 }: {
   member: PenaltyUserInfo;
-  onApplied?: () => void;
+  onApplied?: () => void | Promise<void>;
 }) => [
   {
     label: '경고 관리',

@@ -58,13 +58,16 @@ export type DirectoryFilterOption = {
 
 export type PenaltyStatus = {
   label: string;
+  warningLabel?: string;
   summary: string;
+  summaryTone: string;
   tone: string;
 };
 
 export const EMPTY_TEXT = '-';
 
 const EDIT_KEYS: (keyof EditMemberInfo)[] = [
+  'loginId',
   'userName',
   'nickname',
   'studentNumber',
@@ -147,9 +150,33 @@ export function getRoleBadgeClassName(userRoleId: number) {
 // 현재 활성 제재가 '경고'인지 판별한다(강등 vs 경고 규칙의 단일 출처).
 export function isWarningPenalty(member: MemberInfo): boolean {
   return (
-    Boolean(member.isBlacklist) &&
-    (member.blacklistType === 'WARNING' || member.blacklistType === '경고')
+    Boolean(member.isBlacklist) && getActivePenaltyLabel(member) === '경고'
   );
+}
+
+export function isPermanentDemotionPenalty(
+  member: Pick<MemberInfo, 'blacklistType' | 'isBlacklist'>
+) {
+  return (
+    Boolean(member.isBlacklist) &&
+    convertBlacklistTypeToLabel(member.blacklistType) === '영구 강등'
+  );
+}
+
+export function getActivePenaltyLabel(
+  member: Pick<MemberInfo, 'blacklistType' | 'isBlacklist' | 'userRoleId'>
+) {
+  if (!member.isBlacklist) return '정상';
+
+  const blacklistTypeLabel = convertBlacklistTypeToLabel(member.blacklistType);
+
+  // 강등 중 경고를 추가하면 API의 blacklistType이 최신 경고(WARNING)로
+  // 내려올 수 있으므로, 강등자 등급은 최신 경고보다 강등 상태를 우선한다.
+  if (member.userRoleId === 6) {
+    return blacklistTypeLabel === '영구 강등' ? '영구 강등' : '일반 강등';
+  }
+
+  return blacklistTypeLabel;
 }
 
 export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
@@ -161,20 +188,38 @@ export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
         member.totalWarningCount > 0
           ? '경고 이력은 있지만 현재 별도 제재 상태는 아닙니다.'
           : '제재 이력이 없습니다.',
+      summaryTone: 'bg-emerald-50 text-emerald-700',
     };
   }
 
-  const baseLabel = convertBlacklistTypeToLabel(member.blacklistType);
+  const baseLabel = getActivePenaltyLabel(member);
   // 경고 상태는 횟수까지 노출한다(예: '경고 2회'). 3회면 자동 강등되므로 1·2회만 나타난다.
   const label =
     baseLabel === '경고' && typeof member.currentWarningCount === 'number'
       ? `경고 ${member.currentWarningCount}회`
       : baseLabel;
+  const warningLabel =
+    baseLabel === '일반 강등' &&
+    typeof member.currentWarningCount === 'number' &&
+    member.currentWarningCount >= 1
+      ? `경고 ${member.currentWarningCount}회`
+      : undefined;
 
   return {
     label,
-    tone: 'border border-rose-200 bg-rose-50 text-rose-700',
-    summary: '현재 제재 상태가 적용 중입니다.',
+    warningLabel,
+    tone:
+      baseLabel === '영구 강등'
+        ? 'border border-slate-950 bg-slate-950 text-white'
+        : 'border border-rose-200 bg-rose-50 text-rose-700',
+    summary:
+      baseLabel === '영구 강등'
+        ? '영구강등이 적용되어 해제 기한 없이 이용이 제한됩니다.'
+        : '현재 제재 상태가 적용 중입니다.',
+    summaryTone:
+      baseLabel === '영구 강등'
+        ? 'bg-slate-950 text-white'
+        : 'bg-rose-50 text-rose-700',
   };
 }
 
@@ -246,6 +291,7 @@ export function createMemberDiffPayload(
     if (oldValue === newValue) return;
 
     switch (key) {
+      case 'loginId':
       case 'userName':
       case 'nickname':
       case 'email':
@@ -254,7 +300,7 @@ export function createMemberDiffPayload(
         if (typeof newValue === 'string') diff[key] = newValue;
         break;
       case 'birthday':
-        if (typeof newValue === 'string' && newValue.trim()) {
+        if (typeof newValue === 'string') {
           diff[key] = newValue.trim().substring(0, 10);
         }
         break;

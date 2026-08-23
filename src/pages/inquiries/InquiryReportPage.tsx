@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '@/shared/components';
 import type { InquiryStatus } from '@/shared/types';
+import { parseOneBasedPage } from '@/shared/utils';
 
 import {
   InquiryReportDetailPanel,
@@ -12,20 +13,22 @@ import { useUpdateInquiryStatus } from '@/domains/InquiryReport/hooks';
 
 export default function InquiryReportPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const rawPage = searchParams.get('page');
+  const currentPage = parseOneBasedPage(rawPage);
   const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
   const { mutateAsync: updateStatus } = useUpdateInquiryStatus();
 
-  const handlePageChange = (
-    pageOrUpdater: number | ((prev: number) => number)
-  ) => {
-    const next =
-      typeof pageOrUpdater === 'function'
-        ? pageOrUpdater(currentPage)
-        : pageOrUpdater;
+  useEffect(() => {
+    if (rawPage === null || rawPage === String(currentPage)) return;
 
+    const normalizedSearchParams = new URLSearchParams(searchParams);
+    normalizedSearchParams.set('page', String(currentPage));
+    setSearchParams(normalizedSearchParams, { replace: true });
+  }, [currentPage, rawPage, searchParams, setSearchParams]);
+
+  const handlePageChange = (page: number) => {
     const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.set('page', next.toString());
+    nextSearchParams.set('page', String(Math.max(1, page)));
     setSearchParams(nextSearchParams, { replace: true });
   };
 
@@ -54,7 +57,7 @@ export default function InquiryReportPage() {
           />
         </div>
         {selectedPostId !== null && (
-          <div className='w-full min-w-0 xl:sticky xl:top-4 xl:mt-[48px] xl:w-[min(520px,34vw)] xl:shrink-0'>
+          <div className='w-full min-w-0 xl:sticky xl:top-4 xl:mt-[48px] xl:flex-1 xl:basis-0'>
             <InquiryReportDetailPanel
               postId={selectedPostId}
               onClose={() => setSelectedPostId(null)}

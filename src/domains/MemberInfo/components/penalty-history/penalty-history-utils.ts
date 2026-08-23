@@ -45,6 +45,19 @@ export function findReasonLabel(type: string, reasonType: string) {
   );
 }
 
+export function getWarningCountByReason(reasonType: string) {
+  return Math.max(
+    1,
+    WARNING_REASON_OPTIONS.find((option) => option.value === reasonType)
+      ?.warnCount ?? 1
+  );
+}
+
+export function isPositiveInteger(value: number | string) {
+  const parsedValue = typeof value === 'number' ? value : Number(value);
+  return Number.isInteger(parsedValue) && parsedValue >= 1;
+}
+
 export function getDefaultReasonType(type: string) {
   return getReasonOptions(type)[0]?.value ?? 'ETC';
 }
@@ -78,6 +91,10 @@ export function isOngoingPenalty(history: BlacklistHistoryItem) {
 }
 
 export function getPenaltyTone(history: BlacklistHistoryItem) {
+  if (isPermanentDemotionType(history.type)) {
+    return 'border-slate-950 bg-slate-950 text-white';
+  }
+
   if (isOngoingPenalty(history)) {
     return 'border-rose-600 bg-rose-600 text-white';
   }
@@ -86,20 +103,7 @@ export function getPenaltyTone(history: BlacklistHistoryItem) {
     return 'border-slate-200 bg-white text-slate-900';
   }
 
-  if (isPermanentDemotionType(history.type)) {
-    return 'border-rose-200 bg-rose-50 text-rose-700';
-  }
-
   return 'border-slate-200 bg-slate-50 text-slate-700';
-}
-
-export function formatNow() {
-  const date = new Date();
-  const pad = (value: number) => String(value).padStart(2, '0');
-
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-    date.getDate()
-  )} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
 }
 
 export function getDaysBetween(start?: string | null, end?: string | null) {

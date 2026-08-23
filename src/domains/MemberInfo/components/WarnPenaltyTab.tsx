@@ -13,9 +13,11 @@ import type { AdminBlacklistReq, PenaltyUserInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
-  REVOKE_WARNING_OPTIONS,
-  WARNING_REASON_OPTIONS,
-} from '@/domains/MemberInfo/constants/memberInfo';
+  getWarningCountByReason,
+  isPositiveInteger,
+} from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
+import { WARNING_REASON_OPTIONS } from '@/domains/MemberInfo/constants/memberInfo';
+import { isPermanentDemotionPenalty } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { warnPenaltyAPI } from '@/apis';
 
@@ -24,17 +26,14 @@ export default function WarnPenaltyTab({
   onApplied,
 }: {
   member: PenaltyUserInfo;
-  onApplied?: () => void;
+  onApplied?: () => void | Promise<void>;
 }) {
   const [openModal, setOpenModal] = useState(false);
-  const [formType, setFormType] = useState<'warn' | 'warnCancel' | null>(null);
   const [warnReasonType, setWarnReasonType] = useState('');
   const [warnReason, setWarnReason] = useState('');
   const [warnCount, setWarnCount] = useState(0);
-  const [warnCancelType, setWarnCancelType] = useState('');
-  const [cancelReason, setCancelReason] = useState('');
-  const [cancelCount, setCancelCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isPermanentDemotion = isPermanentDemotionPenalty(member);
 
   const resetWarnForm = () => {
     setWarnReasonType('');
@@ -42,43 +41,17 @@ export default function WarnPenaltyTab({
     setWarnCount(0);
   };
 
-  const resetCancelForm = () => {
-    setWarnCancelType('');
-    setCancelReason('');
-    setCancelCount(0);
-  };
-
   const handleChangeWarnReason = (value: string) => {
     setWarnReasonType(value);
-
-    const found = WARNING_REASON_OPTIONS.find((opt) => opt.value === value);
-
-    if (found) {
-      setWarnCount(found.warnCount);
-    }
-
-    if (value === 'ETC') {
-      setWarnCount(1);
-    }
-  };
-
-  const handleChangeCancelReason = (value: string) => {
-    setWarnCancelType(value);
-
-    const found = REVOKE_WARNING_OPTIONS.find((opt) => opt.value === value);
-
-    // month가 존재하는 경우 자동 설정
-    if (found && typeof found.cancelCount === 'number') {
-      setCancelCount(found.cancelCount);
-    }
-
-    // ETC 선택 시에는 직접 입력
-    if (value === 'ETC') {
-      setCancelCount(1);
-    }
+    setWarnCount(value === 'ETC' ? 1 : getWarningCountByReason(value));
   };
 
   const validateWarnForm = () => {
+    if (isPermanentDemotion) {
+      toast.error('영구강등 회원에게는 경고를 추가할 수 없습니다.');
+      return false;
+    }
+
     if (warnReasonType === '') {
       toast.error('경고 사유를 선택해주세요.');
       return false;
@@ -89,81 +62,48 @@ export default function WarnPenaltyTab({
         toast.error('상세 사유를 입력해주세요.');
         return false;
       }
-      if (warnCount < 1) {
-        toast.error('경고 횟수는 1 이상이어야 합니다.');
+      if (!isPositiveInteger(warnCount)) {
+        toast.error('경고 횟수는 1 이상의 정수여야 합니다.');
         return false;
       }
     }
     return true;
   };
 
-  const validateCancelForm = () => {
-    if (warnCancelType === '') {
-      toast.error('차감 사유를 선택해주세요.');
-      return false;
-    }
-
-    if (warnCancelType === 'ETC') {
-      if (cancelReason.trim() === '') {
-        toast.error('상세 사유를 입력해주세요.');
-        return false;
-      }
-      if (cancelCount < 1) {
-        toast.error('차감 횟수는 1 이상이어야 합니다.');
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const handleSubmit = (type: 'warn' | 'warnCancel') => {
-    const isValid = type === 'warn' ? validateWarnForm() : validateCancelForm();
-    if (!isValid) return;
-
-    setFormType(type);
+  const handleSubmit = () => {
+    if (!validateWarnForm()) return;
     setOpenModal(true);
   };
 
   const handleConfirm = async () => {
     if (isSubmitting) return;
 
-    if (formType === 'warn') {
-      const payload: AdminBlacklistReq = {
-        encryptedUserId: member.encryptedUserId,
-        type: 'WARNING',
-        reason: warnReasonType,
-        warningCount: warnCount,
-      };
+    const payload: AdminBlacklistReq = {
+      encryptedUserId: member.encryptedUserId,
+      type: 'WARNING',
+      reason: warnReasonType,
+      warningCount:
+        warnReasonType === 'ETC'
+          ? warnCount
+          : getWarningCountByReason(warnReasonType),
+    };
 
-      if (warnReasonType === 'ETC') {
-        payload.customReason = warnReason.trim();
-      }
-
-      try {
-        setIsSubmitting(true);
-        await warnPenaltyAPI(payload);
-        toast.success('경고 부여가 완료되었습니다.');
-        resetWarnForm();
-        onApplied?.();
-        setOpenModal(false);
-      } catch (error: unknown) {
-        toast.error(getErrorMessage(error, '경고 부여에 실패했습니다.'));
-      } finally {
-        setIsSubmitting(false);
-      }
-
-      return;
-    } else {
-      console.log('경고 차감:', {
-        member: member.studentNumber,
-        reasonType: warnCancelType,
-        reason: cancelReason,
-        count: cancelCount,
-        totalAfter: Math.max(0, member.totalWarningCount - cancelCount),
-      });
+    if (warnReasonType === 'ETC') {
+      payload.customReason = warnReason.trim();
     }
 
-    setOpenModal(false);
+    try {
+      setIsSubmitting(true);
+      await warnPenaltyAPI(payload);
+      toast.success('경고 부여가 완료되었습니다.');
+      resetWarnForm();
+      await onApplied?.();
+      setOpenModal(false);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, '경고 부여에 실패했습니다.'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -210,11 +150,24 @@ export default function WarnPenaltyTab({
             <Input
               type='number'
               min={1}
+              step={1}
               value={warnCount}
               onChange={(e) => setWarnCount(Number(e.target.value))}
-              className='w-20 bg-white'
+              disabled={warnReasonType !== 'ETC'}
+              className='w-20 bg-white disabled:cursor-not-allowed disabled:bg-gray-100'
             />
           </div>
+          {warnReasonType && warnReasonType !== 'ETC' ? (
+            <p className='text-sm text-gray-500'>
+              선택한 사유의 기본 경고 횟수가 적용됩니다.
+            </p>
+          ) : null}
+
+          {isPermanentDemotion ? (
+            <p className='text-sm font-medium text-red-600'>
+              영구강등 회원에게는 경고를 추가할 수 없습니다.
+            </p>
+          ) : null}
 
           <div className='flex justify-end gap-2'>
             <Button variant='outline' onClick={resetWarnForm}>
@@ -223,8 +176,8 @@ export default function WarnPenaltyTab({
 
             <Button
               className='bg-red-600 text-white hover:bg-red-700'
-              onClick={() => handleSubmit('warn')}
-              disabled={isSubmitting}
+              onClick={handleSubmit}
+              disabled={isSubmitting || isPermanentDemotion}
             >
               경고 적용
             </Button>
@@ -235,65 +188,9 @@ export default function WarnPenaltyTab({
       {/* 경고 차감하기 */}
       <section className='w-1/2 rounded-md border border-blue-300 bg-blue-50 p-4'>
         <h3 className='mb-3 font-semibold text-blue-700'>경고 차감하기</h3>
-
-        {/* 차감 사유 선택 */}
-        <div className='flex flex-col gap-4'>
-          <div className='flex items-center gap-2'>
-            <Label className='w-24'>차감 사유</Label>
-            <Select
-              value={warnCancelType}
-              onValueChange={(v) => handleChangeCancelReason(v)}
-            >
-              <Select.Trigger className='w-40 bg-white'>
-                <Select.Value placeholder='차감 사유 선택' />
-              </Select.Trigger>
-              <Select.Content>
-                {REVOKE_WARNING_OPTIONS.map((item) => (
-                  <Select.Item key={item.value} value={item.value}>
-                    {item.label}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select>
-          </div>
-
-          {/* ETC - 상세 사유, 경고 차감 횟수 입력 */}
-          {warnCancelType === 'ETC' && (
-            <div className='flex items-center gap-2'>
-              <Label className='w-24'>상세 사유</Label>
-              <Input
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                className='w-40 bg-white'
-                disabled={warnCancelType !== 'ETC'}
-              />
-            </div>
-          )}
-          {/* 차감 횟수 */}
-          <div className='flex items-center gap-2'>
-            <Label className='w-24'>차감 횟수</Label>
-            <Input
-              type='number'
-              min={1}
-              value={cancelCount}
-              onChange={(e) => setCancelCount(Number(e.target.value))}
-              className='w-20 bg-white'
-            />
-          </div>
-
-          <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={resetCancelForm}>
-              초기화
-            </Button>
-
-            <Button
-              className='bg-blue-600 text-white hover:bg-blue-700'
-              onClick={() => handleSubmit('warnCancel')}
-              disabled={member.totalWarningCount === 0}
-            >
-              경고 차감
-            </Button>
-          </div>
+        <div className='rounded-md border border-blue-200 bg-white/70 p-4 text-sm font-medium text-blue-700'>
+          경고 차감 API가 준비되지 않았습니다. 차감이 필요한 경우 담당자에게
+          요청해주세요.
         </div>
       </section>
 
@@ -303,21 +200,10 @@ export default function WarnPenaltyTab({
         onConfirm={handleConfirm}
         confirmText='예, 진행합니다'
         closeText='아니요, 취소합니다'
-        title={
-          formType === 'warn'
-            ? `${member.userName} (${member.studentNumber}) 회원에게 경고를 부여하시겠습니까?`
-            : `${member.userName} (${member.studentNumber}) 회원의 경고를 차감하시겠습니까?`
-        }
-        description={
-          formType === 'warn'
-            ? `현재 경고 수: ${member.totalWarningCount} → 적용 후: ${
-                member.totalWarningCount + warnCount
-              }`
-            : `현재 경고 수: ${member.totalWarningCount} → 차감 후: ${Math.max(
-                0,
-                member.totalWarningCount - cancelCount
-              )}`
-        }
+        title={`${member.userName} (${member.studentNumber}) 회원에게 경고를 부여하시겠습니까?`}
+        description={`현재 경고 수: ${member.totalWarningCount} → 적용 후: ${
+          member.totalWarningCount + warnCount
+        }`}
       />
     </div>
   );

@@ -13,7 +13,6 @@ export { ExamReviewPeriodScheduleForm } from './ExamReviewPeriodScheduleForm';
 export { ExamReviewPeriodUpdateConfirmModal } from './ExamReviewPeriodUpdateConfirmModal';
 export { ExamReviewPostInfoSection } from './ExamReviewPostInfoSection';
 export { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
-export { ExamReviewTablePagination } from './ExamReviewTablePagination';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamTable } from './ExamTable';
@@ -22,5 +21,4 @@ export {
   ExamTableEmptyRows,
   ExamTableSkeleton,
 } from './ExamTableFallback';
-export { default as ExamTablePagination } from './ExamTablePagination';
 export { default as ExamWarningPanel } from './ExamWarningPanel';
