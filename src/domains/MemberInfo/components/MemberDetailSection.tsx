@@ -10,7 +10,11 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
-import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
+import type {
+  BlacklistHistoryItem,
+  EditMemberInfo,
+  MemberInfo,
+} from '@/shared/types';
 
 import MemberActivitySection from '@/domains/MemberInfo/components/MemberActivitySection';
 import { SectionCard } from '@/domains/MemberInfo/components/MemberDetailCard';
@@ -42,7 +46,7 @@ type MemberDetailSectionProps = {
   onLoadMorePenaltyHistory: () => void | Promise<void>;
   onOpenPenaltyHistory?: () => void | Promise<void>;
   onPointAdjusted: () => void | Promise<void>;
-  onSaveEdit: (updated: MemberInfo) => void | Promise<void>;
+  onSaveEdit: (changes: Partial<EditMemberInfo>) => void | Promise<void>;
 };
 
 export default function MemberDetailSection({
@@ -137,6 +141,7 @@ export default function MemberDetailSection({
                   type='submit'
                   size='sm'
                   form={MEMBER_INFO_EDIT_FORM_ID}
+                  disabled={isDetailLoading}
                   className='gap-2 rounded-xl bg-slate-950 text-white hover:bg-slate-800'
                 >
                   <Check className='h-4 w-4' />
@@ -157,7 +162,6 @@ export default function MemberDetailSection({
             <MemberInfoEditForm
               member={member}
               onSubmit={onSaveEdit}
-              onCancel={onEditCancel}
               onCopy={onCopy}
             />
           )}
@@ -175,7 +179,7 @@ export default function MemberDetailSection({
         />
       </div>
 
-      <MemberActivitySection />
+      <MemberActivitySection studentNumber={member.studentNumber} />
       <MemberWithdrawalSection />
 
       <MemberPointAdjustmentDialog

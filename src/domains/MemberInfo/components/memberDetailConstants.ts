@@ -7,8 +7,11 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 
+import { PATHS } from '@/shared/constants/paths';
+
 export type DetailShortcut = {
   description: string;
+  getHref?: (studentNumber: string) => string;
   icon: LucideIcon;
   title: string;
 };
@@ -16,13 +19,17 @@ export type DetailShortcut = {
 export const DETAIL_SHORTCUTS: DetailShortcut[] = [
   {
     title: '작성한 게시글 조회',
-    description: '회원별 게시글 이력 API 연동 후 제공됩니다.',
+    description: '해당 회원이 작성한 게시글을 조회합니다.',
     icon: FileText,
+    getHref: (studentNumber) =>
+      `${PATHS.POST_MANAGE}?keywordAuthor=${encodeURIComponent(studentNumber)}&page=1`,
   },
   {
     title: '작성한 댓글 조회',
-    description: '회원별 댓글 이력 API 연동 후 제공됩니다.',
+    description: '해당 회원이 작성한 댓글을 조회합니다.',
     icon: MessageSquare,
+    getHref: (studentNumber) =>
+      `${PATHS.POST_COMMENTS}?searchScope=CONTENT&keywordAuthor=${encodeURIComponent(studentNumber)}&page=1`,
   },
   {
     title: '다운로드 받은 시험후기',

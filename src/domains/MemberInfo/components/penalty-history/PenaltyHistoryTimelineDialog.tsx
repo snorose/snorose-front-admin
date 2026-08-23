@@ -1,6 +1,6 @@
 import type { UIEvent } from 'react';
 
-import { History, Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { History, Loader2, Plus, Trash2 } from 'lucide-react';
 
 import { Button, Dialog } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
@@ -8,10 +8,12 @@ import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 import {
   getPenaltyTone,
   isOngoingPenalty,
+  isPermanentDemotionType,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import { formatDateTime } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type PenaltyHistoryTimelineDialogProps = {
+  canAddWarning: boolean;
   hasNext: boolean;
   histories: BlacklistHistoryItem[];
   isLoading: boolean;
@@ -19,7 +21,6 @@ type PenaltyHistoryTimelineDialogProps = {
   onAddDemotion: () => void;
   onAddWarning: () => void;
   onDelete: (history: BlacklistHistoryItem) => void;
-  onEdit: (history: BlacklistHistoryItem) => void;
   onLoadMore: () => void | Promise<void>;
   onOpenChange: (open: boolean) => void;
   open: boolean;
@@ -27,6 +28,7 @@ type PenaltyHistoryTimelineDialogProps = {
 };
 
 export default function PenaltyHistoryTimelineDialog({
+  canAddWarning,
   hasNext,
   histories,
   isLoading,
@@ -34,7 +36,6 @@ export default function PenaltyHistoryTimelineDialog({
   onAddDemotion,
   onAddWarning,
   onDelete,
-  onEdit,
   onLoadMore,
   onOpenChange,
   open,
@@ -73,6 +74,12 @@ export default function PenaltyHistoryTimelineDialog({
               variant='outline'
               className='h-12 rounded-xl text-base font-semibold'
               onClick={onAddWarning}
+              disabled={!canAddWarning}
+              title={
+                canAddWarning
+                  ? undefined
+                  : '영구강등 회원에게는 경고를 추가할 수 없습니다.'
+              }
             >
               <Plus className='h-5 w-5' />
               경고 추가
@@ -87,6 +94,12 @@ export default function PenaltyHistoryTimelineDialog({
               강등 추가
             </Button>
           </div>
+
+          {!canAddWarning ? (
+            <p className='px-8 pb-5 text-sm font-medium text-rose-600'>
+              영구강등 회원에게는 경고를 추가할 수 없습니다.
+            </p>
+          ) : null}
 
           <div className='border-t border-slate-200' />
 
@@ -108,7 +121,6 @@ export default function PenaltyHistoryTimelineDialog({
                       key={`${history.createdAt}-${history.type}-${index}`}
                       history={history}
                       onDelete={onDelete}
-                      onEdit={onEdit}
                     />
                   ))}
                 </ol>
@@ -136,13 +148,12 @@ export default function PenaltyHistoryTimelineDialog({
 function PenaltyHistoryCard({
   history,
   onDelete,
-  onEdit,
 }: {
   history: BlacklistHistoryItem;
   onDelete: (history: BlacklistHistoryItem) => void;
-  onEdit: (history: BlacklistHistoryItem) => void;
 }) {
   const isOngoing = isOngoingPenalty(history);
+  const isPermanentDemotion = isPermanentDemotionType(history.type);
   // 경고 항목에는 강등 시작일/종료일이 없으므로(항상 '-') 해당 필드를 숨긴다.
   const isWarning = history.type === '경고' || history.type === 'WARNING';
 
@@ -150,7 +161,7 @@ function PenaltyHistoryCard({
     <li className='relative'>
       <span
         className={`absolute top-3 -left-[2.4375rem] h-5 w-5 rounded-full border-4 border-white shadow-sm ${
-          isOngoing ? 'bg-rose-600' : 'bg-slate-950'
+          isOngoing && !isPermanentDemotion ? 'bg-rose-600' : 'bg-slate-950'
         }`}
       />
       <article
@@ -189,19 +200,10 @@ function PenaltyHistoryCard({
               type='button'
               variant='ghost'
               size='icon-sm'
-              onClick={() => onEdit(history)}
-              className='rounded-lg text-slate-500 hover:text-slate-950'
-              aria-label='제재 수정'
-            >
-              <Pencil className='h-4 w-4' />
-            </Button>
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon-sm'
               onClick={() => onDelete(history)}
               className='rounded-lg text-rose-500 hover:text-rose-600'
-              aria-label='제재 삭제'
+              aria-label='제재 삭제 요청 안내'
+              title='제재 삭제는 담당자 요청이 필요합니다.'
               disabled={Boolean(history.deletedAt)}
             >
               <Trash2 className='h-4 w-4' />

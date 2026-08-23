@@ -5,7 +5,6 @@ export { default as MemberDetailSection } from './components/MemberDetailSection
 export { default as MemberDirectoryActionBar } from './components/MemberDirectoryActionBar';
 export { default as MemberDirectorySection } from './components/MemberDirectorySection';
 export { default as MemberInfoEditForm } from './components/MemberInfoEditForm';
-export { default as MemberInfoView } from './components/MemberInfoView';
 export { default as PenaltyUserInfoView } from './components/PenaltyUserInfoView';
 export { default as UserPointHistoryTab } from './components/PointHistoryTab';
 export { default as TabList } from './components/TabList';

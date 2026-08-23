@@ -4,10 +4,8 @@ import { Input, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 
 import { PENALTY_USER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
-import {
-  convertBlacklistTypeToLabel,
-  convertUserRoleIdToEnum,
-} from '@/domains/MemberInfo/utils/memberInfoFormatters';
+import { getActivePenaltyLabel } from '@/domains/MemberInfo/utils/memberDirectory';
+import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 export default function PenaltyUserInfo({
   member,
@@ -36,8 +34,8 @@ export default function PenaltyUserInfo({
             key === 'userRoleId'
               ? convertUserRoleIdToEnum(rawValue as number)
               : key === 'isBlacklist'
-                ? member?.isBlacklist
-                  ? convertBlacklistTypeToLabel(member.blacklistType)
+                ? member
+                  ? getActivePenaltyLabel(member)
                   : '정상'
                 : typeof rawValue === 'boolean'
                   ? String(rawValue)

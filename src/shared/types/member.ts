@@ -119,6 +119,7 @@ export type PenaltyUserInfo = Pick<
 >;
 
 export interface EditMemberInfo {
+  loginId?: string;
   userName?: string;
   nickname?: string;
   email?: string;
