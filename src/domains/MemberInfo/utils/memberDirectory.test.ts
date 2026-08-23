@@ -6,6 +6,7 @@ import {
   createMemberDiffPayload,
   getActivePenaltyLabel,
   getPenaltyStatus,
+  getRoleBadgeMeta,
   isPermanentDemotionPenalty,
   isWarningPenalty,
 } from './memberDirectory';
@@ -63,6 +64,13 @@ describe('createMemberDiffPayload', () => {
 });
 
 describe('회원 제재 상태 판정', () => {
+  test('활성 제재가 없으면 정상 상태를 success tone으로 표시한다', () => {
+    expect(getPenaltyStatus(MEMBER)).toMatchObject({
+      label: '정상',
+      tone: 'success',
+    });
+  });
+
   test('일반강등 중 경고가 추가되어도 강등 상태를 우선 표시한다', () => {
     const member = {
       ...MEMBER,
@@ -75,7 +83,8 @@ describe('회원 제재 상태 판정', () => {
     expect(getActivePenaltyLabel(member)).toBe('일반 강등');
     expect(getPenaltyStatus(member)).toMatchObject({
       label: '일반 강등',
-      warningLabel: '경고 1회',
+      tone: 'danger',
+      warningBadge: { label: '경고 1회', tone: 'warning' },
     });
     expect(isWarningPenalty(member)).toBe(false);
   });
@@ -91,7 +100,8 @@ describe('회원 제재 상태 판정', () => {
 
     expect(getPenaltyStatus(member)).toMatchObject({
       label: '일반 강등',
-      warningLabel: undefined,
+      tone: 'danger',
+      warningBadge: undefined,
     });
   });
 
@@ -103,7 +113,10 @@ describe('회원 제재 상태 판정', () => {
       currentWarningCount: 1,
     };
 
-    expect(getPenaltyStatus(member).label).toBe('경고 1회');
+    expect(getPenaltyStatus(member)).toMatchObject({
+      label: '경고 1회',
+      tone: 'warning',
+    });
     expect(isWarningPenalty(member)).toBe(true);
   });
 
@@ -118,9 +131,29 @@ describe('회원 제재 상태 판정', () => {
     expect(isPermanentDemotionPenalty(member)).toBe(true);
     expect(getPenaltyStatus(member)).toMatchObject({
       label: '영구 강등',
-      tone: 'border border-slate-950 bg-slate-950 text-white',
+      tone: 'danger',
       summary: '영구강등이 적용되어 해제 기한 없이 이용이 제한됩니다.',
       summaryTone: 'bg-slate-950 text-white',
+    });
+  });
+});
+
+describe('회원 등급 배지 메타데이터', () => {
+  test.each([
+    [1, '준회원', 'neutral'],
+    [2, '정회원', 'success'],
+    [4, '리자', 'accent'],
+    [5, '공식', 'info'],
+    [6, '강등자', 'danger'],
+    [7, '광고주', 'info'],
+  ] as const)('%s 등급에 %s·%s tone을 반환한다', (roleId, label, tone) => {
+    expect(getRoleBadgeMeta(roleId)).toEqual({ label, tone });
+  });
+
+  test('알 수 없는 등급은 neutral로 표시한다', () => {
+    expect(getRoleBadgeMeta(999)).toEqual({
+      label: '알 수 없음',
+      tone: 'neutral',
     });
   });
 });

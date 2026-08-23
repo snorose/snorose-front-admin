@@ -2,11 +2,13 @@ import type { UIEvent } from 'react';
 
 import { History, Loader2, Plus, Trash2 } from 'lucide-react';
 
+import { StatusBadge } from '@/shared/components';
 import { Button, Dialog } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 
 import {
-  getPenaltyTone,
+  getPenaltyBadgeMeta,
+  getPenaltyProgressBadgeMeta,
   isOngoingPenalty,
   isPermanentDemotionType,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
@@ -154,6 +156,8 @@ function PenaltyHistoryCard({
 }) {
   const isOngoing = isOngoingPenalty(history);
   const isPermanentDemotion = isPermanentDemotionType(history.type);
+  const penaltyBadge = getPenaltyBadgeMeta(history);
+  const progressBadge = getPenaltyProgressBadgeMeta(history);
   // 경고 항목에는 강등 시작일/종료일이 없으므로(항상 '-') 해당 필드를 숨긴다.
   const isWarning = history.type === '경고' || history.type === 'WARNING';
 
@@ -171,21 +175,13 @@ function PenaltyHistoryCard({
       >
         <div className='flex flex-wrap items-start justify-between gap-3'>
           <div className='flex flex-wrap items-center gap-2'>
-            <span
-              className={`inline-flex rounded-lg border px-3 py-1 text-sm font-bold ${getPenaltyTone(
-                history
-              )}`}
-            >
-              {history.deletedAt ? '(삭제) ' : ''}
-              {history.type}
-            </span>
-            {isOngoing ? (
-              <span className='rounded-full bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-600'>
-                진행중
-              </span>
-            ) : null}
-            {history.deletedAt ? (
-              <span className='text-sm font-medium text-slate-400'>취소됨</span>
+            <StatusBadge tone={penaltyBadge.tone}>
+              {penaltyBadge.label}
+            </StatusBadge>
+            {progressBadge ? (
+              <StatusBadge tone={progressBadge.tone}>
+                {progressBadge.label}
+              </StatusBadge>
             ) : null}
           </div>
           <div className='flex items-center gap-2'>

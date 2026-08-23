@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-  getPenaltyTone,
+  getPenaltyBadgeMeta,
+  getPenaltyProgressBadgeMeta,
   getWarningCountByReason,
   isPositiveInteger,
 } from './penalty-history-utils';
@@ -30,10 +31,10 @@ describe('isPositiveInteger', () => {
   );
 });
 
-describe('getPenaltyTone', () => {
-  test('영구강등은 진행 중이어도 검은색으로 표시한다', () => {
+describe('getPenaltyBadgeMeta', () => {
+  test('진행 중인 영구 강등은 danger tone으로 표시한다', () => {
     expect(
-      getPenaltyTone({
+      getPenaltyBadgeMeta({
         encryptedUserId: 'encrypted-user-id',
         studentNumber: '1234567',
         type: '영구 강등',
@@ -43,6 +44,56 @@ describe('getPenaltyTone', () => {
         blacklistDeadline: null,
         adminName: '관리자',
       })
-    ).toBe('border-slate-950 bg-slate-950 text-white');
+    ).toEqual({ label: '영구 강등', tone: 'danger' });
+  });
+
+  test('경고는 warning tone으로 표시한다', () => {
+    expect(
+      getPenaltyBadgeMeta({
+        encryptedUserId: 'encrypted-user-id',
+        studentNumber: '1234567',
+        type: 'WARNING',
+        blackReason: '운영 정책 위반',
+        createdAt: '2026-01-01 00:00:00',
+        blacklistStartDate: null,
+        blacklistDeadline: null,
+        adminName: '관리자',
+      })
+    ).toEqual({ label: '경고', tone: 'warning' });
+  });
+});
+
+describe('getPenaltyProgressBadgeMeta', () => {
+  const demotion = {
+    encryptedUserId: 'encrypted-user-id',
+    studentNumber: '1234567',
+    type: 'RELEGATION',
+    blackReason: '운영 정책 위반',
+    createdAt: '2026-01-01 00:00:00',
+    blacklistStartDate: '2026-01-01 00:00:00',
+    blacklistDeadline: '2099-01-01 00:00:00',
+    adminName: '관리자',
+  };
+
+  test('진행 중인 강등은 danger tone으로 표시한다', () => {
+    expect(getPenaltyProgressBadgeMeta(demotion)).toEqual({
+      label: '진행중',
+      tone: 'danger',
+    });
+  });
+
+  test('종료된 강등과 취소된 제재는 neutral tone으로 표시한다', () => {
+    expect(
+      getPenaltyProgressBadgeMeta({
+        ...demotion,
+        blacklistDeadline: '2026-01-02 00:00:00',
+      })
+    ).toEqual({ label: '종료', tone: 'neutral' });
+    expect(
+      getPenaltyProgressBadgeMeta({
+        ...demotion,
+        deletedAt: '2026-01-02 00:00:00',
+      })
+    ).toEqual({ label: '취소', tone: 'neutral' });
   });
 });
