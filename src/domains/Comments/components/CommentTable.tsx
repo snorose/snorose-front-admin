@@ -118,6 +118,15 @@ export default function CommentTable({
                 <Table.Head style={{ width: '150px' }} className='px-3 text-xs'>
                   게시판
                 </Table.Head>
+                <Table.Head
+                  style={{ width: '100px' }}
+                  className='px-3 text-center text-xs'
+                >
+                  상태
+                </Table.Head>
+                <Table.Head style={{ width: '180px' }} className='px-3 text-xs'>
+                  작성일
+                </Table.Head>
                 <Table.Head style={{ width: '90px' }} className='px-3 text-xs'>
                   카테고리
                 </Table.Head>
@@ -132,15 +141,6 @@ export default function CommentTable({
                   className='px-3 text-center text-xs'
                 >
                   의심 키워드
-                </Table.Head>
-                <Table.Head
-                  style={{ width: '100px' }}
-                  className='px-3 text-center text-xs'
-                >
-                  상태
-                </Table.Head>
-                <Table.Head style={{ width: '180px' }} className='px-3 text-xs'>
-                  작성일
                 </Table.Head>
               </Table.Row>
             </Table.Header>

@@ -132,7 +132,31 @@ export default function CommentTableRow({
         <Badge variant='unstyled'>{BOARD_NAMES[comment.boardId] ?? '-'}</Badge>
       </Table.Cell>
 
-      {/* 8. 카테고리 */}
+      {/* 8. 상태 */}
+      <Table.Cell className='px-3 text-center'>
+        <div className='flex flex-wrap items-center justify-center gap-1'>
+          {getPostStatusBadges(comment).map((badge, idx) => (
+            <Badge
+              key={idx}
+              variant='unstyled'
+              className={badge.className}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSingleVisibilityToggle(comment);
+              }}
+            >
+              {badge.text}
+            </Badge>
+          ))}
+        </div>
+      </Table.Cell>
+
+      {/* 9. 작성일 */}
+      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
+        {formatDateTimeWithAmPm(comment.createdAt)}
+      </Table.Cell>
+
+      {/* 10. 카테고리 */}
       <Table.Cell className='px-3 text-xs text-gray-500'>
         {comment.category ? (
           <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
@@ -143,7 +167,7 @@ export default function CommentTableRow({
         )}
       </Table.Cell>
 
-      {/* 9. 통계 */}
+      {/* 11. 통계 */}
       <Table.Cell className='px-3 py-1.5 text-center'>
         <div className='mx-auto grid max-w-[110px] grid-cols-2 justify-items-start gap-x-2 gap-y-1 pl-1 font-mono text-[11px] text-gray-500'>
           <span className='flex items-center gap-0.5' title='조회수'>
@@ -176,7 +200,7 @@ export default function CommentTableRow({
         </div>
       </Table.Cell>
 
-      {/* 10. 의심 키워드 */}
+      {/* 12. 의심 키워드 */}
       <Table.Cell className='px-3 text-center'>
         {comment.isKeywordExist ? (
           <Badge className='rounded border-none bg-[#F5F3FF] px-2 py-0.5 text-[11px] font-bold text-[#7C3AED] hover:bg-[#F5F3FF]'>
@@ -187,30 +211,6 @@ export default function CommentTableRow({
             N
           </Badge>
         )}
-      </Table.Cell>
-
-      {/* 11. 상태 */}
-      <Table.Cell className='px-3 text-center'>
-        <div className='flex flex-wrap items-center justify-center gap-1'>
-          {getPostStatusBadges(comment).map((badge, idx) => (
-            <Badge
-              key={idx}
-              variant='unstyled'
-              className={badge.className}
-              onClick={(e) => {
-                e.stopPropagation();
-                onSingleVisibilityToggle(comment);
-              }}
-            >
-              {badge.text}
-            </Badge>
-          ))}
-        </div>
-      </Table.Cell>
-
-      {/* 12. 작성일 */}
-      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {formatDateTimeWithAmPm(comment.createdAt)}
       </Table.Cell>
     </Table.Row>
   );
