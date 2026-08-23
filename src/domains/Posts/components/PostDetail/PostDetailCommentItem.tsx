@@ -10,9 +10,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { MemberInfoPopover } from '@/shared/components';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import StatusChangeModal from '@/shared/components/StatusChangeModal';
-import { Badge, Button } from '@/shared/components/ui';
+import { Button } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResult } from '@/domains/Comments/types';
@@ -30,7 +30,7 @@ export default function PostDetailCommentItem({
   const queryClient = useQueryClient();
   const badges = getPostStatusBadges(comment);
   const statuses = comment.adminCommonStatuses ?? [];
-  const isNormal = badges.length === 1 && badges[0].text === '노출';
+  const isNormal = badges.length === 1 && badges[0].label === '노출';
   const isHidden =
     statuses.includes('ADMIN_HIDDEN') || statuses.includes('AUTO_HIDDEN');
   const isDeleted =
@@ -123,13 +123,9 @@ export default function PostDetailCommentItem({
             {badges.length > 0 && !isNormal && (
               <div className='flex flex-wrap gap-1'>
                 {badges.map((badge, idx) => (
-                  <Badge
-                    key={idx}
-                    variant='unstyled'
-                    className={badge.className}
-                  >
-                    {badge.text}
-                  </Badge>
+                  <StatusBadge key={idx} tone={badge.tone}>
+                    {badge.label}
+                  </StatusBadge>
                 ))}
               </div>
             )}

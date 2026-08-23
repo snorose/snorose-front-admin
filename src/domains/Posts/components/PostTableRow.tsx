@@ -8,7 +8,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-import { MemberInfoPopover } from '@/shared/components';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
@@ -105,9 +105,9 @@ export default function PostTableRow({
         <div className='flex flex-wrap items-center justify-center gap-1'>
           {getPostStatusBadges(post).map((badge, idx) => {
             return (
-              <Badge key={idx} className={badge.className}>
-                {badge.text}
-              </Badge>
+              <StatusBadge key={idx} tone={badge.tone}>
+                {badge.label}
+              </StatusBadge>
             );
           })}
         </div>

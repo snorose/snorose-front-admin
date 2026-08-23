@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { AlertTriangle, Eye, Heart, MessageSquare } from 'lucide-react';
 
-import { MemberInfoPopover } from '@/shared/components';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Badge, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
@@ -138,17 +138,16 @@ export default function CommentTableRow({
       <Table.Cell className='px-3 text-center'>
         <div className='flex flex-wrap items-center justify-center gap-1'>
           {getPostStatusBadges(comment).map((badge, idx) => (
-            <Badge
+            <button
               key={idx}
-              variant='unstyled'
-              className={badge.className}
+              type='button'
               onClick={(e) => {
                 e.stopPropagation();
                 onSingleVisibilityToggle(comment);
               }}
             >
-              {badge.text}
-            </Badge>
+              <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+            </button>
           ))}
         </div>
       </Table.Cell>

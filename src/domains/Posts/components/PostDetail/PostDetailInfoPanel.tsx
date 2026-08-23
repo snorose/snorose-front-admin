@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { MemberInfoPopover } from '@/shared/components';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Badge, Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import { getPostStatusBadges } from '@/shared/utils/postCommentUtils';
@@ -68,9 +68,9 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-400'>게시글 상태</span>
             <div className='flex flex-wrap items-center gap-1.5'>
               {getPostStatusBadges(post).map((badge, idx) => (
-                <Badge key={idx} variant='unstyled' className={badge.className}>
-                  {badge.text}
-                </Badge>
+                <StatusBadge key={idx} tone={badge.tone}>
+                  {badge.label}
+                </StatusBadge>
               ))}
               {post.isNotice && (
                 <Badge className='rounded border-none bg-[#FEE2E2] px-1.5 py-0.5 text-[10px] font-bold text-[#991B1B] hover:bg-[#FEE2E2]'>
