@@ -1,3 +1,4 @@
+import type { StatusBadgeTone } from '@/shared/components';
 import type {
   AdminUserListItem,
   AdminUserListParams,
@@ -56,12 +57,15 @@ export type DirectoryFilterOption = {
   value: string;
 };
 
-export type PenaltyStatus = {
+export type StatusBadgeMeta = {
   label: string;
-  warningLabel?: string;
+  tone: StatusBadgeTone;
+};
+
+export type PenaltyStatus = StatusBadgeMeta & {
+  warningBadge?: StatusBadgeMeta;
   summary: string;
   summaryTone: string;
-  tone: string;
 };
 
 export const EMPTY_TEXT = '-';
@@ -128,23 +132,22 @@ export function toBlacklistHistoryItem(
   };
 }
 
-export function getRoleBadgeClassName(userRoleId: number) {
-  switch (userRoleId) {
-    case 1:
-      return 'bg-slate-100 text-slate-700';
-    case 2:
-      return 'bg-emerald-100 text-emerald-700';
-    case 4:
-      return 'bg-indigo-100 text-indigo-700';
-    case 5:
-      return 'bg-sky-100 text-sky-700';
-    case 6:
-      return 'bg-rose-100 text-rose-700';
-    case 7:
-      return 'bg-amber-100 text-amber-700';
-    default:
-      return 'bg-gray-100 text-gray-700';
-  }
+const ROLE_BADGE_META: Record<number, StatusBadgeMeta> = {
+  1: { label: '준회원', tone: 'neutral' },
+  2: { label: '정회원', tone: 'success' },
+  4: { label: '리자', tone: 'accent' },
+  5: { label: '공식', tone: 'info' },
+  6: { label: '강등자', tone: 'danger' },
+  7: { label: '광고주', tone: 'info' },
+};
+
+export function getRoleBadgeMeta(userRoleId: number): StatusBadgeMeta {
+  return (
+    ROLE_BADGE_META[userRoleId] ?? {
+      label: '알 수 없음',
+      tone: 'neutral',
+    }
+  );
 }
 
 // 현재 활성 제재가 '경고'인지 판별한다(강등 vs 경고 규칙의 단일 출처).
@@ -183,7 +186,7 @@ export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
   if (!member.isBlacklist) {
     return {
       label: '정상',
-      tone: 'border border-emerald-200 bg-emerald-50 text-emerald-700',
+      tone: 'success',
       summary:
         member.totalWarningCount > 0
           ? '경고 이력은 있지만 현재 별도 제재 상태는 아닙니다.'
@@ -198,20 +201,20 @@ export function getPenaltyStatus(member: MemberInfo): PenaltyStatus {
     baseLabel === '경고' && typeof member.currentWarningCount === 'number'
       ? `경고 ${member.currentWarningCount}회`
       : baseLabel;
-  const warningLabel =
+  const warningBadge =
     baseLabel === '일반 강등' &&
     typeof member.currentWarningCount === 'number' &&
     member.currentWarningCount >= 1
-      ? `경고 ${member.currentWarningCount}회`
+      ? {
+          label: `경고 ${member.currentWarningCount}회`,
+          tone: 'warning' as const,
+        }
       : undefined;
 
   return {
     label,
-    warningLabel,
-    tone:
-      baseLabel === '영구 강등'
-        ? 'border border-slate-950 bg-slate-950 text-white'
-        : 'border border-rose-200 bg-rose-50 text-rose-700',
+    warningBadge,
+    tone: baseLabel === '경고' ? 'warning' : 'danger',
     summary:
       baseLabel === '영구 강등'
         ? '영구강등이 적용되어 해제 기한 없이 이용이 제한됩니다.'

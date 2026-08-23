@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react';
 
+import { StatusBadge } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import type {
   BlacklistHistoryItem,
@@ -26,9 +27,8 @@ import MemberWithdrawalSection from '@/domains/MemberInfo/components/MemberWithd
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
 import {
   formatDisplayValue,
-  getRoleBadgeClassName,
+  getRoleBadgeMeta,
 } from '@/domains/MemberInfo/utils/memberDirectory';
-import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 type MemberDetailSectionProps = {
   isDetailLoading: boolean;
@@ -68,7 +68,8 @@ export default function MemberDetailSection({
   onSaveEdit,
 }: MemberDetailSectionProps) {
   const [isPointDialogOpen, setIsPointDialogOpen] = useState(false);
-  const roleLabel = convertUserRoleIdToEnum(member.userRoleId);
+  const roleBadge = getRoleBadgeMeta(member.userRoleId);
+  const roleLabel = roleBadge.label;
 
   return (
     <article className='flex w-full flex-col gap-6'>
@@ -89,13 +90,7 @@ export default function MemberDetailSection({
               <h2 className='text-3xl font-bold tracking-tight text-slate-950'>
                 {member.userName} ({formatDisplayValue(member.studentNumber)})
               </h2>
-              <span
-                className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${getRoleBadgeClassName(
-                  member.userRoleId
-                )}`}
-              >
-                {roleLabel}
-              </span>
+              <StatusBadge tone={roleBadge.tone}>{roleLabel}</StatusBadge>
             </div>
             <p className='text-sm text-slate-500'>회원 상세 정보</p>
           </div>

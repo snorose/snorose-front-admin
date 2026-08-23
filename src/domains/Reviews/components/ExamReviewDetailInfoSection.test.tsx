@@ -25,10 +25,12 @@ const formData: ExamReviewDetailInfoSectionFormData = {
   examTypeAndQuestions: '서술형 3문항',
 };
 
-function renderExamReviewDetailInfoSection() {
+function renderExamReviewDetailInfoSection(
+  overrides: Partial<ExamReviewDetailInfoSectionFormData> = {}
+) {
   return render(
     <ExamReviewDetailInfoSection
-      formData={formData}
+      formData={{ ...formData, ...overrides }}
       setFormData={vi.fn()}
       isFormDisabled={false}
       onFileDownload={vi.fn()}
@@ -103,5 +105,42 @@ describe('ExamReviewDetailInfoSection', () => {
     expect(memoTextarea).not.toBeNull();
     expect(examTypeAndQuestionsTextarea).toHaveClass('min-h-[110px]');
     expect(memoTextarea).toHaveClass('min-h-[110px]');
+  });
+
+  test('삭제·공개·징계 상태를 공통 배지로 표시한다', () => {
+    renderExamReviewDetailInfoSection({
+      deletionStatus: 'ADMIN_DELETED',
+      isSanctioned: true,
+      visibilityStatus: 'ADMIN_HIDDEN',
+    });
+
+    expect(screen.getByText('어드민 삭제')).toHaveClass(
+      'bg-rose-50',
+      'text-rose-700'
+    );
+    expect(screen.getByText('징계')).toHaveClass(
+      'bg-violet-50',
+      'text-violet-700'
+    );
+    expect(screen.getByText('어드민 비공개')).toHaveClass(
+      'bg-amber-50',
+      'text-amber-700'
+    );
+  });
+
+  test('공개·징계 없음 상태를 success 배지로 표시한다', () => {
+    renderExamReviewDetailInfoSection({
+      isSanctioned: false,
+      visibilityStatus: 'VISIBLE',
+    });
+
+    expect(screen.getByText('징계 없음')).toHaveClass(
+      'bg-emerald-50',
+      'text-emerald-700'
+    );
+    expect(screen.getByText('노출')).toHaveClass(
+      'bg-emerald-50',
+      'text-emerald-700'
+    );
   });
 });

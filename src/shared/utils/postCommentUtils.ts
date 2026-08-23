@@ -1,3 +1,5 @@
+import type { StatusBadgeTone } from '@/shared/components/StatusBadge';
+
 export const BOARD_NAMES: Record<number, string> = {
   11: 'about 스노로즈',
   12: '공지사항',
@@ -60,8 +62,8 @@ export const stripHtmlTags = (html: string | null | undefined): string => {
 export const formatCommentId = (id: number) => String(id).padStart(3, '0');
 export const formatPostId = (id: number) => String(id).padStart(3, '0');
 interface StatusBadgeInfo {
-  text: string;
-  className: string;
+  label: string;
+  tone: StatusBadgeTone;
 }
 
 export type AdminStatus =
@@ -103,48 +105,42 @@ export function getPostStatusBadges(post: {
 
   if (isReportedMultiple) {
     badges.push({
-      text: '신고 다수',
-      className:
-        'bg-[#FEF9C3] text-[#A16207] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FEF9C3]',
+      label: '신고 다수',
+      tone: 'warning',
     });
   } else if (post.isVisible === false && statuses.includes('ADMIN_HIDDEN')) {
     badges.push({
-      text: '리자 비공개',
-      className:
-        'bg-[#FFEDD5] text-[#374151] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FFEDD5]',
+      label: '리자 비공개',
+      tone: 'warning',
     });
   }
 
   // 2. 징계 여부
   if (statuses.includes('SANCTIONED')) {
     badges.push({
-      text: '징계',
-      className:
-        'bg-[#FEE2E2] text-[#DC2626] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#FEE2E2]',
+      label: '징계',
+      tone: 'accent',
     });
   }
 
   // 3. 삭제 여부
   if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     badges.push({
-      text: '리자 삭제',
-      className:
-        'bg-[#F3F4F6] text-[#DC2626] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#F3F4F6]',
+      label: '리자 삭제',
+      tone: 'danger',
     });
   } else if (statuses.includes('USER_DELETED')) {
     badges.push({
-      text: '유저 삭제',
-      className:
-        'bg-[#1F2937] text-white border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#1F2937]',
+      label: '유저 삭제',
+      tone: 'danger',
     });
   }
 
   // 매칭되는 상태가 없는 경우 '노출' 표시
   if (badges.length === 0) {
     badges.push({
-      text: '노출',
-      className:
-        'bg-[#F3F4F6] text-[#6B7280] border-none font-bold text-[11px] px-2 py-0.5 rounded hover:bg-[#F3F4F6]',
+      label: '노출',
+      tone: 'success',
     });
   }
 

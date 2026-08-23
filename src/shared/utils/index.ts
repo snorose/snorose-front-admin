@@ -7,6 +7,7 @@ export {
 } from './date-time-formatter';
 export { downloadNotProcessedRowsExcel } from './download-not-processed-excel';
 export { getErrorMessage } from './error-handler';
+export { getPeriodStatus, type PeriodStatus } from './periodStatusUtils';
 export { cookie, tokenStorage, userStorage } from './storage';
 export { executeTokenRefresh, TokenRefreshManager } from './token-manager';
 export {

@@ -1,10 +1,12 @@
 import { MessageSquare, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
+import { StatusBadge } from '@/shared/components';
 import { Button, DropdownMenu, Textarea } from '@/shared/components/ui';
 import type { InquiryComment } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { INQUIRY_COMMENT_MAX_LENGTH } from '@/domains/InquiryReport/constants/inquiryCommentValidation';
+import { INQUIRY_AUXILIARY_BADGE_META } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import {
   canManageComment,
   getCommentDisplayContent,
@@ -68,22 +70,30 @@ export default function InquiryCommentItem({
               </span>
             )}
             {isAdminComment && (
-              <span className='rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600'>
-                관리자
-              </span>
+              <StatusBadge
+                tone={INQUIRY_AUXILIARY_BADGE_META.COMMENT_ADMIN.tone}
+              >
+                {INQUIRY_AUXILIARY_BADGE_META.COMMENT_ADMIN.label}
+              </StatusBadge>
             )}
             {comment.isUpdated && !comment.isDeleted && (
-              <span className='text-[11px] text-gray-400'>수정됨</span>
+              <StatusBadge tone={INQUIRY_AUXILIARY_BADGE_META.EDITED.tone}>
+                {INQUIRY_AUXILIARY_BADGE_META.EDITED.label}
+              </StatusBadge>
             )}
             {!comment.isVisible && (
-              <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500'>
-                숨김
-              </span>
+              <StatusBadge
+                tone={INQUIRY_AUXILIARY_BADGE_META.COMMENT_HIDDEN.tone}
+              >
+                {INQUIRY_AUXILIARY_BADGE_META.COMMENT_HIDDEN.label}
+              </StatusBadge>
             )}
             {comment.isDeleted && (
-              <span className='rounded bg-red-50 px-1.5 py-0.5 text-[10px] text-red-500'>
-                삭제됨
-              </span>
+              <StatusBadge
+                tone={INQUIRY_AUXILIARY_BADGE_META.COMMENT_DELETED.tone}
+              >
+                {INQUIRY_AUXILIARY_BADGE_META.COMMENT_DELETED.label}
+              </StatusBadge>
             )}
           </div>
           <div className='flex items-center gap-1'>

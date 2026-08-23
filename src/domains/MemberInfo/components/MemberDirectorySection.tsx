@@ -1,6 +1,6 @@
 import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
-import { PaginationBar } from '@/shared/components';
+import { PaginationBar, StatusBadge } from '@/shared/components';
 import { Button, Input, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 
@@ -11,9 +11,8 @@ import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDir
 import {
   formatDate,
   formatPoint,
-  getRoleBadgeClassName,
+  getRoleBadgeMeta,
 } from '@/domains/MemberInfo/utils/memberDirectory';
-import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 interface MemberDirectorySectionProps {
   currentPage: number;
@@ -229,6 +228,7 @@ export default function MemberDirectorySection({
                     const isSelected = selectedIds.includes(
                       member.encryptedUserId
                     );
+                    const roleBadge = getRoleBadgeMeta(member.userRoleId);
 
                     return (
                       <Table.Row
@@ -266,13 +266,9 @@ export default function MemberDirectorySection({
                           {member.email}
                         </Table.Cell>
                         <Table.Cell className='px-4'>
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${getRoleBadgeClassName(
-                              member.userRoleId
-                            )}`}
-                          >
-                            {convertUserRoleIdToEnum(member.userRoleId)}
-                          </span>
+                          <StatusBadge tone={roleBadge.tone}>
+                            {roleBadge.label}
+                          </StatusBadge>
                         </Table.Cell>
                         <Table.Cell className='px-4 text-slate-700'>
                           {member.major}

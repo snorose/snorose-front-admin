@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui';
+import { StatusBadge } from '@/shared/components';
 import type { UserBlacklistHistory } from '@/shared/types';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
@@ -23,9 +23,7 @@ export default function PostDetailBlacklistCard() {
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2'>
                 <span className='font-medium text-gray-400'>징계 종류</span>
                 <div>
-                  <Badge className='rounded border-none bg-red-50 px-1.5 py-0.5 text-[10px] font-bold text-red-700'>
-                    {item.type}
-                  </Badge>
+                  <StatusBadge tone='danger'>{item.type}</StatusBadge>
                 </div>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>

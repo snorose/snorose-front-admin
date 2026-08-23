@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui';
+import { StatusBadge } from '@/shared/components';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 interface ReportItem {
@@ -20,9 +20,7 @@ export default function PostDetailReportCard({
     <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
       <div className='flex items-center justify-between'>
         <h3 className='text-[14px] font-bold text-gray-900'>신고 내역</h3>
-        <Badge className='rounded border-none bg-[#DC2626] px-2 py-0.5 text-[10px] font-bold text-white'>
-          총 {reportCount}건
-        </Badge>
+        <StatusBadge tone='danger'>총 {reportCount}건</StatusBadge>
       </div>
       {reportsList.length === 0 ? (
         <div className='py-4 text-center text-xs text-gray-400'>

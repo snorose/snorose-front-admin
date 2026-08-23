@@ -2,9 +2,12 @@ import { useState } from 'react';
 
 import { ChevronDown } from 'lucide-react';
 
+import { StatusBadge } from '@/shared/components';
 import { ConfirmModal, Select } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import type { InquiryStatus } from '@/shared/types';
+
+import { getInquiryStatusBadgeMeta } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 
 type InquiryStatusSelectProps = {
   ariaLabel?: string;
@@ -18,26 +21,12 @@ type InquiryStatusSelectProps = {
   ) => void | Promise<void>;
 };
 
-const INQUIRY_STATUS_LABELS: Record<InquiryStatus, string> = {
-  PENDING: '답변 전',
-  COMPLETED: '답변 완료',
-  HOLD: '보류',
-};
-
-const STATUS_TRIGGER_CLASS_NAMES: Record<InquiryStatus, string> = {
-  PENDING:
-    'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100',
-  COMPLETED:
-    'border-emerald-100 bg-emerald-50 text-emerald-700 hover:border-emerald-200 hover:bg-emerald-100',
-  HOLD: 'border-amber-100 bg-amber-50 text-amber-700 hover:border-amber-200 hover:bg-amber-100',
-};
-
 const STATUS_OPTIONS = [
-  { label: '답변 전', value: 'PENDING' },
-  { label: '답변 완료', value: 'COMPLETED' },
+  'PENDING',
+  'COMPLETED',
   // TODO: 백엔드 HOLD 상태 지원 후 주석 해제
-  // { label: '보류', value: 'HOLD' },
-] as const;
+  // 'HOLD',
+] as const satisfies ReadonlyArray<InquiryStatus>;
 
 export default function InquiryStatusSelect({
   ariaLabel = '상태 변경',
@@ -51,6 +40,7 @@ export default function InquiryStatusSelect({
     null
   );
   const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+  const statusBadge = getInquiryStatusBadgeMeta(status);
 
   const handleConfirmStatusChange = async () => {
     if (!pendingStatus) return;
@@ -78,13 +68,14 @@ export default function InquiryStatusSelect({
           onClick={(event) => event.stopPropagation()}
           aria-label={ariaLabel}
           className={cn(
-            'group h-8 rounded-full border px-3 py-1 text-[11px] font-bold shadow-xs transition focus-visible:ring-2 focus-visible:ring-slate-200 [&>svg]:hidden',
-            STATUS_TRIGGER_CLASS_NAMES[status],
+            'group h-8 rounded-full border-transparent bg-transparent px-1 py-0 shadow-none transition hover:bg-transparent focus-visible:ring-2 focus-visible:ring-slate-200 [&>svg]:hidden',
             className
           )}
         >
           <div className='flex items-center gap-1.5'>
-            <span>{INQUIRY_STATUS_LABELS[status]}</span>
+            <StatusBadge tone={statusBadge.tone}>
+              {statusBadge.label}
+            </StatusBadge>
             <ChevronDown className='h-3.5 w-3.5 opacity-60 transition group-hover:opacity-100' />
           </div>
         </Select.Trigger>
@@ -92,11 +83,21 @@ export default function InquiryStatusSelect({
           align='center'
           onClick={(event) => event.stopPropagation()}
         >
-          {STATUS_OPTIONS.map((option) => (
-            <Select.Item key={option.value} value={option.value}>
-              {option.label}
-            </Select.Item>
-          ))}
+          {STATUS_OPTIONS.map((option) => {
+            const optionBadge = getInquiryStatusBadgeMeta(option);
+
+            return (
+              <Select.Item
+                key={option}
+                value={option}
+                textValue={optionBadge.label}
+              >
+                <StatusBadge tone={optionBadge.tone}>
+                  {optionBadge.label}
+                </StatusBadge>
+              </Select.Item>
+            );
+          })}
         </Select.Content>
       </Select>
 
@@ -105,7 +106,7 @@ export default function InquiryStatusSelect({
         title='상태 변경'
         description={
           pendingStatus
-            ? `"${title}" 상태를 ${INQUIRY_STATUS_LABELS[pendingStatus]}(으)로 변경할까요?`
+            ? `"${title}" 상태를 ${getInquiryStatusBadgeMeta(pendingStatus).label}(으)로 변경할까요?`
             : undefined
         }
         confirmText={isStatusUpdating ? '변경 중...' : '변경'}

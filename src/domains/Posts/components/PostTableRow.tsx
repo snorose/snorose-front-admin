@@ -8,8 +8,8 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-import { MemberInfoPopover } from '@/shared/components';
-import { Badge, Table } from '@/shared/components/ui';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
+import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import {
@@ -66,11 +66,7 @@ export default function PostTableRow({
       >
         <div className='flex max-w-[380px] flex-col gap-1'>
           <div className='flex items-center gap-1.5'>
-            {post.isNotice && (
-              <Badge className='rounded border-none bg-[#FEE2E2] px-1.5 py-0.5 text-[10px] font-bold text-[#991B1B] hover:bg-[#FEE2E2]'>
-                공지
-              </Badge>
-            )}
+            {post.isNotice && <StatusBadge tone='info'>공지</StatusBadge>}
             <span
               className='block truncate font-bold text-gray-900'
               title={post.title}
@@ -97,7 +93,7 @@ export default function PostTableRow({
 
       {/* 4. 게시판 */}
       <Table.Cell className='px-3'>
-        <Badge variant='unstyled'>{post.boardName}</Badge>
+        <StatusBadge tone='outline'>{post.boardName}</StatusBadge>
       </Table.Cell>
 
       {/* 5. 상태 */}
@@ -105,9 +101,9 @@ export default function PostTableRow({
         <div className='flex flex-wrap items-center justify-center gap-1'>
           {getPostStatusBadges(post).map((badge, idx) => {
             return (
-              <Badge key={idx} className={badge.className}>
-                {badge.text}
-              </Badge>
+              <StatusBadge key={idx} tone={badge.tone}>
+                {badge.label}
+              </StatusBadge>
             );
           })}
         </div>
@@ -121,9 +117,7 @@ export default function PostTableRow({
       {/* 7. 카테고리 */}
       <Table.Cell className='px-3 text-xs text-gray-500'>
         {post.category ? (
-          <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
-            {post.category}
-          </span>
+          <StatusBadge tone='outline'>{post.category}</StatusBadge>
         ) : (
           <span className='font-mono text-gray-300'>-</span>
         )}
@@ -169,13 +163,9 @@ export default function PostTableRow({
       {/* 9. 의심 키워드 */}
       <Table.Cell className='px-3 text-center'>
         {post.isKeywordExist ? (
-          <Badge className='rounded border-none bg-[#F5F3FF] px-2 py-0.5 text-[11px] font-bold text-[#7C3AED] hover:bg-[#F5F3FF]'>
-            Y
-          </Badge>
+          <StatusBadge tone='warning'>Y</StatusBadge>
         ) : (
-          <Badge className='rounded border-none bg-[#F3F4F6] px-2 py-0.5 text-[11px] font-bold text-[#9CA3AF] hover:bg-[#F3F4F6]'>
-            N
-          </Badge>
+          <StatusBadge tone='neutral'>N</StatusBadge>
         )}
       </Table.Cell>
     </Table.Row>

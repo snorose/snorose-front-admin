@@ -2,38 +2,41 @@
 
 > 조사 기준: 2026-08-17의 `src` 구현
 >
-> 갱신: 2026-08-22, 공통 `NoticePanel` 도입 현황 반영
+> 갱신: 2026-08-24, 페이지네이션·기간 상태 계산·상태 배지 공통화 현황 반영
 
 ## 한눈에 보기
 
-현재 프로젝트에서 우선 개선하면 좋은 영역은 다음 세 가지다.
+현재 프로젝트에서 다음 개선 대상으로 남아 있는 영역은 세 가지다.
 
 1. **바로 통합해도 되는 중복**
-   - 페이지네이션
    - 포인트 미지급 일정과 시험후기 작성 기간
 2. **공통 골격만 분리하면 좋은 영역**
    - 게시글/댓글 관리 화면
-   - 상태 배지
    - 테이블 로딩·빈 상태
 3. **사용처가 더 늘 때 공통화하면 좋은 영역**
    - 폼 섹션
 
-안내 사항은 두 포인트 화면의 중복을 [`NoticePanel`](../src/shared/components/NoticePanel.tsx)로 통합했다. 공통 컴포넌트는 제목과 목록 구조만 담당하고, 안내 문구는 각 화면에 유지한다.
+다음 공통화 작업은 완료되었다.
 
-가장 먼저 할 작업으로는 `ExamReviewTablePagination`을 기존 `PaginationBar`로 교체하는 것을 권장한다. 두 파일은 이름을 제외하면 사실상 같은 구현이다.
+- 실제 사용 중인 7개 화면의 페이지네이션을 [`PaginationBar`](../src/shared/components/PaginationBar.tsx)로 통합했다.
+- 기간 상태 계산을 [`getPeriodStatus`](../src/shared/utils/periodStatusUtils.ts)로 분리하고 경계 조건을 테스트했다.
+- 주요 관리 도메인의 상태·분류 표시를 [`StatusBadge`](../src/shared/components/StatusBadge.tsx)로 통합했다.
+- 두 포인트 화면의 안내 구조를 [`NoticePanel`](../src/shared/components/NoticePanel.tsx)로 통합했다.
+
+현재 가장 먼저 진행할 작업으로는 포인트 미지급 일정과 시험후기 작성 기간의 공통 UI 분리를 권장한다.
 
 ### 우선순위
 
 | 우선순위 | 개선 대상        | 현재 문제                              | 권장 방향                           |
 | -------- | ---------------- | -------------------------------------- | ----------------------------------- |
-| 1        | 페이지네이션     | 같은 구현이 여러 곳에 존재             | `PaginationBar`로 통합              |
-| 2        | 기간 관리        | 생성·목록·수정·삭제가 두 도메인에 중복 | UI 공통화, API 동작은 도메인에 유지 |
-| 3        | 게시글/댓글 관리 | 필터·선택·테이블 골격이 반복           | 작은 컴포넌트와 훅부터 분리         |
-| 4        | 상태 배지        | 상태별 색상과 크기가 제각각            | 의미 기반 `StatusBadge` 도입        |
-| 5        | 테이블 상태      | 로딩·빈 결과 UI가 화면마다 다름        | `TableStateRow` 공통화              |
-| 6        | 날짜/시간        | 빈 값·초 단위·API 형식 정책이 다름     | 표시용과 전송용 함수 분리           |
+| 1        | 기간 관리        | 생성·목록·수정·삭제가 두 도메인에 중복 | UI 공통화, API 동작은 도메인에 유지 |
+| 2        | 게시글/댓글 관리 | 필터·선택·테이블 골격이 반복           | 작은 컴포넌트와 훅부터 분리         |
+| 3        | 테이블 상태      | 로딩·빈 결과 UI가 화면마다 다름        | `TableStateRow` 공통화              |
+| 4        | 날짜/시간        | 빈 값·초 단위·API 형식 정책이 다름     | 표시용과 전송용 함수 분리           |
+| 5        | 폼 섹션          | 비슷한 마크업 반복                     | 사용처가 늘 때 얇게 공통화          |
+| 완료     | 페이지네이션     | 전용 구현과 페이지 기준이 분산됨       | `PaginationBar`로 통합              |
+| 완료     | 상태 배지        | 상태별 색상과 크기가 제각각            | 의미 기반 `StatusBadge`로 통합      |
 | 완료     | 안내 사항        | 두 포인트 화면의 안내 구조가 반복      | `NoticePanel`로 통합                |
-| 7        | 폼 섹션          | 비슷한 마크업 반복                     | 사용처가 늘 때 얇게 공통화          |
 
 ## 공통화 기준
 
@@ -49,40 +52,28 @@ domain이 담당하는 것
 
 예를 들어 `StatusBadge`는 `success`, `warning` 같은 색상 규칙만 알고, `SANCTIONED`, `CONFIRMED` 같은 업무 상태 코드는 각 도메인이 관리하는 방식이다.
 
-## 1. 페이지네이션 통합
+## 1. 페이지네이션 통합 (완료)
 
 > 현재 사용 화면, 기준 컴포넌트, 교체 범위와 단계별 체크리스트는 [`pagination-consolidation-plan.md`](./pagination-consolidation-plan.md)에 정리되어 있다.
 
-### 현재 문제
+### 현재 상태
 
-- [`PaginationBar`](../src/shared/components/PaginationBar.tsx)와 [`ExamReviewTablePagination`](../src/domains/Reviews/components/ExamReviewTablePagination.tsx)은 실질적으로 동일한 99줄 구현이다.
-- [`ExamTablePagination`](../src/domains/Reviews/components/ExamTablePagination.tsx)은 별도 디자인으로 구현되어 있지만 현재 export 외 사용처가 없다.
-- 회원 영역에는 [`MemberDirectoryPagination`](../src/domains/MemberInfo/components/MemberDirectoryPagination.tsx)과 [`MemberInfoTablePagenation`](../src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx)이 따로 있다.
-- 일부 화면은 0 기반, 일부 화면은 1 기반 페이지를 사용한다.
+- 실제 라우트에서 사용하는 7개 화면이 모두 [`PaginationBar`](../src/shared/components/PaginationBar.tsx)를 사용한다.
+- `ExamReviewTablePagination`, `ExamTablePagination`, `MemberDirectoryPagination`, `MemberInfoTablePagenation`과 관련 export를 삭제했다.
+- UI와 URL의 페이지 번호는 1 기반으로 통일하고, 서버의 0 기반 페이지 변환은 API 함수나 조회 훅 경계에서 처리한다.
+- 전체 페이지 수는 필수 `totalPage`로 전달하고, 페이지 번호 묶음 크기는 `pageBlockSize`로 분리했다.
+- 회원 목록에는 전체 페이지 수 감소 시 마지막 유효 페이지로 이동하는 보정과 요청 경합 방지를 추가했다.
 
-### 제안
+### 검증 상태
 
-`PaginationBar` 하나로 통합하고 다음 규칙을 적용한다.
+- 첫·마지막 페이지 묶음의 이전/다음 버튼 비활성화
+- 전체 페이지가 묶음 크기의 배수인 경우의 마지막 묶음
+- 기본 10개와 선택적 5개 페이지 묶음
+- `totalPage`가 0 또는 1인 경우의 노출 정책
+- 1 기반 페이지 전달과 서버 요청 직전 0 기반 변환
+- 회원 목록의 페이지 범위 보정과 요청 경합
 
-- UI의 페이지 번호는 항상 1부터 시작한다.
-- 서버가 0부터 시작하면 API 훅이나 페이지 컴포넌트에서 변환한다.
-- 전체 페이지 수를 알면 `totalPages`를 사용한다.
-- 전체 페이지 수를 모르면 `hasNext`를 사용한다.
-- 페이지 묶음 크기는 기본 10으로 통일한다.
-
-### 작업 범위
-
-1. `ExamReviewTablePagination`을 `PaginationBar`로 교체
-2. 사용하지 않는 `ExamTablePagination` 제거
-3. `MemberInfoTablePagenation` 오타 수정
-4. 회원 페이지네이션의 0/1 기반 변환을 화면 경계로 이동
-
-### 필요한 테스트
-
-- 첫 페이지 묶음에서는 이전 버튼이 비활성화되는가?
-- 마지막 페이지 묶음에서는 다음 버튼이 비활성화되는가?
-- 전체 페이지가 10의 배수여도 마지막 묶음이 올바른가?
-- `hasNext`만 전달해도 정상 동작하는가?
+공통화 구현과 단위 테스트는 완료되었다. 실제 사용 화면의 브라우저 회귀 검증과 dev API E2E 실행을 위한 인증 환경 설정은 별도 검증 작업으로 남아 있다.
 
 ## 2. 기간 관리 기능 공통화
 
@@ -147,85 +138,48 @@ Points / Reviews
 
 공통 컴포넌트 안에서 `POINTS` 또는 `REVIEWS`를 확인해 API를 분기하지 않는다. 그런 구조는 새로운 기간 기능이 추가될 때마다 공통 컴포넌트의 조건문을 늘리게 된다.
 
-## 3. 예약·진행중·종료 상태 정리
+## 3. 예약·진행중·종료 상태 정리 (계산 로직 완료)
 
-[`PeriodStatusBadge`](../src/shared/components/PeriodStatusBadge.tsx)는 이미 포인트와 시험후기에서 함께 사용하고 있어 방향이 좋다.
-
-### 개선할 부분
-
-현재 컴포넌트 안에서 다음 작업을 모두 수행한다.
-
-- 현재 시간 확인
-- 날짜 문자열 변환
-- 기간 상태 계산
-- 상태별 문구와 색상 결정
-- 배지 렌더링
-
-상태 계산을 별도 함수로 분리하면 경계 조건을 명확하게 테스트할 수 있다.
+[`PeriodStatusBadge`](../src/shared/components/PeriodStatusBadge.tsx)가 담당하던 날짜 변환과 상태 계산을 [`getPeriodStatus`](../src/shared/utils/periodStatusUtils.ts)로 분리했다. 컴포넌트는 상태별 문구와 tone을 선택해 공통 `StatusBadge`로 렌더링한다.
 
 ```ts
 type PeriodStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'ENDED';
 
-getPeriodStatus({ startAt, endAt, now }): PeriodStatus;
+getPeriodStatus(startAt, endAt, now): PeriodStatus;
 ```
 
-### 결정이 필요한 정책
+현재 경계 정책은 다음과 같이 테스트로 고정했다.
+
+- `now < startAt`: 예정
+- `startAt <= now <= endAt`: 진행중
+- `now > endAt`: 종료
+
+### 남은 정책
 
 | 상황               | 확인할 내용                                         |
 | ------------------ | --------------------------------------------------- |
-| `now === startAt`  | 예정인가, 진행중인가?                               |
-| `now === endAt`    | 진행중인가, 종료인가?                               |
 | 잘못된 날짜 문자열 | 기본 상태를 표시할지 오류 처리할지                  |
-| 상태 문구          | `예정`과 `예약` 중 어떤 용어를 사용할지             |
 | 타임존             | 관리자 브라우저 시간과 서버 시간 중 무엇이 기준인지 |
 
-기존 [`PointFreezeListSection.test.tsx`](../src/domains/Points/components/PointFreezeListSection.test.tsx)는 예정·진행중·종료를 간접 검증한다. 이 테스트를 유지하면서 `getPeriodStatus` 단위 테스트를 추가하면 된다.
+`getPeriodStatus` 단위 테스트와 [`PeriodStatusBadge.test.tsx`](../src/shared/components/PeriodStatusBadge.test.tsx)에서 예정·진행중·종료를 검증한다.
 
-## 4. 전체 상태 배지 체계 정리
+## 4. 전체 상태 배지 체계 정리 (완료)
 
-### 현재 문제
+### 현재 상태
 
-상태 배지는 여러 도메인에서 사용하지만 색상과 형태가 서로 다르다.
+기존 UI 원시 컴포넌트인 [`Badge`](../src/shared/components/ui/badge.tsx)는 유지하고, 의미 기반 [`StatusBadge`](../src/shared/components/StatusBadge.tsx)를 추가했다. 공통 컴포넌트는 크기·형태·색상만 관리하며, 상태 코드에서 문구와 tone으로 변환하는 규칙은 관련 도메인 컴포넌트와 유틸에 유지한다.
 
-- [`ExamConfirmStatusBadge`](../src/domains/Reviews/components/ExamConfirmStatusBadge.tsx)
-- [`ExamReviewProcessStatusBadge`](../src/domains/Reviews/components/ExamReviewProcessStatusBadge.tsx)
-- [`ExamTable`](../src/domains/Reviews/components/ExamTable.tsx)의 논의/신고 상태
-- [`postCommentUtils`](../src/shared/utils/postCommentUtils.ts)의 게시글·댓글 상태
-- [`PenaltyHistoryTimelineDialog`](../src/domains/MemberInfo/components/penalty-history/PenaltyHistoryTimelineDialog.tsx)의 진행중 상태
+| 적용 영역   | 공통화한 표시                                                      |
+| ----------- | ------------------------------------------------------------------ |
+| 기간 상태   | 예정·진행중·종료                                                   |
+| 시험후기    | 확인·논의·신고·처리 상태와 상세 편집                               |
+| 게시글·댓글 | 관리 상태, 공지, 의심 키워드, 게시판·카테고리, 상세 신고·징계 정보 |
+| 회원 관리   | 회원 등급, 현재 제재, 제재 종류와 진행 상태                        |
+| 문의·신고   | 대·중분류, 답변 상태, 작성자·댓글 상태                             |
 
-`emerald`, `blue`, `rose`, `red`, 임의 hex 색상이 섞여 있으며 모서리와 글자 크기도 다르다.
+공통 tone은 상태용 `neutral`, `info`, `success`, `warning`, `danger`, `accent`와 분류용 `outline`으로 제한했다. 공통 형태와 모든 tone의 스타일은 [`StatusBadge.test.tsx`](../src/shared/components/StatusBadge.test.tsx)에서 검증하고, 각 도메인의 매핑과 선택 동작은 관련 단위 테스트로 고정했다.
 
-### 제안
-
-기존 [`Badge`](../src/shared/components/ui/badge.tsx)는 그대로 두고, 의미 기반의 `StatusBadge`를 추가한다.
-
-```tsx
-<StatusBadge tone='success'>진행중</StatusBadge>
-<StatusBadge tone='warning'>예정</StatusBadge>
-<StatusBadge tone='danger'>삭제</StatusBadge>
-<StatusBadge tone='neutral'>종료</StatusBadge>
-```
-
-공통 tone은 다음 정도로 제한한다.
-
-| tone      | 용도 예시               |
-| --------- | ----------------------- |
-| `neutral` | 종료, 미확인, 기본 상태 |
-| `info`    | 확인 완료, 정보성 상태  |
-| `success` | 진행중, 공개, 완료      |
-| `warning` | 예정, 보류, 논의 필요   |
-| `danger`  | 삭제, 신고, 실패        |
-| `accent`  | 징계 등 별도 강조 상태  |
-
-상태 코드와 문구는 도메인에 유지한다.
-
-```ts
-const PERIOD_STATUS_META = {
-  SCHEDULED: { label: '예정', tone: 'warning' },
-  IN_PROGRESS: { label: '진행중', tone: 'success' },
-  ENDED: { label: '종료', tone: 'neutral' },
-};
-```
+상세한 tone 선택 기준과 도메인별 매핑은 [`status-badge-guidelines.md`](./status-badge-guidelines.md)를 따른다.
 
 ## 5. 게시글/댓글 관리 화면 공통화
 
@@ -375,10 +329,10 @@ API 전송용   각 API adapter의 serializeDateTime
 
 ### 1차: 빠르게 제거할 수 있는 중복
 
-- [ ] `ExamReviewTablePagination`을 `PaginationBar`로 교체
-- [ ] 사용하지 않는 `ExamTablePagination` 제거
-- [ ] 페이지네이션 테스트 추가
-- [ ] `getPeriodStatus` 분리 및 경계 테스트 추가
+- [x] `ExamReviewTablePagination`을 `PaginationBar`로 교체
+- [x] 사용하지 않는 `ExamTablePagination` 제거
+- [x] 페이지네이션 테스트 추가
+- [x] `getPeriodStatus` 분리 및 경계 테스트 추가
 
 ### 2차: 기간 관리 공통화
 
@@ -396,9 +350,10 @@ API 전송용   각 API adapter의 serializeDateTime
 
 ### 4차: 디자인 규칙 정리
 
-- [ ] `StatusBadge` tone 정의
-- [ ] 기간 상태부터 적용
-- [ ] 시험후기, 게시글/댓글, 제재 상태에 점진 적용
+- [x] `StatusBadge` tone 정의
+- [x] 기간 상태부터 적용
+- [x] 시험후기, 게시글/댓글, 회원 제재, 문의·신고 상태에 적용
+- [x] 상태 배지 정책과 도메인별 매핑 문서화
 - [x] 포인트 안내 UI를 `NoticePanel`로 통합
 - [ ] 정적 안내에 사용할 `role` 정책 결정
 - [ ] 같은 구조가 더 반복되면 `FormSection` 적용
@@ -415,12 +370,12 @@ API 전송용   각 API adapter의 serializeDateTime
 
 이 프로젝트는 이미 `PageHeader`, `PeriodStatusBadge`, `PaginationBar`, `BulkActionBar`, `ConfirmModal` 같은 좋은 공통 기반을 갖추고 있다.
 
-따라서 새로운 공통 시스템을 크게 만드는 것보다 다음 순서가 효과적이다.
+페이지네이션, 기간 상태 계산, 상태 배지, 안내 사항 공통화는 완료되었다. 다음 작업은 새로운 공통 시스템을 크게 만드는 것보다 아래 순서로 진행하는 편이 효과적이다.
 
-1. 완전히 같은 페이지네이션을 먼저 제거한다.
-2. 구조가 거의 같은 두 기간 관리 화면을 통합한다.
-3. 게시글/댓글 화면에서는 선택·필터·테이블 상태처럼 작은 단위만 분리한다.
-4. 상태 배지는 업무 코드는 그대로 두고 색상 규칙만 통일한다.
-5. 안내 사항은 얇은 `NoticePanel`을 유지하고, 폼 섹션은 사용처가 늘 때 공통화한다.
+1. 구조가 거의 같은 두 기간 관리 화면을 통합한다.
+2. 게시글/댓글 화면에서는 선택·필터·테이블 상태처럼 작은 단위만 분리한다.
+3. 날짜/시간 정책은 표시용과 API 전송용을 구분해 점진적으로 정리한다.
+4. 상태 배지와 안내 사항은 현재의 얇은 공통 컴포넌트와 도메인 경계를 유지한다.
+5. 폼 섹션은 같은 구조의 사용처가 더 늘 때 공통화한다.
 
 핵심 원칙은 **공통 UI는 표현을 담당하고, 도메인은 업무 규칙과 API를 담당하는 것**이다.
