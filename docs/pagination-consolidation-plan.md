@@ -19,17 +19,16 @@ shared/components/PaginationBar (최종 통합 목표)
        ├─ 게시글 상세 댓글
        ├─ 문의 및 신고
        ├─ 시험후기 관리
-       ├─ 회원 목록 (추가 작업 필요)
+       ├─ 회원 목록
        └─ 경고 및 강등 이력
 ```
 
 현재 라우트에서 실제로 확인할 수 있는 페이지네이션 화면은 **7곳**이다.
 
-- **6곳은 `PaginationBar` 통합이 완료되었다.**
-- **회원 목록 1곳은 별도 컴포넌트를 사용해 추가 작업이 필요하다.**
-- 시험후기 복제 컴포넌트와 미사용 컴포넌트는 삭제되었다.
+- **7곳 모두 `PaginationBar` 통합이 완료되었다.**
+- 시험후기·회원정보 전용 페이지네이션 컴포넌트는 모두 삭제되었다.
 
-현재 통합 진행 상태는 **부분 완료**다. 회원 이력의 활성·비노출 사용처 정리는 모두 완료되었고, 활성 화면 중에는 회원 목록 통합만 남았다.
+페이지네이션 통합 구현은 **완료**되었다. 실제 사용 중인 7개 화면의 브라우저 수동 회귀 검증만 남았다.
 
 | 구분                  | 상태                                    |
 | --------------------- | --------------------------------------- |
@@ -37,14 +36,14 @@ shared/components/PaginationBar (최종 통합 목표)
 | 시험후기 통합         | **완료**                                |
 | 게시글·댓글 보완      | **완료**                                |
 | 회원 이력 통합        | **완료**                                |
-| 회원 목록 통합        | **추가 작업 필요**                      |
+| 회원 목록 통합        | **완료**                                |
 | 접근성·문구 통일      | **선택 개선** — 통합 완료 조건과는 별도 |
 
 ## 2. 공통 기준을 `PaginationBar`로 정하는 이유
 
 | 기준          | 판단                                                                               |
 | ------------- | ---------------------------------------------------------------------------------- |
-| 현재 사용량   | 실제 화면 7곳 중 6곳에서 사용한다.                                                 |
+| 현재 사용량   | 실제 화면 7곳 모두에서 사용한다.                                                   |
 | 공통 UI 체계  | shadcn 기반 [`Pagination`](../src/shared/components/ui/pagination.tsx)을 사용한다. |
 | 시험후기 중복 | 동일 구현이던 `ExamReviewTablePagination`을 제거하고 통합했다.                     |
 | 응답 계약     | 서버 페이지네이션 응답에 항상 포함되는 `totalPage`를 공통 기준으로 사용할 수 있다. |
@@ -56,15 +55,15 @@ shared/components/PaginationBar (최종 통합 목표)
 
 ### 3.1 라우트에서 실제 사용 중인 화면
 
-| 화면                     | 라우트                  | 현재 렌더링 컴포넌트        | 데이터 방식                  |             화면 페이지 기준 | 서버 페이지 변환             | 현재 상태          |
-| ------------------------ | ----------------------- | --------------------------- | ---------------------------- | ---------------------------: | ---------------------------- | ------------------ |
-| 게시글 관리              | `/posts/manage`         | `PaginationBar`             | 서버 페이지네이션            |             1 기반, URL 저장 | API 함수에서 `page - 1`      | **보완 완료**      |
-| 댓글 관리                | `/posts/comments`       | `PaginationBar`             | 서버 페이지네이션            |             1 기반, URL 저장 | 일반 댓글 API에서 `page - 1` | **보완 완료**      |
-| 게시글 상세 댓글         | `/posts/manage/:postId` | `PaginationBar`             | 서버 페이지네이션            |            1 기반, 로컬 상태 | API 함수에서 `page - 1`      | **보완 완료**      |
-| 문의 및 신고             | `/report/inquiry`       | `PaginationBar`             | 전체 조회 후 클라이언트 분할 |             1 기반, URL 저장 | 없음                         | **보완 완료**      |
-| 시험후기 관리            | `/reviews/exam`         | `PaginationBar`             | 서버 페이지네이션            |      1 기반, URL과 로컬 상태 | 조회 훅에서 `page - 1`       | **교체 완료**      |
-| 회원 목록                | `/member/info`          | `MemberDirectoryPagination` | 서버 페이지네이션            | 상태는 0 기반, 표시는 1 기반 | 변환 없이 0 기반 전송        | **추가 작업 필요** |
-| 경고 및 강등 관리의 이력 | `/member/penalty`       | `PaginationBar`             | 전체 조회 후 클라이언트 분할 |            1 기반, 로컬 상태 | 없음                         | **교체 완료**      |
+| 화면                     | 라우트                  | 현재 렌더링 컴포넌트 | 데이터 방식                  |        화면 페이지 기준 | 서버 페이지 변환             | 현재 상태     |
+| ------------------------ | ----------------------- | -------------------- | ---------------------------- | ----------------------: | ---------------------------- | ------------- |
+| 게시글 관리              | `/posts/manage`         | `PaginationBar`      | 서버 페이지네이션            |        1 기반, URL 저장 | API 함수에서 `page - 1`      | **보완 완료** |
+| 댓글 관리                | `/posts/comments`       | `PaginationBar`      | 서버 페이지네이션            |        1 기반, URL 저장 | 일반 댓글 API에서 `page - 1` | **보완 완료** |
+| 게시글 상세 댓글         | `/posts/manage/:postId` | `PaginationBar`      | 서버 페이지네이션            |       1 기반, 로컬 상태 | API 함수에서 `page - 1`      | **보완 완료** |
+| 문의 및 신고             | `/report/inquiry`       | `PaginationBar`      | 전체 조회 후 클라이언트 분할 |        1 기반, URL 저장 | 없음                         | **보완 완료** |
+| 시험후기 관리            | `/reviews/exam`         | `PaginationBar`      | 서버 페이지네이션            | 1 기반, URL과 로컬 상태 | 조회 훅에서 `page - 1`       | **교체 완료** |
+| 회원 목록                | `/member/info`          | `PaginationBar`      | 서버 페이지네이션            |       1 기반, 로컬 상태 | 조회 훅에서 `page - 1`       | **교체 완료** |
+| 경고 및 강등 관리의 이력 | `/member/penalty`       | `PaginationBar`      | 전체 조회 후 클라이언트 분할 |       1 기반, 로컬 상태 | 없음                         | **교체 완료** |
 
 화면 단위로는 7곳이지만, 같은 컴포넌트를 여러 화면이 공유하므로 제거 대상 파일 수와 일치하지 않는다.
 
@@ -89,18 +88,17 @@ shared/components/PaginationBar (최종 통합 목표)
 
 ## 4. 현재 구현별 차이
 
-| 구현                        |              페이지 기준 | 번호 묶음 | 왼쪽/오른쪽 이동   | `totalPage` | 특이사항                                  |
-| --------------------------- | -----------------------: | --------: | ------------------ | ----------- | ----------------------------------------- |
-| `PaginationBar`             |                   1 기반 | 고정 10개 | 이전/다음 **묶음** | 필수        | 현재 공통 기준                            |
-| `MemberDirectoryPagination` | 입력 0 기반, 표시 1 기반 | 고정 10개 | 이전/다음 **묶음** | 필수        | 컴포넌트 내부에서 `+1`, 클릭 시 `-1` 변환 |
+| 구현            | 페이지 기준 |                         번호 묶음 | 왼쪽/오른쪽 이동   | `totalPage` | 특이사항       |
+| --------------- | ----------: | --------------------------------: | ------------------ | ----------- | -------------- |
+| `PaginationBar` |      1 기반 | 기본 10개, `pageBlockSize`로 설정 | 이전/다음 **묶음** | 필수        | 현재 공통 기준 |
 
-시험후기 전용 구현 2개와 `MemberInfoTablePagenation`은 삭제되어 현재 비교 대상에서 제외했다.
+시험후기 전용 구현 2개, `MemberInfoTablePagenation`, `MemberDirectoryPagination`은 삭제되어 현재 비교 대상에서 제외했다.
 
-현재 남은 가장 중요한 차이는 회원 목록만 React 상태와 API 요청 모두 0부터 시작한다는 점이다.
+모든 화면 상태와 URL은 1 기반을 사용하며, 0 기반 서버 변환은 API 함수 또는 조회 훅 경계에서만 수행한다.
 
 ## 5. `PaginationBar` 계약 보완 현황
 
-### 5.1 UI 상태는 1 기반으로 고정한다 — 회원 목록 추가 작업 필요
+### 5.1 UI 상태는 1 기반으로 고정한다 — 완료
 
 공통 컴포넌트가 0 기반과 1 기반을 동시에 추측해서 처리하지 않도록 한다.
 
@@ -114,7 +112,7 @@ apiPage = currentPage - 1;
 
 URL, React 상태, 화면 표시 값은 모두 1 기반을 사용하고, 서버가 0 기반을 요구할 때만 API 함수나 조회 훅에서 변환한다. 게시글, 댓글, 시험후기는 이미 이 구조를 사용한다.
 
-회원 목록도 최종적으로 다음 구조가 되어야 한다.
+회원 목록은 다음 구조로 변경했다.
 
 ```text
 MemberInfoPage / useMemberDirectoryState
@@ -194,17 +192,17 @@ type PaginationBarProps = {
 - [`src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx`](../src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx)
   - **완료:** 현재 비노출이지만 `PaginationBar`로 교체했다.
 - [`src/domains/MemberInfo/components/MemberDirectorySection.tsx`](../src/domains/MemberInfo/components/MemberDirectorySection.tsx)
-  - **추가 작업 필요:** `MemberDirectoryPagination` 대신 `PaginationBar`를 렌더링한다.
+  - **완료:** `MemberDirectoryPagination` 대신 `PaginationBar`를 렌더링한다.
 
 ### 6.3 페이지 기준과 데이터 전달을 수정할 파일
 
 - [`src/domains/MemberInfo/hooks/useMemberDirectoryState.ts`](../src/domains/MemberInfo/hooks/useMemberDirectoryState.ts)
-  - **추가 작업 필요:** `currentPage`의 초깃값과 필터 초기화 값을 0에서 1로 변경한다.
-  - **추가 작업 필요:** 회원 API 요청 직전에만 0 기반으로 변환한다.
+  - **완료:** `currentPage`의 초깃값과 필터 초기화 값을 0에서 1로 변경했다.
+  - **완료:** 회원 API 요청 직전에만 0 기반으로 변환한다.
 - [`src/pages/member/MemberInfoPage.tsx`](../src/pages/member/MemberInfoPage.tsx)
-  - **추가 작업 필요:** 1 기반 상태가 그대로 전달되는지 확인한다. 큰 구조 변경은 필요하지 않다.
+  - **확인 완료:** 1 기반 상태를 구조 변경 없이 그대로 전달한다.
 - [`src/domains/MemberInfo/hooks/useMemberDetailState.ts`](../src/domains/MemberInfo/hooks/useMemberDetailState.ts)
-  - **추가 작업 필요:** 상세 수정 후 `loadMembers(currentPage)`를 다시 호출하므로 1 기반 변경 후 회귀가 없는지 확인한다.
+  - **확인 완료:** 상세 수정 후 현재 1 기반 페이지를 `loadMembers`에 전달하고 조회 훅 경계에서 0 기반으로 변환한다.
 - [`src/domains/Posts/hooks/usePostTableState.ts`](../src/domains/Posts/hooks/usePostTableState.ts)
   - **완료:** 이미 조회된 `totalPage`를 반환한다.
 - [`src/domains/Posts/components/PostTable.tsx`](../src/domains/Posts/components/PostTable.tsx)
@@ -218,10 +216,10 @@ type PaginationBarProps = {
 
 - **삭제 완료:** `src/domains/Reviews/components/ExamReviewTablePagination.tsx`
 - **삭제 완료:** `src/domains/Reviews/components/ExamTablePagination.tsx`
-- **추가 작업 필요:** [`src/domains/MemberInfo/components/MemberDirectoryPagination.tsx`](../src/domains/MemberInfo/components/MemberDirectoryPagination.tsx)
+- **삭제 완료:** `src/domains/MemberInfo/components/MemberDirectoryPagination.tsx`
 - **삭제 완료:** `src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx`
 - **삭제 완료:** [`src/domains/Reviews/components/index.ts`](../src/domains/Reviews/components/index.ts)의 두 시험후기 페이지네이션 export
-- **추가 작업 필요:** [`src/domains/MemberInfo/index.ts`](../src/domains/MemberInfo/index.ts)의 `MemberDirectoryPagination` export
+- **삭제 완료:** [`src/domains/MemberInfo/index.ts`](../src/domains/MemberInfo/index.ts)의 `MemberDirectoryPagination` export
 
 ## 7. 권장 작업 순서
 
@@ -260,14 +258,14 @@ type PaginationBarProps = {
 4. **완료:** 비노출 `PointHistoryTab`, `DownloadedExamReviewTab`의 import도 교체한다.
 5. **완료:** 모든 사용처가 사라진 `MemberInfoTablePagenation.tsx`를 삭제한다.
 
-### 5단계: 0 기반 회원 목록 교체 — 추가 작업 필요
+### 5단계: 0 기반 회원 목록 교체 — 구현 완료
 
-1. `useMemberDirectoryState`의 화면 상태를 1 기반으로 변경한다.
-2. API 요청 경계에서 `page - 1`을 적용한다.
-3. 검색, 필터, 정렬, 새로고침의 초기화 값을 모두 1로 변경한다.
-4. 상세 화면에서 회원 수정 후 현재 목록 페이지를 다시 불러오는 흐름을 확인한다.
-5. `MemberDirectorySection`을 `PaginationBar`로 교체한다.
-6. `MemberDirectoryPagination.tsx`와 export를 삭제한다.
+1. **완료:** `useMemberDirectoryState`의 화면 상태를 1 기반으로 변경한다.
+2. **완료:** API 요청 경계에서 `page - 1`을 적용한다.
+3. **완료:** 검색, 필터, 정렬, 새로고침의 초기화 값을 모두 1로 변경한다.
+4. **완료:** 상세 화면에서 회원 수정 후 현재 목록 페이지를 다시 불러오는 흐름을 확인한다.
+5. **완료:** `MemberDirectorySection`을 `PaginationBar`로 교체한다.
+6. **완료:** `MemberDirectoryPagination.tsx`와 export를 삭제한다.
 
 회원 목록은 페이지 기준 자체가 바뀌므로 마지막 단계에서 독립적으로 처리하는 편이 회귀 원인을 찾기 쉽다.
 
@@ -275,7 +273,7 @@ type PaginationBarProps = {
 
 ### 공통 컴포넌트 현재 상태
 
-아래 표와 체크리스트는 2026-08-23 재점검 결과다. `[x]`는 현재 소스에서 확인된 완료 항목이고, `[ ]`는 추가 구현·결정·수동 확인이 필요한 항목이다.
+아래 표와 체크리스트는 2026-08-23 재점검 결과다. `[x]`는 현재 소스에서 확인된 완료 항목이고, `[ ]`는 추가 결정·수동 확인이 필요한 항목이다.
 
 | 항목                   | 상태                 | 현재 구현과 필요한 작업                                                                                          |
 | ---------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
@@ -329,13 +327,13 @@ type PaginationBarProps = {
 
 ### 회원 목록
 
-- [ ] **추가 작업 필요:** `currentPage` 초깃값을 1로 변경한다.
-- [ ] **추가 작업 필요:** 검색, 역할, 입학 연도, 전공, 정렬, 새로고침 시 1페이지로 초기화한다.
-- [ ] **추가 작업 필요:** 첫 화면에서 회원 API의 `page=0`을 요청하도록 경계 변환을 적용하고 검증한다.
-- [ ] **추가 작업 필요:** 화면의 2페이지에서 회원 API의 `page=1`을 요청하는지 검증한다.
-- [ ] **추가 작업 필요:** 상세 수정 후 원래 목록 페이지를 다시 불러오는지 검증한다.
-- [ ] **추가 작업 필요:** `MemberDirectorySection`을 `PaginationBar`로 교체한다.
-- [ ] **추가 작업 필요:** `MemberDirectoryPagination.tsx`와 export를 삭제한다.
+- [x] `currentPage` 초깃값을 1로 변경한다.
+- [x] 검색, 역할, 입학 연도, 전공, 정렬, 새로고침 시 1페이지로 초기화한다.
+- [x] 첫 화면에서 회원 API의 `page=0`을 요청하도록 경계 변환을 적용하고 테스트한다.
+- [x] 화면의 2페이지에서 회원 API의 `page=1`을 요청하는지 테스트한다.
+- [x] 상세 수정 후 현재 1 기반 목록 페이지를 다시 불러오고 조회 훅 경계에서 변환하는지 확인한다.
+- [x] `MemberDirectorySection`을 `PaginationBar`로 교체한다.
+- [x] `MemberDirectoryPagination.tsx`와 export를 삭제한다.
 
 ### 회귀 검증과 정리
 
@@ -344,21 +342,21 @@ type PaginationBarProps = {
 - [ ] 마지막 페이지의 데이터가 페이지 크기보다 적어도 정상 표시되는지 확인한다.
 - [ ] 필터 결과가 0개일 때 페이지 버튼이 잘못 노출되지 않는지 확인한다.
 - [ ] 브라우저 뒤로/앞으로 이동 시 URL 기반 화면의 페이지가 복구되는지 확인한다.
-- [ ] 삭제 대상 컴포넌트의 import와 barrel export가 모두 사라졌는지 `rg`로 확인한다.
-- [x] 전체 테스트 103개를 실행한다. (2026-08-23 통과)
+- [x] 삭제 대상 컴포넌트의 import와 barrel export가 모두 사라졌는지 `rg`로 확인한다.
+- [x] 전체 테스트 105개를 실행한다. (2026-08-23 통과)
 - [ ] **추가 작업 필요:** 활성 라우트 화면 테스트 또는 수동 회귀 검증을 실행한다.
 - [x] lint를 실행한다. (2026-08-23 통과)
 - [x] 프로덕션 빌드를 실행한다. (2026-08-23 통과, 청크 크기 경고만 발생)
 
 ## 9. 완료 기준
 
-현재는 아래 6개 완료 기준 중 1개만 충족해 **부분 완료** 상태다. 회원 목록을 교체하고 활성 라우트 회귀 검증까지 마쳐야 전체 완료로 전환할 수 있다.
+현재는 아래 6개 완료 기준 중 5개를 충족했다. 코드 통합은 완료되었으며, 활성 라우트 회귀 검증까지 마치면 전체 완료로 전환할 수 있다.
 
-1. [ ] 페이지 계산 정책을 가진 공통 컴포넌트가 `PaginationBar` 하나만 남는다.
-2. [ ] 모든 화면 상태와 URL은 1 기반 페이지를 사용한다.
-3. [ ] 0 기반 서버 변환은 API 함수 또는 도메인 조회 훅에서만 수행한다.
+1. [x] 페이지 계산 정책을 가진 공통 컴포넌트가 `PaginationBar` 하나만 남는다.
+2. [x] 모든 화면 상태와 URL은 1 기반 페이지를 사용한다.
+3. [x] 0 기반 서버 변환은 API 함수 또는 도메인 조회 훅에서만 수행한다.
 4. [x] `totalPage`를 받을 수 있는 화면은 존재하지 않는 페이지 번호를 노출하지 않는다.
-5. [ ] `ExamReviewTablePagination`, `ExamTablePagination`, `MemberDirectoryPagination`, `MemberInfoTablePagenation`과 관련 export가 제거된다.
+5. [x] `ExamReviewTablePagination`, `ExamTablePagination`, `MemberDirectoryPagination`, `MemberInfoTablePagenation`과 관련 export가 제거된다.
 6. [ ] 실제 사용 중인 7개 화면의 첫 페이지, 중간 페이지, 마지막 페이지 동작이 검증된다.
 
 ## 10. 이번 작업에서 제외할 범위
