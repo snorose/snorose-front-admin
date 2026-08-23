@@ -78,7 +78,10 @@ export default function CommentTable({
 
       <div className='flex items-center justify-between px-1 text-xs text-gray-500'>
         <span>
-          총 <span className='font-bold text-blue-600'>{totalCount ?? 0}</span>
+          총{' '}
+          <span className='font-bold text-blue-600'>
+            {(totalCount ?? 0).toLocaleString('ko-KR')}
+          </span>
           개의 댓글
         </span>
       </div>
