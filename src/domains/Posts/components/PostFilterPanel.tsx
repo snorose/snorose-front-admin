@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils/postCommentUtils';
+import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { PostSearchParams } from '../types';
 

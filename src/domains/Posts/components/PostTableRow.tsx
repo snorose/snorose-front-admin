@@ -11,12 +11,12 @@ import {
 import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-import { formatDateTimeWithAmPm } from '@/shared/utils';
 import {
+  formatDateTimeWithAmPm,
   formatPostId,
   getPostStatusBadges,
-} from '@/shared/utils/postCommentUtils';
-import { stripHtmlTags } from '@/shared/utils/postCommentUtils';
+  stripHtmlTags,
+} from '@/shared/utils';
 
 import type { AdminGetPostResponse } from '../types/post';
 

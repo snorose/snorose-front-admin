@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import {
   BulkActionBar,
   PaginationBar,
+  StatusChangeModal,
   TableStateRow,
 } from '@/shared/components';
-import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
