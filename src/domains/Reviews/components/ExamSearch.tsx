@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Badge, Button, Input, Select } from '@/shared/components/ui';
+import { Button, Input, Select } from '@/shared/components/ui';
 import {
   EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
@@ -21,6 +21,7 @@ import {
 } from '@/domains/Reviews/utils';
 
 import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
+import { ExamDiscussionStatusBadge } from './ExamDiscussionStatusBadge';
 import { ExamMultiSelect } from './ExamMultiSelect';
 import { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
 
@@ -92,38 +93,12 @@ const getStatusCodeFromLabel = (statusLabel: string) =>
   EXAM_REVIEW_PROCESS_STATUS.find((status) => status.label === statusLabel)
     ?.code;
 
-const getDiscussionStatusLabel = (status: string) => {
-  if (status === TRUE_SELECTED) {
-    return '논의 있음';
-  }
-
-  if (status === FALSE_SELECTED) {
-    return '논의 없음';
-  }
-
-  return '논의 여부 전체';
-};
-
 const renderDiscussionStatusBadge = (status: string) => {
-  const label = getDiscussionStatusLabel(status);
-
   if (status === ALL_SELECTED) {
-    return label;
+    return '논의 여부 전체';
   }
 
-  return (
-    <Badge
-      variant='default'
-      className={
-        status === TRUE_SELECTED
-          ? 'bg-blue-50 text-blue-700'
-          : 'bg-gray-100 text-gray-700'
-      }
-      title={label}
-    >
-      {label}
-    </Badge>
-  );
+  return <ExamDiscussionStatusBadge isDiscussed={status === TRUE_SELECTED} />;
 };
 
 export default function ExamSearch({

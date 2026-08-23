@@ -15,6 +15,7 @@ import { clampOneBasedPage } from '@/shared/utils';
 
 import {
   ExamConfirmStatusBadge,
+  ExamDiscussionStatusBadge,
   ExamReviewProcessStatusBadge,
   ExamTableEmpty,
   ExamTableEmptyRows,
@@ -36,23 +37,6 @@ interface ExamReviewTableColumn {
   width?: string;
   render?: (review: ExamReview) => ReactNode;
 }
-
-const renderBooleanBadge = (
-  value: boolean,
-  trueLabel: string,
-  falseLabel: string
-) => (
-  <Badge
-    variant='default'
-    className={cn(
-      'max-w-full truncate',
-      value ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-700'
-    )}
-    title={value ? trueLabel : falseLabel}
-  >
-    {value ? trueLabel : falseLabel}
-  </Badge>
-);
 
 const renderReportedStatusBadge = (review: ExamReview) => {
   if (!review.isReported) return null;
@@ -106,8 +90,9 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
     key: 'isDiscussed',
     label: '논의 여부',
     width: '92px',
-    render: (review: ExamReview) =>
-      renderBooleanBadge(review.isDiscussed, '논의 있음', '논의 없음'),
+    render: (review: ExamReview) => (
+      <ExamDiscussionStatusBadge isDiscussed={review.isDiscussed} />
+    ),
   },
   {
     key: 'processStatuses',

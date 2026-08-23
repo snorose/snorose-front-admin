@@ -9,7 +9,10 @@ import {
 } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 
-import { ExamConfirmStatusBadge } from '@/domains/Reviews/components';
+import {
+  ExamConfirmStatusBadge,
+  ExamDiscussionStatusBadge,
+} from '@/domains/Reviews/components';
 import type {
   ExamReviewProcessStatus,
   LectureType,
@@ -132,26 +135,14 @@ export function ExamReviewDetailInfoSection({
               disabled={isFormDisabled}
             >
               <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
-                {renderStatusBadge(
-                  formData.isDiscussed ? '논의 있음' : '논의 없음',
-                  formData.isDiscussed,
-                  'bg-blue-50 text-blue-700'
-                )}
+                <ExamDiscussionStatusBadge isDiscussed={formData.isDiscussed} />
               </Select.Trigger>
               <Select.Content>
                 <Select.Item value='true'>
-                  {renderStatusBadge(
-                    '논의 있음',
-                    true,
-                    'bg-blue-50 text-blue-700'
-                  )}
+                  <ExamDiscussionStatusBadge isDiscussed />
                 </Select.Item>
                 <Select.Item value='false'>
-                  {renderStatusBadge(
-                    '논의 없음',
-                    false,
-                    'bg-blue-50 text-blue-700'
-                  )}
+                  <ExamDiscussionStatusBadge isDiscussed={false} />
                 </Select.Item>
               </Select.Content>
             </Select>
