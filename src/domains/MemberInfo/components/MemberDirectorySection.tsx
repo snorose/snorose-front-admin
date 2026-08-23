@@ -1,6 +1,6 @@
 import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
-import { PaginationBar, StatusBadge } from '@/shared/components';
+import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
 import { Button, Input, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 
@@ -213,16 +213,15 @@ export default function MemberDirectorySection({
 
               <Table.Body>
                 {members.length === 0 ? (
-                  <Table.Row className='hover:bg-transparent'>
-                    <Table.Cell
-                      colSpan={11}
-                      className='px-4 py-16 text-center text-sm text-slate-500'
-                    >
-                      {isListLoading
+                  <TableStateRow
+                    state={isListLoading ? 'loading' : 'empty'}
+                    colSpan={11}
+                    message={
+                      isListLoading
                         ? '회원 목록을 불러오는 중입니다.'
-                        : '조건에 맞는 회원이 없습니다.'}
-                    </Table.Cell>
-                  </Table.Row>
+                        : '조건에 맞는 회원이 없습니다.'
+                    }
+                  />
                 ) : (
                   members.map((member) => {
                     const isSelected = selectedIds.includes(

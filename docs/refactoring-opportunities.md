@@ -2,7 +2,7 @@
 
 > 조사 기준: 2026-08-17의 `src` 구현
 >
-> 갱신: 2026-08-24, 페이지네이션·기간 상태 계산·상태 배지 공통화 현황 반영
+> 갱신: 2026-08-24, 페이지네이션·기간 상태 계산·상태 배지·테이블 상태 공통화 현황 반영
 
 ## 한눈에 보기
 
@@ -12,7 +12,6 @@
    - 포인트 미지급 일정과 시험후기 작성 기간
 2. **공통 골격만 분리하면 좋은 영역**
    - 게시글/댓글 관리 화면
-   - 테이블 로딩·빈 상태
 3. **사용처가 더 늘 때 공통화하면 좋은 영역**
    - 폼 섹션
 
@@ -22,6 +21,7 @@
 - 기간 상태 계산을 [`getPeriodStatus`](../src/shared/utils/periodStatusUtils.ts)로 분리하고 경계 조건을 테스트했다.
 - 주요 관리 도메인의 상태·분류 표시를 [`StatusBadge`](../src/shared/components/StatusBadge.tsx)로 통합했다.
 - 두 포인트 화면의 안내 구조를 [`NoticePanel`](../src/shared/components/NoticePanel.tsx)로 통합했다.
+- 주요 관리 테이블의 로딩·빈 결과 행을 [`TableStateRow`](../src/shared/components/TableStateRow.tsx)로 통합했다.
 
 현재 가장 먼저 진행할 작업으로는 포인트 미지급 일정과 시험후기 작성 기간의 공통 UI 분리를 권장한다.
 
@@ -31,10 +31,10 @@
 | -------- | ---------------- | -------------------------------------- | ----------------------------------- |
 | 1        | 기간 관리        | 생성·목록·수정·삭제가 두 도메인에 중복 | UI 공통화, API 동작은 도메인에 유지 |
 | 2        | 게시글/댓글 관리 | 필터·선택·테이블 골격이 반복           | 작은 컴포넌트와 훅부터 분리         |
-| 3        | 테이블 상태      | 로딩·빈 결과 UI가 화면마다 다름        | `TableStateRow` 공통화              |
-| 4        | 날짜/시간        | 빈 값·초 단위·API 형식 정책이 다름     | 표시용과 전송용 함수 분리           |
-| 5        | 폼 섹션          | 비슷한 마크업 반복                     | 사용처가 늘 때 얇게 공통화          |
+| 3        | 날짜/시간        | 빈 값·초 단위·API 형식 정책이 다름     | 표시용과 전송용 함수 분리           |
+| 4        | 폼 섹션          | 비슷한 마크업 반복                     | 사용처가 늘 때 얇게 공통화          |
 | 완료     | 페이지네이션     | 전용 구현과 페이지 기준이 분산됨       | `PaginationBar`로 통합              |
+| 완료     | 테이블 상태      | 로딩·빈 결과 UI가 화면마다 다름        | `TableStateRow` 공통화              |
 | 완료     | 상태 배지        | 상태별 색상과 크기가 제각각            | 의미 기반 `StatusBadge`로 통합      |
 | 완료     | 안내 사항        | 두 포인트 화면의 안내 구조가 반복      | `NoticePanel`로 통합                |
 
@@ -196,19 +196,19 @@ getPeriodStatus(startAt, endAt, now): PeriodStatus;
 - 관리 상태
 - 초기화/검색 버튼
 
-[`PostTable`](../src/domains/Posts/components/PostTable.tsx)과 [`CommentTable`](../src/domains/Comments/components/CommentTable.tsx)도 일괄 작업, 전체 선택, 로딩/빈 상태, 페이지네이션 구조가 같다.
+[`PostTable`](../src/domains/Posts/components/PostTable.tsx)과 [`CommentTable`](../src/domains/Comments/components/CommentTable.tsx)도 일괄 작업, 전체 선택, 페이지네이션 구조가 같다.
 
 ### 제안
 
 화면 전체를 하나의 거대한 컴포넌트로 합치지 않고 작은 단위부터 분리한다.
 
-| 공통화 후보            | 역할                   |
-| ---------------------- | ---------------------- |
-| `DateRangeFilterField` | 시작일·종료일 입력     |
-| `FilterChipGroup`      | 게시판·관리 상태 선택  |
-| `FilterActions`        | 초기화·검색 버튼       |
-| `useTableSelection`    | 행 선택과 전체 선택    |
-| `TableStateRow`        | 로딩·빈 결과·오류 표시 |
+| 공통화 후보            | 역할                          |
+| ---------------------- | ----------------------------- |
+| `DateRangeFilterField` | 시작일·종료일 입력            |
+| `FilterChipGroup`      | 게시판·관리 상태 선택         |
+| `FilterActions`        | 초기화·검색 버튼              |
+| `useTableSelection`    | 행 선택과 전체 선택           |
+| `TableStateRow`        | 로딩·빈 결과·오류 표시 (완료) |
 
 행 렌더링, 댓글의 상위 댓글 탐색, 게시글 전용 검색 조건 등은 각 도메인에 남긴다.
 
@@ -224,9 +224,9 @@ useTableSelection({ visibleIds, resetKeys });
 
 데이터 요청이나 삭제 API까지 이 훅에 넣지 않고 선택 상태만 담당하게 한다.
 
-## 6. 테이블 로딩·빈 상태 통일
+## 6. 테이블 로딩·빈 상태 통일 (완료)
 
-### 현재 문제
+### 이전 상태
 
 다음 화면들이 로딩 또는 빈 결과 행을 각각 구현한다.
 
@@ -255,6 +255,13 @@ useTableSelection({ visibleIds, resetKeys });
 ```
 
 공통 컴포넌트는 `loading`, `empty`, `error`의 기본 아이콘과 높이만 관리한다. 복잡한 스켈레톤이 필요한 테이블은 기존 `ExamTableFallback`처럼 별도로 유지한다.
+
+### 현재 상태
+
+- 게시글, 댓글, 문의·신고, 회원 목록의 로딩·빈 결과 행을 공통 [`TableStateRow`](../src/shared/components/TableStateRow.tsx)로 교체했다.
+- `TableStateRow`는 `loading`, `empty`, `error`의 기본 문구·아이콘·높이와 상태별 접근성 역할을 관리한다.
+- 화면별 문구와 동적으로 달라지는 `colSpan`은 각 도메인에서 전달한다.
+- 여러 행으로 구성된 시험후기 스켈레톤은 기존 `ExamTableFallback`을 유지한다.
 
 ## 7. 안내 사항 공통화 (완료)
 
@@ -344,7 +351,7 @@ API 전송용   각 API adapter의 serializeDateTime
 ### 3차: 게시글/댓글 관리 공통화
 
 - [ ] `useTableSelection` 분리
-- [ ] `TableStateRow` 분리
+- [x] `TableStateRow` 분리
 - [ ] 날짜 범위와 필터 chip 분리
 - [ ] 필요할 때만 테이블 전체 골격 공통화
 
@@ -370,10 +377,10 @@ API 전송용   각 API adapter의 serializeDateTime
 
 이 프로젝트는 이미 `PageHeader`, `PeriodStatusBadge`, `PaginationBar`, `BulkActionBar`, `ConfirmModal` 같은 좋은 공통 기반을 갖추고 있다.
 
-페이지네이션, 기간 상태 계산, 상태 배지, 안내 사항 공통화는 완료되었다. 다음 작업은 새로운 공통 시스템을 크게 만드는 것보다 아래 순서로 진행하는 편이 효과적이다.
+페이지네이션, 기간 상태 계산, 상태 배지, 안내 사항, 테이블 상태 공통화는 완료되었다. 다음 작업은 새로운 공통 시스템을 크게 만드는 것보다 아래 순서로 진행하는 편이 효과적이다.
 
 1. 구조가 거의 같은 두 기간 관리 화면을 통합한다.
-2. 게시글/댓글 화면에서는 선택·필터·테이블 상태처럼 작은 단위만 분리한다.
+2. 게시글/댓글 화면에서는 선택·필터처럼 작은 단위만 분리한다.
 3. 날짜/시간 정책은 표시용과 API 전송용을 구분해 점진적으로 정리한다.
 4. 상태 배지와 안내 사항은 현재의 얇은 공통 컴포넌트와 도메인 경계를 유지한다.
 5. 폼 섹션은 같은 구조의 사용처가 더 늘 때 공통화한다.
