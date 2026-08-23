@@ -9,11 +9,11 @@ const TONE_CASES: Array<{
 }> = [
   {
     tone: 'neutral',
-    classNames: ['border-slate-200', 'bg-slate-100', 'text-slate-700'],
+    classNames: ['border-slate-200', 'bg-slate-50', 'text-slate-700'],
   },
   {
     tone: 'info',
-    classNames: ['border-blue-100', 'bg-blue-50', 'text-blue-700'],
+    classNames: ['border-blue-200', 'bg-blue-50', 'text-blue-800'],
   },
   {
     tone: 'success',
@@ -31,6 +31,10 @@ const TONE_CASES: Array<{
     tone: 'accent',
     classNames: ['border-violet-100', 'bg-violet-50', 'text-violet-700'],
   },
+  {
+    tone: 'outline',
+    classNames: ['border-slate-200', 'bg-white', 'text-slate-800'],
+  },
 ];
 
 describe('StatusBadge', () => {
@@ -39,10 +43,10 @@ describe('StatusBadge', () => {
 
     expect(screen.getByText('미확인')).toHaveClass(
       'rounded-full',
-      'px-2.5',
-      'py-1',
+      'px-2',
+      'py-0.5',
       'text-xs',
-      'font-semibold'
+      'font-medium'
     );
   });
 

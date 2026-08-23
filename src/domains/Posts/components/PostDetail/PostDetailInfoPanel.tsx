@@ -55,9 +55,7 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-400'>카테고리</span>
             <div>
               {post.category ? (
-                <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
-                  {post.category}
-                </span>
+                <StatusBadge tone='outline'>{post.category}</StatusBadge>
               ) : (
                 <span className='font-mono text-gray-300'>-</span>
               )}
@@ -86,7 +84,7 @@ export default function PostDetailInfoPanel({
           <div className='flex flex-col gap-1'>
             <span className='font-medium text-gray-400'>게시판</span>
             <div>
-              <Badge variant='unstyled'>{post.boardName}</Badge>
+              <StatusBadge tone='outline'>{post.boardName}</StatusBadge>
             </div>
           </div>
 

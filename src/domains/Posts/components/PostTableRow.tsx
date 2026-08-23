@@ -97,7 +97,7 @@ export default function PostTableRow({
 
       {/* 4. 게시판 */}
       <Table.Cell className='px-3'>
-        <Badge variant='unstyled'>{post.boardName}</Badge>
+        <StatusBadge tone='outline'>{post.boardName}</StatusBadge>
       </Table.Cell>
 
       {/* 5. 상태 */}
@@ -121,9 +121,7 @@ export default function PostTableRow({
       {/* 7. 카테고리 */}
       <Table.Cell className='px-3 text-xs text-gray-500'>
         {post.category ? (
-          <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
-            {post.category}
-          </span>
+          <StatusBadge tone='outline'>{post.category}</StatusBadge>
         ) : (
           <span className='font-mono text-gray-300'>-</span>
         )}

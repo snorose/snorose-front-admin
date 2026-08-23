@@ -40,7 +40,7 @@ describe('PeriodStatusBadge', () => {
       'text-emerald-700'
     );
     expect(screen.getByText('종료')).toHaveClass(
-      'bg-slate-100',
+      'bg-slate-50',
       'text-slate-700'
     );
   });

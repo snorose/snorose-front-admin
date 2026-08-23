@@ -116,9 +116,7 @@ export default function PostDetailCommentItem({
               {formatDateTimeWithAmPm(comment.createdAt)}
             </span>
             {comment.category && (
-              <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-500'>
-                {comment.category}
-              </span>
+              <StatusBadge tone='outline'>{comment.category}</StatusBadge>
             )}
             {badges.length > 0 && !isNormal && (
               <div className='flex flex-wrap gap-1'>

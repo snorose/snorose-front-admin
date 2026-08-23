@@ -9,7 +9,7 @@ describe('ExamDiscussionStatusBadge', () => {
 
     expect(screen.getByText('논의 있음')).toHaveClass(
       'bg-blue-50',
-      'text-blue-700'
+      'text-blue-800'
     );
   });
 
@@ -17,7 +17,7 @@ describe('ExamDiscussionStatusBadge', () => {
     render(<ExamDiscussionStatusBadge isDiscussed={false} />);
 
     expect(screen.getByText('논의 없음')).toHaveClass(
-      'bg-slate-100',
+      'bg-slate-50',
       'text-slate-700'
     );
   });

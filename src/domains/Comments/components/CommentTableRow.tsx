@@ -33,6 +33,7 @@ export default function CommentTableRow({
   onFilterByParentId,
 }: CommentTableRowProps) {
   const navigate = useNavigate();
+  const boardName = BOARD_NAMES[comment.boardId];
 
   return (
     <Table.Row className='border-b border-gray-100 bg-white text-gray-800 last:border-0 hover:bg-gray-50/50 [&_td]:h-[54px]'>
@@ -131,7 +132,11 @@ export default function CommentTableRow({
 
       {/* 7. 게시판 */}
       <Table.Cell className='px-3'>
-        <Badge variant='unstyled'>{BOARD_NAMES[comment.boardId] ?? '-'}</Badge>
+        {boardName ? (
+          <StatusBadge tone='outline'>{boardName}</StatusBadge>
+        ) : (
+          <span className='font-mono text-gray-300'>-</span>
+        )}
       </Table.Cell>
 
       {/* 8. 상태 */}
@@ -160,9 +165,7 @@ export default function CommentTableRow({
       {/* 10. 카테고리 */}
       <Table.Cell className='px-3 text-xs text-gray-500'>
         {comment.category ? (
-          <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
-            {comment.category}
-          </span>
+          <StatusBadge tone='outline'>{comment.category}</StatusBadge>
         ) : (
           <span className='font-mono text-gray-300'>-</span>
         )}

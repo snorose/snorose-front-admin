@@ -6,7 +6,7 @@ import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
 describe('ExamConfirmStatusBadge', () => {
   test.each([
     ['CONFIRMED', '확인', 'bg-blue-50'],
-    ['UNCONFIRMED', '미확인', 'bg-slate-100'],
+    ['UNCONFIRMED', '미확인', 'bg-slate-50'],
     ['NEED_DISCUSS', '논의필요', 'bg-amber-50'],
     ['NEED_ACTION', '징계필요', 'bg-rose-50'],
     ['DELETED', '삭제됨', 'bg-rose-50'],
@@ -20,7 +20,7 @@ describe('ExamConfirmStatusBadge', () => {
     render(<ExamConfirmStatusBadge status='UNKNOWN' />);
 
     expect(screen.getByText('알 수 없음')).toHaveClass(
-      'bg-slate-100',
+      'bg-slate-50',
       'text-slate-700'
     );
   });

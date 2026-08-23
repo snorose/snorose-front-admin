@@ -8,7 +8,8 @@ export type StatusBadgeTone =
   | 'success'
   | 'warning'
   | 'danger'
-  | 'accent';
+  | 'accent'
+  | 'outline';
 
 interface StatusBadgeProps {
   tone: StatusBadgeTone;
@@ -22,6 +23,7 @@ const STATUS_BADGE_TONES: Record<StatusBadgeTone, string> = {
   warning: 'border-amber-100 bg-amber-50 text-amber-700',
   danger: 'border-rose-100 bg-rose-50 text-rose-700',
   accent: 'border-violet-100 bg-violet-50 text-violet-700',
+  outline: 'border-slate-200 bg-white text-slate-800',
 };
 
 export function StatusBadge({ tone, children }: StatusBadgeProps) {
