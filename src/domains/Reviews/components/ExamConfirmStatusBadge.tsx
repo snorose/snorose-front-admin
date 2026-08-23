@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui';
+import { StatusBadge, type StatusBadgeTone } from '@/shared/components';
 import { EXAM_CONFIRM_STATUS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 
@@ -7,27 +7,12 @@ interface ExamConfirmStatusBadgeProps {
   className?: string;
 }
 
-const EXAM_CONFIRMED_STATUS_VARIANTS = {
-  CONFIRMED: {
-    variant: 'default' as const,
-    className: 'border-transparent bg-blue-50 text-blue-700',
-  },
-  UNCONFIRMED: {
-    variant: 'secondary' as const,
-    className: undefined,
-  },
-  NEED_DISCUSS: {
-    variant: 'default' as const,
-    className: 'bg-amber-50 text-amber-700',
-  },
-  NEED_ACTION: {
-    variant: 'destructive' as const,
-    className: 'bg-red-50 text-red-700',
-  },
-  DELETED: {
-    variant: 'outline' as const,
-    className: 'text-gray-500',
-  },
+const EXAM_CONFIRM_STATUS_TONES: Record<string, StatusBadgeTone> = {
+  CONFIRMED: 'info',
+  UNCONFIRMED: 'neutral',
+  NEED_DISCUSS: 'warning',
+  NEED_ACTION: 'danger',
+  DELETED: 'danger',
 };
 
 export function ExamConfirmStatusBadge({
@@ -35,22 +20,12 @@ export function ExamConfirmStatusBadge({
   className,
 }: ExamConfirmStatusBadgeProps) {
   const option = EXAM_CONFIRM_STATUS.find((s) => s.code === status);
-  const label = option?.label ?? '';
-
-  const variantInfo =
-    EXAM_CONFIRMED_STATUS_VARIANTS[
-      status as keyof typeof EXAM_CONFIRMED_STATUS_VARIANTS
-    ] ?? EXAM_CONFIRMED_STATUS_VARIANTS.UNCONFIRMED;
+  const label = option?.label ?? '알 수 없음';
+  const tone = EXAM_CONFIRM_STATUS_TONES[status] ?? 'neutral';
 
   return (
-    <div className={cn('flex items-center', className)}>
-      <Badge
-        variant={variantInfo.variant}
-        className={variantInfo.className}
-        title={label}
-      >
-        {label}
-      </Badge>
+    <div className={cn('flex items-center', className)} title={label}>
+      <StatusBadge tone={tone}>{label}</StatusBadge>
     </div>
   );
 }
