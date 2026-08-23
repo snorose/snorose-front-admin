@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
@@ -47,9 +47,11 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   const [totalPage, setTotalPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [isListLoading, setIsListLoading] = useState(false);
+  const latestRequestIdRef = useRef(0);
 
   const loadMembers = useCallback(
     async (page: number) => {
+      const requestId = ++latestRequestIdRef.current;
       setIsListLoading(true);
       try {
         const params = buildAdminUserListParams({
@@ -63,6 +65,8 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
         });
 
         const response = await getAllUsersAPI(params);
+        if (requestId !== latestRequestIdRef.current) return;
+
         setMembers(response.data);
         setTotalPage(response.totalPage);
         setTotalCount(response.totalCount);
@@ -71,9 +75,13 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
         );
         setSelectedIds([]);
       } catch (error) {
+        if (requestId !== latestRequestIdRef.current) return;
+
         toast.error(getErrorMessage(error, '회원 목록 조회에 실패했습니다.'));
       } finally {
-        setIsListLoading(false);
+        if (requestId === latestRequestIdRef.current) {
+          setIsListLoading(false);
+        }
       }
     },
     [
