@@ -43,6 +43,8 @@ describe('StatusBadge', () => {
 
     expect(screen.getByText('미확인')).toHaveClass(
       'rounded-full',
+      'max-w-full',
+      'truncate',
       'px-2',
       'py-0.5',
       'text-xs',

@@ -30,7 +30,7 @@ export function StatusBadge({ tone, children }: StatusBadgeProps) {
   return (
     <Badge
       variant='unstyled'
-      className={`rounded-full px-2 py-0.5 text-xs ${STATUS_BADGE_TONES[tone]}`}
+      className={`max-w-full truncate rounded-full px-2 py-0.5 text-xs ${STATUS_BADGE_TONES[tone]}`}
     >
       {children}
     </Badge>
