@@ -66,6 +66,9 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
         setMembers(response.data);
         setTotalPage(response.totalPage);
         setTotalCount(response.totalCount);
+        setCurrentPage((current) =>
+          Math.min(current, Math.max(response.totalPage, 1))
+        );
         setSelectedIds([]);
       } catch (error) {
         toast.error(getErrorMessage(error, '회원 목록 조회에 실패했습니다.'));

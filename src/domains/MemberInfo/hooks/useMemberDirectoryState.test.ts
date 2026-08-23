@@ -50,6 +50,36 @@ describe('useMemberDirectoryState 페이지 기준', () => {
     );
   });
 
+  test('응답의 마지막 페이지를 벗어나면 유효한 마지막 페이지로 이동해 다시 조회한다', async () => {
+    getAllUsersAPIMock
+      .mockResolvedValueOnce({
+        data: [],
+        hasNext: true,
+        totalCount: 30,
+        totalPage: 3,
+      })
+      .mockResolvedValue({
+        data: [],
+        hasNext: false,
+        totalCount: 20,
+        totalPage: 2,
+      });
+
+    const { result } = renderHook(() => useMemberDirectoryState(false));
+
+    await waitFor(() => expect(result.current.totalPage).toBe(3));
+
+    act(() => result.current.setCurrentPage(3));
+
+    await waitFor(() => expect(result.current.currentPage).toBe(2));
+    await waitFor(() =>
+      expect(getAllUsersAPIMock).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({ page: 1 })
+      )
+    );
+  });
+
   test('검색·필터·정렬·초기화 시 화면 1페이지로 돌아간다', () => {
     const { result } = renderHook(() => useMemberDirectoryState(true));
     const moveToSecondPage = () => {
