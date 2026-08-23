@@ -65,11 +65,12 @@ export function MemberInfoPopover({
   };
 
   return (
-    <div>
+    <div className='min-w-0'>
       <span
         ref={triggerRef}
         onClick={handleTriggerClick}
-        className='cursor-pointer truncate transition-colors hover:text-blue-700 hover:underline'
+        title={displayName}
+        className='block cursor-pointer truncate transition-colors hover:text-blue-700 hover:underline'
       >
         {displayName}
       </span>
