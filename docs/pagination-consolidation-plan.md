@@ -27,8 +27,10 @@ shared/components/PaginationBar (최종 통합 목표)
 
 - **7곳 모두 `PaginationBar` 통합이 완료되었다.**
 - 시험후기·회원정보 전용 페이지네이션 컴포넌트는 모두 삭제되었다.
+- 회원 목록의 전체 페이지 수가 줄어든 경우 마지막 유효 페이지로 이동하는 범위 보정과 테스트를 추가했다.
+- 문의 및 신고 E2E의 페이지네이션 접근성 이름과 회원 상세 재조회 테스트의 1 기반 페이지 계약을 현재 구현에 맞게 보완했다.
 
-페이지네이션 통합 구현은 **완료**되었다. 실제 사용 중인 7개 화면의 브라우저 수동 회귀 검증만 남았다.
+페이지네이션 통합 구현은 **완료**되었다. 실제 사용 중인 7개 화면의 브라우저 회귀 검증과 dev API E2E 실행을 위한 인증 환경 설정이 남았다.
 
 | 구분                  | 상태     |
 | --------------------- | -------- |
@@ -62,7 +64,7 @@ shared/components/PaginationBar (최종 통합 목표)
 | 게시글 상세 댓글         | `/posts/manage/:postId` | `PaginationBar`      | 서버 페이지네이션            |       1 기반, 로컬 상태 | API 함수에서 `page - 1`      | **보완 완료** |
 | 문의 및 신고             | `/report/inquiry`       | `PaginationBar`      | 전체 조회 후 클라이언트 분할 |        1 기반, URL 저장 | 없음                         | **보완 완료** |
 | 시험후기 관리            | `/reviews/exam`         | `PaginationBar`      | 서버 페이지네이션            | 1 기반, URL과 로컬 상태 | 조회 훅에서 `page - 1`       | **교체 완료** |
-| 회원 목록                | `/member/info`          | `PaginationBar`      | 서버 페이지네이션            |       1 기반, 로컬 상태 | 조회 훅에서 `page - 1`       | **교체 완료** |
+| 회원 목록                | `/member/info`          | `PaginationBar`      | 서버 페이지네이션            |       1 기반, 로컬 상태 | 조회 훅에서 `page - 1`       | **보완 완료** |
 | 경고 및 강등 관리의 이력 | `/member/penalty`       | `PaginationBar`      | 전체 조회 후 클라이언트 분할 |       1 기반, 로컬 상태 | 없음                         | **교체 완료** |
 
 화면 단위로는 7곳이지만, 같은 컴포넌트를 여러 화면이 공유하므로 제거 대상 파일 수와 일치하지 않는다.
@@ -134,6 +136,7 @@ MemberInfoPage / useMemberDirectoryState
 1. 게시글: `usePostList`가 이미 꺼내는 `totalPage`를 `usePostTableState`와 `PostTable`까지 전달한다.
 2. 댓글: 일반 댓글과 대댓글 응답의 `totalPage`를 `useCommentTableState`와 `CommentTable`까지 전달한다.
 3. 시험후기: `totalPage`를 유지하고 공통 컴포넌트에 전달한다.
+4. 회원 목록: 응답의 `totalPage`가 현재 페이지보다 작아지면 마지막 유효 페이지로 보정하고 다시 조회한다.
 
 ### 5.3 페이지 묶음 크기와 데이터 개수를 분리한다 — 공통 컴포넌트 보완 완료
 
@@ -169,6 +172,12 @@ type PaginationBarProps = {
 
 모든 화면을 `totalPage <= 1`에서 숨기는 방향으로 통일하려면 사용자에게 보이는 변화가 생기므로 통합 필수 작업이 아닌 별도 UI 개선으로 다룬다.
 
+### 5.5 응답 이후 현재 페이지 범위 보정 — 완료
+
+서버 데이터 삭제 등으로 전체 페이지 수가 줄어들면 기존 마지막 페이지가 유효 범위를 벗어날 수 있다. 게시글, 댓글, 시험후기와 문의 및 신고 화면은 응답 이후 `currentPage`를 `totalPage` 범위로 보정한다.
+
+회원 목록도 응답의 `totalPage`가 현재 페이지보다 작아진 경우 마지막 유효 페이지로 이동한 뒤 해당 페이지를 다시 조회하도록 보완했다. 단위 테스트에서 화면 3페이지 조회 중 전체 페이지가 2로 줄어들면 화면 2페이지로 이동하고 서버의 1페이지를 다시 요청하는 흐름을 검증했다.
+
 ## 6. 교체 범위
 
 ### 6.1 유지하고 보완할 파일
@@ -199,10 +208,12 @@ type PaginationBarProps = {
 - [`src/domains/MemberInfo/hooks/useMemberDirectoryState.ts`](../src/domains/MemberInfo/hooks/useMemberDirectoryState.ts)
   - **완료:** `currentPage`의 초깃값과 필터 초기화 값을 0에서 1로 변경했다.
   - **완료:** 회원 API 요청 직전에만 0 기반으로 변환한다.
+  - **완료:** 응답의 마지막 페이지를 벗어나면 유효한 마지막 페이지로 이동해 다시 조회한다.
 - [`src/pages/member/MemberInfoPage.tsx`](../src/pages/member/MemberInfoPage.tsx)
   - **확인 완료:** 1 기반 상태를 구조 변경 없이 그대로 전달한다.
 - [`src/domains/MemberInfo/hooks/useMemberDetailState.ts`](../src/domains/MemberInfo/hooks/useMemberDetailState.ts)
   - **확인 완료:** 상세 수정 후 현재 1 기반 페이지를 `loadMembers`에 전달하고 조회 훅 경계에서 0 기반으로 변환한다.
+  - **테스트 완료:** 화면 2페이지를 `loadMembers(2)`로 그대로 전달하는지 검증한다.
 - [`src/domains/Posts/hooks/usePostTableState.ts`](../src/domains/Posts/hooks/usePostTableState.ts)
   - **완료:** 이미 조회된 `totalPage`를 반환한다.
 - [`src/domains/Posts/components/PostTable.tsx`](../src/domains/Posts/components/PostTable.tsx)
@@ -266,6 +277,7 @@ type PaginationBarProps = {
 4. **완료:** 상세 화면에서 회원 수정 후 현재 목록 페이지를 다시 불러오는 흐름을 확인한다.
 5. **완료:** `MemberDirectorySection`을 `PaginationBar`로 교체한다.
 6. **완료:** `MemberDirectoryPagination.tsx`와 export를 삭제한다.
+7. **완료:** 전체 페이지 수가 현재 페이지보다 작아지면 마지막 유효 페이지로 이동하고 다시 조회한다.
 
 회원 목록은 페이지 기준 자체가 바뀌므로 마지막 단계에서 독립적으로 처리하는 편이 회귀 원인을 찾기 쉽다.
 
@@ -331,7 +343,8 @@ type PaginationBarProps = {
 - [x] 검색, 역할, 입학 연도, 전공, 정렬, 새로고침 시 1페이지로 초기화한다.
 - [x] 첫 화면에서 회원 API의 `page=0`을 요청하도록 경계 변환을 적용하고 테스트한다.
 - [x] 화면의 2페이지에서 회원 API의 `page=1`을 요청하는지 테스트한다.
-- [x] 상세 수정 후 현재 1 기반 목록 페이지를 다시 불러오고 조회 훅 경계에서 변환하는지 확인한다.
+- [x] 전체 페이지 수가 줄어 현재 페이지가 범위를 벗어나면 마지막 유효 페이지로 이동하고 다시 조회한다.
+- [x] 상세 수정 후 현재 1 기반 목록 페이지를 `loadMembers`에 그대로 전달하고 조회 훅 경계에서 변환하는지 테스트한다.
 - [x] `MemberDirectorySection`을 `PaginationBar`로 교체한다.
 - [x] `MemberDirectoryPagination.tsx`와 export를 삭제한다.
 
@@ -341,9 +354,11 @@ type PaginationBarProps = {
 - [x] 공통 컴포넌트 단위 테스트에서 첫 묶음과 마지막 묶음의 이동 버튼 상태를 확인한다.
 - [ ] 마지막 페이지의 데이터가 페이지 크기보다 적어도 정상 표시되는지 확인한다.
 - [ ] 필터 결과가 0개일 때 페이지 버튼이 잘못 노출되지 않는지 확인한다.
-- [ ] 브라우저 뒤로/앞으로 이동 시 URL 기반 화면의 페이지가 복구되는지 확인한다.
+- [ ] 브라우저 뒤로/앞으로 이동 시 URL 기반 화면의 페이지가 복구되는지 확인한다. 현재 사용자 페이지 이동도 history `replace`를 사용하므로 페이지 클릭 이력을 남길지 먼저 결정한다.
 - [x] 삭제 대상 컴포넌트의 import와 barrel export가 모두 사라졌는지 `rg`로 확인한다.
-- [x] 전체 테스트 105개를 실행한다. (2026-08-23 통과)
+- [x] 문의 및 신고 E2E가 공통 컴포넌트의 접근성 이름인 `페이지네이션`을 사용하도록 locator를 수정한다.
+- [ ] 문의 및 신고 페이지네이션 E2E를 실제 dev API에서 실행한다. (2026-08-23 실행 시도, 인증 환경변수 부재로 대상 테스트 미실행)
+- [x] 전체 테스트 145개를 실행한다. (2026-08-23 통과)
 - [ ] **추가 작업 필요:** 활성 라우트 화면 테스트 또는 수동 회귀 검증을 실행한다.
 - [x] lint를 실행한다. (2026-08-23 통과)
 - [x] 프로덕션 빌드를 실행한다. (2026-08-23 통과, 청크 크기 경고만 발생)
@@ -365,6 +380,7 @@ type PaginationBarProps = {
 
 - 문의 및 신고의 전체 조회 방식을 서버 페이지네이션으로 변경하는 작업
 - 회원 활동 탭의 샘플 데이터를 실제 API로 교체하는 작업
+- 현재 비노출인 `PointHistoryTab`, `DownloadedExamReviewTab`을 다시 연결할 때 회원 변경 및 데이터 축소에 따른 페이지 초기화·범위 보정을 추가하는 작업
 - 시험후기 페이지의 URL 상태 로직을 `useManagePageUrl`로 통합하는 작업
 - 페이지네이션 디자인 자체를 새로 설계하는 작업
 - 테이블 로딩·빈 상태 UI 공통화
