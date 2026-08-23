@@ -6,25 +6,30 @@ interface PaginationBarProps {
   /** 1부터 시작하는 페이지 번호를 전달한다. */
   onPageChange: (page: number) => void;
   totalPage: number;
+  /** 한 번에 표시할 페이지 번호 개수. 기본값은 10이다. */
+  pageBlockSize?: number;
 }
 
-function getBlockStartPage(page: number) {
-  return Math.floor((page - 1) / 10) * 10 + 1;
+const DEFAULT_PAGE_BLOCK_SIZE = 10;
+
+function getBlockStartPage(page: number, pageBlockSize: number) {
+  return Math.floor((page - 1) / pageBlockSize) * pageBlockSize + 1;
 }
 
 export function PaginationBar({
   currentPage,
   onPageChange,
   totalPage,
+  pageBlockSize = DEFAULT_PAGE_BLOCK_SIZE,
 }: PaginationBarProps) {
-  const blockStart = getBlockStartPage(currentPage);
-  const previousPage = Math.max(1, blockStart - 10);
-  const nextPage = blockStart + 10;
+  const blockStart = getBlockStartPage(currentPage, pageBlockSize);
+  const previousPage = Math.max(1, blockStart - pageBlockSize);
+  const nextPage = blockStart + pageBlockSize;
   const lastPage = Math.max(1, totalPage);
   const canGoPrevious = blockStart > 1;
-  const canGoNext = blockStart + 9 < lastPage;
+  const canGoNext = blockStart + pageBlockSize - 1 < lastPage;
   const startPage = blockStart;
-  const endPage = Math.min(startPage + 9, lastPage);
+  const endPage = Math.min(startPage + pageBlockSize - 1, lastPage);
   const pageNumbers = Array.from(
     { length: endPage - startPage + 1 },
     (_, i) => startPage + i

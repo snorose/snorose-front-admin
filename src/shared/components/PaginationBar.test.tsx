@@ -101,6 +101,43 @@ describe('PaginationBar totalPage 우선 동작', () => {
     expect(onPageChange).toHaveBeenNthCalledWith(3, 21);
   });
 
+  test('pageBlockSize가 5이면 페이지 번호를 5개씩 표시한다', () => {
+    render(
+      <PaginationBar
+        currentPage={6}
+        onPageChange={vi.fn()}
+        totalPage={12}
+        pageBlockSize={5}
+      />
+    );
+
+    for (let page = 6; page <= 10; page += 1) {
+      expect(
+        screen.getByRole('link', { name: String(page) })
+      ).toBeInTheDocument();
+    }
+    expect(screen.queryByRole('link', { name: '5' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: '11' })).not.toBeInTheDocument();
+  });
+
+  test('pageBlockSize가 5이면 이전·다음 묶음을 5페이지 단위로 이동한다', () => {
+    const onPageChange = vi.fn();
+    render(
+      <PaginationBar
+        currentPage={6}
+        onPageChange={onPageChange}
+        totalPage={12}
+        pageBlockSize={5}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('link', { name: 'Go to previous page' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Go to next page' }));
+
+    expect(onPageChange).toHaveBeenNthCalledWith(1, 1);
+    expect(onPageChange).toHaveBeenNthCalledWith(2, 11);
+  });
+
   test.each([0, 1])('totalPage=%s이면 1페이지만 표시한다', (totalPage) => {
     render(
       <PaginationBar
