@@ -43,7 +43,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   );
   // 사용자가 헤더 정렬을 직접 선택했는지 여부(초기/초기화 상태에서는 헤더를 중립으로 표시).
   const [isSortActive, setIsSortActive] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -53,7 +53,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
       setIsListLoading(true);
       try {
         const params = buildAdminUserListParams({
-          page,
+          page: page - 1,
           keyword: appliedKeyword,
           selectedRole,
           selectedMajor,
@@ -107,29 +107,29 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   const handleSearch = useCallback(() => {
     // 빈 검색어로 검색하면 다른 필터는 유지한 채 검색 조건만 해제한다.
     setAppliedKeyword(searchQuery.trim());
-    setCurrentPage(0);
+    setCurrentPage(1);
   }, [searchQuery]);
 
   const handleSelectedRoleChange = useCallback((value: string) => {
     setSelectedRole(value);
-    setCurrentPage(0);
+    setCurrentPage(1);
   }, []);
 
   const handleSelectedAdmissionYearChange = useCallback((value: string) => {
     setSelectedAdmissionYear(value);
-    setCurrentPage(0);
+    setCurrentPage(1);
   }, []);
 
   const handleSelectedMajorChange = useCallback((value: string) => {
     setSelectedMajor(value);
-    setCurrentPage(0);
+    setCurrentPage(1);
   }, []);
 
   // 헤더 클릭 정렬: 같은 컬럼이면 방향 토글, 다른 컬럼이면 그 컬럼 내림차순.
   const handleHeaderSort = useCallback(
     (columnType: string) => {
       setIsSortActive(true);
-      setCurrentPage(0);
+      setCurrentPage(1);
       if (sortType === columnType) {
         setSortDirection((prev) => (prev === 'ASC' ? 'DESC' : 'ASC'));
       } else {
@@ -159,7 +159,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     setSortDirection(DEFAULT_SORT_DIRECTION);
     setIsSortActive(false);
     setSelectedIds([]);
-    setCurrentPage(0);
+    setCurrentPage(1);
   }, []);
 
   const handleToggleAllVisibleRows = useCallback(() => {

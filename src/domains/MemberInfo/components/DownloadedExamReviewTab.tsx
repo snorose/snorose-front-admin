@@ -3,11 +3,10 @@ import { useState } from 'react';
 import { Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 
 import { DOWNLOADEDEXAMREVIEW_SAMPLE_DATA } from '@/__mocks__';
-
-import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface DownloadedExamReviewTabProps {
   encryptedUserId?: string;
@@ -109,9 +108,9 @@ export default function DownloadedExamReviewTab({
         </Table.Body>
       </Table>
       {downloadedData.length > 0 && (
-        <MemberInfoPagination
+        <PaginationBar
           currentPage={currentPage}
-          totalPages={Math.ceil(downloadedData.length / PAGE_SIZE)}
+          totalPage={Math.ceil(downloadedData.length / PAGE_SIZE)}
           onPageChange={setCurrentPage}
         />
       )}

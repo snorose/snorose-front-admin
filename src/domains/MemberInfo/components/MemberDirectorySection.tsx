@@ -1,10 +1,10 @@
 import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
+import { PaginationBar } from '@/shared/components';
 import { Button, Input, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 
 import MemberDirectoryActionBar from '@/domains/MemberInfo/components/MemberDirectoryActionBar';
-import MemberDirectoryPagination from '@/domains/MemberInfo/components/MemberDirectoryPagination';
 import SearchableSelect from '@/domains/MemberInfo/components/SearchableSelect';
 import SortableHead from '@/domains/MemberInfo/components/SortableHead';
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -294,7 +294,7 @@ export default function MemberDirectorySection({
             </Table>
           </div>
 
-          <MemberDirectoryPagination
+          <PaginationBar
             currentPage={currentPage}
             totalPage={totalPage}
             onPageChange={onPageChange}

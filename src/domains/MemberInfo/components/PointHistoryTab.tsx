@@ -3,13 +3,12 @@ import { useState } from 'react';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui/table';
 
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
 import { USERPOINT_SAMPLE_DATA } from '@/__mocks__';
-
-import MemberInfoPagination from './MemberInfoTablePagenation';
 
 interface PointHistoryTabProps {
   encryptedUserId?: string;
@@ -138,9 +137,9 @@ export default function PointHistoryTab({
 
       {/* Pagination */}
       {paginatedData.length > 0 && (
-        <MemberInfoPagination
+        <PaginationBar
           currentPage={currentPage}
-          totalPages={Math.ceil(filteredData.length / PAGE_SIZE)}
+          totalPage={Math.ceil(filteredData.length / PAGE_SIZE)}
           onPageChange={setCurrentPage}
         />
       )}
