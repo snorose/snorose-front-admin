@@ -14,7 +14,7 @@ import {
   getPenaltyTabs,
 } from '@/domains/MemberInfo';
 
-import { searchUsersAPI } from '@/apis';
+import { getUserDetailAPI, searchUsersAPI } from '@/apis';
 
 export default function MemberPenaltyManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,13 +50,30 @@ export default function MemberPenaltyManagementPage() {
     }
   }, [searchQuery]);
 
+  const handlePenaltyApplied = useCallback(async () => {
+    setHistoryRefreshKey((prev) => prev + 1);
+    if (!selectedMember) return;
+
+    const targetUserId = selectedMember.encryptedUserId;
+    try {
+      const member = await getUserDetailAPI(targetUserId);
+      setSelectedMember((currentMember) =>
+        currentMember?.encryptedUserId === targetUserId ? member : currentMember
+      );
+    } catch (error: unknown) {
+      toast.error(
+        getErrorMessage(error, '변경된 회원 상태를 불러오지 못했습니다.')
+      );
+    }
+  }, [selectedMember]);
+
   const tabs = useMemo(() => {
     if (!selectedMember) return [];
     return getPenaltyTabs({
       member: selectedMember,
-      onApplied: () => setHistoryRefreshKey((prev) => prev + 1),
+      onApplied: handlePenaltyApplied,
     });
-  }, [selectedMember]);
+  }, [handlePenaltyApplied, selectedMember]);
 
   return (
     <div className='flex w-full flex-col gap-6'>
