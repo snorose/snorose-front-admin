@@ -1,17 +1,17 @@
 import { type RefObject } from 'react';
 
-import { Badge, Field, Input, Select, Textarea } from '@/shared/components/ui';
+import { StatusBadge } from '@/shared/components';
+import { Field, Input, Select, Textarea } from '@/shared/components/ui';
 import {
-  EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
   SEMESTER_LIST,
 } from '@/shared/constants';
-import { cn } from '@/shared/lib';
 
 import {
   ExamConfirmStatusBadge,
   ExamDiscussionStatusBadge,
+  ExamReviewProcessStatusBadge,
 } from '@/domains/Reviews/components';
 import type {
   ExamReviewProcessStatus,
@@ -51,36 +51,12 @@ export interface ExamReviewDetailInfoSectionProps {
 const STATUS_FIELD_CLASS_NAME =
   'flex min-h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3';
 
-const getProcessStatusLabel = (
-  status: ExamReviewProcessStatus | null
-): string => {
-  if (!status) {
-    return '-';
-  }
-
-  return (
-    EXAM_REVIEW_PROCESS_STATUS.find((option) => option.code === status)
-      ?.label ?? status
+const renderProcessStatusBadge = (status: ExamReviewProcessStatus | null) =>
+  status ? (
+    <ExamReviewProcessStatusBadge status={status} />
+  ) : (
+    <StatusBadge tone='neutral'>-</StatusBadge>
   );
-};
-
-const renderStatusBadge = (
-  label: string,
-  isActive: boolean,
-  activeClassName: string,
-  inactiveClassName = 'bg-gray-100 text-gray-700'
-) => (
-  <Badge
-    variant='default'
-    className={cn(
-      'max-w-full truncate',
-      isActive ? activeClassName : inactiveClassName
-    )}
-    title={label}
-  >
-    {label}
-  </Badge>
-);
 
 export function ExamReviewDetailInfoSection({
   formData,
@@ -92,10 +68,6 @@ export function ExamReviewDetailInfoSection({
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
-  const deletionStatusLabel = getProcessStatusLabel(formData.deletionStatus);
-  const visibilityStatusLabel = getProcessStatusLabel(
-    formData.visibilityStatus
-  );
 
   return (
     <div className='space-y-4'>
@@ -152,12 +124,7 @@ export function ExamReviewDetailInfoSection({
           <Field.Label>삭제 상태</Field.Label>
           <Field.Content>
             <div className={STATUS_FIELD_CLASS_NAME}>
-              {renderStatusBadge(
-                deletionStatusLabel,
-                formData.deletionStatus !== null &&
-                  formData.deletionStatus !== 'VISIBLE',
-                'bg-red-50 text-red-700'
-              )}
+              {renderProcessStatusBadge(formData.deletionStatus)}
             </div>
           </Field.Content>
         </Field>
@@ -165,13 +132,9 @@ export function ExamReviewDetailInfoSection({
           <Field.Label>징계 여부</Field.Label>
           <Field.Content>
             <div className={STATUS_FIELD_CLASS_NAME}>
-              {renderStatusBadge(
-                formData.isSanctioned ? '징계' : '징계 없음',
-                true,
-                formData.isSanctioned
-                  ? 'bg-violet-50 text-violet-700'
-                  : 'bg-emerald-50 text-emerald-700'
-              )}
+              <ExamReviewProcessStatusBadge
+                status={formData.isSanctioned ? 'SANCTIONED' : 'DESANCTIONED'}
+              />
             </div>
           </Field.Content>
         </Field>
@@ -179,12 +142,7 @@ export function ExamReviewDetailInfoSection({
           <Field.Label>공개 상태</Field.Label>
           <Field.Content>
             <div className={STATUS_FIELD_CLASS_NAME}>
-              {renderStatusBadge(
-                visibilityStatusLabel,
-                formData.visibilityStatus !== null &&
-                  formData.visibilityStatus !== 'VISIBLE',
-                'bg-amber-50 text-amber-700'
-              )}
+              {renderProcessStatusBadge(formData.visibilityStatus)}
             </div>
           </Field.Content>
         </Field>

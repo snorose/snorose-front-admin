@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react';
 
-import { PaginationBar } from '@/shared/components';
-import { Badge, Table } from '@/shared/components/ui';
+import { PaginationBar, StatusBadge } from '@/shared/components';
+import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
 import { cn } from '@/shared/lib';
 import { clampOneBasedPage } from '@/shared/utils';
@@ -43,15 +43,7 @@ const renderReportedStatusBadge = (review: ExamReview) => {
 
   const label = `신고 ${review.reportCount}`;
 
-  return (
-    <Badge
-      variant='default'
-      className='max-w-full truncate bg-red-50 text-red-700'
-      title={label}
-    >
-      {label}
-    </Badge>
-  );
+  return <StatusBadge tone='warning'>{label}</StatusBadge>;
 };
 
 const renderProcessStatusBadge = (review: ExamReview) => {
