@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Loader2, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
-import { PaginationBar } from '@/shared/components';
+import { PaginationBar, TableStateRow } from '@/shared/components';
 import { Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
@@ -298,28 +298,21 @@ export default function InquiryReportTable({
 
             <Table.Body>
               {isLoading ? (
-                <Table.Row>
-                  <Table.Cell
-                    colSpan={isDetailOpen ? 5 : 7}
-                    className='h-48 text-center'
-                  >
-                    <div className='flex items-center justify-center gap-2 text-gray-500'>
-                      <Loader2 className='h-5 w-5 animate-spin text-blue-600' />
-                      <span>문의 및 신고 목록을 불러오는 중입니다...</span>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
+                <TableStateRow
+                  state='loading'
+                  colSpan={isDetailOpen ? 5 : 7}
+                  message='문의 및 신고 목록을 불러오는 중입니다.'
+                />
               ) : isEmpty ? (
-                <Table.Row>
-                  <Table.Cell
-                    colSpan={isDetailOpen ? 5 : 7}
-                    className='h-48 text-center text-sm text-gray-400'
-                  >
-                    {activeFilterCount > 0
+                <TableStateRow
+                  state='empty'
+                  colSpan={isDetailOpen ? 5 : 7}
+                  message={
+                    activeFilterCount > 0
                       ? '필터 조건에 해당하는 항목이 없습니다.'
-                      : '등록된 문의 및 신고가 없습니다.'}
-                  </Table.Cell>
-                </Table.Row>
+                      : '등록된 문의 및 신고가 없습니다.'
+                  }
+                />
               ) : (
                 inquiries.map((inquiry, index) => {
                   const inquiryStatus = inquiry.status;

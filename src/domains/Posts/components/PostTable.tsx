@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 
-import { Loader2 } from 'lucide-react';
-
-import { PaginationBar } from '@/shared/components';
-import { BulkActionBar } from '@/shared/components';
+import {
+  BulkActionBar,
+  PaginationBar,
+  TableStateRow,
+} from '@/shared/components';
 import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
@@ -142,23 +143,17 @@ export default function PostTable({
 
             <Table.Body>
               {isLoading ? (
-                <Table.Row>
-                  <Table.Cell colSpan={10} className='h-48 text-center'>
-                    <div className='flex items-center justify-center gap-2 text-gray-500'>
-                      <Loader2 className='h-5 w-5 animate-spin text-blue-600' />
-                      <span>게시글 데이터를 불러오는 중입니다...</span>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
+                <TableStateRow
+                  state='loading'
+                  colSpan={10}
+                  message='게시글 데이터를 불러오는 중입니다.'
+                />
               ) : isEmpty ? (
-                <Table.Row>
-                  <Table.Cell
-                    colSpan={10}
-                    className='h-48 text-center text-sm text-gray-400'
-                  >
-                    등록된 게시글이 없거나 검색 결과가 존재하지 않습니다.
-                  </Table.Cell>
-                </Table.Row>
+                <TableStateRow
+                  state='empty'
+                  colSpan={10}
+                  message='등록된 게시글이 없거나 검색 결과가 존재하지 않습니다.'
+                />
               ) : (
                 posts.map((post) => (
                   <PostTableRow
