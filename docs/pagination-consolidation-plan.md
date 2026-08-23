@@ -20,7 +20,7 @@ shared/components/PaginationBar (최종 통합 목표)
        ├─ 문의 및 신고
        ├─ 시험후기 관리
        ├─ 회원 목록 (추가 작업 필요)
-       └─ 경고 및 강등 이력 (활성 화면 교체 완료)
+       └─ 경고 및 강등 이력
 ```
 
 현재 라우트에서 실제로 확인할 수 있는 페이지네이션 화면은 **7곳**이다.
@@ -29,16 +29,16 @@ shared/components/PaginationBar (최종 통합 목표)
 - **회원 목록 1곳은 별도 컴포넌트를 사용해 추가 작업이 필요하다.**
 - 시험후기 복제 컴포넌트와 미사용 컴포넌트는 삭제되었다.
 
-현재 통합 진행 상태는 **부분 완료**다. 활성 화면 중에는 회원 목록 통합만 남았고, 현재 라우트에 노출되지 않는 회원 활동 탭 2곳의 import 정리가 추가로 필요하다.
+현재 통합 진행 상태는 **부분 완료**다. 회원 이력의 활성·비노출 사용처 정리는 모두 완료되었고, 활성 화면 중에는 회원 목록 통합만 남았다.
 
-| 구분                  | 상태                                        |
-| --------------------- | ------------------------------------------- |
-| 공통 기본 계약·테스트 | **완료**                                    |
-| 시험후기 통합         | **완료**                                    |
-| 게시글·댓글 보완      | **완료**                                    |
-| 회원 이력 통합        | **활성 화면 완료** — 비노출 2곳은 정리 필요 |
-| 회원 목록 통합        | **추가 작업 필요**                          |
-| 접근성·문구 통일      | **선택 개선** — 통합 완료 조건과는 별도     |
+| 구분                  | 상태                                    |
+| --------------------- | --------------------------------------- |
+| 공통 기본 계약·테스트 | **완료**                                |
+| 시험후기 통합         | **완료**                                |
+| 게시글·댓글 보완      | **완료**                                |
+| 회원 이력 통합        | **완료**                                |
+| 회원 목록 통합        | **추가 작업 필요**                      |
+| 접근성·문구 통일      | **선택 개선** — 통합 완료 조건과는 별도 |
 
 ## 2. 공통 기준을 `PaginationBar`로 정하는 이유
 
@@ -68,21 +68,16 @@ shared/components/PaginationBar (최종 통합 목표)
 
 화면 단위로는 7곳이지만, 같은 컴포넌트를 여러 화면이 공유하므로 제거 대상 파일 수와 일치하지 않는다.
 
-### 3.2 현재 라우트에 연결되지 않은 사용처
+### 3.2 현재 라우트에 연결되지 않은 사용처 — 교체 완료
 
-다음 두 컴포넌트도 `MemberInfoTablePagenation`을 import한다.
+다음 두 컴포넌트도 `PaginationBar`로 교체했다.
 
 - [`PointHistoryTab`](../src/domains/MemberInfo/components/PointHistoryTab.tsx)
 - [`DownloadedExamReviewTab`](../src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx)
 
 두 컴포넌트는 [`getMemberInfoTabs`](../src/domains/MemberInfo/constants/MemberInfoTabs.config.tsx)에서 구성되지만, 현재 `getMemberInfoTabs`를 호출하는 코드는 없다. 현재 회원 상세 화면은 비활성 바로가기만 렌더링하므로 사용자가 접근하는 경로에는 노출되지 않는다.
 
-다만 소스 코드의 import는 유효하므로 `MemberInfoTablePagenation.tsx`를 삭제하려면 다음 중 하나가 필요하다.
-
-1. 두 컴포넌트도 `PaginationBar`로 함께 교체한다.
-2. 해당 회원 활동 탭 자체가 폐기 대상인지 별도 확인한 후 관련 코드를 제거한다.
-
-페이지네이션 통합 범위만 작게 유지하려면 **1번처럼 import만 함께 교체**하는 편이 안전하다.
+사용자 경로에는 노출되지 않지만 소스의 유효한 import였으므로 두 탭을 함께 교체했고, 마지막 사용처가 사라진 `MemberInfoTablePagenation.tsx`를 삭제했다.
 
 ### 3.3 사용되지 않는 구현
 
@@ -94,18 +89,14 @@ shared/components/PaginationBar (최종 통합 목표)
 
 ## 4. 현재 구현별 차이
 
-| 구현                        |              페이지 기준 |              번호 묶음 | 왼쪽/오른쪽 이동                       | `totalPage` | 특이사항                                  |
-| --------------------------- | -----------------------: | ---------------------: | -------------------------------------- | ----------- | ----------------------------------------- |
-| `PaginationBar`             |                   1 기반 |              고정 10개 | 이전/다음 **묶음**                     | 필수        | 현재 공통 기준                            |
-| `MemberDirectoryPagination` | 입력 0 기반, 표시 1 기반 |              고정 10개 | 이전/다음 **묶음**                     | 필수        | 컴포넌트 내부에서 `+1`, 클릭 시 `-1` 변환 |
-| `MemberInfoTablePagenation` |                   1 기반 | `groupSize`, 기본 10개 | 한 페이지 이동과 묶음 이동을 모두 제공 | 필수        | 파일명 오타, 자체 버튼 스타일 사용        |
+| 구현                        |              페이지 기준 | 번호 묶음 | 왼쪽/오른쪽 이동   | `totalPage` | 특이사항                                  |
+| --------------------------- | -----------------------: | --------: | ------------------ | ----------- | ----------------------------------------- |
+| `PaginationBar`             |                   1 기반 | 고정 10개 | 이전/다음 **묶음** | 필수        | 현재 공통 기준                            |
+| `MemberDirectoryPagination` | 입력 0 기반, 표시 1 기반 | 고정 10개 | 이전/다음 **묶음** | 필수        | 컴포넌트 내부에서 `+1`, 클릭 시 `-1` 변환 |
 
-시험후기 전용 구현 2개는 삭제되어 현재 비교 대상에서 제외했다.
+시험후기 전용 구현 2개와 `MemberInfoTablePagenation`은 삭제되어 현재 비교 대상에서 제외했다.
 
-가장 중요한 차이는 다음 두 가지다.
-
-1. 회원 목록만 React 상태와 API 요청 모두 0부터 시작한다.
-2. `MemberInfoTablePagenation`은 한 페이지 이동 버튼과 묶음 이동 버튼을 모두 제공하지만, `PaginationBar`는 묶음 이동만 제공한다.
+현재 남은 가장 중요한 차이는 회원 목록만 React 상태와 API 요청 모두 0부터 시작한다는 점이다.
 
 ## 5. `PaginationBar` 계약 보완 현황
 
@@ -148,7 +139,7 @@ MemberInfoPage / useMemberDirectoryState
 
 ### 5.3 페이지 묶음 크기와 데이터 개수를 분리한다 — 공통 컴포넌트 보완 완료
 
-`MemberInfoTablePagenation`의 `groupSize`는 다음 두 의미로 함께 사용된다.
+삭제 전 `MemberInfoTablePagenation`의 `groupSize`는 다음 두 의미로 함께 사용됐다.
 
 - 한 페이지에서 보여 줄 데이터 개수
 - 한 번에 보여 줄 페이지 번호 개수
@@ -199,9 +190,9 @@ type PaginationBarProps = {
 - [`src/domains/MemberInfo/components/BlacklistHistoryTab.tsx`](../src/domains/MemberInfo/components/BlacklistHistoryTab.tsx)
   - **완료:** 활성 화면의 `MemberInfoTablePagenation`을 `PaginationBar`로 교체했다.
 - [`src/domains/MemberInfo/components/PointHistoryTab.tsx`](../src/domains/MemberInfo/components/PointHistoryTab.tsx)
-  - **추가 작업 필요:** 현재 비노출이지만 삭제될 컴포넌트의 import를 제거한다.
+  - **완료:** 현재 비노출이지만 `PaginationBar`로 교체했다.
 - [`src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx`](../src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx)
-  - **추가 작업 필요:** 현재 비노출이지만 삭제될 컴포넌트의 import를 제거한다.
+  - **완료:** 현재 비노출이지만 `PaginationBar`로 교체했다.
 - [`src/domains/MemberInfo/components/MemberDirectorySection.tsx`](../src/domains/MemberInfo/components/MemberDirectorySection.tsx)
   - **추가 작업 필요:** `MemberDirectoryPagination` 대신 `PaginationBar`를 렌더링한다.
 
@@ -228,7 +219,7 @@ type PaginationBarProps = {
 - **삭제 완료:** `src/domains/Reviews/components/ExamReviewTablePagination.tsx`
 - **삭제 완료:** `src/domains/Reviews/components/ExamTablePagination.tsx`
 - **추가 작업 필요:** [`src/domains/MemberInfo/components/MemberDirectoryPagination.tsx`](../src/domains/MemberInfo/components/MemberDirectoryPagination.tsx)
-- **추가 작업 필요:** [`src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx`](../src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx)
+- **삭제 완료:** `src/domains/MemberInfo/components/MemberInfoTablePagenation.tsx`
 - **삭제 완료:** [`src/domains/Reviews/components/index.ts`](../src/domains/Reviews/components/index.ts)의 두 시험후기 페이지네이션 export
 - **추가 작업 필요:** [`src/domains/MemberInfo/index.ts`](../src/domains/MemberInfo/index.ts)의 `MemberDirectoryPagination` export
 
@@ -261,13 +252,13 @@ type PaginationBarProps = {
 2. 일반 댓글과 대댓글의 `totalPage`를 공통 컴포넌트까지 전달한다.
 3. 빈 결과, 마지막 페이지, 필터 후 1페이지 초기화를 확인한다.
 
-### 4단계: 1 기반 회원 이력 교체 — 추가 작업 필요
+### 4단계: 1 기반 회원 이력 교체 — 완료
 
 1. **결정 완료:** 페이지 번호는 기존처럼 5개 묶음을 유지한다.
 2. **완료:** `PaginationBar`에 `pageBlockSize`를 추가한다.
 3. **완료:** 활성 화면인 `BlacklistHistoryTab`을 교체한다.
-4. 비노출 `PointHistoryTab`, `DownloadedExamReviewTab`의 import도 교체한다.
-5. 모든 사용처가 사라지면 오타가 있는 `MemberInfoTablePagenation.tsx`를 삭제한다.
+4. **완료:** 비노출 `PointHistoryTab`, `DownloadedExamReviewTab`의 import도 교체한다.
+5. **완료:** 모든 사용처가 사라진 `MemberInfoTablePagenation.tsx`를 삭제한다.
 
 ### 5단계: 0 기반 회원 목록 교체 — 추가 작업 필요
 
@@ -331,10 +322,10 @@ type PaginationBarProps = {
 - [x] 페이지 번호 묶음은 5개로 유지한다.
 - [x] 한 페이지 이동 버튼을 제거하고 공통 묶음 이동으로 통일한다.
 - [x] `BlacklistHistoryTab`을 `PaginationBar`로 교체한다.
-- [ ] **추가 작업 필요:** `PointHistoryTab`을 `PaginationBar`로 교체하거나 미사용 코드를 제거한다.
-- [ ] **추가 작업 필요:** `DownloadedExamReviewTab`을 `PaginationBar`로 교체하거나 미사용 코드를 제거한다.
-- [ ] **추가 작업 필요:** `MemberInfoTablePagenation.tsx`를 삭제한다.
-- [ ] **추가 작업 필요:** `Pagenation`, `currentGruop` 오타가 소스에 남지 않았는지 검색한다.
+- [x] `PointHistoryTab`을 `PaginationBar`로 교체한다.
+- [x] `DownloadedExamReviewTab`을 `PaginationBar`로 교체한다.
+- [x] `MemberInfoTablePagenation.tsx`를 삭제한다.
+- [x] `Pagenation`, `currentGruop` 오타가 소스에 남지 않았는지 검색한다.
 
 ### 회원 목록
 
@@ -354,14 +345,14 @@ type PaginationBarProps = {
 - [ ] 필터 결과가 0개일 때 페이지 버튼이 잘못 노출되지 않는지 확인한다.
 - [ ] 브라우저 뒤로/앞으로 이동 시 URL 기반 화면의 페이지가 복구되는지 확인한다.
 - [ ] 삭제 대상 컴포넌트의 import와 barrel export가 모두 사라졌는지 `rg`로 확인한다.
-- [x] 관련 단위 테스트 25개를 실행한다. (2026-08-23 통과)
+- [x] 전체 테스트 103개를 실행한다. (2026-08-23 통과)
 - [ ] **추가 작업 필요:** 활성 라우트 화면 테스트 또는 수동 회귀 검증을 실행한다.
 - [x] lint를 실행한다. (2026-08-23 통과)
 - [x] 프로덕션 빌드를 실행한다. (2026-08-23 통과, 청크 크기 경고만 발생)
 
 ## 9. 완료 기준
 
-현재는 아래 6개 완료 기준 중 1개만 충족해 **부분 완료** 상태다. 비노출 회원 활동 탭과 회원 목록을 교체하고 활성 라우트 회귀 검증까지 마쳐야 전체 완료로 전환할 수 있다.
+현재는 아래 6개 완료 기준 중 1개만 충족해 **부분 완료** 상태다. 회원 목록을 교체하고 활성 라우트 회귀 검증까지 마쳐야 전체 완료로 전환할 수 있다.
 
 1. [ ] 페이지 계산 정책을 가진 공통 컴포넌트가 `PaginationBar` 하나만 남는다.
 2. [ ] 모든 화면 상태와 URL은 1 기반 페이지를 사용한다.
