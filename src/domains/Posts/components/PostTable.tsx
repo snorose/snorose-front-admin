@@ -74,7 +74,10 @@ export default function PostTable({
 
       <div className='flex items-center justify-between px-1 text-xs text-gray-500'>
         <span>
-          총 <span className='font-bold text-blue-600'>{totalCount ?? 0}</span>
+          총{' '}
+          <span className='font-bold text-blue-600'>
+            {(totalCount ?? 0).toLocaleString('ko-KR')}
+          </span>
           개의 게시물
         </span>
       </div>
@@ -88,13 +91,15 @@ export default function PostTable({
                   style={{ width: '40px' }}
                   className='px-3 text-center'
                 >
-                  <input
-                    type='checkbox'
-                    ref={selectAllRef}
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    className='cursor-pointer rounded border-gray-300'
-                  />
+                  <label className='inline-flex cursor-pointer p-2'>
+                    <input
+                      type='checkbox'
+                      ref={selectAllRef}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      className='cursor-pointer rounded border-gray-300'
+                    />
+                  </label>
                 </Table.Head>
                 <Table.Head style={{ width: '80px' }} className='px-3 text-xs'>
                   게시글 ID
@@ -107,6 +112,15 @@ export default function PostTable({
                 </Table.Head>
                 <Table.Head style={{ width: '150px' }} className='px-3 text-xs'>
                   게시판
+                </Table.Head>
+                <Table.Head
+                  style={{ width: '140px' }}
+                  className='px-3 text-center text-xs'
+                >
+                  상태
+                </Table.Head>
+                <Table.Head style={{ width: '160px' }} className='px-3 text-xs'>
+                  작성일
                 </Table.Head>
                 <Table.Head style={{ width: '90px' }} className='px-3 text-xs'>
                   카테고리
@@ -122,15 +136,6 @@ export default function PostTable({
                   className='px-3 text-center text-xs'
                 >
                   의심 키워드
-                </Table.Head>
-                <Table.Head
-                  style={{ width: '140px' }}
-                  className='px-3 text-center text-xs'
-                >
-                  상태
-                </Table.Head>
-                <Table.Head style={{ width: '160px' }} className='px-3 text-xs'>
-                  작성일
                 </Table.Head>
               </Table.Row>
             </Table.Header>

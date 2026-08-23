@@ -38,15 +38,17 @@ export default function PostTableRow({
     >
       {/* 0. Checkbox */}
       <Table.Cell className='px-3 text-center'>
-        <input
-          type='checkbox'
-          checked={isSelected}
-          onChange={(e) => {
-            e.stopPropagation();
-            onSelectToggle(post.postId);
-          }}
-          className='rounded border-gray-300'
-        />
+        <label className='inline-flex cursor-pointer p-2'>
+          <input
+            type='checkbox'
+            checked={isSelected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onSelectToggle(post.postId);
+            }}
+            className='cursor-pointer rounded border-gray-300'
+          />
+        </label>
       </Table.Cell>
 
       {/* 1. 게시글 ID */}
@@ -98,7 +100,25 @@ export default function PostTableRow({
         <Badge variant='unstyled'>{post.boardName}</Badge>
       </Table.Cell>
 
-      {/* 5. 카테고리 */}
+      {/* 5. 상태 */}
+      <Table.Cell className='px-3 text-center'>
+        <div className='flex flex-wrap items-center justify-center gap-1'>
+          {getPostStatusBadges(post).map((badge, idx) => {
+            return (
+              <Badge key={idx} className={badge.className}>
+                {badge.text}
+              </Badge>
+            );
+          })}
+        </div>
+      </Table.Cell>
+
+      {/* 6. 작성일 */}
+      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
+        {formatDateTimeWithAmPm(post.createdAt)}
+      </Table.Cell>
+
+      {/* 7. 카테고리 */}
       <Table.Cell className='px-3 text-xs text-gray-500'>
         {post.category ? (
           <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
@@ -109,7 +129,7 @@ export default function PostTableRow({
         )}
       </Table.Cell>
 
-      {/* 6. 통계 */}
+      {/* 8. 통계 */}
       <Table.Cell className='px-3 py-1.5 text-center'>
         <div className='mx-auto grid max-w-[110px] grid-cols-3 justify-items-start gap-x-2 gap-y-1 pl-1 font-mono text-[11px] text-gray-500'>
           <span className='flex items-center gap-0.5' title='조회수'>
@@ -146,7 +166,7 @@ export default function PostTableRow({
         </div>
       </Table.Cell>
 
-      {/* 7. 의심 키워드 */}
+      {/* 9. 의심 키워드 */}
       <Table.Cell className='px-3 text-center'>
         {post.isKeywordExist ? (
           <Badge className='rounded border-none bg-[#F5F3FF] px-2 py-0.5 text-[11px] font-bold text-[#7C3AED] hover:bg-[#F5F3FF]'>
@@ -157,24 +177,6 @@ export default function PostTableRow({
             N
           </Badge>
         )}
-      </Table.Cell>
-
-      {/* 8. 상태 */}
-      <Table.Cell className='px-3 text-center'>
-        <div className='flex flex-wrap items-center justify-center gap-1'>
-          {getPostStatusBadges(post).map((badge, idx) => {
-            return (
-              <Badge key={idx} className={badge.className}>
-                {badge.text}
-              </Badge>
-            );
-          })}
-        </div>
-      </Table.Cell>
-
-      {/* 9. 작성일 */}
-      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {formatDateTimeWithAmPm(post.createdAt)}
       </Table.Cell>
     </Table.Row>
   );
