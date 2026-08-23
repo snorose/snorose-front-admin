@@ -9,3 +9,4 @@ export { PageHeader } from './PageHeader';
 export { PaginationBar } from './PaginationBar';
 export { PeriodStatusBadge } from './PeriodStatusBadge';
 export { ProtectedRoute } from './ProtectedRoute';
+export { StatusBadge, type StatusBadgeTone } from './StatusBadge';
