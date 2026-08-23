@@ -269,7 +269,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     test.skip(inquiries.length < 11, '페이지네이션 확인용 데이터 11건 필요');
     await expect(inquiryReport.dataRows).toHaveCount(10);
     await page
-      .getByRole('navigation', { name: 'pagination' })
+      .getByRole('navigation', { name: '페이지네이션' })
       .getByRole('link', { name: '2', exact: true })
       .click();
     await expect(page).toHaveURL(/page=2/);
