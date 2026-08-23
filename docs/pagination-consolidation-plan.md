@@ -20,31 +20,31 @@ shared/components/PaginationBar (최종 통합 목표)
        ├─ 문의 및 신고
        ├─ 시험후기 관리
        ├─ 회원 목록 (추가 작업 필요)
-       └─ 경고 및 강등 이력 (추가 작업 필요)
+       └─ 경고 및 강등 이력 (활성 화면 교체 완료)
 ```
 
 현재 라우트에서 실제로 확인할 수 있는 페이지네이션 화면은 **7곳**이다.
 
-- **5곳은 `PaginationBar` 통합이 완료되었다.**
-- **회원 관련 2곳은 별도 컴포넌트를 사용해 추가 작업이 필요하다.**
+- **6곳은 `PaginationBar` 통합이 완료되었다.**
+- **회원 목록 1곳은 별도 컴포넌트를 사용해 추가 작업이 필요하다.**
 - 시험후기 복제 컴포넌트와 미사용 컴포넌트는 삭제되었다.
 
-현재 통합 진행 상태는 **부분 완료**다. `PaginationBar`의 기본 동작 계약과 시험후기·게시글·댓글 보완은 완료되었고, 회원 이력과 회원 목록 통합이 남아 있다.
+현재 통합 진행 상태는 **부분 완료**다. 활성 화면 중에는 회원 목록 통합만 남았고, 현재 라우트에 노출되지 않는 회원 활동 탭 2곳의 import 정리가 추가로 필요하다.
 
-| 구분                  | 상태                                    |
-| --------------------- | --------------------------------------- |
-| 공통 기본 계약·테스트 | **완료**                                |
-| 시험후기 통합         | **완료**                                |
-| 게시글·댓글 보완      | **완료**                                |
-| 회원 이력 통합        | **추가 작업 필요**                      |
-| 회원 목록 통합        | **추가 작업 필요**                      |
-| 접근성·문구 통일      | **선택 개선** — 통합 완료 조건과는 별도 |
+| 구분                  | 상태                                        |
+| --------------------- | ------------------------------------------- |
+| 공통 기본 계약·테스트 | **완료**                                    |
+| 시험후기 통합         | **완료**                                    |
+| 게시글·댓글 보완      | **완료**                                    |
+| 회원 이력 통합        | **활성 화면 완료** — 비노출 2곳은 정리 필요 |
+| 회원 목록 통합        | **추가 작업 필요**                          |
+| 접근성·문구 통일      | **선택 개선** — 통합 완료 조건과는 별도     |
 
 ## 2. 공통 기준을 `PaginationBar`로 정하는 이유
 
 | 기준          | 판단                                                                               |
 | ------------- | ---------------------------------------------------------------------------------- |
-| 현재 사용량   | 실제 화면 7곳 중 5곳에서 사용한다.                                                 |
+| 현재 사용량   | 실제 화면 7곳 중 6곳에서 사용한다.                                                 |
 | 공통 UI 체계  | shadcn 기반 [`Pagination`](../src/shared/components/ui/pagination.tsx)을 사용한다. |
 | 시험후기 중복 | 동일 구현이던 `ExamReviewTablePagination`을 제거하고 통합했다.                     |
 | 응답 계약     | 서버 페이지네이션 응답에 항상 포함되는 `totalPage`를 공통 기준으로 사용할 수 있다. |
@@ -64,7 +64,7 @@ shared/components/PaginationBar (최종 통합 목표)
 | 문의 및 신고             | `/report/inquiry`       | `PaginationBar`             | 전체 조회 후 클라이언트 분할 |             1 기반, URL 저장 | 없음                         | **보완 완료**      |
 | 시험후기 관리            | `/reviews/exam`         | `PaginationBar`             | 서버 페이지네이션            |      1 기반, URL과 로컬 상태 | 조회 훅에서 `page - 1`       | **교체 완료**      |
 | 회원 목록                | `/member/info`          | `MemberDirectoryPagination` | 서버 페이지네이션            | 상태는 0 기반, 표시는 1 기반 | 변환 없이 0 기반 전송        | **추가 작업 필요** |
-| 경고 및 강등 관리의 이력 | `/member/penalty`       | `MemberInfoTablePagenation` | 전체 조회 후 클라이언트 분할 |            1 기반, 로컬 상태 | 없음                         | **추가 작업 필요** |
+| 경고 및 강등 관리의 이력 | `/member/penalty`       | `PaginationBar`             | 전체 조회 후 클라이언트 분할 |            1 기반, 로컬 상태 | 없음                         | **교체 완료**      |
 
 화면 단위로는 7곳이지만, 같은 컴포넌트를 여러 화면이 공유하므로 제거 대상 파일 수와 일치하지 않는다.
 
@@ -166,7 +166,7 @@ type PaginationBarProps = {
 
 기존 화면을 보존하기 위해 `PaginationBar`에 기본값이 10인 `pageBlockSize`를 추가했다. 5개·10개 묶음 계산과 이동은 단위 테스트로 고정했다.
 
-회원 이력을 교체할 때만 `pageBlockSize={5}`를 전달하면 된다. 데이터 분할 크기 5는 `BlacklistHistoryTab`에 그대로 남으므로 두 설정의 의미가 분리된다.
+활성 회원 이력 화면은 `pageBlockSize={5}`를 전달한다. 데이터 분할 크기 5는 `BlacklistHistoryTab`에 그대로 남으므로 두 설정의 의미가 분리된다.
 
 ### 5.4 빈 결과와 한 페이지만 있는 경우의 노출 정책 — 현행 유지로 결정
 
@@ -197,7 +197,7 @@ type PaginationBarProps = {
 - [`src/domains/Reviews/components/ExamTable.tsx`](../src/domains/Reviews/components/ExamTable.tsx)
   - **완료:** `ExamReviewTablePagination` import와 JSX를 `PaginationBar`로 변경했다.
 - [`src/domains/MemberInfo/components/BlacklistHistoryTab.tsx`](../src/domains/MemberInfo/components/BlacklistHistoryTab.tsx)
-  - **추가 작업 필요:** 활성 화면의 `MemberInfoTablePagenation`을 교체한다.
+  - **완료:** 활성 화면의 `MemberInfoTablePagenation`을 `PaginationBar`로 교체했다.
 - [`src/domains/MemberInfo/components/PointHistoryTab.tsx`](../src/domains/MemberInfo/components/PointHistoryTab.tsx)
   - **추가 작업 필요:** 현재 비노출이지만 삭제될 컴포넌트의 import를 제거한다.
 - [`src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx`](../src/domains/MemberInfo/components/DownloadedExamReviewTab.tsx)
@@ -265,7 +265,7 @@ type PaginationBarProps = {
 
 1. **결정 완료:** 페이지 번호는 기존처럼 5개 묶음을 유지한다.
 2. **완료:** `PaginationBar`에 `pageBlockSize`를 추가한다.
-3. 활성 화면인 `BlacklistHistoryTab`을 교체한다.
+3. **완료:** 활성 화면인 `BlacklistHistoryTab`을 교체한다.
 4. 비노출 `PointHistoryTab`, `DownloadedExamReviewTab`의 import도 교체한다.
 5. 모든 사용처가 사라지면 오타가 있는 `MemberInfoTablePagenation.tsx`를 삭제한다.
 
@@ -327,10 +327,10 @@ type PaginationBarProps = {
 
 ### 회원 이력
 
-- [ ] **추가 작업 필요:** `/member/penalty` 통합 후에도 한 페이지 데이터 개수 5개를 유지한다.
+- [x] `/member/penalty`의 한 페이지 데이터 개수 5개를 유지한다.
 - [x] 페이지 번호 묶음은 5개로 유지한다.
-- [ ] **결정 필요:** 한 페이지 이동 버튼을 제거하고 묶음 이동으로 통일해도 되는지 확인한다.
-- [ ] **추가 작업 필요:** `BlacklistHistoryTab`을 `PaginationBar`로 교체한다.
+- [x] 한 페이지 이동 버튼을 제거하고 공통 묶음 이동으로 통일한다.
+- [x] `BlacklistHistoryTab`을 `PaginationBar`로 교체한다.
 - [ ] **추가 작업 필요:** `PointHistoryTab`을 `PaginationBar`로 교체하거나 미사용 코드를 제거한다.
 - [ ] **추가 작업 필요:** `DownloadedExamReviewTab`을 `PaginationBar`로 교체하거나 미사용 코드를 제거한다.
 - [ ] **추가 작업 필요:** `MemberInfoTablePagenation.tsx`를 삭제한다.
@@ -361,7 +361,7 @@ type PaginationBarProps = {
 
 ## 9. 완료 기준
 
-현재는 아래 6개 완료 기준 중 1개만 충족해 **부분 완료** 상태다. 회원 이력과 회원 목록을 교체하고 활성 라우트 회귀 검증까지 마쳐야 전체 완료로 전환할 수 있다.
+현재는 아래 6개 완료 기준 중 1개만 충족해 **부분 완료** 상태다. 비노출 회원 활동 탭과 회원 목록을 교체하고 활성 라우트 회귀 검증까지 마쳐야 전체 완료로 전환할 수 있다.
 
 1. [ ] 페이지 계산 정책을 가진 공통 컴포넌트가 `PaginationBar` 하나만 남는다.
 2. [ ] 모든 화면 상태와 URL은 1 기반 페이지를 사용한다.
