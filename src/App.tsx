@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { Sidebar, Toaster } from '@/shared/components/ui';
-import { PATHS } from '@/shared/constants/paths';
+import { PATHS } from '@/shared/constants';
 import { AuthProvider } from '@/shared/contexts';
 
 import {

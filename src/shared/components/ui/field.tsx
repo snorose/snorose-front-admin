@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 
 import { type VariantProps, cva } from 'class-variance-authority';
 
-import { Label } from '@/shared/components/ui/label';
-import { Separator } from '@/shared/components/ui/separator';
+import { Label, Separator } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 Field.Set = function FieldSet({

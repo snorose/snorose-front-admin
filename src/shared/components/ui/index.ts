@@ -2,6 +2,7 @@ export { Accordion } from './accordion';
 export { Alert } from './alert';
 export { Badge } from './badge';
 export { Button } from './button';
+export { buttonVariants } from './button';
 export { Calendar } from './calendar';
 export { Card } from './card';
 export { Collapsible } from './collapsible';

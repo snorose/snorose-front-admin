@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
-import { MAJOR_OPTIONS } from '@/shared/constants/majors';
-import { PATHS } from '@/shared/constants/paths';
+import { MAJOR_OPTIONS, PATHS } from '@/shared/constants';
 import type {
   AdminUserListItem,
   AdminUserSortType,
