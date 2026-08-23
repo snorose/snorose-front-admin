@@ -108,6 +108,15 @@ export default function PostTable({
                 <Table.Head style={{ width: '150px' }} className='px-3 text-xs'>
                   게시판
                 </Table.Head>
+                <Table.Head
+                  style={{ width: '140px' }}
+                  className='px-3 text-center text-xs'
+                >
+                  상태
+                </Table.Head>
+                <Table.Head style={{ width: '160px' }} className='px-3 text-xs'>
+                  작성일
+                </Table.Head>
                 <Table.Head style={{ width: '90px' }} className='px-3 text-xs'>
                   카테고리
                 </Table.Head>
@@ -122,15 +131,6 @@ export default function PostTable({
                   className='px-3 text-center text-xs'
                 >
                   의심 키워드
-                </Table.Head>
-                <Table.Head
-                  style={{ width: '140px' }}
-                  className='px-3 text-center text-xs'
-                >
-                  상태
-                </Table.Head>
-                <Table.Head style={{ width: '160px' }} className='px-3 text-xs'>
-                  작성일
                 </Table.Head>
               </Table.Row>
             </Table.Header>
