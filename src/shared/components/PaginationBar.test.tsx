@@ -15,9 +15,11 @@ describe('PaginationBar totalPage 우선 동작', () => {
     );
 
     const previousLink = screen.getByRole('link', {
-      name: 'Go to previous page',
+      name: '이전 페이지 묶음',
     });
     expect(previousLink).toHaveClass('pointer-events-none');
+    expect(previousLink).toHaveAttribute('aria-disabled', 'true');
+    expect(previousLink).toHaveAttribute('tabindex', '-1');
 
     fireEvent.click(previousLink);
     expect(onPageChange).not.toHaveBeenCalled();
@@ -58,8 +60,10 @@ describe('PaginationBar totalPage 우선 동작', () => {
       />
     );
 
-    const nextLink = screen.getByRole('link', { name: 'Go to next page' });
+    const nextLink = screen.getByRole('link', { name: '다음 페이지 묶음' });
     expect(nextLink).toHaveClass('pointer-events-none');
+    expect(nextLink).toHaveAttribute('aria-disabled', 'true');
+    expect(nextLink).toHaveAttribute('tabindex', '-1');
 
     fireEvent.click(nextLink);
     expect(onPageChange).not.toHaveBeenCalled();
@@ -75,8 +79,10 @@ describe('PaginationBar totalPage 우선 동작', () => {
       />
     );
 
-    const nextLink = screen.getByRole('link', { name: 'Go to next page' });
+    const nextLink = screen.getByRole('link', { name: '다음 페이지 묶음' });
     expect(nextLink).not.toHaveClass('pointer-events-none');
+    expect(nextLink).toHaveAttribute('aria-disabled', 'false');
+    expect(nextLink).not.toHaveAttribute('tabindex');
 
     fireEvent.click(nextLink);
     expect(onPageChange).toHaveBeenCalledWith(21);
@@ -93,8 +99,8 @@ describe('PaginationBar totalPage 우선 동작', () => {
     );
 
     fireEvent.click(screen.getByRole('link', { name: '13' }));
-    fireEvent.click(screen.getByRole('link', { name: 'Go to previous page' }));
-    fireEvent.click(screen.getByRole('link', { name: 'Go to next page' }));
+    fireEvent.click(screen.getByRole('link', { name: '이전 페이지 묶음' }));
+    fireEvent.click(screen.getByRole('link', { name: '다음 페이지 묶음' }));
 
     expect(onPageChange).toHaveBeenNthCalledWith(1, 13);
     expect(onPageChange).toHaveBeenNthCalledWith(2, 1);
@@ -131,8 +137,8 @@ describe('PaginationBar totalPage 우선 동작', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('link', { name: 'Go to previous page' }));
-    fireEvent.click(screen.getByRole('link', { name: 'Go to next page' }));
+    fireEvent.click(screen.getByRole('link', { name: '이전 페이지 묶음' }));
+    fireEvent.click(screen.getByRole('link', { name: '다음 페이지 묶음' }));
 
     expect(onPageChange).toHaveBeenNthCalledWith(1, 1);
     expect(onPageChange).toHaveBeenNthCalledWith(2, 11);
@@ -149,11 +155,27 @@ describe('PaginationBar totalPage 우선 동작', () => {
 
     expect(screen.getByRole('link', { name: '1' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: '2' })).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Go to previous page' })
-    ).toHaveClass('pointer-events-none');
-    expect(screen.getByRole('link', { name: 'Go to next page' })).toHaveClass(
+    expect(screen.getByRole('link', { name: '이전 페이지 묶음' })).toHaveClass(
       'pointer-events-none'
     );
+    expect(screen.getByRole('link', { name: '다음 페이지 묶음' })).toHaveClass(
+      'pointer-events-none'
+    );
+  });
+
+  test('페이지네이션과 이동 버튼에 한글 접근성 문구를 제공한다', () => {
+    render(
+      <PaginationBar currentPage={1} onPageChange={vi.fn()} totalPage={11} />
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: '페이지네이션' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: '이전 페이지 묶음' })
+    ).toHaveTextContent('이전');
+    expect(
+      screen.getByRole('link', { name: '다음 페이지 묶음' })
+    ).toHaveTextContent('다음');
   });
 });

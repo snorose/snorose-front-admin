@@ -41,6 +41,9 @@ export function PaginationBar({
         <Pagination.Item>
           <Pagination.Previous
             href='#'
+            aria-label='이전 페이지 묶음'
+            aria-disabled={!canGoPrevious}
+            tabIndex={canGoPrevious ? undefined : -1}
             onClick={(e) => {
               e.preventDefault();
               if (canGoPrevious) onPageChange(previousPage);
@@ -68,6 +71,9 @@ export function PaginationBar({
         <Pagination.Item>
           <Pagination.Next
             href='#'
+            aria-label='다음 페이지 묶음'
+            aria-disabled={!canGoNext}
+            tabIndex={canGoNext ? undefined : -1}
             onClick={(e) => {
               e.preventDefault();
               if (canGoNext) onPageChange(nextPage);
