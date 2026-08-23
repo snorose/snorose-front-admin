@@ -62,7 +62,7 @@ describe('useMemberDetailState', () => {
     const updateCachedMember = vi.fn();
     const { result } = renderHook(() =>
       useMemberDetailState({
-        currentPage: 0,
+        currentPage: 2,
         loadMembers,
         memberKey: MEMBER.encryptedUserId,
         updateCachedMember,
@@ -84,7 +84,7 @@ describe('useMemberDetailState', () => {
     expect(getUserDetailAPI).toHaveBeenNthCalledWith(2, MEMBER.encryptedUserId);
     expect(result.current.selectedMember).toEqual(serverMember);
     expect(updateCachedMember).toHaveBeenCalledWith(serverMember);
-    expect(loadMembers).toHaveBeenCalledWith(0);
+    expect(loadMembers).toHaveBeenCalledWith(2);
     expect(result.current.isEdit).toBe(false);
   });
 });
