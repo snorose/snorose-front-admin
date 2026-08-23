@@ -2,11 +2,8 @@ import { Link } from 'react-router-dom';
 
 import { BookOpen } from 'lucide-react';
 
-import { SectionCard } from '@/domains/MemberInfo/components/MemberDetailCard';
-import {
-  DETAIL_SHORTCUTS,
-  type DetailShortcut,
-} from '@/domains/MemberInfo/components/memberDetailConstants';
+import { SectionCard } from './MemberDetailCard';
+import { DETAIL_SHORTCUTS, type DetailShortcut } from './memberDetailConstants';
 
 const SHORTCUT_CLASS_NAME =
   'flex min-h-36 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-6 text-center transition';

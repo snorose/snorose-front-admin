@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
-import { getPostStatusBadges } from '@/shared/utils/postCommentUtils';
+import { getPostStatusBadges } from '@/shared/utils';
 
 import type { AdminGetPostResponse } from '../../types/post';
 

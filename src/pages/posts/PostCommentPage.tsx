@@ -1,5 +1,5 @@
 import { PageHeader } from '@/shared/components';
-import { useManagePageUrl } from '@/shared/hooks/useManagePageUrl';
+import { useManagePageUrl } from '@/shared/hooks';
 
 import { CommentFilterPanel } from '@/domains/Comments/components/CommentFilterPanel';
 import CommentTable from '@/domains/Comments/components/CommentTable';

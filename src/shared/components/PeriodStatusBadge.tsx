@@ -1,8 +1,5 @@
 import { cn } from '@/shared/lib';
-import {
-  type PeriodStatus,
-  getPeriodStatus,
-} from '@/shared/utils/periodStatusUtils';
+import { type PeriodStatus, getPeriodStatus } from '@/shared/utils';
 
 import { StatusBadge, type StatusBadgeTone } from './StatusBadge';
 

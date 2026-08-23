@@ -4,7 +4,7 @@ import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PaginationBar } from '@/shared/components';
-import { Table } from '@/shared/components/ui/table';
+import { Table } from '@/shared/components/ui';
 
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 

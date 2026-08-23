@@ -4,7 +4,7 @@ import {
   type AdminStatus,
   BOARD_OPTIONS,
   STATUS_OPTIONS,
-} from '@/shared/utils/postCommentUtils';
+} from '@/shared/utils';
 
 import type { CommentSearchParams } from '../types';
 

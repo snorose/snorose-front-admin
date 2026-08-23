@@ -1,4 +1,4 @@
-import type { AdminStatus } from '@/shared/utils/postCommentUtils';
+import type { AdminStatus } from '@/shared/utils';
 
 export interface AdminCommentResult {
   encryptedUserId: string;

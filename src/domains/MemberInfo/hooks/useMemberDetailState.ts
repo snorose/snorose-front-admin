@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
-import { PATHS } from '@/shared/constants/paths';
+import { PATHS } from '@/shared/constants';
 import type {
   BlacklistHistoryItem,
   EditMemberInfo,
