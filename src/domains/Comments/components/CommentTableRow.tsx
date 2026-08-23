@@ -41,15 +41,17 @@ export default function CommentTableRow({
         className='px-3 text-center'
         onClick={(e) => e.stopPropagation()}
       >
-        <input
-          type='checkbox'
-          checked={isSelected}
-          onChange={(e) => {
-            e.stopPropagation();
-            onSelectToggle(comment.commentId);
-          }}
-          className='cursor-pointer rounded border-gray-300'
-        />
+        <label className='inline-flex cursor-pointer p-2'>
+          <input
+            type='checkbox'
+            checked={isSelected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onSelectToggle(comment.commentId);
+            }}
+            className='cursor-pointer rounded border-gray-300'
+          />
+        </label>
       </Table.Cell>
 
       {/* 2. 댓글 ID */}

@@ -92,13 +92,15 @@ export default function CommentTable({
                   style={{ width: '40px' }}
                   className='px-3 text-center'
                 >
-                  <input
-                    type='checkbox'
-                    ref={selectAllRef}
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    className='cursor-pointer rounded border-gray-300'
-                  />
+                  <label className='inline-flex cursor-pointer p-2'>
+                    <input
+                      type='checkbox'
+                      ref={selectAllRef}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      className='cursor-pointer rounded border-gray-300'
+                    />
+                  </label>
                 </Table.Head>
                 <Table.Head style={{ width: '80px' }} className='px-3 text-xs'>
                   댓글 ID

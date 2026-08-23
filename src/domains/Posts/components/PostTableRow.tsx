@@ -38,15 +38,17 @@ export default function PostTableRow({
     >
       {/* 0. Checkbox */}
       <Table.Cell className='px-3 text-center'>
-        <input
-          type='checkbox'
-          checked={isSelected}
-          onChange={(e) => {
-            e.stopPropagation();
-            onSelectToggle(post.postId);
-          }}
-          className='rounded border-gray-300'
-        />
+        <label className='inline-flex cursor-pointer p-2'>
+          <input
+            type='checkbox'
+            checked={isSelected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onSelectToggle(post.postId);
+            }}
+            className='cursor-pointer rounded border-gray-300'
+          />
+        </label>
       </Table.Cell>
 
       {/* 1. 게시글 ID */}
