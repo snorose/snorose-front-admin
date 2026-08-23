@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { PATHS } from '@/shared/constants/paths';
-import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
+import type {
+  BlacklistHistoryItem,
+  EditMemberInfo,
+  MemberInfo,
+} from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
-import {
-  createMemberDiffPayload,
-  toBlacklistHistoryItem,
-} from '@/domains/MemberInfo/utils/memberDirectory';
+import { toBlacklistHistoryItem } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { blacklistHistoryAPI, editUsersAPI, getUserDetailAPI } from '@/apis';
 
@@ -217,30 +218,64 @@ export function useMemberDetailState({
     }
   }, [fetchPenaltyHistoryPage, selectedMember]);
 
+  const refreshMemberFromServer = useCallback(
+    async (encryptedUserId: string) => {
+      const refreshedMember = await fetchMemberDetail(encryptedUserId);
+
+      if (!refreshedMember) return null;
+
+      setSelectedMember(refreshedMember);
+      updateCachedMember(refreshedMember);
+      await loadMembers(currentPage);
+
+      return refreshedMember;
+    },
+    [currentPage, fetchMemberDetail, loadMembers, updateCachedMember]
+  );
+
   const handleSaveEdit = useCallback(
-    async (updated: MemberInfo) => {
+    async (changes: Partial<EditMemberInfo>) => {
       if (!selectedMember) return;
 
+      if (Object.keys(changes).length === 0) {
+        toast.info('변경 사항이 없습니다.');
+        return;
+      }
+
       try {
-        const diffPayload = createMemberDiffPayload(selectedMember, updated);
-        if (Object.keys(diffPayload).length === 0) {
-          toast.info('변경 사항이 없습니다.');
+        await editUsersAPI(selectedMember.encryptedUserId, changes);
+      } catch (error) {
+        toast.error(getErrorMessage(error, '회원 정보 수정에 실패했습니다.'));
+        return;
+      }
+
+      setIsDetailLoading(true);
+      try {
+        const refreshedMember = await refreshMemberFromServer(
+          selectedMember.encryptedUserId
+        );
+
+        if (!refreshedMember) {
+          toast.error(
+            '회원 정보는 수정되었지만 최신 정보를 불러오지 못했습니다.'
+          );
           return;
         }
 
-        await editUsersAPI(selectedMember.encryptedUserId, diffPayload);
-
-        const nextSelectedMember = { ...selectedMember, ...updated };
-        setSelectedMember(nextSelectedMember);
-        updateCachedMember(nextSelectedMember);
         setIsEdit(false);
         toast.success('회원 정보가 수정되었습니다.');
-        await loadMembers(currentPage);
       } catch (error) {
-        toast.error(getErrorMessage(error, '회원 정보 수정에 실패했습니다.'));
+        toast.error(
+          getErrorMessage(
+            error,
+            '회원 정보는 수정되었지만 최신 정보를 불러오지 못했습니다.'
+          )
+        );
+      } finally {
+        setIsDetailLoading(false);
       }
     },
-    [currentPage, loadMembers, selectedMember, updateCachedMember]
+    [refreshMemberFromServer, selectedMember]
   );
 
   const handleRefreshMemberDetail = useCallback(async () => {
@@ -248,7 +283,7 @@ export function useMemberDetailState({
 
     setIsDetailLoading(true);
     try {
-      const refreshedMember = await fetchMemberDetail(
+      const refreshedMember = await refreshMemberFromServer(
         selectedMember.encryptedUserId
       );
 
@@ -256,10 +291,6 @@ export function useMemberDetailState({
         toast.error('회원 상세 정보를 다시 불러오지 못했습니다.');
         return;
       }
-
-      setSelectedMember(refreshedMember);
-      updateCachedMember(refreshedMember);
-      await loadMembers(currentPage);
     } catch (error) {
       toast.error(
         getErrorMessage(error, '회원 상세 정보를 다시 불러오지 못했습니다.')
@@ -267,13 +298,7 @@ export function useMemberDetailState({
     } finally {
       setIsDetailLoading(false);
     }
-  }, [
-    currentPage,
-    fetchMemberDetail,
-    loadMembers,
-    selectedMember,
-    updateCachedMember,
-  ]);
+  }, [refreshMemberFromServer, selectedMember]);
 
   const handleCopy = useCallback(async (value: string) => {
     await navigator.clipboard.writeText(value);

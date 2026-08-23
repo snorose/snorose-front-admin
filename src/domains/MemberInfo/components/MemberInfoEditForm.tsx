@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useRef, useState } from 'react';
 
 import {
   CalendarDays,
@@ -6,14 +6,11 @@ import {
   GraduationCap,
   IdCard,
   Mail,
-  Trash2,
-  Upload,
   UserRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/shared/components/ui';
-import type { MemberInfo } from '@/shared/types';
+import type { EditMemberInfo, MemberInfo } from '@/shared/types';
 
 import {
   EditableField,
@@ -23,6 +20,7 @@ import {
 } from '@/domains/MemberInfo/components/MemberInfoEditFormFields';
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
 import {
+  createMemberDiffPayload,
   formatDate,
   formatDateTime,
   formatDisplayValue,
@@ -36,20 +34,19 @@ import {
 
 type MemberInfoEditFormProps = {
   member: MemberInfo;
-  onSubmit: (updated: MemberInfo) => void;
-  onCancel: () => void;
+  onSubmit: (changes: Partial<EditMemberInfo>) => void;
   onCopy: (value: string) => void | Promise<void>;
 };
 
 export default function MemberInfoEditForm({
   member,
   onSubmit,
-  onCancel,
   onCopy,
 }: MemberInfoEditFormProps) {
   const [selectedRoleId, setSelectedRoleId] = useState(
     String(member.userRoleId)
   );
+  const [loginId, setLoginId] = useState(member.loginId ?? '');
   const [userName, setUserName] = useState(member.userName ?? '');
   const [nickname, setNickname] = useState(member.nickname ?? '');
   const [email, setEmail] = useState(member.email ?? '');
@@ -61,11 +58,13 @@ export default function MemberInfoEditForm({
     member.birthday ? String(member.birthday).substring(0, 10) : ''
   );
   const [fieldErrors, setFieldErrors] = useState<MemberEditFormErrors>({});
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const nextValues = {
+      loginId: loginId.trim(),
       userName: userName.trim(),
       nickname: nickname.trim(),
       email: email.trim(),
@@ -75,30 +74,28 @@ export default function MemberInfoEditForm({
       userRoleId: Number(selectedRoleId),
     };
 
-    const nextErrors = validateMemberEditForm(nextValues);
-    if (Object.keys(nextErrors).length > 0) {
-      setFieldErrors(nextErrors);
-      toast.error('입력값을 확인해주세요.');
-      return;
-    }
-
-    setFieldErrors({});
-
     const nextMember: MemberInfo = {
       ...member,
       ...nextValues,
     };
+    const changedValues = createMemberDiffPayload(member, nextMember);
+    const nextErrors = validateMemberEditForm(changedValues);
 
-    onSubmit(nextMember);
-  };
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
+      toast.error('입력값을 확인해주세요.');
+      focusFirstInvalidField(formRef.current, nextErrors);
+      return;
+    }
 
-  const handleProfileImageAction = () => {
-    toast.info('프로필 이미지 수정 API 연동 예정입니다.');
+    setFieldErrors({});
+    onSubmit(changedValues);
   };
 
   const fieldItems: FieldItem[] = [
     {
       type: 'editable',
+      fieldName: 'userName',
       icon: UserRound,
       label: '이름',
       value: userName,
@@ -108,14 +105,19 @@ export default function MemberInfoEditForm({
       },
     },
     {
-      type: 'readonly',
+      type: 'editable',
+      fieldName: 'loginId',
       icon: IdCard,
       label: '아이디',
-      value: formatDisplayValue(member.loginId),
-      kind: 'box',
+      value: loginId,
+      onChange: (value) => {
+        setLoginId(value);
+        setFieldErrors((prev) => ({ ...prev, loginId: undefined }));
+      },
     },
     {
       type: 'editable',
+      fieldName: 'nickname',
       icon: UserRound,
       label: '닉네임',
       value: nickname,
@@ -126,6 +128,7 @@ export default function MemberInfoEditForm({
     },
     {
       type: 'editable',
+      fieldName: 'studentNumber',
       icon: GraduationCap,
       label: '학번',
       value: studentNumber,
@@ -136,6 +139,7 @@ export default function MemberInfoEditForm({
     },
     {
       type: 'editable',
+      fieldName: 'birthday',
       icon: CalendarDays,
       label: '생년월일',
       value: birthday,
@@ -147,6 +151,7 @@ export default function MemberInfoEditForm({
     },
     {
       type: 'editable',
+      fieldName: 'major',
       icon: GraduationCap,
       label: '전공',
       value: major,
@@ -195,10 +200,10 @@ export default function MemberInfoEditForm({
     {
       type: 'role',
       label: '회원 등급',
-      value: selectedRoleId,
     },
     {
       type: 'editable',
+      fieldName: 'email',
       icon: Mail,
       label: '이메일',
       value: email,
@@ -212,6 +217,7 @@ export default function MemberInfoEditForm({
 
   return (
     <form
+      ref={formRef}
       id={MEMBER_INFO_EDIT_FORM_ID}
       onSubmit={handleSubmit}
       className='space-y-8'
@@ -229,30 +235,10 @@ export default function MemberInfoEditForm({
               <UserRound className='h-12 w-12' />
             )}
           </div>
-
-          <div className='absolute -bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-2'>
-            <Button
-              type='button'
-              size='icon-sm'
-              onClick={handleProfileImageAction}
-              className='rounded-full bg-slate-950 text-white hover:bg-slate-800'
-            >
-              <Upload className='h-4 w-4' />
-            </Button>
-            <Button
-              type='button'
-              size='icon-sm'
-              onClick={handleProfileImageAction}
-              className='rounded-full bg-rose-500 text-white hover:bg-rose-400'
-            >
-              <Trash2 className='h-4 w-4' />
-            </Button>
-          </div>
         </div>
 
         <div className='space-y-1 text-center text-sm font-medium text-slate-400'>
-          <p>프로필 이미지를 클릭하여 변경하거나 삭제할 수 있습니다</p>
-          <p>(최대 5MB, JPG/PNG)</p>
+          <p>프로필 이미지 변경 또는 삭제는 담당자에게 요청해주세요.</p>
         </div>
       </div>
 
@@ -262,13 +248,14 @@ export default function MemberInfoEditForm({
             return (
               <EditableField
                 key={field.label}
+                fieldName={field.fieldName}
                 icon={field.icon}
                 label={field.label}
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={field.placeholder}
                 type={field.inputType}
-                error={fieldErrors[getFieldErrorKey(field.label)]}
+                error={fieldErrors[field.fieldName]}
               />
             );
           }
@@ -290,39 +277,30 @@ export default function MemberInfoEditForm({
               icon={field.icon}
               label={field.label}
               value={field.value}
-              kind={field.kind}
               copyValue={field.copyValue}
               onCopy={onCopy}
             />
           );
         })}
       </div>
-
-      <div className='hidden'>
-        <button type='submit'>submit</button>
-        <button type='button' onClick={onCancel}>
-          cancel
-        </button>
-      </div>
     </form>
   );
 }
 
-function getFieldErrorKey(label: string): keyof MemberEditFormErrors {
-  switch (label) {
-    case '이름':
-      return 'userName';
-    case '닉네임':
-      return 'nickname';
-    case '학번':
-      return 'studentNumber';
-    case '생년월일':
-      return 'birthday';
-    case '전공':
-      return 'major';
-    case '이메일':
-      return 'email';
-    default:
-      return 'userName';
-  }
+function focusFirstInvalidField(
+  form: HTMLFormElement | null,
+  errors: MemberEditFormErrors
+) {
+  if (!form) return;
+
+  const input = Array.from(form.querySelectorAll<HTMLElement>('[name]')).find(
+    (element) =>
+      Boolean(
+        errors[element.getAttribute('name') as keyof MemberEditFormErrors]
+      )
+  );
+  if (!input) return;
+
+  input.focus({ preventScroll: true });
+  input.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }

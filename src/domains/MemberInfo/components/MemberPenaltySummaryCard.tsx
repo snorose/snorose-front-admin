@@ -11,6 +11,10 @@ import {
 } from '@/domains/MemberInfo/components/MemberDetailCard';
 import MemberPenaltyHistoryDialog from '@/domains/MemberInfo/components/MemberPenaltyHistoryDialog';
 import {
+  isOngoingPenalty,
+  isWarningType,
+} from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
+import {
   formatDateTime,
   getPenaltyStatus,
   getRemainingPenaltyLabel,
@@ -41,13 +45,23 @@ export default function MemberPenaltySummaryCard({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const penaltyStatus = getPenaltyStatus(member);
   const hasActivePenalty = Boolean(member.isBlacklist);
-  // users API의 blacklistReason/blacklistStartDate는 '현재 활성 제재'의 정보다.
-  // 경고면 경고 사유/마지막 경고일, 강등이면 강등 사유/시작일이 담긴다.
   const isWarning = isWarningPenalty(member);
   const isDemotion = hasActivePenalty && !isWarning;
-  const remainingPenaltyLabel = getRemainingPenaltyLabel(
-    member.blacklistEndDate
-  );
+  const latestPayloadIsWarning = isWarningType(member.blacklistType ?? '');
+  const ongoingDemotion = penaltyHistory.find(isOngoingPenalty);
+  // 강등 중 새 경고가 추가되면 users API의 제재 상세 필드가 최신 경고를
+  // 가리킬 수 있다. 이때 경고 정보를 강등 정보로 오표시하지 않고,
+  // 조회된 이력의 진행 중 강등 정보를 사용한다.
+  const demotionReason = latestPayloadIsWarning
+    ? ongoingDemotion?.blackReason
+    : member.blacklistReason;
+  const demotionStartDate = latestPayloadIsWarning
+    ? (ongoingDemotion?.blacklistStartDate ?? ongoingDemotion?.createdAt)
+    : member.blacklistStartDate;
+  const demotionEndDate = latestPayloadIsWarning
+    ? ongoingDemotion?.blacklistDeadline
+    : member.blacklistEndDate;
+  const remainingPenaltyLabel = getRemainingPenaltyLabel(demotionEndDate);
 
   return (
     <>
@@ -73,11 +87,18 @@ export default function MemberPenaltySummaryCard({
         <div className='space-y-6'>
           <div className='space-y-3'>
             <p className='text-sm font-medium text-slate-500'>현재 상태</p>
-            <span
-              className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${penaltyStatus.tone}`}
-            >
-              {penaltyStatus.label}
-            </span>
+            <div className='flex flex-wrap items-center gap-2'>
+              <span
+                className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${penaltyStatus.tone}`}
+              >
+                {penaltyStatus.label}
+              </span>
+              {penaltyStatus.warningLabel ? (
+                <span className='inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700'>
+                  {penaltyStatus.warningLabel}
+                </span>
+              ) : null}
+            </div>
           </div>
 
           {isWarning && member.blacklistReason ? (
@@ -95,31 +116,33 @@ export default function MemberPenaltySummaryCard({
             />
           ) : null}
 
-          {isDemotion && member.blacklistReason ? (
-            <InfoBlock
-              label='강등 사유'
-              value={member.blacklistReason}
-              tone='muted'
-            />
+          {isDemotion && demotionReason ? (
+            <InfoBlock label='강등 사유' value={demotionReason} tone='muted' />
           ) : null}
 
-          {isDemotion && member.blacklistStartDate ? (
+          {isDemotion && demotionStartDate ? (
             <InfoBlock
               label='강등 시작일'
-              value={formatDateTime(member.blacklistStartDate)}
+              value={formatDateTime(demotionStartDate)}
               valueClassName='text-rose-600'
             />
           ) : null}
 
-          {isDemotion && member.blacklistEndDate ? (
+          {isDemotion && demotionEndDate ? (
             <InfoBlock
               label='강등 종료일'
-              value={formatDateTime(member.blacklistEndDate)}
+              value={formatDateTime(demotionEndDate)}
             />
           ) : null}
 
-          {isDemotion && member.blacklistEndDate ? (
+          {isDemotion && demotionEndDate ? (
             <InfoBlock label='남은 기간' value={remainingPenaltyLabel} />
+          ) : null}
+
+          {isDemotion && latestPayloadIsWarning && !ongoingDemotion ? (
+            <p className='rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600'>
+              강등 상세 정보는 제재 이력에서 확인할 수 있습니다.
+            </p>
           ) : null}
 
           <div className='space-y-2'>
@@ -139,11 +162,7 @@ export default function MemberPenaltySummaryCard({
           </div>
 
           <div
-            className={`rounded-2xl px-4 py-5 text-sm font-medium ${
-              hasActivePenalty
-                ? 'bg-rose-50 text-rose-700'
-                : 'bg-emerald-50 text-emerald-700'
-            }`}
+            className={`rounded-2xl px-4 py-5 text-sm font-medium ${penaltyStatus.summaryTone}`}
           >
             {penaltyStatus.summary}
           </div>

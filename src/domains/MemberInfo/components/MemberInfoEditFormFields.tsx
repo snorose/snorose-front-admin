@@ -4,9 +4,11 @@ import { Input, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
 import { EMPTY_TEXT } from '@/domains/MemberInfo/utils/memberDirectory';
+import type { MemberEditFormValues } from '@/domains/MemberInfo/utils/validateMemberEditForm';
 
 export type EditableFieldItem = {
   type: 'editable';
+  fieldName: keyof MemberEditFormValues;
   icon: LucideIcon;
   inputType?: string;
   label: string;
@@ -19,7 +21,6 @@ export type ReadonlyFieldItem = {
   type: 'readonly';
   copyValue?: string;
   icon: LucideIcon;
-  kind?: 'box' | 'text';
   label: string;
   value: string;
 };
@@ -27,13 +28,13 @@ export type ReadonlyFieldItem = {
 export type RoleFieldItem = {
   type: 'role';
   label: string;
-  value: string;
 };
 
 export type FieldItem = EditableFieldItem | ReadonlyFieldItem | RoleFieldItem;
 
 export function EditableField({
   error,
+  fieldName,
   icon: Icon,
   label,
   onChange,
@@ -42,6 +43,7 @@ export function EditableField({
   value,
 }: {
   error?: string;
+  fieldName: keyof MemberEditFormValues;
   icon: LucideIcon;
   label: string;
   onChange: (value: string) => void;
@@ -49,22 +51,40 @@ export function EditableField({
   type?: string;
   value: string;
 }) {
+  const inputId = `member-edit-${fieldName}`;
+  const errorId = `${inputId}-error`;
+
   return (
     <div className='space-y-2'>
-      <div className='flex items-center gap-2 text-sm font-medium text-slate-500'>
+      <label
+        htmlFor={inputId}
+        className={`flex items-center gap-2 text-sm font-medium ${
+          error ? 'text-rose-700' : 'text-slate-500'
+        }`}
+      >
         <Icon className='h-4 w-4' />
         {label}
-      </div>
+      </label>
       <Input
+        id={inputId}
+        name={fieldName}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`h-12 rounded-xl border-0 px-4 text-base font-semibold text-slate-950 shadow-none focus-visible:ring-2 ${
-          error ? 'bg-rose-50 ring-1 ring-rose-200' : 'bg-slate-100'
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className={`h-12 rounded-xl px-4 text-base font-semibold text-slate-950 shadow-none focus-visible:ring-2 ${
+          error
+            ? 'border border-rose-300 bg-rose-50 ring-2 ring-rose-200 focus-visible:border-rose-400 focus-visible:ring-rose-200'
+            : 'border-0 bg-slate-100'
         }`}
       />
-      {error ? <p className='text-sm text-rose-600'>{error}</p> : null}
+      {error ? (
+        <p id={errorId} role='alert' className='text-sm text-rose-600'>
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -103,14 +123,12 @@ export function EditableRoleField({
 export function ReadonlyField({
   copyValue,
   icon: Icon,
-  kind = 'text',
   label,
   onCopy,
   value,
 }: {
   copyValue?: string;
   icon: LucideIcon;
-  kind?: 'box' | 'text';
   label: string;
   onCopy?: (value: string) => void | Promise<void>;
   value: string;
@@ -124,27 +142,21 @@ export function ReadonlyField({
         {label}
       </div>
 
-      {kind === 'box' ? (
-        <div className='rounded-xl bg-slate-100 px-4 py-3 text-base font-semibold text-slate-950'>
+      <div className='flex items-center gap-2'>
+        <p className='text-lg font-semibold break-all text-slate-950'>
           {value}
-        </div>
-      ) : (
-        <div className='flex items-center gap-2'>
-          <p className='text-lg font-semibold break-all text-slate-950'>
-            {value}
-          </p>
-          {copyValue && !isEmpty && onCopy ? (
-            <button
-              type='button'
-              onClick={() => void onCopy(copyValue)}
-              className='rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700'
-              aria-label={`${label} 복사`}
-            >
-              <Copy className='h-4 w-4' />
-            </button>
-          ) : null}
-        </div>
-      )}
+        </p>
+        {copyValue && !isEmpty && onCopy ? (
+          <button
+            type='button'
+            onClick={() => void onCopy(copyValue)}
+            className='rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700'
+            aria-label={`${label} 복사`}
+          >
+            <Copy className='h-4 w-4' />
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
