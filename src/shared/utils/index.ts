@@ -15,6 +15,7 @@ export {
   formatCommentId,
   formatPostId,
   getBoardKey,
+  getBoardKeyByName,
   getPostStatusBadges,
   STATUS_OPTIONS,
   stripHtmlTags,
