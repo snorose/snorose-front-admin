@@ -105,10 +105,10 @@ export default function PostDetailPage() {
             <PostDetailStatusLogCard statusLogs={[]} />
 
             {/* 카드 3: 신고 내역 */}
-            <PostDetailReportCard reportCount={post.reportCount} />
+            <PostDetailReportCard postId={post.postId} />
 
             {/* 카드 4: 징계 정보 */}
-            <PostDetailBlacklistCard />
+            <PostDetailBlacklistCard key={post.postId} postId={post.postId} />
           </div>
         </div>
       </div>
