@@ -108,7 +108,7 @@ export default function PostDetailPage() {
             <PostDetailReportCard postId={post.postId} />
 
             {/* 카드 4: 징계 정보 */}
-            <PostDetailBlacklistCard postId={post.postId} />
+            <PostDetailBlacklistCard key={post.postId} postId={post.postId} />
           </div>
         </div>
       </div>
