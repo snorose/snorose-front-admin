@@ -1,6 +1,16 @@
 import { describe, expect, test } from 'vitest';
 
-import { getPostStatusBadges } from './postCommentUtils';
+import { getBoardKeyByName, getPostStatusBadges } from './postCommentUtils';
+
+describe('getBoardKeyByName', () => {
+  test('게시판 이름에 대응하는 URL key를 반환한다', () => {
+    expect(getBoardKeyByName('함박눈방')).toBe('large-snow');
+  });
+
+  test('등록되지 않은 게시판 이름이면 undefined를 반환한다', () => {
+    expect(getBoardKeyByName('알 수 없는 게시판')).toBeUndefined();
+  });
+});
 
 describe('getPostStatusBadges', () => {
   test.each([

@@ -48,6 +48,16 @@ export const BOARD_KEYS: Record<number, string> = {
 export const getBoardKey = (boardId: number): string | undefined =>
   BOARD_KEYS[boardId];
 
+export const getBoardKeyByName = (boardName: string): string | undefined => {
+  const boardEntry = Object.entries(BOARD_NAMES).find(
+    ([, name]) => name === boardName
+  );
+
+  if (!boardEntry) return undefined;
+
+  return getBoardKey(Number(boardEntry[0]));
+};
+
 export const stripHtmlTags = (html: string | null | undefined): string => {
   if (!html) return '-';
   return (
