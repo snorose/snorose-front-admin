@@ -5,6 +5,7 @@ import type {
   AdminGetPostResponse,
   AdminPostBulkDeleteResult,
   AdminPostListResult,
+  AdminPostReportListResult,
   AdminPostSearchRequest,
 } from '@/domains/Posts/types/post';
 
@@ -103,5 +104,14 @@ export const getPostSanction = async (
   >(`/v1/admin/posts/${postId}/sanctions`, {
     params: { page: page - 1 },
   });
+  return response.data.result;
+};
+
+export const getPostReports = async (
+  postId: number
+): Promise<AdminPostReportListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminPostReportListResult>
+  >(`/v1/admin/posts/${postId}/reports`);
   return response.data.result;
 };
