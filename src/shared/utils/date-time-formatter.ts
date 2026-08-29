@@ -1,6 +1,7 @@
 /**
  * datetime-local input 형식을 API 형식으로 변환
- * '2024-01-01T12:00' → '2024-01-01 12:00:00'
+ *
+ * 예시) '2024-01-01T12:00' → '2024-01-01 12:00:00'
  */
 export function formatDateTimeForAPI(dateTimeString: string): string {
   return dateTimeString.replace('T', ' ') + ':00';
@@ -8,7 +9,8 @@ export function formatDateTimeForAPI(dateTimeString: string): string {
 
 /**
  * datetime-local input 형식을 T 포함 API 형식으로 변환
- * '2024-01-01T12:00' → '2024-01-01T12:00:00'
+ *
+ * 예시) '2024-01-01T12:00' → '2024-01-01T12:00:00'
  */
 export function formatDateTimeWithT(dateTimeString: string): string {
   return `${dateTimeString}:00`;
@@ -16,7 +18,8 @@ export function formatDateTimeWithT(dateTimeString: string): string {
 
 /**
  * API 형식을 datetime-local input 형식으로 변환
- * '2024-01-01 12:00:00' → '2024-01-01T12:00'
+ *
+ * 예시) '2024-01-01 12:00:00' → '2024-01-01T12:00'
  *
  * @deprecated 새 코드에서는 toDateTimeInputValue를 사용한다.
  */
@@ -26,7 +29,9 @@ export function formatDateTimeForInput(dateTimeString: string): string {
 
 /**
  * 날짜/시간 문자열에서 날짜만 반환
- * '2024-01-01 12:00:00' → '2024-01-01'
+ *
+ * 예시) '2024-01-01 12:00:00' → '2024-01-01'
+ *
  * 값이 없으면 '-' 반환
  */
 export function formatDateOnly(
@@ -38,7 +43,9 @@ export function formatDateOnly(
 
 /**
  * 날짜/시간 문자열에서 초 단위를 제거
- * '2024-01-01 12:00:00' → '2024-01-01 12:00'
+ *
+ * 예시) '2024-01-01 12:00:00' → '2024-01-01 12:00'
+ *
  * 값이 없으면 '-' 반환
  */
 export function formatDateTimeToMinutes(
@@ -50,7 +57,9 @@ export function formatDateTimeToMinutes(
 
 /**
  * 날짜/시간 문자열을 초 단위까지 반환
- * '2024-01-01T12:00:00.000' → '2024-01-01 12:00:00'
+ *
+ * 예시) '2024-01-01T12:00:00.000' → '2024-01-01 12:00:00'
+ *
  * 값이 없으면 '-' 반환
  */
 export function formatDateTimeToSeconds(
@@ -87,7 +96,9 @@ export function formatDateTimeWithAmPm(
 
 /**
  * 날짜/시간 문자열을 datetime-local input 값으로 변환
- * '2024-01-01 12:00:00' → '2024-01-01T12:00'
+ *
+ * 예시) '2024-01-01 12:00:00' → '2024-01-01T12:00'
+ *
  * 값이 없으면 빈 문자열 반환
  */
 export function toDateTimeInputValue(
