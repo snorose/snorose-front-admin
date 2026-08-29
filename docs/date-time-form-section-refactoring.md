@@ -84,7 +84,7 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 - [x] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
 - [x] `penalty-history-utils.ts`의 `toDateTimeInputValue`는 공용 util로 대체 가능한지 확인한다.
 - [x] 기간 수정 모달의 `formatDateTimeForInput` 사용처를 `toDateTimeInputValue`로 교체한다.
-- [ ] API 전송용 함수는 형식 차이가 있으므로 유지한다.
+- [x] API 전송용 함수는 형식 차이가 있으므로 유지한다.
 
 ### 2차 구현: `FormSection` 도입
 

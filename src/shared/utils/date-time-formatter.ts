@@ -17,6 +17,8 @@ export function formatDateTimeWithT(dateTimeString: string): string {
 /**
  * API 형식을 datetime-local input 형식으로 변환
  * '2024-01-01 12:00:00' → '2024-01-01T12:00'
+ *
+ * @deprecated 새 코드에서는 toDateTimeInputValue를 사용한다.
  */
 export function formatDateTimeForInput(dateTimeString: string): string {
   return toDateTimeInputValue(dateTimeString);
