@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 
-import { Loader2 } from 'lucide-react';
-
-import { PaginationBar } from '@/shared/components';
-import { BulkActionBar } from '@/shared/components';
-import StatusChangeModal from '@/shared/components/StatusChangeModal';
+import {
+  BulkActionBar,
+  PaginationBar,
+  StatusChangeModal,
+  TableStateRow,
+} from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
@@ -78,7 +79,10 @@ export default function CommentTable({
 
       <div className='flex items-center justify-between px-1 text-xs text-gray-500'>
         <span>
-          총 <span className='font-bold text-blue-600'>{totalCount ?? 0}</span>
+          총{' '}
+          <span className='font-bold text-blue-600'>
+            {(totalCount ?? 0).toLocaleString('ko-KR')}
+          </span>
           개의 댓글
         </span>
       </div>
@@ -92,13 +96,15 @@ export default function CommentTable({
                   style={{ width: '40px' }}
                   className='px-3 text-center'
                 >
-                  <input
-                    type='checkbox'
-                    ref={selectAllRef}
-                    checked={isAllSelected}
-                    onChange={handleSelectAll}
-                    className='cursor-pointer rounded border-gray-300'
-                  />
+                  <label className='inline-flex cursor-pointer p-2'>
+                    <input
+                      type='checkbox'
+                      ref={selectAllRef}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      className='cursor-pointer rounded border-gray-300'
+                    />
+                  </label>
                 </Table.Head>
                 <Table.Head style={{ width: '80px' }} className='px-3 text-xs'>
                   댓글 ID
@@ -118,6 +124,15 @@ export default function CommentTable({
                 <Table.Head style={{ width: '150px' }} className='px-3 text-xs'>
                   게시판
                 </Table.Head>
+                <Table.Head
+                  style={{ width: '100px' }}
+                  className='px-3 text-center text-xs'
+                >
+                  상태
+                </Table.Head>
+                <Table.Head style={{ width: '180px' }} className='px-3 text-xs'>
+                  작성일
+                </Table.Head>
                 <Table.Head style={{ width: '90px' }} className='px-3 text-xs'>
                   카테고리
                 </Table.Head>
@@ -133,37 +148,22 @@ export default function CommentTable({
                 >
                   의심 키워드
                 </Table.Head>
-                <Table.Head
-                  style={{ width: '100px' }}
-                  className='px-3 text-center text-xs'
-                >
-                  상태
-                </Table.Head>
-                <Table.Head style={{ width: '180px' }} className='px-3 text-xs'>
-                  작성일
-                </Table.Head>
               </Table.Row>
             </Table.Header>
 
             <Table.Body>
               {isLoading ? (
-                <Table.Row>
-                  <Table.Cell colSpan={12} className='h-48 text-center'>
-                    <div className='flex items-center justify-center gap-2 text-gray-500'>
-                      <Loader2 className='h-5 w-5 animate-spin text-blue-600' />
-                      <span>댓글 데이터를 불러오는 중입니다...</span>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
+                <TableStateRow
+                  state='loading'
+                  colSpan={12}
+                  message='댓글 데이터를 불러오는 중입니다.'
+                />
               ) : isEmpty ? (
-                <Table.Row>
-                  <Table.Cell
-                    colSpan={12}
-                    className='h-48 text-center text-sm text-gray-400'
-                  >
-                    등록된 댓글이 없거나 검색 결과가 존재하지 않습니다.
-                  </Table.Cell>
-                </Table.Row>
+                <TableStateRow
+                  state='empty'
+                  colSpan={12}
+                  message='등록된 댓글이 없거나 검색 결과가 존재하지 않습니다.'
+                />
               ) : (
                 comments.map((comment) => (
                   <CommentTableRow

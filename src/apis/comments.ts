@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/shared/axios/instance';
-import type { BaseResponse } from '@/shared/types';
+import type { AdminSanctionListResult, BaseResponse } from '@/shared/types';
 
 import type {
   AdminCommentBulkDeleteResult,
@@ -117,5 +117,17 @@ export const updateCommentVisibility = async (
     `/v1/admin/comments/visibility`,
     body
   );
+  return response.data.result;
+};
+
+export const getCommentSanction = async (
+  commentId: number,
+  page: number
+): Promise<AdminSanctionListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminSanctionListResult>
+  >(`/v1/admin/comments/${commentId}/sanctions`, {
+    params: { page: page - 1 },
+  });
   return response.data.result;
 };

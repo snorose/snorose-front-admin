@@ -1,4 +1,5 @@
-import { Button, Dialog } from '@/shared/components/ui';
+import { Button } from './button';
+import { Dialog } from './dialog';
 
 interface ConfirmModalProps {
   isOpen: boolean;

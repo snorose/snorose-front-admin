@@ -4,7 +4,7 @@ import {
   type AdminStatus,
   BOARD_OPTIONS,
   STATUS_OPTIONS,
-} from '@/shared/utils/postCommentUtils';
+} from '@/shared/utils';
 
 import type { CommentSearchParams } from '../types';
 
@@ -118,7 +118,7 @@ export const CommentFilterPanel = ({
           />
         </div>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>게시글 검색</label>
+          <label className='text-sm text-gray-600'>댓글 검색</label>
           <div className='flex gap-2'>
             <select
               value={filters.searchScope ?? 'CONTENT'}

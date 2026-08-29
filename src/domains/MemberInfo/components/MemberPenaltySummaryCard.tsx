@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { History, ShieldAlert } from 'lucide-react';
 
+import { StatusBadge } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 
@@ -88,15 +89,13 @@ export default function MemberPenaltySummaryCard({
           <div className='space-y-3'>
             <p className='text-sm font-medium text-slate-500'>현재 상태</p>
             <div className='flex flex-wrap items-center gap-2'>
-              <span
-                className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${penaltyStatus.tone}`}
-              >
+              <StatusBadge tone={penaltyStatus.tone}>
                 {penaltyStatus.label}
-              </span>
-              {penaltyStatus.warningLabel ? (
-                <span className='inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700'>
-                  {penaltyStatus.warningLabel}
-                </span>
+              </StatusBadge>
+              {penaltyStatus.warningBadge ? (
+                <StatusBadge tone={penaltyStatus.warningBadge.tone}>
+                  {penaltyStatus.warningBadge.label}
+                </StatusBadge>
               ) : null}
             </div>
           </div>

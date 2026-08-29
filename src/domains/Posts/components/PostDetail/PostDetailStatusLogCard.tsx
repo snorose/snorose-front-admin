@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui';
+import { StatusBadge } from '@/shared/components';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
@@ -46,13 +46,9 @@ export default function PostDetailStatusLogCard({
                       reportCount: 0,
                       adminCommonStatuses: [log.reason],
                     }).map((badge, idx) => (
-                      <Badge
-                        key={idx}
-                        variant='unstyled'
-                        className={badge.className}
-                      >
-                        {badge.text}
-                      </Badge>
+                      <StatusBadge key={idx} tone={badge.tone}>
+                        {badge.label}
+                      </StatusBadge>
                     ))}
                   </div>
                 </div>

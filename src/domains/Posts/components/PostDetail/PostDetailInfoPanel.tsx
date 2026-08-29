@@ -4,10 +4,10 @@ import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { MemberInfoPopover } from '@/shared/components';
-import { Badge, Switch } from '@/shared/components/ui';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
+import { Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
-import { getPostStatusBadges } from '@/shared/utils/postCommentUtils';
+import { getPostStatusBadges } from '@/shared/utils';
 
 import type { AdminGetPostResponse } from '../../types/post';
 
@@ -55,9 +55,7 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-400'>카테고리</span>
             <div>
               {post.category ? (
-                <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
-                  {post.category}
-                </span>
+                <StatusBadge tone='outline'>{post.category}</StatusBadge>
               ) : (
                 <span className='font-mono text-gray-300'>-</span>
               )}
@@ -68,15 +66,11 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-400'>게시글 상태</span>
             <div className='flex flex-wrap items-center gap-1.5'>
               {getPostStatusBadges(post).map((badge, idx) => (
-                <Badge key={idx} variant='unstyled' className={badge.className}>
-                  {badge.text}
-                </Badge>
+                <StatusBadge key={idx} tone={badge.tone}>
+                  {badge.label}
+                </StatusBadge>
               ))}
-              {post.isNotice && (
-                <Badge className='rounded border-none bg-[#FEE2E2] px-1.5 py-0.5 text-[10px] font-bold text-[#991B1B] hover:bg-[#FEE2E2]'>
-                  공지
-                </Badge>
-              )}
+              {post.isNotice && <StatusBadge tone='info'>공지</StatusBadge>}
             </div>
           </div>
         </div>
@@ -86,7 +80,7 @@ export default function PostDetailInfoPanel({
           <div className='flex flex-col gap-1'>
             <span className='font-medium text-gray-400'>게시판</span>
             <div>
-              <Badge variant='unstyled'>{post.boardName}</Badge>
+              <StatusBadge tone='outline'>{post.boardName}</StatusBadge>
             </div>
           </div>
 

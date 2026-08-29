@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { ArrowLeft, FileX, Loader2 } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FileX, Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 
@@ -11,6 +11,7 @@ import PostDetailManageCard from '@/domains/Posts/components/PostDetail/PostDeta
 import PostDetailReportCard from '@/domains/Posts/components/PostDetail/PostDetailReportCard';
 import PostDetailStatusLogCard from '@/domains/Posts/components/PostDetail/PostDetailStatusLogCard';
 import { usePost } from '@/domains/Posts/hooks/usePost';
+import { buildOriginalPostUrl } from '@/domains/Posts/utils/postUrl';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -49,17 +50,39 @@ export default function PostDetailPage() {
     );
   }
 
+  const originalPostUrl = buildOriginalPostUrl(post);
+
   return (
     <div className='flex w-full flex-col gap-6 pb-12'>
       <div className='flex flex-col gap-6'>
-        <Button
-          variant='outline'
-          size='sm'
-          className='flex h-8 items-center gap-1 self-start rounded-lg border-gray-300 bg-white px-2 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50'
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className='h-3.5 w-3.5' /> 목록으로
-        </Button>
+        <div className='flex items-center justify-between gap-4'>
+          <Button
+            variant='outline'
+            size='sm'
+            className='flex h-8 items-center gap-1 rounded-lg border-gray-300 bg-white px-2 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50'
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className='h-3.5 w-3.5' /> 목록으로
+          </Button>
+
+          {originalPostUrl && (
+            <Button
+              asChild
+              variant='outline'
+              size='sm'
+              className='h-8 rounded-lg border-gray-300 bg-white px-2 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50'
+            >
+              <a
+                href={originalPostUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                원본 게시글
+                <ExternalLink className='h-3.5 w-3.5' />
+              </a>
+            </Button>
+          )}
+        </div>
 
         <div className='grid grid-cols-1 items-start gap-6 lg:grid-cols-3'>
           {/* 좌측 2/3 컬럼: 상세 카드 + 댓글 카드 리스트 */}
@@ -82,10 +105,10 @@ export default function PostDetailPage() {
             <PostDetailStatusLogCard statusLogs={[]} />
 
             {/* 카드 3: 신고 내역 */}
-            <PostDetailReportCard reportCount={post.reportCount} />
+            <PostDetailReportCard postId={post.postId} />
 
             {/* 카드 4: 징계 정보 */}
-            <PostDetailBlacklistCard />
+            <PostDetailBlacklistCard key={post.postId} postId={post.postId} />
           </div>
         </div>
       </div>

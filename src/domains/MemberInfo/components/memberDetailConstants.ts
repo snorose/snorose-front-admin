@@ -7,7 +7,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 
-import { PATHS } from '@/shared/constants/paths';
+import { PATHS } from '@/shared/constants';
 
 export type DetailShortcut = {
   description: string;

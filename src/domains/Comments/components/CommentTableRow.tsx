@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { AlertTriangle, Eye, Heart, MessageSquare } from 'lucide-react';
 
-import { MemberInfoPopover } from '@/shared/components';
-import { Badge, Table } from '@/shared/components/ui';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
+import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
@@ -33,6 +33,7 @@ export default function CommentTableRow({
   onFilterByParentId,
 }: CommentTableRowProps) {
   const navigate = useNavigate();
+  const boardName = BOARD_NAMES[comment.boardId];
 
   return (
     <Table.Row className='border-b border-gray-100 bg-white text-gray-800 last:border-0 hover:bg-gray-50/50 [&_td]:h-[54px]'>
@@ -41,15 +42,17 @@ export default function CommentTableRow({
         className='px-3 text-center'
         onClick={(e) => e.stopPropagation()}
       >
-        <input
-          type='checkbox'
-          checked={isSelected}
-          onChange={(e) => {
-            e.stopPropagation();
-            onSelectToggle(comment.commentId);
-          }}
-          className='cursor-pointer rounded border-gray-300'
-        />
+        <label className='inline-flex cursor-pointer p-2'>
+          <input
+            type='checkbox'
+            checked={isSelected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onSelectToggle(comment.commentId);
+            }}
+            className='cursor-pointer rounded border-gray-300'
+          />
+        </label>
       </Table.Cell>
 
       {/* 2. 댓글 ID */}
@@ -129,21 +132,46 @@ export default function CommentTableRow({
 
       {/* 7. 게시판 */}
       <Table.Cell className='px-3'>
-        <Badge variant='unstyled'>{BOARD_NAMES[comment.boardId] ?? '-'}</Badge>
-      </Table.Cell>
-
-      {/* 8. 카테고리 */}
-      <Table.Cell className='px-3 text-xs text-gray-500'>
-        {comment.category ? (
-          <span className='rounded bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600'>
-            {comment.category}
-          </span>
+        {boardName ? (
+          <StatusBadge tone='outline'>{boardName}</StatusBadge>
         ) : (
           <span className='font-mono text-gray-300'>-</span>
         )}
       </Table.Cell>
 
-      {/* 9. 통계 */}
+      {/* 8. 상태 */}
+      <Table.Cell className='px-3 text-center'>
+        <div className='flex flex-wrap items-center justify-center gap-1'>
+          {getPostStatusBadges(comment).map((badge, idx) => (
+            <button
+              key={idx}
+              type='button'
+              onClick={(e) => {
+                e.stopPropagation();
+                onSingleVisibilityToggle(comment);
+              }}
+            >
+              <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+            </button>
+          ))}
+        </div>
+      </Table.Cell>
+
+      {/* 9. 작성일 */}
+      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
+        {formatDateTimeWithAmPm(comment.createdAt)}
+      </Table.Cell>
+
+      {/* 10. 카테고리 */}
+      <Table.Cell className='px-3 text-xs text-gray-500'>
+        {comment.category ? (
+          <StatusBadge tone='outline'>{comment.category}</StatusBadge>
+        ) : (
+          <span className='font-mono text-gray-300'>-</span>
+        )}
+      </Table.Cell>
+
+      {/* 11. 통계 */}
       <Table.Cell className='px-3 py-1.5 text-center'>
         <div className='mx-auto grid max-w-[110px] grid-cols-2 justify-items-start gap-x-2 gap-y-1 pl-1 font-mono text-[11px] text-gray-500'>
           <span className='flex items-center gap-0.5' title='조회수'>
@@ -176,41 +204,13 @@ export default function CommentTableRow({
         </div>
       </Table.Cell>
 
-      {/* 10. 의심 키워드 */}
+      {/* 12. 의심 키워드 */}
       <Table.Cell className='px-3 text-center'>
         {comment.isKeywordExist ? (
-          <Badge className='rounded border-none bg-[#F5F3FF] px-2 py-0.5 text-[11px] font-bold text-[#7C3AED] hover:bg-[#F5F3FF]'>
-            Y
-          </Badge>
+          <StatusBadge tone='warning'>Y</StatusBadge>
         ) : (
-          <Badge className='rounded border-none bg-[#F3F4F6] px-2 py-0.5 text-[11px] font-bold text-[#9CA3AF] hover:bg-[#F3F4F6]'>
-            N
-          </Badge>
+          <StatusBadge tone='neutral'>N</StatusBadge>
         )}
-      </Table.Cell>
-
-      {/* 11. 상태 */}
-      <Table.Cell className='px-3 text-center'>
-        <div className='flex flex-wrap items-center justify-center gap-1'>
-          {getPostStatusBadges(comment).map((badge, idx) => (
-            <Badge
-              key={idx}
-              variant='unstyled'
-              className={badge.className}
-              onClick={(e) => {
-                e.stopPropagation();
-                onSingleVisibilityToggle(comment);
-              }}
-            >
-              {badge.text}
-            </Badge>
-          ))}
-        </div>
-      </Table.Cell>
-
-      {/* 12. 작성일 */}
-      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {formatDateTimeWithAmPm(comment.createdAt)}
       </Table.Cell>
     </Table.Row>
   );

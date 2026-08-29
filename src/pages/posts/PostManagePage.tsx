@@ -1,5 +1,5 @@
 import { PageHeader } from '@/shared/components';
-import { useManagePageUrl } from '@/shared/hooks/useManagePageUrl';
+import { useManagePageUrl } from '@/shared/hooks';
 
 import { PostFilterPanel } from '@/domains/Posts/components/PostFilterPanel';
 import PostTable from '@/domains/Posts/components/PostTable';

@@ -1,4 +1,4 @@
-import { Badge } from '@/shared/components/ui';
+import { StatusBadge, type StatusBadgeTone } from '@/shared/components';
 import { cn } from '@/shared/lib';
 
 import type { ExamReviewProcessStatus } from '@/domains/Reviews/types';
@@ -9,17 +9,17 @@ interface ExamReviewProcessStatusBadgeProps {
   className?: string;
 }
 
-const PROCESS_STATUS_BADGE_CLASS_NAMES: Record<
+const PROCESS_STATUS_BADGE_TONES: Record<
   ExamReviewProcessStatus,
-  string
+  StatusBadgeTone
 > = {
-  VISIBLE: 'bg-gray-100 text-gray-700',
-  USER_DELETED: 'bg-red-50 text-red-700',
-  ADMIN_DELETED: 'bg-red-50 text-red-700',
-  ADMIN_HIDDEN: 'bg-amber-50 text-amber-700',
-  AUTO_HIDDEN: 'bg-amber-50 text-amber-700',
-  SANCTIONED: 'bg-violet-50 text-violet-700',
-  DESANCTIONED: 'bg-emerald-50 text-emerald-700',
+  VISIBLE: 'success',
+  USER_DELETED: 'danger',
+  ADMIN_DELETED: 'danger',
+  ADMIN_HIDDEN: 'warning',
+  AUTO_HIDDEN: 'warning',
+  SANCTIONED: 'accent',
+  DESANCTIONED: 'success',
 };
 
 export function ExamReviewProcessStatusBadge({
@@ -29,12 +29,10 @@ export function ExamReviewProcessStatusBadge({
   const label = getExamReviewProcessStatusLabel(status);
 
   return (
-    <Badge
-      variant='default'
-      className={cn(PROCESS_STATUS_BADGE_CLASS_NAMES[status], className)}
-      title={label}
-    >
-      {label}
-    </Badge>
+    <div className={cn('flex items-center', className)} title={label}>
+      <StatusBadge tone={PROCESS_STATUS_BADGE_TONES[status]}>
+        {label}
+      </StatusBadge>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { InquiryDetail } from '@/shared/types';
-import { getBoardKey } from '@/shared/utils/postCommentUtils';
+import { getBoardKey } from '@/shared/utils';
 
 // 문의/신고 글 위치
 const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL;

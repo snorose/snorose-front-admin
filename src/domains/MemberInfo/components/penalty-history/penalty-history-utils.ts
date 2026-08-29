@@ -1,3 +1,4 @@
+import type { StatusBadgeTone } from '@/shared/components';
 import type { BlacklistHistoryItem } from '@/shared/types';
 
 import {
@@ -7,6 +8,17 @@ import {
 } from '@/domains/MemberInfo/constants/memberInfo';
 
 const WARNING_TYPES = ['경고', 'WARNING'];
+
+type PenaltyBadgeMeta = {
+  label: string;
+  tone: StatusBadgeTone;
+};
+
+const PENALTY_PROGRESS_BADGE_META = {
+  ONGOING: { label: '진행중', tone: 'danger' },
+  ENDED: { label: '종료', tone: 'neutral' },
+  CANCELLED: { label: '취소', tone: 'neutral' },
+} satisfies Record<string, PenaltyBadgeMeta>;
 
 export function isWarningType(type: string) {
   return WARNING_TYPES.some((warningType) => type.includes(warningType));
@@ -90,20 +102,29 @@ export function isOngoingPenalty(history: BlacklistHistoryItem) {
   return !endDate || endDate.getTime() >= now.getTime();
 }
 
-export function getPenaltyTone(history: BlacklistHistoryItem) {
-  if (isPermanentDemotionType(history.type)) {
-    return 'border-slate-950 bg-slate-950 text-white';
+export function getPenaltyBadgeMeta(
+  history: BlacklistHistoryItem
+): PenaltyBadgeMeta {
+  const label = getPenaltyTypeLabel(history.type);
+
+  if (history.deletedAt) return { label, tone: 'neutral' };
+  if (isWarningType(history.type)) return { label, tone: 'warning' };
+  if (isPermanentDemotionType(history.type) || isOngoingPenalty(history)) {
+    return { label, tone: 'danger' };
   }
 
-  if (isOngoingPenalty(history)) {
-    return 'border-rose-600 bg-rose-600 text-white';
-  }
+  return { label, tone: 'neutral' };
+}
 
-  if (isWarningType(history.type)) {
-    return 'border-slate-200 bg-white text-slate-900';
-  }
+export function getPenaltyProgressBadgeMeta(
+  history: BlacklistHistoryItem
+): PenaltyBadgeMeta | null {
+  if (history.deletedAt) return PENALTY_PROGRESS_BADGE_META.CANCELLED;
+  if (isWarningType(history.type)) return null;
 
-  return 'border-slate-200 bg-slate-50 text-slate-700';
+  return isOngoingPenalty(history)
+    ? PENALTY_PROGRESS_BADGE_META.ONGOING
+    : PENALTY_PROGRESS_BADGE_META.ENDED;
 }
 
 export function getDaysBetween(start?: string | null, end?: string | null) {

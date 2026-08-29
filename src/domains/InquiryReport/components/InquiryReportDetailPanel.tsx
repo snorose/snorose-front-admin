@@ -2,12 +2,16 @@ import { type FormEvent, useEffect, useState } from 'react';
 
 import { Copy, ExternalLink, Send, X } from 'lucide-react';
 
-import { Badge, Button, Textarea } from '@/shared/components/ui';
+import { StatusBadge } from '@/shared/components';
+import { Button, Textarea } from '@/shared/components/ui';
 import type { InquiryComment, InquiryStatus } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { INQUIRY_COMMENT_MAX_LENGTH } from '@/domains/InquiryReport/constants/inquiryCommentValidation';
-import { INQUIRY_REPORT_CAUSE_LABELS } from '@/domains/InquiryReport/constants/inquiryReportLabels';
+import {
+  INQUIRY_AUXILIARY_BADGE_META,
+  INQUIRY_REPORT_CAUSE_LABELS,
+} from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import {
   useCreateInquiryComment,
   useDeleteInquiryComment,
@@ -201,12 +205,9 @@ export default function InquiryReportDetailPanel({
             {detail.title}
           </p>
           {detail.isEdited && (
-            <Badge
-              variant='unstyled'
-              className='border-transparent bg-gray-100 text-gray-600'
-            >
-              수정됨
-            </Badge>
+            <StatusBadge tone={INQUIRY_AUXILIARY_BADGE_META.EDITED.tone}>
+              {INQUIRY_AUXILIARY_BADGE_META.EDITED.label}
+            </StatusBadge>
           )}
         </div>
         <div className='flex shrink-0 items-center gap-2'>

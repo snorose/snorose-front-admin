@@ -26,6 +26,17 @@ export interface AdminPostListResult {
   data: AdminGetPostResponse[];
 }
 
+export interface AdminPostReportResponse {
+  reason: string;
+  reporterNickname: string;
+  reportedAt: string;
+}
+
+export interface AdminPostReportListResult {
+  totalCount: number;
+  reports: AdminPostReportResponse[];
+}
+
 export interface AdminPostSearchRequest {
   encryptedUserId?: string;
   boardId?: number;
