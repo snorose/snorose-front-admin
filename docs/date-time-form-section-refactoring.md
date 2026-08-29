@@ -15,11 +15,78 @@
 | 초 단위    | 분 단위 표시와 초 단위 전송이 섞여 있음        | 표시 정책과 서버 스펙을 분리    |
 | 폼 섹션    | `제목 + 테두리 + padding + 필드 영역`이 반복됨 | 얇은 `FormSection` 후보로 관리  |
 
+## 시간 util 공용화 조사 결과
+
+결론부터 보면 공용 util은 만들 수 있다. 다만 하나의 `formatDateTime`으로 모두 처리하기보다, 출력 단위별로 작게 나누는 편이 안전하다.
+
+### 필요한 출력 단위
+
+| 출력 단위         | 예시 출력                                    | 현재 사용처                                                       | 공용화 판단                                |
+| ----------------- | -------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------ |
+| 날짜만            | `2026-01-01`                                 | 회원 생년월일, 가입일, 등업일, 최근 로그인, 게시글 상세 징계 기간 | 바로 공용화 가능                           |
+| 날짜+시간, 분까지 | `2026-01-01 10:00`                           | 기간 목록, 문의/신고, 시험후기 로그, 회원 제재 내역 일부          | 바로 공용화 가능                           |
+| 날짜+시간, 초까지 | `2026-01-01 10:00:00`                        | 회원 도메인의 기존 `formatDateTimeWithSeconds`                    | 공용화 가능하지만 사용처 확인 후 적용      |
+| 오전/오후 표시    | `2026-01-01 오후 1:05`                       | 게시글/댓글 관리, 게시글 상세 로그                                | 기존 UI 유지가 필요하므로 별도 함수로 유지 |
+| 입력 필드 값      | `2026-01-01T10:00`                           | 기간 수정 모달, 제재 추가 입력                                    | 표시용과 분리 필요                         |
+| API 전송 값       | `2026-01-01 10:00:00`, `2026-01-01T10:00:00` | 포인트, 시험후기 작성 기간, 포인트 예약 지급                      | 공용 표시 util과 분리 필요                 |
+
+### 현재 함수별 역할
+
+| 함수                        | 위치                                                                                                        | 출력 단위            | 빈 값     | 사용처                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------- | --------- | ------------------------- |
+| `formatDateTimeToMinutes`   | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 분까지    | `-`       | 기간, 문의/신고, 시험후기 |
+| `formatDateTimeWithAmPm`    | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 오전/오후 | `-`       | 게시글/댓글               |
+| `formatDateTimeForInput`    | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 입력 필드 값         | 방어 없음 | 기간 수정 모달            |
+| `formatDateTimeForAPI`      | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, 공백 구분  | 방어 없음 | 포인트, 예약 지급         |
+| `formatDateTimeWithT`       | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, `T` 구분   | 방어 없음 | 시험후기 작성 기간        |
+| `formatDate`                | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜만               | `-`       | 회원 목록/상세            |
+| `formatDateTime`            | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜+시간, 분까지    | `-`       | 회원 상세/제재            |
+| `formatDateTimeWithSeconds` | [`src/domains/MemberInfo/utils/formatDateTime.ts`](../src/domains/MemberInfo/utils/formatDateTime.ts)       | 날짜+시간, 초까지    | 빈 문자열 | 회원 도메인 export        |
+| `toDateTimeInputValue`      | [`penalty-history-utils.ts`](../src/domains/MemberInfo/components/penalty-history/penalty-history-utils.ts) | 입력 필드 값         | 빈 문자열 | 제재 추가/수정 입력       |
+| `fromDateTimeInputValue`    | [`penalty-history-utils.ts`](../src/domains/MemberInfo/components/penalty-history/penalty-history-utils.ts) | API 전송, 공백 구분  | 방어 없음 | 제재 추가 요청            |
+
+### 추천하는 공용 util 모양
+
+공용 util은 `src/shared/utils/date-time-formatter.ts`에 아래 5개를 표준 세트로 둔다. 갑자기 전체 사용처를 바꾸지 않고, 함수와 테스트를 먼저 준비한 뒤 화면별로 점진 교체한다.
+
+```ts
+formatDateOnly(value); // YYYY-MM-DD, 빈 값은 '-'
+formatDateTimeToMinutes(value); // YYYY-MM-DD HH:mm, 빈 값은 '-'
+formatDateTimeToSeconds(value); // YYYY-MM-DD HH:mm:ss, 빈 값은 '-'
+formatDateTimeWithAmPm(value); // YYYY-MM-DD 오전/오후 h:mm, 빈 값은 '-'
+toDateTimeInputValue(value); // YYYY-MM-DDTHH:mm, 빈 값은 ''
+```
+
+이 중 `formatDateTimeToMinutes`와 `formatDateTimeWithAmPm`은 이미 공용 util에 있다. 우선 새로 필요한 함수만 추가하고, 기존 함수는 이름과 동작을 유지한다.
+
+API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구분을 쓰고 시험후기는 `T` 구분을 쓰기 때문에, `serializePointDateTime`, `serializeExamReviewPeriodDateTime`처럼 API 경계에서 이름을 분리하는 쪽이 안전하다.
+
+### 먼저 하면 좋은 작업
+
+- [x] `formatDateOnly`를 공용 util에 추가한다.
+- [x] `formatDateTimeToSeconds`를 공용 util에 추가한다.
+- [x] `toDateTimeInputValue`를 공용 util에 추가한다.
+- [ ] 기존 `formatDateTimeToMinutes`, `formatDateTimeWithAmPm` 테스트도 함께 추가한다.
+- [x] 새 함수의 빈 값 결과를 테스트로 고정한다.
+- [ ] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
+- [ ] 게시글/댓글의 `formatDateTimeWithAmPm`은 기존 UI가 다르므로 유지한다.
+- [ ] API 전송용 `formatDateTimeForAPI`, `formatDateTimeWithT`는 이번 단계에서 건드리지 않는다.
+
 ## 바로 할 작업
 
-우선 날짜/시간보다 폼 섹션부터 작업한다. 날짜/시간은 API 형식 차이가 있어 테스트와 정책 결정이 먼저 필요하지만, `PointDetailSection`과 `MemberInfoSection`은 외곽 마크업이 완전히 같아서 작은 범위로 바로 정리할 수 있다.
+우선 폼 섹션보다 시간 util부터 작업한다. 날짜만, 분까지, 초까지는 공용화 이득이 분명하고 범위도 작다. API 전송 형식은 화면마다 다르므로 이번 작업에서는 표시용과 입력 필드용까지만 정리한다.
 
-### 1차 구현: `FormSection` 도입
+### 1차 구현: 시간 util 공용화
+
+- [x] `src/shared/utils/date-time-formatter.ts`에 `formatDateOnly`, `formatDateTimeToSeconds`, `toDateTimeInputValue`를 추가한다.
+- [x] 기존 `formatDateTimeToMinutes`, `formatDateTimeWithAmPm`은 유지한다.
+- [x] `src/shared/utils/date-time-formatter.test.ts`를 만든다.
+- [ ] 날짜만, 분까지, 초까지, 오전/오후, 입력 필드 값, 빈 값 결과를 테스트한다.
+- [ ] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
+- [ ] `penalty-history-utils.ts`의 `toDateTimeInputValue`는 공용 util로 대체 가능한지 확인한다.
+- [ ] API 전송용 함수는 형식 차이가 있으므로 유지한다.
+
+### 2차 구현: `FormSection` 도입
 
 - [ ] [`src/shared/components/FormSection.tsx`](../src/shared/components/FormSection.tsx)를 만든다.
 - [ ] `FormSection` props는 `title`, `description`, `actions`, `children`, `className`만 둔다.
@@ -39,15 +106,7 @@
 </article>
 ```
 
-### 2차 구현: 날짜/시간 테스트 추가
-
-- [ ] [`src/shared/utils/date-time-formatter.test.ts`](../src/shared/utils/date-time-formatter.test.ts)를 만든다.
-- [ ] `formatDateTimeToMinutes`의 정상 값, `T` 포함 값, `null`, `undefined`, 빈 문자열 결과를 테스트한다.
-- [ ] `formatDateTimeWithAmPm`의 정상 값과 잘못된 날짜 문자열 결과를 테스트한다.
-- [ ] `formatDateTimeForInput`의 API 문자열 변환 결과를 테스트한다.
-- [ ] 테스트가 생긴 뒤에 함수 이름 변경이나 API 전송용 함수 이동을 진행한다.
-
-### 3차 구현: API 전송용 날짜 변환 위치 정리
+### 3차 구현: 날짜/시간 API 전송 경계 정리
 
 - [ ] 포인트 미지급 일정의 `formatDateTimeForAPI` 호출 위치를 화면 컴포넌트에서 API adapter 또는 도메인 훅 경계로 옮긴다.
 - [ ] 시험후기 작성 기간의 `formatDateTimeWithT` 호출 위치도 같은 방식으로 옮긴다.
@@ -56,11 +115,12 @@
 
 ### 이번 문서 기준 추천 순서
 
-1. `FormSection` 생성
-2. `PointDetailSection`, `MemberInfoSection`에만 적용
-3. 날짜/시간 포맷터 테스트 추가
-4. API 전송용 변환 위치 정리
-5. 회원 도메인 날짜 포맷터 공통화 여부 판단
+1. 시간 util 공용 함수 추가
+2. 시간 util 테스트 추가
+3. 회원 도메인의 날짜/시간 표시 함수 교체
+4. `FormSection` 생성
+5. `PointDetailSection`, `MemberInfoSection`에만 적용
+6. API 전송용 날짜 변환 위치 정리
 
 ## 1. 날짜/시간
 
