@@ -3,13 +3,13 @@ import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
 import { Button, Input, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
+import { formatDateOnly } from '@/shared/utils';
 
 import MemberDirectoryActionBar from '@/domains/MemberInfo/components/MemberDirectoryActionBar';
 import SearchableSelect from '@/domains/MemberInfo/components/SearchableSelect';
 import SortableHead from '@/domains/MemberInfo/components/SortableHead';
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
 import {
-  formatDate,
   formatPoint,
   getRoleBadgeMeta,
 } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -276,10 +276,10 @@ export default function MemberDirectorySection({
                           {formatPoint(member.pointBalance)}
                         </Table.Cell>
                         <Table.Cell className='px-4 text-slate-700'>
-                          {formatDate(member.createdAt)}
+                          {formatDateOnly(member.createdAt)}
                         </Table.Cell>
                         <Table.Cell className='px-4 text-slate-700'>
-                          {formatDate(member.authenticatedAt)}
+                          {formatDateOnly(member.authenticatedAt)}
                         </Table.Cell>
                       </Table.Row>
                     );

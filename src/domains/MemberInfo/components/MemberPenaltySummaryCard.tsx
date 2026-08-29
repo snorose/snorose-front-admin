@@ -5,6 +5,7 @@ import { History, ShieldAlert } from 'lucide-react';
 import { StatusBadge } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   InfoBlock,
@@ -16,7 +17,6 @@ import {
   isWarningType,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import {
-  formatDateTime,
   getPenaltyStatus,
   getRemainingPenaltyLabel,
   isWarningPenalty,
@@ -111,7 +111,7 @@ export default function MemberPenaltySummaryCard({
           {isWarning && member.blacklistStartDate ? (
             <InfoBlock
               label='마지막 경고일'
-              value={formatDateTime(member.blacklistStartDate)}
+              value={formatDateTimeToMinutes(member.blacklistStartDate)}
             />
           ) : null}
 
@@ -122,7 +122,7 @@ export default function MemberPenaltySummaryCard({
           {isDemotion && demotionStartDate ? (
             <InfoBlock
               label='강등 시작일'
-              value={formatDateTime(demotionStartDate)}
+              value={formatDateTimeToMinutes(demotionStartDate)}
               valueClassName='text-rose-600'
             />
           ) : null}
@@ -130,7 +130,7 @@ export default function MemberPenaltySummaryCard({
           {isDemotion && demotionEndDate ? (
             <InfoBlock
               label='강등 종료일'
-              value={formatDateTime(demotionEndDate)}
+              value={formatDateTimeToMinutes(demotionEndDate)}
             />
           ) : null}
 
