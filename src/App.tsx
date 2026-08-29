@@ -17,6 +17,7 @@ import {
   LogInPage,
   MemberInfoPage,
   MemberPenaltyManagementPage,
+  NotFoundPage,
   PointFreezePage,
   PostCommentPage,
   PostDetailPage,
@@ -111,6 +112,7 @@ function App() {
                               path={PATHS.ALERTS}
                               element={<PushNotificationPage />}
                             />
+                            <Route path='*' element={<NotFoundPage />} />
                           </Routes>
                         </section>
                       </main>
