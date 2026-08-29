@@ -66,7 +66,7 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 - [x] `formatDateOnly`를 공용 util에 추가한다.
 - [x] `formatDateTimeToSeconds`를 공용 util에 추가한다.
 - [x] `toDateTimeInputValue`를 공용 util에 추가한다.
-- [ ] 기존 `formatDateTimeToMinutes`, `formatDateTimeWithAmPm` 테스트도 함께 추가한다.
+- [x] 기존 `formatDateTimeToMinutes`, `formatDateTimeWithAmPm` 테스트도 함께 추가한다.
 - [x] 새 함수의 빈 값 결과를 테스트로 고정한다.
 - [ ] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
 - [ ] 게시글/댓글의 `formatDateTimeWithAmPm`은 기존 UI가 다르므로 유지한다.
@@ -81,7 +81,7 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 - [x] `src/shared/utils/date-time-formatter.ts`에 `formatDateOnly`, `formatDateTimeToSeconds`, `toDateTimeInputValue`를 추가한다.
 - [x] 기존 `formatDateTimeToMinutes`, `formatDateTimeWithAmPm`은 유지한다.
 - [x] `src/shared/utils/date-time-formatter.test.ts`를 만든다.
-- [ ] 날짜만, 분까지, 초까지, 오전/오후, 입력 필드 값, 빈 값 결과를 테스트한다.
+- [x] 날짜만, 분까지, 초까지, 오전/오후, 입력 필드 값, 빈 값 결과를 테스트한다.
 - [ ] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
 - [ ] `penalty-history-utils.ts`의 `toDateTimeInputValue`는 공용 util로 대체 가능한지 확인한다.
 - [ ] API 전송용 함수는 형식 차이가 있으므로 유지한다.

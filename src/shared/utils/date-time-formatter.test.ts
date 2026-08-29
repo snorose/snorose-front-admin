@@ -2,7 +2,9 @@ import { describe, expect, test } from 'vitest';
 
 import {
   formatDateOnly,
+  formatDateTimeToMinutes,
   formatDateTimeToSeconds,
+  formatDateTimeWithAmPm,
   toDateTimeInputValue,
 } from './date-time-formatter';
 
@@ -18,6 +20,18 @@ describe('formatDateOnly', () => {
   });
 });
 
+describe('formatDateTimeToMinutes', () => {
+  test.each([
+    ['2024-01-01 12:00:00', '2024-01-01 12:00'],
+    ['2024-01-01T12:00:00', '2024-01-01 12:00'],
+    [null, '-'],
+    [undefined, '-'],
+    ['', '-'],
+  ])('%s를 분 단위까지 표시한다', (value, expected) => {
+    expect(formatDateTimeToMinutes(value)).toBe(expected);
+  });
+});
+
 describe('formatDateTimeToSeconds', () => {
   test.each([
     ['2024-01-01 12:00:00', '2024-01-01 12:00:00'],
@@ -28,6 +42,21 @@ describe('formatDateTimeToSeconds', () => {
     ['', '-'],
   ])('%s를 초 단위까지 표시한다', (value, expected) => {
     expect(formatDateTimeToSeconds(value)).toBe(expected);
+  });
+});
+
+describe('formatDateTimeWithAmPm', () => {
+  test.each([
+    ['2024-01-01 00:00:00', '2024-01-01 오전 12:00'],
+    ['2024-01-01 09:05:00', '2024-01-01 오전 9:05'],
+    ['2024-01-01 12:00:00', '2024-01-01 오후 12:00'],
+    ['2024-01-01 13:05:00', '2024-01-01 오후 1:05'],
+    ['invalid-date', '-'],
+    [null, '-'],
+    [undefined, '-'],
+    ['', '-'],
+  ])('%s를 오전/오후 형식으로 표시한다', (value, expected) => {
+    expect(formatDateTimeWithAmPm(value)).toBe(expected);
   });
 });
 
