@@ -86,9 +86,12 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 - [x] 기간 수정 모달의 `formatDateTimeForInput` 사용처를 `toDateTimeInputValue`로 교체한다.
 - [x] API 전송용 함수는 형식 차이가 있으므로 유지한다.
 
-### 2차 구현: `FormSection` 도입
+### 2차 후보: `FormSection` 도입 보류
 
-- [ ] [`src/shared/components/FormSection.tsx`](../src/shared/components/FormSection.tsx)를 만든다.
+현재는 `PointDetailSection`과 `MemberInfoSection` 두 곳만 명확한 적용 후보라 공통화 이득이 크지 않다. 실제 사용처가 더 늘 때 다시 검토한다.
+
+- [ ] 같은 외곽 구조가 3곳 이상 반복되는지 확인한다.
+- [ ] 반복이 충분해지면 [`src/shared/components/FormSection.tsx`](../src/shared/components/FormSection.tsx)를 만든다.
 - [ ] `FormSection` props는 `title`, `description`, `actions`, `children`, `className`만 둔다.
 - [ ] `FormSection`은 `article`, 제목, 선택 설명, 선택 액션, 테두리 본문 영역만 렌더링한다.
 - [ ] 본문 grid class는 `FormSection`에 넣지 않는다. 화면마다 column 수가 달라질 수 있으므로 children에서 유지한다.
@@ -108,19 +111,18 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 
 ### 3차 구현: 날짜/시간 API 전송 경계 정리
 
-- [ ] 포인트 미지급 일정의 `formatDateTimeForAPI` 호출 위치를 화면 컴포넌트에서 API adapter 또는 도메인 훅 경계로 옮긴다.
-- [ ] 시험후기 작성 기간의 `formatDateTimeWithT` 호출 위치도 같은 방식으로 옮긴다.
-- [ ] 이 단계에서는 서버로 보내는 문자열 형식을 바꾸지 않는다.
-- [ ] 포인트는 `YYYY-MM-DD HH:mm:ss`, 시험후기는 `YYYY-MM-DDTHH:mm:ss`가 그대로 전송되는지 확인한다.
+- [x] 포인트 미지급 일정의 `formatDateTimeForAPI` 호출 위치를 화면 컴포넌트에서 도메인 요청 생성 함수로 옮긴다.
+- [x] 시험후기 작성 기간의 `formatDateTimeWithT` 호출 위치도 같은 방식으로 옮긴다.
+- [x] 이 단계에서는 서버로 보내는 문자열 형식을 바꾸지 않는다.
+- [x] 포인트는 `YYYY-MM-DD HH:mm:ss`, 시험후기는 `YYYY-MM-DDTHH:mm:ss`가 그대로 전송되는지 확인한다.
 
 ### 이번 문서 기준 추천 순서
 
 1. 시간 util 공용 함수 추가
 2. 시간 util 테스트 추가
 3. 회원 도메인의 날짜/시간 표시 함수 교체
-4. `FormSection` 생성
-5. `PointDetailSection`, `MemberInfoSection`에만 적용
-6. API 전송용 날짜 변환 위치 정리
+4. API 전송용 날짜 변환 위치 정리
+5. 반복 폼 섹션이 더 늘면 `FormSection` 재검토
 
 ## 1. 날짜/시간
 

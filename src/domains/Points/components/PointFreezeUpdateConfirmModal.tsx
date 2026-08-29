@@ -6,11 +6,9 @@ import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { PointFreeze } from '@/shared/types';
-import {
-  formatDateTimeForAPI,
-  getErrorMessage,
-  toDateTimeInputValue,
-} from '@/shared/utils';
+import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
+
+import { updatePointFreezeRequest } from '@/domains/Points/utils';
 
 import { patchPointFreezeAPI } from '@/apis';
 
@@ -61,11 +59,14 @@ export function PointFreezeUpdateConfirmModal({
     }
 
     try {
-      await patchPointFreezeAPI(selectedItem.id, {
-        title,
-        startAt: formatDateTimeForAPI(startDateTime.dateTime),
-        endAt: formatDateTimeForAPI(endDateTime.dateTime),
-      });
+      await patchPointFreezeAPI(
+        selectedItem.id,
+        updatePointFreezeRequest({
+          title,
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();
       onSuccess();

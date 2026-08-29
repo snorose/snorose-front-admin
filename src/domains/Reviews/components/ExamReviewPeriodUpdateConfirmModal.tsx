@@ -6,11 +6,9 @@ import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExamReviewPeriod } from '@/shared/types';
-import {
-  formatDateTimeWithT,
-  getErrorMessage,
-  toDateTimeInputValue,
-} from '@/shared/utils';
+import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
+
+import { updateExamReviewPeriodRequest } from '@/domains/Reviews/utils';
 
 import { patchExamReviewPeriodAPI } from '@/apis';
 
@@ -61,11 +59,14 @@ export function ExamReviewPeriodUpdateConfirmModal({
     }
 
     try {
-      await patchExamReviewPeriodAPI(selectedItem.id, {
-        title,
-        startAt: formatDateTimeWithT(startDateTime.dateTime),
-        endAt: formatDateTimeWithT(endDateTime.dateTime),
-      });
+      await patchExamReviewPeriodAPI(
+        selectedItem.id,
+        updateExamReviewPeriodRequest({
+          title,
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('시험 후기 작성 기간 수정이 완료되었어요.');
       onClose();
       onSuccess();
