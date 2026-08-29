@@ -8,8 +8,8 @@ import { useDateTimeField } from '@/shared/hooks';
 import type { PointFreeze } from '@/shared/types';
 import {
   formatDateTimeForAPI,
-  formatDateTimeForInput,
   getErrorMessage,
+  toDateTimeInputValue,
 } from '@/shared/utils';
 
 import { patchPointFreezeAPI } from '@/apis';
@@ -34,8 +34,8 @@ export function PointFreezeUpdateConfirmModal({
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
-      const startAtInput = formatDateTimeForInput(selectedItem.startAt);
-      const endAtInput = formatDateTimeForInput(selectedItem.endAt);
+      const startAtInput = toDateTimeInputValue(selectedItem.startAt);
+      const endAtInput = toDateTimeInputValue(selectedItem.endAt);
 
       setTitle(selectedItem.title);
       startDateTime.setDateTime(startAtInput);

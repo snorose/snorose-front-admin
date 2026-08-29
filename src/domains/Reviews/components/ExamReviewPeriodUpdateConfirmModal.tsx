@@ -7,9 +7,9 @@ import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExamReviewPeriod } from '@/shared/types';
 import {
-  formatDateTimeForInput,
   formatDateTimeWithT,
   getErrorMessage,
+  toDateTimeInputValue,
 } from '@/shared/utils';
 
 import { patchExamReviewPeriodAPI } from '@/apis';
@@ -34,8 +34,8 @@ export function ExamReviewPeriodUpdateConfirmModal({
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
-      const startAtInput = formatDateTimeForInput(selectedItem.startAt);
-      const endAtInput = formatDateTimeForInput(selectedItem.endAt);
+      const startAtInput = toDateTimeInputValue(selectedItem.startAt);
+      const endAtInput = toDateTimeInputValue(selectedItem.endAt);
 
       setTitle(selectedItem.title);
       startDateTime.setDateTime(startAtInput);

@@ -36,7 +36,6 @@
 | --------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------- | --------- | ------------------------- |
 | `formatDateTimeToMinutes`   | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 분까지    | `-`       | 기간, 문의/신고, 시험후기 |
 | `formatDateTimeWithAmPm`    | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 오전/오후 | `-`       | 게시글/댓글               |
-| `formatDateTimeForInput`    | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 입력 필드 값         | 방어 없음 | 기간 수정 모달            |
 | `formatDateTimeForAPI`      | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, 공백 구분  | 방어 없음 | 포인트, 예약 지급         |
 | `formatDateTimeWithT`       | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, `T` 구분   | 방어 없음 | 시험후기 작성 기간        |
 | `formatDate`                | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜만               | `-`       | 회원 목록/상세            |
@@ -84,6 +83,7 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 - [x] 날짜만, 분까지, 초까지, 오전/오후, 입력 필드 값, 빈 값 결과를 테스트한다.
 - [x] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
 - [x] `penalty-history-utils.ts`의 `toDateTimeInputValue`는 공용 util로 대체 가능한지 확인한다.
+- [x] 기간 수정 모달의 `formatDateTimeForInput` 사용처를 `toDateTimeInputValue`로 교체한다.
 - [ ] API 전송용 함수는 형식 차이가 있으므로 유지한다.
 
 ### 2차 구현: `FormSection` 도입
@@ -172,28 +172,27 @@ API 전송용   각 API adapter의 serializeDateTime
 
 #### 포맷터별 입출력
 
-| 함수                              | 용도 분류   | 대표 입력                 | 대표 출력               | 빈 값 결과 | 메모                                         |
-| --------------------------------- | ----------- | ------------------------- | ----------------------- | ---------- | -------------------------------------------- |
-| `formatDateTimeForAPI`            | API 전송    | `2024-01-01T12:00`        | `2024-01-01 12:00:00`   | 없음       | 포인트 미지급 일정에서 사용                  |
-| `formatDateTimeWithT`             | API 전송    | `2024-01-01T12:00`        | `2024-01-01T12:00:00`   | 없음       | 시험후기 작성 기간에서 사용                  |
-| `formatDateTimeForInput`          | 입력 초기화 | `2024-01-01 12:00:00`     | `2024-01-01T12:00`      | 없음       | 수정 모달의 `DateTimePicker` 초기값으로 사용 |
-| `formatDateTimeToMinutes`         | 표시        | `2024-01-01 12:00:00`     | `2024-01-01 12:00`      | `-`        | `T`가 포함된 문자열도 공백으로 변환          |
-| `formatDateTimeWithAmPm`          | 표시        | `2024-01-01 12:00:00`     | `2024-01-01 오후 12:00` | `-`        | `new Date()` 파싱 결과에 의존                |
-| `MemberInfo/utils/formatDateTime` | 표시        | `2024-01-01T12:00:00.000` | `2024-01-01 12:00:00`   | 빈 문자열  | `T`가 없으면 원본 문자열 반환                |
-| `memberDirectory.formatDateTime`  | 표시        | `2024-01-01T12:00:00`     | `2024-01-01 12:00`      | `-`        | 공통 `formatDateTimeToMinutes`와 유사        |
+| 함수                              | 용도 분류 | 대표 입력                 | 대표 출력               | 빈 값 결과 | 메모                                  |
+| --------------------------------- | --------- | ------------------------- | ----------------------- | ---------- | ------------------------------------- |
+| `formatDateTimeForAPI`            | API 전송  | `2024-01-01T12:00`        | `2024-01-01 12:00:00`   | 없음       | 포인트 미지급 일정에서 사용           |
+| `formatDateTimeWithT`             | API 전송  | `2024-01-01T12:00`        | `2024-01-01T12:00:00`   | 없음       | 시험후기 작성 기간에서 사용           |
+| `formatDateTimeToMinutes`         | 표시      | `2024-01-01 12:00:00`     | `2024-01-01 12:00`      | `-`        | `T`가 포함된 문자열도 공백으로 변환   |
+| `formatDateTimeWithAmPm`          | 표시      | `2024-01-01 12:00:00`     | `2024-01-01 오후 12:00` | `-`        | `new Date()` 파싱 결과에 의존         |
+| `MemberInfo/utils/formatDateTime` | 표시      | `2024-01-01T12:00:00.000` | `2024-01-01 12:00:00`   | 빈 문자열  | `T`가 없으면 원본 문자열 반환         |
+| `memberDirectory.formatDateTime`  | 표시      | `2024-01-01T12:00:00`     | `2024-01-01 12:00`      | `-`        | 공통 `formatDateTimeToMinutes`와 유사 |
 
 #### 사용 목적별 분류
 
 | 분류        | 현재 함수/컴포넌트                                                      | 정리 방향                                                          |
 | ----------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | 표시        | `formatDateTimeToMinutes`, `formatDateTimeWithAmPm`, 회원 도메인 포맷터 | 공통 표시 정책을 정한 뒤 이름과 빈 값 결과를 맞춘다.               |
-| 입력 초기화 | `formatDateTimeForInput`, `useDateTimeField.setDateTime`                | `DateTimePicker`가 받는 값 형식 `YYYY-MM-DDTHH:mm`을 명시한다.     |
+| 입력 초기화 | `toDateTimeInputValue`, `useDateTimeField.setDateTime`                  | `DateTimePicker`가 받는 값 형식 `YYYY-MM-DDTHH:mm`을 명시한다.     |
 | API 전송    | `formatDateTimeForAPI`, `formatDateTimeWithT`                           | 화면이 아니라 API adapter나 도메인 훅 경계에서 서버 스펙에 맞춘다. |
 | 상태 계산   | `getPeriodStatus`                                                       | 이미 분리된 경계 정책을 유지하고 타임존 기준만 추가로 결정한다.    |
 
 #### 확인된 위험
 
-- `formatDateTimeForAPI`, `formatDateTimeWithT`, `formatDateTimeForInput`은 빈 값 방어가 없으므로 호출 전 필수값 검증에 의존한다.
+- `formatDateTimeForAPI`, `formatDateTimeWithT`는 빈 값 방어가 없으므로 호출 전 필수값 검증에 의존한다.
 - 회원 도메인의 `formatDateTime`은 빈 값을 빈 문자열로 반환하고, 공통 표시 함수는 `-`를 반환한다.
 - `formatDateTimeWithAmPm`은 `new Date()`를 사용하므로 입력 문자열과 브라우저 환경에 따라 로컬 시간 해석 차이가 생길 수 있다.
 - API 전송 형식이 포인트는 공백 구분, 시험후기는 `T` 구분으로 갈라져 있어 공통 함수 하나로 합치기 어렵다.

@@ -19,7 +19,7 @@ export function formatDateTimeWithT(dateTimeString: string): string {
  * '2024-01-01 12:00:00' → '2024-01-01T12:00'
  */
 export function formatDateTimeForInput(dateTimeString: string): string {
-  return dateTimeString.replace(' ', 'T').slice(0, 16);
+  return toDateTimeInputValue(dateTimeString);
 }
 
 /**
