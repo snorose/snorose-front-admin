@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/shared/components/ui';
 import { PATHS } from '@/shared/constants';
@@ -6,26 +6,40 @@ import { PATHS } from '@/shared/constants';
 import { error404 } from '@/assets';
 
 export default function NotFoundPage() {
-  return (
-    <div className='flex min-h-full w-full flex-col items-center justify-center gap-8 px-6 py-12 text-center'>
-      <img
-        className='h-auto w-full max-w-[360px]'
-        src={error404}
-        alt='404 페이지를 찾을 수 없음'
-      />
+  const navigate = useNavigate();
 
+  const handleBackClick = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(PATHS.MEMBER_INFO);
+  };
+
+  return (
+    <div className='flex min-h-full w-full flex-col items-center justify-center gap-8 text-center'>
       <div className='flex flex-col items-center gap-3'>
+        <img
+          className='h-auto w-full max-w-[280px]'
+          src={error404}
+          alt='404 페이지를 찾을 수 없음'
+        />
         <h1 className='text-2xl font-semibold text-gray-900'>
           페이지를 찾을 수 없습니다
         </h1>
-        <p className='max-w-md text-sm leading-6 text-gray-600'>
-          요청하신 페이지가 삭제되었거나 주소가 변경되었어요. 주소를 다시
-          확인하거나 관리자 홈으로 이동해 주세요.
+        <p className='text-md max-w-md leading-6 text-gray-600'>
+          주소를 잘못 입력했거나 사용할 수 없는 경로예요.
         </p>
       </div>
 
-      <Button asChild size='lg' className='min-w-36'>
-        <Link to={PATHS.MEMBER_INFO}>관리자 홈으로 이동</Link>
+      <Button
+        type='button'
+        size='lg'
+        className='min-w-36 !text-white hover:!text-white'
+        onClick={handleBackClick}
+      >
+        이전 페이지로 이동
       </Button>
     </div>
   );
