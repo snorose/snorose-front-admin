@@ -2,18 +2,22 @@
  * datetime-local input 형식을 API 형식으로 변환
  *
  * 예시) '2024-01-01T12:00' → '2024-01-01 12:00:00'
+ *
+ * @deprecated 새 코드에서는 toSpaceSeparatedDateTimeSeconds를 사용한다.
  */
 export function formatDateTimeForAPI(dateTimeString: string): string {
-  return dateTimeString.replace('T', ' ') + ':00';
+  return toSpaceSeparatedDateTimeSeconds(dateTimeString);
 }
 
 /**
  * datetime-local input 형식을 T 포함 API 형식으로 변환
  *
  * 예시) '2024-01-01T12:00' → '2024-01-01T12:00:00'
+ *
+ * @deprecated 새 코드에서는 toTSeparatedDateTimeSeconds를 사용한다.
  */
 export function formatDateTimeWithT(dateTimeString: string): string {
-  return `${dateTimeString}:00`;
+  return toTSeparatedDateTimeSeconds(dateTimeString);
 }
 
 /**
@@ -25,6 +29,26 @@ export function formatDateTimeWithT(dateTimeString: string): string {
  */
 export function formatDateTimeForInput(dateTimeString: string): string {
   return toDateTimeInputValue(dateTimeString);
+}
+
+/**
+ * 날짜/시간 문자열을 공백 구분 초 단위 문자열로 변환
+ *
+ * 예시) '2024-01-01T12:00' → '2024-01-01 12:00:00'
+ */
+export function toSpaceSeparatedDateTimeSeconds(
+  dateTimeString: string
+): string {
+  return `${dateTimeString.replace('T', ' ')}:00`;
+}
+
+/**
+ * 날짜/시간 문자열을 T 구분 초 단위 문자열로 변환
+ *
+ * 예시) '2024-01-01T12:00' → '2024-01-01T12:00:00'
+ */
+export function toTSeparatedDateTimeSeconds(dateTimeString: string): string {
+  return `${dateTimeString}:00`;
 }
 
 /**

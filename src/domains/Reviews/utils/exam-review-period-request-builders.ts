@@ -2,7 +2,7 @@ import type {
   CreateExamReviewPeriod,
   UpdateExamReviewPeriod,
 } from '@/shared/types';
-import { formatDateTimeWithT } from '@/shared/utils';
+import { toTSeparatedDateTimeSeconds } from '@/shared/utils';
 
 interface ExamReviewPeriodFormValues {
   title: string;
@@ -18,8 +18,8 @@ export function createExamReviewPeriodRequest({
   return [
     {
       title,
-      startAt: formatDateTimeWithT(startAt),
-      endAt: formatDateTimeWithT(endAt),
+      startAt: toTSeparatedDateTimeSeconds(startAt),
+      endAt: toTSeparatedDateTimeSeconds(endAt),
     },
   ];
 }
@@ -31,7 +31,7 @@ export function updateExamReviewPeriodRequest({
 }: ExamReviewPeriodFormValues): UpdateExamReviewPeriod {
   return {
     title,
-    startAt: formatDateTimeWithT(startAt),
-    endAt: formatDateTimeWithT(endAt),
+    startAt: toTSeparatedDateTimeSeconds(startAt),
+    endAt: toTSeparatedDateTimeSeconds(endAt),
   };
 }

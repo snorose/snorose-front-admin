@@ -32,17 +32,17 @@
 
 ### 현재 함수별 역할
 
-| 함수                        | 위치                                                                                                        | 출력 단위            | 빈 값     | 사용처                    |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------- | --------- | ------------------------- |
-| `formatDateTimeToMinutes`   | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 분까지    | `-`       | 기간, 문의/신고, 시험후기 |
-| `formatDateTimeWithAmPm`    | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 오전/오후 | `-`       | 게시글/댓글               |
-| `formatDateTimeForAPI`      | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, 공백 구분  | 방어 없음 | 포인트, 예약 지급         |
-| `formatDateTimeWithT`       | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, `T` 구분   | 방어 없음 | 시험후기 작성 기간        |
-| `formatDate`                | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜만               | `-`       | 회원 목록/상세            |
-| `formatDateTime`            | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜+시간, 분까지    | `-`       | 회원 상세/제재            |
-| `formatDateTimeWithSeconds` | [`src/domains/MemberInfo/utils/formatDateTime.ts`](../src/domains/MemberInfo/utils/formatDateTime.ts)       | 날짜+시간, 초까지    | 빈 문자열 | 회원 도메인 export        |
-| `toDateTimeInputValue`      | [`penalty-history-utils.ts`](../src/domains/MemberInfo/components/penalty-history/penalty-history-utils.ts) | 입력 필드 값         | 빈 문자열 | 제재 추가/수정 입력       |
-| `fromDateTimeInputValue`    | [`penalty-history-utils.ts`](../src/domains/MemberInfo/components/penalty-history/penalty-history-utils.ts) | API 전송, 공백 구분  | 방어 없음 | 제재 추가 요청            |
+| 함수                              | 위치                                                                                                        | 출력 단위            | 빈 값     | 사용처                    |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------- | --------- | ------------------------- |
+| `formatDateTimeToMinutes`         | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 분까지    | `-`       | 기간, 문의/신고, 시험후기 |
+| `formatDateTimeWithAmPm`          | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | 날짜+시간, 오전/오후 | `-`       | 게시글/댓글               |
+| `toSpaceSeparatedDateTimeSeconds` | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, 공백 구분  | 방어 없음 | 포인트, 예약 지급         |
+| `toTSeparatedDateTimeSeconds`     | [`src/shared/utils/date-time-formatter.ts`](../src/shared/utils/date-time-formatter.ts)                     | API 전송, `T` 구분   | 방어 없음 | 시험후기 작성 기간        |
+| `formatDate`                      | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜만               | `-`       | 회원 목록/상세            |
+| `formatDateTime`                  | [`src/domains/MemberInfo/utils/memberDirectory.ts`](../src/domains/MemberInfo/utils/memberDirectory.ts)     | 날짜+시간, 분까지    | `-`       | 회원 상세/제재            |
+| `formatDateTimeWithSeconds`       | [`src/domains/MemberInfo/utils/formatDateTime.ts`](../src/domains/MemberInfo/utils/formatDateTime.ts)       | 날짜+시간, 초까지    | 빈 문자열 | 회원 도메인 export        |
+| `toDateTimeInputValue`            | [`penalty-history-utils.ts`](../src/domains/MemberInfo/components/penalty-history/penalty-history-utils.ts) | 입력 필드 값         | 빈 문자열 | 제재 추가/수정 입력       |
+| `fromDateTimeInputValue`          | [`penalty-history-utils.ts`](../src/domains/MemberInfo/components/penalty-history/penalty-history-utils.ts) | API 전송, 공백 구분  | 방어 없음 | 제재 추가 요청            |
 
 ### 추천하는 공용 util 모양
 
@@ -58,7 +58,7 @@ toDateTimeInputValue(value); // YYYY-MM-DDTHH:mm, 빈 값은 ''
 
 이 중 `formatDateTimeToMinutes`와 `formatDateTimeWithAmPm`은 이미 공용 util에 있다. 우선 새로 필요한 함수만 추가하고, 기존 함수는 이름과 동작을 유지한다.
 
-API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구분을 쓰고 시험후기는 `T` 구분을 쓰기 때문에, `serializePointDateTime`, `serializeExamReviewPeriodDateTime`처럼 API 경계에서 이름을 분리하는 쪽이 안전하다.
+API 전송용은 표시용 표준 세트와 구분한다. 공백 구분은 `toSpaceSeparatedDateTimeSeconds`, `T` 구분은 `toTSeparatedDateTimeSeconds`를 사용한다. 기존 `formatDateTimeForAPI`, `formatDateTimeWithT`는 호환성을 위해 wrapper로 유지한다.
 
 ### 먼저 하면 좋은 작업
 
@@ -68,8 +68,9 @@ API 전송용은 위 표준 세트에 넣지 않는다. 포인트는 공백 구�
 - [x] 기존 `formatDateTimeToMinutes`, `formatDateTimeWithAmPm` 테스트도 함께 추가한다.
 - [x] 새 함수의 빈 값 결과를 테스트로 고정한다.
 - [x] 회원 도메인의 `formatDate`, `formatDateTime` 사용처를 공용 util로 교체한다.
-- [ ] 게시글/댓글의 `formatDateTimeWithAmPm`은 기존 UI가 다르므로 유지한다.
-- [ ] API 전송용 `formatDateTimeForAPI`, `formatDateTimeWithT`는 이번 단계에서 건드리지 않는다.
+- [x] 게시글/댓글의 `formatDateTimeWithAmPm`은 기존 UI가 다르므로 유지한다.
+- [x] API 전송용 새 이름 `toSpaceSeparatedDateTimeSeconds`, `toTSeparatedDateTimeSeconds`를 추가한다.
+- [x] 기존 `formatDateTimeForAPI`, `formatDateTimeWithT`는 호환 wrapper로 유지한다.
 
 ## 바로 할 작업
 
@@ -178,6 +179,8 @@ API 전송용   각 API adapter의 serializeDateTime
 | --------------------------------- | --------- | ------------------------- | ----------------------- | ---------- | ------------------------------------- |
 | `formatDateTimeForAPI`            | API 전송  | `2024-01-01T12:00`        | `2024-01-01 12:00:00`   | 없음       | 포인트 미지급 일정에서 사용           |
 | `formatDateTimeWithT`             | API 전송  | `2024-01-01T12:00`        | `2024-01-01T12:00:00`   | 없음       | 시험후기 작성 기간에서 사용           |
+| `toSpaceSeparatedDateTimeSeconds` | API 전송  | `2024-01-01T12:00`        | `2024-01-01 12:00:00`   | 없음       | 공백 구분 전송용 표준 이름            |
+| `toTSeparatedDateTimeSeconds`     | API 전송  | `2024-01-01T12:00`        | `2024-01-01T12:00:00`   | 없음       | `T` 구분 전송용 표준 이름             |
 | `formatDateTimeToMinutes`         | 표시      | `2024-01-01 12:00:00`     | `2024-01-01 12:00`      | `-`        | `T`가 포함된 문자열도 공백으로 변환   |
 | `formatDateTimeWithAmPm`          | 표시      | `2024-01-01 12:00:00`     | `2024-01-01 오후 12:00` | `-`        | `new Date()` 파싱 결과에 의존         |
 | `MemberInfo/utils/formatDateTime` | 표시      | `2024-01-01T12:00:00.000` | `2024-01-01 12:00:00`   | 빈 문자열  | `T`가 없으면 원본 문자열 반환         |
@@ -189,12 +192,12 @@ API 전송용   각 API adapter의 serializeDateTime
 | ----------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | 표시        | `formatDateTimeToMinutes`, `formatDateTimeWithAmPm`, 회원 도메인 포맷터 | 공통 표시 정책을 정한 뒤 이름과 빈 값 결과를 맞춘다.               |
 | 입력 초기화 | `toDateTimeInputValue`, `useDateTimeField.setDateTime`                  | `DateTimePicker`가 받는 값 형식 `YYYY-MM-DDTHH:mm`을 명시한다.     |
-| API 전송    | `formatDateTimeForAPI`, `formatDateTimeWithT`                           | 화면이 아니라 API adapter나 도메인 훅 경계에서 서버 스펙에 맞춘다. |
+| API 전송    | `toSpaceSeparatedDateTimeSeconds`, `toTSeparatedDateTimeSeconds`        | 화면이 아니라 API adapter나 도메인 훅 경계에서 서버 스펙에 맞춘다. |
 | 상태 계산   | `getPeriodStatus`                                                       | 이미 분리된 경계 정책을 유지하고 타임존 기준만 추가로 결정한다.    |
 
 #### 확인된 위험
 
-- `formatDateTimeForAPI`, `formatDateTimeWithT`는 빈 값 방어가 없으므로 호출 전 필수값 검증에 의존한다.
+- `toSpaceSeparatedDateTimeSeconds`, `toTSeparatedDateTimeSeconds`는 빈 값 방어가 없으므로 호출 전 필수값 검증에 의존한다.
 - 회원 도메인의 `formatDateTime`은 빈 값을 빈 문자열로 반환하고, 공통 표시 함수는 `-`를 반환한다.
 - `formatDateTimeWithAmPm`은 `new Date()`를 사용하므로 입력 문자열과 브라우저 환경에 따라 로컬 시간 해석 차이가 생길 수 있다.
 - API 전송 형식이 포인트는 공백 구분, 시험후기는 `T` 구분으로 갈라져 있어 공통 함수 하나로 합치기 어렵다.

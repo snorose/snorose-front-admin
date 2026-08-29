@@ -2,10 +2,14 @@ import { describe, expect, test } from 'vitest';
 
 import {
   formatDateOnly,
+  formatDateTimeForAPI,
   formatDateTimeToMinutes,
   formatDateTimeToSeconds,
   formatDateTimeWithAmPm,
+  formatDateTimeWithT,
   toDateTimeInputValue,
+  toSpaceSeparatedDateTimeSeconds,
+  toTSeparatedDateTimeSeconds,
 } from './date-time-formatter';
 
 describe('formatDateOnly', () => {
@@ -17,6 +21,34 @@ describe('formatDateOnly', () => {
     ['', '-'],
   ])('%s를 날짜만 표시한다', (value, expected) => {
     expect(formatDateOnly(value)).toBe(expected);
+  });
+});
+
+describe('toSpaceSeparatedDateTimeSeconds', () => {
+  test('datetime-local 값을 공백 구분 초 단위 문자열로 변환한다', () => {
+    expect(toSpaceSeparatedDateTimeSeconds('2024-01-01T12:00')).toBe(
+      '2024-01-01 12:00:00'
+    );
+  });
+});
+
+describe('toTSeparatedDateTimeSeconds', () => {
+  test('datetime-local 값을 T 구분 초 단위 문자열로 변환한다', () => {
+    expect(toTSeparatedDateTimeSeconds('2024-01-01T12:00')).toBe(
+      '2024-01-01T12:00:00'
+    );
+  });
+});
+
+describe('deprecated API 전송용 formatter', () => {
+  test('formatDateTimeForAPI는 공백 구분 초 단위 문자열로 변환한다', () => {
+    expect(formatDateTimeForAPI('2024-01-01T12:00')).toBe(
+      '2024-01-01 12:00:00'
+    );
+  });
+
+  test('formatDateTimeWithT는 T 구분 초 단위 문자열로 변환한다', () => {
+    expect(formatDateTimeWithT('2024-01-01T12:00')).toBe('2024-01-01T12:00:00');
   });
 });
 

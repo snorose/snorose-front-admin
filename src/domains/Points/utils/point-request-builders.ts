@@ -3,7 +3,7 @@ import type {
   ExcelPointBulkRewardRequest,
   UpdatePointFreeze,
 } from '@/shared/types';
-import { formatDateTimeForAPI } from '@/shared/utils';
+import { toSpaceSeparatedDateTimeSeconds } from '@/shared/utils';
 
 interface PointFreezeFormValues {
   title: string;
@@ -24,8 +24,8 @@ export function createPointFreezeRequest({
 }: PointFreezeFormValues): CreatePointFreeze {
   return {
     title,
-    startAt: formatDateTimeForAPI(startAt),
-    endAt: formatDateTimeForAPI(endAt),
+    startAt: toSpaceSeparatedDateTimeSeconds(startAt),
+    endAt: toSpaceSeparatedDateTimeSeconds(endAt),
   };
 }
 
@@ -46,7 +46,7 @@ export function createExcelPointBulkRewardRequest({
     paymentMethod: isReservation ? 'RESERVED' : 'IMMEDIATE',
     bulkMemo,
     ...(isReservation && reservationDateTime
-      ? { reservedAt: formatDateTimeForAPI(reservationDateTime) }
+      ? { reservedAt: toSpaceSeparatedDateTimeSeconds(reservationDateTime) }
       : {}),
   };
 }
