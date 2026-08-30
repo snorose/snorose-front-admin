@@ -12,6 +12,7 @@ import {
   searchComments,
 } from '@/apis';
 
+import { IS_POST_RESTORE_ENABLED } from '../../constants';
 import type { AdminGetPostResponse } from '../../types';
 import PostDetailActionModal from './PostDetailActionModal';
 
@@ -131,6 +132,7 @@ export default function PostDetailManageCard({
         {isDeleted ? (
           <Button
             variant='outline'
+            disabled={!IS_POST_RESTORE_ENABLED}
             onClick={() => {
               setModalType('RESTORE');
               setIsModalOpen(true);

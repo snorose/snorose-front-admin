@@ -6,6 +6,7 @@ interface BulkActionBarProps {
   selectedCount: number;
   isVisibilityPending: boolean;
   isDeletePending: boolean;
+  isRestoreDisabled?: boolean;
   onBulkVisibility: (visible: boolean) => void;
   onBulkRestore: () => void;
   onBulkDelete: () => void;
@@ -16,6 +17,7 @@ export function BulkActionBar({
   selectedCount,
   isVisibilityPending,
   isDeletePending,
+  isRestoreDisabled = false,
   onBulkVisibility,
   onBulkRestore,
   onBulkDelete,
@@ -40,7 +42,7 @@ export function BulkActionBar({
           variant='outline'
           size='sm'
           className='flex h-8 items-center gap-1 border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
-          disabled={isVisibilityPending}
+          disabled={isVisibilityPending || isRestoreDisabled}
           onClick={onBulkRestore}
         >
           <RotateCcw className='h-3.5 w-3.5 text-gray-500' /> 복구
