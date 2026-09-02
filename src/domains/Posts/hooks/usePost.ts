@@ -1,17 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getDeletedPost, getPost } from '@/apis';
+import { getPost } from '@/apis';
 
 export const usePost = (postId: number | null) => {
   const query = useQuery({
     queryKey: ['post', postId],
-    queryFn: async () => {
-      try {
-        return await getPost(postId!);
-      } catch {
-        return await getDeletedPost(postId!);
-      }
-    },
+    queryFn: () => getPost(postId!),
     enabled: !!postId,
   });
 
