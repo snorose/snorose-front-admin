@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
   Bookmark,
@@ -32,6 +33,13 @@ export default function PostTableRow({
   onSelectToggle,
 }: PostTableRowProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleOpenDetail = () => {
+    queryClient.setQueryData(['post', post.postId], post);
+    navigate(`/posts/manage/${post.postId}`);
+  };
+
   return (
     <Table.Row
       className={cn('border-b border-gray-100 last:border-0 [&_td]:h-[54px]')}
@@ -61,7 +69,7 @@ export default function PostTableRow({
         className='cursor-pointer px-3 py-2 select-text'
         onClick={(e) => {
           e.stopPropagation();
-          navigate(`/posts/manage/${post.postId}`);
+          handleOpenDetail();
         }}
       >
         <div className='flex max-w-[380px] flex-col gap-1'>
