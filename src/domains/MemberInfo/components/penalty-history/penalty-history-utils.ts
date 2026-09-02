@@ -7,6 +7,8 @@ import {
   WARNING_REASON_OPTIONS,
 } from '@/domains/MemberInfo/constants/memberInfo';
 
+export { toDateTimeInputValue } from '@/shared/utils';
+
 const WARNING_TYPES = ['경고', 'WARNING'];
 
 type PenaltyBadgeMeta = {
@@ -146,11 +148,6 @@ export function addDays(value: string, days: number) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
     date.getDate()
   )} ${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
-}
-
-export function toDateTimeInputValue(value?: string | null) {
-  if (!value) return '';
-  return value.replace(' ', 'T').slice(0, 16);
 }
 
 export function fromDateTimeInputValue(value: string) {
