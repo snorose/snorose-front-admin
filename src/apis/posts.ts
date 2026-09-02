@@ -34,16 +34,6 @@ export const getPost = async (
   return response.data.result;
 };
 
-// 게시글 삭제 단건 조회 api
-export const getDeletedPost = async (
-  postId: number
-): Promise<AdminGetPostResponse> => {
-  const response = await axiosInstance.get<BaseResponse<AdminGetPostResponse>>(
-    `/v1/admin/posts/deleted/${postId}`
-  );
-  return response.data.result;
-};
-
 // 게시글 삭제 api
 export const deletePost = async (
   postId: number,

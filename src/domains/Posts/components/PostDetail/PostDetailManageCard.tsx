@@ -71,16 +71,16 @@ export default function PostDetailManageCard({
 
       return deletePost(post.postId, memo);
     },
-    onSuccess: () => {
+    onSuccess: (deletedPost) => {
       toast.success('게시글이 삭제되었습니다.');
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['post', post.postId] });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({ queryKey: ['posts'] });
+      void queryClient.invalidateQueries({
         queryKey: ['postComments', post.postId],
       });
+      queryClient.setQueryData(['post', post.postId], deletedPost);
     },
     onError: (error) => {
       console.error('게시글 삭제 중 오류 발생:', error);
