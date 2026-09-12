@@ -76,7 +76,7 @@ export interface AdminCommentBulkDeleteResult {
   deletedCommentIds: number[];
   notDeletedComments: {
     commentId: number;
-    memo: string;
+    reason: string;
   }[];
 }
 

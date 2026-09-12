@@ -4,8 +4,8 @@ import type { AdminSanctionListResult, BaseResponse } from '@/shared/types';
 import type {
   AdminGetPostResponse,
   AdminPostBulkDeleteResult,
+  AdminPostBulkUpdateResult,
   AdminPostListResult,
-  AdminPostNoticeUpdateResult,
   AdminPostReportListResult,
   AdminPostSearchRequest,
 } from '@/domains/Posts/types/post';
@@ -75,23 +75,22 @@ export const bulkDeletePosts = async (
 export const updatePostVisibility = async (
   postIds: number[],
   isVisible: boolean
-): Promise<string> => {
-  const response = await axiosInstance.patch<BaseResponse<string>>(
-    `/v1/admin/posts/visibility`,
-    {
-      postIds,
-      isVisible,
-    }
-  );
+): Promise<AdminPostBulkUpdateResult> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<AdminPostBulkUpdateResult>
+  >(`/v1/admin/posts/visibility`, {
+    postIds,
+    isVisible,
+  });
   return response.data.result;
 };
 
 export const updatePostNotice = async (
   postIds: number[],
   isNotice: boolean
-): Promise<AdminPostNoticeUpdateResult> => {
+): Promise<AdminPostBulkUpdateResult> => {
   const response = await axiosInstance.patch<
-    BaseResponse<AdminPostNoticeUpdateResult>
+    BaseResponse<AdminPostBulkUpdateResult>
   >(`/v1/admin/posts/notice`, {
     postIds,
     isNotice,
