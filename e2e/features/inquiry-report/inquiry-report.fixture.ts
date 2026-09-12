@@ -23,6 +23,7 @@ export type RealInquiryFixture = {
   tryGetDetail(postId: number): Promise<InquiryDetail | null>;
   getComments(postId: number, refresh?: boolean): Promise<InquiryComment[]>;
   trackStatus(postId: number, originalStatus: InquiryStatus): void;
+  setStatus(postId: number, status: InquiryStatus): Promise<void>;
   restoreStatus(postId: number, status: InquiryStatus): Promise<void>;
   trackCreatedComment(postId: number, commentId: number): void;
   markCommentDeleted(commentId: number): void;
@@ -98,6 +99,10 @@ class RealInquiryContext implements RealInquiryFixture {
     if (!this.originalStatuses.has(postId)) {
       this.originalStatuses.set(postId, originalStatus);
     }
+  }
+
+  setStatus(postId: number, status: InquiryStatus) {
+    return this.api.updateStatus(postId, status);
   }
 
   async restoreStatus(postId: number, status: InquiryStatus) {

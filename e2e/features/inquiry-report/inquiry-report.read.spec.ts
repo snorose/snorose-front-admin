@@ -46,6 +46,7 @@ const STATUS_LABEL: Record<InquiryStatus, string> = {
   COMPLETED: '답변 완료',
   HOLD: '보류',
 };
+const EXAM_REVIEW_BOARD_ID = 32;
 
 test.describe('문의 및 신고 실제 API read QA', () => {
   test.beforeEach(async ({ inquiryReport }) => {
@@ -417,7 +418,22 @@ test.describe('문의 및 신고 실제 API read QA', () => {
         .toBeVisible();
       if (await targetLink.isVisible()) {
         await expect.soft(targetLink).toHaveAttribute('target', '_blank');
-        await expect.soft(targetLink).toHaveAttribute('href', /\/board\//);
+        if (detail.targetBoardId === EXAM_REVIEW_BOARD_ID) {
+          const targetPostId =
+            subGroup === 'COMMENT_REPORT'
+              ? detail.targetPostId
+              : Number(detail.target);
+          await expect.soft(targetLink).toHaveAttribute(
+            'href',
+            `/reviews/exam?keywordPost=${targetPostId}&page=1`
+          );
+        } else {
+          await expect
+            .soft(targetLink)
+            .toHaveAttribute(
+              'href',
+            `/board/${detail.targetBoardId}/post/${detail.target}`);
+        }
       }
       await inquiryReport.closeDetail();
     }
