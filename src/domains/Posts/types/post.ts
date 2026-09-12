@@ -100,3 +100,13 @@ export interface PostSearchParams {
   sortDirection?: 'ASC' | 'DESC';
   adminCommonStatuses?: string[];
 }
+
+export interface AdminPostNoticeUpdateResult {
+  requestedCount: number;
+  succeededCount: number;
+  succeededPostIds: number[];
+  failedPosts: {
+    postId: number;
+    reason: string;
+  }[];
+}
