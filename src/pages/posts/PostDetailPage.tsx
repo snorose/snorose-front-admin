@@ -85,15 +85,9 @@ export default function PostDetailPage() {
         </div>
 
         <div className='grid grid-cols-1 items-start gap-6 lg:grid-cols-3'>
-          {/* 좌측 2/3 컬럼: 상세 카드 + 댓글 카드 리스트 */}
-          <div className='flex flex-col gap-6 lg:col-span-2'>
+          {/* 좌측 2/3 컬럼: 게시글 상세 정보 */}
+          <div className='lg:col-span-2'>
             <PostDetailInfoPanel post={post} />
-
-            {/* 댓글 목록 */}
-            <PostDetailCommentList
-              postId={post.postId}
-              commentCount={post.commentCount}
-            />
           </div>
 
           {/* 우측 1/3 컬럼: 세로 카드 스택 */}
@@ -111,6 +105,11 @@ export default function PostDetailPage() {
             <PostDetailBlacklistCard key={post.postId} postId={post.postId} />
           </div>
         </div>
+
+        <PostDetailCommentList
+          postId={post.postId}
+          commentCount={post.commentCount}
+        />
       </div>
     </div>
   );

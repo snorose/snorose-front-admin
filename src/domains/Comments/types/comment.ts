@@ -46,6 +46,17 @@ export interface AdminCommentListResult {
   data: AdminCommentResult[];
 }
 
+export interface AdminCommentReportResponse {
+  reason: string;
+  reporterNickname: string;
+  reportedAt: string;
+}
+
+export interface AdminCommentReportListResult {
+  totalCount: number;
+  reports: AdminCommentReportResponse[];
+}
+
 export interface AdminDeleteCommentResult {
   id: number;
   encryptedUserId: string;
