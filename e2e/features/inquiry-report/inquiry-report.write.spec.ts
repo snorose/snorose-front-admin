@@ -84,12 +84,19 @@ test.describe('문의 및 신고 실제 API write QA', () => {
     ).toContainText(inquiryStatusLabel(originalStatus));
   });
 
-  test('[TC-ADM-IR-022] 댓글 입력 유효성과 등록 결과를 확인한다', async ({
+  test('[TC-ADM-IR-022] 댓글 등록 시 답변 완료로 변경한다', async ({
     page,
     inquiryReport,
     realInquiry,
   }) => {
-    const located = await fixedInquiry(realInquiry);
+    let located = await fixedInquiry(realInquiry);
+    const originalStatus = (await realInquiry.getDetail(located.item.postId))
+      .status;
+    realInquiry.trackStatus(located.item.postId, originalStatus);
+    if (originalStatus !== 'PENDING') {
+      await realInquiry.setStatus(located.item.postId, 'PENDING');
+      located = await fixedInquiry(realInquiry);
+    }
     const panel = await openFixedDetail(inquiryReport, located);
     const input = panel.getByPlaceholder('댓글을 입력하세요.');
     const submit = panel.getByRole('button', { name: '댓글 등록' });
@@ -108,12 +115,21 @@ test.describe('문의 및 신고 실제 API write QA', () => {
       'POST',
       `/v1/posts/${located.item.postId}/comments`
     );
+    const statusResponsePromise = mutationResponse(
+      page,
+      'PATCH',
+      `/v1/admin/inquiries/${located.item.postId}/status`
+    );
     await submit.click();
     const created = await responseResult<InquiryComment>(responsePromise);
+    await expectMutationSuccess(statusResponsePromise);
     realInquiry.trackCreatedComment(located.item.postId, created.id);
 
     await expect(panel.getByText(content, { exact: true })).toBeVisible();
     await expect(input).toHaveValue('');
+    await expect(
+      panel.getByRole('combobox', { name: '상태 변경' })
+    ).toContainText('답변 완료');
   });
 
   test('[TC-ADM-IR-023] 대댓글 선택·취소·등록을 확인한다', async ({
