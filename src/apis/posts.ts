@@ -5,6 +5,7 @@ import type {
   AdminGetPostResponse,
   AdminPostBulkDeleteResult,
   AdminPostListResult,
+  AdminPostNoticeUpdateResult,
   AdminPostReportListResult,
   AdminPostSearchRequest,
 } from '@/domains/Posts/types/post';
@@ -82,6 +83,19 @@ export const updatePostVisibility = async (
       isVisible,
     }
   );
+  return response.data.result;
+};
+
+export const updatePostNotice = async (
+  postIds: number[],
+  isNotice: boolean
+): Promise<AdminPostNoticeUpdateResult> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<AdminPostNoticeUpdateResult>
+  >(`/v1/admin/posts/notice`, {
+    postIds,
+    isNotice,
+  });
   return response.data.result;
 };
 

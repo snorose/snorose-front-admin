@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,6 +7,7 @@ import { Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import { getPostStatusBadges } from '@/shared/utils';
 
+import { useUpdatePostNotice } from '../../hooks/useUpdatePostNotice';
 import type { AdminGetPostResponse } from '../../types/post';
 
 interface PostDetailInfoPanelProps {
@@ -18,20 +17,40 @@ interface PostDetailInfoPanelProps {
 export default function PostDetailInfoPanel({
   post,
 }: PostDetailInfoPanelProps) {
-  const [isNotice, setIsNotice] = useState(post.isNotice);
-  const handleNoticeToggle = (checked: boolean) => {
-    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
-    const IS_READY = false;
-    if (!IS_READY) {
-      toast.info('개발 중입니다');
-      return;
-    }
+  const { mutate: updateNotice, isPending } = useUpdatePostNotice();
+  const isDeleted = post.adminCommonStatuses.some(
+    (status) => status === 'ADMIN_DELETED' || status === 'USER_DELETED'
+  );
 
-    setIsNotice(checked);
-    toast.success(
-      checked
-        ? '해당 게시글이 공지로 등록되었습니다.'
-        : '해당 게시글의 공지 등록이 해제되었습니다.'
+  const handleNoticeToggle = (checked: boolean) => {
+    const confirmMessage = checked
+      ? '이 게시글을 공지로 전환하시겠습니까?'
+      : '이 게시글의 공지 설정을 해제하시겠습니까?';
+
+    if (!window.confirm(confirmMessage)) return;
+
+    updateNotice(
+      {
+        postIds: [post.postId],
+        isNotice: checked,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.succeededCount === 0) {
+            toast.error('공지 상태를 변경하지 못했습니다.');
+            return;
+          }
+
+          toast.success(
+            checked
+              ? '해당 게시글이 공지로 등록되었습니다.'
+              : '해당 게시글의 공지 등록이 해제되었습니다.'
+          );
+        },
+        onError: () => {
+          toast.error('공지 상태 변경 중 오류가 발생했습니다.');
+        },
+      }
     );
   };
 
@@ -168,8 +187,9 @@ export default function PostDetailInfoPanel({
       <div className='flex items-center justify-between py-1'>
         <span className='text-sm font-semibold text-gray-700'>공지 전환</span>
         <Switch
-          checked={isNotice}
+          checked={post.isNotice}
           onCheckedChange={handleNoticeToggle}
+          disabled={isPending || isDeleted}
           id='post-detail-notice-switch'
         />
       </div>
