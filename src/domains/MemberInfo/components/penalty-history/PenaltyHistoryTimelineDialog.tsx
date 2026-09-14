@@ -5,6 +5,7 @@ import { History, Loader2, Plus, Trash2 } from 'lucide-react';
 import { StatusBadge } from '@/shared/components';
 import { Button, Dialog } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   getPenaltyBadgeMeta,
@@ -12,7 +13,6 @@ import {
   isOngoingPenalty,
   isPermanentDemotionType,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
-import { formatDateTime } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type PenaltyHistoryTimelineDialogProps = {
   canAddWarning: boolean;
@@ -190,7 +190,7 @@ function PenaltyHistoryCard({
                 isOngoing ? 'text-rose-600' : 'text-slate-400'
               }`}
             >
-              {formatDateTime(history.createdAt)}
+              {formatDateTimeToMinutes(history.createdAt)}
             </span>
             <Button
               type='button'
@@ -232,7 +232,7 @@ function PenaltyHistoryCard({
               취소 사유: {history.deletedReason || '-'}
             </p>
             <p className='mt-1 text-rose-400'>
-              취소 날짜: {formatDateTime(history.deletedAt)} | 취소자:{' '}
+              취소 날짜: {formatDateTimeToMinutes(history.deletedAt)} | 취소자:{' '}
               {history.deletedBy || '-'}
             </p>
           </div>
@@ -243,7 +243,9 @@ function PenaltyHistoryCard({
 }
 
 function Info({ label, value }: { label: string; value?: string | null }) {
-  const displayValue = label.includes('일') ? formatDateTime(value) : value;
+  const displayValue = label.includes('일')
+    ? formatDateTimeToMinutes(value)
+    : value;
 
   return (
     <div className='space-y-2'>

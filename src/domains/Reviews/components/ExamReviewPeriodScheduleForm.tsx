@@ -5,7 +5,9 @@ import { toast } from 'sonner';
 import { DateTimePicker } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import { formatDateTimeWithT, getErrorMessage } from '@/shared/utils';
+import { getErrorMessage } from '@/shared/utils';
+
+import { createExamReviewPeriodRequest } from '@/domains/Reviews/utils';
 
 import { postExamReviewPeriodAPI } from '@/apis';
 
@@ -42,13 +44,13 @@ export function ExamReviewPeriodScheduleForm({
     }
 
     try {
-      await postExamReviewPeriodAPI([
-        {
+      await postExamReviewPeriodAPI(
+        createExamReviewPeriodRequest({
           title,
-          startAt: formatDateTimeWithT(startDateTime.dateTime),
-          endAt: formatDateTimeWithT(endDateTime.dateTime),
-        },
-      ]);
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('시험 후기 작성 기간 생성이 완료되었어요.');
       handleResetButtonClick();
       onSuccess();
