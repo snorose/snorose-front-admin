@@ -153,3 +153,35 @@ export interface ExamReviewsResult {
   totalPage?: number;
   totalCount?: number;
 }
+
+export interface ExamReviewAdminStatusPeriodInput {
+  title: string;
+  startAt: string;
+  endAt: string;
+}
+
+export interface ExamReviewAdminStatusPeriod
+  extends ExamReviewAdminStatusPeriodInput {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExamReviewAdminStatusManager {
+  encryptedAdminId: string;
+  nickname: string;
+  processedCount: number;
+}
+
+export interface ExamReviewAdminStatusSummary {
+  totalCount: number;
+  confirmedCount: number;
+  unconfirmedCount: number;
+  unassignedCount: number;
+}
+
+export interface ExamReviewAdminStatusResult {
+  period: ExamReviewAdminStatusPeriod;
+  summary: ExamReviewAdminStatusSummary;
+  managers: ExamReviewAdminStatusManager[];
+}

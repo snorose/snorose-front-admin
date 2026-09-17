@@ -1,4 +1,10 @@
 export {
+  getAverageProcessedCount,
+  getDefaultAdminStatusPeriod,
+  getExamReviewCompletionRate,
+  sortAdminStatusPeriods,
+} from './exam-admin-status';
+export {
   convertExamTypeEnumToString,
   convertExamTypeToEnum,
   convertLectureTypeToString,

@@ -1,5 +1,10 @@
 export type {
   ExamReview,
+  ExamReviewAdminStatusManager,
+  ExamReviewAdminStatusPeriod,
+  ExamReviewAdminStatusPeriodInput,
+  ExamReviewAdminStatusResult,
+  ExamReviewAdminStatusSummary,
   ExamReviewDetailLog,
   ExamReviewDetailResult,
   ExamReviewProcessStatus,
