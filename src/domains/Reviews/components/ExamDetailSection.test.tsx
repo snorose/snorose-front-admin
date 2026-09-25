@@ -28,20 +28,61 @@ vi.mock('sonner', () => ({
 vi.mock('@/domains/Reviews/components', () => ({
   ExamReviewCommentSection: () => <div>댓글 목록</div>,
   ExamReviewDetailInfoSection: ({
+    formData,
     setFormData,
+    onFileNameRename,
+    canRenameFileName,
   }: {
+    formData: { fileName: string };
     setFormData: (partial: {
       isConfirmed?: boolean;
       lectureName?: string;
     }) => void;
+    onFileNameRename: () => void;
+    canRenameFileName: boolean;
   }) => (
     <div>
       <div>시험후기 상세정보 내용</div>
+      <div>현재 파일명: {formData.fileName}</div>
+      <button
+        type='button'
+        onClick={onFileNameRename}
+        disabled={!canRenameFileName}
+      >
+        파일명 수정
+      </button>
       <button type='button' onClick={() => setFormData({ isConfirmed: true })}>
         확인 상태로 변경
       </button>
       <button type='button' onClick={() => setFormData({ lectureName: ' ' })}>
         강의명 비우기
+      </button>
+    </div>
+  ),
+  ExamReviewFileNameModal: ({
+    postId,
+    currentFileName,
+    onClose,
+    onSuccess,
+  }: {
+    postId: number;
+    currentFileName: string;
+    onClose: () => void;
+    onSuccess: (
+      postId: number,
+      result: { postId: number; fileName: string; logs: [] }
+    ) => void;
+  }) => (
+    <div>
+      <div>수정 대상 파일명: {currentFileName}</div>
+      <button
+        type='button'
+        onClick={() => {
+          onSuccess(postId, { postId, fileName: 'renamed.pdf', logs: [] });
+          onClose();
+        }}
+      >
+        파일명 저장
       </button>
     </div>
   ),
@@ -261,6 +302,58 @@ describe('ExamDetailSection', () => {
       });
     });
     expect(onSaveSuccess).toHaveBeenCalledWith(updatedDetail);
+  });
+
+  test('편집 중 파일명을 수정해도 작성 중인 변경사항을 유지한다', async () => {
+    const user = userEvent.setup();
+    const onFileNameChangeSuccess = vi.fn();
+    vi.mocked(updateExamReview).mockResolvedValue({
+      ...selectedExamReviewDetail,
+      isConfirmed: true,
+      fileName: 'renamed.pdf',
+    });
+
+    const { rerender } = render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+        onFileNameChangeSuccess={onFileNameChangeSuccess}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
+    const renameButton = screen.getByRole('button', { name: '파일명 수정' });
+    expect(renameButton).toBeEnabled();
+
+    await user.click(renameButton);
+    expect(screen.getByText('수정 대상 파일명: exam.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '파일명 저장' }));
+    expect(onFileNameChangeSuccess).toHaveBeenCalledWith(101, {
+      postId: 101,
+      fileName: 'renamed.pdf',
+      logs: [],
+    });
+
+    rerender(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetail,
+          fileName: 'renamed.pdf',
+        }}
+        onFileNameChangeSuccess={onFileNameChangeSuccess}
+      />
+    );
+
+    expect(screen.getByText('현재 파일명: renamed.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '저장' }));
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+    await waitFor(() => {
+      expect(updateExamReview).toHaveBeenCalledWith(101, {
+        post: { isConfirmed: true },
+      });
+    });
   });
 
   test('필수값이 비어 있으면 시험후기 수정 API를 호출하지 않는다', async () => {

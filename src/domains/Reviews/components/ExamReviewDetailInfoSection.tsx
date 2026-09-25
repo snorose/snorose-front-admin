@@ -45,7 +45,6 @@ export interface ExamReviewDetailInfoSectionProps {
   onFileDownload: () => void;
   onFileNameRename: () => void;
   canRenameFileName: boolean;
-  isEditMode: boolean;
   renameButtonRef: RefObject<HTMLButtonElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
   selectedFile: File | null;
@@ -69,7 +68,6 @@ export function ExamReviewDetailInfoSection({
   onFileDownload,
   onFileNameRename,
   canRenameFileName,
-  isEditMode,
   renameButtonRef,
   fileInputRef,
   selectedFile,
@@ -192,11 +190,6 @@ export function ExamReviewDetailInfoSection({
                 type='button'
                 onClick={onFileNameRename}
                 disabled={!canRenameFileName}
-                title={
-                  isEditMode
-                    ? '다른 항목을 저장하거나 취소한 뒤 수정할 수 있습니다.'
-                    : undefined
-                }
                 className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
               >
                 파일명 수정
@@ -224,12 +217,6 @@ export function ExamReviewDetailInfoSection({
                 accept='.pdf,.doc,.docx,.hwp'
               />
             </div>
-            {isEditMode && (
-              <p className='mt-1 text-xs text-gray-500'>
-                파일명 수정은 다른 항목을 저장하거나 취소한 뒤 사용할 수
-                있습니다.
-              </p>
-            )}
           </Field.Content>
         </Field>
         <Field className='gap-0'>
