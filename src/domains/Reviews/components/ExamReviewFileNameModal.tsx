@@ -49,6 +49,17 @@ export function ExamReviewFileNameModal({
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const trimmedFileName = newFileName.trim();
+  const hasInvalidCharacters = INVALID_FILE_NAME_CHARACTERS.some((character) =>
+    trimmedFileName.includes(character)
+  );
+  const hasDifferentExtension =
+    getExtension(trimmedFileName) !== getExtension(currentFileName);
+  const canSubmit =
+    !isSaving &&
+    Boolean(trimmedFileName) &&
+    trimmedFileName !== currentFileName &&
+    !hasInvalidCharacters &&
+    !hasDifferentExtension;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -62,17 +73,13 @@ export function ExamReviewFileNameModal({
       setErrorMessage('현재 파일명과 다른 이름을 입력해주세요.');
       return;
     }
-    if (
-      INVALID_FILE_NAME_CHARACTERS.some((character) =>
-        trimmedFileName.includes(character)
-      )
-    ) {
+    if (hasInvalidCharacters) {
       setErrorMessage(
         `파일명에 ${INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.`
       );
       return;
     }
-    if (getExtension(trimmedFileName) !== getExtension(currentFileName)) {
+    if (hasDifferentExtension) {
       setErrorMessage('기존 파일의 확장자를 유지해주세요.');
       return;
     }
@@ -162,14 +169,7 @@ export function ExamReviewFileNameModal({
             >
               취소
             </Button>
-            <Button
-              type='submit'
-              disabled={
-                isSaving ||
-                !trimmedFileName ||
-                trimmedFileName === currentFileName
-              }
-            >
+            <Button type='submit' disabled={!canSubmit}>
               {isSaving && <Loader2 className='animate-spin' />}
               {isSaving ? '수정 중' : '파일명 수정'}
             </Button>

@@ -52,17 +52,18 @@ describe('ExamReviewFileNameModal', () => {
     renderModal();
 
     const input = screen.getByRole('textbox', { name: '새 파일명' });
+    const submitButton = screen.getByRole('button', { name: '파일명 수정' });
     await user.clear(input);
     await user.type(input, '잘못된/이름.pdf');
-    await user.click(screen.getByRole('button', { name: '파일명 수정' }));
-    expect(screen.getByRole('alert')).toHaveTextContent('사용할 수 없습니다');
+    expect(submitButton).toBeDisabled();
 
     await user.clear(input);
     await user.type(input, '새파일.docx');
-    await user.click(screen.getByRole('button', { name: '파일명 수정' }));
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      '확장자를 유지해주세요'
-    );
+    expect(submitButton).toBeDisabled();
+
+    await user.clear(input);
+    await user.type(input, '새파일.pdf');
+    expect(submitButton).toBeEnabled();
     expect(renameExamReviewFile).not.toHaveBeenCalled();
   });
 
