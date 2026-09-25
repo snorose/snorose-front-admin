@@ -5,7 +5,9 @@ import { toast } from 'sonner';
 import { DateTimePicker } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import { formatDateTimeForAPI, getErrorMessage } from '@/shared/utils';
+import { getErrorMessage } from '@/shared/utils';
+
+import { createPointFreezeRequest } from '@/domains/Points/utils';
 
 import { postPointFreezeAPI } from '@/apis';
 
@@ -42,11 +44,13 @@ export function PointFreezeScheduleForm({
     }
 
     try {
-      await postPointFreezeAPI({
-        title,
-        startAt: formatDateTimeForAPI(startDateTime.dateTime),
-        endAt: formatDateTimeForAPI(endDateTime.dateTime),
-      });
+      await postPointFreezeAPI(
+        createPointFreezeRequest({
+          title,
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
       onSuccess();

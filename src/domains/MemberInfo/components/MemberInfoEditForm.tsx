@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 
 import type { EditMemberInfo, MemberInfo } from '@/shared/types';
+import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   EditableField,
@@ -21,8 +22,6 @@ import {
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
 import {
   createMemberDiffPayload,
-  formatDate,
-  formatDateTime,
   formatDisplayValue,
   formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -164,25 +163,25 @@ export default function MemberInfoEditForm({
       type: 'readonly',
       icon: CalendarDays,
       label: '가입일',
-      value: formatDate(member.createdAt),
+      value: formatDateOnly(member.createdAt),
     },
     {
       type: 'readonly',
       icon: CalendarDays,
       label: '등업일',
-      value: formatDate(member.authenticatedAt),
+      value: formatDateOnly(member.authenticatedAt),
     },
     {
       type: 'readonly',
       icon: CalendarDays,
       label: '최근 로그인 날짜',
-      value: formatDate(member.lastLoginAt),
+      value: formatDateOnly(member.lastLoginAt),
     },
     {
       type: 'readonly',
       icon: CalendarDays,
       label: '정보 수정일',
-      value: formatDateTime(member.updatedAt),
+      value: formatDateTimeToMinutes(member.updatedAt),
     },
     {
       type: 'readonly',
