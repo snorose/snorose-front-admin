@@ -17,7 +17,21 @@ interface ExamReviewFileNameModalProps {
   onSuccess: (postId: number, result: RenameExamReviewFileResult) => void;
 }
 
-const INVALID_FILE_NAME_CHARACTERS = /[\\/:*?"<>|[\]]/;
+const INVALID_FILE_NAME_CHARACTERS = [
+  '\\',
+  '/',
+  ':',
+  '*',
+  '?',
+  '"',
+  '<',
+  '>',
+  '|',
+  '[',
+  ']',
+];
+const INVALID_FILE_NAME_CHARACTERS_TEXT =
+  INVALID_FILE_NAME_CHARACTERS.join(', ');
 
 const getExtension = (fileName: string) => {
   const lastDot = fileName.lastIndexOf('.');
@@ -48,9 +62,13 @@ export function ExamReviewFileNameModal({
       setErrorMessage('현재 파일명과 다른 이름을 입력해주세요.');
       return;
     }
-    if (INVALID_FILE_NAME_CHARACTERS.test(trimmedFileName)) {
+    if (
+      INVALID_FILE_NAME_CHARACTERS.some((character) =>
+        trimmedFileName.includes(character)
+      )
+    ) {
       setErrorMessage(
-        '파일명에 \\, /, :, *, ?, ", <, >, |, [, ]는 사용할 수 없습니다.'
+        `파일명에 ${INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.`
       );
       return;
     }
@@ -130,7 +148,7 @@ export function ExamReviewFileNameModal({
                 id='exam-review-file-name-help'
                 className='text-sm text-gray-500'
               >
-                확장자를 유지해주세요. \\, /, :, *, ?, ", &lt;, &gt;, |, [, ]는
+                확장자를 유지해주세요. {INVALID_FILE_NAME_CHARACTERS_TEXT}는
                 사용할 수 없습니다.
               </p>
             )}
