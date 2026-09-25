@@ -52,6 +52,10 @@ export function ExamReviewFileNameModal({
   const hasInvalidCharacters = INVALID_FILE_NAME_CHARACTERS.some((character) =>
     trimmedFileName.includes(character)
   );
+  const invalidCharacterErrorMessage = hasInvalidCharacters
+    ? `파일명에 ${INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.`
+    : '';
+  const visibleErrorMessage = invalidCharacterErrorMessage || errorMessage;
   const hasDifferentExtension =
     getExtension(trimmedFileName) !== getExtension(currentFileName);
   const canSubmit =
@@ -74,9 +78,7 @@ export function ExamReviewFileNameModal({
       return;
     }
     if (hasInvalidCharacters) {
-      setErrorMessage(
-        `파일명에 ${INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.`
-      );
+      setErrorMessage(invalidCharacterErrorMessage);
       return;
     }
     if (hasDifferentExtension) {
@@ -133,22 +135,22 @@ export function ExamReviewFileNameModal({
                 setNewFileName(event.target.value);
                 setErrorMessage('');
               }}
-              aria-invalid={Boolean(errorMessage)}
+              aria-invalid={Boolean(visibleErrorMessage)}
               aria-describedby={
-                errorMessage
+                visibleErrorMessage
                   ? 'exam-review-file-name-error'
                   : 'exam-review-file-name-help'
               }
               autoFocus
               disabled={isSaving}
             />
-            {errorMessage ? (
+            {visibleErrorMessage ? (
               <p
                 id='exam-review-file-name-error'
                 role='alert'
                 className='text-sm text-red-600'
               >
-                {errorMessage}
+                {visibleErrorMessage}
               </p>
             ) : (
               <p

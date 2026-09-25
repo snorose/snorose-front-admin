@@ -56,10 +56,13 @@ describe('ExamReviewFileNameModal', () => {
     await user.clear(input);
     await user.type(input, '잘못된/이름.pdf');
     expect(submitButton).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('사용할 수 없습니다');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
 
     await user.clear(input);
     await user.type(input, '새파일.docx');
     expect(submitButton).toBeDisabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
     await user.clear(input);
     await user.type(input, '새파일.pdf');
