@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
@@ -34,6 +34,10 @@ function renderExamReviewDetailInfoSection(
       setFormData={vi.fn()}
       isFormDisabled={false}
       onFileDownload={vi.fn()}
+      onFileNameRename={vi.fn()}
+      canRenameFileName
+      isEditMode={false}
+      renameButtonRef={{ current: null }}
       fileInputRef={{ current: null }}
       selectedFile={null}
       setSelectedFile={vi.fn()}
@@ -74,6 +78,15 @@ describe('ExamReviewDetailInfoSection', () => {
     ].forEach((label) => {
       expect(getFieldByLabel(label)).toHaveTextContent(`${label}*`);
     });
+  });
+
+  test('업로드 파일 행에 파일명 수정 버튼을 표시한다', () => {
+    renderExamReviewDetailInfoSection();
+
+    const uploadField = getFieldByLabel('업로드 파일');
+    expect(
+      within(uploadField).getByRole('button', { name: '파일명 수정' })
+    ).toBeEnabled();
   });
 
   test('메모 입력란은 시험 유형 및 문항수 오른쪽 칸에 배치된다', () => {

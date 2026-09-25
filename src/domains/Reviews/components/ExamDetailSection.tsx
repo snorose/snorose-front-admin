@@ -16,6 +16,7 @@ import {
 import {
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
+  ExamReviewFileNameModal,
   ExamReviewLogSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
@@ -25,6 +26,7 @@ import type {
   ExamReviewDetailResult,
   ExamReviewProcessStatus,
   LectureType,
+  RenameExamReviewFileResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 import {
@@ -49,6 +51,10 @@ interface ExamDetailSectionProps {
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
   onSaveSuccess?: (updatedDetail?: ExamReviewDetailResult) => void;
+  onFileNameChangeSuccess?: (
+    postId: number,
+    result: RenameExamReviewFileResult
+  ) => void;
   onDeleteSuccess?: () => void;
 }
 
@@ -165,6 +171,7 @@ export function ExamDetailSection({
   selectedExamReviewDetail,
   isLoadingDetail,
   onSaveSuccess,
+  onFileNameChangeSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
   const [activeTab, setActiveTab] = useState<
@@ -177,8 +184,10 @@ export function ExamDetailSection({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isFileNameModalOpen, setIsFileNameModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const renameButtonRef = useRef<HTMLButtonElement>(null);
   const [initialValues, setInitialValues] = useState<InitialValues | null>(
     null
   );
@@ -253,6 +262,7 @@ export function ExamDetailSection({
 
   useEffect(() => {
     setIsEditMode(false);
+    setIsFileNameModalOpen(false);
   }, [selectedExamReview?.id]);
 
   useEffect(() => {
@@ -696,6 +706,17 @@ export function ExamDetailSection({
                       }
                       isFormDisabled={isFormDisabled}
                       onFileDownload={handleFileDownload}
+                      onFileNameRename={() => setIsFileNameModalOpen(true)}
+                      canRenameFileName={
+                        !isDisabled &&
+                        !isEditMode &&
+                        !isSaving &&
+                        selectedExamReviewDetail?.postId ===
+                          selectedExamReview?.id &&
+                        Boolean(formData.fileName)
+                      }
+                      isEditMode={isEditMode}
+                      renameButtonRef={renameButtonRef}
                       fileInputRef={fileInputRef}
                       selectedFile={selectedFile}
                       setSelectedFile={setSelectedFile}
@@ -748,6 +769,20 @@ export function ExamDetailSection({
           void handleSave();
         }}
       />
+
+      {isFileNameModalOpen && selectedExamReview && formData.fileName && (
+        <ExamReviewFileNameModal
+          key={selectedExamReview.id}
+          postId={selectedExamReview.id}
+          currentFileName={formData.fileName}
+          returnFocusRef={renameButtonRef}
+          onClose={() => setIsFileNameModalOpen(false)}
+          onSuccess={(postId, result) => {
+            toast.success('파일명이 수정되었습니다.');
+            onFileNameChangeSuccess?.(postId, result);
+          }}
+        />
+      )}
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
