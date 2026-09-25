@@ -321,9 +321,11 @@ describe('ExamDetailSection', () => {
       />
     );
 
+    const renameButton = screen.getByRole('button', { name: '파일명 수정' });
+    expect(renameButton).toBeDisabled();
+
     await user.click(screen.getByRole('button', { name: '편집 모드' }));
     await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
-    const renameButton = screen.getByRole('button', { name: '파일명 수정' });
     expect(renameButton).toBeEnabled();
 
     await user.click(renameButton);

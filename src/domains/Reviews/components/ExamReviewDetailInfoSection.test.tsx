@@ -36,6 +36,7 @@ function renderExamReviewDetailInfoSection(
       onFileDownload={vi.fn()}
       onFileNameRename={vi.fn()}
       canRenameFileName
+      isEditMode
       renameButtonRef={{ current: null }}
       fileInputRef={{ current: null }}
       selectedFile={null}

@@ -45,6 +45,7 @@ export interface ExamReviewDetailInfoSectionProps {
   onFileDownload: () => void;
   onFileNameRename: () => void;
   canRenameFileName: boolean;
+  isEditMode: boolean;
   renameButtonRef: RefObject<HTMLButtonElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
   selectedFile: File | null;
@@ -68,6 +69,7 @@ export function ExamReviewDetailInfoSection({
   onFileDownload,
   onFileNameRename,
   canRenameFileName,
+  isEditMode,
   renameButtonRef,
   fileInputRef,
   selectedFile,
@@ -217,6 +219,11 @@ export function ExamReviewDetailInfoSection({
                 accept='.pdf,.doc,.docx,.hwp'
               />
             </div>
+            {!isEditMode && (
+              <p className='mt-1 text-xs text-gray-500'>
+                파일명은 편집 모드에서 수정할 수 있습니다.
+              </p>
+            )}
           </Field.Content>
         </Field>
         <Field className='gap-0'>

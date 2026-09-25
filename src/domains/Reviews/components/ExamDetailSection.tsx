@@ -730,11 +730,13 @@ export function ExamDetailSection({
                       onFileNameRename={() => setIsFileNameModalOpen(true)}
                       canRenameFileName={
                         !isDisabled &&
+                        isEditMode &&
                         !isSaving &&
                         selectedExamReviewDetail?.postId ===
                           selectedExamReview?.id &&
                         Boolean(selectedExamReviewDetail.fileName)
                       }
+                      isEditMode={isEditMode}
                       renameButtonRef={renameButtonRef}
                       fileInputRef={fileInputRef}
                       selectedFile={selectedFile}
@@ -789,7 +791,8 @@ export function ExamDetailSection({
         }}
       />
 
-      {isFileNameModalOpen &&
+      {isEditMode &&
+        isFileNameModalOpen &&
         selectedExamReview &&
         selectedExamReviewDetail?.fileName && (
           <ExamReviewFileNameModal
