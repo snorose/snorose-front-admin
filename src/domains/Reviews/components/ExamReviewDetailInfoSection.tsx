@@ -43,6 +43,10 @@ export interface ExamReviewDetailInfoSectionProps {
   setFormData: (partial: Partial<ExamReviewDetailInfoSectionFormData>) => void;
   isFormDisabled: boolean;
   onFileDownload: () => void;
+  onFileNameRename: () => void;
+  canRenameFileName: boolean;
+  isEditMode: boolean;
+  renameButtonRef: RefObject<HTMLButtonElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
@@ -63,6 +67,10 @@ export function ExamReviewDetailInfoSection({
   setFormData,
   isFormDisabled,
   onFileDownload,
+  onFileNameRename,
+  canRenameFileName,
+  isEditMode,
+  renameButtonRef,
   fileInputRef,
   selectedFile,
   setSelectedFile,
@@ -169,10 +177,10 @@ export function ExamReviewDetailInfoSection({
         <Field className='gap-0'>
           <Field.Label required>업로드 파일</Field.Label>
           <Field.Content>
-            <div className='flex items-center gap-2'>
+            <div className='flex flex-wrap items-center gap-2'>
               <button
                 type='button'
-                className='flex-1 truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400'
+                className='min-w-0 flex-1 basis-full truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 sm:basis-0'
                 onClick={onFileDownload}
                 disabled={!formData.fileName}
                 title={formData.fileName}
@@ -180,10 +188,19 @@ export function ExamReviewDetailInfoSection({
                 {selectedFile?.name || formData.fileName || '파일 없음'}
               </button>
               <button
+                ref={renameButtonRef}
+                type='button'
+                onClick={onFileNameRename}
+                disabled={!canRenameFileName}
+                className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
+              >
+                파일명 수정
+              </button>
+              <button
                 type='button'
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isFormDisabled}
-                className='rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60'
+                className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
               >
                 파일 변경
               </button>
@@ -202,6 +219,11 @@ export function ExamReviewDetailInfoSection({
                 accept='.pdf,.doc,.docx,.hwp'
               />
             </div>
+            {!isEditMode && (
+              <p className='mt-1 text-xs text-gray-500'>
+                파일명은 편집 모드에서 수정할 수 있습니다.
+              </p>
+            )}
           </Field.Content>
         </Field>
         <Field className='gap-0'>

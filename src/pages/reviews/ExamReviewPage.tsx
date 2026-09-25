@@ -18,6 +18,7 @@ import type {
   ExamReview,
   ExamReviewDetailResult,
   ExamReviewSearchParams,
+  RenameExamReviewFileResult,
   Semester,
 } from '@/domains/Reviews/types';
 import {
@@ -38,6 +39,8 @@ export default function ExamReviewPage() {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const fetchingIdRef = useRef<number | null>(null);
+  const selectedReviewIdRef = useRef<number | null>(null);
+  selectedReviewIdRef.current = selectedExamReview?.id ?? null;
   const [searchParams, setSearchParams] = useState<ExamReviewSearchParams>({});
 
   // URL에서 페이지 번호 읽기
@@ -306,6 +309,33 @@ export default function ExamReviewPage() {
     setRefreshKey((prev) => prev + 1);
   };
 
+  const handleFileNameChangeSuccess = (
+    postId: number,
+    result: RenameExamReviewFileResult
+  ) => {
+    if (selectedReviewIdRef.current !== postId) return;
+
+    setSelectedExamReviewDetail((current) =>
+      current?.postId === postId
+        ? { ...current, fileName: result.fileName, logs: result.logs }
+        : current
+    );
+
+    void getExamReviewDetail(postId)
+      .then((detail) => {
+        if (selectedReviewIdRef.current === postId) {
+          setSelectedExamReviewDetail(detail);
+        }
+      })
+      .catch(() => {
+        if (selectedReviewIdRef.current === postId) {
+          toast.error(
+            '파일명은 수정되었지만 상세 정보를 새로고침하지 못했습니다.'
+          );
+        }
+      });
+  };
+
   // 시험후기 선택 시 상세 정보 조회
   useEffect(() => {
     const fetchExamReviewDetail = async () => {
@@ -429,6 +459,7 @@ export default function ExamReviewPage() {
         selectedExamReviewDetail={selectedExamReviewDetail}
         isLoadingDetail={isLoadingDetail}
         onSaveSuccess={handleSaveSuccess}
+        onFileNameChangeSuccess={handleFileNameChangeSuccess}
         onDeleteSuccess={handleDeleteSuccess}
       />
     </div>

@@ -7,6 +7,7 @@ export { ExamDiscussionStatusBadge } from './ExamDiscussionStatusBadge';
 export { ExamMultiSelect } from './ExamMultiSelect';
 export { ExamReviewCommentSection } from './ExamReviewCommentSection';
 export { ExamReviewDetailInfoSection } from './ExamReviewDetailInfoSection';
+export { ExamReviewFileNameModal } from './ExamReviewFileNameModal';
 export { ExamReviewLogSection } from './ExamReviewLogSection';
 export { ExamReviewPeriodDeleteConfirmModal } from './ExamReviewPeriodDeleteConfirmModal';
 export { ExamReviewPeriodListSection } from './ExamReviewPeriodListSection';

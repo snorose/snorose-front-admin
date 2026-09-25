@@ -16,6 +16,7 @@ import {
 import {
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
+  ExamReviewFileNameModal,
   ExamReviewLogSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
@@ -25,6 +26,7 @@ import type {
   ExamReviewDetailResult,
   ExamReviewProcessStatus,
   LectureType,
+  RenameExamReviewFileResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 import {
@@ -49,6 +51,10 @@ interface ExamDetailSectionProps {
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
   onSaveSuccess?: (updatedDetail?: ExamReviewDetailResult) => void;
+  onFileNameChangeSuccess?: (
+    postId: number,
+    result: RenameExamReviewFileResult
+  ) => void;
   onDeleteSuccess?: () => void;
 }
 
@@ -165,6 +171,7 @@ export function ExamDetailSection({
   selectedExamReviewDetail,
   isLoadingDetail,
   onSaveSuccess,
+  onFileNameChangeSuccess,
   onDeleteSuccess,
 }: ExamDetailSectionProps = {}) {
   const [activeTab, setActiveTab] = useState<
@@ -177,8 +184,11 @@ export function ExamDetailSection({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isFileNameModalOpen, setIsFileNameModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const renameButtonRef = useRef<HTMLButtonElement>(null);
+  const initializedPostIdRef = useRef<number | null>(null);
   const [initialValues, setInitialValues] = useState<InitialValues | null>(
     null
   );
@@ -253,40 +263,60 @@ export function ExamDetailSection({
 
   useEffect(() => {
     setIsEditMode(false);
+    setIsFileNameModalOpen(false);
   }, [selectedExamReview?.id]);
 
   useEffect(() => {
     if (formInitialValues) {
-      setFormData({
-        encryptedUserId: formInitialValues.encryptedUserId,
-        postId: formInitialValues.postId,
-        isConfirmed: formInitialValues.isConfirmed,
-        isDiscussed: formInitialValues.isDiscussed,
-        deletionStatus: formInitialValues.deletionStatus,
-        isSanctioned: formInitialValues.isSanctioned,
-        visibilityStatus: formInitialValues.visibilityStatus,
-        memo: formInitialValues.memo,
-        examReviewName: formInitialValues.examReviewName,
-        uploadTime: formInitialValues.uploadTime,
-        lectureName: formInitialValues.lectureName,
-        professorName: formInitialValues.professorName,
-        classNumber: formInitialValues.classNumber,
-        semester: formInitialValues.semester,
-        lectureType: formInitialValues.lectureType,
-        isPF: formInitialValues.isPF,
-        isOnline: formInitialValues.isOnline,
-        examType: formInitialValues.examType,
-        fileName: formInitialValues.fileName,
-        examTypeAndQuestions: formInitialValues.examTypeAndQuestions,
-        author: formInitialValues.author,
-      });
-      setSelectedFile(null);
-      setInitialValues(formInitialValues.initialValues);
+      if (
+        isEditMode &&
+        initializedPostIdRef.current === formInitialValues.postId
+      ) {
+        setFormData((current) => ({
+          ...current,
+          fileName: selectedFile
+            ? current.fileName
+            : formInitialValues.fileName,
+        }));
+        setInitialValues((current) =>
+          current
+            ? { ...current, fileName: formInitialValues.fileName }
+            : formInitialValues.initialValues
+        );
+      } else {
+        setFormData({
+          encryptedUserId: formInitialValues.encryptedUserId,
+          postId: formInitialValues.postId,
+          isConfirmed: formInitialValues.isConfirmed,
+          isDiscussed: formInitialValues.isDiscussed,
+          deletionStatus: formInitialValues.deletionStatus,
+          isSanctioned: formInitialValues.isSanctioned,
+          visibilityStatus: formInitialValues.visibilityStatus,
+          memo: formInitialValues.memo,
+          examReviewName: formInitialValues.examReviewName,
+          uploadTime: formInitialValues.uploadTime,
+          lectureName: formInitialValues.lectureName,
+          professorName: formInitialValues.professorName,
+          classNumber: formInitialValues.classNumber,
+          semester: formInitialValues.semester,
+          lectureType: formInitialValues.lectureType,
+          isPF: formInitialValues.isPF,
+          isOnline: formInitialValues.isOnline,
+          examType: formInitialValues.examType,
+          fileName: formInitialValues.fileName,
+          examTypeAndQuestions: formInitialValues.examTypeAndQuestions,
+          author: formInitialValues.author,
+        });
+        setSelectedFile(null);
+        setInitialValues(formInitialValues.initialValues);
+      }
+      initializedPostIdRef.current = formInitialValues.postId;
     } else {
       resetForm();
       setInitialValues(null);
+      initializedPostIdRef.current = null;
     }
-  }, [formInitialValues]);
+  }, [formInitialValues, isEditMode, selectedFile]);
 
   const isDirty = useMemo(() => {
     if (!initialValues) return false;
@@ -405,7 +435,8 @@ export function ExamDetailSection({
   };
 
   const handleFileDownload = async () => {
-    if (!selectedExamReview || !formData.fileName) {
+    const currentFileName = selectedExamReviewDetail?.fileName;
+    if (!selectedExamReview || !currentFileName) {
       toast.error('다운로드할 파일이 없습니다.');
       return;
     }
@@ -413,13 +444,13 @@ export function ExamDetailSection({
     try {
       const blob = await downloadExamReviewFile(
         selectedExamReview.id,
-        formData.fileName
+        currentFileName
       );
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = formData.fileName;
+      link.download = currentFileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -696,6 +727,17 @@ export function ExamDetailSection({
                       }
                       isFormDisabled={isFormDisabled}
                       onFileDownload={handleFileDownload}
+                      onFileNameRename={() => setIsFileNameModalOpen(true)}
+                      canRenameFileName={
+                        !isDisabled &&
+                        isEditMode &&
+                        !isSaving &&
+                        selectedExamReviewDetail?.postId ===
+                          selectedExamReview?.id &&
+                        Boolean(selectedExamReviewDetail.fileName)
+                      }
+                      isEditMode={isEditMode}
+                      renameButtonRef={renameButtonRef}
                       fileInputRef={fileInputRef}
                       selectedFile={selectedFile}
                       setSelectedFile={setSelectedFile}
@@ -748,6 +790,23 @@ export function ExamDetailSection({
           void handleSave();
         }}
       />
+
+      {isEditMode &&
+        isFileNameModalOpen &&
+        selectedExamReview &&
+        selectedExamReviewDetail?.fileName && (
+          <ExamReviewFileNameModal
+            key={selectedExamReview.id}
+            postId={selectedExamReview.id}
+            currentFileName={selectedExamReviewDetail.fileName}
+            returnFocusRef={renameButtonRef}
+            onClose={() => setIsFileNameModalOpen(false)}
+            onSuccess={(postId, result) => {
+              toast.success('파일명이 수정되었습니다.');
+              onFileNameChangeSuccess?.(postId, result);
+            }}
+          />
+        )}
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}
