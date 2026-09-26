@@ -77,7 +77,7 @@ export const deleteExamReview = async (
 export const restoreExamReview = async (
   postId: number
 ): Promise<{ postId: number }> => {
-  const response = await axiosInstance.patch<BaseResponse<{ postId: number }>>(
+  const response = await axiosInstance.post<BaseResponse<{ postId: number }>>(
     `/v1/admin/reviews/${postId}/restore`
   );
   return response.data.result;

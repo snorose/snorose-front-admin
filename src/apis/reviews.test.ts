@@ -12,6 +12,7 @@ vi.mock('@/shared/axios/instance', () => ({
   axiosInstance: {
     get: vi.fn(),
     patch: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
@@ -48,9 +49,9 @@ describe('시험후기 파일명 API', () => {
 });
 
 describe('시험후기 복구 API', () => {
-  test('postId를 복구 경로에 넣고 응답 result를 반환한다', async () => {
+  test('복구 경로에 POST 요청을 보내고 응답 result를 반환한다', async () => {
     const result = { postId: 1725770 };
-    vi.mocked(axiosInstance.patch).mockResolvedValue({
+    vi.mocked(axiosInstance.post).mockResolvedValue({
       data: {
         isSuccess: true,
         code: 1000,
@@ -60,7 +61,7 @@ describe('시험후기 복구 API', () => {
     });
 
     await expect(restoreExamReview(1725770)).resolves.toEqual(result);
-    expect(axiosInstance.patch).toHaveBeenLastCalledWith(
+    expect(axiosInstance.post).toHaveBeenLastCalledWith(
       '/v1/admin/reviews/1725770/restore'
     );
   });
