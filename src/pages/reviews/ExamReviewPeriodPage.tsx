@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-import { toast } from 'sonner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { PageHeader } from '@/shared/components';
-import type { ExamReviewPeriod } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
@@ -13,33 +10,23 @@ import {
 
 import { getExamReviewPeriodsAPI } from '@/apis';
 
+const EXAM_REVIEW_PERIODS_QUERY_KEY = ['examReviewPeriods'] as const;
+
 export default function ExamReviewPeriodPage() {
-  const [examReviewPeriods, setExamReviewPeriods] = useState<
-    ExamReviewPeriod[]
-  >([]);
-
-  const isFetchingRef = useRef(false);
-
-  const getExamReviewPeriods = useCallback(async () => {
-    if (isFetchingRef.current) return;
-
-    isFetchingRef.current = true;
-
-    try {
-      const data = await getExamReviewPeriodsAPI();
-      setExamReviewPeriods(data);
-    } catch (error: unknown) {
-      toast.error(
-        getErrorMessage(error, '시험 후기 작성 기간 조회에 실패했습니다.')
-      );
-    } finally {
-      isFetchingRef.current = false;
-    }
-  }, []);
-
-  useEffect(() => {
-    getExamReviewPeriods();
-  }, [getExamReviewPeriods]);
+  const queryClient = useQueryClient();
+  const {
+    data: examReviewPeriods = [],
+    isPending,
+    isFetching,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: EXAM_REVIEW_PERIODS_QUERY_KEY,
+    queryFn: getExamReviewPeriodsAPI,
+    staleTime: 0,
+  });
+  const getExamReviewPeriods = () =>
+    queryClient.invalidateQueries({ queryKey: EXAM_REVIEW_PERIODS_QUERY_KEY });
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -53,6 +40,16 @@ export default function ExamReviewPeriodPage() {
       <ExamReviewPeriodListSection
         examReviewPeriods={examReviewPeriods}
         getExamReviewPeriods={getExamReviewPeriods}
+        isLoading={isPending}
+        isFetching={isFetching}
+        errorMessage={
+          error
+            ? getErrorMessage(error, '시험 후기 작성 기간 조회에 실패했습니다.')
+            : undefined
+        }
+        onRetry={() => {
+          void refetch();
+        }}
       />
     </div>
   );

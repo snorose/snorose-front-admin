@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { MoreHorizontalIcon } from 'lucide-react';
 
 import { PeriodStatusBadge } from '@/shared/components';
-import { Button, DropdownMenu, Table } from '@/shared/components/ui';
+import { Button, DropdownMenu, Skeleton, Table } from '@/shared/components/ui';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -15,9 +15,17 @@ import {
 export function ExamReviewPeriodListSection({
   examReviewPeriods,
   getExamReviewPeriods,
+  isLoading = false,
+  isFetching = false,
+  errorMessage,
+  onRetry,
 }: {
   examReviewPeriods: ExamReviewPeriod[];
   getExamReviewPeriods: () => void;
+  isLoading?: boolean;
+  isFetching?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
 }) {
   const [selectedItem, setSelectedItem] = useState<ExamReviewPeriod | null>(
     null
@@ -47,7 +55,29 @@ export function ExamReviewPeriodListSection({
     <>
       <article className='flex w-full flex-col gap-1'>
         <h3 className='text-lg font-bold'>시험 후기 작성 기간 조회</h3>
-        <div className='overflow-hidden rounded-md border'>
+        {errorMessage && (
+          <div
+            role='alert'
+            className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3 text-sm'
+          >
+            <span>{errorMessage}</span>
+            {onRetry && (
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                disabled={isFetching}
+                onClick={onRetry}
+              >
+                다시 시도
+              </Button>
+            )}
+          </div>
+        )}
+        <div
+          className='overflow-x-auto rounded-md border'
+          aria-busy={isFetching}
+        >
           <Table className='w-full'>
             <Table.Header>
               <Table.Row className='text-center'>
@@ -62,7 +92,16 @@ export function ExamReviewPeriodListSection({
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {examReviewPeriods.length > 0 ? (
+              {isLoading ? (
+                <Table.Row>
+                  <Table.Cell colSpan={8}>
+                    <span role='status' className='sr-only'>
+                      작성 기간을 불러오는 중입니다.
+                    </span>
+                    <Skeleton className='h-5 w-full' />
+                  </Table.Cell>
+                </Table.Row>
+              ) : examReviewPeriods.length > 0 ? (
                 examReviewPeriods.map(
                   (
                     { id, title, startAt, endAt, createdAt, updatedAt },
@@ -121,8 +160,10 @@ export function ExamReviewPeriodListSection({
                 )
               ) : (
                 <Table.Row>
-                  <Table.Cell className='text-center' colSpan={9}>
-                    등록된 기간이 없습니다.
+                  <Table.Cell className='text-center' colSpan={8}>
+                    {errorMessage
+                      ? '작성 기간 목록을 표시할 수 없습니다.'
+                      : '등록된 기간이 없습니다.'}
                   </Table.Cell>
                 </Table.Row>
               )}
