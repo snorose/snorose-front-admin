@@ -694,7 +694,7 @@ export function ExamDetailSection({
                 disabled={isDisabled}
               >
                 <Trash2 className='h-4 w-4' />
-                시험후기 삭제
+                삭제
               </Button>
             ))}
         </div>
