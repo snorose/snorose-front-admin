@@ -3,6 +3,7 @@
  * 실제 포인트 지급/차감은 실행하지 않습니다.
  */
 import { type Page, expect, test } from '@playwright/test';
+import { randomUUID } from 'node:crypto';
 
 import { getE2EAdminCredentials } from '../../shared/e2e-env';
 
@@ -190,6 +191,123 @@ test.describe('단일건 포인트 지급/차감 read QA', () => {
       page.getByText('유효한 포인트 지급/차감량을 입력해주세요.', {
         exact: true,
       })
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('[TC-ADM-PT-011] 존재하지 않는 아이디를 검색하면 안내와 빈 회원 정보가 표시된다', async ({
+    page,
+  }) => {
+    // 기존 검색 결과가 남아 있지 않는지도 함께 확인합니다.
+    await searchAdminMember(page);
+    await page
+      .getByPlaceholder('아이디 또는 학번을 입력해주세요.')
+      .fill(`e2e-missing-${randomUUID()}`);
+    await page.getByRole('button', { name: '검색', exact: true }).click();
+
+    await expect(
+      page.getByText(
+        '입력한 학번 또는 아이디와 정확히 일치하는 회원이 없습니다.',
+        { exact: true }
+      )
+    ).toBeVisible({ timeout: 15_000 });
+    for (const id of [
+      'userName',
+      'major',
+      'loginId',
+      'studentNumber',
+      'encryptedUserId',
+    ]) {
+      await expect(page.locator(`#${id}`)).toHaveValue('');
+    }
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('[TC-ADM-PT-012] 학번으로 검색하면 아이디 검색과 같은 회원이 표시된다', async ({
+    page,
+  }) => {
+    await searchAdminMember(page);
+    const ids = ['loginId', 'userName', 'major', 'studentNumber'] as const;
+    const original = await Promise.all(
+      ids.map((id) => page.locator(`#${id}`).inputValue())
+    );
+    const studentNumber = original[3];
+    expect(studentNumber).not.toBe('');
+    await page.getByRole('button', { name: '초기화', exact: true }).click();
+    await page
+      .getByPlaceholder('아이디 또는 학번을 입력해주세요.')
+      .fill(studentNumber);
+    // Enter 검색 경로도 검증합니다.
+    await page
+      .getByPlaceholder('아이디 또는 학번을 입력해주세요.')
+      .press('Enter');
+
+    await expect(page.locator('#loginId')).toHaveValue(original[0], {
+      timeout: 15_000,
+    });
+    for (const [index, id] of ids.entries()) {
+      await expect(page.locator(`#${id}`)).toHaveValue(original[index]);
+    }
+    // 암호화 ID는 조회마다 바뀔 수 있어 문자열의 동일성을 비교하지 않습니다.
+    await expect(page.locator('#encryptedUserId')).not.toHaveValue('');
+  });
+
+  test('[TC-ADM-PT-013] 검색 후 초기화하면 회원 정보와 포인트 입력값이 모두 지워진다', async ({
+    page,
+  }) => {
+    await searchAdminMember(page);
+    await selectManualCategory(page);
+    await page.getByLabel('포인트 지급/차감량').fill('10');
+    await page.getByLabel('메모').fill('[E2E:POINT] 회원 검색 후 초기화');
+    await page.getByRole('button', { name: '초기화', exact: true }).click();
+
+    for (const id of [
+      'userName',
+      'major',
+      'loginId',
+      'studentNumber',
+      'encryptedUserId',
+    ]) {
+      await expect(page.locator(`#${id}`)).toHaveValue('');
+    }
+    await expect(
+      page.getByPlaceholder('아이디 또는 학번을 입력해주세요.')
+    ).toHaveValue('');
+    await expect(page.getByRole('combobox')).toHaveText(
+      '포인트 유형을 선택해주세요'
+    );
+    await expect(page.getByLabel('포인트 지급/차감량')).toHaveValue('');
+    await expect(page.getByLabel('메모')).toHaveValue('');
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('[TC-ADM-PT-014] 포인트 유형을 선택하지 않으면 확인창을 열지 않는다', async ({
+    page,
+  }) => {
+    await searchAdminMember(page);
+    await page.getByLabel('메모').fill('[E2E:POINT] 유형 미선택 검증');
+    // 유형 선택 전에는 지급량 입력도 잠겨 있으므로 현재 화면 상태 그대로 검증합니다.
+    await expect(page.getByRole('combobox')).toHaveText(
+      '포인트 유형을 선택해주세요'
+    );
+    await expect(page.getByLabel('포인트 지급/차감량')).not.toBeEditable();
+    await page.getByRole('button', { name: '적용', exact: true }).click();
+    await expect(
+      page.getByText('모든 필수 항목을 입력해주세요.', { exact: true })
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('[TC-ADM-PT-015] 지급량을 입력하지 않으면 확인창을 열지 않는다', async ({
+    page,
+  }) => {
+    await searchAdminMember(page);
+    await selectManualCategory(page);
+    await page.getByLabel('메모').fill('[E2E:POINT] 지급량 미입력 검증');
+    await expect(page.getByLabel('포인트 지급/차감량')).toHaveValue('');
+    await page.getByRole('button', { name: '적용', exact: true }).click();
+    await expect(
+      page.getByText('모든 필수 항목을 입력해주세요.', { exact: true })
     ).toBeVisible();
     await expect(page.getByRole('dialog')).not.toBeVisible();
   });
