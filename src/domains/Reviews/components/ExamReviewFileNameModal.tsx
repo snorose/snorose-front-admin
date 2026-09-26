@@ -96,7 +96,7 @@ export function ExamReviewFileNameModal({
       setErrorMessage(
         (isAxiosError<{ message?: string }>(error) &&
           error.response?.data?.message) ||
-          '파일명 수정에 실패했습니다. 다시 시도해주세요.'
+          '파일명 변경에 실패했습니다. 다시 시도해주세요.'
       );
     } finally {
       setIsSaving(false);
@@ -114,9 +114,9 @@ export function ExamReviewFileNameModal({
         }}
       >
         <Dialog.Header>
-          <Dialog.Title>파일명 수정</Dialog.Title>
+          <Dialog.Title>파일명 변경</Dialog.Title>
           <Dialog.Description>
-            파일 내용은 유지하고 이름만 수정합니다.
+            파일명은 다른 정보와 별도로 변경 즉시 저장됩니다.
           </Dialog.Description>
         </Dialog.Header>
         <form onSubmit={handleSubmit} className='space-y-4'>
@@ -173,7 +173,7 @@ export function ExamReviewFileNameModal({
             </Button>
             <Button type='submit' disabled={!canSubmit}>
               {isSaving && <Loader2 className='animate-spin' />}
-              {isSaving ? '수정 중' : '파일명 수정'}
+              {isSaving ? '변경 중' : '파일명 변경'}
             </Button>
           </Dialog.Footer>
         </form>

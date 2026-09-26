@@ -38,7 +38,7 @@ describe('ExamReviewFileNameModal', () => {
     const input = screen.getByRole('textbox', { name: '새 파일명' });
     await user.clear(input);
     await user.type(input, '새파일.pdf');
-    await user.click(screen.getByRole('button', { name: '파일명 수정' }));
+    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
 
     await waitFor(() => {
       expect(renameExamReviewFile).toHaveBeenCalledWith(101, '새파일.pdf');
@@ -52,7 +52,7 @@ describe('ExamReviewFileNameModal', () => {
     renderModal();
 
     const input = screen.getByRole('textbox', { name: '새 파일명' });
-    const submitButton = screen.getByRole('button', { name: '파일명 수정' });
+    const submitButton = screen.getByRole('button', { name: '파일명 변경' });
     await user.clear(input);
     await user.type(input, '잘못된/이름.pdf');
     expect(submitButton).toBeDisabled();
@@ -81,7 +81,7 @@ describe('ExamReviewFileNameModal', () => {
     const input = screen.getByRole('textbox', { name: '새 파일명' });
     await user.clear(input);
     await user.type(input, '새파일.pdf');
-    await user.click(screen.getByRole('button', { name: '파일명 수정' }));
+    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       '이미 사용 중인 파일명입니다.'

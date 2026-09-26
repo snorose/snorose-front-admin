@@ -54,7 +54,7 @@ vi.mock('@/domains/Reviews/components', () => ({
         onClick={onFileNameRename}
         disabled={!canRenameFileName}
       >
-        파일명 수정
+        파일명 변경
       </button>
       <button type='button' onClick={() => setFormData({ isConfirmed: true })}>
         확인 상태로 변경
@@ -417,6 +417,32 @@ describe('ExamDetailSection', () => {
     expect(onSaveSuccess).toHaveBeenCalledWith(updatedDetail);
   });
 
+  test('편집 모드에 들어가지 않고 파일명을 변경한다', async () => {
+    const user = userEvent.setup();
+    const onFileNameChangeSuccess = vi.fn();
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+        onFileNameChangeSuccess={onFileNameChangeSuccess}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
+    expect(screen.getByText('수정 대상 파일명: exam.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '파일명 저장' }));
+
+    expect(onFileNameChangeSuccess).toHaveBeenCalledWith(101, {
+      postId: 101,
+      fileName: 'renamed.pdf',
+      logs: [],
+    });
+    expect(updateExamReview).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('button', { name: '저장' })
+    ).not.toBeInTheDocument();
+  });
+
   test('편집 중 파일명을 수정해도 작성 중인 변경사항을 유지한다', async () => {
     const user = userEvent.setup();
     const onFileNameChangeSuccess = vi.fn();
@@ -434,8 +460,8 @@ describe('ExamDetailSection', () => {
       />
     );
 
-    const renameButton = screen.getByRole('button', { name: '파일명 수정' });
-    expect(renameButton).toBeDisabled();
+    const renameButton = screen.getByRole('button', { name: '파일명 변경' });
+    expect(renameButton).toBeEnabled();
 
     await user.click(screen.getByRole('button', { name: '편집 모드' }));
     await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
