@@ -59,6 +59,24 @@ export class PointsApi {
     return member;
   }
 
+  async assertStudentNumberAbsent(studentNumber: string) {
+    for (let page = 0; page < 100; page += 1) {
+      const result = await this.call<AdminUserListResult>(
+        'GET',
+        `/v2/admin/users?keyword=${encodeURIComponent(studentNumber)}&page=${page}`
+      );
+      if (
+        result.data.some((member) => member.studentNumber === studentNumber)
+      ) {
+        throw new Error(
+          '실패 행 검증용 학번이 실제 회원에게 존재합니다. 지급 전에 테스트를 중단합니다.'
+        );
+      }
+      if (!result.hasNext) return;
+    }
+    throw new Error('실패 행 학번 확인이 최대 페이지 수를 초과했습니다.');
+  }
+
   async restoreBalance(id: string, difference: number, memo: string) {
     await this.call<void>('POST', '/v1/admin/points', {
       encryptedUserId: id,
