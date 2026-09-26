@@ -1,5 +1,29 @@
 import { expect, test } from './point-freeze.fixture';
 
+test('액세스 토큰 만료 후 미지급 일정 진입 시 재발급한 토큰으로 조회한다', async ({
+  page,
+  context,
+}) => {
+  await page.goto('/point/single');
+  await expect(
+    page.getByRole('heading', { name: '단일건 포인트 지급/차감', exact: true })
+  ).toBeVisible();
+  await page.getByRole('button', { name: '포인트 관리', exact: true }).click();
+
+  // 로그인 상태를 유지한 채 15분 수명의 액세스 토큰 쿠키만 만료시킵니다.
+  await context.clearCookies({ name: 'accessToken' });
+  const responsePromise = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === '/v1/admin/points/point-freeze' &&
+      response.request().method() === 'GET'
+  );
+  await page
+    .getByRole('link', { name: '미지급 일정 관리', exact: true })
+    .click();
+  expect((await responsePromise).status()).toBe(200);
+  await expect(page.getByRole('table')).toBeVisible();
+});
+
 test.describe('포인트 미지급 일정 read QA', () => {
   test.beforeEach(async ({ freezePage }) => {
     const response = freezePage.response('GET');

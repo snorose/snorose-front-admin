@@ -5,7 +5,11 @@ import axios, {
 } from 'axios';
 
 import { REISSUE_TOKEN_ENDPOINT } from '@/shared/constants';
-import { executeTokenRefresh, tokenStorage } from '@/shared/utils';
+import {
+  TokenRefreshManager,
+  executeTokenRefresh,
+  tokenStorage,
+} from '@/shared/utils';
 
 class AxiosInstanceManager {
   private static instance: AxiosInstance | null = null;
@@ -16,6 +20,20 @@ class AxiosInstanceManager {
   }> = [];
 
   private constructor() {}
+
+  private static async refreshAccessToken(): Promise<string> {
+    const success = await TokenRefreshManager.refresh(async () => {
+      const result = await executeTokenRefresh();
+      return result.success;
+    });
+    const accessToken = tokenStorage.getAccessToken();
+
+    if (!success || !accessToken) {
+      throw new Error('토큰 재발급 실패');
+    }
+
+    return accessToken;
+  }
 
   private static processQueue(
     error: Error | null = null,
@@ -44,8 +62,23 @@ class AxiosInstanceManager {
 
       // Request Interceptor
       AxiosInstanceManager.instance.interceptors.request.use(
-        (config: InternalAxiosRequestConfig) => {
-          const accessToken = tokenStorage.getAccessToken();
+        async (config: InternalAxiosRequestConfig) => {
+          let accessToken = tokenStorage.getAccessToken();
+
+          // 사용 중 쿠키가 만료된 경우 인증 요청보다 먼저 토큰을 재발급합니다.
+          if (
+            !accessToken &&
+            tokenStorage.getRefreshToken() &&
+            config.url !== REISSUE_TOKEN_ENDPOINT &&
+            config.url !== '/v1/users/login'
+          ) {
+            try {
+              accessToken = await this.refreshAccessToken();
+            } catch (error) {
+              this.handleLogout();
+              return Promise.reject(error);
+            }
+          }
 
           if (
             accessToken &&
@@ -98,15 +131,15 @@ class AxiosInstanceManager {
 
             try {
               // 공통 토큰 재발급 함수 사용
-              const result = await executeTokenRefresh();
+              const accessToken = await this.refreshAccessToken();
 
-              if (result.success && result.accessToken) {
+              if (accessToken) {
                 // 대기 중인 요청들에 새 토큰 전달
-                this.processQueue(null, result.accessToken);
+                this.processQueue(null, accessToken);
 
                 // 원래 요청 재시도
                 if (originalRequest.headers) {
-                  originalRequest.headers.Authorization = `Bearer ${result.accessToken}`;
+                  originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 }
 
                 this.isRefreshing = false;
