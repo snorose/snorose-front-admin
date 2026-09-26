@@ -54,10 +54,6 @@ export default function AdjustSinglePointPage() {
   };
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    latestSearchId.current += 1;
-    setSearchedMember(null);
-    setIsSearching(false);
-    setIsConfirmModalOpen(false);
     setSearchQuery(e.target.value);
   };
 
