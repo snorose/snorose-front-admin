@@ -4,14 +4,7 @@ import { isAxiosError } from 'axios';
 import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import {
-  Button,
-  Card,
-  ConfirmModal,
-  Skeleton,
-  Tabs,
-  Textarea,
-} from '@/shared/components/ui';
+import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
 
 import {
   ExamReviewCommentSection,
@@ -45,6 +38,7 @@ import {
   updateExamReview,
 } from '@/apis/reviews';
 
+import { ExamReviewDeleteModal } from './ExamReviewDeleteModal';
 import { ExamReviewRestoreModal } from './ExamReviewRestoreModal';
 import type { ExamReviewUpdateChange } from './ExamReviewUpdateConfirmModal';
 
@@ -690,15 +684,18 @@ export function ExamDetailSection({
                 삭제된 시험 후기 복구
               </Button>
             ) : (
-              <button
+              <Button
                 type='button'
+                variant='outline'
+                size='sm'
                 aria-label='시험 후기 삭제'
-                className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
                 onClick={openDeleteModal}
                 disabled={isDisabled}
               >
-                <Trash2 className='h-4 w-4 text-red-500' />
-              </button>
+                <Trash2 className='h-4 w-4' />
+                시험후기 삭제
+              </Button>
             ))}
         </div>
 
@@ -893,51 +890,15 @@ export function ExamDetailSection({
         onConfirm={() => void handleRestore()}
       />
 
-      <ConfirmModal
+      <ExamReviewDeleteModal
         isOpen={isDeleteModalOpen}
-        confirmText={isDeleting ? '삭제 중' : '삭제'}
-        confirmButtonClassName='bg-red-600 text-white hover:bg-red-700'
-        confirmDisabled={!deleteReason.trim() || isDeleting}
-        closeText='취소'
+        existingMemo={selectedExamReviewDetail?.memo ?? null}
+        deleteReason={deleteReason}
+        isDeleting={isDeleting}
+        onReasonChange={setDeleteReason}
         onClose={closeDeleteModal}
-        onConfirm={handleDeleteClick}
-        title='시험 후기 삭제'
-        description='기존 메모 아래에 삭제 사유를 추가해 저장합니다.'
-      >
-        <div className='flex flex-col gap-4'>
-          <div className='flex flex-col gap-2'>
-            <label
-              htmlFor='exam-review-existing-memo'
-              className='text-sm font-medium text-gray-700'
-            >
-              기존 메모
-            </label>
-            <Textarea
-              id='exam-review-existing-memo'
-              value={selectedExamReviewDetail?.memo ?? ''}
-              placeholder='기존 메모가 없습니다.'
-              className='min-h-[96px] resize-none bg-gray-50'
-              readOnly
-            />
-          </div>
-          <div className='flex flex-col gap-2'>
-            <label
-              htmlFor='exam-review-delete-reason'
-              className='text-sm font-medium text-gray-700'
-            >
-              삭제 사유
-            </label>
-            <Textarea
-              id='exam-review-delete-reason'
-              value={deleteReason}
-              onChange={(event) => setDeleteReason(event.target.value)}
-              placeholder='삭제 사유를 입력해주세요.'
-              className='min-h-[120px] resize-none'
-              disabled={isDeleting}
-            />
-          </div>
-        </div>
-      </ConfirmModal>
+        onConfirm={() => void handleDeleteClick()}
+      />
     </article>
   );
 }
