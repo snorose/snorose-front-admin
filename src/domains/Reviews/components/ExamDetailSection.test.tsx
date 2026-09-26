@@ -183,7 +183,9 @@ describe('ExamDetailSection', () => {
       expect(
         screen.queryByRole('button', { name: '시험 후기 삭제' })
       ).toBeNull();
-      await user.click(screen.getByRole('button', { name: '시험 후기 복구' }));
+      await user.click(
+        screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+      );
       expect(restoreExamReview).not.toHaveBeenCalled();
       const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
       expect(within(dialog).getByLabelText('기존 메모')).toHaveValue(
@@ -231,7 +233,9 @@ describe('ExamDetailSection', () => {
       />
     );
 
-    await user.click(screen.getByRole('button', { name: '시험 후기 복구' }));
+    await user.click(
+      screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+    );
     const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
     await user.type(within(dialog).getByLabelText('복구 사유'), '삭제 오류');
     await user.click(within(dialog).getByRole('button', { name: '복구' }));
@@ -256,7 +260,9 @@ describe('ExamDetailSection', () => {
         }}
       />
     );
-    await user.click(screen.getByRole('button', { name: '시험 후기 복구' }));
+    await user.click(
+      screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+    );
     const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
     await user.type(within(dialog).getByLabelText('복구 사유'), '삭제 오류');
     await user.click(within(dialog).getByRole('button', { name: '복구' }));
