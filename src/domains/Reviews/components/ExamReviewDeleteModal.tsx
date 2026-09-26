@@ -32,6 +32,13 @@ export function ExamReviewDeleteModal({
       description='시험후기를 삭제하시겠습니까?'
     >
       <div className='flex flex-col gap-4'>
+        <div className='flex flex-col gap-2 border-b pb-4 text-sm'>
+          <p className='leading-relaxed break-keep text-red-600'>
+            삭제 시 사용자 포인트 100점이 차감되고 인앱 알림이 발송됩니다.
+            <br />
+            신중하게 확인한 후 삭제해주세요.
+          </p>
+        </div>
         <div className='flex flex-col gap-2'>
           <label
             htmlFor='exam-review-existing-memo'
