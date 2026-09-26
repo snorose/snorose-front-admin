@@ -7,6 +7,14 @@ npx playwright test e2e/features/points/points.read.spec.ts --project=dev-read
 npx playwright test e2e/features/points/points.write.spec.ts --project=dev-write
 ```
 
+브라우저 창에서 포인트 조회 테스트의 동작을 천천히 보려면 다음 명령을 사용합니다.
+
+```bash
+E2E_SLOW_MO=500 npm run test:e2e:headed -- e2e/features/points/points.read.spec.ts
+```
+
+`--headed`는 실제 브라우저 창을 표시합니다. 테스트가 끝나면 창이 닫히며, 동영상 파일을 저장하는 기능은 아닙니다.
+
 - read: 입력 안내, 자동 지급량, 초기화, 로그인 계정 검색, 지급·차감 확인창과 취소를 검증합니다. 실제 지급은 하지 않습니다.
 - write: 별도 QA 회원에게 10포인트를 지급하고 10포인트를 차감하여 API로 잔액을 확인합니다.
 - `.env.e2e.local`의 `E2E_QA_POINT_LOGIN_ID`에 별도 dev 테스트 회원 아이디를 입력합니다. 로그인에 사용하는 `E2E_ADMIN_LOGIN_ID`와 달라야 합니다. 테스트 회원 비밀번호는 필요하지 않습니다.
