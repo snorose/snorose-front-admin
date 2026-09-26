@@ -3,12 +3,50 @@ import type { BaseResponse } from '@/shared/types';
 import type {
   AdjustAllMemberPoint,
   AdjustSinglePoint,
+  AdminUserListItem,
   CreatePointFreeze,
   ExcelPointBulkRewardRequest,
   ExcelPointBulkRewardResult,
   PointFreeze,
   UpdatePointFreeze,
 } from '@/shared/types';
+
+import { getAllUsersAPI } from './users';
+
+export const searchSinglePointMemberAPI = async (
+  keyword: string
+): Promise<AdminUserListItem> => {
+  const query = keyword.trim();
+  if (!query) throw new Error('검색어를 입력해주세요.');
+
+  const matches = new Map<string, AdminUserListItem>();
+  let page = 0;
+  let hasNext: boolean;
+
+  do {
+    const result = await getAllUsersAPI({ keyword: query, page });
+    for (const member of result.data) {
+      if (member.studentNumber === query || member.loginId === query) {
+        matches.set(member.encryptedUserId, member);
+      }
+    }
+    if (matches.size > 1) {
+      throw new Error(
+        '일치하는 회원이 여러 명입니다. 다른 학번 또는 아이디로 검색해주세요.'
+      );
+    }
+    hasNext = result.hasNext;
+    page += 1;
+  } while (hasNext);
+
+  const member = matches.values().next().value;
+  if (!member) {
+    throw new Error(
+      '입력한 학번 또는 아이디와 정확히 일치하는 회원이 없습니다.'
+    );
+  }
+  return member;
+};
 
 // 어드민 포인트 증감
 export const postSinglePointAPI = async (

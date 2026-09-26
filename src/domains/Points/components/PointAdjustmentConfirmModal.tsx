@@ -1,7 +1,7 @@
 import { Button, Dialog } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
-import type { MemberInfo } from '@/shared/types';
+import type { AdminUserListItem } from '@/shared/types';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -9,7 +9,7 @@ interface PointAdjustmentConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  searchedMember: MemberInfo;
+  searchedMember: AdminUserListItem;
   selectedCategory: PointCategoryValue | '';
   difference: string;
   memo: string;
