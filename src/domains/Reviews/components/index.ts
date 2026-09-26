@@ -6,6 +6,7 @@ export { default as ExamDiscussionPanel } from './ExamDiscussionPanel';
 export { ExamDiscussionStatusBadge } from './ExamDiscussionStatusBadge';
 export { ExamMultiSelect } from './ExamMultiSelect';
 export { ExamReviewCommentSection } from './ExamReviewCommentSection';
+export { ExamReviewDeleteModal } from './ExamReviewDeleteModal';
 export { ExamReviewDetailInfoSection } from './ExamReviewDetailInfoSection';
 export { ExamReviewFileNameModal } from './ExamReviewFileNameModal';
 export { ExamReviewLogSection } from './ExamReviewLogSection';

@@ -36,7 +36,7 @@ export function ConfirmModal({
           )}
         </Dialog.Header>
 
-        {children && <div className='py-4'>{children}</div>}
+        {children && <div>{children}</div>}
 
         <Dialog.Footer>
           <Button type='button' variant='outline' onClick={onClose}>
