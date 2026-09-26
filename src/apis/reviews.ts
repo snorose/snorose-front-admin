@@ -73,6 +73,16 @@ export const deleteExamReview = async (
   return response.data.result;
 };
 
+// 시험후기 복구 api
+export const restoreExamReview = async (
+  postId: number
+): Promise<{ postId: number }> => {
+  const response = await axiosInstance.patch<BaseResponse<{ postId: number }>>(
+    `/v1/admin/reviews/${postId}/restore`
+  );
+  return response.data.result;
+};
+
 // 시험후기 상세 조회 api
 export const getExamReviewDetail = async (
   postId: number

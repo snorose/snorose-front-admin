@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -41,6 +41,7 @@ import {
 import {
   deleteExamReview,
   downloadExamReviewFile,
+  restoreExamReview,
   updateExamReview,
 } from '@/apis/reviews';
 
@@ -56,6 +57,7 @@ interface ExamDetailSectionProps {
     result: RenameExamReviewFileResult
   ) => void;
   onDeleteSuccess?: () => void;
+  onRestoreSuccess?: (postId: number) => void;
 }
 
 type FormData = {
@@ -173,6 +175,7 @@ export function ExamDetailSection({
   onSaveSuccess,
   onFileNameChangeSuccess,
   onDeleteSuccess,
+  onRestoreSuccess,
 }: ExamDetailSectionProps = {}) {
   const [activeTab, setActiveTab] = useState<
     'review' | 'post' | 'comments' | 'logs'
@@ -181,6 +184,9 @@ export function ExamDetailSection({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [restoreReason, setRestoreReason] = useState('');
+  const [isRestoring, setIsRestoring] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -194,6 +200,9 @@ export function ExamDetailSection({
   );
 
   const isDisabled = !selectedExamReview || Boolean(isLoadingDetail);
+  const isDeleted =
+    selectedExamReviewDetail?.deletionStatus === 'USER_DELETED' ||
+    selectedExamReviewDetail?.deletionStatus === 'ADMIN_DELETED';
   const isFormDisabled =
     !selectedExamReview || Boolean(isLoadingDetail) || !isEditMode;
 
@@ -264,6 +273,8 @@ export function ExamDetailSection({
   useEffect(() => {
     setIsEditMode(false);
     setIsFileNameModalOpen(false);
+    setIsRestoreModalOpen(false);
+    setRestoreReason('');
   }, [selectedExamReview?.id]);
 
   useEffect(() => {
@@ -607,6 +618,46 @@ export function ExamDetailSection({
     }
   };
 
+  const handleRestore = async () => {
+    if (
+      isRestoring ||
+      !isDeleted ||
+      !selectedExamReview ||
+      selectedExamReviewDetail?.postId !== selectedExamReview.id
+    ) {
+      return;
+    }
+
+    const trimmedRestoreReason = restoreReason.trim();
+    if (!trimmedRestoreReason) {
+      toast.error('복구 사유를 입력해주세요.');
+      return;
+    }
+
+    const postId = selectedExamReview.id;
+    const existingMemo = selectedExamReviewDetail.memo?.trim();
+    const restoreReasonMarker = `[복구 사유]\n${trimmedRestoreReason}`;
+    const restoreMemo = existingMemo?.includes(restoreReasonMarker)
+      ? existingMemo
+      : [existingMemo, restoreReasonMarker].filter(Boolean).join('\n\n');
+    setIsRestoring(true);
+    try {
+      await updateExamReview(postId, { post: { memo: restoreMemo } });
+      await restoreExamReview(postId);
+      toast.success('시험 후기가 복구되었습니다.');
+      setIsRestoreModalOpen(false);
+      setRestoreReason('');
+      onRestoreSuccess?.(postId);
+    } catch (error: unknown) {
+      toast.error(
+        (isAxiosError(error) && error.response?.data?.message) ||
+          '시험 후기 복구에 실패했습니다. 다시 시도해주세요.'
+      );
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
   return (
     <article className='flex flex-col gap-1'>
       <div className='flex w-full flex-col rounded-md border'>
@@ -619,17 +670,35 @@ export function ExamDetailSection({
               <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
             )}
           </div>
-          {selectedExamReview && (
-            <button
-              type='button'
-              aria-label='시험 후기 삭제'
-              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-              onClick={openDeleteModal}
-              disabled={isDisabled}
-            >
-              <Trash2 className='h-4 w-4 text-red-500' />
-            </button>
-          )}
+          {selectedExamReview &&
+            (isDeleted ? (
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                onClick={() => setIsRestoreModalOpen(true)}
+                disabled={
+                  isDisabled ||
+                  isSaving ||
+                  isRestoring ||
+                  selectedExamReviewDetail?.postId !== selectedExamReview.id
+                }
+              >
+                <RotateCcw className='mr-1.5 h-4 w-4' />
+                삭제된 시험 후기 복구
+              </Button>
+            ) : (
+              <button
+                type='button'
+                aria-label='시험 후기 삭제'
+                className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
+                onClick={openDeleteModal}
+                disabled={isDisabled}
+              >
+                <Trash2 className='h-4 w-4 text-red-500' />
+              </button>
+            ))}
         </div>
 
         {!selectedExamReview ? (
@@ -807,6 +876,65 @@ export function ExamDetailSection({
             }}
           />
         )}
+
+      <ConfirmModal
+        isOpen={isRestoreModalOpen}
+        title='시험 후기 복구'
+        description='삭제된 시험후기를 복구하시겠습니까?'
+        confirmText={isRestoring ? '복구 중' : '복구'}
+        confirmDisabled={!restoreReason.trim() || isRestoring}
+        onClose={() => {
+          if (!isRestoring) {
+            setIsRestoreModalOpen(false);
+            setRestoreReason('');
+          }
+        }}
+        onConfirm={() => void handleRestore()}
+      >
+        <div className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-2 border-b pb-4 text-sm'>
+            <p className='leading-relaxed text-red-600'>
+              시험후기를 복구하면 사용자에게 100포인트가 다시 지급됩니다.
+              <br />
+              신중하게 확인한 후 복구해주세요.
+            </p>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label
+              htmlFor='exam-review-restore-existing-memo'
+              className='text-sm font-medium text-gray-700'
+            >
+              기존 메모
+            </label>
+            <Textarea
+              id='exam-review-restore-existing-memo'
+              value={selectedExamReviewDetail?.memo ?? ''}
+              placeholder='기존 메모가 없습니다.'
+              className='min-h-[96px] resize-none bg-gray-50'
+              readOnly
+            />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label
+              htmlFor='exam-review-restore-reason'
+              className='text-sm font-medium text-gray-700'
+            >
+              복구 사유
+            </label>
+            <Textarea
+              id='exam-review-restore-reason'
+              value={restoreReason}
+              onChange={(event) => setRestoreReason(event.target.value)}
+              placeholder='복구 사유를 입력해주세요.'
+              className='min-h-[120px] resize-none'
+              disabled={isRestoring}
+            />
+            <p className='text-sm text-gray-500'>
+              기존 메모 아래에 [복구 사유]로 저장됩니다.
+            </p>
+          </div>
+        </div>
+      </ConfirmModal>
 
       <ConfirmModal
         isOpen={isDeleteModalOpen}

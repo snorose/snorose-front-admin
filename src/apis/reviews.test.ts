@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { axiosInstance } from '@/shared/axios/instance';
 
-import { downloadExamReviewFile, renameExamReviewFile } from './reviews';
+import {
+  downloadExamReviewFile,
+  renameExamReviewFile,
+  restoreExamReview,
+} from './reviews';
 
 vi.mock('@/shared/axios/instance', () => ({
   axiosInstance: {
@@ -39,6 +43,25 @@ describe('시험후기 파일명 API', () => {
     expect(axiosInstance.get).toHaveBeenCalledWith(
       '/v1/reviews/files/101/download/%EC%83%88%20%EC%9D%B4%EB%A6%84.pdf',
       { responseType: 'blob' }
+    );
+  });
+});
+
+describe('시험후기 복구 API', () => {
+  test('postId를 복구 경로에 넣고 응답 result를 반환한다', async () => {
+    const result = { postId: 1725770 };
+    vi.mocked(axiosInstance.patch).mockResolvedValue({
+      data: {
+        isSuccess: true,
+        code: 1000,
+        message: '요청에 성공하였습니다.',
+        result,
+      },
+    });
+
+    await expect(restoreExamReview(1725770)).resolves.toEqual(result);
+    expect(axiosInstance.patch).toHaveBeenLastCalledWith(
+      '/v1/admin/reviews/1725770/restore'
     );
   });
 });
