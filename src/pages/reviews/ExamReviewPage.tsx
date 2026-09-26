@@ -309,6 +309,14 @@ export default function ExamReviewPage() {
     setRefreshKey((prev) => prev + 1);
   };
 
+  const handleRestoreSuccess = (postId: number) => {
+    if (selectedReviewIdRef.current === postId) {
+      setSelectedExamReview(null);
+      setSelectedExamReviewDetail(null);
+    }
+    setRefreshKey((prev) => prev + 1);
+  };
+
   const handleFileNameChangeSuccess = (
     postId: number,
     result: RenameExamReviewFileResult
@@ -461,6 +469,7 @@ export default function ExamReviewPage() {
         onSaveSuccess={handleSaveSuccess}
         onFileNameChangeSuccess={handleFileNameChangeSuccess}
         onDeleteSuccess={handleDeleteSuccess}
+        onRestoreSuccess={handleRestoreSuccess}
       />
     </div>
   );

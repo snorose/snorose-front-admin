@@ -15,6 +15,7 @@ export { ExamReviewPeriodScheduleForm } from './ExamReviewPeriodScheduleForm';
 export { ExamReviewPeriodUpdateConfirmModal } from './ExamReviewPeriodUpdateConfirmModal';
 export { ExamReviewPostInfoSection } from './ExamReviewPostInfoSection';
 export { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
+export { ExamReviewRestoreModal } from './ExamReviewRestoreModal';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamTable } from './ExamTable';
