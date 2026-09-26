@@ -42,7 +42,6 @@ describe('PointFreezeListSection', () => {
             updatedAt: '2026-01-01 10:00:00',
           },
         ]}
-        getPointFreezes={vi.fn()}
       />
     );
 

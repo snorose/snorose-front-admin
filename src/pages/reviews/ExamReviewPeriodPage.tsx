@@ -23,7 +23,6 @@ export default function ExamReviewPeriodPage() {
   } = useQuery({
     queryKey: EXAM_REVIEW_PERIODS_QUERY_KEY,
     queryFn: getExamReviewPeriodsAPI,
-    staleTime: 0,
   });
   const getExamReviewPeriods = () =>
     queryClient.invalidateQueries({ queryKey: EXAM_REVIEW_PERIODS_QUERY_KEY });

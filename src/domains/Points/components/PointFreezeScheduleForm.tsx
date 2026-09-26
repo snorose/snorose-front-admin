@@ -7,17 +7,11 @@ import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { getErrorMessage } from '@/shared/utils';
 
+import { useCreatePointFreeze } from '@/domains/Points/hooks';
 import { createPointFreezeRequest } from '@/domains/Points/utils';
 
-import { postPointFreezeAPI } from '@/apis';
-
-interface PointFreezeScheduleFormProps {
-  onSuccess: () => void;
-}
-
-export function PointFreezeScheduleForm({
-  onSuccess,
-}: PointFreezeScheduleFormProps) {
+export function PointFreezeScheduleForm() {
+  const { mutateAsync, isPending } = useCreatePointFreeze();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -43,8 +37,10 @@ export function PointFreezeScheduleForm({
       return;
     }
 
+    if (isPending) return;
+
     try {
-      await postPointFreezeAPI(
+      await mutateAsync(
         createPointFreezeRequest({
           title,
           startAt: startDateTime.dateTime,
@@ -53,7 +49,6 @@ export function PointFreezeScheduleForm({
       );
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
-      onSuccess();
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '미지급 일정 생성에 실패했습니다.'));
     }
@@ -119,6 +114,7 @@ export function PointFreezeScheduleForm({
               size='sm'
               variant='outline'
               className='w-16 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+              disabled={isPending}
               onClick={handleResetButtonClick}
             >
               초기화
@@ -128,6 +124,7 @@ export function PointFreezeScheduleForm({
               size='sm'
               variant='outline'
               className='w-16 cursor-pointer font-bold'
+              disabled={isPending}
               onClick={handleCreateButtonClick}
             >
               생성

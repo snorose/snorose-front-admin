@@ -8,23 +8,21 @@ import { useDateTimeField } from '@/shared/hooks';
 import type { PointFreeze } from '@/shared/types';
 import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
 
+import { useUpdatePointFreeze } from '@/domains/Points/hooks';
 import { updatePointFreezeRequest } from '@/domains/Points/utils';
-
-import { patchPointFreezeAPI } from '@/apis';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
   selectedItem: PointFreeze;
   onClose: () => void;
-  onSuccess: () => void;
 }
 
 export function PointFreezeUpdateConfirmModal({
   isUpdateModalOpen,
   selectedItem,
   onClose,
-  onSuccess,
 }: PointFreezeUpdateConfirmModalProps) {
+  const { mutateAsync, isPending } = useUpdatePointFreeze();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -47,7 +45,7 @@ export function PointFreezeUpdateConfirmModal({
   };
 
   const handleUpdateConfirm = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || isPending) return;
 
     if (
       title === '' ||
@@ -59,17 +57,16 @@ export function PointFreezeUpdateConfirmModal({
     }
 
     try {
-      await patchPointFreezeAPI(
-        selectedItem.id,
-        updatePointFreezeRequest({
+      await mutateAsync({
+        id: selectedItem.id,
+        data: updatePointFreezeRequest({
           title,
           startAt: startDateTime.dateTime,
           endAt: endDateTime.dateTime,
-        })
-      );
+        }),
+      });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();
-      onSuccess();
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(
         error,
@@ -121,7 +118,11 @@ export function PointFreezeUpdateConfirmModal({
           <Button type='button' variant='outline' onClick={handleUpdateCancel}>
             취소
           </Button>
-          <Button type='button' onClick={handleUpdateConfirm}>
+          <Button
+            type='button'
+            disabled={isPending}
+            onClick={handleUpdateConfirm}
+          >
             수정
           </Button>
         </Dialog.Footer>
