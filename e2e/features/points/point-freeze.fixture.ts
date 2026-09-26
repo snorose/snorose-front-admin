@@ -16,7 +16,8 @@ export const test = base.extend<{
     await use(await PointFreezeApi.create(context));
   },
   freezeQa: async ({ freezeApi }, use) => {
-    const prefix = `[E2E:POINT-FREEZE:${randomUUID().replaceAll('-', '').slice(0, 16)}]`;
+    // DB title은 varchar(30)이므로 16자리 실행 ID와 짧은 접두사를 사용합니다.
+    const prefix = `[E2E:PF:${randomUUID().replaceAll('-', '').slice(0, 16)}]`;
     try {
       await use({ prefix });
     } finally {

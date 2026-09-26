@@ -89,7 +89,7 @@ test('[TC-ADM-PF-007] 시작일이 종료일보다 늦으면 등록을 거절한
   freezeApi,
   freezeQa,
 }) => {
-  const title = `${freezeQa.prefix} 날짜 역순`;
+  const title = `${freezeQa.prefix} 역순`;
   await freezePage.goto();
   await freezePage.fill(title, 11, 10);
   const responsePromise = freezePage.response('POST');

@@ -24,7 +24,7 @@ export class PointFreezeApi {
   }
 
   async cleanup(prefix: string) {
-    if (!prefix.startsWith('[E2E:POINT-FREEZE:'))
+    if (!/^\[E2E:PF:[a-f0-9]{16}\]$/.test(prefix))
       throw new Error('E2E 일정만 정리할 수 있습니다.');
     const schedules = (await this.list()).filter((item) =>
       item.title.startsWith(prefix)
