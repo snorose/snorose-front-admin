@@ -1,41 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-import { toast } from 'sonner';
-
 import { PageHeader } from '@/shared/components';
-import type { PointFreeze } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
   PointFreezeListSection,
   PointFreezeScheduleForm,
 } from '@/domains/Points/components';
-
-import { getPointFreezesAPI } from '@/apis';
+import { usePointFreezes } from '@/domains/Points/hooks/usePointFreezes';
 
 export default function PointFreezePage() {
-  const [pointFreezes, setPointFreezes] = useState<PointFreeze[]>([]);
-
-  const isFetchingRef = useRef(false);
-
-  const getPointFreezes = useCallback(async () => {
-    if (isFetchingRef.current) return;
-
-    isFetchingRef.current = true;
-
-    try {
-      const data = await getPointFreezesAPI();
-      setPointFreezes(data);
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error, '미지급 일정 조회에 실패했습니다.'));
-    } finally {
-      isFetchingRef.current = false;
-    }
-  }, []);
-
-  useEffect(() => {
-    getPointFreezes();
-  }, [getPointFreezes]);
+  const {
+    data: pointFreezes = [],
+    isPending,
+    isFetching,
+    error,
+    refetch,
+  } = usePointFreezes();
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -44,11 +23,20 @@ export default function PointFreezePage() {
         description='포인트 미지급 일정을 생성, 조회, 수정, 삭제할 수 있어요.'
       />
 
-      <PointFreezeScheduleForm onSuccess={getPointFreezes} />
+      <PointFreezeScheduleForm />
 
       <PointFreezeListSection
         pointFreezes={pointFreezes}
-        getPointFreezes={getPointFreezes}
+        isLoading={isPending}
+        isFetching={isFetching}
+        errorMessage={
+          error
+            ? getErrorMessage(error, '미지급 일정 조회에 실패했습니다.')
+            : undefined
+        }
+        onRetry={() => {
+          void refetch();
+        }}
       />
     </div>
   );
