@@ -797,8 +797,9 @@ export function ExamDetailSection({
                       onFileNameRename={() => setIsFileNameModalOpen(true)}
                       canRenameFileName={
                         !isDisabled &&
-                        isEditMode &&
                         !isSaving &&
+                        !isDeleting &&
+                        !isRestoring &&
                         selectedExamReviewDetail?.postId ===
                           selectedExamReview?.id &&
                         Boolean(selectedExamReviewDetail.fileName)
@@ -858,8 +859,7 @@ export function ExamDetailSection({
         }}
       />
 
-      {isEditMode &&
-        isFileNameModalOpen &&
+      {isFileNameModalOpen &&
         selectedExamReview &&
         selectedExamReviewDetail?.fileName && (
           <ExamReviewFileNameModal
@@ -869,7 +869,7 @@ export function ExamDetailSection({
             returnFocusRef={renameButtonRef}
             onClose={() => setIsFileNameModalOpen(false)}
             onSuccess={(postId, result) => {
-              toast.success('파일명이 수정되었습니다.');
+              toast.success('파일명이 변경되었습니다.');
               onFileNameChangeSuccess?.(postId, result);
             }}
           />

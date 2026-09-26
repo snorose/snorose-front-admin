@@ -80,12 +80,12 @@ describe('ExamReviewDetailInfoSection', () => {
     });
   });
 
-  test('업로드 파일 행에 파일명 수정 버튼을 표시한다', () => {
+  test('업로드 파일 행에 파일명 변경 버튼을 표시한다', () => {
     renderExamReviewDetailInfoSection();
 
     const uploadField = getFieldByLabel('업로드 파일');
     expect(
-      within(uploadField).getByRole('button', { name: '파일명 수정' })
+      within(uploadField).getByRole('button', { name: '파일명 변경' })
     ).toBeEnabled();
   });
 
