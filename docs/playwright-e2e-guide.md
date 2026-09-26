@@ -157,6 +157,8 @@ e2e/features/member/
 
 Playwright 설정이 `features/**/*.read.spec.ts`와 `features/**/*.write.spec.ts`를 자동으로 찾으므로 일반적으로 프로젝트 설정을 추가할 필요가 없습니다.
 
+기능별 실행 명령, QA 환경변수, TC 목록, 데이터 정리 방식은 각 기능 폴더의 `README.md`에 작성합니다. 공통 가이드에는 설치·인증·공통 실행 방법을 유지합니다. 기능별 문서는 [E2E 문서 안내](../e2e/README.md)에서 찾을 수 있습니다.
+
 작성 원칙은 다음과 같습니다.
 
 1. Page Object에는 locator와 재사용 동작만 둡니다.
