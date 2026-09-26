@@ -1,8 +1,8 @@
 import { Input, Label } from '@/shared/components/ui';
-import type { MemberInfo } from '@/shared/types';
+import type { AdminUserListItem } from '@/shared/types';
 
 interface MemberInfoSectionProps {
-  searchedMember: MemberInfo | null;
+  searchedMember: AdminUserListItem | null;
 }
 
 export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {
