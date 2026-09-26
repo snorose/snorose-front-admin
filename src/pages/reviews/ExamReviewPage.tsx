@@ -2,17 +2,24 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
-import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { formatDateTimeToMinutes, parseOneBasedPage } from '@/shared/utils';
+import { Button } from '@/shared/components/ui';
+import {
+  formatDateTimeToMinutes,
+  getErrorMessage,
+  parseOneBasedPage,
+} from '@/shared/utils';
 
 import {
   ExamDetailSection,
   ExamSearch,
   ExamTable,
 } from '@/domains/Reviews/components';
+import {
+  examReviewDetailQueryKey,
+  useExamReviewDetail,
+} from '@/domains/Reviews/hooks';
 import { isExamReviewSort } from '@/domains/Reviews/types';
 import type {
   ExamReview,
@@ -34,11 +41,14 @@ export default function ExamReviewPage() {
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
   const [selectedExamReview, setSelectedExamReview] =
     useState<ExamReview | null>(null);
-  const [selectedExamReviewDetail, setSelectedExamReviewDetail] =
-    useState<ExamReviewDetailResult | null>(null);
-  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const {
+    data: selectedExamReviewDetail = null,
+    isLoading: isLoadingDetail,
+    isFetching: isFetchingDetail,
+    error: detailError,
+    refetch: refetchDetail,
+  } = useExamReviewDetail(selectedExamReview?.id ?? null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const fetchingIdRef = useRef<number | null>(null);
   const selectedReviewIdRef = useRef<number | null>(null);
   selectedReviewIdRef.current = selectedExamReview?.id ?? null;
   const [searchParams, setSearchParams] = useState<ExamReviewSearchParams>({});
@@ -221,7 +231,11 @@ export default function ExamReviewPage() {
         if (updatedDetailFromSave !== undefined) {
           updatedDetail = updatedDetailFromSave;
         } else {
-          updatedDetail = await getExamReviewDetail(selectedExamReview.id);
+          updatedDetail = await queryClient.fetchQuery({
+            queryKey: examReviewDetailQueryKey(selectedExamReview.id),
+            queryFn: () => getExamReviewDetail(selectedExamReview.id),
+            staleTime: 0,
+          });
         }
 
         // 현재 검색 파라미터로 쿼리 키 생성
@@ -289,8 +303,13 @@ export default function ExamReviewPage() {
         }
 
         // 선택된 항목도 업데이트
-        setSelectedExamReview(updatedItem);
-        setSelectedExamReviewDetail(updatedDetail);
+        queryClient.setQueryData(
+          examReviewDetailQueryKey(selectedExamReview.id),
+          updatedDetail
+        );
+        if (selectedReviewIdRef.current === selectedExamReview.id) {
+          setSelectedExamReview(updatedItem);
+        }
       } catch (error) {
         // 에러 발생 시 기존 방식으로 fallback
         console.error('Failed to update cache:', error);
@@ -303,16 +322,22 @@ export default function ExamReviewPage() {
   };
 
   const handleDeleteSuccess = () => {
+    if (selectedExamReview) {
+      void queryClient.invalidateQueries({
+        queryKey: examReviewDetailQueryKey(selectedExamReview.id),
+      });
+    }
     // 삭제 후 선택 해제 및 테이블 새로고침
     setSelectedExamReview(null);
-    setSelectedExamReviewDetail(null);
     setRefreshKey((prev) => prev + 1);
   };
 
   const handleRestoreSuccess = (postId: number) => {
+    void queryClient.invalidateQueries({
+      queryKey: examReviewDetailQueryKey(postId),
+    });
     if (selectedReviewIdRef.current === postId) {
       setSelectedExamReview(null);
-      setSelectedExamReviewDetail(null);
     }
     setRefreshKey((prev) => prev + 1);
   };
@@ -321,75 +346,17 @@ export default function ExamReviewPage() {
     postId: number,
     result: RenameExamReviewFileResult
   ) => {
-    if (selectedReviewIdRef.current !== postId) return;
-
-    setSelectedExamReviewDetail((current) =>
-      current?.postId === postId
-        ? { ...current, fileName: result.fileName, logs: result.logs }
-        : current
+    queryClient.setQueryData<ExamReviewDetailResult>(
+      examReviewDetailQueryKey(postId),
+      (current) =>
+        current
+          ? { ...current, fileName: result.fileName, logs: result.logs }
+          : current
     );
-
-    void getExamReviewDetail(postId)
-      .then((detail) => {
-        if (selectedReviewIdRef.current === postId) {
-          setSelectedExamReviewDetail(detail);
-        }
-      })
-      .catch(() => {
-        if (selectedReviewIdRef.current === postId) {
-          toast.error(
-            '파일명은 수정되었지만 상세 정보를 새로고침하지 못했습니다.'
-          );
-        }
-      });
+    void queryClient.invalidateQueries({
+      queryKey: examReviewDetailQueryKey(postId),
+    });
   };
-
-  // 시험후기 선택 시 상세 정보 조회
-  useEffect(() => {
-    const fetchExamReviewDetail = async () => {
-      if (!selectedExamReview) {
-        setSelectedExamReviewDetail(null);
-        fetchingIdRef.current = null;
-        return;
-      }
-
-      const examId = selectedExamReview.id;
-
-      // 이미 같은 ID에 대한 요청이 진행 중이면 중복 호출 방지
-      if (fetchingIdRef.current === examId) {
-        return;
-      }
-
-      fetchingIdRef.current = examId;
-      setIsLoadingDetail(true);
-
-      try {
-        const response = await getExamReviewDetail(examId);
-
-        // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
-        if (fetchingIdRef.current === examId) {
-          setSelectedExamReviewDetail(response);
-        }
-      } catch (error: unknown) {
-        // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
-        if (fetchingIdRef.current === examId) {
-          const errorMessage =
-            (isAxiosError(error) && error.response?.data?.message) ||
-            '시험 후기 상세 정보를 불러오는데 실패했습니다.';
-          toast.error(errorMessage);
-          setSelectedExamReviewDetail(null);
-        }
-      } finally {
-        // 요청이 완료되었을 때 현재 선택된 ID와 일치하는지 확인
-        if (fetchingIdRef.current === examId) {
-          setIsLoadingDetail(false);
-          fetchingIdRef.current = null;
-        }
-      }
-    };
-
-    fetchExamReviewDetail();
-  }, [selectedExamReview]);
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -461,6 +428,31 @@ export default function ExamReviewPage() {
           onPageChange={handlePageChange}
         />
       </div>
+
+      {selectedExamReview && detailError && (
+        <div
+          role='alert'
+          className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3 text-sm'
+        >
+          <span>
+            {getErrorMessage(
+              detailError,
+              '시험 후기 상세 정보를 불러오지 못했습니다.'
+            )}
+          </span>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            disabled={isFetchingDetail}
+            onClick={() => {
+              void refetchDetail();
+            }}
+          >
+            다시 시도
+          </Button>
+        </div>
+      )}
 
       <ExamDetailSection
         selectedExamReview={selectedExamReview}
