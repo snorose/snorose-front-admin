@@ -5,7 +5,7 @@ import {
   PointFreezeListSection,
   PointFreezeScheduleForm,
 } from '@/domains/Points/components';
-import { usePointFreezes } from '@/domains/Points/hooks/usePointFreezes';
+import { usePointFreezes } from '@/domains/Points/hooks';
 
 export default function PointFreezePage() {
   const {

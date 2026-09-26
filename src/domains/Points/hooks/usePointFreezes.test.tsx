@@ -16,7 +16,7 @@ import {
   useDeletePointFreeze,
   usePointFreezes,
   useUpdatePointFreeze,
-} from './usePointFreezes';
+} from './index';
 
 vi.mock('@/apis', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/apis')>()),
