@@ -29,7 +29,7 @@ export function ExamReviewDeleteModal({
       onClose={onClose}
       onConfirm={onConfirm}
       title='시험 후기 삭제'
-      description='기존 메모 아래에 삭제 사유를 추가해 저장합니다.'
+      description='시험후기를 삭제하시겠습니까?'
     >
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-2'>
@@ -62,6 +62,9 @@ export function ExamReviewDeleteModal({
             className='min-h-[120px] resize-none'
             disabled={isDeleting}
           />
+          <p className='text-sm text-gray-500'>
+            기존 메모 아래에 [삭제 사유]로 저장됩니다.
+          </p>
         </div>
       </div>
     </ConfirmModal>
