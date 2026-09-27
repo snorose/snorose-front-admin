@@ -18,10 +18,10 @@
 | ------------------------------------------------------------------------------------------------ | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | [StatusChangeModal](../../src/shared/components/StatusChangeModal.tsx)                           | 게시글·댓글 상태 변경 사유 | `Textarea`로 교체. 회색 테두리, 큰 모서리, 파란 포커스 스타일 제거. 현재 최소 높이 100px과 빈 사유 확인 버튼 비활성화 유지 |
 | [PostDetailActionModal](../../src/domains/Posts/components/PostDetail/PostDetailActionModal.tsx) | 게시글 상세 상태 변경 사유 | 위와 동일. 복구 시 사유 입력을 숨기는 조건과 댓글 동시 삭제 옵션 유지                                                      |
-| [ExamDeletePanel](../../src/domains/Reviews/components/ExamDeletePanel.tsx)                      | 시험후기 삭제 사유         | 사용 여부 확인 후 유지한다면 교체. 최소 높이 200px과 자동 높이 조절 검토                                                   |
-| [ExamDiscussionPanel](../../src/domains/Reviews/components/ExamDiscussionPanel.tsx)              | 시험후기 논의사항          | 사용 여부 확인 후 유지한다면 교체. 최소 높이 200px과 자동 높이 조절 검토                                                   |
-| [ExamDegradePanel](../../src/domains/Reviews/components/ExamDegradePanel.tsx)                    | 기타 강등 사유             | 사용 여부 확인 후 유지한다면 교체. 기타 선택 시 노출 조건과 최소 높이 100px 유지                                           |
-| [ExamWarningPanel](../../src/domains/Reviews/components/ExamWarningPanel.tsx)                    | 기타 경고 사유             | 사용 여부 확인 후 유지한다면 교체. 기타 선택 시 노출 조건과 최소 높이 100px 유지                                           |
+| `ExamDeletePanel` (4단계에서 삭제)                                                               | 시험후기 삭제 사유         | 사용 여부 확인 후 유지한다면 교체. 최소 높이 200px과 자동 높이 조절 검토                                                   |
+| `ExamDiscussionPanel` (4단계에서 삭제)                                                           | 시험후기 논의사항          | 사용 여부 확인 후 유지한다면 교체. 최소 높이 200px과 자동 높이 조절 검토                                                   |
+| `ExamDegradePanel` (4단계에서 삭제)                                                              | 기타 강등 사유             | 사용 여부 확인 후 유지한다면 교체. 기타 선택 시 노출 조건과 최소 높이 100px 유지                                           |
+| `ExamWarningPanel` (4단계에서 삭제)                                                              | 기타 경고 사유             | 사용 여부 확인 후 유지한다면 교체. 기타 선택 시 노출 조건과 최소 높이 100px 유지                                           |
 
 `StatusChangeModal`은 게시글 목록, 댓글 목록, 게시글 상세 댓글에서 재사용된다. 한 번 교체하면 여러 화면에 적용된다.
 
@@ -107,11 +107,21 @@ textarea 사용처에 별도의 필드 오류 상태·인라인 오류 메시지
 
 아래 항목은 유지 후 교체하거나, 불필요한 코드로 판단하여 삭제한 경우 완료로 표시한다.
 
-- [ ] `ExamDeletePanel`: 유지 여부 결정 및 처리
-- [ ] `ExamDiscussionPanel`: 유지 여부 결정 및 처리
-- [ ] `ExamDegradePanel`: 유지 여부 결정 및 처리
-- [ ] `ExamWarningPanel`: 유지 여부 결정 및 처리
-- [ ] 유지한 패널의 자동 높이 조절을 확인하고 중복 `scrollHeight` 코드 정리
+- [x] `ExamDeletePanel`: 사용 참조 없음 확인 후 파일과 export 삭제
+- [x] `ExamDiscussionPanel`: 사용 참조 없음 확인 후 파일과 export 삭제
+- [x] `ExamDegradePanel`: 사용 참조 없음 확인 후 파일과 export 삭제
+- [x] `ExamWarningPanel`: 사용 참조 없음 확인 후 파일과 export 삭제
+- [x] 자동 높이 조절 중복 정리: 패널 4개 삭제로 해당 `scrollHeight` 코드도 제거. 유지한 패널 없음
+
+4단계 완료: 패널 4개는 정의와 export 외에 사용 참조가 없어 삭제했다. 실제 화면은 기존 시험후기 상세·삭제/복구 모달과 회원 제재 추가 모달을 계속 사용한다. 화면 입력부는 조사 당시 18곳에서 현재 14곳으로 줄었으며 모두 공통 `Textarea`를 사용한다.
+
+#### 패널을 삭제한 이유
+
+- 저장소 전체 검색에서 패널 4개는 **컴포넌트 정의와 barrel export 외에 사용 참조가 없었다**.
+- 실제 시험후기 삭제·복구는 `ExamReviewDeleteModal`, `ExamReviewRestoreModal`을 사용하고, 회원 제재 추가는 `PenaltyHistoryAddDialog`를 사용한다. 기존 화면은 삭제한 패널에 의존하지 않는다.
+- 사용되지 않는 패널을 공통 `Textarea`로 교체하는 것보다, 파일과 export를 제거해 불필요한 스타일과 자동 높이 조절 중복 코드를 줄이는 방향을 선택했다.
+
+이는 **현재 코드에서 사용하지 않는다는 근거에 따른 판단**이며, 향후 기능 계획에도 필요 없다고 확인한 것은 아니다. 패널을 다시 사용할 계획이 생기면 Git 이력에서 복원한 뒤 공통 `Textarea`를 적용한다. 삭제 후 빌드와 시험후기 상세 관련 테스트 17개가 통과했다.
 
 ### 완료 확인
 
