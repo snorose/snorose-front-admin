@@ -7,7 +7,7 @@
 **기존 shadcn 기반 [`Input`](../src/shared/components/ui/input.tsx)을 그대로 공용 기준으로 사용한다.** 이미 `shared/components/ui`에서 export하므로 새 `CommonInput`이나 범용 입력 래퍼는 필요하지 않다.
 
 - 일반 텍스트·비밀번호·숫자·날짜 입력은 `Input`을 직접 사용한다.
-- 기본 높이 `h-9`, 테두리, 둥근 모서리, 포커스, 비활성·오류 스타일을 유지한다. 호출부에는 너비·배치 위주로 지정한다.
+- 기본 높이 `h-9`, 테두리, 둥근 모서리, 포커스, 비활성·오류 스타일을 유지한다. 호출부에는 너비·배치 위주로 지정한다. 로그인은 입력이 적은 독립 폼이므로 44px 높이를 예외로 유지하고 입력 글자 크기는 14px로 맞춘다.
 - 레이블·설명·오류 문구는 기존 `Label` 또는 `Field`와 조합한다. `id`/`htmlFor`, `aria-describedby`, `aria-invalid`로 연결한다.
 - 입력 내부 버튼·아이콘이 필요한 곳은 기존 `InputGroup.Input`, `InputGroup.Addon`, `InputGroup.Button`을 활용한다. 검색 실행·초기화·복사 로직은 호출부에 둔다.
 - 값 변환, 검증, API 호출은 페이지·도메인에 유지한다. 숫자 입력도 편집 중에는 빈 문자열을 허용하고 기존 제출 시점 변환을 보존한다.
@@ -28,7 +28,7 @@
 
 ### 후속 적용: 기존 Input 사용처 정리
 
-- [ ] **로그인 `/`** — [`LogInPage.tsx`](../src/pages/login/LogInPage.tsx): 아이디·비밀번호 레이블 연결. `h-11 text-base` 예외 필요성을 검토하고 기본 크기 우선 적용. 비밀번호 보기 버튼은 InputGroup 조합, 로딩 비활성 유지.
+- [x] **로그인 `/`** — [`LogInPage.tsx`](../src/pages/login/LogInPage.tsx): 아이디·비밀번호에 숨김 레이블과 자동완성 연결. 기존 44px 높이 유지, 입력 글자 크기는 데스크톱에서 기존에 표시되던 14px로 통일. 비밀번호 보기 버튼은 InputGroup으로 조합하고 로딩 중 함께 비활성화. 좁은 화면에서는 폼 너비와 카드 패딩 조정.
 - [ ] **회원 정보 `/member/info`, `/member/info/:memberKey`** — [`MemberDirectorySection.tsx`](../src/domains/MemberInfo/components/MemberDirectorySection.tsx), [`MemberInfoEditFormFields.tsx`](../src/domains/MemberInfo/components/MemberInfoEditFormFields.tsx), [`MemberPointAdjustmentDialog.tsx`](../src/domains/MemberInfo/components/MemberPointAdjustmentDialog.tsx): 검색 아이콘을 InputGroup으로 조합. 검색·회원 수정·포인트 카테고리 직접 입력·수량의 `h-12`, 큰 radius, 별도 배경·포커스 재정의 정리. 기존 오류 연결과 자동 수량 `readOnly` 유지.
 - [ ] **경고·강등 관리 `/member/penalty`** — [`MemberPenaltyManagementPage.tsx`](../src/pages/member/MemberPenaltyManagementPage.tsx), [`PenaltyUserInfoView.tsx`](../src/domains/MemberInfo/components/PenaltyUserInfoView.tsx), [`WarnPenaltyTab.tsx`](../src/domains/MemberInfo/components/WarnPenaltyTab.tsx), [`DemotionPenaltyTab.tsx`](../src/domains/MemberInfo/components/DemotionPenaltyTab.tsx): 회원 검색, 조회 전용 정보, 상세 사유, 경고 횟수·강등 개월의 레이블 연결. `bg-gray-*` 등 상태 스타일은 테마 토큰으로 정리. 복사 버튼은 InputGroup 조합, 읽기 전용·비활성 조건 유지.
 - [ ] **회원 정보 및 제재 모달 사용 화면** — [`PenaltyHistoryAddFields.tsx`](../src/domains/MemberInfo/components/penalty-history/PenaltyHistoryAddFields.tsx), [`SearchableSelect.tsx`](../src/domains/MemberInfo/components/SearchableSelect.tsx): 경고/강등 상세 사유·횟수·개월의 높이·radius·배경·오류 스타일 중복 정리, 레이블 연결. 선택 목록 내부 검색 Input도 기본 스타일로 정리하되 선택 동작 유지. 공유 모달이므로 한 번 수정 후 회원 상세와 게시글·댓글 제재 흐름 확인.
