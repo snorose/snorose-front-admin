@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input } from '@/shared/components/ui';
+import { Button, Input, Label } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import type { AdminUserListItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
@@ -18,6 +18,7 @@ import {
 import { postSinglePointAPI, searchSinglePointMemberAPI } from '@/apis';
 
 export default function AdjustSinglePointPage() {
+  const searchInputId = useId();
   const [searchedMember, setSearchedMember] =
     useState<AdminUserListItem | null>(null);
   const latestSearchId = useRef(0);
@@ -101,8 +102,12 @@ export default function AdjustSinglePointPage() {
       />
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>회원 검색</h3>
+        <Label htmlFor={searchInputId} className='sr-only'>
+          회원 검색 (아이디 또는 학번)
+        </Label>
         <div className='flex gap-2'>
           <Input
+            id={searchInputId}
             type='text'
             placeholder='아이디 또는 학번을 입력해주세요.'
             className='w-96'

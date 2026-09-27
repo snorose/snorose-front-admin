@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { Input, Label } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 
@@ -6,6 +8,7 @@ interface MemberInfoSectionProps {
 }
 
 export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {
+  const inputId = useId();
   const MEMBER_INFO = [
     {
       label: '이름',
@@ -40,15 +43,15 @@ export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {
       <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
         {MEMBER_INFO.map(({ label, id, value }) => (
           <div className='flex flex-col gap-1' key={id}>
-            <Label htmlFor={id} required>
+            <Label htmlFor={`${inputId}-${id}`} required>
               {label}
             </Label>
             <Input
               type='text'
-              id={id}
+              id={`${inputId}-${id}`}
               value={value ?? ''}
               readOnly
-              className='cursor-not-allowed bg-gray-100'
+              className='bg-muted cursor-not-allowed'
               placeholder='회원을 검색해 주세요.'
             />
           </div>

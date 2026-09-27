@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -23,6 +23,7 @@ export function PointFreezeUpdateConfirmModal({
   onClose,
 }: PointFreezeUpdateConfirmModalProps) {
   const { mutateAsync, isPending } = useUpdatePointFreeze();
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -90,10 +91,12 @@ export function PointFreezeUpdateConfirmModal({
           </Dialog.Description>
         </Dialog.Header>
         <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>일정 제목: </Label>
+          <Label htmlFor={titleId} className='text-sm font-semibold'>
+            일정 제목:
+          </Label>
           <Input
             type='text'
-            id='title'
+            id={titleId}
             value={title}
             onChange={handleInputChange}
           />
