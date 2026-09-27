@@ -432,7 +432,7 @@ export default function InquiryReportDetailPanel({
             placeholder={
               replyParentComment ? '대댓글을 입력하세요.' : '댓글을 입력하세요.'
             }
-            className='min-h-24 resize-none bg-white text-[13px]'
+            className='min-h-24 resize-none'
           />
           <div className='flex items-center justify-between gap-2'>
             <span className='text-[11px] text-gray-400'>

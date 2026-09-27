@@ -308,7 +308,7 @@ export default function PenaltyHistoryAddDialog({
                 onChange={(event) => setMemo(event.target.value)}
                 placeholder='관리자명: 내용'
                 maxLength={MEMO_MAX_LENGTH}
-                className='min-h-32 resize-none rounded-xl border-0 bg-slate-100 px-4 py-4 text-base shadow-none focus-visible:ring-slate-300'
+                className='min-h-32 resize-none'
               />
               <p className='text-right text-sm font-medium text-slate-400'>
                 {memo.length}/{MEMO_MAX_LENGTH}

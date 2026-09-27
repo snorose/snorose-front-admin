@@ -136,7 +136,7 @@ export default function InquiryCommentItem({
               value={editingCommentValue}
               onChange={(event) => onEditingValueChange(event.target.value)}
               maxLength={INQUIRY_COMMENT_MAX_LENGTH}
-              className='min-h-20 resize-none bg-white text-[13px]'
+              className='min-h-20 resize-none'
             />
             <div className='flex items-center justify-between gap-2'>
               <span className='text-[11px] text-gray-400'>

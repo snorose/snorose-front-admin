@@ -265,7 +265,7 @@ export default function MemberPointAdjustmentDialog({
                 value={memo}
                 onChange={(event) => setMemo(event.target.value)}
                 placeholder='메모를 입력해주세요'
-                className='min-h-28 resize-none rounded-xl bg-slate-50'
+                className='min-h-28 resize-none'
               />
             </Field>
           </div>

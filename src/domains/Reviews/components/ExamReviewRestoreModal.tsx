@@ -48,7 +48,7 @@ export function ExamReviewRestoreModal({
             id='exam-review-restore-existing-memo'
             value={existingMemo ?? ''}
             placeholder='기존 메모가 없습니다.'
-            className='min-h-[96px] resize-none bg-gray-50'
+            className='bg-muted min-h-[96px] resize-none'
             readOnly
           />
         </div>

@@ -75,11 +75,23 @@
 
 ### 2단계: 기존 사용처 스타일 정리
 
-- [ ] `MemberPointAdjustmentDialog`: 모서리·배경 덮어쓰기 정리
-- [ ] `PenaltyHistoryAddDialog`: 모서리·테두리·배경·패딩·글꼴·포커스 덮어쓰기 정리
-- [ ] `InquiryReportDetailPanel`: 배경·글꼴 덮어쓰기 정리
-- [ ] `InquiryCommentItem`: 배경·글꼴 덮어쓰기 정리
-- [ ] `ExamReviewDeleteModal`, `ExamReviewRestoreModal`: 기존 메모 배경을 같은 읽기 전용 토큰으로 통일
+- [x] `MemberPointAdjustmentDialog`: 모서리·배경 덮어쓰기 정리
+- [x] `PenaltyHistoryAddDialog`: 모서리·테두리·배경·패딩·글꼴·포커스 덮어쓰기 정리
+- [x] `InquiryReportDetailPanel`: 배경·글꼴 덮어쓰기 정리
+- [x] `InquiryCommentItem`: 배경·글꼴 덮어쓰기 정리
+- [x] `ExamReviewDeleteModal`, `ExamReviewRestoreModal`: 기존 메모 배경을 같은 읽기 전용 토큰으로 통일
+
+### 2단계 변경 화면 확인 경로
+
+| 변경 입력          | 페이지 경로       | 여는 방법                                                                           |
+| ------------------ | ----------------- | ----------------------------------------------------------------------------------- |
+| 회원 포인트 메모   | `/member/info`    | 회원 선택 → 상세의 포인트 옆 편집 버튼 → 메모 입력                                  |
+| 제재 추가 메모     | `/member/info`    | 회원 선택 → 강등/경고 카드의 히스토리 아이콘 → 경고 추가 또는 강등 추가 → 메모 입력 |
+| 문의 댓글/대댓글   | `/report/inquiry` | 문의 선택 → 상세 패널 하단 댓글 입력. 대댓글은 댓글의 답글 버튼으로 확인            |
+| 문의 댓글 수정     | `/report/inquiry` | 문의 선택 → 관리 가능한 댓글의 더보기 → 수정                                        |
+| 시험후기 기존 메모 | `/reviews/exam`   | 후기 선택 → 상세의 삭제 버튼. 삭제된 후기는 삭제된 시험 후기 복구 버튼으로 확인     |
+
+입력창 확인 후 취소하면 된다. 위 변경은 입력 스타일에 한정하며, 높이·글자 수 제한·읽기 전용·저장 동작은 유지한다.
 
 ### 3단계: 라벨과 상태 연결
 
