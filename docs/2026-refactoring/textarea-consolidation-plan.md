@@ -95,11 +95,13 @@
 
 ### 3단계: 라벨과 상태 연결
 
-- [ ] `ExamReviewDetailInfoSection`: 입력 2곳에 `id`와 `htmlFor` 연결
-- [ ] `PenaltyHistoryAddDialog`: 메모 라벨과 입력 연결
-- [ ] `InquiryReportDetailPanel`: 댓글/대댓글 입력의 접근 가능한 이름 추가
-- [ ] `InquiryCommentItem`: 댓글 수정 입력의 접근 가능한 이름 추가
-- [ ] 실제 필드 오류가 있는 사용처에서 `aria-invalid`, `aria-describedby`와 오류 메시지 연결 확인
+- [x] `ExamReviewDetailInfoSection`: 입력 2곳에 `id`와 `htmlFor` 연결
+- [x] `PenaltyHistoryAddDialog`: 메모 라벨과 입력 연결
+- [x] `InquiryReportDetailPanel`: 댓글/대댓글 입력의 접근 가능한 이름 추가
+- [x] `InquiryCommentItem`: 댓글 수정 입력의 접근 가능한 이름 추가
+- [x] 실제 필드 오류가 있는 사용처에서 `aria-invalid`, `aria-describedby`와 오류 메시지 연결 확인
+
+textarea 사용처에 별도의 필드 오류 상태·인라인 오류 메시지는 없음을 확인했다. 기존 버튼 비활성화와 toast 검증은 유지하며, 서버 요청 실패를 입력값 오류로 표시하지 않는다. 제재 메모·문의 댓글의 글자 수 안내는 `aria-describedby`로 연결했다.
 
 ### 4단계: 사용 참조 없는 패널 정리
 

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 
 import { AlertTriangle, Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -45,6 +45,8 @@ export default function PenaltyHistoryAddDialog({
   onApplied,
   onOpenChange,
 }: PenaltyHistoryAddDialogProps) {
+  const memoId = useId();
+  const memoDescriptionId = useId();
   const [warningReason, setWarningReason] = useState(
     DEFAULT_WARNING_REASON?.value ?? ''
   );
@@ -302,15 +304,20 @@ export default function PenaltyHistoryAddDialog({
               />
             )}
 
-            <Field label='메모'>
+            <Field label='메모' htmlFor={memoId}>
               <Textarea
+                id={memoId}
+                aria-describedby={memoDescriptionId}
                 value={memo}
                 onChange={(event) => setMemo(event.target.value)}
                 placeholder='관리자명: 내용'
                 maxLength={MEMO_MAX_LENGTH}
                 className='min-h-32 resize-none'
               />
-              <p className='text-right text-sm font-medium text-slate-400'>
+              <p
+                id={memoDescriptionId}
+                className='text-right text-sm font-medium text-slate-400'
+              >
                 {memo.length}/{MEMO_MAX_LENGTH}
               </p>
             </Field>

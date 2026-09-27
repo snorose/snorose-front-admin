@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useId, useState } from 'react';
 
 import { Copy, ExternalLink, Send, X } from 'lucide-react';
 
@@ -57,6 +57,7 @@ export default function InquiryReportDetailPanel({
   onClose,
   onStatusChange,
 }: InquiryReportDetailPanelProps) {
+  const commentDescriptionId = useId();
   const [commentInput, setCommentInput] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingCommentValue, setEditingCommentValue] = useState('');
@@ -426,6 +427,8 @@ export default function InquiryReportDetailPanel({
             </div>
           )}
           <Textarea
+            aria-label={replyParentComment ? '대댓글 작성' : '댓글 작성'}
+            aria-describedby={commentDescriptionId}
             value={commentInput}
             onChange={(event) => setCommentInput(event.target.value)}
             maxLength={INQUIRY_COMMENT_MAX_LENGTH}
@@ -435,7 +438,10 @@ export default function InquiryReportDetailPanel({
             className='min-h-24 resize-none'
           />
           <div className='flex items-center justify-between gap-2'>
-            <span className='text-[11px] text-gray-400'>
+            <span
+              id={commentDescriptionId}
+              className='text-[11px] text-gray-400'
+            >
               {commentInput.length}/{INQUIRY_COMMENT_MAX_LENGTH}
             </span>
             <Button

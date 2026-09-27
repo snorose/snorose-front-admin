@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { MessageSquare, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
@@ -42,6 +44,7 @@ export default function InquiryCommentItem({
   onReplyStart,
   onEditingValueChange,
 }: InquiryCommentItemProps) {
+  const editingDescriptionId = useId();
   const isEditing = editingCommentId === comment.id;
   const isManageable = canManageComment(comment);
   const canReply = depth === 0 && comment.isVisible && !comment.isDeleted;
@@ -133,13 +136,18 @@ export default function InquiryCommentItem({
         {isEditing ? (
           <div className='flex flex-col gap-2'>
             <Textarea
+              aria-label='댓글 수정'
+              aria-describedby={editingDescriptionId}
               value={editingCommentValue}
               onChange={(event) => onEditingValueChange(event.target.value)}
               maxLength={INQUIRY_COMMENT_MAX_LENGTH}
               className='min-h-20 resize-none'
             />
             <div className='flex items-center justify-between gap-2'>
-              <span className='text-[11px] text-gray-400'>
+              <span
+                id={editingDescriptionId}
+                className='text-[11px] text-gray-400'
+              >
                 {editingCommentValue.length}/{INQUIRY_COMMENT_MAX_LENGTH}
               </span>
               <div className='flex justify-end gap-2'>
