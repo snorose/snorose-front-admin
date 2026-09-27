@@ -1,4 +1,6 @@
-import { Button } from '@/shared/components/ui';
+import { useId } from 'react';
+
+import { Button, Textarea } from '@/shared/components/ui';
 
 interface PostDetailActionModalProps {
   isOpen: boolean;
@@ -21,6 +23,8 @@ export default function PostDetailActionModal({
   onDeleteCommentsAlsoChange,
   onConfirm,
 }: PostDetailActionModalProps) {
+  const reasonId = useId();
+
   if (!isOpen) return null;
 
   const actionText =
@@ -50,12 +54,18 @@ export default function PostDetailActionModal({
 
         <div className='flex flex-col gap-4'>
           {requiresReason && (
-            <textarea
-              className='min-h-[100px] w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
-              placeholder='변경 사유를 입력하세요...'
-              value={reason}
-              onChange={(e) => onReasonChange(e.target.value)}
-            />
+            <>
+              <label htmlFor={reasonId} className='sr-only'>
+                변경 사유
+              </label>
+              <Textarea
+                id={reasonId}
+                className='min-h-[100px]'
+                placeholder='변경 사유를 입력하세요...'
+                value={reason}
+                onChange={(e) => onReasonChange(e.target.value)}
+              />
+            </>
           )}
 
           {modalType === 'DELETE' && (

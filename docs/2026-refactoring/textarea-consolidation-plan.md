@@ -70,8 +70,8 @@
 
 ### 1단계: 직접 작성 입력 교체
 
-- [ ] `StatusChangeModal`: 공통 `Textarea` 적용, 기본 스타일 사용, 라벨 연결
-- [ ] `PostDetailActionModal`: 공통 `Textarea` 적용, 기본 스타일 사용, 라벨 연결
+- [x] `StatusChangeModal`: 공통 `Textarea` 적용, 기본 스타일 사용, 라벨 연결
+- [x] `PostDetailActionModal`: 공통 `Textarea` 적용, 기본 스타일 사용, 라벨 연결
 
 ### 2단계: 기존 사용처 스타일 정리
 
