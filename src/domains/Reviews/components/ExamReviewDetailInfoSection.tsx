@@ -1,4 +1,4 @@
-import { type RefObject } from 'react';
+import { type RefObject, useId } from 'react';
 
 import { StatusBadge } from '@/shared/components';
 import { Field, Input, Select, Textarea } from '@/shared/components/ui';
@@ -74,6 +74,7 @@ export function ExamReviewDetailInfoSection({
   selectedFile,
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
+  const inputId = useId();
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
 
   return (
@@ -154,9 +155,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>강의명</Field.Label>
+          <Field.Label htmlFor={`${inputId}-lectureName`} required>
+            강의명
+          </Field.Label>
           <Field.Content>
             <Input
+              id={`${inputId}-lectureName`}
               value={formData.lectureName}
               onChange={(e) => setFormData({ lectureName: e.target.value })}
               disabled={isFormDisabled}
@@ -164,9 +168,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>교수명</Field.Label>
+          <Field.Label htmlFor={`${inputId}-professorName`} required>
+            교수명
+          </Field.Label>
           <Field.Content>
             <Input
+              id={`${inputId}-professorName`}
               value={formData.professorName}
               onChange={(e) => setFormData({ professorName: e.target.value })}
               disabled={isFormDisabled}
@@ -291,9 +298,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>분반</Field.Label>
+          <Field.Label htmlFor={`${inputId}-classNumber`} required>
+            분반
+          </Field.Label>
           <Field.Content>
             <Input
+              id={`${inputId}-classNumber`}
               type='number'
               value={formData.classNumber ?? ''}
               onChange={(e) => {

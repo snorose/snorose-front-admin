@@ -1,4 +1,4 @@
-import { type RefObject, useState } from 'react';
+import { type RefObject, useId, useState } from 'react';
 
 import { isAxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
@@ -45,6 +45,9 @@ export function ExamReviewFileNameModal({
   onClose,
   onSuccess,
 }: ExamReviewFileNameModalProps) {
+  const inputId = useId();
+  const helpId = `${inputId}-help`;
+  const errorId = `${inputId}-error`;
   const [newFileName, setNewFileName] = useState(currentFileName);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -127,36 +130,25 @@ export function ExamReviewFileNameModal({
             </p>
           </div>
           <div className='space-y-1.5'>
-            <Label htmlFor='exam-review-new-file-name'>새 파일명</Label>
+            <Label htmlFor={inputId}>새 파일명</Label>
             <Input
-              id='exam-review-new-file-name'
+              id={inputId}
               value={newFileName}
               onChange={(event) => {
                 setNewFileName(event.target.value);
                 setErrorMessage('');
               }}
               aria-invalid={Boolean(visibleErrorMessage)}
-              aria-describedby={
-                visibleErrorMessage
-                  ? 'exam-review-file-name-error'
-                  : 'exam-review-file-name-help'
-              }
+              aria-describedby={visibleErrorMessage ? errorId : helpId}
               autoFocus
               disabled={isSaving}
             />
             {visibleErrorMessage ? (
-              <p
-                id='exam-review-file-name-error'
-                role='alert'
-                className='text-sm text-red-600'
-              >
+              <p id={errorId} role='alert' className='text-sm text-red-600'>
                 {visibleErrorMessage}
               </p>
             ) : (
-              <p
-                id='exam-review-file-name-help'
-                className='text-sm text-gray-500'
-              >
+              <p id={helpId} className='text-sm text-gray-500'>
                 확장자를 유지해주세요. {INVALID_FILE_NAME_CHARACTERS_TEXT}는
                 사용할 수 없습니다.
               </p>

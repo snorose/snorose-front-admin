@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -25,6 +25,7 @@ export function ExamReviewPeriodUpdateConfirmModal({
   onClose,
   onSuccess,
 }: ExamReviewPeriodUpdateConfirmModalProps) {
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -87,10 +88,12 @@ export function ExamReviewPeriodUpdateConfirmModal({
           </Dialog.Description>
         </Dialog.Header>
         <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>기간 제목: </Label>
+          <Label htmlFor={titleId} className='text-sm font-semibold'>
+            기간 제목:
+          </Label>
           <Input
             type='text'
-            id='title'
+            id={titleId}
             value={title}
             onChange={handleInputChange}
           />
