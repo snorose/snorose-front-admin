@@ -123,9 +123,9 @@ SearchableSelect / ExamMultiSelect
 ### 2단계: 공통 스타일 기준 적용
 
 - [x] 필터 Select의 높이와 폭 기준 결정
-- [ ] `gray-*` 직접 색상을 shadcn 토큰으로 점진적으로 변경
-- [ ] 필드 Select의 라벨·disabled·오류 상태 점검
-- [ ] 긴 옵션 목록의 최대 높이와 모바일 표시 확인
+- [x] `gray-*` 직접 색상을 shadcn 토큰으로 점진적으로 변경
+- [x] 필드 Select의 라벨·disabled·오류 상태 점검
+- [x] 긴 옵션 목록의 최대 높이와 모바일 표시 확인
 
 ### 3단계: 회귀 검증
 

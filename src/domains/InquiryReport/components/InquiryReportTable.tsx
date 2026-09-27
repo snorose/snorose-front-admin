@@ -141,7 +141,7 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[112px] ${groupFilter !== 'ALL' ? 'bg-blue-50' : 'bg-white'}`}
+              className={`h-9 w-[112px] ${groupFilter !== 'ALL' ? 'bg-primary/10' : 'bg-background'}`}
             >
               <Select.Value />
             </Select.Trigger>
@@ -169,7 +169,7 @@ export default function InquiryReportTable({
                 setSubGroupFilter('ALL');
                 onPageChange(1);
               }}
-              className='absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center bg-blue-50 text-blue-400 hover:text-blue-600'
+              className='bg-primary/10 text-primary hover:text-primary/80 absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
             >
               <X className='h-3 w-3' />
             </button>
@@ -186,7 +186,7 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[160px] ${groupFilter === 'ALL' || groupFilter === 'ETC' ? 'bg-gray-50' : subGroupFilter !== 'ALL' ? 'bg-blue-50' : 'bg-white'}`}
+              className={`h-9 w-[160px] ${groupFilter === 'ALL' || groupFilter === 'ETC' ? 'bg-muted' : subGroupFilter !== 'ALL' ? 'bg-primary/10' : 'bg-background'}`}
             >
               <Select.Value />
             </Select.Trigger>
@@ -209,7 +209,7 @@ export default function InquiryReportTable({
                 setSubGroupFilter('ALL');
                 onPageChange(1);
               }}
-              className='absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center bg-blue-50 text-blue-400 hover:text-blue-600'
+              className='bg-primary/10 text-primary hover:text-primary/80 absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
             >
               <X className='h-3 w-3' />
             </button>
@@ -225,7 +225,7 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[124px] ${statusFilter !== 'ALL' ? 'bg-blue-50' : 'bg-white'}`}
+              className={`h-9 w-[124px] ${statusFilter !== 'ALL' ? 'bg-primary/10' : 'bg-background'}`}
             >
               <Select.Value />
             </Select.Trigger>
@@ -244,7 +244,7 @@ export default function InquiryReportTable({
                 setStatusFilter('ALL');
                 onPageChange(1);
               }}
-              className='absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center bg-blue-50 text-blue-400 hover:text-blue-600'
+              className='bg-primary/10 text-primary hover:text-primary/80 absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
             >
               <X className='h-3 w-3' />
             </button>
