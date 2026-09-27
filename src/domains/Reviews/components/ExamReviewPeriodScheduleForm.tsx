@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -18,6 +18,7 @@ interface ExamReviewPeriodScheduleFormProps {
 export function ExamReviewPeriodScheduleForm({
   onSuccess,
 }: ExamReviewPeriodScheduleFormProps) {
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -87,12 +88,12 @@ export function ExamReviewPeriodScheduleForm({
         <h3 className='text-lg font-bold'>시험 후기 작성 기간 생성</h3>
         <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='title' required>
+            <Label htmlFor={titleId} required>
               기간 제목
             </Label>
             <Input
               type='text'
-              id='title'
+              id={titleId}
               placeholder='예: 2026-1학기 중간고사'
               value={title}
               onChange={handleInputChange}
