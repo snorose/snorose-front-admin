@@ -1,8 +1,5 @@
 export { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
-export { default as ExamDegradePanel } from './ExamDegradePanel';
-export { default as ExamDeletePanel } from './ExamDeletePanel';
 export { ExamDetailSection } from './ExamDetailSection';
-export { default as ExamDiscussionPanel } from './ExamDiscussionPanel';
 export { ExamDiscussionStatusBadge } from './ExamDiscussionStatusBadge';
 export { ExamMultiSelect } from './ExamMultiSelect';
 export { ExamReviewCommentSection } from './ExamReviewCommentSection';
@@ -25,4 +22,3 @@ export {
   ExamTableEmptyRows,
   ExamTableSkeleton,
 } from './ExamTableFallback';
-export { default as ExamWarningPanel } from './ExamWarningPanel';

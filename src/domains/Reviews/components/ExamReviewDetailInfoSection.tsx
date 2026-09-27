@@ -75,6 +75,8 @@ export function ExamReviewDetailInfoSection({
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
   const inputId = useId();
+  const examTypeAndQuestionsId = useId();
+  const memoId = useId();
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
 
   return (
@@ -358,9 +360,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>시험 유형 및 문항수</Field.Label>
+          <Field.Label htmlFor={examTypeAndQuestionsId} required>
+            시험 유형 및 문항수
+          </Field.Label>
           <Field.Content>
             <Textarea
+              id={examTypeAndQuestionsId}
               value={formData.examTypeAndQuestions}
               onChange={(e) =>
                 setFormData({ examTypeAndQuestions: e.target.value })
@@ -372,9 +377,10 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>메모</Field.Label>
+          <Field.Label htmlFor={memoId}>메모</Field.Label>
           <Field.Content>
             <Textarea
+              id={memoId}
               value={formData.memo ?? ''}
               onChange={(e) => setFormData({ memo: e.target.value })}
               disabled={isFormDisabled}

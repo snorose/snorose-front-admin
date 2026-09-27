@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
-import { Button } from '@/shared/components/ui';
+import { Button, Textarea } from '@/shared/components/ui';
 
 interface StatusChangeModalProps {
   target: 'POST' | 'COMMENT';
@@ -14,6 +14,7 @@ export default function StatusChangeModal({
   onClose,
   onConfirmAction,
 }: StatusChangeModalProps) {
+  const reasonId = useId();
   const [reason, setReason] = useState('');
   return (
     <div
@@ -37,8 +38,12 @@ export default function StatusChangeModal({
         </p>
 
         <div className='flex flex-col gap-4'>
-          <textarea
-            className='min-h-[100px] w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none'
+          <label htmlFor={reasonId} className='sr-only'>
+            상태 변경 사유
+          </label>
+          <Textarea
+            id={reasonId}
+            className='min-h-[100px]'
             placeholder='사유를 입력하세요...'
             value={reason}
             onChange={(e) => setReason(e.target.value)}
