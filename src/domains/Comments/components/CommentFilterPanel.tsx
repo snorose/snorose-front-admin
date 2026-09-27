@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { Input, Label } from '@/shared/components/ui';
+import { Input, Label, Select } from '@/shared/components/ui';
 import {
   type AdminStatus,
   BOARD_OPTIONS,
@@ -142,23 +142,31 @@ export const CommentFilterPanel = ({
             댓글 검색
           </Label>
           <div className='flex gap-2'>
-            <select
-              aria-label='댓글 검색 범위'
+            <Select
               value={filters.searchScope ?? 'CONTENT'}
-              onChange={(e) =>
+              onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  searchScope: e.target
-                    .value as CommentSearchParams['searchScope'],
+                  searchScope: value as CommentSearchParams['searchScope'],
                 }))
               }
-              className='h-9 rounded border border-gray-200 bg-gray-50 px-2 text-sm'
             >
-              <option value='CONTENT'>내용</option>
-              <option value='COMMENT_ID'>댓글 ID</option>
-              <option value='PARENT_COMMENT_ID'>상위 댓글 ID</option>
-              <option value='POST_ID'>게시글 ID</option>
-            </select>
+              <Select.Trigger
+                id={`${inputId}-searchScope`}
+                aria-label='댓글 검색 범위'
+                className='h-9 w-[140px] shrink-0'
+              >
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content align='start'>
+                <Select.Item value='CONTENT'>내용</Select.Item>
+                <Select.Item value='COMMENT_ID'>댓글 ID</Select.Item>
+                <Select.Item value='PARENT_COMMENT_ID'>
+                  상위 댓글 ID
+                </Select.Item>
+                <Select.Item value='POST_ID'>게시글 ID</Select.Item>
+              </Select.Content>
+            </Select>
             <Input
               id={`${inputId}-searchQuery`}
               type='text'
@@ -193,15 +201,14 @@ export const CommentFilterPanel = ({
           >
             정렬
           </Label>
-          <select
-            id={`${inputId}-sort`}
+          <Select
             value={
               filters.sortTypes?.[0] && filters.sortDirection
                 ? `${filters.sortTypes[0]}|${filters.sortDirection}`
                 : 'CREATED_AT|DESC'
             }
-            onChange={(e) => {
-              const [sortType, sortDirection] = e.target.value.split('|');
+            onValueChange={(value) => {
+              const [sortType, sortDirection] = value.split('|');
               setFilters((prev) => ({
                 ...prev,
                 sortTypes: [sortType] as CommentSearchParams['sortTypes'],
@@ -209,14 +216,20 @@ export const CommentFilterPanel = ({
                   sortDirection as CommentSearchParams['sortDirection'],
               }));
             }}
-            className='h-9 rounded border border-gray-200 bg-gray-50 px-3 text-sm'
           >
-            <option value='CREATED_AT|DESC'>최신순</option>
-            <option value='CREATED_AT|ASC'>오래된순</option>
-            <option value='REPORT_COUNT|DESC'>신고 수</option>
-            <option value='LIKE_COUNT|DESC'>좋아요 수</option>
-            <option value='CHILD_COMMENT_COUNT|DESC'>댓글 수</option>
-          </select>
+            <Select.Trigger id={`${inputId}-sort`} className='h-9 w-full'>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content align='start'>
+              <Select.Item value='CREATED_AT|DESC'>최신순</Select.Item>
+              <Select.Item value='CREATED_AT|ASC'>오래된순</Select.Item>
+              <Select.Item value='REPORT_COUNT|DESC'>신고 수</Select.Item>
+              <Select.Item value='LIKE_COUNT|DESC'>좋아요 수</Select.Item>
+              <Select.Item value='CHILD_COMMENT_COUNT|DESC'>
+                댓글 수
+              </Select.Item>
+            </Select.Content>
+          </Select>
         </div>
         <div className='flex flex-1 flex-col gap-1'>
           <Label
@@ -225,26 +238,31 @@ export const CommentFilterPanel = ({
           >
             의심 키워드
           </Label>
-          <select
-            id={`${inputId}-isKeywordExist`}
+          <Select
             value={
               filters.isKeywordExist === undefined
-                ? ''
+                ? 'ALL'
                 : String(filters.isKeywordExist)
             }
-            onChange={(e) =>
+            onValueChange={(value) =>
               setFilters((prev) => ({
                 ...prev,
-                isKeywordExist:
-                  e.target.value === '' ? undefined : e.target.value === 'true',
+                isKeywordExist: value === 'ALL' ? undefined : value === 'true',
               }))
             }
-            className='h-9 rounded border border-gray-200 bg-gray-50 px-3 text-sm'
           >
-            <option value=''>전체</option>
-            <option value='true'>있음</option>
-            <option value='false'>없음</option>
-          </select>
+            <Select.Trigger
+              id={`${inputId}-isKeywordExist`}
+              className='h-9 w-full'
+            >
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content align='start'>
+              <Select.Item value='ALL'>전체</Select.Item>
+              <Select.Item value='true'>있음</Select.Item>
+              <Select.Item value='false'>없음</Select.Item>
+            </Select.Content>
+          </Select>
         </div>
       </div>
 
