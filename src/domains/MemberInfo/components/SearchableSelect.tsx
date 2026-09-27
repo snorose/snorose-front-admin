@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { Check, ChevronsUpDown, Search } from 'lucide-react';
 
-import { Input, Popover } from '@/shared/components/ui';
+import { InputGroup, Label, Popover } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -26,6 +26,7 @@ export default function SearchableSelect({
   includeAllOption = true,
   isActive = false,
 }: SearchableSelectProps) {
+  const inputId = useId();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
 
@@ -83,9 +84,15 @@ export default function SearchableSelect({
           className='w-[var(--radix-popover-trigger-width)] p-0'
         >
           <div className='border-b border-slate-100 p-2'>
-            <div className='relative'>
-              <Search className='pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-slate-400' />
-              <Input
+            <Label htmlFor={inputId} className='sr-only'>
+              {label} 목록 검색
+            </Label>
+            <InputGroup>
+              <InputGroup.Addon>
+                <Search aria-hidden='true' />
+              </InputGroup.Addon>
+              <InputGroup.Input
+                id={inputId}
                 autoFocus
                 value={query}
                 placeholder='검색...'
@@ -98,9 +105,8 @@ export default function SearchableSelect({
                     handleSelect(filtered[0].value);
                   }
                 }}
-                className='h-9 rounded-lg border-slate-200 pl-8 shadow-none'
               />
-            </div>
+            </InputGroup>
           </div>
           <ul className='max-h-60 overflow-y-auto p-1'>
             {filtered.length === 0 ? (

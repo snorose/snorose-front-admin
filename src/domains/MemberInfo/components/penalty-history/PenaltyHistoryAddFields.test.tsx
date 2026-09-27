@@ -30,7 +30,7 @@ describe('WarningFields', () => {
     expect(screen.getByRole('spinbutton')).toBeEnabled();
   });
 
-  test('유효하지 않은 경고 횟수를 로즈색으로 강조한다', () => {
+  test('경고 횟수의 오류 상태와 접근성 이름을 제공한다', () => {
     render(
       <WarningFields
         {...COMMON_PROPS}
@@ -44,9 +44,9 @@ describe('WarningFields', () => {
       'aria-invalid',
       'true'
     );
-    expect(screen.getByRole('spinbutton')).toHaveClass(
-      'aria-invalid:border-rose-300',
-      'aria-invalid:bg-rose-50'
+    expect(screen.getByRole('spinbutton', { name: '경고 횟수' })).toBe(
+      screen.getByLabelText('경고 횟수')
     );
+    expect(screen.getByRole('textbox', { name: '상세 사유' })).toBeEnabled();
   });
 });
