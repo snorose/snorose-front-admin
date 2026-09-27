@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
+import { Input, Label } from '@/shared/components/ui';
 import {
   type AdminStatus,
   BOARD_OPTIONS,
@@ -19,6 +20,7 @@ export const CommentFilterPanel = ({
   totalCount,
   initialFilters = {},
 }: CommentFilterPanelProps) => {
+  const inputId = useId();
   const [filters, setFilters] = useState<CommentSearchParams>({
     searchScope: 'CONTENT',
     ...initialFilters,
@@ -65,11 +67,19 @@ export const CommentFilterPanel = ({
 
       {/* 작성일 기간 */}
       <div className='flex flex-col gap-1'>
-        <label className='text-sm text-gray-600'>작성일 기간</label>
+        <span className='text-sm leading-5 font-medium text-gray-600'>
+          작성일 기간
+        </span>
         <div className='flex gap-4'>
           <div className='flex flex-1 flex-col gap-1'>
-            <label className='text-xs text-gray-500'>시작일</label>
-            <input
+            <Label
+              htmlFor={`${inputId}-startDate`}
+              className='py-0 text-xs leading-4 font-normal text-gray-500'
+            >
+              시작일
+            </Label>
+            <Input
+              id={`${inputId}-startDate`}
               type='date'
               value={filters.startDate ?? ''}
               onChange={(e) =>
@@ -78,12 +88,17 @@ export const CommentFilterPanel = ({
                   startDate: e.target.value || undefined,
                 }))
               }
-              className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
             />
           </div>
           <div className='flex flex-1 flex-col gap-1'>
-            <label className='text-xs text-gray-500'>종료일</label>
-            <input
+            <Label
+              htmlFor={`${inputId}-endDate`}
+              className='py-0 text-xs leading-4 font-normal text-gray-500'
+            >
+              종료일
+            </Label>
+            <Input
+              id={`${inputId}-endDate`}
               type='date'
               value={filters.endDate ?? ''}
               onChange={(e) =>
@@ -92,7 +107,6 @@ export const CommentFilterPanel = ({
                   endDate: e.target.value || undefined,
                 }))
               }
-              className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
             />
           </div>
         </div>
@@ -101,10 +115,14 @@ export const CommentFilterPanel = ({
       {/* 게시자 / 게시글 검색 */}
       <div className='flex gap-4'>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>
+          <Label
+            htmlFor={`${inputId}-keywordAuthor`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
             게시자 검색 (아이디/닉네임/학번)
-          </label>
-          <input
+          </Label>
+          <Input
+            id={`${inputId}-keywordAuthor`}
             type='text'
             placeholder='게시자 검색...'
             value={filters.keywordAuthor ?? ''}
@@ -114,13 +132,18 @@ export const CommentFilterPanel = ({
                 keywordAuthor: e.target.value || undefined,
               }))
             }
-            className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
           />
         </div>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>댓글 검색</label>
+          <Label
+            htmlFor={`${inputId}-searchQuery`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
+            댓글 검색
+          </Label>
           <div className='flex gap-2'>
             <select
+              aria-label='댓글 검색 범위'
               value={filters.searchScope ?? 'CONTENT'}
               onChange={(e) =>
                 setFilters((prev) => ({
@@ -129,14 +152,15 @@ export const CommentFilterPanel = ({
                     .value as CommentSearchParams['searchScope'],
                 }))
               }
-              className='rounded border border-gray-200 bg-gray-50 px-2 py-2 text-sm'
+              className='h-9 rounded border border-gray-200 bg-gray-50 px-2 text-sm'
             >
               <option value='CONTENT'>내용</option>
               <option value='COMMENT_ID'>댓글 ID</option>
               <option value='PARENT_COMMENT_ID'>상위 댓글 ID</option>
               <option value='POST_ID'>게시글 ID</option>
             </select>
-            <input
+            <Input
+              id={`${inputId}-searchQuery`}
               type='text'
               placeholder={
                 filters.searchScope === 'COMMENT_ID'
@@ -154,7 +178,7 @@ export const CommentFilterPanel = ({
                   searchQuery: e.target.value || undefined,
                 }));
               }}
-              className='flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
+              className='flex-1'
             />
           </div>
         </div>
@@ -163,8 +187,14 @@ export const CommentFilterPanel = ({
       {/* 정렬 / 의심 키워드 */}
       <div className='flex gap-4'>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>정렬</label>
+          <Label
+            htmlFor={`${inputId}-sort`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
+            정렬
+          </Label>
           <select
+            id={`${inputId}-sort`}
             value={
               filters.sortTypes?.[0] && filters.sortDirection
                 ? `${filters.sortTypes[0]}|${filters.sortDirection}`
@@ -179,7 +209,7 @@ export const CommentFilterPanel = ({
                   sortDirection as CommentSearchParams['sortDirection'],
               }));
             }}
-            className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
+            className='h-9 rounded border border-gray-200 bg-gray-50 px-3 text-sm'
           >
             <option value='CREATED_AT|DESC'>최신순</option>
             <option value='CREATED_AT|ASC'>오래된순</option>
@@ -189,8 +219,14 @@ export const CommentFilterPanel = ({
           </select>
         </div>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>의심 키워드</label>
+          <Label
+            htmlFor={`${inputId}-isKeywordExist`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
+            의심 키워드
+          </Label>
           <select
+            id={`${inputId}-isKeywordExist`}
             value={
               filters.isKeywordExist === undefined
                 ? ''
@@ -203,7 +239,7 @@ export const CommentFilterPanel = ({
                   e.target.value === '' ? undefined : e.target.value === 'true',
               }))
             }
-            className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
+            className='h-9 rounded border border-gray-200 bg-gray-50 px-3 text-sm'
           >
             <option value=''>전체</option>
             <option value='true'>있음</option>
@@ -214,7 +250,9 @@ export const CommentFilterPanel = ({
 
       {/* 게시판 필터 */}
       <div className='flex flex-col gap-2'>
-        <label className='text-sm text-gray-600'>게시판 필터</label>
+        <span className='text-sm leading-5 font-medium text-gray-600'>
+          게시판 필터
+        </span>
         <div className='flex flex-wrap gap-2'>
           <button
             onClick={() =>
@@ -249,7 +287,9 @@ export const CommentFilterPanel = ({
 
       {/* 상태 필터 */}
       <div className='flex flex-col gap-2'>
-        <label className='text-sm text-gray-600'>상태 필터</label>
+        <span className='text-sm leading-5 font-medium text-gray-600'>
+          상태 필터
+        </span>
         <div className='flex flex-wrap gap-2'>
           <button
             onClick={() =>

@@ -20,8 +20,8 @@
 
 ### 우선 적용: 기본 input 교체
 
-- [ ] **게시글 관리 `/posts/manage`** — [`PostFilterPanel.tsx`](../src/domains/Posts/components/PostFilterPanel.tsx): 시작일·종료일, 게시자 검색, 게시글 검색 **4개 교체**. 개별 테두리·배경·패딩 제거, 레이블 연결.
-- [ ] **댓글 관리 `/posts/comments`** — [`CommentFilterPanel.tsx`](../src/domains/Comments/components/CommentFilterPanel.tsx): 시작일·종료일, 게시자 검색, 댓글/ID 검색 **4개 교체**. 검색 범위별 placeholder와 값 처리 유지, 레이블 연결.
+- [x] **게시글 관리 `/posts/manage`** — [`PostFilterPanel.tsx`](../src/domains/Posts/components/PostFilterPanel.tsx): 시작일·종료일, 게시자 검색, 게시글 검색 **4개 교체**. 개별 테두리·배경·패딩 제거, 레이블 연결.
+- [x] **댓글 관리 `/posts/comments`** — [`CommentFilterPanel.tsx`](../src/domains/Comments/components/CommentFilterPanel.tsx): 시작일·종료일, 게시자 검색, 댓글/ID 검색 **4개 교체**. 검색 범위별 placeholder와 값 처리 유지, 레이블 연결.
 - [x] **시험후기 관리 `/reviews/exam`** — [`ExamSearch.tsx`](../src/domains/Reviews/components/ExamSearch.tsx): 시험후기명/postId·작성자 검색 **2개 교체**. 지우기 버튼은 InputGroup으로 조합하고 접근성 이름 추가. 기존 날짜 Input 2개의 글자 크기·중복 높이 지정 정리.
 
 **우선 교체 대상은 3개 파일의 입력 10개다.** 시험후기 검색 2개는 InputGroup으로 교체하고, 날짜 Input의 크기 재정의를 정리했다. 검색 입력·지우기 버튼에 접근성 이름도 추가했다. 게시글·댓글의 8개도 공용 Input으로 교체하고 레이블을 연결해 우선 교체를 완료했다. 검색 범위 Select에는 접근성 이름을 추가하고 입력과 높이를 맞췄다. 날짜는 `Input type='date'`로 유지하며, 검색 조건·URL 동기화·Enter 동작을 바꾸지 않는다.
@@ -81,7 +81,7 @@ import { Input, Label } from '@/shared/components/ui';
 
 ## 4. 권장 작업 순서와 완료 기준
 
-- [ ] **기본 input 10개 교체:** 게시글 → 댓글 → 시험후기 검색 순서로 작은 변경 단위로 적용한다.
+- [x] **기본 input 10개 교체:** 게시글 → 댓글 → 시험후기 검색 순서로 작은 변경 단위로 적용한다.
 - [ ] **기존 Input 정리:** 회원 화면의 큰 스타일 재정의와 InputGroup 조합을 먼저 정리하고, 나머지 폼의 레이블·상태 연결을 보완한다.
 - [ ] **회귀 확인:** 검색·초기화·Enter·URL 복원, 날짜 값, 음수/빈 수량, 읽기 전용·비활성, 오류 표시, 지우기·복사·비밀번호 보기 버튼을 확인한다.
 
