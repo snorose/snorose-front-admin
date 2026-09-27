@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input } from '@/shared/components/ui';
+import { Button, Input, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -17,6 +17,7 @@ import {
 import { getUserDetailAPI, searchUsersAPI } from '@/apis';
 
 export default function MemberPenaltyManagementPage() {
+  const searchId = useId();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMember, setSelectedMember] = useState<PenaltyUserInfo | null>(
     null
@@ -83,8 +84,13 @@ export default function MemberPenaltyManagementPage() {
       />
 
       <section>
+        <Label htmlFor={searchId} className='sr-only'>
+          회원 검색 (아이디 또는 학번)
+        </Label>
         <div className='flex gap-2'>
           <Input
+            id={searchId}
+            aria-describedby={errorMessage ? `${searchId}-error` : undefined}
             type='text'
             placeholder='아이디, 학번을 입력해주세요'
             className='w-96'
@@ -102,7 +108,11 @@ export default function MemberPenaltyManagementPage() {
           </Button>
         </div>
       </section>
-      {errorMessage && <p className='font-medium'>{errorMessage}</p>}
+      {errorMessage && (
+        <p id={`${searchId}-error`} role='alert' className='font-medium'>
+          {errorMessage}
+        </p>
+      )}
 
       <article>
         <h3 className='text-lg font-bold'>회원정보</h3>

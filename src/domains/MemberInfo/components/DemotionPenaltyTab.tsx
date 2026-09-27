@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -27,6 +27,7 @@ export default function DemotionPenaltyTab({
   member: PenaltyUserInfo;
   onApplied?: () => void | Promise<void>;
 }) {
+  const inputId = useId();
   const [openModal, setOpenModal] = useState(false);
 
   type DemoteType = 'RELEGATION' | 'BLACKLIST' | '';
@@ -149,14 +150,19 @@ export default function DemotionPenaltyTab({
         {/* 강등 유형 선택 */}
         <div className='flex flex-col gap-4'>
           <div className='flex items-center gap-2'>
-            <Label className='w-24'>강등 유형</Label>
+            <Label htmlFor={`${inputId}-type`} className='w-24'>
+              강등 유형
+            </Label>
             <Select
               value={demoteType}
               onValueChange={(v) =>
                 setDemoteType(isValidDemoteType(v) ? v : '')
               }
             >
-              <Select.Trigger className='w-40 bg-white'>
+              <Select.Trigger
+                id={`${inputId}-type`}
+                className='bg-background w-40'
+              >
                 <Select.Value placeholder='강등 유형 선택' />
               </Select.Trigger>
               <Select.Content>
@@ -168,13 +174,18 @@ export default function DemotionPenaltyTab({
 
           {/* 강등 사유 선택 */}
           <div className='flex items-center gap-2'>
-            <Label className='w-24'>강등 사유</Label>
+            <Label htmlFor={`${inputId}-reason-type`} className='w-24'>
+              강등 사유
+            </Label>
             <Select
               value={demoteReasonType}
               onValueChange={(v) => handleChangeDemoteReason(v)}
               disabled={!demoteType}
             >
-              <Select.Trigger className='w-40 bg-white'>
+              <Select.Trigger
+                id={`${inputId}-reason-type`}
+                className='bg-background w-40'
+              >
                 <Select.Value placeholder='강등 사유 선택' />
               </Select.Trigger>
               <Select.Content>
@@ -193,11 +204,14 @@ export default function DemotionPenaltyTab({
           {/* ETC 사유 입력 */}
           {demoteReasonType === 'ETC' && (
             <div className='flex items-center gap-2'>
-              <Label className='w-24'>상세 사유</Label>
+              <Label htmlFor={`${inputId}-reason`} className='w-24'>
+                상세 사유
+              </Label>
               <Input
+                id={`${inputId}-reason`}
                 value={demoteReason}
                 onChange={(e) => setDemoteReason(e.target.value)}
-                className='w-40 bg-white'
+                className='bg-background w-40'
                 disabled={demoteReasonType !== 'ETC'}
               />
             </div>
@@ -206,16 +220,19 @@ export default function DemotionPenaltyTab({
           {/* 기간 입력 */}
           {demoteType === 'RELEGATION' && (
             <div className='flex items-center gap-2'>
-              <Label className='w-24'>기간(월)</Label>
+              <Label htmlFor={`${inputId}-months`} className='w-24'>
+                기간(월)
+              </Label>
               <Input
+                id={`${inputId}-months`}
                 type='number'
                 min={1}
                 step={1}
                 value={months}
                 onChange={(e) => setMonths(Number(e.target.value))}
-                className='w-24 bg-white'
+                className='bg-background w-24'
               />
-              <span className='text-gray-600'>
+              <span className='text-muted-foreground'>
                 → 종료 예정일: <b>{calculatedEndDate}</b>
               </span>
             </div>
@@ -240,7 +257,7 @@ export default function DemotionPenaltyTab({
       {/* 강등 해제하기 */}
       <section className='w-1/2 rounded-md border border-blue-300 bg-blue-50 p-4'>
         <h3 className='mb-3 font-semibold text-blue-700'>강등 해제하기</h3>
-        <div className='rounded-md border border-blue-200 bg-white/70 p-4 text-sm font-medium text-blue-700'>
+        <div className='bg-background/70 rounded-md border border-blue-200 p-4 text-sm font-medium text-blue-700'>
           강등 해제 API가 준비되지 않았습니다. 해제가 필요한 경우 담당자에게
           요청해주세요.
         </div>
