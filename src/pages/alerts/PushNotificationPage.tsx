@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -90,6 +90,7 @@ const INITIAL_FORM_DATA: PushNotification = {
 };
 
 export default function PushNotificationPage() {
+  const inputId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
   const [isLoading, setIsLoading] = useState(false);
@@ -235,12 +236,13 @@ export default function PushNotificationPage() {
           <h3 className='text-lg font-bold'>필수 정보</h3>
           <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='name' required>
+              <Label htmlFor={`${inputId}-name`} required>
                 알림명
               </Label>
               <Input
                 type='text'
-                id='name'
+                id={`${inputId}-name`}
+                aria-describedby={`${inputId}-name-help`}
                 placeholder='예: 251013 리뉴얼 1주년 기념 포인트 지급 안내'
                 value={formData.name}
                 onChange={(e) =>
@@ -248,35 +250,45 @@ export default function PushNotificationPage() {
                 }
               />
               <div className='flex px-1'>
-                <p className='text-xs text-gray-500'>내부 확인 및 구분용</p>
+                <p
+                  id={`${inputId}-name-help`}
+                  className='text-xs text-gray-500'
+                >
+                  내부 확인 및 구분용
+                </p>
               </div>
             </div>
 
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='title' required>
+              <Label htmlFor={`${inputId}-title`} required>
                 알림 제목
               </Label>
               <Input
                 type='text'
-                id='title'
+                id={`${inputId}-title`}
+                aria-describedby={`${inputId}-title-count`}
                 maxLength={21}
                 placeholder='예: 스노로즈 리뉴얼 1주년 기념 포인트'
                 value={formData.title}
                 onChange={handleTitleChange}
               />
               <div className='flex justify-end px-1'>
-                <p className='text-xs text-gray-500'>
+                <p
+                  id={`${inputId}-title-count`}
+                  className='text-xs text-gray-500'
+                >
                   {formData.title.length} / 21자
                 </p>
               </div>
             </div>
 
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='body' required>
+              <Label htmlFor={`${inputId}-body`} required>
                 알림 내용
               </Label>
               <Textarea
-                id='body'
+                id={`${inputId}-body`}
+                aria-describedby={`${inputId}-body-count`}
                 maxLength={100}
                 placeholder='예: 모든 정회원 여러분께 10포인트 선물이 도착했습니다! 지급 내역은 [내정보 &gt; 포인트 내역 보기] 에서 확인하실 수 있습니다. (2025.10.12 19시 기준 정회원 대상)'
                 value={formData.body}
@@ -284,34 +296,44 @@ export default function PushNotificationPage() {
                 className='h-28'
               />
               <div className='flex justify-end px-1'>
-                <p className='text-xs text-gray-500'>
+                <p
+                  id={`${inputId}-body-count`}
+                  className='text-xs text-gray-500'
+                >
                   {formData.body.length} / 100자
                 </p>
               </div>
             </div>
 
             <div className='flex flex-col gap-1'>
-              <Label htmlFor='url' required>
+              <Label htmlFor={`${inputId}-url`} required>
                 알림 클릭 시 연결되는 주소
               </Label>
               <RadioGroup
+                aria-label='알림 연결 주소 유형'
                 value={urlInputType}
                 onValueChange={handleUrlInputTypeChange}
                 className='mb-1 flex gap-4'
               >
                 <div className='flex items-center gap-2'>
-                  <RadioGroup.Item value='internal' id='url-internal' />
+                  <RadioGroup.Item
+                    value='internal'
+                    id={`${inputId}-url-internal`}
+                  />
                   <Label
-                    htmlFor='url-internal'
+                    htmlFor={`${inputId}-url-internal`}
                     className='cursor-pointer font-normal'
                   >
                     스노로즈 내부 URL
                   </Label>
                 </div>
                 <div className='flex items-center gap-2'>
-                  <RadioGroup.Item value='external' id='url-external' />
+                  <RadioGroup.Item
+                    value='external'
+                    id={`${inputId}-url-external`}
+                  />
                   <Label
-                    htmlFor='url-external'
+                    htmlFor={`${inputId}-url-external`}
                     className='cursor-pointer font-normal'
                   >
                     외부 URL
@@ -320,7 +342,8 @@ export default function PushNotificationPage() {
               </RadioGroup>
               <Input
                 type='text'
-                id='url'
+                id={`${inputId}-url`}
+                aria-describedby={`${inputId}-url-help`}
                 value={formData.url}
                 placeholder={
                   urlInputType === 'internal'
@@ -329,7 +352,10 @@ export default function PushNotificationPage() {
                 }
                 onChange={handleUrlChange}
               />
-              <p className='px-1 text-xs text-gray-500'>
+              <p
+                id={`${inputId}-url-help`}
+                className='px-1 text-xs text-gray-500'
+              >
                 {urlInputType === 'internal' ? (
                   <>
                     기본 주소("https://www.snorose.com")를 제외한 경로만 입력해
@@ -348,10 +374,11 @@ export default function PushNotificationPage() {
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
-                <Label htmlFor='isMarketing' required>
+                <Label id={`${inputId}-isMarketing-label`} required>
                   메시지 유형
                 </Label>
                 <RadioGroup
+                  aria-labelledby={`${inputId}-isMarketing-label`}
                   value={formData.isMarketing ? 'true' : 'false'}
                   onValueChange={(value) =>
                     setFormData({
@@ -362,18 +389,24 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroup.Item value='true' id='marketing-true' />
+                    <RadioGroup.Item
+                      value='true'
+                      id={`${inputId}-marketing-true`}
+                    />
                     <Label
-                      htmlFor='marketing-true'
+                      htmlFor={`${inputId}-marketing-true`}
                       className='cursor-pointer font-normal'
                     >
                       광고성 (이벤트 홍보 등)
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroup.Item value='false' id='marketing-false' />
+                    <RadioGroup.Item
+                      value='false'
+                      id={`${inputId}-marketing-false`}
+                    />
                     <Label
-                      htmlFor='marketing-false'
+                      htmlFor={`${inputId}-marketing-false`}
                       className='cursor-pointer font-normal'
                     >
                       정보성 (전체 공지, 댓글, 관리자 삭제/비공개 통보 등)
@@ -384,10 +417,11 @@ export default function PushNotificationPage() {
             </div>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
-                <Label htmlFor='isTest' required>
+                <Label id={`${inputId}-isTest-label`} required>
                   발송 대상
                 </Label>
                 <RadioGroup
+                  aria-labelledby={`${inputId}-isTest-label`}
                   value={formData.isTest ? 'true' : 'false'}
                   onValueChange={(value) =>
                     setFormData({ ...formData, isTest: value === 'true' })
@@ -395,18 +429,21 @@ export default function PushNotificationPage() {
                   className='flex flex-col gap-1'
                 >
                   <div className='flex items-center gap-3'>
-                    <RadioGroup.Item value='true' id='test-true' />
+                    <RadioGroup.Item value='true' id={`${inputId}-test-true`} />
                     <Label
-                      htmlFor='test-true'
+                      htmlFor={`${inputId}-test-true`}
                       className='cursor-pointer font-normal'
                     >
                       관리자에게만 테스트 발송
                     </Label>
                   </div>
                   <div className='flex items-center gap-3'>
-                    <RadioGroup.Item value='false' id='test-false' />
+                    <RadioGroup.Item
+                      value='false'
+                      id={`${inputId}-test-false`}
+                    />
                     <Label
-                      htmlFor='test-false'
+                      htmlFor={`${inputId}-test-false`}
                       className='cursor-pointer font-normal'
                     >
                       푸시 알림 허용 회원 전체에게 발송

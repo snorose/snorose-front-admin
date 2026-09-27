@@ -37,7 +37,7 @@
 - [x] **개별 포인트 지급·차감 `/point/single`** — [`AdjustSinglePointPage.tsx`](../src/pages/points/AdjustSinglePointPage.tsx), [`MemberInfoSection.tsx`](../src/domains/Points/components/MemberInfoSection.tsx), [`PointDetailSection.tsx`](../src/domains/Points/components/PointDetailSection.tsx): 회원 검색에 숨김 레이블 연결. 조회 정보·포인트 유형·수량·메모에 useId 기반 레이블 연결. 공용 Input과 값 처리 유지, 조회 정보·자동 수량의 읽기 전용 배경을 bg-muted로 정리.
 - [x] **전체 포인트 지급·차감 `/point/all`** — [`PointDetailSection.tsx`](../src/domains/Points/components/PointDetailSection.tsx): 개별 포인트와 공유하는 PointDetailSection의 레이블 연결과 읽기 전용 배경 변경 함께 반영. 수량·메모 입력과 초기화 로직 유지.
 - [x] **포인트 동결 기간 `/point/freeze`** — [`PointFreezeScheduleForm.tsx`](../src/domains/Points/components/PointFreezeScheduleForm.tsx), [`PointFreezeUpdateConfirmModal.tsx`](../src/domains/Points/components/PointFreezeUpdateConfirmModal.tsx): 동결 제목 Input 유지, 생성/수정 레이블 연결 및 useId로 입력 id 중복 방지. 일정 생성·수정과 대기 상태 처리 유지.
-- [ ] **푸시 알림 `/alerts`** — [`PushNotificationPage.tsx`](../src/pages/alerts/PushNotificationPage.tsx): 알림명·제목·URL Input 유지. 설명·글자 수를 `aria-describedby`로 연결. 제목 21자 제한과 내부 경로/외부 URL 처리 유지.
+- [x] **푸시 알림 `/alerts`** — [`PushNotificationPage.tsx`](../src/pages/alerts/PushNotificationPage.tsx): 알림명·제목·URL Input과 내용 Textarea 유지. 설명·글자 수를 aria-describedby로 연결하고 useId로 레이블·입력·안내의 고유 id 부여. URL 유형·메시지 유형·발송 대상 라디오 그룹에 접근성 이름 연결. 제목 21자·내용 100자 제한과 내부 경로/외부 URL 처리 유지.
 
 높이를 기본값으로 줄이는 화면은 인접 버튼과 Select의 정렬도 함께 확인한다. 입력 크기를 줄이기 위해 페이지 전체를 재설계할 필요는 없다.
 
