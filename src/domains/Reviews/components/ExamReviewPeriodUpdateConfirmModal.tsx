@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -6,11 +6,9 @@ import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExamReviewPeriod } from '@/shared/types';
-import {
-  formatDateTimeForInput,
-  formatDateTimeWithT,
-  getErrorMessage,
-} from '@/shared/utils';
+import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
+
+import { updateExamReviewPeriodRequest } from '@/domains/Reviews/utils';
 
 import { patchExamReviewPeriodAPI } from '@/apis';
 
@@ -27,6 +25,7 @@ export function ExamReviewPeriodUpdateConfirmModal({
   onClose,
   onSuccess,
 }: ExamReviewPeriodUpdateConfirmModalProps) {
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -34,8 +33,8 @@ export function ExamReviewPeriodUpdateConfirmModal({
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
-      const startAtInput = formatDateTimeForInput(selectedItem.startAt);
-      const endAtInput = formatDateTimeForInput(selectedItem.endAt);
+      const startAtInput = toDateTimeInputValue(selectedItem.startAt);
+      const endAtInput = toDateTimeInputValue(selectedItem.endAt);
 
       setTitle(selectedItem.title);
       startDateTime.setDateTime(startAtInput);
@@ -61,11 +60,14 @@ export function ExamReviewPeriodUpdateConfirmModal({
     }
 
     try {
-      await patchExamReviewPeriodAPI(selectedItem.id, {
-        title,
-        startAt: formatDateTimeWithT(startDateTime.dateTime),
-        endAt: formatDateTimeWithT(endDateTime.dateTime),
-      });
+      await patchExamReviewPeriodAPI(
+        selectedItem.id,
+        updateExamReviewPeriodRequest({
+          title,
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('시험 후기 작성 기간 수정이 완료되었어요.');
       onClose();
       onSuccess();
@@ -86,10 +88,12 @@ export function ExamReviewPeriodUpdateConfirmModal({
           </Dialog.Description>
         </Dialog.Header>
         <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>기간 제목: </Label>
+          <Label htmlFor={titleId} className='text-sm font-semibold'>
+            기간 제목:
+          </Label>
           <Input
             type='text'
-            id='title'
+            id={titleId}
             value={title}
             onChange={handleInputChange}
           />

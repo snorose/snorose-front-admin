@@ -10,6 +10,7 @@ import type {
   ExamReviewDetailResult,
   ExamReviewSearchParams,
   ExamReviewsResult,
+  RenameExamReviewFileResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 
@@ -52,12 +53,32 @@ export const updateExamReview = async (
   return response.data.result;
 };
 
+export const renameExamReviewFile = async (
+  postId: number,
+  newFileName: string
+): Promise<RenameExamReviewFileResult> => {
+  const response = await axiosInstance.patch<
+    BaseResponse<RenameExamReviewFileResult>
+  >(`/v1/admin/reviews/${postId}/file-name`, { newFileName });
+  return response.data.result;
+};
+
 // 시험후기 삭제 api
 export const deleteExamReview = async (
   postId: number
 ): Promise<{ postId: number }> => {
   const response = await axiosInstance.delete<BaseResponse<{ postId: number }>>(
     `/v1/admin/reviews/${postId}`
+  );
+  return response.data.result;
+};
+
+// 시험후기 복구 api
+export const restoreExamReview = async (
+  postId: number
+): Promise<{ postId: number }> => {
+  const response = await axiosInstance.post<BaseResponse<{ postId: number }>>(
+    `/v1/admin/reviews/${postId}/restore`
   );
   return response.data.result;
 };
@@ -78,7 +99,7 @@ export const downloadExamReviewFile = async (
   fileName: string
 ): Promise<Blob> => {
   const response = await axiosInstance.get(
-    `/v1/reviews/files/${postId}/download/${fileName}`,
+    `/v1/reviews/files/${postId}/download/${encodeURIComponent(fileName)}`,
     { responseType: 'blob' }
   );
   return response.data;

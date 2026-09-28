@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
+import { Input, Label, Select } from '@/shared/components/ui';
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { PostSearchParams } from '../types';
@@ -15,6 +16,7 @@ export const PostFilterPanel = ({
   totalCount,
   initialFilters = {},
 }: PostFilterPanelProps) => {
+  const inputId = useId();
   const [filters, setFilters] = useState<PostSearchParams>(initialFilters);
 
   const handleStatusToggle = (status: string) => {
@@ -50,11 +52,19 @@ export const PostFilterPanel = ({
 
       {/* 작성일 기간 */}
       <div className='flex flex-col gap-1'>
-        <label className='text-sm text-gray-600'>작성일 기간</label>
+        <span className='text-sm leading-5 font-medium text-gray-600'>
+          작성일 기간
+        </span>
         <div className='flex gap-4'>
           <div className='flex flex-1 flex-col gap-1'>
-            <label className='text-xs text-gray-500'>시작일</label>
-            <input
+            <Label
+              htmlFor={`${inputId}-startDate`}
+              className='py-0 text-xs leading-4 font-normal text-gray-500'
+            >
+              시작일
+            </Label>
+            <Input
+              id={`${inputId}-startDate`}
               type='date'
               value={filters.startDate ?? ''}
               onChange={(e) =>
@@ -63,12 +73,17 @@ export const PostFilterPanel = ({
                   startDate: e.target.value || undefined,
                 }))
               }
-              className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
             />
           </div>
           <div className='flex flex-1 flex-col gap-1'>
-            <label className='text-xs text-gray-500'>종료일</label>
-            <input
+            <Label
+              htmlFor={`${inputId}-endDate`}
+              className='py-0 text-xs leading-4 font-normal text-gray-500'
+            >
+              종료일
+            </Label>
+            <Input
+              id={`${inputId}-endDate`}
               type='date'
               value={filters.endDate ?? ''}
               onChange={(e) =>
@@ -77,7 +92,6 @@ export const PostFilterPanel = ({
                   endDate: e.target.value || undefined,
                 }))
               }
-              className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
             />
           </div>
         </div>
@@ -86,10 +100,14 @@ export const PostFilterPanel = ({
       {/* 게시자 / 게시글 검색 */}
       <div className='flex gap-4'>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>
+          <Label
+            htmlFor={`${inputId}-keywordAuthor`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
             게시자 검색 (아이디/닉네임/학번)
-          </label>
-          <input
+          </Label>
+          <Input
+            id={`${inputId}-keywordAuthor`}
             type='text'
             placeholder='게시자 검색...'
             value={filters.keywordAuthor ?? ''}
@@ -99,28 +117,40 @@ export const PostFilterPanel = ({
                 keywordAuthor: e.target.value || undefined,
               }))
             }
-            className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
           />
         </div>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>게시글 검색</label>
+          <Label
+            htmlFor={`${inputId}-keywordPost`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
+            게시글 검색
+          </Label>
           <div className='flex gap-2'>
-            <select
+            <Select
               value={filters.postSearchScope ?? 'TITLE_AND_CONTENT'}
-              onChange={(e) =>
+              onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  postSearchScope: e.target
-                    .value as PostSearchParams['postSearchScope'],
+                  postSearchScope: value as PostSearchParams['postSearchScope'],
                 }))
               }
-              className='rounded border border-gray-200 bg-gray-50 px-2 py-2 text-sm'
             >
-              <option value='TITLE_AND_CONTENT'>제목+내용</option>
-              <option value='TITLE'>제목</option>
-              <option value='CONTENT'>내용</option>
-            </select>
-            <input
+              <Select.Trigger
+                id={`${inputId}-postSearchScope`}
+                aria-label='게시글 검색 범위'
+                className='h-9 w-[120px] shrink-0'
+              >
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content align='start'>
+                <Select.Item value='TITLE_AND_CONTENT'>제목+내용</Select.Item>
+                <Select.Item value='TITLE'>제목</Select.Item>
+                <Select.Item value='CONTENT'>내용</Select.Item>
+              </Select.Content>
+            </Select>
+            <Input
+              id={`${inputId}-keywordPost`}
               type='text'
               placeholder='검색어 입력...'
               value={filters.keywordPost ?? ''}
@@ -130,7 +160,7 @@ export const PostFilterPanel = ({
                   keywordPost: e.target.value || undefined,
                 }))
               }
-              className='flex-1 rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
+              className='flex-1'
             />
           </div>
         </div>
@@ -139,15 +169,20 @@ export const PostFilterPanel = ({
       {/* 정렬 / 의심 키워드 */}
       <div className='flex gap-4'>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>정렬</label>
-          <select
+          <Label
+            htmlFor={`${inputId}-sort`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
+            정렬
+          </Label>
+          <Select
             value={
               filters.sortTypes && filters.sortDirection
                 ? `${filters.sortTypes}|${filters.sortDirection}`
                 : 'CREATED_AT|DESC'
             }
-            onChange={(e) => {
-              const [sortTypes, sortDirection] = e.target.value.split('|');
+            onValueChange={(value) => {
+              const [sortTypes, sortDirection] = value.split('|');
               setFilters((prev) => ({
                 ...prev,
                 sortTypes: sortTypes as PostSearchParams['sortTypes'],
@@ -155,38 +190,53 @@ export const PostFilterPanel = ({
                   sortDirection as PostSearchParams['sortDirection'],
               }));
             }}
-            className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
           >
-            <option value='CREATED_AT|DESC'>최신순</option>
-            <option value='CREATED_AT|ASC'>오래된순</option>
-            <option value='REPORT_COUNT|DESC'>신고 수</option>
-            <option value='VIEW_COUNT|DESC'>조회 수</option>
-            <option value='LIKE_COUNT|DESC'>좋아요 수</option>
-            <option value='COMMENT_COUNT|DESC'>댓글 수</option>
-            <option value='SCRAP_COUNT|DESC'>스크랩 수</option>
-          </select>
+            <Select.Trigger id={`${inputId}-sort`} className='h-9 w-full'>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content align='start'>
+              <Select.Item value='CREATED_AT|DESC'>최신순</Select.Item>
+              <Select.Item value='CREATED_AT|ASC'>오래된순</Select.Item>
+              <Select.Item value='REPORT_COUNT|DESC'>신고 수</Select.Item>
+              <Select.Item value='VIEW_COUNT|DESC'>조회 수</Select.Item>
+              <Select.Item value='LIKE_COUNT|DESC'>좋아요 수</Select.Item>
+              <Select.Item value='COMMENT_COUNT|DESC'>댓글 수</Select.Item>
+              <Select.Item value='SCRAP_COUNT|DESC'>스크랩 수</Select.Item>
+            </Select.Content>
+          </Select>
         </div>
         <div className='flex flex-1 flex-col gap-1'>
-          <label className='text-sm text-gray-600'>의심 키워드</label>
-          <select
+          <Label
+            htmlFor={`${inputId}-isKeywordExist`}
+            className='py-0 text-sm leading-5 font-medium text-gray-600'
+          >
+            의심 키워드
+          </Label>
+          <Select
             value={
               filters.isKeywordExist === undefined
-                ? ''
+                ? 'ALL'
                 : String(filters.isKeywordExist)
             }
-            onChange={(e) =>
+            onValueChange={(value) =>
               setFilters((prev) => ({
                 ...prev,
-                isKeywordExist:
-                  e.target.value === '' ? undefined : e.target.value === 'true',
+                isKeywordExist: value === 'ALL' ? undefined : value === 'true',
               }))
             }
-            className='rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm'
           >
-            <option value=''>전체</option>
-            <option value='true'>있음</option>
-            <option value='false'>없음</option>
-          </select>
+            <Select.Trigger
+              id={`${inputId}-isKeywordExist`}
+              className='h-9 w-full'
+            >
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content align='start'>
+              <Select.Item value='ALL'>전체</Select.Item>
+              <Select.Item value='true'>있음</Select.Item>
+              <Select.Item value='false'>없음</Select.Item>
+            </Select.Content>
+          </Select>
         </div>
       </div>
 
@@ -207,7 +257,9 @@ export const PostFilterPanel = ({
 
       {/* 게시판 필터 */}
       <div className='flex flex-col gap-2'>
-        <label className='text-sm text-gray-600'>게시판 필터</label>
+        <span className='text-sm leading-5 font-medium text-gray-600'>
+          게시판 필터
+        </span>
         <div className='flex flex-wrap gap-2'>
           <button
             onClick={() =>
@@ -242,7 +294,9 @@ export const PostFilterPanel = ({
 
       {/* 상태 필터 */}
       <div className='flex flex-col gap-2'>
-        <label className='text-sm text-gray-600'>상태 필터</label>
+        <span className='text-sm leading-5 font-medium text-gray-600'>
+          상태 필터
+        </span>
         <div className='flex flex-wrap gap-2'>
           <button
             onClick={() =>

@@ -1,9 +1,11 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import LogInPage from './LogInPage';
-import { useAuth } from '@/shared/hooks';
 import { toast } from 'sonner';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import { useAuth } from '@/shared/hooks';
+
+import LogInPage from './LogInPage';
 
 vi.mock('@/shared/hooks', () => ({
   useAuth: vi.fn(),
@@ -45,10 +47,14 @@ describe('로그인 페이지', () => {
     expect(
       screen.getByText('어드민 페이지에 오신 것을 환영합니다')
     ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('스노로즈 아이디')).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText('스노로즈 비밀번호')
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText('스노로즈 아이디')).toHaveAttribute(
+      'autocomplete',
+      'username'
+    );
+    expect(screen.getByLabelText('스노로즈 비밀번호')).toHaveAttribute(
+      'autocomplete',
+      'current-password'
+    );
     expect(screen.getByRole('button', { name: '로그인' })).toBeInTheDocument();
   });
 
@@ -238,6 +244,9 @@ describe('로그인 페이지', () => {
 
     expect(screen.getByPlaceholderText('스노로즈 아이디')).toBeDisabled();
     expect(screen.getByPlaceholderText('스노로즈 비밀번호')).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: '비밀번호 보기' })
+    ).toBeDisabled();
 
     const loadingButton = screen.getByRole('button', { name: '로그인 중...' });
     expect(loadingButton).toBeInTheDocument();

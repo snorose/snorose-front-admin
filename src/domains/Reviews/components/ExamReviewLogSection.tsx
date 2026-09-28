@@ -29,6 +29,8 @@ const CHANGE_FIELD_LABELS: Record<string, string> = {
   visibilityStatus: '공개 상태',
   memo: '메모',
   fileName: '파일명',
+  oldFileName: '수정 전 파일명',
+  newFileName: '수정 후 파일명',
 };
 
 const getVisibleChanges = (changes?: ExamReviewDetailLog['changes'] | null) =>

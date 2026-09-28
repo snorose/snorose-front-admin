@@ -147,6 +147,11 @@ export interface ExamReviewDetailResult {
   logs: ExamReviewDetailLog[] | null;
 }
 
+export type RenameExamReviewFileResult = Pick<
+  ExamReviewDetailResult,
+  'postId' | 'fileName' | 'logs'
+>;
+
 export interface ExamReviewsResult {
   data: ExamReviews[];
   hasNext: boolean;

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Input, Select } from '@/shared/components/ui';
+import { Button, Input, InputGroup, Select } from '@/shared/components/ui';
 import {
   EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
@@ -331,50 +331,54 @@ export default function ExamSearch({
   return (
     <div key={searchKey} className='flex flex-col gap-2'>
       <div className='flex flex-wrap items-center gap-2'>
-        <div className='relative w-[220px]'>
-          <input
+        <InputGroup className='w-[220px] max-w-full'>
+          <InputGroup.Input
             type='text'
+            aria-label='시험후기명 또는 postId 검색'
             placeholder='시험후기명 또는 postId 검색'
             value={keywordPost}
             onChange={(e) => setKeywordPost(e.target.value)}
             onKeyDown={handleKeyDown}
-            className='h-9 w-full rounded-md border-1 border-gray-500 bg-white px-2 py-2 pr-7 text-[13px]'
           />
           {keywordPost && (
-            <button
-              onClick={handleKeywordPostReset}
-              className='absolute top-1/2 right-2 z-10 flex -translate-y-1/2 items-center justify-center rounded-sm p-0.5 hover:bg-gray-200'
-              type='button'
-            >
-              <X className='pointer-events-none h-4 w-4 text-gray-600' />
-            </button>
+            <InputGroup.Addon align='inline-end'>
+              <InputGroup.Button
+                onClick={handleKeywordPostReset}
+                size='icon-xs'
+                aria-label='시험후기 검색어 지우기'
+              >
+                <X aria-hidden='true' />
+              </InputGroup.Button>
+            </InputGroup.Addon>
           )}
-        </div>
-        <div className='relative w-[260px]'>
-          <input
+        </InputGroup>
+        <InputGroup className='w-[260px] max-w-full'>
+          <InputGroup.Input
             type='text'
+            aria-label='작성자 검색 (아이디, 닉네임, 학번)'
             placeholder='작성자 검색 (아이디, 닉네임, 학번)'
             value={keywordAuthor}
             onChange={(e) => setKeywordAuthor(e.target.value)}
             onKeyDown={handleKeyDown}
-            className='h-9 w-full rounded-md border-1 border-gray-500 bg-white px-2 py-2 pr-7 text-[13px]'
           />
           {keywordAuthor && (
-            <button
-              onClick={handleKeywordAuthorReset}
-              className='absolute top-1/2 right-2 z-10 flex -translate-y-1/2 items-center justify-center rounded-sm p-0.5 hover:bg-gray-200'
-              type='button'
-            >
-              <X className='pointer-events-none h-4 w-4 text-gray-600' />
-            </button>
+            <InputGroup.Addon align='inline-end'>
+              <InputGroup.Button
+                onClick={handleKeywordAuthorReset}
+                size='icon-xs'
+                aria-label='작성자 검색어 지우기'
+              >
+                <X aria-hidden='true' />
+              </InputGroup.Button>
+            </InputGroup.Addon>
           )}
-        </div>
+        </InputGroup>
         <Input
           type='date'
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
           max={endDate || undefined}
-          className='h-9 w-[150px] text-[13px]'
+          className='w-[150px]'
           aria-label='검색 시작일'
         />
         <span className='text-xs text-gray-500'>~</span>
@@ -383,7 +387,7 @@ export default function ExamSearch({
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
           min={startDate || undefined}
-          className='h-9 w-[150px] text-[13px]'
+          className='w-[150px]'
           aria-label='검색 종료일'
         />
       </div>

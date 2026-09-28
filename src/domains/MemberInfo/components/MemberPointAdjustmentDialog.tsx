@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useId, useState } from 'react';
 
 import { CheckCircle, Coins, TrendingDown, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import {
   Button,
   Dialog,
   Input,
+  Label,
   Select,
   Textarea,
 } from '@/shared/components/ui';
@@ -35,6 +36,7 @@ export default function MemberPointAdjustmentDialog({
   onOpenChange,
   open,
 }: MemberPointAdjustmentDialogProps) {
+  const inputId = useId();
   const [selectedCategory, setSelectedCategory] = useState<
     PointCategoryValue | ''
   >('');
@@ -187,12 +189,12 @@ export default function MemberPointAdjustmentDialog({
               현재 보유 포인트: {member.pointBalance.toLocaleString()}P
             </div> */}
 
-            <Field label='카테고리' required>
+            <Field label='카테고리' htmlFor={`${inputId}-category`} required>
               <Select
                 value={selectedCategory}
                 onValueChange={handleCategoryChange}
               >
-                <Select.Trigger className='h-12 w-full rounded-xl bg-slate-50'>
+                <Select.Trigger id={`${inputId}-category`} className='w-full'>
                   <Select.Value placeholder='카테고리를 선택해주세요' />
                 </Select.Trigger>
                 <Select.Content>
@@ -206,28 +208,37 @@ export default function MemberPointAdjustmentDialog({
             </Field>
 
             {isCustomCategory ? (
-              <Field label='카테고리 직접 입력' required>
+              <Field
+                label='카테고리 직접 입력'
+                htmlFor={`${inputId}-custom-category`}
+                required
+              >
                 <Input
+                  id={`${inputId}-custom-category`}
                   type='text'
                   value={customCategory}
                   onChange={(event) => setCustomCategory(event.target.value)}
                   placeholder='카테고리를 입력해주세요'
-                  className='h-12 rounded-xl bg-slate-50'
                 />
               </Field>
             ) : null}
 
-            <Field label='포인트 수량' required>
+            <Field
+              label='포인트 수량'
+              htmlFor={`${inputId}-difference`}
+              required
+            >
               <Input
+                id={`${inputId}-difference`}
                 type='number'
                 step={1}
                 value={difference}
                 onChange={(event) => setDifference(event.target.value)}
                 placeholder='예: 100 (지급) 또는 -50 (차감)'
                 readOnly={isAutoFilled}
-                className={`h-12 rounded-xl bg-slate-50 ${
-                  isAutoFilled ? 'cursor-not-allowed' : ''
-                }`}
+                className={
+                  isAutoFilled ? 'bg-muted cursor-not-allowed' : undefined
+                }
               />
               {hasPointPreview ? (
                 <div
@@ -248,12 +259,13 @@ export default function MemberPointAdjustmentDialog({
               ) : null}
             </Field>
 
-            <Field label='메모' required>
+            <Field label='메모' htmlFor={`${inputId}-memo`} required>
               <Textarea
+                id={`${inputId}-memo`}
                 value={memo}
                 onChange={(event) => setMemo(event.target.value)}
                 placeholder='메모를 입력해주세요'
-                className='min-h-28 resize-none rounded-xl bg-slate-50'
+                className='min-h-28 resize-none'
               />
             </Field>
           </div>
@@ -297,19 +309,24 @@ export default function MemberPointAdjustmentDialog({
 function Field({
   children,
   label,
+  htmlFor,
   required = false,
 }: {
   children: ReactNode;
   label: string;
+  htmlFor: string;
   required?: boolean;
 }) {
   return (
-    <label className='block space-y-2'>
-      <span className='text-sm font-bold text-slate-900'>
+    <div className='space-y-2'>
+      <Label
+        htmlFor={htmlFor}
+        required={required}
+        className='py-0 font-bold text-slate-900'
+      >
         {label}
-        {required ? <span className='ml-1 text-red-500'>*</span> : null}
-      </span>
+      </Label>
       {children}
-    </label>
+    </div>
   );
 }

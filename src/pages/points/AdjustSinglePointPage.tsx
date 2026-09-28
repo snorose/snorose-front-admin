@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input } from '@/shared/components/ui';
+import { Button, Input, Label } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
-import type { MemberInfo } from '@/shared/types';
+import type { AdminUserListItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
@@ -15,10 +15,13 @@ import {
   PointDetailSection,
 } from '@/domains/Points/components';
 
-import { postSinglePointAPI, searchUsersAPI } from '@/apis';
+import { postSinglePointAPI, searchSinglePointMemberAPI } from '@/apis';
 
 export default function AdjustSinglePointPage() {
-  const [searchedMember, setSearchedMember] = useState<MemberInfo | null>(null);
+  const searchInputId = useId();
+  const [searchedMember, setSearchedMember] =
+    useState<AdminUserListItem | null>(null);
+  const latestSearchId = useRef(0);
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
   >('');
@@ -34,15 +37,20 @@ export default function AdjustSinglePointPage() {
       return;
     }
 
+    const searchId = ++latestSearchId.current;
+    setSearchedMember(null);
+    setIsConfirmModalOpen(false);
     setIsSearching(true);
     try {
-      const member = await searchUsersAPI(searchQuery.trim());
+      const member = await searchSinglePointMemberAPI(searchQuery.trim());
+      if (searchId !== latestSearchId.current) return;
       setSearchedMember(member);
     } catch (error: unknown) {
+      if (searchId !== latestSearchId.current) return;
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
       setSearchedMember(null);
     } finally {
-      setIsSearching(false);
+      if (searchId === latestSearchId.current) setIsSearching(false);
     }
   };
 
@@ -51,6 +59,9 @@ export default function AdjustSinglePointPage() {
   };
 
   const handleResetButtonClick = () => {
+    latestSearchId.current += 1;
+    setIsSearching(false);
+    setIsConfirmModalOpen(false);
     setSearchedMember(null);
     setSelectedCategory('');
     setSearchQuery('');
@@ -91,8 +102,12 @@ export default function AdjustSinglePointPage() {
       />
       <article className='flex flex-col gap-1'>
         <h3 className='text-lg font-bold'>회원 검색</h3>
+        <Label htmlFor={searchInputId} className='sr-only'>
+          회원 검색 (아이디 또는 학번)
+        </Label>
         <div className='flex gap-2'>
           <Input
+            id={searchInputId}
             type='text'
             placeholder='아이디 또는 학번을 입력해주세요.'
             className='w-96'
@@ -142,7 +157,7 @@ export default function AdjustSinglePointPage() {
           isOpen={isConfirmModalOpen}
           onClose={() => setIsConfirmModalOpen(false)}
           onConfirm={handleConfirmModalButtonClick}
-          searchedMember={searchedMember as MemberInfo}
+          searchedMember={searchedMember}
           selectedCategory={selectedCategory}
           difference={difference}
           memo={memo}

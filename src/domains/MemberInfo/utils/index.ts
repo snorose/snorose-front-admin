@@ -6,8 +6,6 @@ export {
   type DirectoryFilterOption,
   EMPTY_TEXT,
   type FilterValue,
-  formatDate,
-  formatDateTime,
   formatDisplayValue,
   formatPoint,
   getActivePenaltyLabel,

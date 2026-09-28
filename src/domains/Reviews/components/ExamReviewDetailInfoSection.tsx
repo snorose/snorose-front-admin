@@ -1,4 +1,4 @@
-import { type RefObject } from 'react';
+import { type RefObject, useId } from 'react';
 
 import { StatusBadge } from '@/shared/components';
 import { Field, Input, Select, Textarea } from '@/shared/components/ui';
@@ -43,6 +43,10 @@ export interface ExamReviewDetailInfoSectionProps {
   setFormData: (partial: Partial<ExamReviewDetailInfoSectionFormData>) => void;
   isFormDisabled: boolean;
   onFileDownload: () => void;
+  onFileNameRename: () => void;
+  canRenameFileName: boolean;
+  isEditMode: boolean;
+  renameButtonRef: RefObject<HTMLButtonElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
@@ -63,17 +67,29 @@ export function ExamReviewDetailInfoSection({
   setFormData,
   isFormDisabled,
   onFileDownload,
+  onFileNameRename,
+  canRenameFileName,
+  renameButtonRef,
   fileInputRef,
   selectedFile,
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
+  // 파일명 변경 버튼을 다시 노출할 때 사용할 props입니다.
+  void onFileNameRename;
+  void canRenameFileName;
+  void renameButtonRef;
+  const inputId = useId();
+  const examTypeAndQuestionsId = useId();
+  const memoId = useId();
   const confirmStatus = formData.isConfirmed ? 'CONFIRMED' : 'UNCONFIRMED';
 
   return (
     <div className='space-y-4'>
       <div className='grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-4'>
         <Field className='gap-0'>
-          <Field.Label required>확인여부</Field.Label>
+          <Field.Label htmlFor={`${inputId}-isConfirmed`} required>
+            확인여부
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.isConfirmed ? 'true' : 'false'}
@@ -82,14 +98,14 @@ export function ExamReviewDetailInfoSection({
               }
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-isConfirmed`} className='w-full'>
                 <ExamConfirmStatusBadge status={confirmStatus} />
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value='true'>
+                <Select.Item value='true' textValue='확인 완료'>
                   <ExamConfirmStatusBadge status='CONFIRMED' />
                 </Select.Item>
-                <Select.Item value='false'>
+                <Select.Item value='false' textValue='미확인'>
                   <ExamConfirmStatusBadge status='UNCONFIRMED' />
                 </Select.Item>
               </Select.Content>
@@ -97,7 +113,9 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>논의 여부</Field.Label>
+          <Field.Label htmlFor={`${inputId}-isDiscussed`} required>
+            논의 여부
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.isDiscussed ? 'true' : 'false'}
@@ -106,14 +124,14 @@ export function ExamReviewDetailInfoSection({
               }
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-isDiscussed`} className='w-full'>
                 <ExamDiscussionStatusBadge isDiscussed={formData.isDiscussed} />
               </Select.Trigger>
               <Select.Content>
-                <Select.Item value='true'>
+                <Select.Item value='true' textValue='논의 있음'>
                   <ExamDiscussionStatusBadge isDiscussed />
                 </Select.Item>
-                <Select.Item value='false'>
+                <Select.Item value='false' textValue='논의 없음'>
                   <ExamDiscussionStatusBadge isDiscussed={false} />
                 </Select.Item>
               </Select.Content>
@@ -147,9 +165,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>강의명</Field.Label>
+          <Field.Label htmlFor={`${inputId}-lectureName`} required>
+            강의명
+          </Field.Label>
           <Field.Content>
             <Input
+              id={`${inputId}-lectureName`}
               value={formData.lectureName}
               onChange={(e) => setFormData({ lectureName: e.target.value })}
               disabled={isFormDisabled}
@@ -157,9 +178,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>교수명</Field.Label>
+          <Field.Label htmlFor={`${inputId}-professorName`} required>
+            교수명
+          </Field.Label>
           <Field.Content>
             <Input
+              id={`${inputId}-professorName`}
               value={formData.professorName}
               onChange={(e) => setFormData({ professorName: e.target.value })}
               disabled={isFormDisabled}
@@ -169,21 +193,33 @@ export function ExamReviewDetailInfoSection({
         <Field className='gap-0'>
           <Field.Label required>업로드 파일</Field.Label>
           <Field.Content>
-            <div className='flex items-center gap-2'>
+            <div className='flex flex-wrap items-center gap-2'>
               <button
                 type='button'
-                className='flex-1 truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400'
+                className='min-w-0 flex-1 basis-full truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 sm:basis-0'
                 onClick={onFileDownload}
                 disabled={!formData.fileName}
                 title={formData.fileName}
               >
                 {selectedFile?.name || formData.fileName || '파일 없음'}
               </button>
+              {/* 파일명 변경 기능은 사용자에게 노출하지 않습니다. */}
+              {/*
+              <button
+                ref={renameButtonRef}
+                type='button'
+                onClick={onFileNameRename}
+                disabled={!canRenameFileName}
+                className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
+              >
+                파일명 변경
+              </button>
+              */}
               <button
                 type='button'
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isFormDisabled}
-                className='rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60'
+                className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
               >
                 파일 변경
               </button>
@@ -205,14 +241,16 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>수강학기</Field.Label>
+          <Field.Label htmlFor={`${inputId}-semester`} required>
+            수강학기
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.semester}
               onValueChange={(value) => setFormData({ semester: value })}
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-semester`} className='w-full'>
                 <Select.Value>{formData.semester}</Select.Value>
               </Select.Trigger>
               <Select.Content className='max-h-[200px] overflow-y-auto'>
@@ -226,14 +264,16 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>시험 종류</Field.Label>
+          <Field.Label htmlFor={`${inputId}-examType`} required>
+            시험 종류
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.examType}
               onValueChange={(value) => setFormData({ examType: value })}
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-examType`} className='w-full'>
                 <Select.Value>{formData.examType}</Select.Value>
               </Select.Trigger>
               <Select.Content className='max-h-[200px] overflow-y-auto'>
@@ -247,7 +287,9 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>강의 종류</Field.Label>
+          <Field.Label htmlFor={`${inputId}-lectureType`} required>
+            강의 종류
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.lectureType}
@@ -259,7 +301,7 @@ export function ExamReviewDetailInfoSection({
               }
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-lectureType`} className='w-full'>
                 <Select.Value>
                   {convertLectureTypeToString(formData.lectureType)}
                 </Select.Value>
@@ -275,9 +317,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>분반</Field.Label>
+          <Field.Label htmlFor={`${inputId}-classNumber`} required>
+            분반
+          </Field.Label>
           <Field.Content>
             <Input
+              id={`${inputId}-classNumber`}
               type='number'
               value={formData.classNumber ?? ''}
               onChange={(e) => {
@@ -296,14 +341,16 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>P/F</Field.Label>
+          <Field.Label htmlFor={`${inputId}-isPF`} required>
+            P/F
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.isPF}
               onValueChange={(value) => setFormData({ isPF: value })}
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-isPF`} className='w-full'>
                 <Select.Value>{formData.isPF}</Select.Value>
               </Select.Trigger>
               <Select.Content>
@@ -314,14 +361,16 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>온라인 강의 여부</Field.Label>
+          <Field.Label htmlFor={`${inputId}-isOnline`} required>
+            온라인 강의 여부
+          </Field.Label>
           <Field.Content>
             <Select
               value={formData.isOnline}
               onValueChange={(value) => setFormData({ isOnline: value })}
               disabled={isFormDisabled}
             >
-              <Select.Trigger className='w-full justify-between rounded-md border border-gray-200 bg-white px-3'>
+              <Select.Trigger id={`${inputId}-isOnline`} className='w-full'>
                 <Select.Value>{formData.isOnline}</Select.Value>
               </Select.Trigger>
               <Select.Content>
@@ -332,9 +381,12 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label required>시험 유형 및 문항수</Field.Label>
+          <Field.Label htmlFor={examTypeAndQuestionsId} required>
+            시험 유형 및 문항수
+          </Field.Label>
           <Field.Content>
             <Textarea
+              id={examTypeAndQuestionsId}
               value={formData.examTypeAndQuestions}
               onChange={(e) =>
                 setFormData({ examTypeAndQuestions: e.target.value })
@@ -346,9 +398,10 @@ export function ExamReviewDetailInfoSection({
           </Field.Content>
         </Field>
         <Field className='gap-0'>
-          <Field.Label>메모</Field.Label>
+          <Field.Label htmlFor={memoId}>메모</Field.Label>
           <Field.Content>
             <Textarea
+              id={memoId}
               value={formData.memo ?? ''}
               onChange={(e) => setFormData({ memo: e.target.value })}
               disabled={isFormDisabled}

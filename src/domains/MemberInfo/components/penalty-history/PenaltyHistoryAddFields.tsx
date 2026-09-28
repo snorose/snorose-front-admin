@@ -1,12 +1,9 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { Input, Label, Select } from '@/shared/components/ui';
 
 import type { DemotionType } from '@/domains/MemberInfo/components/penalty-history/penalty-history-add-utils';
 import { WARNING_REASON_OPTIONS } from '@/domains/MemberInfo/constants/memberInfo';
-
-const INVALID_FIELD_CLASS =
-  'aria-invalid:border aria-invalid:border-rose-300 aria-invalid:bg-rose-50 aria-invalid:ring-2 aria-invalid:ring-rose-200';
 
 type ReasonOption = {
   value: string;
@@ -33,10 +30,12 @@ export function WarningFields({
   reason: string;
   warningCount: number;
 }) {
+  const inputId = useId();
   return (
     <>
-      <Field label='사유'>
+      <Field label='사유' htmlFor={`${inputId}-reason`}>
         <ReasonSelect
+          id={`${inputId}-reason`}
           fieldName='warningReason'
           invalid={invalidFieldName === 'warningReason'}
           onValueChange={onReasonChange}
@@ -45,20 +44,26 @@ export function WarningFields({
           value={reason}
         />
         {needsCustomReason ? (
-          <Input
-            name='customReason'
-            aria-invalid={invalidFieldName === 'customReason'}
-            value={customReason}
-            onChange={(event) => onCustomReasonChange(event.target.value)}
-            placeholder='사유를 입력하세요'
-            className={`h-12 rounded-xl border-0 bg-slate-100 px-4 text-base shadow-none focus-visible:ring-slate-300 ${INVALID_FIELD_CLASS}`}
-          />
+          <Field label='상세 사유' htmlFor={`${inputId}-customReason`}>
+            <Input
+              id={`${inputId}-customReason`}
+              name='customReason'
+              aria-invalid={invalidFieldName === 'customReason'}
+              value={customReason}
+              onChange={(event) => onCustomReasonChange(event.target.value)}
+              placeholder='사유를 입력하세요'
+            />
+          </Field>
         ) : null}
       </Field>
 
-      <Field label='경고 횟수'>
+      <Field label='경고 횟수' htmlFor={`${inputId}-warningCount`}>
         <Input
+          id={`${inputId}-warningCount`}
           name='warningCount'
+          aria-describedby={
+            !needsCustomReason ? `${inputId}-count-help` : undefined
+          }
           aria-invalid={invalidFieldName === 'warningCount'}
           type='number'
           min={1}
@@ -68,10 +73,13 @@ export function WarningFields({
           onChange={(event) =>
             onWarningCountChange(Math.max(1, Number(event.target.value)))
           }
-          className={`h-12 rounded-xl border-0 bg-slate-100 px-4 text-base shadow-none focus-visible:ring-slate-300 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 ${INVALID_FIELD_CLASS}`}
+          className='disabled:bg-muted disabled:cursor-not-allowed'
         />
         {!needsCustomReason ? (
-          <p className='text-sm font-medium text-slate-500'>
+          <p
+            id={`${inputId}-count-help`}
+            className='text-muted-foreground text-sm font-medium'
+          >
             선택한 사유의 기본 경고 횟수가 적용됩니다.
           </p>
         ) : null}
@@ -107,14 +115,16 @@ export function DemotionFields({
   relegationEndDateTime: string;
   relegationMonth: number;
 }) {
+  const inputId = useId();
   return (
     <>
-      <Field label='강등 종류'>
+      <Field label='강등 종류' htmlFor={`${inputId}-demotionType`}>
         <Select value={demotionType} onValueChange={onDemotionTypeChange}>
           <Select.Trigger
+            id={`${inputId}-demotionType`}
             data-field-name='demotionType'
             aria-invalid={invalidFieldName === 'demotionType'}
-            className={`h-12 w-full rounded-xl border-0 bg-slate-100 px-4 text-base font-semibold shadow-none focus:ring-slate-300 ${INVALID_FIELD_CLASS}`}
+            className='w-full'
           >
             <Select.Value placeholder='강등 종류 선택' />
           </Select.Trigger>
@@ -126,9 +136,11 @@ export function DemotionFields({
       </Field>
 
       {demotionType === 'RELEGATION' ? (
-        <Field label='강등 기간 (월)'>
+        <Field label='강등 기간 (월)' htmlFor={`${inputId}-relegationMonth`}>
           <Input
+            id={`${inputId}-relegationMonth`}
             name='relegationMonth'
+            aria-describedby={`${inputId}-end-date`}
             aria-invalid={invalidFieldName === 'relegationMonth'}
             type='number'
             min={1}
@@ -137,16 +149,19 @@ export function DemotionFields({
             onChange={(event) =>
               onRelegationMonthChange(Math.max(1, Number(event.target.value)))
             }
-            className={`h-12 rounded-xl border-0 bg-slate-100 px-4 text-base shadow-none focus-visible:ring-slate-300 ${INVALID_FIELD_CLASS}`}
           />
-          <p className='text-sm font-semibold text-slate-500'>
+          <p
+            id={`${inputId}-end-date`}
+            className='text-muted-foreground text-sm font-semibold'
+          >
             {relegationEndDateTime} 까지 강등
           </p>
         </Field>
       ) : null}
 
-      <Field label='사유'>
+      <Field label='사유' htmlFor={`${inputId}-reason`}>
         <ReasonSelect
+          id={`${inputId}-reason`}
           fieldName='demotionReason'
           invalid={invalidFieldName === 'demotionReason'}
           onValueChange={onDemotionReasonChange}
@@ -155,14 +170,16 @@ export function DemotionFields({
           value={demotionReason}
         />
         {needsCustomReason ? (
-          <Input
-            name='customReason'
-            aria-invalid={invalidFieldName === 'customReason'}
-            value={customReason}
-            onChange={(event) => onCustomReasonChange(event.target.value)}
-            placeholder='사유를 입력하세요'
-            className={`h-12 rounded-xl border-0 bg-slate-100 px-4 text-base shadow-none focus-visible:ring-slate-300 ${INVALID_FIELD_CLASS}`}
-          />
+          <Field label='상세 사유' htmlFor={`${inputId}-customReason`}>
+            <Input
+              id={`${inputId}-customReason`}
+              name='customReason'
+              aria-invalid={invalidFieldName === 'customReason'}
+              value={customReason}
+              onChange={(event) => onCustomReasonChange(event.target.value)}
+              placeholder='사유를 입력하세요'
+            />
+          </Field>
         ) : null}
       </Field>
     </>
@@ -172,19 +189,24 @@ export function DemotionFields({
 export function Field({
   children,
   label,
+  htmlFor,
 }: {
   children: ReactNode;
   label: string;
+  htmlFor?: string;
 }) {
   return (
     <div className='space-y-2'>
-      <Label className='text-base font-bold text-slate-950'>{label}</Label>
+      <Label htmlFor={htmlFor} className='text-base font-bold text-slate-950'>
+        {label}
+      </Label>
       {children}
     </div>
   );
 }
 
 function ReasonSelect({
+  id,
   fieldName,
   invalid,
   onValueChange,
@@ -192,6 +214,7 @@ function ReasonSelect({
   placeholder,
   value,
 }: {
+  id: string;
   fieldName: string;
   invalid: boolean;
   onValueChange: (value: string) => void;
@@ -202,9 +225,10 @@ function ReasonSelect({
   return (
     <Select value={value} onValueChange={onValueChange}>
       <Select.Trigger
+        id={id}
         data-field-name={fieldName}
         aria-invalid={invalid}
-        className={`h-12 w-full rounded-xl border-0 bg-slate-100 px-4 text-base font-semibold shadow-none focus:ring-slate-300 ${INVALID_FIELD_CLASS}`}
+        className='w-full'
       >
         <Select.Value placeholder={placeholder} />
       </Select.Trigger>

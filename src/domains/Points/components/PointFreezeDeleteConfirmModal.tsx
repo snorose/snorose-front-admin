@@ -4,28 +4,26 @@ import { Button, Dialog } from '@/shared/components/ui';
 import type { PointFreeze } from '@/shared/types';
 import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
 
-import { deletePointFreezeAPI } from '@/apis';
+import { useDeletePointFreeze } from '@/domains/Points/hooks';
 
 interface PointFreezeDeleteConfirmModalProps {
   isDeleteModalOpen: boolean;
   selectedItem: PointFreeze;
-  onSuccess: () => void;
   onClose: () => void;
 }
 export function PointFreezeDeleteConfirmModal({
   isDeleteModalOpen,
   selectedItem,
-  onSuccess,
   onClose,
 }: PointFreezeDeleteConfirmModalProps) {
+  const { mutateAsync, isPending } = useDeletePointFreeze();
   const handleDeleteConfirm = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || isPending) return;
 
     try {
-      await deletePointFreezeAPI(selectedItem.id);
+      await mutateAsync(selectedItem.id);
       toast.success('미지급 일정 삭제가 완료되었어요.');
       onClose();
-      await onSuccess();
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '미지급 일정 삭제에 실패했습니다.'));
     }
@@ -68,7 +66,11 @@ export function PointFreezeDeleteConfirmModal({
           <Button type='button' variant='outline' onClick={handleDeleteCancel}>
             취소
           </Button>
-          <Button type='button' onClick={handleDeleteConfirm}>
+          <Button
+            type='button'
+            disabled={isPending}
+            onClick={handleDeleteConfirm}
+          >
             삭제
           </Button>
         </Dialog.Footer>

@@ -86,18 +86,6 @@ export function formatDisplayValue(value: string | null | undefined) {
   return value;
 }
 
-export function formatDate(value: string | null | undefined) {
-  if (!value) return EMPTY_TEXT;
-  return value.substring(0, 10);
-}
-
-export function formatDateTime(value: string | null | undefined) {
-  if (!value) return EMPTY_TEXT;
-
-  const normalizedValue = value.replace('T', ' ');
-  return normalizedValue.slice(0, 16);
-}
-
 export function formatPoint(value: number | null | undefined) {
   if (typeof value !== 'number') return EMPTY_TEXT;
   return `${value.toLocaleString()}P`;

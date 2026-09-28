@@ -1,21 +1,18 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
 import { DateTimePicker } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import { formatDateTimeForAPI, getErrorMessage } from '@/shared/utils';
+import { getErrorMessage } from '@/shared/utils';
 
-import { postPointFreezeAPI } from '@/apis';
+import { useCreatePointFreeze } from '@/domains/Points/hooks';
+import { createPointFreezeRequest } from '@/domains/Points/utils';
 
-interface PointFreezeScheduleFormProps {
-  onSuccess: () => void;
-}
-
-export function PointFreezeScheduleForm({
-  onSuccess,
-}: PointFreezeScheduleFormProps) {
+export function PointFreezeScheduleForm() {
+  const { mutateAsync, isPending } = useCreatePointFreeze();
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -41,15 +38,18 @@ export function PointFreezeScheduleForm({
       return;
     }
 
+    if (isPending) return;
+
     try {
-      await postPointFreezeAPI({
-        title,
-        startAt: formatDateTimeForAPI(startDateTime.dateTime),
-        endAt: formatDateTimeForAPI(endDateTime.dateTime),
-      });
+      await mutateAsync(
+        createPointFreezeRequest({
+          title,
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('미지급 일정 생성이 완료되었어요.');
       handleResetButtonClick();
-      onSuccess();
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '미지급 일정 생성에 실패했습니다.'));
     }
@@ -81,12 +81,12 @@ export function PointFreezeScheduleForm({
         <h3 className='text-lg font-bold'>미지급 일정 생성</h3>
         <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='title' required>
+            <Label htmlFor={titleId} required>
               일정 제목
             </Label>
             <Input
               type='text'
-              id='title'
+              id={titleId}
               placeholder='예: 2026-1학기 중간고사'
               value={title}
               onChange={handleInputChange}
@@ -115,6 +115,7 @@ export function PointFreezeScheduleForm({
               size='sm'
               variant='outline'
               className='w-16 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+              disabled={isPending}
               onClick={handleResetButtonClick}
             >
               초기화
@@ -124,6 +125,7 @@ export function PointFreezeScheduleForm({
               size='sm'
               variant='outline'
               className='w-16 cursor-pointer font-bold'
+              disabled={isPending}
               onClick={handleCreateButtonClick}
             >
               생성

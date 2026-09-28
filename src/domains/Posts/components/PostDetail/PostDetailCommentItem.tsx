@@ -16,6 +16,7 @@ import {
   StatusChangeModal,
 } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResult } from '@/domains/Comments/types';
@@ -25,10 +26,14 @@ import { deleteComment, restoreComment, updateCommentVisibility } from '@/apis';
 
 interface PostDetailCommentItemProps {
   comment: AdminCommentResult;
+  isSelected: boolean;
+  onSelect: (commentId: number) => void;
 }
 
 export default function PostDetailCommentItem({
   comment,
+  isSelected,
+  onSelect,
 }: PostDetailCommentItemProps) {
   const queryClient = useQueryClient();
   const badges = getPostStatusBadges(comment);
@@ -101,13 +106,21 @@ export default function PostDetailCommentItem({
   return (
     <div
       key={comment.commentId}
-      className={`flex items-start gap-3 ${isSubComment ? 'pl-8' : ''}`}
+      className={cn('flex items-start gap-3', isSubComment && 'pl-8')}
     >
       {isSubComment && (
         <CornerDownRight className='mt-2.5 h-4 w-4 shrink-0 text-gray-400' />
       )}
 
-      <div className='relative flex-1 rounded-xl border border-gray-200 bg-gray-50/50 p-4'>
+      <div
+        className={cn(
+          'relative flex-1 cursor-pointer rounded-xl border bg-gray-50/50 p-4 transition-colors',
+          isSelected
+            ? 'border-blue-400 ring-2 ring-blue-100'
+            : 'border-gray-200 hover:border-gray-300'
+        )}
+        onClick={() => onSelect(comment.commentId)}
+      >
         {/* 상단 헤더: 닉네임 + 일시 및 액션 버튼 */}
         <div className='flex items-start justify-between gap-4'>
           <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>

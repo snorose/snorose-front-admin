@@ -1,21 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import {
-  Button,
-  Card,
-  ConfirmModal,
-  Skeleton,
-  Tabs,
-  Textarea,
-} from '@/shared/components/ui';
+import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
 
 import {
   ExamReviewCommentSection,
   ExamReviewDetailInfoSection,
+  ExamReviewFileNameModal,
   ExamReviewLogSection,
   ExamReviewPostInfoSection,
   ExamReviewUpdateConfirmModal,
@@ -25,6 +19,7 @@ import type {
   ExamReviewDetailResult,
   ExamReviewProcessStatus,
   LectureType,
+  RenameExamReviewFileResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 import {
@@ -39,9 +34,12 @@ import {
 import {
   deleteExamReview,
   downloadExamReviewFile,
+  restoreExamReview,
   updateExamReview,
 } from '@/apis/reviews';
 
+import { ExamReviewDeleteModal } from './ExamReviewDeleteModal';
+import { ExamReviewRestoreModal } from './ExamReviewRestoreModal';
 import type { ExamReviewUpdateChange } from './ExamReviewUpdateConfirmModal';
 
 interface ExamDetailSectionProps {
@@ -49,7 +47,12 @@ interface ExamDetailSectionProps {
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
   onSaveSuccess?: (updatedDetail?: ExamReviewDetailResult) => void;
+  onFileNameChangeSuccess?: (
+    postId: number,
+    result: RenameExamReviewFileResult
+  ) => void;
   onDeleteSuccess?: () => void;
+  onRestoreSuccess?: (postId: number) => void;
 }
 
 type FormData = {
@@ -165,8 +168,12 @@ export function ExamDetailSection({
   selectedExamReviewDetail,
   isLoadingDetail,
   onSaveSuccess,
+  onFileNameChangeSuccess,
   onDeleteSuccess,
+  onRestoreSuccess,
 }: ExamDetailSectionProps = {}) {
+  // 복구 버튼을 다시 노출할 때 사용할 아이콘입니다.
+  void RotateCcw;
   const [activeTab, setActiveTab] = useState<
     'review' | 'post' | 'comments' | 'logs'
   >('review');
@@ -174,16 +181,25 @@ export function ExamDetailSection({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteReason, setDeleteReason] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
+  const [restoreReason, setRestoreReason] = useState('');
+  const [isRestoring, setIsRestoring] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isFileNameModalOpen, setIsFileNameModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const renameButtonRef = useRef<HTMLButtonElement>(null);
+  const initializedPostIdRef = useRef<number | null>(null);
   const [initialValues, setInitialValues] = useState<InitialValues | null>(
     null
   );
 
   const isDisabled = !selectedExamReview || Boolean(isLoadingDetail);
+  const isDeleted =
+    selectedExamReviewDetail?.deletionStatus === 'USER_DELETED' ||
+    selectedExamReviewDetail?.deletionStatus === 'ADMIN_DELETED';
   const isFormDisabled =
     !selectedExamReview || Boolean(isLoadingDetail) || !isEditMode;
 
@@ -253,40 +269,62 @@ export function ExamDetailSection({
 
   useEffect(() => {
     setIsEditMode(false);
+    setIsFileNameModalOpen(false);
+    setIsRestoreModalOpen(false);
+    setRestoreReason('');
   }, [selectedExamReview?.id]);
 
   useEffect(() => {
     if (formInitialValues) {
-      setFormData({
-        encryptedUserId: formInitialValues.encryptedUserId,
-        postId: formInitialValues.postId,
-        isConfirmed: formInitialValues.isConfirmed,
-        isDiscussed: formInitialValues.isDiscussed,
-        deletionStatus: formInitialValues.deletionStatus,
-        isSanctioned: formInitialValues.isSanctioned,
-        visibilityStatus: formInitialValues.visibilityStatus,
-        memo: formInitialValues.memo,
-        examReviewName: formInitialValues.examReviewName,
-        uploadTime: formInitialValues.uploadTime,
-        lectureName: formInitialValues.lectureName,
-        professorName: formInitialValues.professorName,
-        classNumber: formInitialValues.classNumber,
-        semester: formInitialValues.semester,
-        lectureType: formInitialValues.lectureType,
-        isPF: formInitialValues.isPF,
-        isOnline: formInitialValues.isOnline,
-        examType: formInitialValues.examType,
-        fileName: formInitialValues.fileName,
-        examTypeAndQuestions: formInitialValues.examTypeAndQuestions,
-        author: formInitialValues.author,
-      });
-      setSelectedFile(null);
-      setInitialValues(formInitialValues.initialValues);
+      if (
+        isEditMode &&
+        initializedPostIdRef.current === formInitialValues.postId
+      ) {
+        setFormData((current) => ({
+          ...current,
+          fileName: selectedFile
+            ? current.fileName
+            : formInitialValues.fileName,
+        }));
+        setInitialValues((current) =>
+          current
+            ? { ...current, fileName: formInitialValues.fileName }
+            : formInitialValues.initialValues
+        );
+      } else {
+        setFormData({
+          encryptedUserId: formInitialValues.encryptedUserId,
+          postId: formInitialValues.postId,
+          isConfirmed: formInitialValues.isConfirmed,
+          isDiscussed: formInitialValues.isDiscussed,
+          deletionStatus: formInitialValues.deletionStatus,
+          isSanctioned: formInitialValues.isSanctioned,
+          visibilityStatus: formInitialValues.visibilityStatus,
+          memo: formInitialValues.memo,
+          examReviewName: formInitialValues.examReviewName,
+          uploadTime: formInitialValues.uploadTime,
+          lectureName: formInitialValues.lectureName,
+          professorName: formInitialValues.professorName,
+          classNumber: formInitialValues.classNumber,
+          semester: formInitialValues.semester,
+          lectureType: formInitialValues.lectureType,
+          isPF: formInitialValues.isPF,
+          isOnline: formInitialValues.isOnline,
+          examType: formInitialValues.examType,
+          fileName: formInitialValues.fileName,
+          examTypeAndQuestions: formInitialValues.examTypeAndQuestions,
+          author: formInitialValues.author,
+        });
+        setSelectedFile(null);
+        setInitialValues(formInitialValues.initialValues);
+      }
+      initializedPostIdRef.current = formInitialValues.postId;
     } else {
       resetForm();
       setInitialValues(null);
+      initializedPostIdRef.current = null;
     }
-  }, [formInitialValues]);
+  }, [formInitialValues, isEditMode, selectedFile]);
 
   const isDirty = useMemo(() => {
     if (!initialValues) return false;
@@ -405,7 +443,8 @@ export function ExamDetailSection({
   };
 
   const handleFileDownload = async () => {
-    if (!selectedExamReview || !formData.fileName) {
+    const currentFileName = selectedExamReviewDetail?.fileName;
+    if (!selectedExamReview || !currentFileName) {
       toast.error('다운로드할 파일이 없습니다.');
       return;
     }
@@ -413,13 +452,13 @@ export function ExamDetailSection({
     try {
       const blob = await downloadExamReviewFile(
         selectedExamReview.id,
-        formData.fileName
+        currentFileName
       );
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = formData.fileName;
+      link.download = currentFileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -576,6 +615,46 @@ export function ExamDetailSection({
     }
   };
 
+  const handleRestore = async () => {
+    if (
+      isRestoring ||
+      !isDeleted ||
+      !selectedExamReview ||
+      selectedExamReviewDetail?.postId !== selectedExamReview.id
+    ) {
+      return;
+    }
+
+    const trimmedRestoreReason = restoreReason.trim();
+    if (!trimmedRestoreReason) {
+      toast.error('복구 사유를 입력해주세요.');
+      return;
+    }
+
+    const postId = selectedExamReview.id;
+    const existingMemo = selectedExamReviewDetail.memo?.trim();
+    const restoreReasonMarker = `[복구 사유]\n${trimmedRestoreReason}`;
+    const restoreMemo = existingMemo?.includes(restoreReasonMarker)
+      ? existingMemo
+      : [existingMemo, restoreReasonMarker].filter(Boolean).join('\n\n');
+    setIsRestoring(true);
+    try {
+      await updateExamReview(postId, { post: { memo: restoreMemo } });
+      await restoreExamReview(postId);
+      toast.success('시험 후기가 복구되었습니다.');
+      setIsRestoreModalOpen(false);
+      setRestoreReason('');
+      onRestoreSuccess?.(postId);
+    } catch (error: unknown) {
+      toast.error(
+        (isAxiosError(error) && error.response?.data?.message) ||
+          '시험 후기 복구에 실패했습니다. 다시 시도해주세요.'
+      );
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
   return (
     <article className='flex flex-col gap-1'>
       <div className='flex w-full flex-col rounded-md border'>
@@ -588,17 +667,42 @@ export function ExamDetailSection({
               <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
             )}
           </div>
-          {selectedExamReview && (
-            <button
-              type='button'
-              aria-label='시험 후기 삭제'
-              className='rounded-sm bg-red-100 p-2 hover:bg-red-200 disabled:cursor-not-allowed disabled:opacity-60'
-              onClick={openDeleteModal}
-              disabled={isDisabled}
-            >
-              <Trash2 className='h-4 w-4 text-red-500' />
-            </button>
-          )}
+          {selectedExamReview &&
+            (isDeleted ? (
+              /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */
+              null
+              /*
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                onClick={() => setIsRestoreModalOpen(true)}
+                disabled={
+                  isDisabled ||
+                  isSaving ||
+                  isRestoring ||
+                  selectedExamReviewDetail?.postId !== selectedExamReview.id
+                }
+              >
+                <RotateCcw className='mr-1.5 h-4 w-4' />
+                삭제된 시험 후기 복구
+              </Button>
+              */
+            ) : (
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                aria-label='시험 후기 삭제'
+                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                onClick={openDeleteModal}
+                disabled={isDisabled}
+              >
+                <Trash2 className='h-4 w-4' />
+                삭제
+              </Button>
+            ))}
         </div>
 
         {!selectedExamReview ? (
@@ -696,6 +800,18 @@ export function ExamDetailSection({
                       }
                       isFormDisabled={isFormDisabled}
                       onFileDownload={handleFileDownload}
+                      onFileNameRename={() => setIsFileNameModalOpen(true)}
+                      canRenameFileName={
+                        !isDisabled &&
+                        !isSaving &&
+                        !isDeleting &&
+                        !isRestoring &&
+                        selectedExamReviewDetail?.postId ===
+                          selectedExamReview?.id &&
+                        Boolean(selectedExamReviewDetail.fileName)
+                      }
+                      isEditMode={isEditMode}
+                      renameButtonRef={renameButtonRef}
                       fileInputRef={fileInputRef}
                       selectedFile={selectedFile}
                       setSelectedFile={setSelectedFile}
@@ -749,51 +865,46 @@ export function ExamDetailSection({
         }}
       />
 
-      <ConfirmModal
+      {isFileNameModalOpen &&
+        selectedExamReview &&
+        selectedExamReviewDetail?.fileName && (
+          <ExamReviewFileNameModal
+            key={selectedExamReview.id}
+            postId={selectedExamReview.id}
+            currentFileName={selectedExamReviewDetail.fileName}
+            returnFocusRef={renameButtonRef}
+            onClose={() => setIsFileNameModalOpen(false)}
+            onSuccess={(postId, result) => {
+              toast.success('파일명이 변경되었습니다.');
+              onFileNameChangeSuccess?.(postId, result);
+            }}
+          />
+        )}
+
+      <ExamReviewRestoreModal
+        isOpen={isRestoreModalOpen}
+        existingMemo={selectedExamReviewDetail?.memo ?? null}
+        restoreReason={restoreReason}
+        isRestoring={isRestoring}
+        onReasonChange={setRestoreReason}
+        onClose={() => {
+          if (!isRestoring) {
+            setIsRestoreModalOpen(false);
+            setRestoreReason('');
+          }
+        }}
+        onConfirm={() => void handleRestore()}
+      />
+
+      <ExamReviewDeleteModal
         isOpen={isDeleteModalOpen}
-        confirmText={isDeleting ? '삭제 중' : '삭제'}
-        confirmButtonClassName='bg-red-600 text-white hover:bg-red-700'
-        confirmDisabled={!deleteReason.trim() || isDeleting}
-        closeText='취소'
+        existingMemo={selectedExamReviewDetail?.memo ?? null}
+        deleteReason={deleteReason}
+        isDeleting={isDeleting}
+        onReasonChange={setDeleteReason}
         onClose={closeDeleteModal}
-        onConfirm={handleDeleteClick}
-        title='시험 후기 삭제'
-        description='기존 메모 아래에 삭제 사유를 추가해 저장합니다.'
-      >
-        <div className='flex flex-col gap-4'>
-          <div className='flex flex-col gap-2'>
-            <label
-              htmlFor='exam-review-existing-memo'
-              className='text-sm font-medium text-gray-700'
-            >
-              기존 메모
-            </label>
-            <Textarea
-              id='exam-review-existing-memo'
-              value={selectedExamReviewDetail?.memo ?? ''}
-              placeholder='기존 메모가 없습니다.'
-              className='min-h-[96px] resize-none bg-gray-50'
-              readOnly
-            />
-          </div>
-          <div className='flex flex-col gap-2'>
-            <label
-              htmlFor='exam-review-delete-reason'
-              className='text-sm font-medium text-gray-700'
-            >
-              삭제 사유
-            </label>
-            <Textarea
-              id='exam-review-delete-reason'
-              value={deleteReason}
-              onChange={(event) => setDeleteReason(event.target.value)}
-              placeholder='삭제 사유를 입력해주세요.'
-              className='min-h-[120px] resize-none'
-              disabled={isDeleting}
-            />
-          </div>
-        </div>
-      </ConfirmModal>
+        onConfirm={() => void handleDeleteClick()}
+      />
     </article>
   );
 }

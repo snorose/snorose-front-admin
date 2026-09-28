@@ -8,13 +8,18 @@ import type {
   ExamReviewDetailResult,
 } from '@/domains/Reviews/types';
 
-import { deleteExamReview, updateExamReview } from '@/apis/reviews';
+import {
+  deleteExamReview,
+  restoreExamReview,
+  updateExamReview,
+} from '@/apis/reviews';
 
 import { ExamDetailSection } from './ExamDetailSection';
 
 vi.mock('@/apis/reviews', () => ({
   deleteExamReview: vi.fn(),
   downloadExamReviewFile: vi.fn(),
+  restoreExamReview: vi.fn(),
   updateExamReview: vi.fn(),
 }));
 
@@ -28,20 +33,61 @@ vi.mock('sonner', () => ({
 vi.mock('@/domains/Reviews/components', () => ({
   ExamReviewCommentSection: () => <div>댓글 목록</div>,
   ExamReviewDetailInfoSection: ({
+    formData,
     setFormData,
+    onFileNameRename,
+    canRenameFileName,
   }: {
+    formData: { fileName: string };
     setFormData: (partial: {
       isConfirmed?: boolean;
       lectureName?: string;
     }) => void;
+    onFileNameRename: () => void;
+    canRenameFileName: boolean;
   }) => (
     <div>
       <div>시험후기 상세정보 내용</div>
+      <div>현재 파일명: {formData.fileName}</div>
+      <button
+        type='button'
+        onClick={onFileNameRename}
+        disabled={!canRenameFileName}
+      >
+        파일명 변경
+      </button>
       <button type='button' onClick={() => setFormData({ isConfirmed: true })}>
         확인 상태로 변경
       </button>
       <button type='button' onClick={() => setFormData({ lectureName: ' ' })}>
         강의명 비우기
+      </button>
+    </div>
+  ),
+  ExamReviewFileNameModal: ({
+    postId,
+    currentFileName,
+    onClose,
+    onSuccess,
+  }: {
+    postId: number;
+    currentFileName: string;
+    onClose: () => void;
+    onSuccess: (
+      postId: number,
+      result: { postId: number; fileName: string; logs: [] }
+    ) => void;
+  }) => (
+    <div>
+      <div>수정 대상 파일명: {currentFileName}</div>
+      <button
+        type='button'
+        onClick={() => {
+          onSuccess(postId, { postId, fileName: 'renamed.pdf', logs: [] });
+          onClose();
+        }}
+      >
+        파일명 저장
       </button>
     </div>
   ),
@@ -115,6 +161,114 @@ const selectedExamReviewDetailWithMemo: ExamReviewDetailResult = {
 describe('ExamDetailSection', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  test.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(
+    '%s 후기에서 복구 사유를 기존 메모 아래에 저장한 뒤 복구한다',
+    async (deletionStatus) => {
+      const user = userEvent.setup();
+      const onRestoreSuccess = vi.fn();
+      vi.mocked(restoreExamReview).mockResolvedValue({ postId: 101 });
+      render(
+        <ExamDetailSection
+          selectedExamReview={selectedExamReview}
+          selectedExamReviewDetail={{
+            ...selectedExamReviewDetailWithMemo,
+            deletionStatus,
+          }}
+          onRestoreSuccess={onRestoreSuccess}
+        />
+      );
+
+      expect(
+        screen.queryByRole('button', { name: '시험 후기 삭제' })
+      ).toBeNull();
+      await user.click(
+        screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+      );
+      expect(restoreExamReview).not.toHaveBeenCalled();
+      const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
+      expect(within(dialog).getByLabelText('기존 메모')).toHaveValue(
+        '기존 운영자 메모'
+      );
+      expect(
+        within(dialog).getByRole('button', { name: '복구' })
+      ).toBeDisabled();
+      await user.type(
+        within(dialog).getByLabelText('복구 사유'),
+        '  삭제 오류  '
+      );
+      await user.click(within(dialog).getByRole('button', { name: '복구' }));
+
+      await waitFor(() => {
+        expect(restoreExamReview).toHaveBeenCalledWith(101);
+        expect(onRestoreSuccess).toHaveBeenCalledWith(101);
+      });
+      expect(updateExamReview).toHaveBeenCalledWith(101, {
+        post: { memo: '기존 운영자 메모\n\n[복구 사유]\n삭제 오류' },
+      });
+      expect(
+        vi.mocked(updateExamReview).mock.invocationCallOrder[0]
+      ).toBeLessThan(vi.mocked(restoreExamReview).mock.invocationCallOrder[0]);
+      expect(toast.success).toHaveBeenCalledWith('시험 후기가 복구되었습니다.');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    }
+  );
+
+  test('복구 실패 시 서버 오류를 표시하고 재시도할 수 있도록 확인 창을 유지한다', async () => {
+    const user = userEvent.setup();
+    const onRestoreSuccess = vi.fn();
+    vi.mocked(restoreExamReview).mockRejectedValue({
+      isAxiosError: true,
+      response: { data: { message: '복구할 수 없는 시험후기입니다.' } },
+    });
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetail,
+          deletionStatus: 'ADMIN_DELETED',
+        }}
+        onRestoreSuccess={onRestoreSuccess}
+      />
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+    );
+    const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
+    await user.type(within(dialog).getByLabelText('복구 사유'), '삭제 오류');
+    await user.click(within(dialog).getByRole('button', { name: '복구' }));
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        '복구할 수 없는 시험후기입니다.'
+      );
+    });
+    expect(onRestoreSuccess).not.toHaveBeenCalled();
+    expect(within(dialog).getByRole('button', { name: '복구' })).toBeEnabled();
+  });
+
+  test('복구 사유 저장에 실패하면 복구하지 않고 입력한 사유를 유지한다', async () => {
+    const user = userEvent.setup();
+    vi.mocked(updateExamReview).mockRejectedValueOnce(new Error('저장 실패'));
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetail,
+          deletionStatus: 'ADMIN_DELETED',
+        }}
+      />
+    );
+    await user.click(
+      screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+    );
+    const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
+    await user.type(within(dialog).getByLabelText('복구 사유'), '삭제 오류');
+    await user.click(within(dialog).getByRole('button', { name: '복구' }));
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(restoreExamReview).not.toHaveBeenCalled();
+    expect(within(dialog).getByLabelText('복구 사유')).toHaveValue('삭제 오류');
   });
 
   test('삭제 사유를 메모로 저장한 뒤 시험 후기를 삭제한다', async () => {
@@ -261,6 +415,86 @@ describe('ExamDetailSection', () => {
       });
     });
     expect(onSaveSuccess).toHaveBeenCalledWith(updatedDetail);
+  });
+
+  test('편집 모드에 들어가지 않고 파일명을 변경한다', async () => {
+    const user = userEvent.setup();
+    const onFileNameChangeSuccess = vi.fn();
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+        onFileNameChangeSuccess={onFileNameChangeSuccess}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
+    expect(screen.getByText('수정 대상 파일명: exam.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '파일명 저장' }));
+
+    expect(onFileNameChangeSuccess).toHaveBeenCalledWith(101, {
+      postId: 101,
+      fileName: 'renamed.pdf',
+      logs: [],
+    });
+    expect(updateExamReview).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('button', { name: '저장' })
+    ).not.toBeInTheDocument();
+  });
+
+  test('편집 중 파일명을 수정해도 작성 중인 변경사항을 유지한다', async () => {
+    const user = userEvent.setup();
+    const onFileNameChangeSuccess = vi.fn();
+    vi.mocked(updateExamReview).mockResolvedValue({
+      ...selectedExamReviewDetail,
+      isConfirmed: true,
+      fileName: 'renamed.pdf',
+    });
+
+    const { rerender } = render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+        onFileNameChangeSuccess={onFileNameChangeSuccess}
+      />
+    );
+
+    const renameButton = screen.getByRole('button', { name: '파일명 변경' });
+    expect(renameButton).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
+    expect(renameButton).toBeEnabled();
+
+    await user.click(renameButton);
+    expect(screen.getByText('수정 대상 파일명: exam.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '파일명 저장' }));
+    expect(onFileNameChangeSuccess).toHaveBeenCalledWith(101, {
+      postId: 101,
+      fileName: 'renamed.pdf',
+      logs: [],
+    });
+
+    rerender(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetail,
+          fileName: 'renamed.pdf',
+        }}
+        onFileNameChangeSuccess={onFileNameChangeSuccess}
+      />
+    );
+
+    expect(screen.getByText('현재 파일명: renamed.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '저장' }));
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+    await waitFor(() => {
+      expect(updateExamReview).toHaveBeenCalledWith(101, {
+        post: { isConfirmed: true },
+      });
+    });
   });
 
   test('필수값이 비어 있으면 시험후기 수정 API를 호출하지 않는다', async () => {

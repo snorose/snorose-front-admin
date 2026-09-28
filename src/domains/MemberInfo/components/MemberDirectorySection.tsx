@@ -1,15 +1,17 @@
+import { useId } from 'react';
+
 import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
 import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
-import { Button, Input, Table } from '@/shared/components/ui';
+import { Button, InputGroup, Label, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
+import { formatDateOnly } from '@/shared/utils';
 
 import MemberDirectoryActionBar from '@/domains/MemberInfo/components/MemberDirectoryActionBar';
 import SearchableSelect from '@/domains/MemberInfo/components/SearchableSelect';
 import SortableHead from '@/domains/MemberInfo/components/SortableHead';
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
 import {
-  formatDate,
   formatPoint,
   getRoleBadgeMeta,
 } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -75,6 +77,7 @@ export default function MemberDirectorySection({
   totalPage,
   admissionYearOptions,
 }: MemberDirectorySectionProps) {
+  const searchInputId = useId();
   return (
     <article className='flex w-full flex-col gap-4'>
       <section className='rounded-3xl border border-slate-200 bg-white p-6 shadow-sm'>
@@ -85,9 +88,15 @@ export default function MemberDirectorySection({
 
         <div className='mt-6 space-y-5'>
           <div className='flex flex-col gap-2 md:flex-row'>
-            <div className='relative flex-1'>
-              <Search className='pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-400' />
-              <Input
+            <Label htmlFor={searchInputId} className='sr-only'>
+              회원 검색
+            </Label>
+            <InputGroup className='flex-1'>
+              <InputGroup.Addon>
+                <Search aria-hidden='true' />
+              </InputGroup.Addon>
+              <InputGroup.Input
+                id={searchInputId}
                 type='text'
                 value={searchQuery}
                 placeholder='이름, 학번, 아이디, 닉네임, 이메일로 검색...'
@@ -97,14 +106,13 @@ export default function MemberDirectorySection({
                     void onSearch();
                   }
                 }}
-                className='h-12 rounded-2xl border-slate-200 bg-slate-50 pl-11 shadow-none'
               />
-            </div>
+            </InputGroup>
 
             <Button
               type='button'
               variant='outline'
-              className='h-12 rounded-2xl border-slate-200 px-6'
+              className='h-9 px-6'
               onClick={() => void onSearch()}
               disabled={isListLoading}
             >
@@ -276,10 +284,10 @@ export default function MemberDirectorySection({
                           {formatPoint(member.pointBalance)}
                         </Table.Cell>
                         <Table.Cell className='px-4 text-slate-700'>
-                          {formatDate(member.createdAt)}
+                          {formatDateOnly(member.createdAt)}
                         </Table.Cell>
                         <Table.Cell className='px-4 text-slate-700'>
-                          {formatDate(member.authenticatedAt)}
+                          {formatDateOnly(member.authenticatedAt)}
                         </Table.Cell>
                       </Table.Row>
                     );

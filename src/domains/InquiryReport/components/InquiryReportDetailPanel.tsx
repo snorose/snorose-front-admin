@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useId, useState } from 'react';
 
 import { Copy, ExternalLink, Send, X } from 'lucide-react';
 
@@ -31,6 +31,7 @@ import {
 import {
   buildInquiryPostUrl,
   buildReportTargetUrl,
+  hasUnmappedReportTargetBoard,
   isReportInquiry,
 } from '../utils/inquiryReportUrls';
 import {
@@ -56,6 +57,7 @@ export default function InquiryReportDetailPanel({
   onClose,
   onStatusChange,
 }: InquiryReportDetailPanelProps) {
+  const commentDescriptionId = useId();
   const [commentInput, setCommentInput] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editingCommentValue, setEditingCommentValue] = useState('');
@@ -106,6 +108,7 @@ export default function InquiryReportDetailPanel({
   const inquiryPostUrl = buildInquiryPostUrl(detail);
   const inquiryPostLabel = isReportInquiry(detail) ? '신고글' : '문의글';
   const reportTargetUrl = buildReportTargetUrl(detail);
+  const hasUnmappedTargetBoard = hasUnmappedReportTargetBoard(detail);
   const isWriterWithdrawn = isWithdrawnInquiryAuthor(detail);
   const canCopyAuthorLoginId = !isWriterWithdrawn && detail.userLoginId;
   const isCommentInputValid =
@@ -125,9 +128,17 @@ export default function InquiryReportDetailPanel({
         content: trimmedComment,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           setCommentInput('');
           setReplyParentId(null);
+
+          if (currentStatus === 'COMPLETED') return;
+
+          try {
+            await onStatusChange(detail.inquiryId, 'COMPLETED');
+          } catch {
+            // 상태 변경 오류는 useUpdateInquiryStatus에서 안내한다.
+          }
         },
       }
     );
@@ -240,6 +251,21 @@ export default function InquiryReportDetailPanel({
               <ExternalLink className='h-3.5 w-3.5 shrink-0' />
               대상글
             </a>
+          )}
+          {hasUnmappedTargetBoard && (
+            <span
+              title={`게시판 ID ${detail.targetBoardId}의 URL 매핑이 없습니다.`}
+            >
+              <button
+                type='button'
+                disabled
+                aria-label={`신고 대상 게시판 매핑 없음 (ID ${detail.targetBoardId})`}
+                className='flex h-8 cursor-not-allowed items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 text-[12px] font-medium text-gray-400'
+              >
+                <ExternalLink className='h-3.5 w-3.5 shrink-0' />
+                대상글 (매핑 없음)
+              </button>
+            </span>
           )}
           <button
             onClick={onClose}
@@ -401,16 +427,21 @@ export default function InquiryReportDetailPanel({
             </div>
           )}
           <Textarea
+            aria-label={replyParentComment ? '대댓글 작성' : '댓글 작성'}
+            aria-describedby={commentDescriptionId}
             value={commentInput}
             onChange={(event) => setCommentInput(event.target.value)}
             maxLength={INQUIRY_COMMENT_MAX_LENGTH}
             placeholder={
               replyParentComment ? '대댓글을 입력하세요.' : '댓글을 입력하세요.'
             }
-            className='min-h-24 resize-none bg-white text-[13px]'
+            className='min-h-24 resize-none'
           />
           <div className='flex items-center justify-between gap-2'>
-            <span className='text-[11px] text-gray-400'>
+            <span
+              id={commentDescriptionId}
+              className='text-[11px] text-gray-400'
+            >
               {commentInput.length}/{INQUIRY_COMMENT_MAX_LENGTH}
             </span>
             <Button

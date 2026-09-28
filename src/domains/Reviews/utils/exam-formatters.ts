@@ -16,6 +16,7 @@ const ACTION_LABELS: Record<string, string> = {
   CREATED: '생성',
   UPDATED: '수정',
   DELETED: '삭제',
+  RENAMED_FILE: '파일명 수정',
   CONFIRMED: '확인',
   UNCONFIRMED: '미확인',
 };

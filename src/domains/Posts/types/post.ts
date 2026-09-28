@@ -70,12 +70,8 @@ export interface AdminPostBulkDeleteRequest {
 export interface AdminPostBulkDeleteResult {
   requestedCount: number;
   deletedCount: number;
-  failedCount: number;
   deletedPostIds: number[];
-  notDeletedPosts: {
-    postId: number;
-    reason: string;
-  }[];
+  notDeletedPosts: number[];
 }
 
 export interface PostSearchParams {
@@ -99,4 +95,14 @@ export interface PostSearchParams {
     | 'SCRAP_COUNT';
   sortDirection?: 'ASC' | 'DESC';
   adminCommonStatuses?: string[];
+}
+
+export interface AdminPostBulkUpdateResult {
+  requestedCount: number;
+  succeededCount: number;
+  succeededPostIds: number[];
+  failedPosts: {
+    postId: number;
+    reason: string;
+  }[];
 }

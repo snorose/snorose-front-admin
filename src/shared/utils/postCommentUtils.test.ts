@@ -1,10 +1,27 @@
 import { describe, expect, test } from 'vitest';
 
-import { getBoardKeyByName, getPostStatusBadges } from './postCommentUtils';
+import {
+  getBoardKey,
+  getBoardKeyByName,
+  getPostStatusBadges,
+} from './postCommentUtils';
+
+describe('getBoardKey', () => {
+  test.each([
+    [41, 'residence'],
+    [43, 'sookplace'],
+  ])('게시판 ID %i에 대응하는 URL key를 반환한다', (boardId, expected) => {
+    expect(getBoardKey(boardId)).toBe(expected);
+  });
+});
 
 describe('getBoardKeyByName', () => {
   test('게시판 이름에 대응하는 URL key를 반환한다', () => {
     expect(getBoardKeyByName('함박눈방')).toBe('large-snow');
+  });
+
+  test('숙플레이스 이름에 대응하는 URL key를 반환한다', () => {
+    expect(getBoardKeyByName('숙플레이스')).toBe('sookplace');
   });
 
   test('등록되지 않은 게시판 이름이면 undefined를 반환한다', () => {

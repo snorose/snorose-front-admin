@@ -9,6 +9,7 @@ export type {
   ExamReviewsResult,
   ExamType,
   LectureType,
+  RenameExamReviewFileResult,
   Semester,
   Status,
   UpdateExamReviewPost,

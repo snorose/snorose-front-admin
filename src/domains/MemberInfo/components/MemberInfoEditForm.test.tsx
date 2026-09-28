@@ -60,7 +60,9 @@ describe('MemberInfoEditForm', () => {
 
     expect(loginIdInput).toHaveFocus();
     expect(loginIdInput).toHaveAttribute('aria-invalid', 'true');
-    expect(loginIdInput).toHaveClass('border-rose-300', 'bg-rose-50');
+    expect(loginIdInput).toHaveAccessibleDescription(
+      screen.getByRole('alert').textContent ?? ''
+    );
     expect(scrollIntoView).toHaveBeenCalledWith({
       behavior: 'smooth',
       block: 'center',

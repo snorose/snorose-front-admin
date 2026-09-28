@@ -16,6 +16,7 @@
     "test:e2e:read": "playwright test --project=dev-read",
     "test:e2e:write": "playwright test --project=dev-write",
     "test:e2e:ui": "playwright test --ui --project=dev-read --project=dev-write",
+    "test:e2e:headed": "playwright test --project=dev-read --headed",
     "test:e2e:report": "playwright show-report"
   },
   "lint-staged": {

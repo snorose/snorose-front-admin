@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
 import { DateTimePicker } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import { formatDateTimeWithT, getErrorMessage } from '@/shared/utils';
+import { getErrorMessage } from '@/shared/utils';
+
+import { createExamReviewPeriodRequest } from '@/domains/Reviews/utils';
 
 import { postExamReviewPeriodAPI } from '@/apis';
 
@@ -16,6 +18,7 @@ interface ExamReviewPeriodScheduleFormProps {
 export function ExamReviewPeriodScheduleForm({
   onSuccess,
 }: ExamReviewPeriodScheduleFormProps) {
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -42,13 +45,13 @@ export function ExamReviewPeriodScheduleForm({
     }
 
     try {
-      await postExamReviewPeriodAPI([
-        {
+      await postExamReviewPeriodAPI(
+        createExamReviewPeriodRequest({
           title,
-          startAt: formatDateTimeWithT(startDateTime.dateTime),
-          endAt: formatDateTimeWithT(endDateTime.dateTime),
-        },
-      ]);
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        })
+      );
       toast.success('시험 후기 작성 기간 생성이 완료되었어요.');
       handleResetButtonClick();
       onSuccess();
@@ -85,12 +88,12 @@ export function ExamReviewPeriodScheduleForm({
         <h3 className='text-lg font-bold'>시험 후기 작성 기간 생성</h3>
         <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
-            <Label htmlFor='title' required>
+            <Label htmlFor={titleId} required>
               기간 제목
             </Label>
             <Input
               type='text'
-              id='title'
+              id={titleId}
               placeholder='예: 2026-1학기 중간고사'
               value={title}
               onChange={handleInputChange}

@@ -1,6 +1,8 @@
+import { useId } from 'react';
+
 import { Copy } from 'lucide-react';
 
-import { Input, Label } from '@/shared/components/ui';
+import { Input, InputGroup, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 
 import { PENALTY_USER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
@@ -12,6 +14,7 @@ export default function PenaltyUserInfo({
 }: {
   member: PenaltyUserInfo | null;
 }) {
+  const inputId = useId();
   const COPY_KEYS: (keyof PenaltyUserInfo)[] = ['studentNumber', 'loginId'];
 
   const DATE_FIELDS: (keyof PenaltyUserInfo)[] = [
@@ -49,13 +52,19 @@ export default function PenaltyUserInfo({
 
             return (
               <div key={key} className='flex gap-4'>
-                <Label className='w-32 text-gray-700'>{label}</Label>
+                <Label
+                  htmlFor={`${inputId}-${key}`}
+                  className='text-foreground w-32'
+                >
+                  {label}
+                </Label>
 
                 <Input
+                  id={`${inputId}-${key}`}
                   readOnly
                   value={dateValue}
                   placeholder='회원을 검색해 주세요.'
-                  className={`w-60 overflow-x-scroll ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
+                  className={`w-60 overflow-x-scroll ${!rawValue ? 'bg-muted text-muted-foreground' : ''}`}
                 />
               </div>
             );
@@ -63,27 +72,43 @@ export default function PenaltyUserInfo({
 
           return (
             <div key={key} className='flex gap-4'>
-              <Label className='w-32 text-gray-700'>{label}</Label>
+              <Label
+                htmlFor={`${inputId}-${key}`}
+                className='text-foreground w-32'
+              >
+                {label}
+              </Label>
 
-              <div className='relative w-60'>
+              {isCopy ? (
+                <InputGroup
+                  className={`w-60 ${!rawValue ? 'bg-muted text-muted-foreground' : ''}`}
+                >
+                  <InputGroup.Input
+                    id={`${inputId}-${key}`}
+                    readOnly
+                    value={displayValue}
+                    placeholder='회원을 검색해 주세요.'
+                  />
+                  <InputGroup.Addon align='inline-end'>
+                    <InputGroup.Button
+                      size='icon-xs'
+                      onClick={() => handleCopy(String(displayValue))}
+                      disabled={!displayValue}
+                      aria-label={`${label} 복사`}
+                    >
+                      <Copy aria-hidden='true' />
+                    </InputGroup.Button>
+                  </InputGroup.Addon>
+                </InputGroup>
+              ) : (
                 <Input
+                  id={`${inputId}-${key}`}
                   readOnly
                   value={displayValue}
                   placeholder='회원을 검색해 주세요.'
-                  className={`w-full overflow-x-scroll ${isCopy ? 'pr-10' : ''} ${!rawValue ? 'bg-gray-100 text-gray-500' : ''}`}
+                  className={`w-60 overflow-x-scroll ${!rawValue ? 'bg-muted text-muted-foreground' : ''}`}
                 />
-                {isCopy && (
-                  <button
-                    type='button'
-                    onClick={() => handleCopy(String(displayValue))}
-                    disabled={!displayValue}
-                    aria-label='복사'
-                    className='absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40'
-                  >
-                    <Copy className='h-4 w-4' />
-                  </button>
-                )}
-              </div>
+              )}
             </div>
           );
         })}

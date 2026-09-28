@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -6,27 +6,24 @@ import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { PointFreeze } from '@/shared/types';
-import {
-  formatDateTimeForAPI,
-  formatDateTimeForInput,
-  getErrorMessage,
-} from '@/shared/utils';
+import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
 
-import { patchPointFreezeAPI } from '@/apis';
+import { useUpdatePointFreeze } from '@/domains/Points/hooks';
+import { updatePointFreezeRequest } from '@/domains/Points/utils';
 
 interface PointFreezeUpdateConfirmModalProps {
   isUpdateModalOpen: boolean;
   selectedItem: PointFreeze;
   onClose: () => void;
-  onSuccess: () => void;
 }
 
 export function PointFreezeUpdateConfirmModal({
   isUpdateModalOpen,
   selectedItem,
   onClose,
-  onSuccess,
 }: PointFreezeUpdateConfirmModalProps) {
+  const { mutateAsync, isPending } = useUpdatePointFreeze();
+  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -34,8 +31,8 @@ export function PointFreezeUpdateConfirmModal({
 
   useEffect(() => {
     if (selectedItem && isUpdateModalOpen) {
-      const startAtInput = formatDateTimeForInput(selectedItem.startAt);
-      const endAtInput = formatDateTimeForInput(selectedItem.endAt);
+      const startAtInput = toDateTimeInputValue(selectedItem.startAt);
+      const endAtInput = toDateTimeInputValue(selectedItem.endAt);
 
       setTitle(selectedItem.title);
       startDateTime.setDateTime(startAtInput);
@@ -49,7 +46,7 @@ export function PointFreezeUpdateConfirmModal({
   };
 
   const handleUpdateConfirm = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || isPending) return;
 
     if (
       title === '' ||
@@ -61,14 +58,16 @@ export function PointFreezeUpdateConfirmModal({
     }
 
     try {
-      await patchPointFreezeAPI(selectedItem.id, {
-        title,
-        startAt: formatDateTimeForAPI(startDateTime.dateTime),
-        endAt: formatDateTimeForAPI(endDateTime.dateTime),
+      await mutateAsync({
+        id: selectedItem.id,
+        data: updatePointFreezeRequest({
+          title,
+          startAt: startDateTime.dateTime,
+          endAt: endDateTime.dateTime,
+        }),
       });
       toast.success('미지급 일정 수정이 완료되었어요.');
       onClose();
-      onSuccess();
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(
         error,
@@ -92,10 +91,12 @@ export function PointFreezeUpdateConfirmModal({
           </Dialog.Description>
         </Dialog.Header>
         <div className='flex flex-col gap-1'>
-          <Label className='text-sm font-semibold'>일정 제목: </Label>
+          <Label htmlFor={titleId} className='text-sm font-semibold'>
+            일정 제목:
+          </Label>
           <Input
             type='text'
-            id='title'
+            id={titleId}
             value={title}
             onChange={handleInputChange}
           />
@@ -120,7 +121,11 @@ export function PointFreezeUpdateConfirmModal({
           <Button type='button' variant='outline' onClick={handleUpdateCancel}>
             취소
           </Button>
-          <Button type='button' onClick={handleUpdateConfirm}>
+          <Button
+            type='button'
+            disabled={isPending}
+            onClick={handleUpdateConfirm}
+          >
             수정
           </Button>
         </Dialog.Footer>

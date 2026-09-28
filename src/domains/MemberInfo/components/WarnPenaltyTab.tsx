@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -28,6 +28,7 @@ export default function WarnPenaltyTab({
   member: PenaltyUserInfo;
   onApplied?: () => void | Promise<void>;
 }) {
+  const inputId = useId();
   const [openModal, setOpenModal] = useState(false);
   const [warnReasonType, setWarnReasonType] = useState('');
   const [warnReason, setWarnReason] = useState('');
@@ -115,12 +116,17 @@ export default function WarnPenaltyTab({
         {/* 경고 사유 선택 */}
         <div className='flex flex-col gap-4'>
           <div className='flex items-center gap-2'>
-            <Label className='w-24'>경고 사유</Label>
+            <Label htmlFor={`${inputId}-reason-type`} className='w-24'>
+              경고 사유
+            </Label>
             <Select
               value={warnReasonType}
               onValueChange={(v) => handleChangeWarnReason(v)}
             >
-              <Select.Trigger className='w-40 bg-white'>
+              <Select.Trigger
+                id={`${inputId}-reason-type`}
+                className='bg-background w-40'
+              >
                 <Select.Value placeholder='경고 사유 선택' />
               </Select.Trigger>
               <Select.Content>
@@ -136,29 +142,35 @@ export default function WarnPenaltyTab({
           {/* ETC - 상세 사유, 경고 횟수 입력 */}
           {warnReasonType === 'ETC' && (
             <div className='flex items-center gap-2'>
-              <Label className='w-24'>상세 사유</Label>
+              <Label htmlFor={`${inputId}-reason`} className='w-24'>
+                상세 사유
+              </Label>
               <Input
+                id={`${inputId}-reason`}
                 value={warnReason}
                 onChange={(e) => setWarnReason(e.target.value)}
-                className='w-40 bg-white'
+                className='bg-background w-40'
                 disabled={warnReasonType !== 'ETC'}
               />
             </div>
           )}
           <div className='flex items-center gap-2'>
-            <Label className='w-24'>적용 경고 횟수</Label>
+            <Label htmlFor={`${inputId}-count`} className='w-24'>
+              적용 경고 횟수
+            </Label>
             <Input
+              id={`${inputId}-count`}
               type='number'
               min={1}
               step={1}
               value={warnCount}
               onChange={(e) => setWarnCount(Number(e.target.value))}
               disabled={warnReasonType !== 'ETC'}
-              className='w-20 bg-white disabled:cursor-not-allowed disabled:bg-gray-100'
+              className='bg-background disabled:bg-muted w-20 disabled:cursor-not-allowed'
             />
           </div>
           {warnReasonType && warnReasonType !== 'ETC' ? (
-            <p className='text-sm text-gray-500'>
+            <p className='text-muted-foreground text-sm'>
               선택한 사유의 기본 경고 횟수가 적용됩니다.
             </p>
           ) : null}
@@ -188,7 +200,7 @@ export default function WarnPenaltyTab({
       {/* 경고 차감하기 */}
       <section className='w-1/2 rounded-md border border-blue-300 bg-blue-50 p-4'>
         <h3 className='mb-3 font-semibold text-blue-700'>경고 차감하기</h3>
-        <div className='rounded-md border border-blue-200 bg-white/70 p-4 text-sm font-medium text-blue-700'>
+        <div className='bg-background/70 rounded-md border border-blue-200 p-4 text-sm font-medium text-blue-700'>
           경고 차감 API가 준비되지 않았습니다. 차감이 필요한 경우 담당자에게
           요청해주세요.
         </div>

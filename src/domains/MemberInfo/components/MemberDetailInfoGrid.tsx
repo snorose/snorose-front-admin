@@ -13,11 +13,10 @@ import {
 } from 'lucide-react';
 
 import type { MemberInfo } from '@/shared/types';
+import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   EMPTY_TEXT,
-  formatDate,
-  formatDateTime,
   formatDisplayValue,
   formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -87,7 +86,7 @@ export default function MemberDetailInfoGrid({
         <DetailField
           icon={CalendarDays}
           label='생년월일'
-          value={formatDate(member.birthday)}
+          value={formatDateOnly(member.birthday)}
         />
         <DetailField
           icon={GraduationCap}
@@ -97,22 +96,22 @@ export default function MemberDetailInfoGrid({
         <DetailField
           icon={CalendarDays}
           label='가입일'
-          value={formatDate(member.createdAt)}
+          value={formatDateOnly(member.createdAt)}
         />
         <DetailField
           icon={CalendarDays}
           label='등업일'
-          value={formatDate(member.authenticatedAt)}
+          value={formatDateOnly(member.authenticatedAt)}
         />
         <DetailField
           icon={CalendarDays}
           label='최근 로그인 날짜'
-          value={formatDate(member.lastLoginAt)}
+          value={formatDateOnly(member.lastLoginAt)}
         />
         <DetailField
           icon={CalendarDays}
           label='정보 수정일'
-          value={formatDateTime(member.updatedAt)}
+          value={formatDateTimeToMinutes(member.updatedAt)}
         />
         <DetailField
           icon={Coins}

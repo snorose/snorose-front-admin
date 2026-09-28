@@ -11,3 +11,7 @@ export {
   getStatusName,
   isExamReviewSanctioned,
 } from './exam-formatters';
+export {
+  createExamReviewPeriodRequest,
+  updateExamReviewPeriodRequest,
+} from './exam-review-period-request-builders';

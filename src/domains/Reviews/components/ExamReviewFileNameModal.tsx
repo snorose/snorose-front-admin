@@ -1,0 +1,175 @@
+import { type RefObject, useId, useState } from 'react';
+
+import { isAxiosError } from 'axios';
+import { Loader2 } from 'lucide-react';
+
+import { Button, Dialog, Input, Label } from '@/shared/components/ui';
+
+import type { RenameExamReviewFileResult } from '@/domains/Reviews/types';
+
+import { renameExamReviewFile } from '@/apis/reviews';
+
+interface ExamReviewFileNameModalProps {
+  postId: number;
+  currentFileName: string;
+  returnFocusRef: RefObject<HTMLButtonElement | null>;
+  onClose: () => void;
+  onSuccess: (postId: number, result: RenameExamReviewFileResult) => void;
+}
+
+const INVALID_FILE_NAME_CHARACTERS = [
+  '\\',
+  '/',
+  ':',
+  '*',
+  '?',
+  '"',
+  '<',
+  '>',
+  '|',
+  '[',
+  ']',
+];
+const INVALID_FILE_NAME_CHARACTERS_TEXT =
+  INVALID_FILE_NAME_CHARACTERS.join(', ');
+
+const getExtension = (fileName: string) => {
+  const lastDot = fileName.lastIndexOf('.');
+  return lastDot > 0 ? fileName.slice(lastDot).toLowerCase() : '';
+};
+
+export function ExamReviewFileNameModal({
+  postId,
+  currentFileName,
+  returnFocusRef,
+  onClose,
+  onSuccess,
+}: ExamReviewFileNameModalProps) {
+  const inputId = useId();
+  const helpId = `${inputId}-help`;
+  const errorId = `${inputId}-error`;
+  const [newFileName, setNewFileName] = useState(currentFileName);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const trimmedFileName = newFileName.trim();
+  const hasInvalidCharacters = INVALID_FILE_NAME_CHARACTERS.some((character) =>
+    trimmedFileName.includes(character)
+  );
+  const invalidCharacterErrorMessage = hasInvalidCharacters
+    ? `파일명에 ${INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.`
+    : '';
+  const visibleErrorMessage = invalidCharacterErrorMessage || errorMessage;
+  const hasDifferentExtension =
+    getExtension(trimmedFileName) !== getExtension(currentFileName);
+  const canSubmit =
+    !isSaving &&
+    Boolean(trimmedFileName) &&
+    trimmedFileName !== currentFileName &&
+    !hasInvalidCharacters &&
+    !hasDifferentExtension;
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isSaving) return;
+
+    if (!trimmedFileName) {
+      setErrorMessage('파일명을 입력해주세요.');
+      return;
+    }
+    if (trimmedFileName === currentFileName) {
+      setErrorMessage('현재 파일명과 다른 이름을 입력해주세요.');
+      return;
+    }
+    if (hasInvalidCharacters) {
+      setErrorMessage(invalidCharacterErrorMessage);
+      return;
+    }
+    if (hasDifferentExtension) {
+      setErrorMessage('기존 파일의 확장자를 유지해주세요.');
+      return;
+    }
+
+    setIsSaving(true);
+    setErrorMessage('');
+    try {
+      const result = await renameExamReviewFile(postId, trimmedFileName);
+      onSuccess(postId, result);
+      onClose();
+    } catch (error: unknown) {
+      setErrorMessage(
+        (isAxiosError<{ message?: string }>(error) &&
+          error.response?.data?.message) ||
+          '파일명 변경에 실패했습니다. 다시 시도해주세요.'
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && !isSaving && onClose()}>
+      <Dialog.Content
+        className='sm:max-w-md'
+        showCloseButton={!isSaving}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          returnFocusRef.current?.focus();
+        }}
+      >
+        <Dialog.Header>
+          <Dialog.Title>파일명 변경</Dialog.Title>
+          <Dialog.Description>
+            파일명은 다른 정보와 별도로 변경 즉시 저장됩니다.
+          </Dialog.Description>
+        </Dialog.Header>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <div className='space-y-1.5'>
+            <p className='text-sm font-medium'>현재 파일명</p>
+            <p className='rounded-md border bg-gray-50 px-3 py-2 text-sm break-all text-gray-700'>
+              {currentFileName}
+            </p>
+          </div>
+          <div className='space-y-1.5'>
+            <Label htmlFor={inputId}>새 파일명</Label>
+            <Input
+              id={inputId}
+              value={newFileName}
+              onChange={(event) => {
+                setNewFileName(event.target.value);
+                setErrorMessage('');
+              }}
+              aria-invalid={Boolean(visibleErrorMessage)}
+              aria-describedby={visibleErrorMessage ? errorId : helpId}
+              autoFocus
+              disabled={isSaving}
+            />
+            {visibleErrorMessage ? (
+              <p id={errorId} role='alert' className='text-sm text-red-600'>
+                {visibleErrorMessage}
+              </p>
+            ) : (
+              <p id={helpId} className='text-sm text-gray-500'>
+                확장자를 유지해주세요. {INVALID_FILE_NAME_CHARACTERS_TEXT}는
+                사용할 수 없습니다.
+              </p>
+            )}
+          </div>
+          <Dialog.Footer>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={onClose}
+              disabled={isSaving}
+            >
+              취소
+            </Button>
+            <Button type='submit' disabled={!canSubmit}>
+              {isSaving && <Loader2 className='animate-spin' />}
+              {isSaving ? '변경 중' : '파일명 변경'}
+            </Button>
+          </Dialog.Footer>
+        </form>
+      </Dialog.Content>
+    </Dialog>
+  );
+}

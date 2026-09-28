@@ -3,6 +3,8 @@ import { getBoardKey } from '@/shared/utils';
 
 // 문의/신고 글 위치
 const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL;
+const USER_FRONT_BOARD_BASE_URL = 'https://front.dev.snorose.com/board';
+const EXAM_REVIEW_BOARD_ID = 32;
 
 // 신고 여부는 group으로만 판단 (category/subGroup은 문의·신고 공용이라 제외)
 export function isReportInquiry(detail: InquiryDetail): boolean {
@@ -15,28 +17,43 @@ export function buildInquiryPostUrl(detail: InquiryDetail): string {
   return `${USER_FRONT_BASE_URL}/${path}/${detail.inquiryId}`;
 }
 
-// 신고 대상 글 URL. 유형별로 postId 출처가 다름 (board는 targetBoardId 공통)
-// POST/EXAM_REVIEW → target, COMMENT → targetPostId, USER·문의 → 없음(null)
-export function buildReportTargetUrl(detail: InquiryDetail): string | null {
-  if (!isReportInquiry(detail)) return null;
-
-  let postId: number;
+function getReportTargetPostId(detail: InquiryDetail): number | null {
   switch (detail.subGroup) {
     case 'POST_REPORT':
     case 'EXAM_REVIEW_REPORT':
-      postId = Number(detail.target);
-      break;
+      return Number(detail.target) || null;
     case 'COMMENT_REPORT':
-      postId = detail.targetPostId;
-      break;
+      return detail.targetPostId || null;
     default:
-      // USER_REPORT 등: 이동할 글 페이지 없음
       return null;
+  }
+}
+
+export function hasUnmappedReportTargetBoard(
+  detail: InquiryDetail
+): boolean {
+  return (
+    isReportInquiry(detail) &&
+    getReportTargetPostId(detail) !== null &&
+    !getBoardKey(detail.targetBoardId)
+  );
+}
+
+// 신고 대상 글 URL. 족보는 어드민 시험후기 관리로, 나머지는 사용자 프론트로 이동한다.
+// 족보 신고는 targetBoardId 32로 구분한다.
+export function buildReportTargetUrl(detail: InquiryDetail): string | null {
+  if (!isReportInquiry(detail)) return null;
+
+  const postId = getReportTargetPostId(detail);
+  if (!postId) return null;
+
+  if (detail.targetBoardId === EXAM_REVIEW_BOARD_ID) {
+    return `/reviews/exam?keywordPost=${postId}&page=1`;
   }
 
   const boardKey = getBoardKey(detail.targetBoardId);
 
-  if (!postId || !boardKey) return null;
+  if (!boardKey) return null;
 
-  return `${USER_FRONT_BASE_URL}/board/${boardKey}/post/${postId}`;
+  return `${USER_FRONT_BOARD_BASE_URL}/${boardKey}/post/${postId}`;
 }

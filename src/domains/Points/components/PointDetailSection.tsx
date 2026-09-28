@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 
 import { Input, Label, Select } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
@@ -22,6 +22,7 @@ export function PointDetailSection({
   memo,
   onMemoChange,
 }: PointDetailSectionProps) {
+  const inputId = useId();
   const selectedOption = selectedCategory
     ? POINT_CATEGORY_OPTIONS.find((option) => option.value === selectedCategory)
     : undefined;
@@ -56,7 +57,7 @@ export function PointDetailSection({
       <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
       <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
         <div className='flex flex-col gap-1'>
-          <Label htmlFor='category' required>
+          <Label htmlFor={`${inputId}-category`} required>
             포인트 유형
           </Label>
           <Select
@@ -66,7 +67,7 @@ export function PointDetailSection({
             }
             value={selectedCategory}
           >
-            <Select.Trigger className='w-full'>
+            <Select.Trigger id={`${inputId}-category`} className='w-full'>
               <Select.Value placeholder='포인트 유형을 선택해주세요' />
             </Select.Trigger>
             <Select.Content>
@@ -80,27 +81,27 @@ export function PointDetailSection({
         </div>
 
         <div className='flex flex-col gap-1'>
-          <Label htmlFor='difference' required>
+          <Label htmlFor={`${inputId}-difference`} required>
             포인트 지급/차감량
           </Label>
           <Input
             type='number'
-            id='difference'
+            id={`${inputId}-difference`}
             value={difference}
             placeholder='양수 또는 음수만 입력 가능 (예: 20, -50)'
             onChange={(e) => onDifferenceChange(e.target.value)}
             readOnly={isAutoFilled}
-            className={isAutoFilled ? 'cursor-not-allowed bg-gray-100' : ''}
+            className={isAutoFilled ? 'bg-muted cursor-not-allowed' : ''}
           />
         </div>
 
         <div className='flex flex-col gap-1'>
-          <Label htmlFor='memo' required>
+          <Label htmlFor={`${inputId}-memo`} required>
             메모
           </Label>
           <Input
             type='text'
-            id='memo'
+            id={`${inputId}-memo`}
             placeholder='이벤트 참여 포인트 지급, 시험 후기 오류 제보 등'
             value={memo}
             onChange={(e) => onMemoChange(e.target.value)}

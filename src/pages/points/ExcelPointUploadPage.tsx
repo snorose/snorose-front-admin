@@ -20,11 +20,9 @@ import type {
   ExcelPointBulkNotProcessedRow,
   ExcelPointBulkRewardResult,
 } from '@/shared/types';
-import {
-  downloadNotProcessedRowsExcel,
-  formatDateTimeForAPI,
-  getErrorMessage,
-} from '@/shared/utils';
+import { downloadNotProcessedRowsExcel, getErrorMessage } from '@/shared/utils';
+
+import { createExcelPointBulkRewardRequest } from '@/domains/Points/utils';
 
 import { postExcelPointBulkRewardAPI } from '@/apis';
 
@@ -365,14 +363,11 @@ export default function ExcelPointUploadPage() {
 
       const result = await postExcelPointBulkRewardAPI({
         file: submitFile,
-        request: {
-          paymentMethod:
-            paymentTiming === 'immediate' ? 'IMMEDIATE' : 'RESERVED',
+        request: createExcelPointBulkRewardRequest({
           bulkMemo,
-          ...(paymentTiming === 'reservation' && reservationAt.dateTime
-            ? { reservedAt: formatDateTimeForAPI(reservationAt.dateTime) }
-            : {}),
-        },
+          isReservation: paymentTiming === 'reservation',
+          reservationDateTime: reservationAt.dateTime,
+        }),
       });
 
       setUploadResult(remapUploadResultRowNumbers(result, submittedRows));
