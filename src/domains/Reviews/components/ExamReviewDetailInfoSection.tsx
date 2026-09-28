@@ -74,6 +74,10 @@ export function ExamReviewDetailInfoSection({
   selectedFile,
   setSelectedFile,
 }: ExamReviewDetailInfoSectionProps) {
+  // 파일명 변경 버튼을 다시 노출할 때 사용할 props입니다.
+  void onFileNameRename;
+  void canRenameFileName;
+  void renameButtonRef;
   const inputId = useId();
   const examTypeAndQuestionsId = useId();
   const memoId = useId();
@@ -199,6 +203,8 @@ export function ExamReviewDetailInfoSection({
               >
                 {selectedFile?.name || formData.fileName || '파일 없음'}
               </button>
+              {/* 파일명 변경 기능은 사용자에게 노출하지 않습니다. */}
+              {/*
               <button
                 ref={renameButtonRef}
                 type='button'
@@ -208,6 +214,7 @@ export function ExamReviewDetailInfoSection({
               >
                 파일명 변경
               </button>
+              */}
               <button
                 type='button'
                 onClick={() => fileInputRef.current?.click()}
