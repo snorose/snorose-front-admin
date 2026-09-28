@@ -172,6 +172,8 @@ export function ExamDetailSection({
   onDeleteSuccess,
   onRestoreSuccess,
 }: ExamDetailSectionProps = {}) {
+  // 복구 버튼을 다시 노출할 때 사용할 아이콘입니다.
+  void RotateCcw;
   const [activeTab, setActiveTab] = useState<
     'review' | 'post' | 'comments' | 'logs'
   >('review');
@@ -667,6 +669,9 @@ export function ExamDetailSection({
           </div>
           {selectedExamReview &&
             (isDeleted ? (
+              /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */
+              null
+              /*
               <Button
                 type='button'
                 variant='outline'
@@ -683,6 +688,7 @@ export function ExamDetailSection({
                 <RotateCcw className='mr-1.5 h-4 w-4' />
                 삭제된 시험 후기 복구
               </Button>
+              */
             ) : (
               <Button
                 type='button'
