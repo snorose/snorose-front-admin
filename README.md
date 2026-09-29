@@ -7,11 +7,11 @@
 <br>
 <br>
 
-## 🚀 프로젝트 배경
+## 🚀 프로젝트 목적
 
-운영기획팀(운영 관리·이벤트 기획·회계 파트)은 회원 관리, 게시글·댓글 모니터링, 포인트 정산, 시험 후기 검수, 이벤트 기획 등 커뮤니티 전반의 운영을 담당합니다.<br>
-회원과 콘텐츠 규모가 점차 확대되면서, 운영 업무를 보다 효율적이고 체계적으로 관리할 수 있는 환경의 필요성이 커졌습니다.<br>
-이에 따라 운영 효율을 높이고 관리 부담을 줄이기 위한 관리자 전용 페이지를 개발했습니다.
+스노로즈 운영진이 회원과 콘텐츠를 관리하고, 커뮤니티 운영 업무를 효율적으로 처리할 수 있도록 개발한 관리자 전용 사이트입니다.
+
+회원 관리, 게시글·댓글 모니터링, 포인트 정산, 시험후기 검수, 문의·신고 처리 등 주요 운영 기능을 한곳에서 제공합니다.
 
 <br />
 
@@ -23,7 +23,14 @@
 - 빌드 도구: `Vite`
 - 패키지 매니저: `npm`
 - 배포: `Cloudflare Pages`
-- 테스트: `Vitest`
+- 테스트: `Vitest`, `Testing Library`, `Playwright` (E2E)
+
+<br>
+
+## 🧪 테스트 및 검증
+
+Vitest·Testing Library 기반 테스트와 Playwright E2E 테스트를 사용합니다.
+E2E는 실제 dev API·DB를 사용하는 조회·변경 테스트로 구성되어 있으며, 실행 방법과 기능별 안내는 [E2E 문서](./e2e/README.md)를 참고합니다.
 
 <br>
 
@@ -35,6 +42,15 @@
 src/
 ├── apis/                    # API 호출 함수
 ├── assets/                  # 정적 자산 (이미지, 로고 등)
+├── components/              # 앱 수준 컴포넌트 (ErrorBoundary 등)
+├── domains/                 # 도메인별 기능 (components, hooks 등)
+│   ├── Alerts/              # 푸시 알림
+│   ├── Comments/            # 댓글 관리
+│   ├── InquiryReport/       # 문의·신고 관리
+│   ├── MemberInfo/          # 회원 관리
+│   ├── Points/              # 포인트 관리
+│   ├── Posts/               # 게시글 관리
+│   └── Reviews/             # 시험후기 관리
 ├── pages/                   # 페이지 컴포넌트
 ├── shared/                  # 공유 코드
 │   ├── axios/               # Axios 인스턴스 설정
@@ -46,15 +62,14 @@ src/
 │   ├── lib/                 # 라이브러리 유틸 (cn 등)
 │   ├── types/               # TypeScript 타입 정의
 │   └── utils/               # 유틸리티 함수
-└── domains/                 # 도메인별 기능
-    ├── Points/
-    │   ├── components/
-    │   ├── hooks/
-    │   └── ...
-    └── Reviews/
-        ├── components/
-        ├── hooks/
-        └── ...
+└── test/                    # Vitest 공통 설정
+
+e2e/                        # Playwright E2E 테스트
+├── features/               # 기능별 조회·변경 테스트
+├── setup/                  # 공통 로그인 설정
+└── shared/                 # E2E 공통 코드
+
+docs/                       # 개발·리팩터링·QA 문서
 ```
 
 <br>
