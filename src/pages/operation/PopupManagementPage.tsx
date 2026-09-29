@@ -226,8 +226,8 @@ export default function PopupManagementPage() {
           <ul className='list-inside list-disc text-sm'>
             <li>설정한 게시 기간에만 사용자 홈 화면에 노출됩니다.</li>
             <li>
-              노출 순서 값이 작을수록 먼저 표시되며, 같은 값은 등록순으로
-              정렬됩니다.
+              노출 순서 값이 작을수록 먼저 표시되며, 같은 값은 먼저 등록한
+              팝업부터 표시됩니다.
             </li>
             <li>
               게시 기간에 따라 예약·진행 중·종료 상태가 자동으로 표시됩니다.
