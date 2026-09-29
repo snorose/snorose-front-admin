@@ -1,4 +1,6 @@
-import { Badge, Button, Table } from '@/shared/components/ui';
+import { CircleHelpIcon } from 'lucide-react';
+
+import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
 
 import type { PopupContent } from '@/domains/Operation/types';
 
@@ -29,7 +31,27 @@ export function PopupManagementTable({
             <Table.Head className='text-center'>상태</Table.Head>
             <Table.Head className='text-center'>노출 순서</Table.Head>
             <Table.Head>팝업명</Table.Head>
-            <Table.Head>게시 기간</Table.Head>
+            <Table.Head>
+              <div className='flex items-center gap-1'>
+                <span>게시 기간</span>
+                <Tooltip.Provider delayDuration={200}>
+                  <Tooltip>
+                    <Tooltip.Trigger asChild>
+                      <button
+                        type='button'
+                        className='text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex size-5 cursor-help items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none'
+                        aria-label='게시 기간 안내'
+                      >
+                        <CircleHelpIcon className='size-4' aria-hidden='true' />
+                      </button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content side='top' sideOffset={4}>
+                      설정한 기간에만 사용자 홈 화면에 노출됩니다.
+                    </Tooltip.Content>
+                  </Tooltip>
+                </Tooltip.Provider>
+              </div>
+            </Table.Head>
             <Table.Head>생성일시</Table.Head>
             <Table.Head>수정일시</Table.Head>
             <Table.Head className='text-center'>관리</Table.Head>
