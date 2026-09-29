@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
-import { Plus } from 'lucide-react';
+import { AlertTriangleIcon, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { NoticePanel, PageHeader } from '@/shared/components';
-import { Button, ConfirmModal } from '@/shared/components/ui';
+import { Alert, Button, ConfirmModal } from '@/shared/components/ui';
 
 import {
   PopupEditorDialog,
@@ -218,6 +218,15 @@ export default function PopupManagementPage() {
         title='팝업창 관리'
         description='사용자 홈 화면에 노출되는 공지 팝업 콘텐츠와 노출 기간을 관리할 수 있어요.'
       />
+
+      <Alert className='border-amber-300 bg-amber-50 text-amber-950'>
+        <AlertTriangleIcon aria-hidden='true' />
+        <Alert.Title>현재 임시 데이터를 표시하고 있습니다.</Alert.Title>
+        <Alert.Description className='text-amber-800'>
+          실제 데이터는 API 연결 후 제공될 예정이며, 해당 페이지는 동작
+          점검용으로만 확인 부탁드려요.
+        </Alert.Description>
+      </Alert>
 
       <NoticePanel
         items={[
