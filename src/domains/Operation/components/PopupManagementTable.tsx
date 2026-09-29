@@ -1,6 +1,4 @@
-import { MoreHorizontalIcon } from 'lucide-react';
-
-import { Badge, Button, DropdownMenu, Table } from '@/shared/components/ui';
+import { Badge, Button, Table } from '@/shared/components/ui';
 
 import type { PopupContent } from '@/domains/Operation/types';
 
@@ -34,7 +32,7 @@ export function PopupManagementTable({
             <Table.Head>게시 기간</Table.Head>
             <Table.Head>생성일시</Table.Head>
             <Table.Head>수정일시</Table.Head>
-            <Table.Head className='text-right'>더보기</Table.Head>
+            <Table.Head className='text-center'>관리</Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -64,26 +62,25 @@ export function PopupManagementTable({
                 <Table.Cell>{popup.createdAt || '-'}</Table.Cell>
                 <Table.Cell>{popup.updatedAt || '-'}</Table.Cell>
                 <Table.Cell className='text-right'>
-                  <DropdownMenu>
-                    <DropdownMenu.Trigger asChild>
-                      <Button variant='ghost' size='icon' className='size-7'>
-                        <MoreHorizontalIcon />
-                        <span className='sr-only'>팝업 관리 메뉴 열기</span>
-                      </Button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Content align='end'>
-                      <DropdownMenu.Item onClick={() => onUpdate(popup)}>
-                        수정
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Separator />
-                      <DropdownMenu.Item
-                        variant='destructive'
-                        onClick={() => onDelete(popup.id)}
-                      >
-                        삭제
-                      </DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                  </DropdownMenu>
+                  <div className='flex justify-center gap-1'>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='sm'
+                      onClick={() => onUpdate(popup)}
+                    >
+                      수정
+                    </Button>
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='sm'
+                      className='text-destructive hover:bg-destructive/10 hover:text-destructive'
+                      onClick={() => onDelete(popup.id)}
+                    >
+                      삭제
+                    </Button>
+                  </div>
                 </Table.Cell>
               </Table.Row>
             ))
