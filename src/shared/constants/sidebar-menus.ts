@@ -103,7 +103,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
     items: [
       {
         title: '푸시 알림 전송',
-        url: PATHS.ALERTS,
+        url: PATHS.PUSH_NOTIFICATIONS,
       },
       // {
       //   title: '팝업창 관리',

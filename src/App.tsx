@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -24,6 +24,7 @@ import {
   PostDetailPage,
   PostManagePage,
   PushNotificationPage,
+  ServerMaintenancePage,
 } from '@/pages';
 
 import './App.css';
@@ -110,12 +111,25 @@ function App() {
                               element={<InquiryReportPage />}
                             />
                             <Route
-                              path={PATHS.ALERTS}
+                              path={PATHS.PUSH_NOTIFICATIONS}
                               element={<PushNotificationPage />}
+                            />
+                            <Route
+                              path='/alerts'
+                              element={
+                                <Navigate
+                                  to={PATHS.PUSH_NOTIFICATIONS}
+                                  replace
+                                />
+                              }
                             />
                             <Route
                               path={PATHS.POPUPS}
                               element={<PopupManagementPage />}
+                            />
+                            <Route
+                              path={PATHS.SERVER_MAINTENANCE}
+                              element={<ServerMaintenancePage />}
                             />
                             <Route path='*' element={<NotFoundPage />} />
                           </Routes>
