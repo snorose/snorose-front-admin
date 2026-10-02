@@ -37,6 +37,29 @@ export interface AdminPostReportListResult {
   reports: AdminPostReportResponse[];
 }
 
+export interface AdminPostStatusHistory {
+  actorNickname: string | null;
+  changedAt: string;
+  changedStatus:
+    | 'AUTO_HIDDEN'
+    | 'USER_DELETED'
+    | 'DELETE_RESTORED'
+    | 'ADMIN_DELETED'
+    | 'ADMIN_HIDDEN'
+    | 'VISIBILITY_RESTORED'
+    | 'SANCTIONED'
+    | 'SANCTION_RELEASED';
+  memo: string | null;
+}
+
+export interface AdminPostStatusHistoryListResult {
+  hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  currentCount: number;
+  data: AdminPostStatusHistory[];
+}
+
 export interface AdminPostSearchRequest {
   encryptedUserId?: string;
   boardId?: number;
