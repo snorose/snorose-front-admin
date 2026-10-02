@@ -8,6 +8,7 @@ import type {
   AdminPostListResult,
   AdminPostReportListResult,
   AdminPostSearchRequest,
+  AdminPostStatusHistoryListResult,
 } from '@/domains/Posts/types/post';
 
 // 게시글 조건 조회 api
@@ -105,6 +106,19 @@ export const getPostSanction = async (
   const response = await axiosInstance.get<
     BaseResponse<AdminSanctionListResult>
   >(`/v1/admin/posts/${postId}/sanctions`, {
+    params: { page: page - 1 },
+  });
+  return response.data.result;
+};
+
+// 게시글 상태 변경 내역 조회 api
+export const getPostStatusHistories = async (
+  postId: number,
+  page: number
+): Promise<AdminPostStatusHistoryListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminPostStatusHistoryListResult>
+  >(`/v1/admin/posts/${postId}/status-histories`, {
     params: { page: page - 1 },
   });
   return response.data.result;

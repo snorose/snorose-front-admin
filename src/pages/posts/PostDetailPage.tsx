@@ -96,7 +96,7 @@ export default function PostDetailPage() {
             <PostDetailManageCard post={post} />
 
             {/* 카드 2: 게시글 상태 변경 내역 */}
-            <PostDetailStatusLogCard statusLogs={[]} />
+            <PostDetailStatusLogCard postId={post.postId} />
 
             {/* 카드 3: 신고 내역 */}
             <PostDetailReportCard postId={post.postId} />
