@@ -25,6 +25,9 @@ export function usePostTableState({
 }: UsePostTableStateProps) {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [visibilityModalType, setVisibilityModalType] = useState<
+    'SHOW' | 'HIDE' | null
+  >(null);
 
   useEffect(() => {
     setSelectedIds([]);
@@ -106,28 +109,46 @@ export function usePostTableState({
     );
   };
 
+  // 목록 버튼을 누르면 모달만 엽니다.
   const handleBulkVisibility = (isVisible: boolean) => {
-    // TODO: 추후 API 연동 완료 시 아래 플래그를 true로 변경하거나 블록 삭제
-    const IS_READY = false;
-    if (!IS_READY) {
-      toast.info('개발 중입니다');
-      return;
-    }
-
     if (selectedIds.length === 0) return;
+
+    setVisibilityModalType(isVisible ? 'SHOW' : 'HIDE');
+  };
+
+  // 모달에서 확인하면 입력한 메모로 요청합니다.
+  const handleConfirmBulkVisibility = (memo: string) => {
+    if (visibilityModalType === null || selectedIds.length === 0) return;
+    if (!memo.trim()) return;
+
     bulkVisibility(
-      { postIds: selectedIds, isVisible },
       {
-        onSuccess: () => {
-          toast.success(
-            isVisible
-              ? '선택한 게시글의 비공개가 해제되었습니다.'
-              : '선택한 게시글이 비공개 처리되었습니다.'
-          );
-          setSelectedIds([]);
+        postIds: selectedIds,
+        isVisible: visibilityModalType === 'SHOW',
+        memo,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.succeededCount === 0) {
+            toast.error('선택한 게시글의 공개 상태를 변경하지 못했습니다.');
+            return;
+          }
+
+          if (result.failedPosts.length > 0) {
+            toast.warning(
+              `${result.succeededCount}개 변경 완료, ${result.failedPosts.length}개 실패했습니다.`
+            );
+          } else {
+            toast.success(
+              `${result.succeededCount}개의 공개 상태를 변경했습니다.`
+            );
+          }
+
+          const succeededIds = new Set(result.succeededPostIds);
+          setSelectedIds((prev) => prev.filter((id) => !succeededIds.has(id)));
+          setVisibilityModalType(null);
         },
-        onError: () =>
-          toast.error('노출 상태 일괄 변경 중 오류가 발생했습니다.'),
+        onError: () => toast.error('공개 상태 변경에 실패했습니다.'),
       }
     );
   };
@@ -201,6 +222,9 @@ export function usePostTableState({
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleBulkVisibility,
+    visibilityModalType,
+    setVisibilityModalType,
+    handleConfirmBulkVisibility,
     handleBulkRestore,
     handleSingleDelete,
     isDeletePending,
