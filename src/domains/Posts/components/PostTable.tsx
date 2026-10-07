@@ -41,6 +41,9 @@ export default function PostTable({
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleBulkVisibility,
+    visibilityModalType,
+    setVisibilityModalType,
+    handleConfirmBulkVisibility,
     handleBulkRestore,
     isDeletePending,
     isVisibilityPending,
@@ -189,6 +192,14 @@ export default function PostTable({
           modalType='DELETE'
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirmAction={handleConfirmBulkDelete}
+        />
+      )}
+      {visibilityModalType !== null && (
+        <StatusChangeModal
+          target='POST'
+          modalType={visibilityModalType}
+          onClose={() => setVisibilityModalType(null)}
+          onConfirmAction={handleConfirmBulkVisibility}
         />
       )}
     </div>
