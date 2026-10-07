@@ -9,12 +9,20 @@ export const useUpdatePostVisibility = () => {
     mutationFn: ({
       postIds,
       isVisible,
+      memo,
     }: {
       postIds: number[];
       isVisible: boolean;
-    }) => updatePostVisibility(postIds, isVisible),
-    onSuccess: () => {
+      memo: string;
+    }) => updatePostVisibility(postIds, isVisible, memo),
+    onSuccess: ({ succeededPostIds }) => {
       void queryClient.invalidateQueries({ queryKey: ['posts'] });
+      succeededPostIds.forEach((postId) => {
+        void queryClient.invalidateQueries({ queryKey: ['post', postId] });
+        void queryClient.invalidateQueries({
+          queryKey: ['postStatusHistories', postId],
+        });
+      });
     },
     onError: (error) => {
       console.error('게시글 상태 변경 중 오류 발생:', error);

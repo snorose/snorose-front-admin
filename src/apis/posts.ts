@@ -75,13 +75,15 @@ export const bulkDeletePosts = async (
 // 게시글 노출/숨김 일괄 업데이트 api
 export const updatePostVisibility = async (
   postIds: number[],
-  isVisible: boolean
+  isVisible: boolean,
+  memo: string
 ): Promise<AdminPostBulkUpdateResult> => {
   const response = await axiosInstance.patch<
     BaseResponse<AdminPostBulkUpdateResult>
   >(`/v1/admin/posts/visibility`, {
     postIds,
     isVisible,
+    memo,
   });
   return response.data.result;
 };
