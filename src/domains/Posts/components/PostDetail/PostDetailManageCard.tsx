@@ -10,6 +10,7 @@ import {
   deletePost,
   restorePost,
   searchComments,
+  updatePostVisibility,
 } from '@/apis';
 
 import { IS_POST_RESTORE_ENABLED } from '../../constants';
@@ -102,6 +103,35 @@ export default function PostDetailManageCard({
       toast.error('게시글 복구에 실패했습니다.');
     },
   });
+
+  const visibilityMutation = useMutation({
+    mutationFn: ({ isVisible, memo }: { isVisible: boolean; memo: string }) =>
+      updatePostVisibility([post.postId], isVisible, memo),
+
+    onSuccess: (result) => {
+      if (result.succeededCount === 0) {
+        toast.error('게시글 공개 상태를 변경하지 못했습니다.');
+        return;
+      }
+
+      toast.success('게시글 공개 상태가 변경되었습니다.');
+      setIsModalOpen(false);
+      setReason('');
+
+      void queryClient.invalidateQueries({ queryKey: ['posts'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['post', post.postId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ['postStatusHistories', post.postId],
+      });
+    },
+
+    onError: () => {
+      toast.error('게시글 공개 상태 변경에 실패했습니다.');
+    },
+  });
+
   // 게시글 관리 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<
@@ -117,11 +147,12 @@ export default function PostDetailManageCard({
     } else if (modalType === 'RESTORE') {
       restoreMutation.mutate();
     } else {
-      // TODO: DELETE 외(RESTORE, HIDE) API 연동 시 아래 로직 구현
-      toast.info('개발 중입니다');
-      setIsModalOpen(false);
-      setReason('');
-      setDeleteCommentsAlso(false);
+      if (!reason.trim()) return;
+
+      visibilityMutation.mutate({
+        isVisible: modalType === 'SHOW',
+        memo: reason,
+      });
     }
   };
 
