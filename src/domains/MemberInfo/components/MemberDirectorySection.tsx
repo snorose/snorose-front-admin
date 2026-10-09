@@ -116,9 +116,11 @@ export default function MemberDirectorySection({
               disabled={isListLoading}
             >
               {isListLoading ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
-              ) : null}
-              회원 검색
+                <Loader2 aria-hidden='true' className='animate-spin' />
+              ) : (
+                <Search aria-hidden='true' />
+              )}
+              {isListLoading ? '검색 중...' : '검색'}
             </Button>
           </div>
 

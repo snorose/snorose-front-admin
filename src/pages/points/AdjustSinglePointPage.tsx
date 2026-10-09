@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from 'react';
 
-import { Search } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
@@ -126,11 +126,16 @@ export default function AdjustSinglePointPage() {
           </InputGroup>
           <Button
             type='button'
-            className='w-20'
+            className='min-w-28'
             onClick={handleSearchButtonClick}
             disabled={isSearching}
           >
-            {isSearching ? '검색중..' : '검색'}
+            {isSearching ? (
+              <Loader2 aria-hidden='true' className='animate-spin' />
+            ) : (
+              <Search aria-hidden='true' />
+            )}
+            {isSearching ? '검색 중...' : '검색'}
           </Button>
         </div>
       </article>

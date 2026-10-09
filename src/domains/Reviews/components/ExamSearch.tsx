@@ -560,7 +560,8 @@ export default function ExamSearch({
 
       <div className='flex w-fit items-center gap-2'>
         <Button className='min-w-[72px]' onClick={handleSearch}>
-          조회
+          <Search aria-hidden='true' />
+          검색
         </Button>
         <Button
           className='min-w-[136px]'

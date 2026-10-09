@@ -355,6 +355,7 @@ export const PostFilterPanel = ({
           onClick={() => onFilterChange(filters)}
           className='min-w-0 flex-1 shrink'
         >
+          <Search aria-hidden='true' />
           검색
         </Button>
       </div>

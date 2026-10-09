@@ -38,7 +38,7 @@ describe('시험후기 날짜 검색', () => {
       screen.getByRole('button', { name: '검색 종료일' })
     ).toHaveTextContent('2026-10-17');
     expect(onSearchChange).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: '조회' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onSearchChange).toHaveBeenCalledExactlyOnceWith({
       startDate: '2026-10-09',
       endDate: '2026-10-17',
@@ -70,7 +70,7 @@ describe('시험후기 날짜 검색', () => {
     ).toBeEnabled();
     await user.click(screen.getByRole('button', { name: /2026년 10월 17일/ }));
     expect(onSearchChange).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: '조회' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onSearchChange).toHaveBeenCalledWith({
       startDate: '2026-10-17',
       endDate: '2026-10-17',
@@ -92,7 +92,7 @@ describe('시험후기 날짜 검색', () => {
       screen.getByRole('button', { name: /2026년 10월 8일/ })
     ).toBeDisabled();
     await user.click(screen.getByRole('button', { name: /2026년 10월 9일/ }));
-    await user.click(screen.getByRole('button', { name: '조회' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onSearchChange).toHaveBeenCalledWith({
       startDate: '2026-10-09',
       endDate: '2026-10-09',
@@ -116,7 +116,7 @@ describe('시험후기 날짜 검색', () => {
       screen.getByRole('button', { name: '검색 시작일' })
     ).toHaveTextContent('시작일 선택');
     expect(onSearchChange).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: '조회' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onSearchChange).toHaveBeenLastCalledWith({
       endDate: '2026-10-17',
       keywordPost: '후기',
@@ -141,7 +141,7 @@ describe('시험후기 날짜 검색', () => {
         initialEndDate='2026-10-09'
       />
     );
-    await user.click(screen.getByRole('button', { name: '조회' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(toast.error).toHaveBeenCalledWith(
       '시작일은 종료일보다 늦을 수 없습니다.'
     );
