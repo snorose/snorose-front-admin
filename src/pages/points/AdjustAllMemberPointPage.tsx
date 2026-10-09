@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { NoticePanel, PageHeader } from '@/shared/components';
@@ -95,6 +96,7 @@ export default function AdjustAllMemberPointPage() {
           onClick={handleResetButtonClick}
           className='w-32'
         >
+          <RotateCcw aria-hidden='true' />
           초기화
         </Button>
         <Button

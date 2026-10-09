@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 
+import { RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DateTimePicker } from '@/shared/components';
@@ -120,9 +121,10 @@ export function ExamReviewPeriodScheduleForm({
               type='button'
               size='sm'
               variant='outline'
-              className='w-16'
+              className='w-24'
               onClick={handleResetButtonClick}
             >
+              <RotateCcw aria-hidden='true' />
               초기화
             </Button>
             <Button

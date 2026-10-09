@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { ChevronDown, Search, X } from 'lucide-react';
+import { ChevronDown, RotateCcw, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DatePicker } from '@/shared/components';
@@ -567,6 +567,7 @@ export default function ExamSearch({
           variant='outline'
           onClick={handleSearchOptionReset}
         >
+          <RotateCcw aria-hidden='true' />
           검색 옵션 초기화
         </Button>
       </div>

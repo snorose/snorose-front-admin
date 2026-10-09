@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { Search } from 'lucide-react';
+import { RotateCcw, Search } from 'lucide-react';
 
 import { DatePicker } from '@/shared/components';
 import { Button, InputGroup, Label, Select } from '@/shared/components/ui';
@@ -347,6 +347,7 @@ export const PostFilterPanel = ({
           onClick={handleReset}
           className='min-w-0 flex-1 shrink'
         >
+          <RotateCcw aria-hidden='true' />
           초기화
         </Button>
         <Button

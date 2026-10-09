@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 
+import { RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -183,6 +184,7 @@ export default function WarnPenaltyTab({
 
           <div className='flex justify-end gap-2'>
             <Button type='button' variant='outline' onClick={resetWarnForm}>
+              <RotateCcw aria-hidden='true' />
               초기화
             </Button>
 

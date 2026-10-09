@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-import { Loader2, Search, Users } from 'lucide-react';
+import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
 
 import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
 import { Button, InputGroup, Label, Table } from '@/shared/components/ui';
@@ -155,6 +155,7 @@ export default function MemberDirectorySection({
                 onClick={onRefreshDirectory}
                 disabled={isListLoading}
               >
+                <RotateCcw aria-hidden='true' />
                 초기화
               </Button>
             </div>
