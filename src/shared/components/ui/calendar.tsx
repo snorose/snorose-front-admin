@@ -2,6 +2,8 @@ import * as React from 'react';
 import {
   type DayButton,
   DayPicker,
+  type DropdownProps,
+  type RootProps,
   getDefaultClassNames,
 } from 'react-day-picker';
 
@@ -14,6 +16,61 @@ import {
 import { cn } from '@/shared/lib';
 
 import { Button, buttonVariants } from './button';
+import { Select } from './select';
+
+function CalendarDropdown({
+  options,
+  value,
+  onChange,
+  disabled,
+  'aria-label': label,
+}: DropdownProps) {
+  return (
+    <Select
+      value={String(value)}
+      disabled={disabled}
+      onValueChange={(nextValue) => {
+        // DayPicker의 월·연도 이동 콜백은 select 이벤트의 target.value를 사용한다.
+        onChange?.({
+          target: { value: nextValue },
+        } as React.ChangeEvent<HTMLSelectElement>);
+      }}
+    >
+      <Select.Trigger
+        size='sm'
+        aria-label={label}
+        className='relative gap-1 pr-1 pl-2 [&_svg]:size-3.5'
+      >
+        <Select.Value />
+      </Select.Trigger>
+      <Select.Content
+        align='start'
+        className='max-h-[min(16rem,var(--radix-select-content-available-height))] min-w-(--radix-select-trigger-width)'
+      >
+        {options?.map((option) => (
+          <Select.Item
+            key={option.value}
+            value={String(option.value)}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </Select.Item>
+        ))}
+      </Select.Content>
+    </Select>
+  );
+}
+
+function CalendarRoot({ className, rootRef, ...props }: RootProps) {
+  return (
+    <div
+      data-slot='calendar'
+      ref={rootRef}
+      className={cn(className)}
+      {...props}
+    />
+  );
+}
 
 function Calendar({
   className,
@@ -132,16 +189,8 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
-          return (
-            <div
-              data-slot='calendar'
-              ref={rootRef}
-              className={cn(className)}
-              {...props}
-            />
-          );
-        },
+        Root: CalendarRoot,
+        Dropdown: CalendarDropdown,
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === 'left') {
             return (

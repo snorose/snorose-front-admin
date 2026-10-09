@@ -100,7 +100,7 @@ export function ExamReviewPeriodScheduleForm({
             />
           </div>
 
-          <div className='flex gap-4'>
+          <div className='grid gap-4 sm:grid-cols-2'>
             {dateTimeFields.map((field, index) => (
               <DateTimePicker
                 key={index}
@@ -111,7 +111,6 @@ export function ExamReviewPeriodScheduleForm({
                 onTimeChange={field.onTimeChange}
                 datePlaceholder={field.datePlaceholder}
                 required
-                className='w-1/2'
               />
             ))}
           </div>

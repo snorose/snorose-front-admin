@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ExamReviewPeriod } from '@/shared/types';
@@ -42,7 +48,7 @@ function renderPage() {
 }
 
 describe('시험후기 작성 기간 Query 조회', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => vi.resetAllMocks());
 
   test('초기 조회 중에는 빈 목록 대신 로딩을 표시하고 응답 후 기간을 표시한다', async () => {
     let resolve!: (periods: ExamReviewPeriod[]) => void;
@@ -70,7 +76,12 @@ describe('시험후기 작성 기간 Query 조회', () => {
       .mockRejectedValueOnce(new Error('조회 실패'))
       .mockResolvedValueOnce([period]);
     renderPage();
-    expect(await screen.findByRole('alert')).toHaveTextContent('조회 실패');
+    const list = within(
+      screen
+        .getByRole('heading', { name: '시험 후기 작성 기간 조회' })
+        .closest('article')!
+    );
+    expect(await list.findByRole('alert')).toHaveTextContent('조회 실패');
     expect(
       screen.queryByText('등록된 기간이 없습니다.')
     ).not.toBeInTheDocument();
@@ -78,7 +89,8 @@ describe('시험후기 작성 기간 Query 조회', () => {
     expect(
       await screen.findByRole('cell', { name: period.title })
     ).toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(list.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('안내 사항');
   });
 
   test('변경 성공 콜백에서 캐시를 갱신하여 새 목록을 표시한다', async () => {
@@ -104,7 +116,12 @@ describe('시험후기 작성 기간 Query 조회', () => {
     renderPage();
     await screen.findByRole('cell', { name: period.title });
     fireEvent.click(screen.getByRole('button', { name: '테스트 변경 완료' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('갱신 실패');
+    const list = within(
+      screen
+        .getByRole('heading', { name: '시험 후기 작성 기간 조회' })
+        .closest('article')!
+    );
+    expect(await list.findByRole('alert')).toHaveTextContent('갱신 실패');
     expect(
       screen.getByRole('cell', { name: period.title })
     ).toBeInTheDocument();

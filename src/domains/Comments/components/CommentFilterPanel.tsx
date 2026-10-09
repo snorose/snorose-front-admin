@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 
+import { DatePicker } from '@/shared/components';
 import { Input, Label, Select } from '@/shared/components/ui';
 import {
   type AdminStatus,
@@ -71,40 +72,40 @@ export const CommentFilterPanel = ({
           작성일 기간
         </span>
         <div className='flex gap-4'>
-          <div className='flex flex-1 flex-col gap-1'>
+          <div className='flex min-w-0 flex-1 flex-col gap-1'>
             <Label
               htmlFor={`${inputId}-startDate`}
               className='py-0 text-xs leading-4 font-normal text-gray-500'
             >
               시작일
             </Label>
-            <Input
+            <DatePicker
               id={`${inputId}-startDate`}
-              type='date'
-              value={filters.startDate ?? ''}
-              onChange={(e) =>
+              placeholder='시작일 선택'
+              value={filters.startDate}
+              onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  startDate: e.target.value || undefined,
+                  startDate: value,
                 }))
               }
             />
           </div>
-          <div className='flex flex-1 flex-col gap-1'>
+          <div className='flex min-w-0 flex-1 flex-col gap-1'>
             <Label
               htmlFor={`${inputId}-endDate`}
               className='py-0 text-xs leading-4 font-normal text-gray-500'
             >
               종료일
             </Label>
-            <Input
+            <DatePicker
               id={`${inputId}-endDate`}
-              type='date'
-              value={filters.endDate ?? ''}
-              onChange={(e) =>
+              placeholder='종료일 선택'
+              value={filters.endDate}
+              onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  endDate: e.target.value || undefined,
+                  endDate: value,
                 }))
               }
             />
@@ -154,7 +155,7 @@ export const CommentFilterPanel = ({
               <Select.Trigger
                 id={`${inputId}-searchScope`}
                 aria-label='댓글 검색 범위'
-                className='h-9 w-[140px] shrink-0'
+                className='h-9 w-35 shrink-0'
               >
                 <Select.Value />
               </Select.Trigger>

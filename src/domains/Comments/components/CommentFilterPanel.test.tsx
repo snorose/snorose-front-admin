@@ -12,6 +12,46 @@ beforeAll(() => {
 });
 
 describe('CommentFilterPanel', () => {
+  test('선택한 날짜와 기본 검색 범위를 전달하고 전체 초기화한다', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+    render(
+      <CommentFilterPanel
+        initialFilters={{ startDate: '2026-10-01', endDate: '2026-10-09' }}
+        onFilterChange={onFilterChange}
+      />
+    );
+
+    const startDate = screen.getByRole('button', { name: '시작일' });
+    const endDate = screen.getByRole('button', { name: '종료일' });
+    await user.click(startDate);
+    await user.click(screen.getByRole('button', { name: /2026년 10월 2일/ }));
+    await user.click(endDate);
+    await user.click(screen.getByRole('button', { name: /2026년 10월 15일/ }));
+    expect(onFilterChange).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      searchScope: 'CONTENT',
+      startDate: '2026-10-02',
+      endDate: '2026-10-15',
+    });
+
+    await user.click(endDate);
+    await user.click(screen.getByRole('button', { name: '날짜 선택 해제' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      searchScope: 'CONTENT',
+      startDate: '2026-10-02',
+      endDate: undefined,
+    });
+
+    await user.click(screen.getByRole('button', { name: '초기화' }));
+    expect(startDate).toHaveTextContent('시작일 선택');
+    expect(endDate).toHaveTextContent('종료일 선택');
+    expect(onFilterChange).toHaveBeenLastCalledWith({ searchScope: 'CONTENT' });
+  });
+
   test('검색 범위 변경에 따라 댓글 검색 placeholder가 바뀐다', async () => {
     const user = userEvent.setup();
 

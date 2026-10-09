@@ -2,6 +2,7 @@ import { useId } from 'react';
 
 import { Copy, type LucideIcon, UserRound } from 'lucide-react';
 
+import { DatePicker } from '@/shared/components';
 import { Input, Label, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
@@ -68,16 +69,34 @@ export function EditableField({
         <Icon className='h-4 w-4' />
         {label}
       </label>
-      <Input
-        id={inputId}
-        name={fieldName}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-      />
+      {type === 'date' ? (
+        <DatePicker
+          id={inputId}
+          name={fieldName}
+          value={value || undefined}
+          onValueChange={(nextValue) => onChange(nextValue ?? '')}
+          placeholder={placeholder}
+          captionLayout='dropdown'
+          maxDate={
+            fieldName === 'birthday'
+              ? `${new Date().getFullYear()}-12-31`
+              : undefined
+          }
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+        />
+      ) : (
+        <Input
+          id={inputId}
+          name={fieldName}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+        />
+      )}
       {error ? (
         <p id={errorId} role='alert' className='text-destructive text-sm'>
           {error}
