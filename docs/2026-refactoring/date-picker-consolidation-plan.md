@@ -2,7 +2,7 @@
 
 > 조사 기준: 2026-10-09 현재 소스
 >
-> 상태: 1단계 완료. 2~4단계의 날짜·시간 선택기 공통화와 기본 입력 교체는 진행 예정이다.
+> 상태: 1~2단계 완료. 3~4단계의 기본 입력 교체와 전체 확인은 진행 예정이다.
 >
 > 선행 작업: [게시글·댓글 Calendar 교체와 전체 사용처 조사](./post-comment-calendar-plan.md)
 
@@ -16,7 +16,7 @@
 
 ## 2. 현재 상태와 전체 대상
 
-현재 DatePicker와 DateTimePicker는 같은 shadcn Calendar·Popover·Button과 CalendarIcon을 사용하지만, 달력을 조합하는 코드가 따로 있다. DatePicker의 한국어 표시·개별 해제·재열기 월 처리는 DateTimePicker에 공유되지 않는다.
+2단계 완료 후 DateTimePicker는 공용 DatePicker를 내부에서 재사용한다. 게시글·댓글과 기존 날짜·시간 사용처가 같은 한국어 달력·CalendarIcon·전체 클릭·개별 해제·월·연도 탐색·재열기 동작을 공유한다. 남은 기본 날짜 입력은 3단계 대상이다.
 
 | 화면·기능                    | 현재 구현                  | 필드 수                | 목표 구현                                            |
 | ---------------------------- | -------------------------- | ---------------------- | ---------------------------------------------------- |
@@ -59,7 +59,7 @@
 
 `Calendar`, `Popover`, `Button`의 UI 원형은 재사용한다. 언어와 날짜 선택 정책은 DatePicker에서 설정하고, 개별 화면은 Calendar를 직접 렌더링하지 않는다.
 
-DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거한다. 날짜 표시와 변환을 DatePicker에 위임하고 시간 선택만 추가한다.
+DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거했다. 공용 유틸로 외부 Date와 날짜 문자열을 변환하고, 날짜 UI는 DatePicker에 위임하며 시간 선택만 추가한다.
 
 ## 4. 통일할 동작과 모양
 
@@ -129,6 +129,7 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거한�
 | 수정              | [ui/calendar.tsx](../../src/shared/components/ui/calendar.tsx)                                       | Calendar 루트 컴포넌트를 고정해 월·연도 변경 시 드롭다운 포커스 유지             |
 | 수정              | [DateTimePicker.tsx](../../src/shared/components/DateTimePicker.tsx)                                 | 내부 달력을 DatePicker로 교체. 레이블·시·분 이름과 비활성·오류 전달 추가         |
 | 신규              | `src/shared/components/DateTimePicker.test.tsx`                                                      | 날짜·시간 선택·해제·초기값·콜백·폼 내부 동작 검증                                |
+| 신규              | `src/test/date-time-picker-usage.test.tsx`                                                           | 미지급·작성 기간의 생성·수정 요청과 모달 재열기, 팝업 변경 콜백 검증             |
 | 수정              | [use-date-time-field.ts](../../src/shared/hooks/use-date-time-field.ts)                              | 로컬 날짜 파싱 사용, 잘못된 값 방어. 반환값과 콜백 계약 유지                     |
 | 신규              | `src/shared/hooks/use-date-time-field.test.ts`                                                       | 초기값·재설정·해제·시간 유지와 시간대별 날짜 조합 검증                           |
 | 수정              | [ExamSearch.tsx](../../src/domains/Reviews/components/ExamSearch.tsx)                                | 기본 날짜 입력 2개를 DatePicker로 교체                                           |
@@ -210,9 +211,9 @@ DatePicker의 기존 사용을 유지한다. 해제 시 필터에는 `undefined`
 
 ### 2단계: 날짜·시간 선택기의 내부 공통화
 
-- [ ] DateTimePicker의 달력 표시를 DatePicker로 교체한다.
-- [ ] 날짜 레이블 연결, 시·분 이름, 버튼 type, 비활성·오류 전달, 좁은 화면 배치를 적용한다.
-- [ ] 미지급 일정과 작성 기간의 생성·수정부터 확인하고 팝업·예약 지급까지 검증한다.
+- [x] DateTimePicker의 달력 표시를 DatePicker로 교체한다.
+- [x] 날짜 레이블 연결, 시·분 이름, 버튼 type, 비활성·오류 전달, 좁은 화면 배치를 적용한다.
+- [x] 미지급 일정과 작성 기간의 생성·수정부터 확인하고 팝업·예약 지급까지 검증한다.
 
 ### 3단계: 남은 기본 입력 교체
 
@@ -308,3 +309,42 @@ TZ=Asia/Seoul npm run test:run -- \
 ```
 
 추가 실행한 [ExamReviewPeriodPage.test.tsx](../../src/pages/reviews/ExamReviewPeriodPage.test.tsx)의 기존 실패는 별도 보수가 필요하다. 첫 실패는 조회 오류 대신 상시 노출되는 안내 영역의 `alert`를 선택해 발생한다. 빈 목록 및 일정 표시 검증도 변경 전 소스에서 동일하게 실패했다. 전체 테스트가 통과했다고 간주하지 않으며, 이번 단계에서는 해당 테스트를 수정하지 않았다.
+
+## 13. 2단계 작업 결과
+
+### 내부 공통화와 접근성
+
+[DateTimePicker.tsx](../../src/shared/components/DateTimePicker.tsx)는 DatePicker와 시·분 Select를 조합한다. 기존 `Date | undefined`, `HH:mm`, `onDateSelect`, `onTimeChange`, `datePlaceholder`, `required`, `className` 계약을 유지한다. `formatDateValue`와 `parseDateValue`로 날짜만 변환하므로 음수 오프셋 시간대에서도 선택일이 바뀌지 않는다.
+
+- 날짜 전체 클릭, 한국어 달력, 월·연도 드롭다운, 선택·해제 후 닫기, 재열기 기준 월, CalendarIcon은 DatePicker가 담당한다.
+- `useId`로 날짜·시·분에 고유 id를 부여하고 Label을 날짜 버튼에 연결했다. 날짜는 해당 label, 시간은 `${label} 시`, `${label} 분`으로 접근성 이름을 제공한다.
+- `disabled`, `aria-describedby`, `aria-invalid`를 추가해 날짜와 시·분 입력에 함께 전달한다.
+- 날짜·시·분 버튼은 `type='button'`이며 선택 중 폼을 제출하지 않는다. 필수 레이블은 기존처럼 표시하고, 필수 날짜도 비운 뒤 화면의 기존 저장 검증을 사용한다.
+- 날짜 해제는 `onDateSelect(undefined)`로 전달하며 시·분을 유지한다. 시간만 바꿨을 때 날짜를 임의로 채워 넣지 않는다.
+
+### 공간에 따른 배치
+
+DateTimePicker 자체의 가용 너비를 container query로 확인한다. 24rem 이상이면 날짜와 시간 그룹을 한 줄에 두고, 좁으면 날짜를 첫 줄·시와 분을 둘째 줄에 둔다. 화면 전체가 넓어도 폭이 좁은 수정 모달에서는 두 줄을 사용한다.
+
+[PointFreezeScheduleForm.tsx](../../src/domains/Points/components/PointFreezeScheduleForm.tsx)와 [ExamReviewPeriodScheduleForm.tsx](../../src/domains/Reviews/components/ExamReviewPeriodScheduleForm.tsx)는 시작·종료 필드를 모바일에서 세로로 배치하고 `sm` 이상에서 두 열로 배치한다. 날짜 placeholder와 저장·초기화 정책은 유지한다.
+
+### 사용처 검증
+
+[DateTimePicker.test.tsx](../../src/shared/components/DateTimePicker.test.tsx)에 10개 테스트를 추가했다. 날짜·시간 선택, 로컬 Date 콜백, 두 해제 경로, 시·분 보존, 빈 날짜, 외부 값 변경, 잘못된 Date, 고유 id·레이블, 비활성·오류, 폼 제출 방지를 검증한다. 예약 지급은 현재 화면의 선택 옵션이 숨겨져 있어 같은 DateTimePicker·훅·요청 빌더 조합으로 선택 결과와 `reservedAt` 형식을 확인한다.
+
+[date-time-picker-usage.test.tsx](../../src/test/date-time-picker-usage.test.tsx)에 실제 사용처를 렌더링하는 5개 테스트를 추가했다. 미지급 일정·작성 기간의 필수값 검증, 생성 후 초기화, 수정 모달을 다른 일정으로 다시 열 때 초기값, 저장 요청의 공백·`T` 구분과 초 단위를 확인했다. 팝업은 날짜·시간 변경과 해제 콜백, 외부 초기값 변경을 확인했다. API와 mutation은 테스트에서 모의 처리한다.
+
+1단계 대상 7개 파일에 위 두 파일을 추가한 **9개 파일 89개 테스트**가 `Asia/Seoul`, `America/Los_Angeles`에서 각각 통과했다. `npm run lint`, `npm run build`도 통과했으며 빌드에는 기존 번들 크기 경고가 남아 있다. 1단계에서 확인한 작성 기간 페이지의 기존 테스트 실패는 이번 검증 대상에 포함하지 않았다.
+
+실제 Chromium에서도 다음 검증을 완료했다.
+
+| 검증          | 결과                                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 환경          | 1440px·768px·390px 서울, 390px 로스앤젤레스의 4개 환경 통과                                                                       |
+| 클릭 영역     | 생성 폼 4개·수정 모달 4개·팝업 2개·예약 지급 1개 날짜 필드에서 글자·여백·아이콘 클릭 총 132건 통과                                |
+| 달력·키보드   | 한국어 월·연도 탐색, 선택·해제, Escape 닫기와 포커스 복귀, 방향키·Enter 날짜 선택, 선택 중 폼 제출 없음 확인                      |
+| 상태·값       | 생성 폼 초기화, 수정 모달을 다른 일정으로 다시 열기, 날짜 해제 후 시·분 유지, 예약 지급 요청값, 오류 설명·비활성 전달 확인        |
+| 배치          | 생성 폼의 화면별 열 수, DateTimePicker의 가용 너비에 따른 줄바꿈, 날짜·시간과 팝업의 화면 경계 확인. 모바일 모달과 달력 캡처 확인 |
+| 브라우저 오류 | 발생 없음                                                                                                                         |
+
+브라우저 검증은 실제 생성 폼·수정 모달·팝업 컴포넌트와 예약 지급용 DateTimePicker·훅·요청 빌더 조합을 임시 확인 화면에서 렌더링해 수행했다. 실서버 저장은 실행하지 않았으며 임시 확인 화면은 제거했다.
