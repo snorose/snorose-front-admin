@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { format } from 'date-fns';
-import { ChevronDownIcon } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 
 import {
   Button,
@@ -63,7 +63,7 @@ export function DateTimePicker({
               ) : (
                 <span className='text-muted-foreground'>{datePlaceholder}</span>
               )}
-              <ChevronDownIcon />
+              <CalendarIcon aria-hidden='true' />
             </Button>
           </Popover.Trigger>
           <Popover.Content className='w-auto p-0' align='start'>
