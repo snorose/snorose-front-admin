@@ -37,6 +37,9 @@ describe('MemberInfoEditForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    HTMLElement.prototype.hasPointerCapture = () => false;
+    HTMLElement.prototype.setPointerCapture = () => undefined;
+    HTMLElement.prototype.releasePointerCapture = () => undefined;
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       configurable: true,
       value: scrollIntoView,
@@ -88,17 +91,16 @@ describe('MemberInfoEditForm', () => {
       name: '연도 선택',
     });
     const currentYear = new Date().getFullYear();
-    expect(yearSelect.querySelector('option:last-child')).toHaveValue(
-      String(currentYear)
+    await user.click(yearSelect);
+    expect(screen.getAllByRole('option').at(-1)).toHaveTextContent(
+      `${currentYear}년`
     );
     expect(
-      yearSelect.querySelector(`option[value="${currentYear + 1}"]`)
-    ).toBeNull();
-    await user.selectOptions(yearSelect, String(currentYear));
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '월 선택' }),
-      '11'
-    );
+      screen.queryByRole('option', { name: `${currentYear + 1}년` })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: `${currentYear}년` }));
+    await user.click(screen.getByRole('combobox', { name: '월 선택' }));
+    await user.click(screen.getByRole('option', { name: '12월' }));
     const nextMonth = screen.getByRole('button', { name: '다음 달로 이동' });
     expect(nextMonth).toHaveAttribute('aria-disabled', 'true');
     await user.click(nextMonth);
@@ -110,14 +112,10 @@ describe('MemberInfoEditForm', () => {
         name: new RegExp(`${currentYear}년 12월 31일`),
       })
     ).toBeEnabled();
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '연도 선택' }),
-      '1980'
-    );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '월 선택' }),
-      '1'
-    );
+    await user.click(screen.getByRole('combobox', { name: '연도 선택' }));
+    await user.click(screen.getByRole('option', { name: '1980년' }));
+    await user.click(screen.getByRole('combobox', { name: '월 선택' }));
+    await user.click(screen.getByRole('option', { name: '2월' }));
     await user.click(screen.getByRole('button', { name: /1980년 2월 29일/ }));
     expect(birthday).toHaveTextContent('1980-02-29');
     expect(onSubmit).not.toHaveBeenCalled();
@@ -153,14 +151,10 @@ describe('MemberInfoEditForm', () => {
     });
     expect(onSubmit).not.toHaveBeenCalled();
     await user.click(birthday);
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '연도 선택' }),
-      '2000'
-    );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '월 선택' }),
-      '0'
-    );
+    await user.click(screen.getByRole('combobox', { name: '연도 선택' }));
+    await user.click(screen.getByRole('option', { name: '2000년' }));
+    await user.click(screen.getByRole('combobox', { name: '월 선택' }));
+    await user.click(screen.getByRole('option', { name: '1월' }));
     await user.click(screen.getByRole('button', { name: /2000년 1월 5일/ }));
     expect(birthday).toHaveAttribute('aria-invalid', 'false');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();

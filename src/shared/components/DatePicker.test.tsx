@@ -2,11 +2,18 @@ import { useState } from 'react';
 
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeAll, describe, expect, test, vi } from 'vitest';
 
 import { Label } from '@/shared/components/ui';
 
 import { DatePicker } from './DatePicker';
+
+beforeAll(() => {
+  HTMLElement.prototype.hasPointerCapture = () => false;
+  HTMLElement.prototype.setPointerCapture = () => undefined;
+  HTMLElement.prototype.releasePointerCapture = () => undefined;
+  HTMLElement.prototype.scrollIntoView = () => undefined;
+});
 
 function ControlledDatePicker({
   initialValue = '2026-10-09',
@@ -57,20 +64,16 @@ describe('DatePicker', () => {
     render(<ControlledDatePicker captionLayout='dropdown' />);
     await user.click(screen.getByRole('button', { name: '작성일' }));
 
-    const yearSelect = screen.getByRole('combobox', { name: '연도 선택' });
-    await user.selectOptions(yearSelect, '2000');
+    await user.click(screen.getByRole('combobox', { name: '연도 선택' }));
+    await user.click(screen.getByRole('option', { name: '2000년' }));
     expect(screen.getByRole('combobox', { name: '연도 선택' })).toHaveFocus();
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '월 선택' }),
-      '0'
-    );
+    await user.click(screen.getByRole('combobox', { name: '월 선택' }));
+    await user.click(screen.getByRole('option', { name: '1월' }));
     expect(
       screen.getByRole('grid', { name: '2000년 1월' })
     ).toBeInTheDocument();
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '연도 선택' }),
-      '2030'
-    );
+    await user.click(screen.getByRole('combobox', { name: '연도 선택' }));
+    await user.click(screen.getByRole('option', { name: '2030년' }));
     expect(
       screen.getByRole('grid', { name: '2030년 1월' })
     ).toBeInTheDocument();
@@ -90,15 +93,14 @@ describe('DatePicker', () => {
     );
     await user.click(screen.getByRole('button', { name: '작성일' }));
     const yearSelect = screen.getByRole('combobox', { name: '연도 선택' });
-    expect(yearSelect).toHaveValue('1850');
-    await user.selectOptions(yearSelect, '1750');
+    expect(yearSelect).toHaveTextContent('1850년');
+    await user.click(yearSelect);
+    await user.click(screen.getByRole('option', { name: '1750년' }));
     expect(
       screen.getByRole('grid', { name: '1750년 1월' })
     ).toBeInTheDocument();
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '연도 선택' }),
-      '1650'
-    );
+    await user.click(screen.getByRole('combobox', { name: '연도 선택' }));
+    await user.click(screen.getByRole('option', { name: '1650년' }));
     expect(
       screen.getByRole('grid', { name: '1650년 1월' })
     ).toBeInTheDocument();
@@ -269,11 +271,11 @@ describe('DatePicker', () => {
     expect(
       screen.getByRole('dialog', { name: '생년월일' })
     ).toBeInTheDocument();
+    await user.click(screen.getByRole('combobox', { name: '월 선택' }));
     expect(
-      within(screen.getByRole('combobox', { name: '월 선택' })).getByRole(
-        'option',
-        { name: '1월' }
-      )
+      within(screen.getByRole('listbox')).getByRole('option', {
+        name: '1월',
+      })
     ).toBeInTheDocument();
   });
 
