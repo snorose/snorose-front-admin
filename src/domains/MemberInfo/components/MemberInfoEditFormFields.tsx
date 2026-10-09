@@ -77,6 +77,11 @@ export function EditableField({
           onValueChange={(nextValue) => onChange(nextValue ?? '')}
           placeholder={placeholder}
           captionLayout='dropdown'
+          maxDate={
+            fieldName === 'birthday'
+              ? `${new Date().getFullYear()}-12-31`
+              : undefined
+          }
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
         />

@@ -84,6 +84,32 @@ describe('MemberInfoEditForm', () => {
     expect(birthday).toHaveTextContent('2000-01-01');
     expect(birthday).toHaveAttribute('name', 'birthday');
     await user.click(birthday);
+    const yearSelect = screen.getByRole('combobox', {
+      name: '연도 선택',
+    });
+    const currentYear = new Date().getFullYear();
+    expect(yearSelect.querySelector('option:last-child')).toHaveValue(
+      String(currentYear)
+    );
+    expect(
+      yearSelect.querySelector(`option[value="${currentYear + 1}"]`)
+    ).toBeNull();
+    await user.selectOptions(yearSelect, String(currentYear));
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: '월 선택' }),
+      '11'
+    );
+    const nextMonth = screen.getByRole('button', { name: '다음 달로 이동' });
+    expect(nextMonth).toHaveAttribute('aria-disabled', 'true');
+    await user.click(nextMonth);
+    expect(screen.getByRole('grid')).toHaveAccessibleName(
+      `${currentYear}년 12월`
+    );
+    expect(
+      screen.getByRole('button', {
+        name: new RegExp(`${currentYear}년 12월 31일`),
+      })
+    ).toBeEnabled();
     await user.selectOptions(
       screen.getByRole('combobox', { name: '연도 선택' }),
       '1980'
