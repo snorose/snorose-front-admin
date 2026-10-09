@@ -2,12 +2,7 @@ import { useId } from 'react';
 
 import { Loader2, Search } from 'lucide-react';
 
-import {
-  AdvancedSearchFilters,
-  PaginationBar,
-  StatusBadge,
-  TableStateRow,
-} from '@/shared/components';
+import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
 import { Button, InputGroup, Label, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 import { formatDateOnly } from '@/shared/utils';
@@ -97,65 +92,58 @@ export default function MemberDirectorySection({
         </h2>
 
         <div className='flex min-w-0 flex-col gap-4 rounded-md border p-4 pb-5'>
-          <div className='flex min-w-0 flex-col gap-4'>
-            <div className='flex flex-wrap items-center gap-2'>
-              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-80'>
-                <Label htmlFor={searchInputId}>회원 검색어</Label>
-                <InputGroup className='flex-1'>
-                  <InputGroup.Addon>
-                    <Search aria-hidden='true' />
-                  </InputGroup.Addon>
-                  <InputGroup.Input
-                    id={searchInputId}
-                    type='text'
-                    value={searchQuery}
-                    placeholder='이름, 학번, 아이디, 닉네임, 이메일로 검색...'
-                    onChange={(event) =>
-                      onSearchQueryChange(event.target.value)
+          <div className='flex min-w-0 flex-wrap items-end gap-2'>
+            <div className='flex w-full min-w-0 flex-col gap-1 sm:w-80'>
+              <Label htmlFor={searchInputId}>회원 검색어</Label>
+              <InputGroup className='flex-1'>
+                <InputGroup.Addon>
+                  <Search aria-hidden='true' />
+                </InputGroup.Addon>
+                <InputGroup.Input
+                  id={searchInputId}
+                  type='text'
+                  value={searchQuery}
+                  placeholder='이름, 학번, 아이디, 닉네임, 이메일로 검색...'
+                  onChange={(event) => onSearchQueryChange(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      void onSearch();
                     }
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        void onSearch();
-                      }
-                    }}
-                  />
-                </InputGroup>
-              </div>
+                  }}
+                />
+              </InputGroup>
             </div>
-            <AdvancedSearchFilters>
-              <div className='flex flex-wrap items-end gap-2'>
-                <div className='w-full min-w-0 sm:w-40'>
-                  <SearchableSelect
-                    label='등급'
-                    value={selectedRole}
-                    placeholder='전체'
-                    options={roleOptions}
-                    onValueChange={onSelectedRoleChange}
-                    isActive={selectedRole !== 'ALL'}
-                  />
-                </div>
-                <div className='w-full min-w-0 sm:w-40'>
-                  <SearchableSelect
-                    label='입학연도'
-                    value={selectedAdmissionYear}
-                    placeholder='전체'
-                    options={admissionYearOptions}
-                    onValueChange={onSelectedAdmissionYearChange}
-                    isActive={selectedAdmissionYear !== 'ALL'}
-                  />
-                </div>
-                <div className='w-full min-w-0 sm:w-56'>
-                  <SearchableSelect
-                    label='전공'
-                    value={selectedMajor}
-                    placeholder='전체'
-                    options={majorOptions}
-                    onValueChange={onSelectedMajorChange}
-                    isActive={selectedMajor !== 'ALL'}
-                  />
-                </div>
-              </div>
-            </AdvancedSearchFilters>
+
+            <div className='w-full min-w-0 sm:w-40'>
+              <SearchableSelect
+                label='등급'
+                value={selectedRole}
+                placeholder='전체'
+                options={roleOptions}
+                onValueChange={onSelectedRoleChange}
+                isActive={selectedRole !== 'ALL'}
+              />
+            </div>
+            <div className='w-full min-w-0 sm:w-40'>
+              <SearchableSelect
+                label='입학연도'
+                value={selectedAdmissionYear}
+                placeholder='전체'
+                options={admissionYearOptions}
+                onValueChange={onSelectedAdmissionYearChange}
+                isActive={selectedAdmissionYear !== 'ALL'}
+              />
+            </div>
+            <div className='w-full min-w-0 sm:w-56'>
+              <SearchableSelect
+                label='전공'
+                value={selectedMajor}
+                placeholder='전체'
+                options={majorOptions}
+                onValueChange={onSelectedMajorChange}
+                isActive={selectedMajor !== 'ALL'}
+              />
+            </div>
           </div>
           <div className='flex flex-wrap justify-end gap-2'>
             <Button

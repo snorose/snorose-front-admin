@@ -55,8 +55,8 @@ describe('CommentFilterPanel', () => {
     });
 
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
-    expect(startDate).toHaveTextContent('작성 시작일 선택');
-    expect(endDate).toHaveTextContent('작성 종료일 선택');
+    expect(startDate).toHaveTextContent('시작일');
+    expect(endDate).toHaveTextContent('종료일');
     expect(onFilterChange).toHaveBeenLastCalledWith({ searchScope: 'CONTENT' });
   });
 
@@ -65,7 +65,7 @@ describe('CommentFilterPanel', () => {
 
     render(<CommentFilterPanel onFilterChange={vi.fn()} />);
 
-    expect(screen.getByPlaceholderText('검색어 입력...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('댓글 검색어')).toBeInTheDocument();
 
     await user.click(screen.getByRole('combobox', { name: '댓글 검색 범위' }));
     await user.click(screen.getByRole('option', { name: '댓글 ID' }));
@@ -82,7 +82,7 @@ describe('CommentFilterPanel', () => {
     await user.click(screen.getByRole('combobox', { name: '정렬' }));
     await user.click(screen.getByRole('option', { name: '신고 수' }));
     await user.click(screen.getByRole('combobox', { name: '의심 키워드' }));
-    await user.click(screen.getByRole('option', { name: '있음' }));
+    await user.click(screen.getByRole('option', { name: '의심 키워드 있음' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
 
     expect(onFilterChange).toHaveBeenCalledWith({
