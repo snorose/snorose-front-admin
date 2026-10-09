@@ -1,5 +1,6 @@
 export { AppSidebar } from './AppSidebar';
 export { BulkActionBar } from './BulkActionBar';
+export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
 export { Header } from './Header';
 export { default as MemberInfoModal } from './MemberInfoModal';

@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 
+import { DatePicker } from '@/shared/components';
 import { Input, Label, Select } from '@/shared/components/ui';
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
@@ -56,44 +57,40 @@ export const PostFilterPanel = ({
           작성일 기간
         </span>
         <div className='flex gap-4'>
-          <div className='flex flex-1 flex-col gap-1'>
+          <div className='flex min-w-0 flex-1 flex-col gap-1'>
             <Label
               htmlFor={`${inputId}-startDate`}
               className='py-0 text-xs leading-4 font-normal text-gray-500'
             >
               시작일
             </Label>
-            <Input
+            <DatePicker
               id={`${inputId}-startDate`}
-              type='date'
-              className='cursor-pointer'
-              onClick={(e) => e.currentTarget.showPicker?.()}
-              value={filters.startDate ?? ''}
-              onChange={(e) =>
+              placeholder='시작일 선택'
+              value={filters.startDate}
+              onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  startDate: e.target.value || undefined,
+                  startDate: value,
                 }))
               }
             />
           </div>
-          <div className='flex flex-1 flex-col gap-1'>
+          <div className='flex min-w-0 flex-1 flex-col gap-1'>
             <Label
               htmlFor={`${inputId}-endDate`}
               className='py-0 text-xs leading-4 font-normal text-gray-500'
             >
               종료일
             </Label>
-            <Input
+            <DatePicker
               id={`${inputId}-endDate`}
-              type='date'
-              className='cursor-pointer'
-              onClick={(e) => e.currentTarget.showPicker?.()}
-              value={filters.endDate ?? ''}
-              onChange={(e) =>
+              placeholder='종료일 선택'
+              value={filters.endDate}
+              onValueChange={(value) =>
                 setFilters((prev) => ({
                   ...prev,
-                  endDate: e.target.value || undefined,
+                  endDate: value,
                 }))
               }
             />
