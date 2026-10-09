@@ -30,36 +30,36 @@ export function BulkActionBar({
       <span className='text-sm font-bold text-red-800'>{label} 일괄 처리:</span>
       <div className='flex flex-wrap items-center gap-2'>
         <Button
+          type='button'
           variant='destructive'
           size='sm'
-          className='flex h-8 items-center gap-1 bg-red-600 text-xs hover:bg-red-700'
           disabled={isDeletePending}
           onClick={onBulkDelete}
         >
           <Trash2 className='h-3.5 w-3.5' /> 삭제
         </Button>
         <Button
+          type='button'
           variant='outline'
           size='sm'
-          className='flex h-8 items-center gap-1 border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
           disabled={isVisibilityPending || isRestoreDisabled}
           onClick={onBulkRestore}
         >
           <RotateCcw className='h-3.5 w-3.5 text-gray-500' /> 복구
         </Button>
         <Button
+          type='button'
           variant='outline'
           size='sm'
-          className='flex h-8 items-center gap-1 border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
           disabled={isVisibilityPending}
           onClick={() => onBulkVisibility(false)}
         >
           <EyeOff className='h-3.5 w-3.5 text-gray-500' /> 비공개
         </Button>
         <Button
+          type='button'
           variant='outline'
           size='sm'
-          className='flex h-8 items-center gap-1 border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
           disabled={isVisibilityPending}
           onClick={() => onBulkVisibility(true)}
         >

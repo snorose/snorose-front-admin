@@ -126,12 +126,12 @@ export function PointFreezeListSection({
                         <DropdownMenu>
                           <DropdownMenu.Trigger asChild>
                             <Button
+                              type='button'
                               variant='ghost'
-                              size='icon'
-                              className='size-6'
+                              size='icon-sm'
+                              aria-label={`${title} 미지급 일정 메뉴 열기`}
                             >
-                              <MoreHorizontalIcon />
-                              <span className='sr-only'>Open menu</span>
+                              <MoreHorizontalIcon aria-hidden='true' />
                             </Button>
                           </DropdownMenu.Trigger>
                           <DropdownMenu.Content align='end'>

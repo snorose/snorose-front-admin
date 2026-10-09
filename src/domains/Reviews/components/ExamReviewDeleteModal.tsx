@@ -23,7 +23,7 @@ export function ExamReviewDeleteModal({
     <ConfirmModal
       isOpen={isOpen}
       confirmText={isDeleting ? '삭제 중' : '삭제'}
-      confirmButtonClassName='bg-red-600 text-white hover:bg-red-700'
+      confirmVariant='destructive'
       confirmDisabled={!deleteReason.trim() || isDeleting}
       closeText='취소'
       onClose={onClose}

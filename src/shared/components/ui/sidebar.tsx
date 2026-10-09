@@ -255,17 +255,18 @@ Sidebar.Trigger = function SidebarTrigger({
     <Button
       data-sidebar='trigger'
       data-slot='sidebar-trigger'
+      type='button'
       variant='ghost'
-      size='icon'
-      className={cn('size-7', className)}
+      size='icon-sm'
+      className={className}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <PanelLeftIcon />
-      <span className='sr-only'>Toggle Sidebar</span>
+      <PanelLeftIcon aria-hidden='true' />
+      <span className='sr-only'>사이드바 열기 또는 닫기</span>
     </Button>
   );
 };
@@ -280,10 +281,11 @@ Sidebar.Rail = function SidebarRail({
     <button
       data-sidebar='rail'
       data-slot='sidebar-rail'
-      aria-label='Toggle Sidebar'
+      type='button'
+      aria-label='사이드바 열기 또는 닫기'
       tabIndex={-1}
       onClick={toggleSidebar}
-      title='Toggle Sidebar'
+      title='사이드바 열기 또는 닫기'
       className={cn(
         'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
