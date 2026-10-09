@@ -2,7 +2,7 @@
 
 > 조사 기준: 2026-10-09 현재 소스
 >
-> 상태: 1~3단계 완료. 4단계의 전체 확인과 미사용 스타일 정리는 진행 예정이다.
+> 상태: 1~4단계 완료. 총 20개 날짜 필드 공통화와 관련 검증을 완료했다. 전체 테스트의 기존 시험후기 상세 실패 6개는 16절에 기록한다.
 >
 > 선행 작업: [게시글·댓글 Calendar 교체와 전체 사용처 조사](./post-comment-calendar-plan.md)
 
@@ -16,7 +16,7 @@
 
 ## 2. 현재 상태와 전체 대상
 
-3단계 완료 후 모든 대상 화면은 DatePicker 또는 DatePicker를 내부에서 재사용하는 DateTimePicker를 사용한다. 한국어 달력·CalendarIcon·전체 클릭·개별 해제·재열기 동작을 공유하며, 일반 날짜는 좌우 화살표로 월을 이동하고 생년월일은 월·연도 드롭다운을 사용한다.
+모든 대상 화면은 DatePicker 또는 DatePicker를 내부에서 재사용하는 DateTimePicker를 사용한다. 한국어 달력·CalendarIcon·전체 클릭·개별 해제·재열기 동작을 공유하며, 일반 날짜는 좌우 화살표로 월을 이동하고 생년월일은 월·연도 드롭다운을 사용한다.
 
 | 화면·기능                    | 현재 구현             | 필드 수                | 목표 구현                                            |
 | ---------------------------- | --------------------- | ---------------------- | ---------------------------------------------------- |
@@ -146,9 +146,10 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거했�
 | 수정              | [ServerMaintenancePage.test.tsx](../../src/pages/operation/ServerMaintenancePage.test.tsx)           | 기본 input 직접 변경을 실제 날짜·시간 선택으로 교체하고 CRUD·검증 유지 확인      |
 | 점검·필요 시 수정 | 기존 DateTimePicker 사용처 6개 파일                                                                  | 새로운 공용 UI에서 초기값·모달·레이아웃·필수 검증·시간 선택 확인                 |
 | 수정              | [기존 작업 문서](./post-comment-calendar-plan.md)                                                    | 후속 공통화 완료 후 최신 구조와 사용처 갱신                                      |
-| 정리 후보         | [index.css](../../src/index.css)                                                                     | 기본 날짜 입력이 모두 제거된 뒤 미사용 `calendar-picker-indicator` 규칙 제거     |
+| 수정              | [index.css](../../src/index.css)                                                                     | 기본 날짜 입력 제거 후 미사용 `calendar-picker-indicator` 규칙 제거 완료         |
+| 수정              | [ExamReviewPeriodPage.test.tsx](../../src/pages/reviews/ExamReviewPeriodPage.test.tsx)               | 목록 오류와 상시 안내 영역 구분, 테스트 간 모의 응답 격리                        |
 
-기존 DateTimePicker 사용처:
+현재 DateTimePicker 사용처는 아래 7개 파일이다. 기존 6개 파일에 3단계에서 서버 점검 폼을 추가했다.
 
 - [PointFreezeScheduleForm.tsx](../../src/domains/Points/components/PointFreezeScheduleForm.tsx)
 - [PointFreezeUpdateConfirmModal.tsx](../../src/domains/Points/components/PointFreezeUpdateConfirmModal.tsx)
@@ -156,6 +157,7 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거했�
 - [ExamReviewPeriodUpdateConfirmModal.tsx](../../src/domains/Reviews/components/ExamReviewPeriodUpdateConfirmModal.tsx)
 - [PopupEditorDialog.tsx](../../src/domains/Operation/components/PopupEditorDialog.tsx)
 - [ExcelPointUploadPage.tsx](../../src/pages/points/ExcelPointUploadPage.tsx)
+- [MaintenanceScheduleForm.tsx](../../src/domains/Operation/components/MaintenanceScheduleForm.tsx)
 
 ## 7. 화면별 값과 검증 보존
 
@@ -228,12 +230,12 @@ DatePicker의 기존 사용을 유지한다. 해제 시 필터에는 `undefined`
 
 ### 4단계: 전체 확인과 문서 갱신
 
-- [ ] `src`에 기본 date·datetime-local 입력과 동적 `inputType: 'date'`의 기본 입력 경로가 남지 않았는지 검색한다.
-- [ ] Calendar를 직접 렌더링하는 제품 컴포넌트가 DatePicker 한곳인지 확인한다.
-- [ ] 미사용 기본 날짜 아이콘 CSS를 정리한다.
-- [ ] 관련 테스트, 린트, 타입 검사·빌드를 실행한다.
-- [ ] 실제 브라우저에서 화면·모달·모바일·키보드·시간대를 확인한다.
-- [ ] 기존 교체 문서와 이 문서의 사용처·완료 체크리스트를 갱신한다.
+- [x] `src`에 기본 date·datetime-local 입력과 동적 `inputType: 'date'`의 기본 입력 경로가 남지 않았는지 검색한다.
+- [x] Calendar를 직접 렌더링하는 제품 컴포넌트가 DatePicker 한곳인지 확인한다.
+- [x] 미사용 기본 날짜 아이콘 CSS를 정리한다.
+- [x] 관련 테스트, 린트, 타입 검사·빌드를 실행한다.
+- [x] 실제 브라우저에서 화면·모달·모바일·키보드·시간대를 확인한다.
+- [x] 기존 교체 문서와 이 문서의 사용처·완료 체크리스트를 갱신한다.
 
 각 단계의 관련 검증이 통과한 뒤 다음 단계로 진행한다. DateTimePicker의 외부 계약을 유지해 전체 사용처의 상태와 요청 처리를 한꺼번에 다시 작성하는 것을 피한다.
 
@@ -313,7 +315,7 @@ TZ=Asia/Seoul npm run test:run -- \
   src/domains/Reviews/utils/exam-review-period-request-builders.test.ts
 ```
 
-추가 실행한 [ExamReviewPeriodPage.test.tsx](../../src/pages/reviews/ExamReviewPeriodPage.test.tsx)의 기존 실패는 별도 보수가 필요하다. 첫 실패는 조회 오류 대신 상시 노출되는 안내 영역의 `alert`를 선택해 발생한다. 빈 목록 및 일정 표시 검증도 변경 전 소스에서 동일하게 실패했다. 전체 테스트가 통과했다고 간주하지 않으며, 이번 단계에서는 해당 테스트를 수정하지 않았다.
+추가 실행한 [ExamReviewPeriodPage.test.tsx](../../src/pages/reviews/ExamReviewPeriodPage.test.tsx)의 기존 실패는 1단계 당시 별도 보수가 필요했다. 첫 실패는 조회 오류 대신 상시 노출되는 안내 영역의 `alert`를 선택해 발생했다. 빈 목록 및 일정 표시 검증도 변경 전 소스에서 동일하게 실패했다. 1단계에서는 해당 테스트를 수정하지 않았으며, 4단계에서 오류 영역 선택과 모의 응답 격리를 보정해 해결했다(16절 참조).
 
 ## 13. 2단계 작업 결과
 
@@ -385,4 +387,47 @@ Chromium의 1440px·768px·390px 서울과 390px 로스앤젤레스 환경에서
 
 서버 점검 페이지 테스트는 기본 일시 input을 직접 변경하는 대신 공용 달력과 Select에서 실제 값을 선택한다. 회원 폼의 생년월일 저장은 콜백으로 검증했고, 브라우저의 점검 CRUD는 기존 임시 데이터 페이지에서 실행했다. 실서버 회원 정보나 일정을 저장하지 않았으며 임시 확인 화면은 제거했다.
 
-이번 검증은 위 관련 테스트 대상에 한정한다. 1단계에서 확인한 작성 기간 페이지의 기존 테스트 실패는 그대로 남아 있으며, 전체 테스트 실행과 미사용 날짜 아이콘 CSS 정리는 4단계에서 진행한다.
+3단계 검증은 위 관련 테스트 대상에 한정했다. 당시 남아 있던 작성 기간 페이지 테스트 실패와 미사용 날짜 아이콘 CSS는 4단계에서 정리했다. 전체 테스트 결과는 16절에 기록한다.
+
+## 16. 4단계 작업 결과
+
+### 사용처 감사와 정리
+
+제품 소스의 날짜 전용 7개·날짜와 시간 13개, 총 20개 필드를 다시 확인했다. 기본 `date`·`datetime-local` 입력과 `showPicker`는 남아 있지 않다. 제품 컴포넌트의 `<Calendar>` 렌더링은 DatePicker 한곳이며 DateTimePicker도 이를 재사용한다. `ui/calendar.tsx`는 공용 Calendar 원형을 제공한다.
+
+회원 폼의 `inputType: 'date'`는 필드 구분용 설정으로 남아 있다. [MemberInfoEditFormFields.tsx](../../src/domains/MemberInfo/components/MemberInfoEditFormFields.tsx)의 날짜 분기에서 DatePicker를 렌더링하므로 기본 입력으로 이어지지 않는다. 회원 정보의 `CalendarDays`는 항목 설명 아이콘이며 날짜 선택칸의 공통 CalendarIcon과 역할이 다르다.
+
+[index.css](../../src/index.css)의 미사용 `input[type='date']::-webkit-calendar-picker-indicator` 규칙을 제거했다. 화면별 placeholder·필수값·기간 제한과 API 요청 형식은 기존 정책을 유지한다. 최신 대상과 사용처 파일은 2절과 6절을 참조한다.
+
+### 관련 테스트 보정과 전체 결과
+
+[ExamReviewPeriodPage.test.tsx](../../src/pages/reviews/ExamReviewPeriodPage.test.tsx)는 상시 안내의 `alert` 대신 조회 목록 안의 오류 `alert`를 검증하도록 수정했다. 재시도 성공 후에는 목록 오류가 사라지고 안내는 계속 표시되는지 확인한다. `vi.resetAllMocks()`로 테스트 사이에 남는 일회성 모의 응답도 제거했다. 페이지의 네 테스트가 모두 통과하며 제품 동작을 바꾸지는 않았다.
+
+| 검증                    | 결과                                                                                               |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| 달력과 사용처 회귀 검증 | 16개 파일 133개 테스트가 서울·로스앤젤레스 시간대에서 각각 통과                                    |
+| 전체 테스트             | 56개 파일 415개 중 409개 통과, 기존 시험후기 상세 테스트 6개 실패                                  |
+| 변경 전 재현            | 변경 전 `HEAD`를 별도 임시 경로에 추출해 상세 테스트 2개 파일을 실행한 결과, 17개 중 같은 6개 실패 |
+
+전체 테스트는 `TZ=Asia/Seoul npm run test:run -- --maxWorkers=4`, 관련 테스트는 같은 실행 명령에 16개 관련 파일을 지정하고 `TZ=America/Los_Angeles`에서도 실행했다. 병렬 작업에 따른 상호작용 테스트 시간 초과를 피하도록 worker 수를 제한했다.
+
+남은 실패는 다음 두 파일에 있으며 날짜 선택 UI와 무관하다. 전체 테스트가 통과한 상태로 기록하지 않는다.
+
+- [ExamDetailSection.test.tsx](../../src/domains/Reviews/components/ExamDetailSection.test.tsx): 복구 관련 네 테스트가 복구 버튼을 찾지 못하고, 삭제 관련 한 테스트는 삭제 API 호출을 확인하지 못한다.
+- [ExamReviewDetailInfoSection.test.tsx](../../src/domains/Reviews/components/ExamReviewDetailInfoSection.test.tsx): 파일명 변경 버튼을 기대하지만 현재 화면은 `파일 변경`으로 표시한다.
+
+### 브라우저와 정적 검사
+
+Chromium에서 실제 필터·회원 폼·일정 생성 폼·점검 페이지·수정 모달·팝업을 렌더링했다. 숨겨진 예약 지급은 기존 DateTimePicker·훅·요청 빌더 조합으로 확인했다.
+
+| 검증                | 결과                                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 환경                | 1440px·768px·390px 서울, 390px 로스앤젤레스의 4개 환경 통과                                                                                                  |
+| 클릭 범위           | 20개 날짜 필드 × 글자·여백·아이콘 × 4개 환경, 합계 240건 통과                                                                                                |
+| 탐색·닫기           | 일반 달력의 좌우 월 이동, 생년월일의 월·연도 드롭다운, Escape 닫기와 트리거 포커스 복귀 확인                                                                 |
+| 값과 키보드         | 생년월일 과거 연도·윤일 저장 문자열, 시험후기 같은 날짜와 경계, Space·방향키·Enter 선택, 날짜 해제 후 시·분 유지, 예약 지급 요청값·선택 중 폼 제출 없음 확인 |
+| 배치                | 모든 날짜 선택칸과 달력의 화면 경계 확인, 모바일 수정 모달 캡처 확인                                                                                         |
+| 기본 입력·실행 오류 | 기본 date·datetime-local 입력 없음. 브라우저 실행 오류 없음                                                                                                  |
+| 정적 검사           | `npm run lint`, `npm run build` 통과. 빌드에는 기존 번들 크기 경고 유지                                                                                      |
+
+실서버 저장은 실행하지 않았으며 임시 확인 화면은 제거했다. 모든 단계의 달력 UI 통일과 관련 검증을 완료했다. 위에 기록한 기존 시험후기 상세 테스트 보수는 별도 작업으로 남는다.
