@@ -68,7 +68,7 @@ describe('DateTimePicker', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  test('한국어 공용 달력에서 월·연도를 이동해 로컬 Date 콜백을 전달한다', async () => {
+  test('한국어 공용 달력에서 화살표로 월을 이동해 로컬 Date 콜백을 전달한다', async () => {
     const user = userEvent.setup();
     const onDateSelect = vi.fn();
     const onTimeChange = vi.fn();
@@ -86,15 +86,14 @@ describe('DateTimePicker', () => {
     expect(
       screen.getByRole('dialog', { name: '시작 일시' })
     ).toBeInTheDocument();
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '연도 선택' }),
-      '2030'
-    );
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: '월 선택' }),
-      '0'
-    );
-    await user.click(screen.getByRole('button', { name: /2030년 1월 15일/ }));
+    expect(
+      screen.queryByRole('combobox', { name: '연도 선택' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('combobox', { name: '월 선택' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '다음 달로 이동' }));
+    await user.click(screen.getByRole('button', { name: /2026년 11월 15일/ }));
     expect(onDateSelect).toHaveBeenCalledTimes(1);
     const selected = onDateSelect.mock.calls[0][0] as Date;
     expect([
@@ -102,7 +101,7 @@ describe('DateTimePicker', () => {
       selected.getMonth(),
       selected.getDate(),
       selected.getHours(),
-    ]).toEqual([2030, 0, 15, 0]);
+    ]).toEqual([2026, 10, 15, 0]);
     expect(onTimeChange).not.toHaveBeenCalled();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     await waitFor(() => expect(trigger).toHaveFocus());

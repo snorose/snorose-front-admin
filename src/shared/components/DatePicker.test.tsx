@@ -8,21 +8,53 @@ import { Label } from '@/shared/components/ui';
 
 import { DatePicker } from './DatePicker';
 
-function ControlledDatePicker({ initialValue = '2026-10-09' }) {
+function ControlledDatePicker({
+  initialValue = '2026-10-09',
+  captionLayout = 'label',
+}: {
+  initialValue?: string;
+  captionLayout?: 'label' | 'dropdown';
+}) {
   const [value, setValue] = useState<string | undefined>(initialValue);
 
   return (
     <>
       <Label htmlFor='date'>작성일</Label>
-      <DatePicker id='date' value={value} onValueChange={setValue} />
+      <DatePicker
+        id='date'
+        value={value}
+        onValueChange={setValue}
+        captionLayout={captionLayout}
+      />
     </>
   );
 }
 
 describe('DatePicker', () => {
+  test('기본 달력은 제목과 좌우 화살표를 표시하고 연도 경계를 이동한다', async () => {
+    const user = userEvent.setup();
+    render(<ControlledDatePicker initialValue='2026-12-09' />);
+    await user.click(screen.getByRole('button', { name: '작성일' }));
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.getByText('2026년 12월')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '다음 달로 이동' }));
+    expect(
+      screen.getByRole('grid', { name: '2027년 1월' })
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '이전 달로 이동' }));
+    expect(
+      screen.getByRole('grid', { name: '2026년 12월' })
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '다음 달로 이동' }));
+    await user.click(screen.getByRole('button', { name: /2027년 1월 15일/ }));
+    expect(screen.getByRole('button', { name: '작성일' })).toHaveTextContent(
+      '2027-01-15'
+    );
+  });
+
   test('월·연도 드롭다운으로 과거와 미래 날짜를 탐색한다', async () => {
     const user = userEvent.setup();
-    render(<ControlledDatePicker />);
+    render(<ControlledDatePicker captionLayout='dropdown' />);
     await user.click(screen.getByRole('button', { name: '작성일' }));
 
     const yearSelect = screen.getByRole('combobox', { name: '연도 선택' });
@@ -50,7 +82,12 @@ describe('DatePicker', () => {
 
   test('현재 연도 탐색 범위 밖의 초기값도 표시하고 탐색 범위를 확장한다', async () => {
     const user = userEvent.setup();
-    render(<ControlledDatePicker initialValue='1850-01-01' />);
+    render(
+      <ControlledDatePicker
+        initialValue='1850-01-01'
+        captionLayout='dropdown'
+      />
+    );
     await user.click(screen.getByRole('button', { name: '작성일' }));
     const yearSelect = screen.getByRole('combobox', { name: '연도 선택' });
     expect(yearSelect).toHaveValue('1850');
@@ -224,6 +261,7 @@ describe('DatePicker', () => {
           value={undefined}
           onValueChange={vi.fn()}
           aria-labelledby='date-label'
+          captionLayout='dropdown'
         />
       </>
     );

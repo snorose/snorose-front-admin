@@ -60,14 +60,19 @@ async function chooseDate(
   day: number
 ) {
   await user.click(screen.getByRole('button', { name: label }));
-  await user.selectOptions(
-    screen.getByRole('combobox', { name: '연도 선택' }),
-    '2026'
-  );
-  await user.selectOptions(
-    screen.getByRole('combobox', { name: '월 선택' }),
-    '9'
-  );
+  const month = screen
+    .getByRole('grid')
+    .getAttribute('aria-label')
+    ?.match(/(\d+)년 (\d+)월/);
+  if (!month) throw new Error('달력의 현재 월을 확인할 수 없습니다.');
+  const offset = 2026 * 12 + 9 - (Number(month[1]) * 12 + Number(month[2]) - 1);
+  for (let index = 0; index < Math.abs(offset); index++) {
+    await user.click(
+      screen.getByRole('button', {
+        name: offset > 0 ? '다음 달로 이동' : '이전 달로 이동',
+      })
+    );
+  }
   await user.click(
     screen.getByRole('button', { name: new RegExp(`2026년 10월 ${day}일`) })
   );

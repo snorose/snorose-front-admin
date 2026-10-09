@@ -21,6 +21,7 @@ interface DatePickerProps extends Pick<
   minDate?: string;
   maxDate?: string;
   clearable?: boolean;
+  captionLayout?: 'label' | 'dropdown';
 }
 
 export function DatePicker({
@@ -33,6 +34,7 @@ export function DatePicker({
   minDate,
   maxDate,
   clearable = true,
+  captionLayout = 'label',
   ...accessibilityProps
 }: DatePickerProps) {
   const [open, setOpen] = useState(false);
@@ -118,7 +120,7 @@ export function DatePicker({
         <Calendar
           mode='single'
           required={!clearable}
-          captionLayout='dropdown'
+          captionLayout={captionLayout}
           selected={date}
           onSelect={handleSelect}
           month={visibleMonth}
