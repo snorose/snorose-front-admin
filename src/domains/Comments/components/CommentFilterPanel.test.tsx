@@ -22,8 +22,9 @@ describe('CommentFilterPanel', () => {
       />
     );
 
-    const startDate = screen.getByRole('button', { name: '시작일' });
-    const endDate = screen.getByRole('button', { name: '종료일' });
+    const startDate = screen.getByRole('button', { name: '작성 시작일' });
+    const endDate = screen.getByRole('button', { name: '작성 종료일' });
+    expect(screen.queryByText('작성일 기간')).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: '검색 조건 초기화' })
     ).toHaveAttribute('data-variant', 'outline');
@@ -54,8 +55,8 @@ describe('CommentFilterPanel', () => {
     });
 
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
-    expect(startDate).toHaveTextContent('시작일 선택');
-    expect(endDate).toHaveTextContent('종료일 선택');
+    expect(startDate).toHaveTextContent('작성 시작일 선택');
+    expect(endDate).toHaveTextContent('작성 종료일 선택');
     expect(onFilterChange).toHaveBeenLastCalledWith({ searchScope: 'CONTENT' });
   });
 
