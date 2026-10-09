@@ -180,8 +180,8 @@ export default function MemberDirectorySection({
           </span>
         </div>
 
-        <div className='overflow-hidden rounded-2xl border border-slate-200'>
-          <Table className='min-w-[920px]'>
+        <div className='overflow-hidden rounded-md border border-slate-200'>
+          <Table className='min-w-230'>
             <Table.Header>
               <Table.Row className='border-b border-slate-200 bg-slate-50 hover:bg-slate-50'>
                 <Table.Head className='w-12 px-4'>
