@@ -39,7 +39,8 @@ export default function PostDetailPage() {
           게시글 정보를 찾을 수 없거나 불러오지 못했습니다.
         </p>
         <Button
-          variant='default'
+          type='button'
+          variant='outline'
           size='sm'
           onClick={() => navigate(-1)}
           className='mt-1'
@@ -57,21 +58,16 @@ export default function PostDetailPage() {
       <div className='flex flex-col gap-6'>
         <div className='flex items-center justify-between gap-4'>
           <Button
+            type='button'
             variant='outline'
             size='sm'
-            className='flex h-8 items-center gap-1 rounded-lg border-gray-300 bg-white px-2 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50'
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className='h-3.5 w-3.5' /> 목록으로
           </Button>
 
           {originalPostUrl && (
-            <Button
-              asChild
-              variant='outline'
-              size='sm'
-              className='h-8 rounded-lg border-gray-300 bg-white px-2 text-xs font-medium text-gray-700 shadow-xs hover:bg-gray-50'
-            >
+            <Button asChild variant='outline' size='sm'>
               <a
                 href={originalPostUrl}
                 target='_blank'

@@ -106,13 +106,14 @@ export default function InquiryCommentItem({
             {isManageable && (
               <DropdownMenu>
                 <DropdownMenu.Trigger asChild>
-                  <button
+                  <Button
                     type='button'
-                    className='flex h-7 w-7 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-600'
-                    aria-label='댓글 더보기'
+                    variant='ghost'
+                    size='icon-sm'
+                    aria-label={`${comment.userDisplay} 댓글 메뉴 열기`}
                   >
-                    <MoreVertical className='h-4 w-4' />
-                  </button>
+                    <MoreVertical aria-hidden='true' />
+                  </Button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content align='end'>
                   <DropdownMenu.Item onClick={() => onEditStart(comment)}>
@@ -163,7 +164,6 @@ export default function InquiryCommentItem({
                   type='button'
                   size='sm'
                   disabled={!isEditingCommentValid}
-                  className='bg-slate-900 text-white hover:bg-slate-700'
                   onClick={() => onEditSubmit(comment.id)}
                 >
                   저장
@@ -185,19 +185,20 @@ export default function InquiryCommentItem({
 
         <div className='mt-2 flex items-center justify-end'>
           {canReply && (
-            <button
+            <Button
               type='button'
-              className={`flex h-7 items-center gap-1 rounded border px-2 text-[12px] transition ${
-                isReplying
-                  ? 'border-slate-500 bg-slate-700 text-white'
-                  : 'border-gray-200 bg-white text-gray-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700'
-              }`}
-              aria-label='대댓글 작성'
+              variant='outline'
+              size='xs'
+              className={
+                isReplying ? 'border-primary bg-primary/10' : undefined
+              }
+              aria-label={`${comment.userDisplay} 댓글에 대댓글 작성`}
+              aria-pressed={isReplying}
               onClick={() => onReplyStart(comment.id)}
             >
-              <MessageSquare className='h-3.5 w-3.5' />
+              <MessageSquare aria-hidden='true' />
               {comment.children.length}
-            </button>
+            </Button>
           )}
         </div>
       </article>

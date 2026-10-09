@@ -24,7 +24,7 @@ export function PopupManagementTable({
   onDelete,
 }: PopupManagementTableProps) {
   return (
-    <div className='overflow-hidden rounded-md border'>
+    <div className='overflow-x-auto rounded-md border'>
       <Table>
         <Table.Header>
           <Table.Row>
@@ -37,13 +37,15 @@ export function PopupManagementTable({
                 <Tooltip.Provider delayDuration={200}>
                   <Tooltip>
                     <Tooltip.Trigger asChild>
-                      <button
+                      <Button
                         type='button'
-                        className='text-muted-foreground hover:text-foreground focus-visible:ring-ring inline-flex size-5 cursor-help items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none'
+                        variant='ghost'
+                        size='icon-sm'
+                        className='cursor-help'
                         aria-label='게시 기간 안내'
                       >
                         <CircleHelpIcon className='size-4' aria-hidden='true' />
-                      </button>
+                      </Button>
                     </Tooltip.Trigger>
                     <Tooltip.Content side='top' sideOffset={4}>
                       설정한 기간에만 사용자 홈 화면에 노출됩니다.
@@ -95,9 +97,8 @@ export function PopupManagementTable({
                     </Button>
                     <Button
                       type='button'
-                      variant='ghost'
+                      variant='destructive-outline'
                       size='sm'
-                      className='text-destructive hover:bg-destructive/10 hover:text-destructive'
                       onClick={() => onDelete(popup.id)}
                     >
                       삭제

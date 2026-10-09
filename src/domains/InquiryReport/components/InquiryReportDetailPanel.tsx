@@ -267,13 +267,15 @@ export default function InquiryReportDetailPanel({
               </button>
             </span>
           )}
-          <button
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon-sm'
             onClick={onClose}
-            className='flex h-6 w-6 items-center justify-center rounded text-gray-400 hover:bg-gray-100 hover:text-gray-600'
-            aria-label='닫기'
+            aria-label='문의·신고 상세 닫기'
           >
-            <X className='h-4 w-4' />
-          </button>
+            <X aria-hidden='true' />
+          </Button>
         </div>
       </div>
 
@@ -326,15 +328,16 @@ export default function InquiryReportDetailPanel({
                 )}
               </span>
               {canCopyAuthorLoginId && (
-                <button
+                <Button
                   type='button'
+                  variant='ghost'
+                  size='icon-sm'
                   onClick={handleAuthorLoginIdCopy}
                   aria-label='작성자 아이디 복사'
                   title='작성자 아이디 복사'
-                  className='flex h-6 w-6 shrink-0 items-center justify-center rounded text-gray-400 transition hover:bg-gray-100 hover:text-gray-700'
                 >
-                  <Copy className='h-3.5 w-3.5' />
-                </button>
+                  <Copy aria-hidden='true' />
+                </Button>
               )}
             </span>
           </div>
@@ -417,13 +420,14 @@ export default function InquiryReportDetailPanel({
               <span className='min-w-0 truncate'>
                 {getCommentAuthorDisplay(replyParentComment)} 댓글에 대댓글 작성
               </span>
-              <button
+              <Button
                 type='button'
-                className='shrink-0 text-slate-400 hover:text-slate-700'
+                variant='link'
+                size='xs'
                 onClick={handleReplyCancel}
               >
                 취소
-              </button>
+              </Button>
             </div>
           )}
           <Textarea
@@ -448,7 +452,6 @@ export default function InquiryReportDetailPanel({
               type='submit'
               size='sm'
               disabled={!isCommentInputValid || createComment.isPending}
-              className='bg-slate-900 text-white hover:bg-slate-700'
             >
               <Send className='h-3.5 w-3.5' />
               {replyParentComment ? '대댓글 등록' : '댓글 등록'}

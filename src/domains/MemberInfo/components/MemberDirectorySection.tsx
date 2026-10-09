@@ -111,8 +111,7 @@ export default function MemberDirectorySection({
 
             <Button
               type='button'
-              variant='outline'
-              className='h-9 px-6'
+              size='default'
               onClick={() => void onSearch()}
               disabled={isListLoading}
             >
@@ -154,7 +153,7 @@ export default function MemberDirectorySection({
               <Button
                 type='button'
                 variant='outline'
-                className='h-11 w-full rounded-2xl border-slate-200 px-6 whitespace-nowrap text-slate-600'
+                className='w-full whitespace-nowrap'
                 onClick={onRefreshDirectory}
                 disabled={isListLoading}
               >
@@ -165,7 +164,7 @@ export default function MemberDirectorySection({
           </div>
 
           <div className='flex flex-wrap items-center justify-between gap-3'>
-            <MemberDirectoryActionBar hasSelection={selectedIds.length > 0} />
+            <MemberDirectoryActionBar />
 
             <span className='text-sm text-slate-500'>
               총 {totalCount.toLocaleString()}명

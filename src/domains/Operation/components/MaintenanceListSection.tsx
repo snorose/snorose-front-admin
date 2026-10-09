@@ -82,11 +82,10 @@ export function MaintenanceListSection({ items, onEdit, onDelete }: Props) {
                           <Button
                             type='button'
                             variant='ghost'
-                            size='icon'
-                            className='size-8'
-                            aria-label={`${item.title} 더보기`}
+                            size='icon-sm'
+                            aria-label={`${item.title} 서버 점검 일정 메뉴 열기`}
                           >
-                            <MoreHorizontalIcon className='size-4' />
+                            <MoreHorizontalIcon aria-hidden='true' />
                           </Button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Content align='end'>

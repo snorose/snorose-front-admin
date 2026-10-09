@@ -162,46 +162,54 @@ export default function PostDetailManageCard({
       <div className='flex w-full justify-center'>
         {isDeleted ? (
           <Button
+            type='button'
             variant='outline'
+            size='lg'
             disabled={!IS_POST_RESTORE_ENABLED}
             onClick={() => {
               setModalType('RESTORE');
               setIsModalOpen(true);
             }}
-            className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
+            className='w-full'
           >
             게시글 복구
           </Button>
         ) : !isVisible ? (
           <Button
+            type='button'
             variant='outline'
+            size='lg'
             onClick={() => {
               setModalType('SHOW');
               setIsModalOpen(true);
             }}
-            className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
+            className='w-full'
           >
             게시글 공개
           </Button>
         ) : (
           <div className='flex w-full flex-col gap-2'>
             <Button
+              type='button'
               variant='outline'
+              size='lg'
               onClick={() => {
                 setModalType('HIDE');
                 setIsModalOpen(true);
               }}
-              className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
+              className='w-full'
             >
               게시글 비공개
             </Button>
             <Button
-              variant='destructive'
+              type='button'
+              variant='destructive-outline'
+              size='lg'
               onClick={() => {
                 setModalType('DELETE');
                 setIsModalOpen(true);
               }}
-              className='flex h-10 w-full items-center justify-center rounded-lg bg-red-600 text-[13px] text-white hover:bg-red-700'
+              className='w-full'
             >
               게시글 삭제
             </Button>
