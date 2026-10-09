@@ -196,13 +196,15 @@ export function ExamReviewDetailInfoSection({
             <div className='flex flex-wrap items-center gap-2'>
               <Button
                 type='button'
-                variant='link'
-                className='min-w-0 flex-1 basis-full justify-start truncate text-left sm:basis-0'
+                variant='outline'
+                className='border-input text-primary hover:text-primary disabled:text-muted-foreground min-w-0 flex-1 basis-full justify-start bg-transparent px-3 py-1 text-left text-base font-normal shadow-xs hover:bg-transparent hover:underline sm:basis-0 md:text-sm'
                 onClick={onFileDownload}
                 disabled={!formData.fileName}
-                title={formData.fileName}
+                title={selectedFile?.name || formData.fileName}
               >
-                {selectedFile?.name || formData.fileName || '파일 없음'}
+                <span className='truncate'>
+                  {selectedFile?.name || formData.fileName || '파일 없음'}
+                </span>
               </Button>
               {/* 파일명 변경 기능은 사용자에게 노출하지 않습니다. */}
               {/*
