@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 
 import { DatePicker } from '@/shared/components';
-import { Input, Label, Select } from '@/shared/components/ui';
+import { Button, Input, Label, Select } from '@/shared/components/ui';
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { PostSearchParams } from '../types';
@@ -330,18 +330,21 @@ export const PostFilterPanel = ({
         </div>
       </div>
       <div className='flex w-full gap-4'>
-        <button
+        <Button
+          type='button'
+          variant='outline'
           onClick={handleReset}
-          className='w-full rounded border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50'
+          className='min-w-0 flex-1 shrink'
         >
           초기화
-        </button>
-        <button
+        </Button>
+        <Button
+          type='button'
           onClick={() => onFilterChange(filters)}
-          className='w-full rounded bg-gray-900 py-2 text-sm font-semibold text-white hover:bg-gray-700'
+          className='min-w-0 flex-1 shrink'
         >
           검색
-        </button>
+        </Button>
       </div>
       {totalCount !== undefined && (
         <span className='text-sm text-gray-500'>
