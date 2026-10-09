@@ -359,74 +359,73 @@ export default function ExamReviewPage() {
   };
 
   return (
-    <div className='flex w-full flex-col gap-6'>
+    <div className='flex w-full min-w-0 flex-col gap-6'>
       <PageHeader
         title='시험후기 관리'
         description='시험후기를 편집하거나 삭제하고, 경고 및 강등 처리를 할 수 있어요.'
       />
 
-      <div className='flex flex-col gap-2'>
-        <div className='flex'>
-          <ExamSearch
-            onSearchChange={handleSearchChange}
-            initialEndDate={searchParamsFromUrl.get('endDate') || ''}
-            initialKeywordAuthor={
-              searchParamsFromUrl.get('keywordAuthor') || ''
-            }
-            initialKeywordPost={
-              searchParamsFromUrl.get('keywordPost') ||
-              searchParamsFromUrl.get('keyword') ||
-              ''
-            }
-            initialSort={searchParamsFromUrl.get('sort') || undefined}
-            initialSemester={
-              searchParamsFromUrl.get('semester') &&
-              searchParamsFromUrl.get('lectureYear')
-                ? convertSemesterEnumToString(
-                    searchParamsFromUrl.get('semester')! as Semester,
-                    parseInt(searchParamsFromUrl.get('lectureYear')!, 10)
-                  )
+      <div className='flex min-w-0 flex-col gap-6'>
+        <ExamSearch
+          onSearchChange={handleSearchChange}
+          initialEndDate={searchParamsFromUrl.get('endDate') || ''}
+          initialKeywordAuthor={searchParamsFromUrl.get('keywordAuthor') || ''}
+          initialKeywordPost={
+            searchParamsFromUrl.get('keywordPost') ||
+            searchParamsFromUrl.get('keyword') ||
+            ''
+          }
+          initialSort={searchParamsFromUrl.get('sort') || undefined}
+          initialSemester={
+            searchParamsFromUrl.get('semester') &&
+            searchParamsFromUrl.get('lectureYear')
+              ? convertSemesterEnumToString(
+                  searchParamsFromUrl.get('semester')! as Semester,
+                  parseInt(searchParamsFromUrl.get('lectureYear')!, 10)
+                )
+              : undefined
+          }
+          initialExamType={
+            searchParamsFromUrl.get('examType') === 'MIDTERM'
+              ? '중간고사'
+              : searchParamsFromUrl.get('examType') === 'FINALTERM'
+                ? '기말고사'
                 : undefined
-            }
-            initialExamType={
-              searchParamsFromUrl.get('examType') === 'MIDTERM'
-                ? '중간고사'
-                : searchParamsFromUrl.get('examType') === 'FINALTERM'
-                  ? '기말고사'
-                  : undefined
-            }
-            initialIsConfirmed={
-              searchParamsFromUrl.get('isConfirmed') === 'true'
-                ? true
-                : searchParamsFromUrl.get('isConfirmed') === 'false'
-                  ? false
-                  : undefined
-            }
-            initialIsDiscussed={
-              searchParamsFromUrl.get('isDiscussed') === 'true'
-                ? true
-                : searchParamsFromUrl.get('isDiscussed') === 'false'
-                  ? false
-                  : undefined
-            }
-            initialIsReported={
-              searchParamsFromUrl.get('isReported') === 'true'
-                ? true
+          }
+          initialIsConfirmed={
+            searchParamsFromUrl.get('isConfirmed') === 'true'
+              ? true
+              : searchParamsFromUrl.get('isConfirmed') === 'false'
+                ? false
                 : undefined
-            }
-            initialStatuses={searchParamsFromUrl.get('statuses') || ''}
-            initialStartDate={searchParamsFromUrl.get('startDate') || ''}
-          />
-        </div>
-
-        <ExamTable
-          onRowSelect={setSelectedExamReview}
-          refreshKey={refreshKey}
-          selectedId={selectedExamReview?.id}
-          searchParams={searchParams}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
+          }
+          initialIsDiscussed={
+            searchParamsFromUrl.get('isDiscussed') === 'true'
+              ? true
+              : searchParamsFromUrl.get('isDiscussed') === 'false'
+                ? false
+                : undefined
+          }
+          initialIsReported={
+            searchParamsFromUrl.get('isReported') === 'true' ? true : undefined
+          }
+          initialStatuses={searchParamsFromUrl.get('statuses') || ''}
+          initialStartDate={searchParamsFromUrl.get('startDate') || ''}
         />
+        <section
+          aria-label='시험후기 목록'
+          className='flex min-w-0 flex-col gap-1'
+        >
+          <h2 className='text-lg font-bold'>시험후기 목록</h2>
+          <ExamTable
+            onRowSelect={setSelectedExamReview}
+            refreshKey={refreshKey}
+            selectedId={selectedExamReview?.id}
+            searchParams={searchParams}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        </section>
       </div>
 
       {selectedExamReview && detailError && (

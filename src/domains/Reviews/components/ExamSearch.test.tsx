@@ -32,10 +32,10 @@ describe('시험후기 날짜 검색', () => {
       />
     );
     expect(
-      screen.getByRole('button', { name: '검색 시작일' })
+      screen.getByRole('button', { name: '작성 시작일' })
     ).toHaveTextContent('2026-10-09');
     expect(
-      screen.getByRole('button', { name: '검색 종료일' })
+      screen.getByRole('button', { name: '작성 종료일' })
     ).toHaveTextContent('2026-10-17');
     expect(onSearchChange).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: '검색' }));
@@ -61,7 +61,7 @@ describe('시험후기 날짜 검색', () => {
         initialEndDate='2026-10-17'
       />
     );
-    await user.click(screen.getByRole('button', { name: '검색 시작일' }));
+    await user.click(screen.getByRole('button', { name: '작성 시작일' }));
     expect(
       screen.getByRole('button', { name: /2026년 10월 18일/ })
     ).toBeDisabled();
@@ -87,7 +87,7 @@ describe('시험후기 날짜 검색', () => {
         initialEndDate='2026-10-17'
       />
     );
-    await user.click(screen.getByRole('button', { name: '검색 종료일' }));
+    await user.click(screen.getByRole('button', { name: '작성 종료일' }));
     expect(
       screen.getByRole('button', { name: /2026년 10월 8일/ })
     ).toBeDisabled();
@@ -110,11 +110,11 @@ describe('시험후기 날짜 검색', () => {
         initialKeywordPost='후기'
       />
     );
-    await user.click(screen.getByRole('button', { name: '검색 시작일' }));
+    await user.click(screen.getByRole('button', { name: '작성 시작일' }));
     await user.click(screen.getByRole('button', { name: '날짜 선택 해제' }));
     expect(
-      screen.getByRole('button', { name: '검색 시작일' })
-    ).toHaveTextContent('시작일 선택');
+      screen.getByRole('button', { name: '작성 시작일' })
+    ).toHaveTextContent('시작일');
     expect(onSearchChange).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onSearchChange).toHaveBeenLastCalledWith({
@@ -124,8 +124,8 @@ describe('시험후기 날짜 검색', () => {
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
     expect(onSearchChange).toHaveBeenLastCalledWith({});
     expect(
-      screen.getByRole('button', { name: '검색 종료일' })
-    ).toHaveTextContent('종료일 선택');
+      screen.getByRole('button', { name: '작성 종료일' })
+    ).toHaveTextContent('종료일');
     expect(
       screen.getByRole('textbox', { name: '시험후기명 또는 postId 검색' })
     ).toHaveValue('');

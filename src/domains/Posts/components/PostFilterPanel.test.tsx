@@ -55,8 +55,8 @@ describe('PostFilterPanel', () => {
     });
 
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
-    expect(startDate).toHaveTextContent('작성 시작일 선택');
-    expect(endDate).toHaveTextContent('작성 종료일 선택');
+    expect(startDate).toHaveTextContent('시작일');
+    expect(endDate).toHaveTextContent('종료일');
     expect(onFilterChange).toHaveBeenLastCalledWith({});
   });
 
@@ -65,14 +65,14 @@ describe('PostFilterPanel', () => {
 
     render(<PostFilterPanel onFilterChange={vi.fn()} />);
 
-    expect(screen.getByPlaceholderText('검색어 입력...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('게시글 검색어')).toBeInTheDocument();
 
     await user.click(
       screen.getByRole('combobox', { name: '게시글 검색 범위' })
     );
     await user.click(screen.getByRole('option', { name: '제목' }));
 
-    expect(screen.getByPlaceholderText('검색어 입력...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('게시글 검색어')).toBeInTheDocument();
   });
 
   test('정렬·의심 키워드 선택값을 기존 검색 파라미터로 전달한다', async () => {
@@ -84,7 +84,7 @@ describe('PostFilterPanel', () => {
     await user.click(screen.getByRole('combobox', { name: '정렬' }));
     await user.click(screen.getByRole('option', { name: '조회 수' }));
     await user.click(screen.getByRole('combobox', { name: '의심 키워드' }));
-    await user.click(screen.getByRole('option', { name: '없음' }));
+    await user.click(screen.getByRole('option', { name: '의심 키워드 없음' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
 
     expect(onFilterChange).toHaveBeenCalledWith({
