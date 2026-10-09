@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   type DayButton,
   DayPicker,
+  type RootProps,
   getDefaultClassNames,
 } from 'react-day-picker';
 
@@ -14,6 +15,17 @@ import {
 import { cn } from '@/shared/lib';
 
 import { Button, buttonVariants } from './button';
+
+function CalendarRoot({ className, rootRef, ...props }: RootProps) {
+  return (
+    <div
+      data-slot='calendar'
+      ref={rootRef}
+      className={cn(className)}
+      {...props}
+    />
+  );
+}
 
 function Calendar({
   className,
@@ -132,16 +144,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
-          return (
-            <div
-              data-slot='calendar'
-              ref={rootRef}
-              className={cn(className)}
-              {...props}
-            />
-          );
-        },
+        Root: CalendarRoot,
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === 'left') {
             return (

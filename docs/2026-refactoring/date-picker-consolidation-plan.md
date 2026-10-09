@@ -2,7 +2,7 @@
 
 > 조사 기준: 2026-10-09 현재 소스
 >
-> 상태: 계획 작성. 이 문서의 추가 공통화와 기본 입력 교체는 아직 구현하지 않았다.
+> 상태: 1단계 완료. 2~4단계의 날짜·시간 선택기 공통화와 기본 입력 교체는 진행 예정이다.
 >
 > 선행 작업: [게시글·댓글 Calendar 교체와 전체 사용처 조사](./post-comment-calendar-plan.md)
 
@@ -126,6 +126,7 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거한�
 | 수정              | [shared/utils/index.ts](../../src/shared/utils/index.ts)                                             | 날짜 선택용 변환 함수 export                                                     |
 | 수정              | [DatePicker.tsx](../../src/shared/components/DatePicker.tsx)                                         | 범위·오류·접근성 prop, 월·연도 탐색, 해제 정책 추가. 파싱은 공용 함수 재사용     |
 | 수정              | [DatePicker.test.tsx](../../src/shared/components/DatePicker.test.tsx)                               | 범위 경계·연도 이동·오류 연결·기존 클릭 동작 검증                                |
+| 수정              | [ui/calendar.tsx](../../src/shared/components/ui/calendar.tsx)                                       | Calendar 루트 컴포넌트를 고정해 월·연도 변경 시 드롭다운 포커스 유지             |
 | 수정              | [DateTimePicker.tsx](../../src/shared/components/DateTimePicker.tsx)                                 | 내부 달력을 DatePicker로 교체. 레이블·시·분 이름과 비활성·오류 전달 추가         |
 | 신규              | `src/shared/components/DateTimePicker.test.tsx`                                                      | 날짜·시간 선택·해제·초기값·콜백·폼 내부 동작 검증                                |
 | 수정              | [use-date-time-field.ts](../../src/shared/hooks/use-date-time-field.ts)                              | 로컬 날짜 파싱 사용, 잘못된 값 방어. 반환값과 콜백 계약 유지                     |
@@ -188,7 +189,7 @@ DatePicker의 기존 사용을 유지한다. 해제 시 필터에는 `undefined`
 
 ## 8. 날짜 처리와 시간대
 
-현재 `useDateTimeField`는 날짜 부분을 `new Date('yyyy-MM-dd')`로 파싱한다. 날짜 전용 문자열은 UTC 기준으로 해석되어, 음수 오프셋 시간대에서 로컬 형식으로 다시 표시할 때 전날이 될 수 있다. 공통화하면서 로컬 날짜 파싱으로 교체한다.
+교체 전 `useDateTimeField`는 날짜 부분을 `new Date('yyyy-MM-dd')`로 파싱했다. 날짜 전용 문자열은 UTC 기준으로 해석되어, 음수 오프셋 시간대에서 로컬 형식으로 다시 표시할 때 전날이 될 수 있었다. 1단계에서 공용 로컬 날짜 파싱으로 교체했다.
 
 - DatePicker, DateTimePicker 어댑터, useDateTimeField가 같은 날짜 선택용 함수를 사용한다.
 - 날짜 형식과 실제 날짜 유효성을 검증한다. 잘못된 초기값으로 `format`을 호출해 렌더링 오류가 발생하지 않게 한다.
@@ -202,10 +203,10 @@ DatePicker의 기존 사용을 유지한다. 해제 시 필터에는 `undefined`
 
 ### 1단계: 값 처리와 공용 날짜 선택기
 
-- [ ] 공용 로컬 날짜 파싱·변환 함수를 추가하고 유효성·윤년·빈 값·시간대 검증을 작성한다.
-- [ ] useDateTimeField의 UTC 날짜 파싱을 교체하고 초기값·해제·reset·setDateTime 계약을 검증한다.
-- [ ] DatePicker에 범위·접근성·오류·해제 정책과 월·연도 탐색을 추가한다.
-- [ ] 기존 게시글·댓글 테스트와 실제 클릭 동작이 유지되는지 확인한다.
+- [x] 공용 로컬 날짜 파싱·변환 함수를 추가하고 유효성·윤년·빈 값·시간대 검증을 작성한다.
+- [x] useDateTimeField의 UTC 날짜 파싱을 교체하고 초기값·해제·reset·setDateTime 계약을 검증한다.
+- [x] DatePicker에 범위·접근성·오류·해제 정책과 월·연도 탐색을 추가한다.
+- [x] 기존 게시글·댓글 테스트와 실제 클릭 동작이 유지되는지 확인한다.
 
 ### 2단계: 날짜·시간 선택기의 내부 공통화
 
@@ -265,3 +266,45 @@ npm run build
 - 남은 기본 날짜 입력과 중복된 Popover·Calendar 조합이 제거된다.
 - 기존 검색·회원 수정·일정 생성 및 수정의 값과 API 요청 형식을 보존한다.
 - 관련 테스트와 실제 브라우저 검증 결과를 문서에 기록한다.
+
+## 12. 1단계 작업 결과
+
+### 값 처리와 훅
+
+[date-picker-utils.ts](../../src/shared/utils/date-picker-utils.ts)에 `parseDateValue`, `formatDateValue`, `parseLocalDateTime`을 추가했다. 날짜는 `yyyy-MM-dd` 형식과 실제 날짜 유효성을 함께 검사하고 로컬 자정으로 파싱한다. 날짜·시간 입력은 날짜 전용 값 또는 `T`로 구분한 로컬 일시를 받으며, 초·소수 초가 있으면 기존 훅처럼 분 단위 시간만 사용한다. UTC 오프셋이나 `Z`가 붙은 값은 로컬 일시 계약에 맞지 않으므로 유효하지 않은 입력으로 처리한다.
+
+[useDateTimeField](../../src/shared/hooks/use-date-time-field.ts)는 공용 함수를 사용한다. 날짜 해제 후 시간 유지, reset의 `00:00` 복귀, `setDateTime`과 개별 setter의 콜백 미호출 계약을 유지했다. 잘못된 초기값이나 `Invalid Date`는 빈 날짜로 처리해 렌더링 오류를 방지한다.
+
+### 공용 DatePicker
+
+- `minDate`, `maxDate`는 경계를 포함하며 범위 밖 날짜를 비활성화한다. 범위 밖 기존 값은 부모 상태를 자동 변경하지 않고, 달력을 열 때 표시 월만 유효 범위로 이동한다. 최소일이 최대일보다 늦으면 모든 날짜 선택을 막는다.
+- `clearable`의 기본값은 `true`다. `false`이면 해제 버튼과 선택한 날짜 재클릭을 통한 해제를 모두 막는다.
+- `aria-label`, `aria-labelledby`, `aria-describedby`, `aria-invalid`를 날짜 버튼에 전달한다. 달력 팝업에도 이름과 설명을 연결한다.
+- 한국어 월·연도 드롭다운을 추가했다. 업무 제한이 없으면 현재 연도·선택 연도·탐색 연도에서 앞뒤 100년을 제공하고, 탐색에 따라 확장한다. 연도는 1~9999 안에서 이동하며, 이 탐색 범위를 업무상 최소·최대일 제한으로 사용하지 않는다.
+- [Calendar 루트](../../src/shared/components/ui/calendar.tsx)를 별도 컴포넌트로 고정했다. 월·연도 변경 때 달력 전체가 다시 마운트되어 드롭다운 포커스를 잃던 동작을 수정했다.
+
+### 검증 결과
+
+| 검증                                                                       | 결과                                                                                                                                     |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 공용 날짜 유틸·훅·DatePicker, 게시글·댓글 필터, 포인트·작성 기간 요청 빌더 | 7개 파일 74개 테스트가 `Asia/Seoul`, `America/Los_Angeles`에서 각각 통과                                                                 |
+| 추가 일정 페이지 테스트                                                    | 두 시간대 모두 미지급 일정 2개 통과, 작성 기간 1개 통과·3개 실패. 실패 3개는 변경 전 `HEAD` 소스에서도 동일하게 재현                     |
+| 린트·공백 검사                                                             | `npm run lint`, `git diff --check` 통과                                                                                                  |
+| 타입 검사·빌드                                                             | `npm run build` 통과. 기존 번들 크기 경고 발생                                                                                           |
+| 실제 Chromium                                                              | 1440px·768px·390px 서울, 390px 로스앤젤레스의 4개 환경에서 게시글·댓글 날짜 글자·여백·아이콘 클릭 총 48건 통과                           |
+| 추가 브라우저 동작                                                         | 월·연도 이동과 포커스 유지, 범위 경계, 해제 금지, 오류 설명 연결, 선택·초기화·재열기·Escape·외부 클릭·키보드 선택·Popover 화면 경계 확인 |
+
+1단계 대상 테스트 명령은 다음과 같다. `TZ`를 `America/Los_Angeles`로 바꿔 같은 검증을 실행했다.
+
+```bash
+TZ=Asia/Seoul npm run test:run -- \
+  src/shared/utils/date-picker-utils.test.ts \
+  src/shared/hooks/use-date-time-field.test.ts \
+  src/shared/components/DatePicker.test.tsx \
+  src/domains/Posts/components/PostFilterPanel.test.tsx \
+  src/domains/Comments/components/CommentFilterPanel.test.tsx \
+  src/domains/Points/utils/point-request-builders.test.ts \
+  src/domains/Reviews/utils/exam-review-period-request-builders.test.ts
+```
+
+추가 실행한 [ExamReviewPeriodPage.test.tsx](../../src/pages/reviews/ExamReviewPeriodPage.test.tsx)의 기존 실패는 별도 보수가 필요하다. 첫 실패는 조회 오류 대신 상시 노출되는 안내 영역의 `alert`를 선택해 발생한다. 빈 목록 및 일정 표시 검증도 변경 전 소스에서 동일하게 실패했다. 전체 테스트가 통과했다고 간주하지 않으며, 이번 단계에서는 해당 테스트를 수정하지 않았다.
