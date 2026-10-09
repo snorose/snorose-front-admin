@@ -117,7 +117,7 @@ export default function InquiryCommentItem({
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content align='end'>
                   <DropdownMenu.Item onClick={() => onEditStart(comment)}>
-                    <Pencil className='h-4 w-4' />
+                    <Pencil aria-hidden='true' className='h-4 w-4' />
                     수정
                   </DropdownMenu.Item>
                   <DropdownMenu.Separator />
@@ -125,7 +125,7 @@ export default function InquiryCommentItem({
                     variant='destructive'
                     onClick={() => onDelete(comment.id)}
                   >
-                    <Trash2 className='h-4 w-4' />
+                    <Trash2 aria-hidden='true' className='h-4 w-4' />
                     삭제
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>

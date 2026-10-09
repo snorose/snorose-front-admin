@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
@@ -211,6 +212,7 @@ export default function PostDetailManageCard({
               }}
               className='w-full'
             >
+              <Trash2 aria-hidden='true' />
               게시글 삭제
             </Button>
           </div>

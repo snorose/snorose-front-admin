@@ -695,7 +695,7 @@ export function ExamDetailSection({
                 onClick={openDeleteModal}
                 disabled={isDisabled}
               >
-                <Trash2 className='h-4 w-4' />
+                <Trash2 aria-hidden='true' />
                 삭제
               </Button>
             ))}
@@ -775,7 +775,7 @@ export function ExamDetailSection({
                         onClick={() => setIsEditMode((prev) => !prev)}
                         disabled={isDisabled}
                       >
-                        <Pencil className='mr-1.5 h-3.5 w-3.5' />
+                        <Pencil aria-hidden='true' />
                         편집 모드
                       </Button>
                     )

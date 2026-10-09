@@ -1,10 +1,11 @@
 import { useCallback, useId, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 
+import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input, Label } from '@/shared/components/ui';
+import { Button, InputGroup, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -99,15 +100,19 @@ export default function MemberPenaltyManagementPage() {
           회원 검색 (아이디 또는 학번)
         </Label>
         <form className='flex flex-wrap gap-2' onSubmit={handleSearchSubmit}>
-          <Input
-            id={searchId}
-            aria-describedby={errorMessage ? `${searchId}-error` : undefined}
-            type='text'
-            placeholder='아이디, 학번을 입력해주세요'
-            className='max-w-96 min-w-0 flex-1'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <InputGroup className='max-w-96 min-w-0 flex-1'>
+            <InputGroup.Addon>
+              <Search aria-hidden='true' />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              id={searchId}
+              aria-describedby={errorMessage ? `${searchId}-error` : undefined}
+              type='text'
+              placeholder='아이디, 학번을 입력해주세요'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </InputGroup>
           <Button type='submit' className='w-20' disabled={isSearching}>
             {isSearching ? '검색 중...' : '검색'}
           </Button>

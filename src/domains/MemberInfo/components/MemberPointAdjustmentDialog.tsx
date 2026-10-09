@@ -279,7 +279,6 @@ export default function MemberPointAdjustmentDialog({
               취소
             </Button>
             <Button type='button' onClick={handleApply} disabled={isSubmitting}>
-              <Coins className='h-4 w-4' />
               지급
             </Button>
           </Dialog.Footer>

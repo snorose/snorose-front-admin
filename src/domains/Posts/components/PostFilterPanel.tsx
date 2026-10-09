@@ -1,7 +1,9 @@
 import { useId, useState } from 'react';
 
+import { Search } from 'lucide-react';
+
 import { DatePicker } from '@/shared/components';
-import { Button, Input, Label, Select } from '@/shared/components/ui';
+import { Button, InputGroup, Label, Select } from '@/shared/components/ui';
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { PostSearchParams } from '../types';
@@ -99,35 +101,40 @@ export const PostFilterPanel = ({
       </div>
 
       {/* 게시자 / 게시글 검색 */}
-      <div className='flex gap-4'>
-        <div className='flex flex-1 flex-col gap-1'>
+      <div className='flex flex-col gap-4 lg:flex-row'>
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <Label
             htmlFor={`${inputId}-keywordAuthor`}
             className='py-0 text-sm leading-5 font-medium text-gray-600'
           >
             게시자 검색 (아이디/닉네임/학번)
           </Label>
-          <Input
-            id={`${inputId}-keywordAuthor`}
-            type='text'
-            placeholder='게시자 검색...'
-            value={filters.keywordAuthor ?? ''}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                keywordAuthor: e.target.value || undefined,
-              }))
-            }
-          />
+          <InputGroup>
+            <InputGroup.Addon>
+              <Search aria-hidden='true' />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              id={`${inputId}-keywordAuthor`}
+              type='text'
+              placeholder='게시자 검색...'
+              value={filters.keywordAuthor ?? ''}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  keywordAuthor: e.target.value || undefined,
+                }))
+              }
+            />
+          </InputGroup>
         </div>
-        <div className='flex flex-1 flex-col gap-1'>
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <Label
             htmlFor={`${inputId}-keywordPost`}
             className='py-0 text-sm leading-5 font-medium text-gray-600'
           >
             게시글 검색
           </Label>
-          <div className='flex gap-2'>
+          <div className='flex min-w-0 gap-2'>
             <Select
               value={filters.postSearchScope ?? 'TITLE_AND_CONTENT'}
               onValueChange={(value) =>
@@ -150,19 +157,23 @@ export const PostFilterPanel = ({
                 <Select.Item value='CONTENT'>내용</Select.Item>
               </Select.Content>
             </Select>
-            <Input
-              id={`${inputId}-keywordPost`}
-              type='text'
-              placeholder='검색어 입력...'
-              value={filters.keywordPost ?? ''}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  keywordPost: e.target.value || undefined,
-                }))
-              }
-              className='flex-1'
-            />
+            <InputGroup className='min-w-0 flex-1'>
+              <InputGroup.Addon>
+                <Search aria-hidden='true' />
+              </InputGroup.Addon>
+              <InputGroup.Input
+                id={`${inputId}-keywordPost`}
+                type='text'
+                placeholder='검색어 입력...'
+                value={filters.keywordPost ?? ''}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    keywordPost: e.target.value || undefined,
+                  }))
+                }
+              />
+            </InputGroup>
           </div>
         </div>
       </div>

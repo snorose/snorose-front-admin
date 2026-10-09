@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { MoreHorizontalIcon } from 'lucide-react';
+import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { PeriodStatusBadge } from '@/shared/components';
 import { Button, DropdownMenu, Skeleton, Table } from '@/shared/components/ui';
@@ -140,6 +140,7 @@ export function PointFreezeListSection({
                                 handleUpdateScheduleButtonClick(id)
                               }
                             >
+                              <Pencil aria-hidden='true' />
                               수정
                             </DropdownMenu.Item>
                             <DropdownMenu.Separator />
@@ -147,6 +148,7 @@ export function PointFreezeListSection({
                               variant='destructive'
                               onClick={() => handleDeleteScheduleClick(id)}
                             >
+                              <Trash2 aria-hidden='true' />
                               삭제
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>

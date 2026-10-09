@@ -7,6 +7,7 @@ import {
   Eye,
   Heart,
   MessageSquare,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -171,6 +172,7 @@ export default function PostDetailCommentItem({
                     setIsModalOpen(true);
                   }}
                 >
+                  <Trash2 aria-hidden='true' className='size-3.5' />
                   삭제
                 </Button>
               </>

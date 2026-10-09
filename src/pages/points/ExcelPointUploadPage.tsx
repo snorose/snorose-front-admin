@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { AlertTriangle, CheckCircle2, Download, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
@@ -707,7 +707,6 @@ export default function ExcelPointUploadPage() {
                               className='shrink-0 border-amber-200 bg-white text-amber-950 hover:bg-amber-50'
                               onClick={handleDownloadNotProcessedExcel}
                             >
-                              <Download className='size-4' aria-hidden />
                               미처리 명단 엑셀 저장
                             </Button>
                           ) : null}

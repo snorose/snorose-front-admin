@@ -1,4 +1,4 @@
-import { CircleHelpIcon } from 'lucide-react';
+import { CircleHelpIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
 
@@ -93,6 +93,7 @@ export function PopupManagementTable({
                       size='sm'
                       onClick={() => onUpdate(popup)}
                     >
+                      <Pencil aria-hidden='true' />
                       수정
                     </Button>
                     <Button
@@ -101,6 +102,7 @@ export function PopupManagementTable({
                       size='sm'
                       onClick={() => onDelete(popup.id)}
                     >
+                      <Trash2 aria-hidden='true' />
                       삭제
                     </Button>
                   </div>

@@ -1,9 +1,10 @@
 import { useId, useRef, useState } from 'react';
 
+import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input, Label } from '@/shared/components/ui';
+import { Button, InputGroup, Label } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import type { AdminUserListItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
@@ -106,19 +107,23 @@ export default function AdjustSinglePointPage() {
           회원 검색 (아이디 또는 학번)
         </Label>
         <div className='flex gap-2'>
-          <Input
-            id={searchInputId}
-            type='text'
-            placeholder='아이디 또는 학번을 입력해주세요.'
-            className='w-96'
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSearchButtonClick();
-              }
-            }}
-          />
+          <InputGroup className='max-w-96 min-w-0 flex-1'>
+            <InputGroup.Addon>
+              <Search aria-hidden='true' />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              id={searchInputId}
+              type='text'
+              placeholder='아이디 또는 학번을 입력해주세요.'
+              value={searchQuery}
+              onChange={handleSearchInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearchButtonClick();
+                }
+              }}
+            />
+          </InputGroup>
           <Button
             type='button'
             className='w-20'

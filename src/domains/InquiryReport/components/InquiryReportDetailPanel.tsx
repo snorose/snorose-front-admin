@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useId, useState } from 'react';
 
-import { Copy, ExternalLink, Send, X } from 'lucide-react';
+import { Copy, ExternalLink, X } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
 import { Button, Textarea } from '@/shared/components/ui';
@@ -453,7 +453,6 @@ export default function InquiryReportDetailPanel({
               size='sm'
               disabled={!isCommentInputValid || createComment.isPending}
             >
-              <Send className='h-3.5 w-3.5' />
               {replyParentComment ? '대댓글 등록' : '댓글 등록'}
             </Button>
           </div>

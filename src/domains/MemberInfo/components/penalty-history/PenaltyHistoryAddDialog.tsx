@@ -1,6 +1,6 @@
 import { useId, useMemo, useRef, useState } from 'react';
 
-import { AlertTriangle, Loader2, Plus } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button, Dialog, Textarea } from '@/shared/components/ui';
@@ -342,9 +342,7 @@ export default function PenaltyHistoryAddDialog({
             >
               {isSubmitting ? (
                 <Loader2 className='h-5 w-5 animate-spin' />
-              ) : (
-                <Plus className='h-5 w-5' />
-              )}
+              ) : null}
               {submitLabel}
             </Button>
           </Dialog.Footer>

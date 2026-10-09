@@ -1,6 +1,6 @@
 import { useId } from 'react';
 
-import { Loader2, RotateCcw, Search, Users } from 'lucide-react';
+import { Loader2, Search, Users } from 'lucide-react';
 
 import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
 import { Button, InputGroup, Label, Table } from '@/shared/components/ui';
@@ -117,9 +117,7 @@ export default function MemberDirectorySection({
             >
               {isListLoading ? (
                 <Loader2 className='h-4 w-4 animate-spin' />
-              ) : (
-                <Search className='h-4 w-4' />
-              )}
+              ) : null}
               회원 검색
             </Button>
           </div>
@@ -157,7 +155,6 @@ export default function MemberDirectorySection({
                 onClick={onRefreshDirectory}
                 disabled={isListLoading}
               >
-                <RotateCcw className='h-4 w-4' />
                 초기화
               </Button>
             </div>

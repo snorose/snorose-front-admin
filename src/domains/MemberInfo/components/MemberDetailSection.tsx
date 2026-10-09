@@ -1,13 +1,6 @@
 import { useState } from 'react';
 
-import {
-  ArrowLeft,
-  Check,
-  Loader2,
-  PencilIcon,
-  UserRound,
-  X,
-} from 'lucide-react';
+import { ArrowLeft, Loader2, Pencil, UserRound } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
@@ -117,7 +110,7 @@ export default function MemberDetailSection({
                 size='sm'
                 onClick={onEditStart}
               >
-                <PencilIcon className='h-4 w-4' />
+                <Pencil aria-hidden='true' />
                 수정
               </Button>
             ) : (
@@ -128,7 +121,6 @@ export default function MemberDetailSection({
                   size='sm'
                   onClick={onEditCancel}
                 >
-                  <X className='h-4 w-4' />
                   취소
                 </Button>
                 <Button
@@ -137,7 +129,6 @@ export default function MemberDetailSection({
                   form={MEMBER_INFO_EDIT_FORM_ID}
                   disabled={isDetailLoading}
                 >
-                  <Check className='h-4 w-4' />
                   완료
                 </Button>
               </div>
