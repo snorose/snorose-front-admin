@@ -154,7 +154,7 @@ export const CommentFilterPanel = ({
               <Select.Trigger
                 id={`${inputId}-searchScope`}
                 aria-label='댓글 검색 범위'
-                className='h-9 w-[140px] shrink-0'
+                className='h-9 w-35 shrink-0'
               >
                 <Select.Value />
               </Select.Trigger>

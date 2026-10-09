@@ -139,7 +139,7 @@ export const PostFilterPanel = ({
               <Select.Trigger
                 id={`${inputId}-postSearchScope`}
                 aria-label='게시글 검색 범위'
-                className='h-9 w-[120px] shrink-0'
+                className='h-9 w-30 shrink-0'
               >
                 <Select.Value />
               </Select.Trigger>
