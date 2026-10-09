@@ -43,7 +43,7 @@ export default function SortableHead({
         onClick={() => onSort(columnType)}
         aria-label={`${label} 정렬`}
         className={cn(
-          'inline-flex cursor-pointer items-center gap-1 select-none',
+          'focus-visible:ring-ring inline-flex min-h-8 cursor-pointer items-center gap-1 rounded-md select-none focus-visible:ring-2 focus-visible:outline-none',
           isActive ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'
         )}
       >

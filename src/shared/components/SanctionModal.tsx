@@ -38,6 +38,7 @@ export default function SanctionModal({
           </Dialog.Header>
           <div className='flex gap-3 py-2'>
             <Button
+              type='button'
               className='flex-1'
               variant='outline'
               onClick={() => {
@@ -48,7 +49,9 @@ export default function SanctionModal({
               경고
             </Button>
             <Button
-              className='flex-1 bg-red-600 text-white hover:bg-red-700'
+              type='button'
+              variant='destructive-outline'
+              className='flex-1'
               onClick={() => {
                 onClose();
                 setPenaltyMode('DEMOTION');

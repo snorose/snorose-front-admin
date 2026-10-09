@@ -1,4 +1,5 @@
 import { useCallback, useId, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 
 import { toast } from 'sonner';
 
@@ -23,10 +24,12 @@ export default function MemberPenaltyManagementPage() {
     null
   );
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // 회원 검색 API
   const handleSearch = useCallback(async () => {
+    if (isSearching) return;
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) {
@@ -36,6 +39,7 @@ export default function MemberPenaltyManagementPage() {
       return;
     }
 
+    setIsSearching(true);
     try {
       const member = await searchUsersAPI(query);
 
@@ -48,8 +52,15 @@ export default function MemberPenaltyManagementPage() {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
       setSelectedMember(null);
       setErrorMessage('데이터가 없습니다');
+    } finally {
+      setIsSearching(false);
     }
-  }, [searchQuery]);
+  }, [isSearching, searchQuery]);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void handleSearch();
+  };
 
   const handlePenaltyApplied = useCallback(async () => {
     setHistoryRefreshKey((prev) => prev + 1);
@@ -87,26 +98,20 @@ export default function MemberPenaltyManagementPage() {
         <Label htmlFor={searchId} className='sr-only'>
           회원 검색 (아이디 또는 학번)
         </Label>
-        <div className='flex gap-2'>
+        <form className='flex flex-wrap gap-2' onSubmit={handleSearchSubmit}>
           <Input
             id={searchId}
             aria-describedby={errorMessage ? `${searchId}-error` : undefined}
             type='text'
             placeholder='아이디, 학번을 입력해주세요'
-            className='w-96'
+            className='max-w-96 min-w-0 flex-1'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
-          <Button
-            size='sm'
-            variant='outline'
-            className='h-auto w-20 text-black'
-            onClick={handleSearch}
-          >
-            검색
+          <Button type='submit' className='w-20' disabled={isSearching}>
+            {isSearching ? '검색 중...' : '검색'}
           </Button>
-        </div>
+        </form>
       </section>
       {errorMessage && (
         <p id={`${searchId}-error`} role='alert' className='font-medium'>

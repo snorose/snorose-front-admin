@@ -4,7 +4,7 @@ import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PaginationBar } from '@/shared/components';
-import { Table } from '@/shared/components/ui';
+import { Button, Table } from '@/shared/components/ui';
 
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
@@ -81,14 +81,15 @@ export default function PointHistoryTab({
                   <div className='flex items-center justify-center gap-1'>
                     <span>{history.sourceId}</span>
 
-                    <button
+                    <Button
                       type='button'
+                      variant='ghost'
+                      size='icon-sm'
                       onClick={() => handleCopy(history.sourceId)}
-                      aria-label='복사'
-                      className='rounded p-1 text-gray-600 transition hover:bg-gray-100 hover:text-black'
+                      aria-label={`포인트 ID ${history.sourceId} 복사`}
                     >
                       <Copy className='h-4 w-4' />
-                    </button>
+                    </Button>
                   </div>
                 </Table.Cell>
 
