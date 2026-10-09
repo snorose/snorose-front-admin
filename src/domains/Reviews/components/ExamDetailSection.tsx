@@ -668,9 +668,7 @@ export function ExamDetailSection({
             )}
           </div>
           {selectedExamReview &&
-            (isDeleted ? (
-              /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */
-              null
+            (isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (
               /*
               <Button
                 type='button'
@@ -689,13 +687,11 @@ export function ExamDetailSection({
                 삭제된 시험 후기 복구
               </Button>
               */
-            ) : (
               <Button
                 type='button'
-                variant='outline'
+                variant='destructive-outline'
                 size='sm'
                 aria-label='시험 후기 삭제'
-                className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
                 onClick={openDeleteModal}
                 disabled={isDisabled}
               >
@@ -750,7 +746,6 @@ export function ExamDetailSection({
                           type='button'
                           variant='outline'
                           size='sm'
-                          className='h-8 px-5 text-xs'
                           onClick={handleCancel}
                           disabled={isDisabled || isSaving}
                         >
@@ -759,7 +754,6 @@ export function ExamDetailSection({
                         <Button
                           type='button'
                           size='sm'
-                          className='h-8 bg-blue-600 px-5 text-xs text-white hover:bg-blue-700'
                           onClick={openSaveModal}
                           disabled={isDisabled || !isDirty || isSaving}
                         >
@@ -778,7 +772,6 @@ export function ExamDetailSection({
                         type='button'
                         variant='secondary'
                         size='sm'
-                        className='h-8 bg-blue-100 px-5 text-xs text-blue-700 hover:bg-blue-200 hover:text-blue-800'
                         onClick={() => setIsEditMode((prev) => !prev)}
                         disabled={isDisabled}
                       >

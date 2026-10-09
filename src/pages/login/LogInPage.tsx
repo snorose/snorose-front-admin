@@ -104,8 +104,8 @@ export default function LogInPage() {
           <Button
             type='submit'
             size='lg'
-            variant='outline'
-            className='h-11 w-full cursor-pointer text-base'
+            variant='default'
+            className='h-11 w-full text-base'
             disabled={isLoading}
           >
             {isLoading ? '로그인 중...' : '로그인'}

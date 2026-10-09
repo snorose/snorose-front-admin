@@ -121,9 +121,7 @@ export default function AdjustSinglePointPage() {
           />
           <Button
             type='button'
-            size='sm'
-            variant='outline'
-            className='h-auto w-20 cursor-pointer text-black'
+            className='w-20'
             onClick={handleSearchButtonClick}
             disabled={isSearching}
           >

@@ -113,7 +113,7 @@ export function PointFreezeScheduleForm() {
               type='button'
               size='sm'
               variant='outline'
-              className='w-16 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+              className='w-16'
               disabled={isPending}
               onClick={handleResetButtonClick}
             >
@@ -122,8 +122,8 @@ export function PointFreezeScheduleForm() {
             <Button
               type='button'
               size='sm'
-              variant='outline'
-              className='w-16 cursor-pointer font-bold'
+              variant='default'
+              className='w-16'
               disabled={isPending}
               onClick={handleCreateButtonClick}
             >

@@ -73,8 +73,8 @@ export default function PenaltyHistoryTimelineDialog({
           <div className='grid grid-cols-2 gap-3 px-8 py-5'>
             <Button
               type='button'
-              variant='outline'
-              className='h-12 rounded-xl text-base font-semibold'
+              variant='destructive-outline'
+              size='xl'
               onClick={onAddWarning}
               disabled={!canAddWarning}
               title={
@@ -88,8 +88,8 @@ export default function PenaltyHistoryTimelineDialog({
             </Button>
             <Button
               type='button'
-              variant='outline'
-              className='h-12 rounded-xl text-base font-semibold'
+              variant='destructive-outline'
+              size='xl'
               onClick={onAddDemotion}
             >
               <Plus className='h-5 w-5' />
@@ -197,7 +197,7 @@ function PenaltyHistoryCard({
               variant='ghost'
               size='icon-sm'
               onClick={() => onDelete(history)}
-              className='rounded-lg text-rose-500 hover:text-rose-600'
+              className='text-destructive hover:text-destructive'
               aria-label='제재 삭제 요청 안내'
               title='제재 삭제는 담당자 요청이 필요합니다.'
               disabled={Boolean(history.deletedAt)}

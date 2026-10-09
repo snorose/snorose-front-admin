@@ -36,7 +36,7 @@ export default function NotFoundPage() {
       <Button
         type='button'
         size='lg'
-        className='min-w-36 !text-white hover:!text-white'
+        className='min-w-36'
         onClick={handleBackClick}
       >
         이전 페이지로 이동

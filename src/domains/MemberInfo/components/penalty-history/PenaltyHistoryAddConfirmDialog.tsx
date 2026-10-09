@@ -51,7 +51,7 @@ export default function PenaltyHistoryAddConfirmDialog({
             <Button
               type='button'
               variant='outline'
-              className='h-12 rounded-xl px-6 text-base font-semibold text-slate-950'
+              size='xl'
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
@@ -59,7 +59,8 @@ export default function PenaltyHistoryAddConfirmDialog({
             </Button>
             <Button
               type='button'
-              className='h-12 rounded-xl bg-slate-950 px-6 text-base font-bold text-white hover:bg-slate-800'
+              variant='destructive'
+              size='xl'
               onClick={onConfirm}
               disabled={isSubmitting}
             >

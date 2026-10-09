@@ -241,18 +241,15 @@ function RowNumberColumnHead({ variant }: { variant: 'preview' | 'failure' }) {
         <span>행 번호</span>
         <Tooltip>
           <Tooltip.Trigger asChild>
-            <button
+            <Button
               type='button'
-              className={cn(
-                '-m-0.5 inline-flex shrink-0 rounded-full p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
-                isFailure
-                  ? 'text-amber-700/90 hover:text-amber-950 focus-visible:ring-amber-400'
-                  : 'text-slate-500 hover:text-slate-800 focus-visible:ring-slate-400'
-              )}
+              variant='ghost'
+              size='icon-sm'
+              className={cn(isFailure ? 'text-amber-700/90' : 'text-slate-500')}
               aria-label='행 번호 안내'
             >
               <Info className='size-3.5' aria-hidden />
-            </button>
+            </Button>
           </Tooltip.Trigger>
           <Tooltip.Content side='top' sideOffset={4}>
             {ROW_NUMBER_TOOLTIP_TEXT}

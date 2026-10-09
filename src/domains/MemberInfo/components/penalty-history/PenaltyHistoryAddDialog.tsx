@@ -327,7 +327,7 @@ export default function PenaltyHistoryAddDialog({
             <Button
               type='button'
               variant='outline'
-              className='h-12 rounded-xl px-6 text-base font-semibold'
+              size='xl'
               onClick={closeDialog}
               disabled={isSubmitting}
             >
@@ -335,7 +335,8 @@ export default function PenaltyHistoryAddDialog({
             </Button>
             <Button
               type='button'
-              className='h-12 rounded-xl bg-slate-950 px-6 text-base font-bold text-white hover:bg-slate-800'
+              variant='destructive-outline'
+              size='xl'
               onClick={handleRequestSubmit}
               disabled={isSubmitting}
             >
