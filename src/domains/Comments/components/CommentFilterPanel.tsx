@@ -352,7 +352,7 @@ export const CommentFilterPanel = ({
         </div>
       </div>
 
-      <div className='flex w-full gap-4'>
+      <div className='flex w-full flex-col gap-2 sm:flex-row sm:gap-4'>
         <Button
           type='button'
           variant='outline'
@@ -360,7 +360,7 @@ export const CommentFilterPanel = ({
           className='min-w-0 flex-1 shrink'
         >
           <RotateCcw aria-hidden='true' />
-          초기화
+          검색 조건 초기화
         </Button>
         <Button
           type='button'

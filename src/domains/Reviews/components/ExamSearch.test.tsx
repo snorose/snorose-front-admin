@@ -121,7 +121,7 @@ describe('시험후기 날짜 검색', () => {
       endDate: '2026-10-17',
       keywordPost: '후기',
     });
-    await user.click(screen.getByRole('button', { name: '검색 옵션 초기화' }));
+    await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
     expect(onSearchChange).toHaveBeenLastCalledWith({});
     expect(
       screen.getByRole('button', { name: '검색 종료일' })

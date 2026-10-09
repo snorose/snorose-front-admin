@@ -1,4 +1,3 @@
-import { RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
@@ -47,8 +46,7 @@ export function PointActionButtons({
         onClick={onReset}
         className='w-32'
       >
-        <RotateCcw aria-hidden='true' />
-        초기화
+        입력 초기화
       </Button>
       <Button
         type='button'

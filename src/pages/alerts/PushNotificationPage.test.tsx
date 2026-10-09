@@ -232,7 +232,7 @@ describe('PushNotificationPage', () => {
     await user.type(titleInput, '테스트 제목');
     await user.type(bodyInput, '테스트 내용');
 
-    const resetButton = screen.getByRole('button', { name: '초기화' });
+    const resetButton = screen.getByRole('button', { name: '입력 초기화' });
     await user.click(resetButton);
 
     expect(nameInput).toHaveValue('');
@@ -710,7 +710,7 @@ describe('PushNotificationPage', () => {
 
       await user.click(screen.getByLabelText(/외부 URL/));
 
-      const resetButton = screen.getByRole('button', { name: '초기화' });
+      const resetButton = screen.getByRole('button', { name: '입력 초기화' });
       await user.click(resetButton);
 
       const marketingTrueRadio =

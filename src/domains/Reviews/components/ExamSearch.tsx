@@ -569,7 +569,7 @@ export default function ExamSearch({
           onClick={handleSearchOptionReset}
         >
           <RotateCcw aria-hidden='true' />
-          검색 옵션 초기화
+          검색 조건 초기화
         </Button>
       </div>
     </div>

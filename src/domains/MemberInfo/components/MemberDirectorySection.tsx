@@ -158,7 +158,7 @@ export default function MemberDirectorySection({
                 disabled={isListLoading}
               >
                 <RotateCcw aria-hidden='true' />
-                초기화
+                검색 조건 초기화
               </Button>
             </div>
           </div>

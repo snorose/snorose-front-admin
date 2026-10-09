@@ -106,7 +106,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     await user.click(screen.getByRole('option', { name: '23시' }));
     await user.click(screen.getByRole('button', { name: '수정' }));
     expect(screen.getByRole('alert')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '초기화' }));
+    await user.click(screen.getByRole('button', { name: '입력 초기화' }));
     expect(screen.getByLabelText(/일정 제목/)).toHaveValue(INITIAL.title);
     expect(screen.getByRole('button', { name: '시작 일시' })).toHaveTextContent(
       '2026-10-09'
@@ -137,7 +137,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     await user.click(day);
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
     await user.click(screen.getByRole('option', { name: '23시' }));
-    await user.click(screen.getByRole('button', { name: '초기화' }));
+    await user.click(screen.getByRole('button', { name: '입력 초기화' }));
     expect(screen.getByLabelText(/일정 제목/)).toHaveValue('');
     expect(screen.getByRole('button', { name: '시작 일시' })).toHaveTextContent(
       '시작 날짜 선택'

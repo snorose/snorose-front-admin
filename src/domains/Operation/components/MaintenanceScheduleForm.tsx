@@ -1,7 +1,5 @@
 import { useId, useState } from 'react';
 
-import { RotateCcw } from 'lucide-react';
-
 import { DateTimePicker } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
@@ -120,8 +118,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             </Button>
           )}
           <Button type='button' size='sm' variant='outline' onClick={reset}>
-            <RotateCcw aria-hidden='true' />
-            초기화
+            입력 초기화
           </Button>
           <Button type='submit' size='sm'>
             {initial ? '수정' : '생성'}
