@@ -423,6 +423,7 @@ export default function ExcelPointUploadPage() {
                 <InputGroup.Button
                   type='button'
                   variant='default'
+                  size='xs'
                   className='mx-1'
                   disabled={isSubmitting || isParsingFile}
                   onClick={handleUploadButtonClick}

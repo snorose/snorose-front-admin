@@ -327,7 +327,7 @@ export default function PenaltyHistoryAddDialog({
             <Button
               type='button'
               variant='outline'
-              size='xl'
+              size='default'
               onClick={closeDialog}
               disabled={isSubmitting}
             >
@@ -336,12 +336,12 @@ export default function PenaltyHistoryAddDialog({
             <Button
               type='button'
               variant='destructive-outline'
-              size='xl'
+              size='default'
               onClick={handleRequestSubmit}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <Loader2 className='h-5 w-5 animate-spin' />
+                <Loader2 aria-hidden='true' className='animate-spin' />
               ) : null}
               {submitLabel}
             </Button>

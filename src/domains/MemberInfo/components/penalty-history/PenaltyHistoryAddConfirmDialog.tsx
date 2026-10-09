@@ -51,7 +51,7 @@ export default function PenaltyHistoryAddConfirmDialog({
             <Button
               type='button'
               variant='outline'
-              size='xl'
+              size='default'
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
@@ -60,12 +60,12 @@ export default function PenaltyHistoryAddConfirmDialog({
             <Button
               type='button'
               variant='destructive'
-              size='xl'
+              size='default'
               onClick={onConfirm}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <Loader2 className='h-5 w-5 animate-spin' />
+                <Loader2 aria-hidden='true' className='animate-spin' />
               ) : null}
               확인
             </Button>

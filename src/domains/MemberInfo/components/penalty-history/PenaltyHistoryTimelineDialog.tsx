@@ -74,7 +74,7 @@ export default function PenaltyHistoryTimelineDialog({
             <Button
               type='button'
               variant='destructive-outline'
-              size='xl'
+              size='default'
               onClick={onAddWarning}
               disabled={!canAddWarning}
               title={
@@ -83,16 +83,16 @@ export default function PenaltyHistoryTimelineDialog({
                   : '영구강등 회원에게는 경고를 추가할 수 없습니다.'
               }
             >
-              <Plus className='h-5 w-5' />
+              <Plus aria-hidden='true' />
               경고 추가
             </Button>
             <Button
               type='button'
               variant='destructive-outline'
-              size='xl'
+              size='default'
               onClick={onAddDemotion}
             >
-              <Plus className='h-5 w-5' />
+              <Plus aria-hidden='true' />
               강등 추가
             </Button>
           </div>
