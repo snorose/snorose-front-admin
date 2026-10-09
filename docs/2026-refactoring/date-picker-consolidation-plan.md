@@ -2,7 +2,7 @@
 
 > 조사 기준: 2026-10-09 현재 소스
 >
-> 상태: 1~2단계 완료. 3~4단계의 기본 입력 교체와 전체 확인은 진행 예정이다.
+> 상태: 1~3단계 완료. 4단계의 전체 확인과 미사용 스타일 정리는 진행 예정이다.
 >
 > 선행 작업: [게시글·댓글 Calendar 교체와 전체 사용처 조사](./post-comment-calendar-plan.md)
 
@@ -16,19 +16,19 @@
 
 ## 2. 현재 상태와 전체 대상
 
-2단계 완료 후 DateTimePicker는 공용 DatePicker를 내부에서 재사용한다. 게시글·댓글과 기존 날짜·시간 사용처가 같은 한국어 달력·CalendarIcon·전체 클릭·개별 해제·좌우 화살표 월 이동·재열기 동작을 공유한다. 남은 기본 날짜 입력은 3단계 대상이다.
+3단계 완료 후 모든 대상 화면은 DatePicker 또는 DatePicker를 내부에서 재사용하는 DateTimePicker를 사용한다. 한국어 달력·CalendarIcon·전체 클릭·개별 해제·재열기 동작을 공유하며, 일반 날짜는 좌우 화살표로 월을 이동하고 생년월일은 월·연도 드롭다운을 사용한다.
 
-| 화면·기능                    | 현재 구현                  | 필드 수                | 목표 구현                                            |
-| ---------------------------- | -------------------------- | ---------------------- | ---------------------------------------------------- |
-| 게시글 작성일 검색           | DatePicker                 | 시작·종료 2개          | 확장된 공용 DatePicker 유지                          |
-| 댓글 작성일 검색             | DatePicker                 | 시작·종료 2개          | 확장된 공용 DatePicker 유지                          |
-| 미지급 일정 생성·수정        | DateTimePicker             | 각각 시작·종료, 총 4개 | 공용 DatePicker를 내부에서 재사용하는 DateTimePicker |
-| 시험후기 작성 기간 생성·수정 | DateTimePicker             | 각각 시작·종료, 총 4개 | 동일한 DateTimePicker                                |
-| 팝업 등록·수정               | DateTimePicker             | 시작·종료 2개          | 동일한 DateTimePicker                                |
-| 엑셀 포인트 예약 지급        | 조건부 DateTimePicker      | 예약 일시 1개          | 동일한 DateTimePicker                                |
-| 시험후기 검색                | 기본 `date` 입력           | 시작·종료 2개          | DatePicker                                           |
-| 회원 생년월일 수정           | 기본 `date` 입력           | 1개                    | DatePicker                                           |
-| 서버 점검 일정 생성·수정     | 기본 `datetime-local` 입력 | 시작·종료 2개          | DateTimePicker                                       |
+| 화면·기능                    | 현재 구현             | 필드 수                | 목표 구현                                            |
+| ---------------------------- | --------------------- | ---------------------- | ---------------------------------------------------- |
+| 게시글 작성일 검색           | DatePicker            | 시작·종료 2개          | 확장된 공용 DatePicker 유지                          |
+| 댓글 작성일 검색             | DatePicker            | 시작·종료 2개          | 확장된 공용 DatePicker 유지                          |
+| 미지급 일정 생성·수정        | DateTimePicker        | 각각 시작·종료, 총 4개 | 공용 DatePicker를 내부에서 재사용하는 DateTimePicker |
+| 시험후기 작성 기간 생성·수정 | DateTimePicker        | 각각 시작·종료, 총 4개 | 동일한 DateTimePicker                                |
+| 팝업 등록·수정               | DateTimePicker        | 시작·종료 2개          | 동일한 DateTimePicker                                |
+| 엑셀 포인트 예약 지급        | 조건부 DateTimePicker | 예약 일시 1개          | 동일한 DateTimePicker                                |
+| 시험후기 검색                | DatePicker            | 시작·종료 2개          | DatePicker                                           |
+| 회원 생년월일 수정           | DatePicker            | 1개                    | DatePicker(월·연도 드롭다운)                         |
+| 서버 점검 일정 생성·수정     | DateTimePicker        | 시작·종료 2개          | DateTimePicker                                       |
 
 대상은 소스 기준으로 **날짜 전용 7개 필드, 날짜·시간 13개 필드, 총 20개 필드**다. 생성·수정이 같은 컴포넌트를 공유하는 팝업과 서버 점검 폼은 필드를 중복 집계하지 않았다.
 
@@ -82,7 +82,7 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거했�
 
 일반 검색과 일정 선택은 `2026년 10월`처럼 월·연도를 제목으로 표시하고 좌우 화살표로 월을 이동한다. 공용 DatePicker의 기본값은 `captionLayout='label'`이다.
 
-생년월일을 월 이동 버튼만으로 고르면 수백 번 이동해야 할 수 있다. 생년월일 사용처에서는 같은 DatePicker에 `captionLayout='dropdown'`을 전달해 과거 연도로 바로 이동할 수 있게 한다. 실제 회원 생년월일 화면에 이 옵션을 연결하는 작업은 3단계에서 진행한다.
+생년월일을 월 이동 버튼만으로 고르면 수백 번 이동해야 할 수 있다. 생년월일 사용처에서는 같은 DatePicker에 `captionLayout='dropdown'`을 전달해 과거 연도로 바로 이동할 수 있게 한다. 3단계에서 실제 회원 생년월일 화면에도 이 옵션을 연결했다.
 
 드롭다운의 이동 범위는 업무상 선택 제한과 구분해서 설계한다. 기존 선택값과 미래 일정이 탐색 범위에 들어가도록 하고, 드롭다운의 기본 범위 때문에 미래 날짜 선택이 막히지 않는지 검증한다. 생년월일의 미래 날짜 제한 등 현재 없는 업무 규칙을 UI 통일을 이유로 새로 추가하지 않는다.
 
@@ -99,6 +99,7 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거했�
 | prop                                   | 계획                                                                                |
 | -------------------------------------- | ----------------------------------------------------------------------------------- |
 | `id`, `value`, `onValueChange`         | 기존 유지. `value`는 `yyyy-MM-dd` 또는 `undefined`                                  |
+| `name`                                 | 선택적으로 날짜 버튼에 전달. 회원 폼의 기존 필드 이름과 오류 포커스 검색 유지       |
 | `placeholder`, `className`, `disabled` | 기존 유지                                                                           |
 | `minDate`, `maxDate`                   | `yyyy-MM-dd` 문자열을 선택적으로 전달. 경계 날짜는 선택 가능하며 경계 밖은 비활성화 |
 | `clearable`                            | 선택적으로 전달. 기본값 `true`. 모든 해제 경로에 같은 정책 적용                     |
@@ -141,6 +142,7 @@ DateTimePicker는 자체 Popover·Calendar와 달력 열림 상태를 제거했�
 | 수정              | [MemberInfoEditForm.tsx](../../src/domains/MemberInfo/components/MemberInfoEditForm.tsx)             | 생년월일 안내 문구 지정, 날짜 버튼으로도 기존 오류 이동·포커스가 동작하는지 확인 |
 | 수정              | [MemberInfoEditForm.test.tsx](../../src/domains/MemberInfo/components/MemberInfoEditForm.test.tsx)   | 생년월일 선택·해제·저장값·오류 포커스 검증                                       |
 | 수정              | [MaintenanceScheduleForm.tsx](../../src/domains/Operation/components/MaintenanceScheduleForm.tsx)    | 기본 날짜·시간 입력 2개를 DateTimePicker로 교체                                  |
+| 신규              | `src/domains/Operation/components/MaintenanceScheduleForm.test.tsx`                                  | 필수값·시간 순서·수정 초기값·생성 및 수정 초기화·저장 문자열 검증                |
 | 수정              | [ServerMaintenancePage.test.tsx](../../src/pages/operation/ServerMaintenancePage.test.tsx)           | 기본 input 직접 변경을 실제 날짜·시간 선택으로 교체하고 CRUD·검증 유지 확인      |
 | 점검·필요 시 수정 | 기존 DateTimePicker 사용처 6개 파일                                                                  | 새로운 공용 UI에서 초기값·모달·레이아웃·필수 검증·시간 선택 확인                 |
 | 수정              | [기존 작업 문서](./post-comment-calendar-plan.md)                                                    | 후속 공통화 완료 후 최신 구조와 사용처 갱신                                      |
@@ -178,7 +180,7 @@ DatePicker의 기존 사용을 유지한다. 해제 시 필터에는 `undefined`
 
 ### 서버 점검 일정
 
-- 폼의 `draft.startAt`, `draft.endAt`는 기존 로컬 날짜·시간 문자열로 유지한다. DateTimePicker와 `useDateTimeField`로 선택값을 조합해 draft를 갱신한다.
+- 폼의 `draft.startAt`, `draft.endAt`는 기존 로컬 날짜·시간 문자열로 유지한다. DateTimePicker와 `useDateTimeField`의 상태에서 draft를 파생해 저장한다. 날짜·시간 값을 별도 draft state에 중복 저장하지 않는다.
 - 생성·수정 초기값, 초기화, 취소에서 draft와 날짜·시간 훅이 함께 동기화되어야 한다.
 - 현재 `setDateTime()`은 훅 상태만 갱신하고 `onDateTimeChange` 콜백을 호출하지 않는다. 초기화·초기값 주입 시 콜백이 draft까지 갱신한다고 가정하지 않는다.
 - 필수값 누락, 유효하지 않은 날짜·시간, `종료 > 시작` 검증과 제목 trim을 유지한다. 같은 일시나 빠른 종료 일시는 계속 거부한다.
@@ -220,9 +222,9 @@ DatePicker의 기존 사용을 유지한다. 해제 시 필터에는 `undefined`
 
 ### 3단계: 남은 기본 입력 교체
 
-- [ ] 시험후기 검색에 DatePicker를 적용하고 기존 min/max·기간 검증을 보존한다.
-- [ ] 회원 생년월일에 DatePicker를 적용하고 과거 연도 이동·오류 포커스·저장값을 검증한다.
-- [ ] 서버 점검에 DateTimePicker를 적용하고 생성·수정·초기화·필수값·시간 순서 검증을 보존한다.
+- [x] 시험후기 검색에 DatePicker를 적용하고 기존 min/max·기간 검증을 보존한다.
+- [x] 회원 생년월일에 DatePicker를 적용하고 과거 연도 이동·오류 포커스·저장값을 검증한다.
+- [x] 서버 점검에 DateTimePicker를 적용하고 생성·수정·초기화·필수값·시간 순서 검증을 보존한다.
 
 ### 4단계: 전체 확인과 문서 갱신
 
@@ -257,7 +259,7 @@ npm run lint
 npm run build
 ```
 
-서버 점검의 기존 테스트는 `datetime-local` input을 `fireEvent.change`로 직접 바꾼다. 교체 후에는 실제 달력과 시·분 선택을 조작하도록 수정한다. 테스트를 통과시키기 위해 화면에 사용하지 않는 기본 날짜 input을 남겨 두지 않는다.
+서버 점검의 교체 전 테스트는 `datetime-local` input을 `fireEvent.change`로 직접 바꿨다. 3단계에서 실제 달력과 시간 Select를 조작하도록 수정했다. 테스트를 통과시키기 위해 화면에 사용하지 않는 기본 날짜 input을 남겨 두지 않는다.
 
 실서버에 일정을 생성하거나 회원 정보를 저장하지 않아도 컴포넌트 콜백과 요청 빌더 결과를 검증할 수 있다. 숨겨진 팝업·예약 지급 UI는 테스트 또는 임시 확인 화면에서 실제 컴포넌트를 렌더링해 확인한다.
 
@@ -361,3 +363,26 @@ DateTimePicker 자체의 가용 너비를 container query로 확인한다. 24rem
 관련 5개 파일의 46개 테스트가 서울·로스앤젤레스 시간대에서 각각 통과했고, 타입 검사·빌드도 통과했다. 12~13절의 테스트 수와 드롭다운 브라우저 결과는 각 단계 당시의 검증 기록이다.
 
 Chromium의 1440px·768px·390px 서울과 390px 로스앤젤레스 환경에서 날짜 전용·날짜와 시간 필드의 글자·여백·아이콘 클릭 24건, 좌우 월 이동과 연도 경계, 날짜 선택·시간 유지·포커스 복귀를 확인했다. 생년월일용 드롭다운 옵션과 모바일 화면 경계도 정상 동작했으며 브라우저 오류는 없었다. 임시 확인 화면은 제거했다.
+
+## 15. 3단계 작업 결과
+
+### 남은 기본 입력 교체
+
+- [ExamSearch.tsx](../../src/domains/Reviews/components/ExamSearch.tsx)의 검색 시작일·종료일을 DatePicker로 교체했다. 시작일의 `maxDate`, 종료일의 `minDate`로 경계를 포함한 기존 제한을 연결한다. 해제는 기존 state의 `''`로 변환하며, 검색 버튼을 눌렀을 때만 날짜 문자열을 전달한다. 역전 기간의 기존 toast 검증과 필터 초기화도 유지한다.
+- [MemberInfoEditFormFields.tsx](../../src/domains/MemberInfo/components/MemberInfoEditFormFields.tsx)의 EditableField는 날짜일 때 DatePicker를 사용한다. 월·연도 드롭다운과 `생년월일 선택` 안내를 적용했다. DatePicker에 `name` prop을 추가해 기존 `name='birthday'`, Label, 오류 설명 연결을 유지한다. 기존 `focusFirstInvalidField`는 HTMLElement를 대상으로 하므로 날짜 버튼에도 그대로 동작한다. 생년월일 저장 문자열과 해제 후 필수값 검증을 유지하고 미래 날짜 제한을 새로 추가하지 않았다.
+- [MaintenanceScheduleForm.tsx](../../src/domains/Operation/components/MaintenanceScheduleForm.tsx)의 시작·종료 입력을 DateTimePicker로 교체했다. 제목 state와 두 날짜·시간 훅에서 저장용 draft를 조합한다. 초기화는 각 훅의 `setDateTime`과 제목을 함께 복원한다. 기존 수정 페이지의 일정 id 기반 `key`로 새 초기값을 반영하며, 취소와 생성 후 초기화도 유지한다. 저장값은 기존 `yyyy-MM-ddTHH:mm`, 제목 trim과 필수값·`종료 > 시작` 검증을 유지한다. 날짜·시·분 모두 오류 설명을 연결하고 폼별 id를 고유하게 만들었다.
+
+### 검증 결과
+
+| 검증                              | 결과                                                                                                                                                                             |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3단계 화면 테스트                 | 검색 5개, 회원 폼 3개, 점검 폼 8개, 점검 페이지 2개로 총 18개 통과                                                                                                               |
+| 공용 변경과 이전 사용처 회귀 검증 | 날짜 유틸·훅·DatePicker·DateTimePicker·게시글·댓글·일정 사용처·요청 빌더·회원 검증을 포함한 15개 파일 129개 테스트가 서울·로스앤젤레스에서 각각 통과                             |
+| 정적 검사                         | `npm run lint`, `npm run build`, `git diff --check` 통과. 기존 번들 크기 경고 유지                                                                                               |
+| 실제 Chromium                     | 1440px·768px·390px 서울과 390px 로스앤젤레스에서 다섯 날짜 필드의 글자·여백·아이콘 클릭 총 60건 통과                                                                             |
+| 브라우저 동작                     | 검색 경계·같은 날짜·검색 및 초기화, 생년월일 과거 연도·윤일 선택과 저장 문자열, 해제 후 오류 포커스·재선택, 점검 시간 순서 검증·생성·수정·삭제·초기화·수정 초기값·팝업 경계 확인 |
+| 기본 입력·브라우저 오류           | 확인 화면의 기본 date·datetime-local 입력 없음. 브라우저 오류 없음                                                                                                               |
+
+서버 점검 페이지 테스트는 기본 일시 input을 직접 변경하는 대신 공용 달력과 Select에서 실제 값을 선택한다. 회원 폼의 생년월일 저장은 콜백으로 검증했고, 브라우저의 점검 CRUD는 기존 임시 데이터 페이지에서 실행했다. 실서버 회원 정보나 일정을 저장하지 않았으며 임시 확인 화면은 제거했다.
+
+이번 검증은 위 관련 테스트 대상에 한정한다. 1단계에서 확인한 작성 기간 페이지의 기존 테스트 실패는 그대로 남아 있으며, 전체 테스트 실행과 미사용 날짜 아이콘 CSS 정리는 4단계에서 진행한다.

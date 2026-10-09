@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
+import { DateTimePicker } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
+import { useDateTimeField } from '@/shared/hooks';
 
 import type { ServerMaintenance } from '../types/maintenance';
 
@@ -9,8 +11,6 @@ export type MaintenanceDraft = Pick<
   'title' | 'startAt' | 'endAt'
 >;
 
-const EMPTY_DRAFT: MaintenanceDraft = { title: '', startAt: '', endAt: '' };
-
 interface Props {
   initial?: ServerMaintenance;
   onSave: (draft: MaintenanceDraft) => void;
@@ -18,20 +18,30 @@ interface Props {
 }
 
 export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
-  const [draft, setDraft] = useState<MaintenanceDraft>(initial ?? EMPTY_DRAFT);
+  const id = useId();
+  const titleId = `${id}-title`;
+  const headingId = `${id}-heading`;
+  const errorId = `${id}-error`;
+  const [title, setTitle] = useState(initial?.title ?? '');
+  const start = useDateTimeField({ initialDateTime: initial?.startAt });
+  const end = useDateTimeField({ initialDateTime: initial?.endAt });
+  const draft: MaintenanceDraft = {
+    title,
+    startAt: start.dateTime,
+    endAt: end.dateTime,
+  };
   const [error, setError] = useState('');
 
   const reset = () => {
-    setDraft(initial ?? EMPTY_DRAFT);
+    setTitle(initial?.title ?? '');
+    start.setDateTime(initial?.startAt ?? '');
+    end.setDateTime(initial?.endAt ?? '');
     setError('');
   };
 
   return (
-    <section
-      className='flex flex-col gap-1'
-      aria-labelledby='maintenance-form-title'
-    >
-      <h2 id='maintenance-form-title' className='text-lg font-bold'>
+    <section className='flex flex-col gap-1' aria-labelledby={headingId}>
+      <h2 id={headingId} className='text-lg font-bold'>
         {initial ? '서버 점검 일정 수정' : '서버 점검 일정 등록'}
       </h2>
       <form
@@ -55,58 +65,44 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
         }}
       >
         <div className='flex flex-col gap-1'>
-          <Label htmlFor='maintenance-title' required>
+          <Label htmlFor={titleId} required>
             일정 제목
           </Label>
           <Input
-            id='maintenance-title'
+            id={titleId}
             placeholder='예: 정기 서버점검'
-            value={draft.title}
-            onChange={(event) =>
-              setDraft({ ...draft, title: event.target.value })
-            }
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
             maxLength={100}
             required
           />
         </div>
         <div className='grid gap-4 sm:grid-cols-2'>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='maintenance-start' required>
-              시작 일시
-            </Label>
-            <Input
-              id='maintenance-start'
-              type='datetime-local'
-              value={draft.startAt}
-              onChange={(event) =>
-                setDraft({ ...draft, startAt: event.target.value })
-              }
-              required
-              aria-describedby={error ? 'maintenance-error' : undefined}
-            />
-          </div>
-          <div className='flex flex-col gap-1'>
-            <Label htmlFor='maintenance-end' required>
-              종료 일시
-            </Label>
-            <Input
-              id='maintenance-end'
-              type='datetime-local'
-              value={draft.endAt}
-              onChange={(event) =>
-                setDraft({ ...draft, endAt: event.target.value })
-              }
-              required
-              aria-describedby={error ? 'maintenance-error' : undefined}
-            />
-          </div>
+          <DateTimePicker
+            label='시작 일시'
+            date={start.date}
+            time={start.time}
+            onDateSelect={start.onDateSelect}
+            onTimeChange={start.onTimeChange}
+            datePlaceholder='시작 날짜 선택'
+            required
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
+          />
+          <DateTimePicker
+            label='종료 일시'
+            date={end.date}
+            time={end.time}
+            onDateSelect={end.onDateSelect}
+            onTimeChange={end.onTimeChange}
+            datePlaceholder='종료 날짜 선택'
+            required
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
+          />
         </div>
         {error && (
-          <p
-            id='maintenance-error'
-            role='alert'
-            className='text-destructive text-sm'
-          >
+          <p id={errorId} role='alert' className='text-destructive text-sm'>
             {error}
           </p>
         )}

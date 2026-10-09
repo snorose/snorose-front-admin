@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Input, InputGroup, Select } from '@/shared/components/ui';
+import { DatePicker } from '@/shared/components';
+import { Button, InputGroup, Select } from '@/shared/components/ui';
 import {
   EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
@@ -115,6 +116,7 @@ export default function ExamSearch({
   initialIsReported,
   initialStatuses,
 }: ExamSearchProps) {
+  const dateId = useId();
   // key prop을 사용하여 prop 변경 시 컴포넌트 재초기화 (useEffect 대신)
   const searchKey = `${initialStartDate}-${initialEndDate}-${initialKeywordAuthor}-${initialKeywordPost}-${initialSort}-${initialSemester}-${initialExamType}-${initialIsConfirmed}-${initialIsDiscussed}-${initialIsReported}-${initialStatuses}`;
 
@@ -373,20 +375,22 @@ export default function ExamSearch({
             </InputGroup.Addon>
           )}
         </InputGroup>
-        <Input
-          type='date'
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          max={endDate || undefined}
+        <DatePicker
+          id={`${dateId}-start`}
+          value={startDate || undefined}
+          onValueChange={(value) => setStartDate(value ?? '')}
+          maxDate={endDate || undefined}
+          placeholder='시작일 선택'
           className='w-[150px]'
           aria-label='검색 시작일'
         />
         <span className='text-xs text-gray-500'>~</span>
-        <Input
-          type='date'
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          min={startDate || undefined}
+        <DatePicker
+          id={`${dateId}-end`}
+          value={endDate || undefined}
+          onValueChange={(value) => setEndDate(value ?? '')}
+          minDate={startDate || undefined}
+          placeholder='종료일 선택'
           className='w-[150px]'
           aria-label='검색 종료일'
         />

@@ -13,6 +13,7 @@ interface DatePickerProps extends Pick<
   'aria-label' | 'aria-labelledby' | 'aria-describedby' | 'aria-invalid'
 > {
   id: string;
+  name?: string;
   value: string | undefined;
   onValueChange: (value: string | undefined) => void;
   placeholder?: string;
@@ -26,6 +27,7 @@ interface DatePickerProps extends Pick<
 
 export function DatePicker({
   id,
+  name,
   value,
   onValueChange,
   placeholder = '날짜 선택',
@@ -91,6 +93,7 @@ export function DatePicker({
       <Popover.Trigger asChild>
         <Button
           id={id}
+          name={name}
           type='button'
           variant='outline'
           disabled={disabled}
