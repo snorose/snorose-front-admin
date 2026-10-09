@@ -81,6 +81,8 @@ export const CommentFilterPanel = ({
             <Input
               id={`${inputId}-startDate`}
               type='date'
+              className='cursor-pointer'
+              onClick={(e) => e.currentTarget.showPicker?.()}
               value={filters.startDate ?? ''}
               onChange={(e) =>
                 setFilters((prev) => ({
@@ -100,6 +102,8 @@ export const CommentFilterPanel = ({
             <Input
               id={`${inputId}-endDate`}
               type='date'
+              className='cursor-pointer'
+              onClick={(e) => e.currentTarget.showPicker?.()}
               value={filters.endDate ?? ''}
               onChange={(e) =>
                 setFilters((prev) => ({
