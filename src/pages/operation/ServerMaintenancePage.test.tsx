@@ -74,7 +74,11 @@ describe('서버 점검 일정 관리', () => {
     await chooseHour(user, '종료 일시', '03');
     await user.click(screen.getByRole('button', { name: '생성' }));
     expect(screen.getByRole('cell', { name: '신규 점검' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '신규 점검 더보기' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: '신규 점검 서버 점검 일정 메뉴 열기',
+      })
+    );
     await user.click(screen.getByRole('menuitem', { name: '수정' }));
     expect(
       screen.getByRole('heading', { name: '서버 점검 일정 수정' })
@@ -93,7 +97,11 @@ describe('서버 점검 일정 관리', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: '수정' }));
     expect(screen.getByRole('cell', { name: '수정 점검' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '수정 점검 더보기' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: '수정 점검 서버 점검 일정 메뉴 열기',
+      })
+    );
     await user.click(screen.getByRole('menuitem', { name: '삭제' }));
     const dialog = screen.getByRole('dialog');
     fireEvent.click(within(dialog).getByRole('button', { name: '삭제' }));

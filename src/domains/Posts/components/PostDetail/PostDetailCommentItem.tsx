@@ -7,6 +7,7 @@ import {
   Eye,
   Heart,
   MessageSquare,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -150,9 +151,9 @@ export default function PostDetailCommentItem({
             {isNormal && (
               <>
                 <Button
+                  type='button'
                   variant='outline'
-                  size='sm'
-                  className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                  size='xs'
                   onClick={(e) => {
                     e.stopPropagation();
                     setModalType('HIDE');
@@ -162,24 +163,25 @@ export default function PostDetailCommentItem({
                   비공개
                 </Button>
                 <Button
-                  variant='destructive'
-                  size='sm'
-                  className='h-7 rounded-md bg-red-600 px-2 text-xs font-medium text-white hover:bg-red-700'
+                  type='button'
+                  variant='destructive-outline'
+                  size='xs'
                   onClick={(e) => {
                     e.stopPropagation();
                     setModalType('DELETE');
                     setIsModalOpen(true);
                   }}
                 >
+                  <Trash2 aria-hidden='true' className='size-3.5' />
                   삭제
                 </Button>
               </>
             )}
             {isHidden && (
               <Button
+                type='button'
                 variant='outline'
-                size='sm'
-                className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                size='xs'
                 onClick={(e) => {
                   e.stopPropagation();
                   setModalType('SHOW');
@@ -191,9 +193,9 @@ export default function PostDetailCommentItem({
             )}
             {isDeleted && (
               <Button
+                type='button'
                 variant='outline'
-                size='sm'
-                className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                size='xs'
                 disabled={restoreMutation.isPending}
                 onClick={(e) => {
                   e.stopPropagation();

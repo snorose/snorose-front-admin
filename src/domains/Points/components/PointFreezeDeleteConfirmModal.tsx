@@ -68,6 +68,7 @@ export function PointFreezeDeleteConfirmModal({
           </Button>
           <Button
             type='button'
+            variant='destructive'
             disabled={isPending}
             onClick={handleDeleteConfirm}
           >

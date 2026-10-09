@@ -1,4 +1,4 @@
-import { MoreHorizontalIcon } from 'lucide-react';
+import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { PeriodStatusBadge } from '@/shared/components';
 import { Button, DropdownMenu, Table } from '@/shared/components/ui';
@@ -82,15 +82,15 @@ export function MaintenanceListSection({ items, onEdit, onDelete }: Props) {
                           <Button
                             type='button'
                             variant='ghost'
-                            size='icon'
-                            className='size-8'
-                            aria-label={`${item.title} 더보기`}
+                            size='icon-sm'
+                            aria-label={`${item.title} 서버 점검 일정 메뉴 열기`}
                           >
-                            <MoreHorizontalIcon className='size-4' />
+                            <MoreHorizontalIcon aria-hidden='true' />
                           </Button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Content align='end'>
                           <DropdownMenu.Item onClick={() => onEdit(item)}>
+                            <Pencil aria-hidden='true' />
                             수정
                           </DropdownMenu.Item>
                           <DropdownMenu.Separator />
@@ -98,6 +98,7 @@ export function MaintenanceListSection({ items, onEdit, onDelete }: Props) {
                             variant='destructive'
                             onClick={() => onDelete(item)}
                           >
+                            <Trash2 aria-hidden='true' />
                             삭제
                           </DropdownMenu.Item>
                         </DropdownMenu.Content>

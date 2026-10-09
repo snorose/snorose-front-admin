@@ -24,6 +24,13 @@ describe('CommentFilterPanel', () => {
 
     const startDate = screen.getByRole('button', { name: '시작일' });
     const endDate = screen.getByRole('button', { name: '종료일' });
+    expect(
+      screen.getByRole('button', { name: '검색 조건 초기화' })
+    ).toHaveAttribute('data-variant', 'outline');
+    expect(screen.getByRole('button', { name: '검색' })).toHaveAttribute(
+      'data-variant',
+      'default'
+    );
     await user.click(startDate);
     await user.click(screen.getByRole('button', { name: /2026년 10월 2일/ }));
     await user.click(endDate);
@@ -46,7 +53,7 @@ describe('CommentFilterPanel', () => {
       endDate: undefined,
     });
 
-    await user.click(screen.getByRole('button', { name: '초기화' }));
+    await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
     expect(startDate).toHaveTextContent('시작일 선택');
     expect(endDate).toHaveTextContent('종료일 선택');
     expect(onFilterChange).toHaveBeenLastCalledWith({ searchScope: 'CONTENT' });

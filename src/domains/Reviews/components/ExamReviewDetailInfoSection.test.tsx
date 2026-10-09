@@ -80,13 +80,19 @@ describe('ExamReviewDetailInfoSection', () => {
     });
   });
 
-  test('업로드 파일 행에 파일명 변경 버튼을 표시한다', () => {
+  test('업로드 파일 행에 다운로드와 파일 변경만 표시한다', () => {
     renderExamReviewDetailInfoSection();
 
     const uploadField = getFieldByLabel('업로드 파일');
     expect(
-      within(uploadField).getByRole('button', { name: '파일명 변경' })
+      within(uploadField).getByRole('button', { name: 'exam.pdf' })
     ).toBeEnabled();
+    expect(
+      within(uploadField).getByRole('button', { name: '파일 변경' })
+    ).toBeEnabled();
+    expect(
+      within(uploadField).queryByRole('button', { name: '파일명 변경' })
+    ).not.toBeInTheDocument();
   });
 
   test('메모 입력란은 시험 유형 및 문항수 오른쪽 칸에 배치된다', () => {

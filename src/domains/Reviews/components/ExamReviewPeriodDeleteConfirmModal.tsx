@@ -70,7 +70,11 @@ export function ExamReviewPeriodDeleteConfirmModal({
           <Button type='button' variant='outline' onClick={handleDeleteCancel}>
             취소
           </Button>
-          <Button type='button' onClick={handleDeleteConfirm}>
+          <Button
+            type='button'
+            variant='destructive'
+            onClick={handleDeleteConfirm}
+          >
             삭제
           </Button>
         </Dialog.Footer>

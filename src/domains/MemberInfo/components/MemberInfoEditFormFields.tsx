@@ -3,7 +3,7 @@ import { useId } from 'react';
 import { Copy, type LucideIcon, UserRound } from 'lucide-react';
 
 import { DatePicker } from '@/shared/components';
-import { Input, Label, Select } from '@/shared/components/ui';
+import { Button, Input, Label, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
 import { EMPTY_TEXT } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -168,14 +168,15 @@ export function ReadonlyField({
           {value}
         </p>
         {copyValue && !isEmpty && onCopy ? (
-          <button
+          <Button
             type='button'
+            variant='ghost'
+            size='icon'
             onClick={() => void onCopy(copyValue)}
-            className='rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700'
             aria-label={`${label} 복사`}
           >
             <Copy className='h-4 w-4' />
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

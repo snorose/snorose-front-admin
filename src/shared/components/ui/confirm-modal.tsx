@@ -1,4 +1,6 @@
-import { Button } from './button';
+import type { VariantProps } from 'class-variance-authority';
+
+import { Button, buttonVariants } from './button';
 import { Dialog } from './dialog';
 
 interface ConfirmModalProps {
@@ -8,7 +10,7 @@ interface ConfirmModalProps {
   onConfirm: () => void;
   onClose: () => void;
   confirmText?: string;
-  confirmButtonClassName?: string;
+  confirmVariant?: VariantProps<typeof buttonVariants>['variant'];
   confirmDisabled?: boolean;
   closeText?: string;
   children?: React.ReactNode;
@@ -21,7 +23,7 @@ export function ConfirmModal({
   onConfirm,
   onClose,
   confirmText = '확인',
-  confirmButtonClassName,
+  confirmVariant = 'default',
   confirmDisabled = false,
   closeText = '취소',
   children,
@@ -44,8 +46,8 @@ export function ConfirmModal({
           </Button>
           <Button
             type='button'
+            variant={confirmVariant}
             onClick={onConfirm}
-            className={confirmButtonClassName}
             disabled={confirmDisabled}
           >
             {confirmText}

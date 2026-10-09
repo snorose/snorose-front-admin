@@ -239,12 +239,13 @@ export default function DemotionPenaltyTab({
           )}
 
           <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={resetDemoteForm}>
-              초기화
+            <Button type='button' variant='outline' onClick={resetDemoteForm}>
+              입력 초기화
             </Button>
 
             <Button
-              className='bg-red-600 text-white hover:bg-red-700'
+              type='button'
+              variant='destructive-outline'
               onClick={handleSubmit}
               disabled={isSubmitting}
             >
@@ -265,6 +266,8 @@ export default function DemotionPenaltyTab({
 
       <ConfirmModal
         isOpen={openModal}
+        confirmVariant='destructive'
+        confirmDisabled={isSubmitting}
         onClose={() => setOpenModal(false)}
         onConfirm={handleConfirm}
         confirmText='예, 진행합니다'

@@ -44,15 +44,15 @@ export function PointActionButtons({
         size='lg'
         variant='outline'
         onClick={onReset}
-        className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+        className='w-32'
       >
-        초기화
+        입력 초기화
       </Button>
       <Button
         type='button'
         size='lg'
-        variant='outline'
-        className='text-md h-10 w-32 cursor-pointer font-bold'
+        variant='default'
+        className='w-32'
         onClick={handleApplyClick}
       >
         적용

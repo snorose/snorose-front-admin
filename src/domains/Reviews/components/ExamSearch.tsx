@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, RotateCcw, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DatePicker } from '@/shared/components';
@@ -334,6 +334,9 @@ export default function ExamSearch({
     <div key={searchKey} className='flex flex-col gap-2'>
       <div className='flex flex-wrap items-center gap-2'>
         <InputGroup className='w-[220px] max-w-full'>
+          <InputGroup.Addon>
+            <Search aria-hidden='true' />
+          </InputGroup.Addon>
           <InputGroup.Input
             type='text'
             aria-label='시험후기명 또는 postId 검색'
@@ -355,6 +358,9 @@ export default function ExamSearch({
           )}
         </InputGroup>
         <InputGroup className='w-[260px] max-w-full'>
+          <InputGroup.Addon>
+            <Search aria-hidden='true' />
+          </InputGroup.Addon>
           <InputGroup.Input
             type='text'
             aria-label='작성자 검색 (아이디, 닉네임, 학번)'
@@ -554,14 +560,16 @@ export default function ExamSearch({
 
       <div className='flex w-fit items-center gap-2'>
         <Button className='min-w-[72px]' onClick={handleSearch}>
-          조회
+          <Search aria-hidden='true' />
+          검색
         </Button>
         <Button
           className='min-w-[136px]'
           variant='outline'
           onClick={handleSearchOptionReset}
         >
-          검색 옵션 초기화
+          <RotateCcw aria-hidden='true' />
+          검색 조건 초기화
         </Button>
       </div>
     </div>

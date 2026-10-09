@@ -78,6 +78,7 @@ export default function ServerMaintenancePage() {
       />
       <ConfirmModal
         isOpen={deleting !== null}
+        confirmVariant='destructive'
         title='서버 점검 일정을 삭제할까요?'
         description={
           deleting ? `${deleting.title} 일정이 목록에서 제거됩니다.` : undefined

@@ -111,17 +111,16 @@ export default function MemberDirectorySection({
 
             <Button
               type='button'
-              variant='outline'
-              className='h-9 px-6'
+              size='default'
               onClick={() => void onSearch()}
               disabled={isListLoading}
             >
               {isListLoading ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
+                <Loader2 aria-hidden='true' className='animate-spin' />
               ) : (
-                <Search className='h-4 w-4' />
+                <Search aria-hidden='true' />
               )}
-              회원 검색
+              {isListLoading ? '검색 중...' : '검색'}
             </Button>
           </div>
 
@@ -154,18 +153,18 @@ export default function MemberDirectorySection({
               <Button
                 type='button'
                 variant='outline'
-                className='h-11 w-full rounded-2xl border-slate-200 px-6 whitespace-nowrap text-slate-600'
+                className='w-full whitespace-nowrap'
                 onClick={onRefreshDirectory}
                 disabled={isListLoading}
               >
-                <RotateCcw className='h-4 w-4' />
-                초기화
+                <RotateCcw aria-hidden='true' />
+                검색 조건 초기화
               </Button>
             </div>
           </div>
 
           <div className='flex flex-wrap items-center justify-between gap-3'>
-            <MemberDirectoryActionBar hasSelection={selectedIds.length > 0} />
+            <MemberDirectoryActionBar />
 
             <span className='text-sm text-slate-500'>
               총 {totalCount.toLocaleString()}명

@@ -73,7 +73,7 @@ export function PushNotificationConfirmModal({
           <Button
             type='button'
             variant='outline'
-            size='lg'
+            size='default'
             disabled={isLoading}
             onClick={onClose}
             className='w-full'
@@ -82,7 +82,7 @@ export function PushNotificationConfirmModal({
           </Button>
           <Button
             type='button'
-            size='lg'
+            size='default'
             disabled={isLoading}
             onClick={onConfirm}
             className='w-full'

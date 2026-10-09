@@ -78,7 +78,7 @@ export default function MemberPenaltySummaryCard({
               void onOpenPenaltyHistory?.();
               setIsHistoryOpen(true);
             }}
-            className='rounded-xl text-slate-600'
+            className='text-slate-600'
             aria-label='강등/경고 히스토리 열기'
           >
             <History className='h-5 w-5' />

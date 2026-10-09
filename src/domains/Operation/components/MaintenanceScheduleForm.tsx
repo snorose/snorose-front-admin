@@ -118,7 +118,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             </Button>
           )}
           <Button type='button' size='sm' variant='outline' onClick={reset}>
-            초기화
+            입력 초기화
           </Button>
           <Button type='submit' size='sm'>
             {initial ? '수정' : '생성'}

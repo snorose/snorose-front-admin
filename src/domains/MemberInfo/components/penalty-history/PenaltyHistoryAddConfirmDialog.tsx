@@ -51,7 +51,7 @@ export default function PenaltyHistoryAddConfirmDialog({
             <Button
               type='button'
               variant='outline'
-              className='h-12 rounded-xl px-6 text-base font-semibold text-slate-950'
+              size='default'
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
@@ -59,12 +59,13 @@ export default function PenaltyHistoryAddConfirmDialog({
             </Button>
             <Button
               type='button'
-              className='h-12 rounded-xl bg-slate-950 px-6 text-base font-bold text-white hover:bg-slate-800'
+              variant='destructive'
+              size='default'
               onClick={onConfirm}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <Loader2 className='h-5 w-5 animate-spin' />
+                <Loader2 aria-hidden='true' className='animate-spin' />
               ) : null}
               확인
             </Button>

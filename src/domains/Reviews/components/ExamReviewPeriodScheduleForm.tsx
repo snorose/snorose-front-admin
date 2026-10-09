@@ -120,16 +120,16 @@ export function ExamReviewPeriodScheduleForm({
               type='button'
               size='sm'
               variant='outline'
-              className='w-16 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+              className='w-24'
               onClick={handleResetButtonClick}
             >
-              초기화
+              입력 초기화
             </Button>
             <Button
               type='button'
               size='sm'
-              variant='outline'
-              className='w-16 cursor-pointer font-bold'
+              variant='default'
+              className='w-16'
               onClick={handleCreateButtonClick}
             >
               생성

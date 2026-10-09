@@ -1,7 +1,9 @@
 import { useId, useState } from 'react';
 
+import { RotateCcw, Search } from 'lucide-react';
+
 import { DatePicker } from '@/shared/components';
-import { Input, Label, Select } from '@/shared/components/ui';
+import { Button, InputGroup, Label, Select } from '@/shared/components/ui';
 import {
   type AdminStatus,
   BOARD_OPTIONS,
@@ -114,35 +116,40 @@ export const CommentFilterPanel = ({
       </div>
 
       {/* 게시자 / 게시글 검색 */}
-      <div className='flex gap-4'>
-        <div className='flex flex-1 flex-col gap-1'>
+      <div className='flex flex-col gap-4 lg:flex-row'>
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <Label
             htmlFor={`${inputId}-keywordAuthor`}
             className='py-0 text-sm leading-5 font-medium text-gray-600'
           >
             게시자 검색 (아이디/닉네임/학번)
           </Label>
-          <Input
-            id={`${inputId}-keywordAuthor`}
-            type='text'
-            placeholder='게시자 검색...'
-            value={filters.keywordAuthor ?? ''}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                keywordAuthor: e.target.value || undefined,
-              }))
-            }
-          />
+          <InputGroup>
+            <InputGroup.Addon>
+              <Search aria-hidden='true' />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              id={`${inputId}-keywordAuthor`}
+              type='text'
+              placeholder='게시자 검색...'
+              value={filters.keywordAuthor ?? ''}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  keywordAuthor: e.target.value || undefined,
+                }))
+              }
+            />
+          </InputGroup>
         </div>
-        <div className='flex flex-1 flex-col gap-1'>
+        <div className='flex min-w-0 flex-1 flex-col gap-1'>
           <Label
             htmlFor={`${inputId}-searchQuery`}
             className='py-0 text-sm leading-5 font-medium text-gray-600'
           >
             댓글 검색
           </Label>
-          <div className='flex gap-2'>
+          <div className='flex min-w-0 gap-2'>
             <Select
               value={filters.searchScope ?? 'CONTENT'}
               onValueChange={(value) =>
@@ -168,27 +175,31 @@ export const CommentFilterPanel = ({
                 <Select.Item value='POST_ID'>게시글 ID</Select.Item>
               </Select.Content>
             </Select>
-            <Input
-              id={`${inputId}-searchQuery`}
-              type='text'
-              placeholder={
-                filters.searchScope === 'COMMENT_ID'
-                  ? '댓글 ID (숫자만)'
-                  : filters.searchScope === 'PARENT_COMMENT_ID'
-                    ? '상위 댓글 ID (숫자만)'
-                    : filters.searchScope === 'POST_ID'
-                      ? '게시글 ID (숫자만)'
-                      : '검색어 입력...'
-              }
-              value={filters.searchQuery ?? ''}
-              onChange={(e) => {
-                setFilters((prev) => ({
-                  ...prev,
-                  searchQuery: e.target.value || undefined,
-                }));
-              }}
-              className='flex-1'
-            />
+            <InputGroup className='min-w-0 flex-1'>
+              <InputGroup.Addon>
+                <Search aria-hidden='true' />
+              </InputGroup.Addon>
+              <InputGroup.Input
+                id={`${inputId}-searchQuery`}
+                type='text'
+                placeholder={
+                  filters.searchScope === 'COMMENT_ID'
+                    ? '댓글 ID (숫자만)'
+                    : filters.searchScope === 'PARENT_COMMENT_ID'
+                      ? '상위 댓글 ID (숫자만)'
+                      : filters.searchScope === 'POST_ID'
+                        ? '게시글 ID (숫자만)'
+                        : '검색어 입력...'
+                }
+                value={filters.searchQuery ?? ''}
+                onChange={(e) => {
+                  setFilters((prev) => ({
+                    ...prev,
+                    searchQuery: e.target.value || undefined,
+                  }));
+                }}
+              />
+            </InputGroup>
           </div>
         </div>
       </div>
@@ -341,19 +352,24 @@ export const CommentFilterPanel = ({
         </div>
       </div>
 
-      <div className='flex w-full gap-4'>
-        <button
+      <div className='flex w-full flex-col gap-2 sm:flex-row sm:gap-4'>
+        <Button
+          type='button'
+          variant='outline'
           onClick={handleReset}
-          className='w-full rounded border border-gray-200 py-2 text-sm text-gray-600 hover:bg-gray-50'
+          className='min-w-0 flex-1 shrink'
         >
-          초기화
-        </button>
-        <button
+          <RotateCcw aria-hidden='true' />
+          검색 조건 초기화
+        </Button>
+        <Button
+          type='button'
           onClick={() => onFilterChange(filters)}
-          className='w-full rounded bg-gray-900 py-2 text-sm font-semibold text-white hover:bg-gray-700'
+          className='min-w-0 flex-1 shrink'
         >
+          <Search aria-hidden='true' />
           검색
-        </button>
+        </Button>
       </div>
       {totalCount !== undefined && (
         <span className='text-sm text-gray-500'>

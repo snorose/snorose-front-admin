@@ -274,18 +274,11 @@ export default function MemberPointAdjustmentDialog({
             <Button
               type='button'
               variant='outline'
-              className='rounded-xl'
               onClick={() => handleOpenChange(false)}
             >
               취소
             </Button>
-            <Button
-              type='button'
-              className='rounded-xl bg-slate-950 text-white hover:bg-slate-800'
-              onClick={handleApply}
-              disabled={isSubmitting}
-            >
-              <Coins className='h-4 w-4' />
+            <Button type='button' onClick={handleApply} disabled={isSubmitting}>
               지급
             </Button>
           </Dialog.Footer>

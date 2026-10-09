@@ -1,7 +1,7 @@
 import { type RefObject, useId } from 'react';
 
 import { StatusBadge } from '@/shared/components';
-import { Field, Input, Select, Textarea } from '@/shared/components/ui';
+import { Button, Field, Input, Select, Textarea } from '@/shared/components/ui';
 import {
   EXAM_TYPE_LIST,
   LECTURE_TYPE_OPTIONS,
@@ -194,15 +194,18 @@ export function ExamReviewDetailInfoSection({
           <Field.Label required>업로드 파일</Field.Label>
           <Field.Content>
             <div className='flex flex-wrap items-center gap-2'>
-              <button
+              <Button
                 type='button'
-                className='min-w-0 flex-1 basis-full truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-blue-600 underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 sm:basis-0'
+                variant='outline'
+                className='border-input text-primary hover:text-primary disabled:text-muted-foreground min-w-0 flex-1 basis-full justify-start bg-transparent px-3 py-1 text-left text-base font-normal shadow-xs hover:bg-transparent hover:underline sm:basis-0 md:text-sm'
                 onClick={onFileDownload}
                 disabled={!formData.fileName}
-                title={formData.fileName}
+                title={selectedFile?.name || formData.fileName}
               >
-                {selectedFile?.name || formData.fileName || '파일 없음'}
-              </button>
+                <span className='truncate'>
+                  {selectedFile?.name || formData.fileName || '파일 없음'}
+                </span>
+              </Button>
               {/* 파일명 변경 기능은 사용자에게 노출하지 않습니다. */}
               {/*
               <button
@@ -215,14 +218,14 @@ export function ExamReviewDetailInfoSection({
                 파일명 변경
               </button>
               */}
-              <button
+              <Button
                 type='button'
+                variant='outline'
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isFormDisabled}
-                className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
               >
                 파일 변경
-              </button>
+              </Button>
               <input
                 ref={fileInputRef}
                 type='file'

@@ -12,6 +12,7 @@ import {
   UserRound,
 } from 'lucide-react';
 
+import { Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -118,14 +119,15 @@ export default function MemberDetailInfoGrid({
           label='보유 포인트'
           value={formatPoint(member.pointBalance)}
           action={
-            <button
+            <Button
               type='button'
+              variant='ghost'
+              size='icon'
               onClick={onPointAdjustmentOpen}
-              className='rounded-md p-1 text-slate-950 transition hover:bg-slate-100 hover:text-slate-700'
               aria-label='포인트 지급/차감'
             >
-              <Coins className='h-5 w-5' />
-            </button>
+              <Coins aria-hidden='true' />
+            </Button>
           }
         />
         <DetailField
@@ -175,14 +177,15 @@ function DetailField({
           {value}
         </p>
         {copyValue && onCopy && value !== EMPTY_TEXT && (
-          <button
+          <Button
             type='button'
+            variant='ghost'
+            size='icon'
             onClick={() => void onCopy(copyValue)}
-            className='rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700'
             aria-label={`${label} 복사`}
           >
-            <Copy className='h-4 w-4' />
-          </button>
+            <Copy aria-hidden='true' />
+          </Button>
         )}
         {action}
       </div>

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { AlertTriangle, CheckCircle2, Download, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
@@ -241,18 +241,15 @@ function RowNumberColumnHead({ variant }: { variant: 'preview' | 'failure' }) {
         <span>행 번호</span>
         <Tooltip>
           <Tooltip.Trigger asChild>
-            <button
+            <Button
               type='button'
-              className={cn(
-                '-m-0.5 inline-flex shrink-0 rounded-full p-0.5 outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
-                isFailure
-                  ? 'text-amber-700/90 hover:text-amber-950 focus-visible:ring-amber-400'
-                  : 'text-slate-500 hover:text-slate-800 focus-visible:ring-slate-400'
-              )}
+              variant='ghost'
+              size='icon-sm'
+              className={cn(isFailure ? 'text-amber-700/90' : 'text-slate-500')}
               aria-label='행 번호 안내'
             >
               <Info className='size-3.5' aria-hidden />
-            </button>
+            </Button>
           </Tooltip.Trigger>
           <Tooltip.Content side='top' sideOffset={4}>
             {ROW_NUMBER_TOOLTIP_TEXT}
@@ -426,6 +423,7 @@ export default function ExcelPointUploadPage() {
                 <InputGroup.Button
                   type='button'
                   variant='default'
+                  size='xs'
                   className='mx-1'
                   disabled={isSubmitting || isParsingFile}
                   onClick={handleUploadButtonClick}
@@ -710,7 +708,6 @@ export default function ExcelPointUploadPage() {
                               className='shrink-0 border-amber-200 bg-white text-amber-950 hover:bg-amber-50'
                               onClick={handleDownloadNotProcessedExcel}
                             >
-                              <Download className='size-4' aria-hidden />
                               미처리 명단 엑셀 저장
                             </Button>
                           ) : null}

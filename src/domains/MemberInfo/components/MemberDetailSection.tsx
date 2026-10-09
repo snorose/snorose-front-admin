@@ -1,13 +1,6 @@
 import { useState } from 'react';
 
-import {
-  ArrowLeft,
-  Check,
-  Loader2,
-  PencilIcon,
-  UserRound,
-  X,
-} from 'lucide-react';
+import { ArrowLeft, Loader2, Pencil, UserRound } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
@@ -80,7 +73,8 @@ export default function MemberDetailSection({
             variant='outline'
             size='icon'
             onClick={onBack}
-            className='mt-1 rounded-xl'
+            className='mt-1'
+            aria-label='회원 목록으로 돌아가기'
           >
             <ArrowLeft className='h-4 w-4' />
           </Button>
@@ -115,9 +109,8 @@ export default function MemberDetailSection({
                 variant='outline'
                 size='sm'
                 onClick={onEditStart}
-                className='gap-2 rounded-xl'
               >
-                <PencilIcon className='h-4 w-4' />
+                <Pencil aria-hidden='true' />
                 수정
               </Button>
             ) : (
@@ -127,9 +120,7 @@ export default function MemberDetailSection({
                   variant='outline'
                   size='sm'
                   onClick={onEditCancel}
-                  className='gap-2 rounded-xl'
                 >
-                  <X className='h-4 w-4' />
                   취소
                 </Button>
                 <Button
@@ -137,9 +128,7 @@ export default function MemberDetailSection({
                   size='sm'
                   form={MEMBER_INFO_EDIT_FORM_ID}
                   disabled={isDetailLoading}
-                  className='gap-2 rounded-xl bg-slate-950 text-white hover:bg-slate-800'
                 >
-                  <Check className='h-4 w-4' />
                   완료
                 </Button>
               </div>
