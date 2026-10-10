@@ -14,6 +14,26 @@ beforeAll(() => {
 });
 
 describe('PostFilterPanel', () => {
+  test('공지 Checkbox는 레이블·Space로 토글하고 검색할 때만 조건을 적용한다', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+    render(<PostFilterPanel onFilterChange={onFilterChange} />);
+    const checkbox = screen.getByRole('checkbox', { name: '공지만 보기' });
+    expect(checkbox).toHaveAttribute('data-slot', 'checkbox');
+    expect(checkbox).not.toBeChecked();
+    await user.click(screen.getByText('공지만 보기'));
+    expect(checkbox).toBeChecked();
+    expect(onFilterChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({ isNotice: true });
+    checkbox.focus();
+    await user.keyboard(' ');
+    expect(checkbox).not.toBeChecked();
+    expect(onFilterChange).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({ isNotice: undefined });
+  });
+
   test('게시판을 숫자 단일 값으로 전달하고 전체 선택으로 조건을 해제한다', async () => {
     const user = userEvent.setup();
     const onFilterChange = vi.fn();

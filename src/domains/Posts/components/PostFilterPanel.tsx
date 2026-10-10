@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { DatePicker, FilterMultiSelect } from '@/shared/components';
 import {
   Button,
+  Checkbox,
   Input,
   InputGroup,
   Label,
@@ -287,20 +288,24 @@ export const PostFilterPanel = ({
         </div>
         <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
           {/* 공지만 보기 */}
-          <label className='flex min-h-9 w-fit cursor-pointer items-center gap-2 text-sm'>
-            <input
-              type='checkbox'
-              className='accent-primary focus-visible:ring-ring size-4 rounded-sm focus-visible:ring-2 focus-visible:outline-none'
+          <div className='flex min-h-9 w-fit items-center gap-2'>
+            <Checkbox
+              id={`${inputId}-isNotice`}
               checked={filters.isNotice ?? false}
-              onChange={(e) =>
+              onCheckedChange={(checked) =>
                 setFilters((prev) => ({
                   ...prev,
-                  isNotice: e.target.checked || undefined,
+                  isNotice: checked === true ? true : undefined,
                 }))
               }
             />
-            공지만 보기
-          </label>
+            <Label
+              htmlFor={`${inputId}-isNotice`}
+              className='min-h-9 cursor-pointer font-normal'
+            >
+              공지만 보기
+            </Label>
+          </div>
           <div className='flex gap-2 @md:ml-auto'>
             <Button
               type='button'
