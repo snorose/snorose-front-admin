@@ -7,7 +7,11 @@ import {
   useState,
 } from 'react';
 
-import { PaginationBar, StatusBadge } from '@/shared/components';
+import {
+  ListResultHeader,
+  PaginationBar,
+  StatusBadge,
+} from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
 import { cn } from '@/shared/lib';
@@ -96,6 +100,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
 ];
 
 interface ExamTableProps {
+  titleId?: string;
   data?: ExamReview[];
   onRowSelect?: (review: ExamReview | null) => void;
   refreshKey?: number;
@@ -106,6 +111,7 @@ interface ExamTableProps {
 }
 
 export default function ExamTable({
+  titleId,
   data: propData,
   onRowSelect,
   refreshKey,
@@ -130,7 +136,13 @@ export default function ExamTable({
     [propOnPageChange]
   );
 
-  const { data: queryData, isLoading } = useExamReviews({
+  const hasProvidedData = propData !== undefined;
+  const {
+    data: queryData,
+    isLoading: isQueryLoading,
+    isFetching,
+    error,
+  } = useExamReviews({
     page: currentPage,
     startDate: searchParams.startDate,
     endDate: searchParams.endDate,
@@ -144,7 +156,7 @@ export default function ExamTable({
     isDiscussed: searchParams.isDiscussed,
     isReported: searchParams.isReported,
     statuses: searchParams.statuses,
-    enabled: !propData,
+    enabled: !hasProvidedData,
     refreshKey, // refreshKey를 queryKey에 포함시켜 자동 refetch
   });
 
@@ -152,11 +164,10 @@ export default function ExamTable({
     () => propData ?? queryData?.data ?? [],
     [propData, queryData?.data]
   );
-  const responseTotalPage = queryData?.totalPage;
+  const isLoading = !hasProvidedData && isQueryLoading;
+  const responseTotalPage = hasProvidedData ? undefined : queryData?.totalPage;
   const totalPage = useStableTotalPage(responseTotalPage, currentPage);
-  const totalCount = queryData?.totalCount;
-  const totalCountText =
-    totalCount === undefined ? '-' : totalCount.toLocaleString();
+  const totalCount = hasProvidedData ? undefined : queryData?.totalCount;
   const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
 
   useEffect(() => {
@@ -186,14 +197,21 @@ export default function ExamTable({
   }, [selectedId, currentPageData, onRowSelect]);
 
   return (
-    <>
-      <div className='flex items-center justify-start text-sm text-gray-600'>
-        총{' '}
-        <span className='px-1 font-semibold text-gray-900'>
-          {totalCountText}
-        </span>
-        개
-      </div>
+    <div className='flex min-w-0 flex-col gap-3'>
+      <ListResultHeader
+        title='시험후기 목록'
+        titleId={titleId}
+        totalCount={totalCount}
+        status={
+          hasProvidedData
+            ? 'ready'
+            : isLoading || isFetching
+              ? 'loading'
+              : error
+                ? 'error'
+                : 'ready'
+        }
+      />
 
       <div className='w-full overflow-x-auto rounded-md border'>
         <Table className='w-full table-fixed rounded-lg bg-white shadow'>
@@ -282,6 +300,6 @@ export default function ExamTable({
         onPageChange={setCurrentPage}
         totalPage={totalPage}
       />
-    </>
+    </div>
   );
 }
