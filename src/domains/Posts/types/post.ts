@@ -1,3 +1,4 @@
+import type { AdminReportHistory } from '@/shared/types/report-history';
 import type { AdminStatusHistory } from '@/shared/types/status-history';
 
 export interface AdminGetPostResponse {
@@ -28,11 +29,7 @@ export interface AdminPostListResult {
   data: AdminGetPostResponse[];
 }
 
-export interface AdminPostReportResponse {
-  reason: string;
-  reporterNickname: string;
-  reportedAt: string;
-}
+export type AdminPostReportResponse = AdminReportHistory;
 
 export interface AdminPostReportListResult {
   totalCount: number;

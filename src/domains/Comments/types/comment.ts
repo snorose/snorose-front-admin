@@ -1,3 +1,4 @@
+import type { AdminReportHistory } from '@/shared/types/report-history';
 import type { AdminStatusHistory } from '@/shared/types/status-history';
 import type { AdminStatus } from '@/shared/utils';
 
@@ -47,11 +48,7 @@ export interface AdminCommentListResult {
   data: AdminCommentResult[];
 }
 
-export interface AdminCommentReportResponse {
-  reason: string;
-  reporterNickname: string;
-  reportedAt: string;
-}
+export type AdminCommentReportResponse = AdminReportHistory;
 
 export interface AdminCommentReportListResult {
   totalCount: number;
