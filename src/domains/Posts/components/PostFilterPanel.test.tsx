@@ -1,6 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
+
+import { BOARD_OPTIONS } from '@/shared/utils';
 
 import { PostFilterPanel } from './PostFilterPanel';
 
@@ -12,6 +14,99 @@ beforeAll(() => {
 });
 
 describe('PostFilterPanel', () => {
+  test('게시판을 숫자 단일 값으로 전달하고 전체 선택으로 조건을 해제한다', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+    render(
+      <PostFilterPanel
+        initialFilters={{ boardId: BOARD_OPTIONS[0].value }}
+        onFilterChange={onFilterChange}
+      />
+    );
+    const board = screen.getByRole('combobox', { name: '게시판' });
+    expect(board).toHaveTextContent(BOARD_OPTIONS[0].label);
+    await user.click(board);
+    await user.click(
+      screen.getByRole('option', { name: BOARD_OPTIONS[1].label })
+    );
+    expect(onFilterChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      boardId: BOARD_OPTIONS[1].value,
+    });
+    await user.click(board);
+    await user.click(screen.getByRole('option', { name: '전체' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({ boardId: undefined });
+  });
+
+  test('관리 상태를 복수 선택하고 마지막 해제 시 조건을 생략한다', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+    render(<PostFilterPanel onFilterChange={onFilterChange} />);
+    const status = screen.getByRole('button', { name: '관리 상태' });
+    await user.click(status);
+    await user.click(screen.getByRole('menuitemcheckbox', { name: '노출' }));
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: '어드민 비공개' })
+    );
+    expect(onFilterChange).not.toHaveBeenCalled();
+    expect(status).toHaveTextContent('관리 상태 2개');
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      adminCommonStatuses: ['VISIBLE', 'ADMIN_HIDDEN'],
+    });
+    await user.click(status);
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: '어드민 비공개' })
+    );
+    await user.click(screen.getByRole('menuitemcheckbox', { name: '노출' }));
+    await user.keyboard('{Escape}');
+    expect(status).toHaveTextContent('전체');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      adminCommonStatuses: undefined,
+    });
+  });
+
+  test.each(['게시글 검색', '게시자 검색 (아이디/닉네임/학번)'])(
+    '%s의 Enter는 현재 조건을 검색하고 한글 조합 Enter는 무시한다',
+    async (name) => {
+      const user = userEvent.setup();
+      const onFilterChange = vi.fn();
+      const initialFilters = {
+        encryptedUserId: 'user-id',
+        isVisible: false,
+        isKeywordExist: false,
+        isNotice: true,
+      };
+      render(
+        <PostFilterPanel
+          initialFilters={initialFilters}
+          onFilterChange={onFilterChange}
+        />
+      );
+      const input = screen.getByRole('textbox', { name });
+      await user.type(input, '검색어');
+      fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+      expect(onFilterChange).not.toHaveBeenCalled();
+      await user.keyboard('{Enter}');
+      expect(onFilterChange).toHaveBeenCalledExactlyOnceWith({
+        ...initialFilters,
+        [name === '게시글 검색' ? 'keywordPost' : 'keywordAuthor']: '검색어',
+      });
+      await user.click(
+        screen.getByRole('button', { name: '검색 조건 초기화' })
+      );
+      expect(onFilterChange).toHaveBeenLastCalledWith({});
+      expect(input).toHaveValue('');
+      expect(
+        screen.getByRole('checkbox', { name: '공지만 보기' })
+      ).not.toBeChecked();
+    }
+  );
+
   test('날짜 선택·해제 결과를 검색에 전달하고 전체 초기화한다', async () => {
     const user = userEvent.setup();
     const onFilterChange = vi.fn();

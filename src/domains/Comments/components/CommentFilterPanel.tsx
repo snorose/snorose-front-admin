@@ -1,14 +1,14 @@
-import { useId, useState } from 'react';
+import { type KeyboardEvent, useId, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
-import { AdvancedSearchFilters, DatePicker } from '@/shared/components';
-import { Button, InputGroup, Label, Select } from '@/shared/components/ui';
 import {
-  type AdminStatus,
-  BOARD_OPTIONS,
-  STATUS_OPTIONS,
-} from '@/shared/utils';
+  AdvancedSearchFilters,
+  DatePicker,
+  FilterMultiSelect,
+} from '@/shared/components';
+import { Button, InputGroup, Label, Select } from '@/shared/components/ui';
+import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { CommentSearchParams } from '../types';
 
@@ -27,31 +27,10 @@ export const CommentFilterPanel = ({
     ...initialFilters,
   });
 
-  const handleStatusToggle = (status: AdminStatus) => {
-    setFilters((prev) => {
-      const current = prev.adminCommonStatuses ?? [];
-      const exists = current.includes(status);
-      return {
-        ...prev,
-        adminCommonStatuses: exists
-          ? current.filter((s) => s !== status)
-          : [...current, status],
-      };
-    });
-  };
-
-  const handleBoardToggle = (boardId: number) => {
-    setFilters((prev) => {
-      const current = prev.boardIds ?? [];
-      const exists = current.includes(boardId);
-
-      return {
-        ...prev,
-        boardIds: exists
-          ? current.filter((id) => id !== boardId)
-          : [...current, boardId],
-      };
-    });
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+    event.preventDefault();
+    onFilterChange(filters);
   };
 
   const handleReset = () => {
@@ -119,6 +98,7 @@ export const CommentFilterPanel = ({
                             : '댓글 검색어'
                     }
                     value={filters.searchQuery ?? ''}
+                    onKeyDown={handleSearchKeyDown}
                     onChange={(e) => {
                       setFilters((prev) => ({
                         ...prev,
@@ -141,6 +121,7 @@ export const CommentFilterPanel = ({
                   type='text'
                   placeholder='게시자 검색 (아이디/닉네임/학번)'
                   value={filters.keywordAuthor ?? ''}
+                  onKeyDown={handleSearchKeyDown}
                   onChange={(e) =>
                     setFilters((prev) => ({
                       ...prev,
@@ -196,155 +177,95 @@ export const CommentFilterPanel = ({
           </div>
 
           <AdvancedSearchFilters>
-            <div className='flex min-w-0 flex-col gap-4'>
-              {/* 정렬 / 의심 키워드 */}
-              <div className='flex flex-wrap items-center gap-2'>
-                <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
-                  <Label htmlFor={`${inputId}-sort`}>정렬</Label>
-                  <Select
-                    value={
-                      filters.sortTypes?.[0] && filters.sortDirection
-                        ? `${filters.sortTypes[0]}|${filters.sortDirection}`
-                        : 'CREATED_AT|DESC'
-                    }
-                    onValueChange={(value) => {
-                      const [sortType, sortDirection] = value.split('|');
-                      setFilters((prev) => ({
-                        ...prev,
-                        sortTypes: [
-                          sortType,
-                        ] as CommentSearchParams['sortTypes'],
-                        sortDirection:
-                          sortDirection as CommentSearchParams['sortDirection'],
-                      }));
-                    }}
-                  >
-                    <Select.Trigger
-                      id={`${inputId}-sort`}
-                      className='h-9 w-full'
-                    >
-                      <Select.Value />
-                    </Select.Trigger>
-                    <Select.Content align='start'>
-                      <Select.Item value='CREATED_AT|DESC'>최신순</Select.Item>
-                      <Select.Item value='CREATED_AT|ASC'>오래된순</Select.Item>
-                      <Select.Item value='REPORT_COUNT|DESC'>
-                        신고 수
-                      </Select.Item>
-                      <Select.Item value='LIKE_COUNT|DESC'>
-                        좋아요 수
-                      </Select.Item>
-                      <Select.Item value='CHILD_COMMENT_COUNT|DESC'>
-                        댓글 수
-                      </Select.Item>
-                    </Select.Content>
-                  </Select>
-                </div>
-                <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
-                  <Label htmlFor={`${inputId}-isKeywordExist`}>
-                    의심 키워드
-                  </Label>
-                  <Select
-                    value={
-                      filters.isKeywordExist === undefined
-                        ? 'ALL'
-                        : String(filters.isKeywordExist)
-                    }
-                    onValueChange={(value) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        isKeywordExist:
-                          value === 'ALL' ? undefined : value === 'true',
-                      }))
-                    }
-                  >
-                    <Select.Trigger
-                      id={`${inputId}-isKeywordExist`}
-                      className='h-9 w-full'
-                    >
-                      <Select.Value />
-                    </Select.Trigger>
-                    <Select.Content align='start'>
-                      <Select.Item value='ALL'>전체</Select.Item>
-                      <Select.Item value='true'>의심 키워드 있음</Select.Item>
-                      <Select.Item value='false'>의심 키워드 없음</Select.Item>
-                    </Select.Content>
-                  </Select>
-                </div>
+            <div className='flex flex-wrap items-end gap-2'>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${inputId}-sort`}>정렬</Label>
+                <Select
+                  value={
+                    filters.sortTypes?.[0] && filters.sortDirection
+                      ? `${filters.sortTypes[0]}|${filters.sortDirection}`
+                      : 'CREATED_AT|DESC'
+                  }
+                  onValueChange={(value) => {
+                    const [sortType, sortDirection] = value.split('|');
+                    setFilters((prev) => ({
+                      ...prev,
+                      sortTypes: [sortType] as CommentSearchParams['sortTypes'],
+                      sortDirection:
+                        sortDirection as CommentSearchParams['sortDirection'],
+                    }));
+                  }}
+                >
+                  <Select.Trigger id={`${inputId}-sort`} className='h-9 w-full'>
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content align='start'>
+                    <Select.Item value='CREATED_AT|DESC'>최신순</Select.Item>
+                    <Select.Item value='CREATED_AT|ASC'>오래된순</Select.Item>
+                    <Select.Item value='REPORT_COUNT|DESC'>신고 수</Select.Item>
+                    <Select.Item value='LIKE_COUNT|DESC'>좋아요 수</Select.Item>
+                    <Select.Item value='CHILD_COMMENT_COUNT|DESC'>
+                      댓글 수
+                    </Select.Item>
+                  </Select.Content>
+                </Select>
               </div>
-
-              {/* 게시판 필터 */}
-              <div className='flex flex-col gap-2'>
-                <span className='text-sm leading-5 font-medium text-gray-600'>
-                  게시판 필터
-                </span>
-                <div className='flex flex-wrap gap-2'>
-                  <button
-                    onClick={() =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        boardIds: undefined,
-                      }))
-                    }
-                    className={`rounded-full border px-3 py-1 text-sm ${
-                      !filters.boardIds?.length
-                        ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    전체
-                  </button>
-                  {BOARD_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleBoardToggle(option.value)}
-                      className={`rounded-full border px-3 py-1 text-sm ${
-                        filters.boardIds?.includes(option.value)
-                          ? 'border-gray-900 bg-gray-900 text-white'
-                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
+              <div className='w-full min-w-0 sm:w-40'>
+                <FilterMultiSelect
+                  label='게시판'
+                  value={filters.boardIds ?? []}
+                  options={BOARD_OPTIONS}
+                  onValueChange={(boardIds) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      boardIds: boardIds.length ? boardIds : undefined,
+                    }))
+                  }
+                />
               </div>
-
-              {/* 상태 필터 */}
-              <div className='flex flex-col gap-2'>
-                <span className='text-sm leading-5 font-medium text-gray-600'>
-                  상태 필터
-                </span>
-                <div className='flex flex-wrap gap-2'>
-                  <button
-                    onClick={() =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        adminCommonStatuses: undefined,
-                      }))
-                    }
-                    className={`rounded-full border px-3 py-1 text-sm ${
-                      !filters.adminCommonStatuses?.length
-                        ? 'border-gray-900 bg-gray-900 text-white'
-                        : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                    }`}
+              <div className='w-full min-w-0 sm:w-40'>
+                <FilterMultiSelect
+                  label='관리 상태'
+                  value={filters.adminCommonStatuses ?? []}
+                  options={STATUS_OPTIONS}
+                  onValueChange={(statuses) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      adminCommonStatuses: statuses.length
+                        ? statuses
+                        : undefined,
+                    }))
+                  }
+                />
+              </div>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${inputId}-isKeywordExist`}>의심 키워드</Label>
+                <Select
+                  value={
+                    filters.isKeywordExist === undefined
+                      ? 'ALL'
+                      : String(filters.isKeywordExist)
+                  }
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      isKeywordExist:
+                        value === 'ALL' ? undefined : value === 'true',
+                    }))
+                  }
+                >
+                  <Select.Trigger
+                    id={`${inputId}-isKeywordExist`}
+                    className='h-9 w-full'
                   >
-                    전체
-                  </button>
-                  {STATUS_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleStatusToggle(option.value)}
-                      className={`rounded-full border px-3 py-1 text-sm ${
-                        filters.adminCommonStatuses?.includes(option.value)
-                          ? 'border-gray-900 bg-gray-900 text-white'
-                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content align='start'>
+                    <Select.Item value='ALL'>전체</Select.Item>
+                    <Select.Item value='true'>의심 키워드 있음</Select.Item>
+                    <Select.Item value='false'>의심 키워드 없음</Select.Item>
+                  </Select.Content>
+                </Select>
               </div>
             </div>
           </AdvancedSearchFilters>

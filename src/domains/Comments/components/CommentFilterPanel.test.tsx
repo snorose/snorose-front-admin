@@ -1,6 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
+
+import { BOARD_OPTIONS } from '@/shared/utils';
 
 import { CommentFilterPanel } from './CommentFilterPanel';
 
@@ -12,6 +14,109 @@ beforeAll(() => {
 });
 
 describe('CommentFilterPanel', () => {
+  test('게시판·상태를 복수 선택하고 선택 해제 시 조건을 생략한다', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+    render(<CommentFilterPanel onFilterChange={onFilterChange} />);
+    const board = screen.getByRole('button', { name: '게시판' });
+    await user.click(board);
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[0].label })
+    );
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[1].label })
+    );
+    expect(board).toHaveTextContent('게시판 2개');
+    await user.keyboard('{Escape}');
+    const status = screen.getByRole('button', { name: '관리 상태' });
+    await user.click(status);
+    await user.click(screen.getByRole('menuitemcheckbox', { name: '노출' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: '징계' }));
+    expect(onFilterChange).not.toHaveBeenCalled();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      searchScope: 'CONTENT',
+      boardIds: [BOARD_OPTIONS[0].value, BOARD_OPTIONS[1].value],
+      adminCommonStatuses: ['VISIBLE', 'SANCTIONED'],
+    });
+    await user.click(board);
+    await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
+    await user.keyboard('{Escape}');
+    await user.click(status);
+    await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
+    await user.keyboard('{Escape}');
+    expect(board).toHaveTextContent('전체');
+    expect(status).toHaveTextContent('전체');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenLastCalledWith({
+      searchScope: 'CONTENT',
+      boardIds: undefined,
+      adminCommonStatuses: undefined,
+    });
+  });
+
+  test('게시판의 마지막 선택을 해제하면 undefined를 전달한다', async () => {
+    const user = userEvent.setup();
+    const onFilterChange = vi.fn();
+    render(
+      <CommentFilterPanel
+        initialFilters={{ boardIds: [BOARD_OPTIONS[0].value] }}
+        onFilterChange={onFilterChange}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: '게시판' }));
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[0].label })
+    );
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onFilterChange).toHaveBeenCalledWith({
+      searchScope: 'CONTENT',
+      boardIds: undefined,
+    });
+  });
+
+  test.each(['댓글 검색', '게시자 검색 (아이디/닉네임/학번)'])(
+    '%s의 Enter는 다중 정렬·숨은 조건을 보존하고 한글 조합 Enter는 무시한다',
+    async (name) => {
+      const user = userEvent.setup();
+      const onFilterChange = vi.fn();
+      const initialFilters = {
+        sortTypes: ['REPORT_COUNT', 'LIKE_COUNT'] as const,
+        sortDirection: 'DESC' as const,
+        isReported: false,
+        isKeywordExist: false,
+      };
+      render(
+        <CommentFilterPanel
+          initialFilters={{
+            ...initialFilters,
+            sortTypes: [...initialFilters.sortTypes],
+          }}
+          onFilterChange={onFilterChange}
+        />
+      );
+      const input = screen.getByRole('textbox', { name });
+      await user.type(input, '검색어');
+      fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+      expect(onFilterChange).not.toHaveBeenCalled();
+      await user.keyboard('{Enter}');
+      expect(onFilterChange).toHaveBeenCalledExactlyOnceWith({
+        searchScope: 'CONTENT',
+        ...initialFilters,
+        [name === '댓글 검색' ? 'searchQuery' : 'keywordAuthor']: '검색어',
+      });
+      await user.click(
+        screen.getByRole('button', { name: '검색 조건 초기화' })
+      );
+      expect(onFilterChange).toHaveBeenLastCalledWith({
+        searchScope: 'CONTENT',
+      });
+      expect(input).toHaveValue('');
+    }
+  );
+
   test('선택한 날짜와 기본 검색 범위를 전달하고 전체 초기화한다', async () => {
     const user = userEvent.setup();
     const onFilterChange = vi.fn();
