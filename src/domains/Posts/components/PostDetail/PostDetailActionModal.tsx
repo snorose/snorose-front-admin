@@ -35,7 +35,7 @@ export default function PostDetailActionModal({
         : modalType === 'RESTORE'
           ? '복구'
           : '삭제';
-  const requiresReason = modalType !== 'RESTORE';
+  const requiresReason = true;
 
   return (
     <div

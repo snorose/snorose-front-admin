@@ -129,3 +129,18 @@ export interface AdminPostBulkUpdateResult {
     reason: string;
   }[];
 }
+
+export interface AdminPostRestoreResponse {
+  post: AdminGetPostResponse;
+  attachmentRestore: {
+    status: 'NOT_APPLICABLE' | 'SUCCESS' | 'PARTIAL_FAILURE' | 'FAILURE';
+    restoredAttachmentIds: number[];
+    failedAttachments: {
+      attachmentId: number;
+      failedComponents: ('ORIGINAL' | 'OPTIMIZED')[];
+    }[];
+    thumbnailFailed: boolean;
+  };
+  restoredCommentIds: number[];
+  failedComments: { commentId: number; reason: string }[];
+}

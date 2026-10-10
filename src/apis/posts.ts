@@ -7,6 +7,7 @@ import type {
   AdminPostBulkUpdateResult,
   AdminPostListResult,
   AdminPostReportListResult,
+  AdminPostRestoreResponse,
   AdminPostSearchRequest,
   AdminPostStatusHistoryListResult,
 } from '@/domains/Posts/types/post';
@@ -51,11 +52,12 @@ export const deletePost = async (
 
 // 게시글 복구 api
 export const restorePost = async (
-  postId: number
-): Promise<AdminGetPostResponse> => {
+  postId: number,
+  memo: string
+): Promise<AdminPostRestoreResponse> => {
   const response = await axiosInstance.patch<
-    BaseResponse<AdminGetPostResponse>
-  >(`/v1/admin/posts/${postId}/restore`);
+    BaseResponse<AdminPostRestoreResponse>
+  >(`/v1/admin/posts/${postId}/restore`, { memo });
   return response.data.result;
 };
 
