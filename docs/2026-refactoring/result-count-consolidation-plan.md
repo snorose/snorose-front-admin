@@ -1,7 +1,7 @@
 # 목록 조회 개수 공통화 작업 계획
 
 > 조사 기준: 2026-10-10 현재 소스 코드
-> 상태: 설계 제안 / 구현 전
+> 상태: 1단계 공통 컴포넌트 구현 완료 / 화면 적용 전
 > 대상: 시험후기 관리, 게시글 관리, 댓글 관리, 회원 목록
 
 ## 1. 권장안
@@ -104,7 +104,7 @@
 
 ### 4.2 제안 props
 
-아래 타입은 구현 시 적용할 계약이다. 아직 생성된 컴포넌트는 아니다.
+아래 타입은 1단계 공통 컴포넌트에 적용한 계약이다.
 
 ```ts
 type ResultCountProps = {
@@ -169,9 +169,9 @@ type ListResultHeaderProps = ResultCountProps & {
 
 ### 1단계: 공통 표현과 위치 생성
 
-- [ ] `ResultCount`를 생성하고 단위·숫자 포맷·상태 정책을 적용한다.
-- [ ] `ListResultHeader`를 생성하고 제목 ID, 줄바꿈, 제목·개수 배치를 적용한다.
-- [ ] `shared/components/index.ts`에 export를 추가한다.
+- [x] `ResultCount`를 생성하고 단위·숫자 포맷·상태 정책을 적용한다.
+- [x] `ListResultHeader`를 생성하고 제목 ID, 줄바꿈, 제목·개수 배치를 적용한다.
+- [x] `shared/components/index.ts`에 export를 추가한다.
 
 ### 2단계: 게시글·댓글 적용
 
