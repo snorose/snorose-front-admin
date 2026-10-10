@@ -14,13 +14,11 @@ import type { CommentSearchParams } from '../types';
 
 interface CommentFilterPanelProps {
   onFilterChange: (filters: CommentSearchParams) => void;
-  totalCount?: number;
   initialFilters?: CommentSearchParams;
 }
 
 export const CommentFilterPanel = ({
   onFilterChange,
-  totalCount,
   initialFilters = {},
 }: CommentFilterPanelProps) => {
   const inputId = useId();
@@ -372,12 +370,6 @@ export const CommentFilterPanel = ({
           </Button>
         </div>
       </div>
-      {totalCount !== undefined && (
-        <span className='text-sm text-gray-500'>
-          총 <span className='font-semibold text-blue-600'>{totalCount}</span>
-          개의 댓글
-        </span>
-      )}
     </section>
   );
 };

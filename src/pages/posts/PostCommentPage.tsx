@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { PageHeader } from '@/shared/components';
 import { useManagePageUrl } from '@/shared/hooks';
 
@@ -20,6 +22,7 @@ const COMMENT_SCHEMA = {
 } as const;
 
 export default function PostCommentPage() {
+  const titleId = useId();
   const { searchParams, currentPage, handleSearchChange, handlePageChange } =
     useManagePageUrl<CommentSearchParams>(COMMENT_SCHEMA);
 
@@ -35,9 +38,12 @@ export default function PostCommentPage() {
           initialFilters={searchParams}
           onFilterChange={handleSearchChange}
         />
-        <section aria-label='댓글 목록' className='flex min-w-0 flex-col gap-1'>
-          <h2 className='text-lg font-bold'>댓글 목록</h2>
+        <section
+          aria-labelledby={titleId}
+          className='flex min-w-0 flex-col gap-1'
+        >
           <CommentTable
+            titleId={titleId}
             searchParams={searchParams}
             refreshKey={0}
             currentPage={currentPage}

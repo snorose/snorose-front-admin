@@ -37,6 +37,8 @@ export function useCommentTableState({
   const {
     data: totalCommentData,
     isLoading: isTotalLoading,
+    isFetching: isTotalFetching,
+    error: totalError,
     refetch: refetchTotal,
   } = useCommentList({
     page: currentPage,
@@ -47,6 +49,8 @@ export function useCommentTableState({
   const {
     data: childCommentData,
     isLoading: isChildLoading,
+    isFetching: isChildFetching,
+    error: childError,
     refetch: refetchChild,
   } = useCommentChildrenList({
     commentId: parentId,
@@ -78,6 +82,8 @@ export function useCommentTableState({
       : totalCommentData?.totalCount;
 
   const isLoading = parentId !== null ? isChildLoading : isTotalLoading;
+  const isFetching = parentId !== null ? isChildFetching : isTotalFetching;
+  const error = parentId !== null ? childError : totalError;
 
   const { mutate: bulkDelete, isPending: isDeletePending } = useBulkDelete({
     deleteFn: bulkDeleteComments,
@@ -223,6 +229,8 @@ export function useCommentTableState({
   return {
     comments,
     isLoading,
+    isFetching,
+    error,
     selectedIds,
     setSelectedIds,
     isAllSelected,

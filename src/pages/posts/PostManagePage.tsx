@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { PageHeader } from '@/shared/components';
 import { useManagePageUrl } from '@/shared/hooks';
 
@@ -22,6 +24,7 @@ const POST_SCHEMA = {
 } as const;
 
 export default function PostManagePage() {
+  const titleId = useId();
   const { searchParams, currentPage, handleSearchChange, handlePageChange } =
     useManagePageUrl<PostSearchParams>(POST_SCHEMA);
 
@@ -38,11 +41,11 @@ export default function PostManagePage() {
           onFilterChange={handleSearchChange}
         />
         <section
-          aria-label='게시글 목록'
+          aria-labelledby={titleId}
           className='flex min-w-0 flex-col gap-1'
         >
-          <h2 className='text-lg font-bold'>게시글 목록</h2>
           <PostTable
+            titleId={titleId}
             searchParams={searchParams}
             refreshKey={0}
             currentPage={currentPage}
