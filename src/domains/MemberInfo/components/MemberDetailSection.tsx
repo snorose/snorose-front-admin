@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Loader2, Pencil, UserRound } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
@@ -16,8 +17,10 @@ import MemberDetailInfoGrid from '@/domains/MemberInfo/components/MemberDetailIn
 import MemberInfoEditForm from '@/domains/MemberInfo/components/MemberInfoEditForm';
 import MemberPenaltySummaryCard from '@/domains/MemberInfo/components/MemberPenaltySummaryCard';
 import MemberPointAdjustmentDialog from '@/domains/MemberInfo/components/MemberPointAdjustmentDialog';
+import MemberPointHistoryDialog from '@/domains/MemberInfo/components/MemberPointHistoryDialog';
 import MemberWithdrawalSection from '@/domains/MemberInfo/components/MemberWithdrawalSection';
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
+import { memberPointHistoryQueryKey } from '@/domains/MemberInfo/hooks/useMemberPointHistory';
 import {
   formatDisplayValue,
   getRoleBadgeMeta,
@@ -61,6 +64,8 @@ export default function MemberDetailSection({
   onSaveEdit,
 }: MemberDetailSectionProps) {
   const [isPointDialogOpen, setIsPointDialogOpen] = useState(false);
+  const [isPointHistoryOpen, setIsPointHistoryOpen] = useState(false);
+  const queryClient = useQueryClient();
   const roleBadge = getRoleBadgeMeta(member.userRoleId);
   const roleLabel = roleBadge.label;
 
@@ -140,6 +145,7 @@ export default function MemberDetailSection({
               member={member}
               onCopy={onCopy}
               onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
+              onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
               roleLabel={roleLabel}
             />
           ) : (
@@ -168,9 +174,21 @@ export default function MemberDetailSection({
 
       <MemberPointAdjustmentDialog
         member={member}
-        onAdjusted={onPointAdjusted}
+        onAdjusted={async () => {
+          await queryClient.invalidateQueries({
+            queryKey: memberPointHistoryQueryKey(member.encryptedUserId),
+          });
+          await onPointAdjusted();
+        }}
         open={isPointDialogOpen}
         onOpenChange={setIsPointDialogOpen}
+      />
+      <MemberPointHistoryDialog
+        key={member.encryptedUserId}
+        member={member}
+        onCopy={onCopy}
+        open={isPointHistoryOpen}
+        onOpenChange={setIsPointHistoryOpen}
       />
     </article>
   );

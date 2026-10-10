@@ -6,6 +6,7 @@ import {
   Coins,
   Copy,
   GraduationCap,
+  History,
   IdCard,
   type LucideIcon,
   Mail,
@@ -26,6 +27,7 @@ type MemberDetailInfoGridProps = {
   member: MemberInfo;
   onCopy: (value: string) => void | Promise<void>;
   onPointAdjustmentOpen: () => void;
+  onPointHistoryOpen: () => void;
   roleLabel: string;
 };
 
@@ -33,6 +35,7 @@ export default function MemberDetailInfoGrid({
   member,
   onCopy,
   onPointAdjustmentOpen,
+  onPointHistoryOpen,
   roleLabel,
 }: MemberDetailInfoGridProps) {
   return (
@@ -119,15 +122,28 @@ export default function MemberDetailInfoGrid({
           label='보유 포인트'
           value={formatPoint(member.pointBalance)}
           action={
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon'
-              onClick={onPointAdjustmentOpen}
-              aria-label='포인트 지급/차감'
-            >
-              <Coins aria-hidden='true' />
-            </Button>
+            <div className='flex shrink-0 items-center gap-1'>
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon'
+                onClick={onPointHistoryOpen}
+                aria-label='포인트 증감 히스토리 열기'
+                title='포인트 증감 히스토리'
+              >
+                <History aria-hidden='true' />
+              </Button>
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon'
+                onClick={onPointAdjustmentOpen}
+                aria-label='포인트 지급/차감'
+                title='포인트 지급/차감'
+              >
+                <Coins aria-hidden='true' />
+              </Button>
+            </div>
           }
         />
         <DetailField
