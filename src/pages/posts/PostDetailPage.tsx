@@ -1,9 +1,10 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { ArrowLeft, ExternalLink, FileX, Loader2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 
+import { parseCommentId } from '@/domains/Comments/utils/commentUrls';
 import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetail/PostDetailBlacklistCard';
 import PostDetailCommentList from '@/domains/Posts/components/PostDetail/PostDetailCommentList';
 import PostDetailInfoPanel from '@/domains/Posts/components/PostDetail/PostDetailInfoPanel';
@@ -16,6 +17,9 @@ import { buildOriginalPostUrl } from '@/domains/Posts/utils/postUrl';
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const commentIdParam = searchParams.get('commentId') ?? '';
+  const focusedCommentId = parseCommentId(commentIdParam);
   const numericPostId = postId ? parseInt(postId, 10) : null;
 
   // 게시글 상세조회 쿼리
@@ -103,6 +107,12 @@ export default function PostDetailPage() {
         </div>
 
         <PostDetailCommentList
+          key={
+            focusedCommentId === null
+              ? undefined
+              : `${post.postId}-${focusedCommentId}`
+          }
+          focusedCommentId={focusedCommentId}
           postId={post.postId}
           commentCount={post.commentCount}
         />

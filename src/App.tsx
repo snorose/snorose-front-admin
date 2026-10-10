@@ -20,6 +20,7 @@ import {
   NotFoundPage,
   PointFreezePage,
   PopupManagementPage,
+  PostCommentDetailPage,
   PostCommentPage,
   PostDetailPage,
   PostManagePage,
@@ -97,6 +98,10 @@ function App() {
                             <Route
                               path={PATHS.POST_COMMENTS}
                               element={<PostCommentPage />}
+                            />
+                            <Route
+                              path={PATHS.POST_COMMENT_DETAIL}
+                              element={<PostCommentDetailPage />}
                             />
                             <Route
                               path={PATHS.POST_DETAIL}
