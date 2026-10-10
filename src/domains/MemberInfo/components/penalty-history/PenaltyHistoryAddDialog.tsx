@@ -20,11 +20,13 @@ import {
   DEFAULT_WARNING_REASON,
   type DemotionType,
   MEMO_MAX_LENGTH,
+  PENALTY_ADD_BLOCKED_MESSAGE,
   RELEGATION_REASON_OPTIONS,
   getDemotionTypeLabel,
   getReasonLabel,
   getRelegationEndDateTimeLabel,
   getWarningCountByReason,
+  isPenaltyAddTemporarilyBlocked,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-add-utils';
 import { isPositiveInteger } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import { BLACKLIST_DEMOTE_OPTIONS } from '@/domains/MemberInfo/constants/memberInfo';
@@ -69,6 +71,7 @@ export default function PenaltyHistoryAddDialog({
 
   const isWarningMode = mode === 'WARNING';
   const isOpen = mode !== null;
+  const isPenaltyBlocked = isPenaltyAddTemporarilyBlocked(member);
   const selectedReason = isWarningMode ? warningReason : demotionReason;
   const needsCustomReason = selectedReason === 'ETC';
   const title = isWarningMode ? '경고 추가' : '강등 추가';
@@ -139,6 +142,11 @@ export default function PenaltyHistoryAddDialog({
   const validate = () => {
     if (!mode) return false;
 
+    if (isPenaltyBlocked) {
+      toast.error(PENALTY_ADD_BLOCKED_MESSAGE);
+      return false;
+    }
+
     if (isWarningMode && isPermanentDemotionPenalty(member)) {
       toast.error('영구강등 회원에게는 경고를 추가할 수 없습니다.');
       return false;
@@ -199,7 +207,7 @@ export default function PenaltyHistoryAddDialog({
   };
 
   const handleConfirmSubmit = async () => {
-    if (isSubmitting || !mode) return;
+    if (isSubmitting || !validate()) return;
 
     const payload = buildPayload({
       customReason,
@@ -263,65 +271,74 @@ export default function PenaltyHistoryAddDialog({
             </Dialog.Description>
           </Dialog.Header>
 
-          <div className='space-y-5'>
-            {isWarningMode ? (
-              <WarningFields
-                customReason={customReason}
-                invalidFieldName={invalidFieldName}
-                needsCustomReason={needsCustomReason}
-                onCustomReasonChange={(value) => {
-                  setCustomReason(value);
-                  setInvalidFieldName(undefined);
-                }}
-                onReasonChange={handleChangeWarningReason}
-                onWarningCountChange={(value) => {
-                  setWarningCount(value);
-                  setInvalidFieldName(undefined);
-                }}
-                reason={warningReason}
-                warningCount={warningCount}
-              />
-            ) : (
-              <DemotionFields
-                customReason={customReason}
-                demotionReason={demotionReason}
-                demotionReasonOptions={demotionReasonOptions}
-                demotionType={demotionType}
-                invalidFieldName={invalidFieldName}
-                needsCustomReason={needsCustomReason}
-                onCustomReasonChange={(value) => {
-                  setCustomReason(value);
-                  setInvalidFieldName(undefined);
-                }}
-                onDemotionReasonChange={handleChangeDemotionReason}
-                onDemotionTypeChange={handleChangeDemotionType}
-                onRelegationMonthChange={(value) => {
-                  setRelegationMonth(value);
-                  setInvalidFieldName(undefined);
-                }}
-                relegationEndDateTime={relegationEndDateTime}
-                relegationMonth={relegationMonth}
-              />
-            )}
+          {isPenaltyBlocked ? (
+            <p
+              role='alert'
+              className='rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600'
+            >
+              {PENALTY_ADD_BLOCKED_MESSAGE}
+            </p>
+          ) : (
+            <div className='space-y-5'>
+              {isWarningMode ? (
+                <WarningFields
+                  customReason={customReason}
+                  invalidFieldName={invalidFieldName}
+                  needsCustomReason={needsCustomReason}
+                  onCustomReasonChange={(value) => {
+                    setCustomReason(value);
+                    setInvalidFieldName(undefined);
+                  }}
+                  onReasonChange={handleChangeWarningReason}
+                  onWarningCountChange={(value) => {
+                    setWarningCount(value);
+                    setInvalidFieldName(undefined);
+                  }}
+                  reason={warningReason}
+                  warningCount={warningCount}
+                />
+              ) : (
+                <DemotionFields
+                  customReason={customReason}
+                  demotionReason={demotionReason}
+                  demotionReasonOptions={demotionReasonOptions}
+                  demotionType={demotionType}
+                  invalidFieldName={invalidFieldName}
+                  needsCustomReason={needsCustomReason}
+                  onCustomReasonChange={(value) => {
+                    setCustomReason(value);
+                    setInvalidFieldName(undefined);
+                  }}
+                  onDemotionReasonChange={handleChangeDemotionReason}
+                  onDemotionTypeChange={handleChangeDemotionType}
+                  onRelegationMonthChange={(value) => {
+                    setRelegationMonth(value);
+                    setInvalidFieldName(undefined);
+                  }}
+                  relegationEndDateTime={relegationEndDateTime}
+                  relegationMonth={relegationMonth}
+                />
+              )}
 
-            <Field label='메모' htmlFor={memoId}>
-              <Textarea
-                id={memoId}
-                aria-describedby={memoDescriptionId}
-                value={memo}
-                onChange={(event) => setMemo(event.target.value)}
-                placeholder='관리자명: 내용'
-                maxLength={MEMO_MAX_LENGTH}
-                className='min-h-32 resize-none'
-              />
-              <p
-                id={memoDescriptionId}
-                className='text-right text-sm font-medium text-slate-400'
-              >
-                {memo.length}/{MEMO_MAX_LENGTH}
-              </p>
-            </Field>
-          </div>
+              <Field label='메모' htmlFor={memoId}>
+                <Textarea
+                  id={memoId}
+                  aria-describedby={memoDescriptionId}
+                  value={memo}
+                  onChange={(event) => setMemo(event.target.value)}
+                  placeholder='관리자명: 내용'
+                  maxLength={MEMO_MAX_LENGTH}
+                  className='min-h-32 resize-none'
+                />
+                <p
+                  id={memoDescriptionId}
+                  className='text-right text-sm font-medium text-slate-400'
+                >
+                  {memo.length}/{MEMO_MAX_LENGTH}
+                </p>
+              </Field>
+            </div>
+          )}
 
           <Dialog.Footer className='gap-2'>
             <Button
@@ -338,7 +355,7 @@ export default function PenaltyHistoryAddDialog({
               variant='destructive-outline'
               size='default'
               onClick={handleRequestSubmit}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isPenaltyBlocked}
             >
               {isSubmitting ? (
                 <Loader2 aria-hidden='true' className='animate-spin' />
@@ -356,7 +373,7 @@ export default function PenaltyHistoryAddDialog({
         member={member}
         onConfirm={handleConfirmSubmit}
         onOpenChange={setIsConfirmOpen}
-        open={isConfirmOpen}
+        open={isConfirmOpen && !isPenaltyBlocked}
         relegationEndDateTime={relegationEndDateTime}
         relegationMonth={relegationMonth}
         warningCount={warningCount}
