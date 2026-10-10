@@ -43,7 +43,7 @@ export function FilterMultiSelect<T extends string | number>({
             aria-labelledby={`${id}-label`}
             aria-describedby={`${id}-summary`}
             disabled={isDisabled}
-            className='border-input h-9 w-full justify-between bg-transparent px-3 font-normal shadow-xs'
+            className='border-input h-9 w-full justify-between bg-transparent px-3 font-normal shadow-none'
           >
             <span id={`${id}-summary`} className='truncate'>
               {summary}
