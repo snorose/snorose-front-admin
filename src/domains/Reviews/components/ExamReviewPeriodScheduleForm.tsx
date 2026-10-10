@@ -86,7 +86,7 @@ export function ExamReviewPeriodScheduleForm({
     <section className='flex flex-col gap-4'>
       <article className='flex w-full flex-col gap-1'>
         <h3 className='text-lg font-bold'>시험 후기 작성 기간 생성</h3>
-        <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+        <div className='@container flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor={titleId} required>
               기간 제목
@@ -120,7 +120,7 @@ export function ExamReviewPeriodScheduleForm({
               type='button'
               size='sm'
               variant='outline'
-              className='w-24'
+              className='h-9 min-w-24 flex-1 shadow-none @md:flex-none'
               onClick={handleResetButtonClick}
             >
               입력 초기화
@@ -129,7 +129,7 @@ export function ExamReviewPeriodScheduleForm({
               type='button'
               size='sm'
               variant='default'
-              className='w-16'
+              className='h-9 min-w-24 flex-1 shadow-none @md:flex-none'
               onClick={handleCreateButtonClick}
             >
               생성
