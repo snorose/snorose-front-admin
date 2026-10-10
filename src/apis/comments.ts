@@ -89,11 +89,14 @@ export const deleteComment = async (
 
 // 댓글 복구 api
 export const restoreComment = async (
-  commentId: number
+  commentId: number,
+  memo: string
 ): Promise<AdminDeleteCommentResult> => {
   const response = await axiosInstance.patch<
     BaseResponse<AdminDeleteCommentResult>
-  >(`/v1/admin/comments/${commentId}/restore`);
+  >(`/v1/admin/comments/${commentId}/restore`, {
+    memo,
+  });
   return response.data.result;
 };
 
