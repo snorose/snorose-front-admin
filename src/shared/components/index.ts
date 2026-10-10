@@ -3,6 +3,7 @@ export { AppSidebar } from './AppSidebar';
 export { BulkActionBar } from './BulkActionBar';
 export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
+export { FilterMultiSelect } from './FilterMultiSelect';
 export { Header } from './Header';
 export {
   ListResultHeader,

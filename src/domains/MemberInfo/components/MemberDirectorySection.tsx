@@ -98,11 +98,20 @@ export default function MemberDirectorySection({
           회원 검색
         </h2>
 
-        <div className='flex min-w-0 flex-col gap-4 rounded-md border p-4 pb-5'>
-          <div className='flex min-w-0 flex-wrap items-end gap-2'>
-            <div className='flex w-full min-w-0 flex-col gap-1 sm:w-80'>
+        <form
+          aria-labelledby={`${searchInputId}-search-heading`}
+          className='border-border bg-background @container flex min-w-0 flex-col gap-4 rounded-md border p-4'
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!isListLoading) {
+              void onSearch();
+            }
+          }}
+        >
+          <div className='grid min-w-0 grid-cols-1 items-end gap-4 @md:grid-cols-2 @5xl:grid-cols-4'>
+            <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor={searchInputId}>회원 검색어</Label>
-              <InputGroup className='flex-1'>
+              <InputGroup className='shadow-none'>
                 <InputGroup.Addon>
                   <Search aria-hidden='true' />
                 </InputGroup.Addon>
@@ -110,18 +119,21 @@ export default function MemberDirectorySection({
                   id={searchInputId}
                   type='text'
                   value={searchQuery}
-                  placeholder='이름, 학번, 아이디, 닉네임, 이메일로 검색...'
+                  placeholder='이름, 학번, 아이디, 닉네임, 이메일'
                   onChange={(event) => onSearchQueryChange(event.target.value)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') {
-                      void onSearch();
+                      event.preventDefault();
+                      if (!event.nativeEvent.isComposing && !isListLoading) {
+                        void onSearch();
+                      }
                     }
                   }}
                 />
               </InputGroup>
             </div>
 
-            <div className='w-full min-w-0 sm:w-40'>
+            <div className='min-w-0'>
               <SearchableSelect
                 label='등급'
                 value={selectedRole}
@@ -131,7 +143,7 @@ export default function MemberDirectorySection({
                 isActive={selectedRole !== 'ALL'}
               />
             </div>
-            <div className='w-full min-w-0 sm:w-40'>
+            <div className='min-w-0'>
               <SearchableSelect
                 label='입학연도'
                 value={selectedAdmissionYear}
@@ -141,7 +153,7 @@ export default function MemberDirectorySection({
                 isActive={selectedAdmissionYear !== 'ALL'}
               />
             </div>
-            <div className='w-full min-w-0 sm:w-56'>
+            <div className='min-w-0'>
               <SearchableSelect
                 label='전공'
                 value={selectedMajor}
@@ -152,34 +164,35 @@ export default function MemberDirectorySection({
               />
             </div>
           </div>
-          <div className='flex flex-wrap justify-end gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              className='w-24'
-              aria-label='검색 조건 초기화'
-              onClick={onRefreshDirectory}
-              disabled={isListLoading}
-            >
-              초기화
-            </Button>
-            <Button
-              type='button'
-              size='sm'
-              className='w-16'
-              aria-label={isListLoading ? '검색 중...' : undefined}
-              onClick={() => void onSearch()}
-              disabled={isListLoading}
-            >
-              {isListLoading ? (
-                <Loader2 aria-hidden='true' className='animate-spin' />
-              ) : (
-                '검색'
-              )}
-            </Button>
+          <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
+            <div className='flex gap-2 @md:ml-auto'>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='h-9 min-w-24 flex-1 shadow-none @md:flex-none'
+                aria-label='검색 조건 초기화'
+                onClick={onRefreshDirectory}
+                disabled={isListLoading}
+              >
+                초기화
+              </Button>
+              <Button
+                type='submit'
+                size='sm'
+                className='h-9 min-w-24 flex-1 shadow-none @md:flex-none'
+                aria-label={isListLoading ? '검색 중...' : undefined}
+                disabled={isListLoading}
+              >
+                {isListLoading ? (
+                  <Loader2 aria-hidden='true' className='animate-spin' />
+                ) : (
+                  '검색'
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
+        </form>
       </section>
 
       <section

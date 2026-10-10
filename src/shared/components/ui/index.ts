@@ -5,6 +5,7 @@ export { Button } from './button';
 export { buttonVariants } from './button';
 export { Calendar } from './calendar';
 export { Card } from './card';
+export { Checkbox } from './checkbox';
 export { Collapsible } from './collapsible';
 export { ConfirmModal } from './confirm-modal';
 export { Dialog } from './dialog';
