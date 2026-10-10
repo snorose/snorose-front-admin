@@ -1,3 +1,4 @@
+import type { AdminStatusHistory } from '@/shared/types/status-history';
 import type { AdminStatus } from '@/shared/utils';
 
 export interface AdminCommentResult {
@@ -102,8 +103,7 @@ export interface CommentSearchParams {
   adminCommonStatuses?: AdminStatus[];
 }
 
-export type AdminCommentStatusHistory =
-  import('@/domains/Posts/types/post').AdminPostStatusHistory;
+export type AdminCommentStatusHistory = AdminStatusHistory;
 export interface AdminCommentStatusHistoryListResult {
   hasNext: boolean;
   totalPage: number;

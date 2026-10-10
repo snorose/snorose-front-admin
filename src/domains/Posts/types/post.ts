@@ -1,3 +1,5 @@
+import type { AdminStatusHistory } from '@/shared/types/status-history';
+
 export interface AdminGetPostResponse {
   postId: number;
   encryptedUserId: string;
@@ -37,20 +39,7 @@ export interface AdminPostReportListResult {
   reports: AdminPostReportResponse[];
 }
 
-export interface AdminPostStatusHistory {
-  actorNickname: string | null;
-  changedAt: string;
-  changedStatus:
-    | 'AUTO_HIDDEN'
-    | 'USER_DELETED'
-    | 'DELETE_RESTORED'
-    | 'ADMIN_DELETED'
-    | 'ADMIN_HIDDEN'
-    | 'VISIBILITY_RESTORED'
-    | 'SANCTIONED'
-    | 'SANCTION_RELEASED';
-  memo: string | null;
-}
+export type AdminPostStatusHistory = AdminStatusHistory;
 
 export interface AdminPostStatusHistoryListResult {
   hasNext: boolean;
