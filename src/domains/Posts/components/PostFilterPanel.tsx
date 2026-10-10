@@ -285,7 +285,7 @@ export const PostFilterPanel = ({
             </div>
           </div>
         </div>
-        <div className='border-border flex flex-col gap-3 border-t pt-4 @md:flex-row @md:items-center'>
+        <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
           {/* 공지만 보기 */}
           <label className='flex min-h-9 w-fit cursor-pointer items-center gap-2 text-sm'>
             <input
