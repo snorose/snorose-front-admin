@@ -101,3 +101,13 @@ export interface CommentSearchParams {
   boardIds?: number[];
   adminCommonStatuses?: AdminStatus[];
 }
+
+export type AdminCommentStatusHistory =
+  import('@/domains/Posts/types/post').AdminPostStatusHistory;
+export interface AdminCommentStatusHistoryListResult {
+  hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  currentCount: number;
+  data: AdminCommentStatusHistory[];
+}

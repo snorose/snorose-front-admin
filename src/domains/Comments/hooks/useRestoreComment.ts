@@ -45,6 +45,9 @@ export const useRestoreComment = () => {
       return { restored, restoredIds, failedIds };
     },
     onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ['commentStatusHistories'],
+      });
       void queryClient.invalidateQueries({ queryKey: ['comments'] });
       void queryClient.invalidateQueries({ queryKey: ['postComments'] });
     },
