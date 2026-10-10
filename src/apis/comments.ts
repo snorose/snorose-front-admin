@@ -7,6 +7,7 @@ import type {
   AdminCommentReportListResult,
   AdminCommentResult,
   AdminCommentSearchRequest,
+  AdminCommentStatusHistoryListResult,
   AdminCommentVisibilityUpdateRequest,
   AdminDeleteCommentResult,
 } from '@/domains/Comments/types/comment';
@@ -142,5 +143,17 @@ export const getCommentReports = async (
   const response = await axiosInstance.get<
     BaseResponse<AdminCommentReportListResult>
   >(`/v1/admin/comments/${commentId}/reports`);
+  return response.data.result;
+};
+
+export const getCommentStatusHistories = async (
+  commentId: number,
+  page: number
+): Promise<AdminCommentStatusHistoryListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminCommentStatusHistoryListResult>
+  >(`/v1/admin/comments/${commentId}/status-histories`, {
+    params: { page: page - 1 },
+  });
   return response.data.result;
 };
