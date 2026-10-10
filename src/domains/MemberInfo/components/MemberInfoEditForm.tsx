@@ -147,6 +147,7 @@ export default function MemberInfoEditForm({
         setFieldErrors((prev) => ({ ...prev, birthday: undefined }));
       },
       inputType: 'date',
+      placeholder: '생년월일 선택',
     },
     {
       type: 'editable',

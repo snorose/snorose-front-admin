@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import {
   BulkActionBar,
+  ListResultHeader,
   PaginationBar,
   StatusChangeModal,
   TableStateRow,
@@ -10,12 +11,12 @@ import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
 
-import { IS_POST_RESTORE_ENABLED } from '../constants';
 import { usePostTableState } from '../hooks/usePostTableState';
 import type { PostSearchParams } from '../types';
 import PostTableRow from './PostTableRow';
 
 interface PostTableProps {
+  titleId?: string;
   searchParams?: PostSearchParams;
   refreshKey?: number;
   currentPage: number;
@@ -23,6 +24,7 @@ interface PostTableProps {
 }
 
 export default function PostTable({
+  titleId,
   searchParams = {},
   refreshKey,
   currentPage,
@@ -31,6 +33,8 @@ export default function PostTable({
   const {
     posts,
     isLoading,
+    isFetching,
+    error,
     selectedIds,
     setSelectedIds,
     isAllSelected,
@@ -41,7 +45,13 @@ export default function PostTable({
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleBulkVisibility,
+    visibilityModalType,
+    setVisibilityModalType,
+    handleConfirmBulkVisibility,
     handleBulkRestore,
+    handleConfirmBulkRestore,
+    isRestoreModalOpen,
+    setIsRestoreModalOpen,
     isDeletePending,
     isVisibilityPending,
     totalPage,
@@ -63,27 +73,22 @@ export default function PostTable({
   const isEmpty = !isLoading && posts.length === 0;
 
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex min-w-0 flex-col gap-3'>
+      <ListResultHeader
+        title='게시글 목록'
+        titleId={titleId}
+        totalCount={totalCount}
+        status={isLoading || isFetching ? 'loading' : error ? 'error' : 'ready'}
+      />
       <BulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
         isDeletePending={isDeletePending}
-        isRestoreDisabled={!IS_POST_RESTORE_ENABLED}
         onBulkVisibility={handleBulkVisibility}
         onBulkRestore={handleBulkRestore}
         onBulkDelete={handleBulkDelete}
         label='게시글'
       />
-
-      <div className='flex items-center justify-between px-1 text-xs text-gray-500'>
-        <span>
-          총{' '}
-          <span className='font-bold text-blue-600'>
-            {(totalCount ?? 0).toLocaleString('ko-KR')}
-          </span>
-          개의 게시물
-        </span>
-      </div>
 
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
@@ -183,12 +188,28 @@ export default function PostTable({
         totalPage={paginationTotalPage}
       />
 
+      {isRestoreModalOpen && (
+        <StatusChangeModal
+          target='POST'
+          modalType='RESTORE'
+          onClose={() => setIsRestoreModalOpen(false)}
+          onConfirmAction={handleConfirmBulkRestore}
+        />
+      )}
       {isDeleteModalOpen && (
         <StatusChangeModal
           target='POST'
           modalType='DELETE'
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirmAction={handleConfirmBulkDelete}
+        />
+      )}
+      {visibilityModalType !== null && (
+        <StatusChangeModal
+          target='POST'
+          modalType={visibilityModalType}
+          onClose={() => setVisibilityModalType(null)}
+          onConfirmAction={handleConfirmBulkVisibility}
         />
       )}
     </div>

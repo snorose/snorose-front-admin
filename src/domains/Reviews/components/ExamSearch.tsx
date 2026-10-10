@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Input, InputGroup, Select } from '@/shared/components/ui';
+import { AdvancedSearchFilters, DatePicker } from '@/shared/components';
+import { Button, InputGroup, Label, Select } from '@/shared/components/ui';
 import {
   EXAM_REVIEW_PROCESS_STATUS,
   EXAM_TYPE_LIST,
@@ -95,7 +96,7 @@ const getStatusCodeFromLabel = (statusLabel: string) =>
 
 const renderDiscussionStatusBadge = (status: string) => {
   if (status === ALL_SELECTED) {
-    return '논의 여부 전체';
+    return '전체';
   }
 
   return <ExamDiscussionStatusBadge isDiscussed={status === TRUE_SELECTED} />;
@@ -115,6 +116,7 @@ export default function ExamSearch({
   initialIsReported,
   initialStatuses,
 }: ExamSearchProps) {
+  const dateId = useId();
   // key prop을 사용하여 prop 변경 시 컴포넌트 재초기화 (useEffect 대신)
   const searchKey = `${initialStartDate}-${initialEndDate}-${initialKeywordAuthor}-${initialKeywordPost}-${initialSort}-${initialSemester}-${initialExamType}-${initialIsConfirmed}-${initialIsDiscussed}-${initialIsReported}-${initialStatuses}`;
 
@@ -329,237 +331,330 @@ export default function ExamSearch({
   };
 
   return (
-    <div key={searchKey} className='flex flex-col gap-2'>
-      <div className='flex flex-wrap items-center gap-2'>
-        <InputGroup className='w-[220px] max-w-full'>
-          <InputGroup.Input
-            type='text'
-            aria-label='시험후기명 또는 postId 검색'
-            placeholder='시험후기명 또는 postId 검색'
-            value={keywordPost}
-            onChange={(e) => setKeywordPost(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          {keywordPost && (
-            <InputGroup.Addon align='inline-end'>
-              <InputGroup.Button
-                onClick={handleKeywordPostReset}
-                size='icon-xs'
-                aria-label='시험후기 검색어 지우기'
-              >
-                <X aria-hidden='true' />
-              </InputGroup.Button>
-            </InputGroup.Addon>
-          )}
-        </InputGroup>
-        <InputGroup className='w-[260px] max-w-full'>
-          <InputGroup.Input
-            type='text'
-            aria-label='작성자 검색 (아이디, 닉네임, 학번)'
-            placeholder='작성자 검색 (아이디, 닉네임, 학번)'
-            value={keywordAuthor}
-            onChange={(e) => setKeywordAuthor(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          {keywordAuthor && (
-            <InputGroup.Addon align='inline-end'>
-              <InputGroup.Button
-                onClick={handleKeywordAuthorReset}
-                size='icon-xs'
-                aria-label='작성자 검색어 지우기'
-              >
-                <X aria-hidden='true' />
-              </InputGroup.Button>
-            </InputGroup.Addon>
-          )}
-        </InputGroup>
-        <Input
-          type='date'
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          max={endDate || undefined}
-          className='w-[150px]'
-          aria-label='검색 시작일'
-        />
-        <span className='text-xs text-gray-500'>~</span>
-        <Input
-          type='date'
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          min={startDate || undefined}
-          className='w-[150px]'
-          aria-label='검색 종료일'
-        />
-      </div>
+    <section
+      key={searchKey}
+      aria-labelledby={`${dateId}-heading`}
+      className='flex w-full min-w-0 flex-col gap-1'
+    >
+      <h2 id={`${dateId}-heading`} className='text-lg font-bold'>
+        시험후기 검색
+      </h2>
+      <div className='flex min-w-0 flex-col gap-4 rounded-md border p-4 pb-5'>
+        <div className='flex min-w-0 flex-col gap-4'>
+          <div className='flex flex-wrap items-end gap-2'>
+            <div className='flex w-full min-w-0 flex-col gap-1 sm:w-60'>
+              <Label htmlFor={`${dateId}-keywordPost`}>시험후기 검색어</Label>
+              <InputGroup>
+                <InputGroup.Addon>
+                  <Search aria-hidden='true' />
+                </InputGroup.Addon>
+                <InputGroup.Input
+                  type='text'
+                  id={`${dateId}-keywordPost`}
+                  aria-label='시험후기명 또는 postId 검색'
+                  placeholder='시험후기명 또는 postId 검색'
+                  value={keywordPost}
+                  onChange={(e) => setKeywordPost(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                {keywordPost && (
+                  <InputGroup.Addon align='inline-end'>
+                    <InputGroup.Button
+                      onClick={handleKeywordPostReset}
+                      size='icon-xs'
+                      aria-label='시험후기 검색어 지우기'
+                    >
+                      <X aria-hidden='true' />
+                    </InputGroup.Button>
+                  </InputGroup.Addon>
+                )}
+              </InputGroup>
+            </div>
+            <div className='flex w-full min-w-0 flex-col gap-1 sm:w-60'>
+              <Label htmlFor={`${dateId}-keywordAuthor`}>작성자</Label>
+              <InputGroup>
+                <InputGroup.Addon>
+                  <Search aria-hidden='true' />
+                </InputGroup.Addon>
+                <InputGroup.Input
+                  type='text'
+                  id={`${dateId}-keywordAuthor`}
+                  aria-label='작성자 검색 (아이디, 닉네임, 학번)'
+                  placeholder='작성자 검색 (아이디, 닉네임, 학번)'
+                  value={keywordAuthor}
+                  onChange={(e) => setKeywordAuthor(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                {keywordAuthor && (
+                  <InputGroup.Addon align='inline-end'>
+                    <InputGroup.Button
+                      onClick={handleKeywordAuthorReset}
+                      size='icon-xs'
+                      aria-label='작성자 검색어 지우기'
+                    >
+                      <X aria-hidden='true' />
+                    </InputGroup.Button>
+                  </InputGroup.Addon>
+                )}
+              </InputGroup>
+            </div>
+            <fieldset className='flex w-full min-w-0 flex-col gap-1 sm:w-auto'>
+              <legend className='py-1 text-sm leading-none font-semibold'>
+                작성 기간
+              </legend>
+              <div className='flex w-full min-w-0 items-center gap-2 sm:w-auto'>
+                <div className='flex min-w-0 flex-1 flex-col gap-1 sm:w-40 sm:flex-none'>
+                  <Label className='sr-only' htmlFor={`${dateId}-start`}>
+                    작성 시작일
+                  </Label>
+                  <DatePicker
+                    id={`${dateId}-start`}
+                    value={startDate || undefined}
+                    onValueChange={(value) => setStartDate(value ?? '')}
+                    maxDate={endDate || undefined}
+                    placeholder='시작일'
+                  />
+                </div>
+                <span aria-hidden='true' className='text-muted-foreground'>
+                  ~
+                </span>
+                <div className='flex min-w-0 flex-1 flex-col gap-1 sm:w-40 sm:flex-none'>
+                  <Label className='sr-only' htmlFor={`${dateId}-end`}>
+                    작성 종료일
+                  </Label>
+                  <DatePicker
+                    id={`${dateId}-end`}
+                    value={endDate || undefined}
+                    onValueChange={(value) => setEndDate(value ?? '')}
+                    minDate={startDate || undefined}
+                    placeholder='종료일'
+                  />
+                </div>
+              </div>
+            </fieldset>
+          </div>
 
-      {/* 필터 Select들 */}
-      <div className='flex flex-wrap items-center gap-2'>
-        <Select value={sort} onValueChange={setSort}>
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              게시일 최신순
-            </Select.Item>
-            <Select.Item value='ASC' className='text-sm'>
-              제목 오름차순
-            </Select.Item>
-            <Select.Item value='DESC' className='text-sm'>
-              제목 내림차순
-            </Select.Item>
-            <Select.Item value='REPORT' className='text-sm'>
-              신고순
-            </Select.Item>
-          </Select.Content>
-        </Select>
+          <AdvancedSearchFilters>
+            {/* 필터 Select들 */}
+            <div className='flex flex-wrap items-end gap-2'>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${dateId}-sort`}>정렬</Label>
+                <Select value={sort} onValueChange={setSort}>
+                  <Select.Trigger
+                    id={`${dateId}-sort`}
+                    className='h-9 w-full text-sm'
+                  >
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content align='start'>
+                    <Select.Item value={ALL_SELECTED} className='text-sm'>
+                      게시일 최신순
+                    </Select.Item>
+                    <Select.Item value='ASC' className='text-sm'>
+                      제목 오름차순
+                    </Select.Item>
+                    <Select.Item value='DESC' className='text-sm'>
+                      제목 내림차순
+                    </Select.Item>
+                    <Select.Item value='REPORT' className='text-sm'>
+                      신고순
+                    </Select.Item>
+                  </Select.Content>
+                </Select>
+              </div>
 
-        <Select value={semester} onValueChange={setSemester}>
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content
-            align='start'
-            className='max-h-[200px] overflow-y-auto'
-          >
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              강의 연도
-            </Select.Item>
-            {SEMESTER_LIST.map((sem) => (
-              <Select.Item key={sem} value={sem} className='text-sm'>
-                {sem}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${dateId}-semester`}>강의 연도</Label>
+                <Select value={semester} onValueChange={setSemester}>
+                  <Select.Trigger
+                    id={`${dateId}-semester`}
+                    className='h-9 w-full text-sm'
+                  >
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content
+                    align='start'
+                    className='max-h-[200px] overflow-y-auto'
+                  >
+                    <Select.Item value={ALL_SELECTED} className='text-sm'>
+                      전체
+                    </Select.Item>
+                    {SEMESTER_LIST.map((sem) => (
+                      <Select.Item key={sem} value={sem} className='text-sm'>
+                        {sem}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </div>
 
-        <Select value={examType} onValueChange={setExamType}>
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content
-            align='start'
-            className='max-h-[200px] overflow-y-auto'
-          >
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              시험 종류
-            </Select.Item>
-            {EXAM_TYPE_LIST.map((type) => (
-              <Select.Item key={type} value={type} className='text-sm'>
-                {type}
-              </Select.Item>
-            ))}
-          </Select.Content>
-        </Select>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${dateId}-examType`}>시험 종류</Label>
+                <Select value={examType} onValueChange={setExamType}>
+                  <Select.Trigger
+                    id={`${dateId}-examType`}
+                    className='h-9 w-full text-sm'
+                  >
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content
+                    align='start'
+                    className='max-h-[200px] overflow-y-auto'
+                  >
+                    <Select.Item value={ALL_SELECTED} className='text-sm'>
+                      전체
+                    </Select.Item>
+                    {EXAM_TYPE_LIST.map((type) => (
+                      <Select.Item key={type} value={type} className='text-sm'>
+                        {type}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select>
+              </div>
 
-        <Select value={confirmStatus} onValueChange={setConfirmStatus}>
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              확인 상태 전체
-            </Select.Item>
-            <Select.Item
-              value={CONFIRMED_SELECTED}
-              className='text-sm'
-              textValue='확인완료'
-            >
-              <ExamConfirmStatusBadge status={CONFIRMED_SELECTED} />
-            </Select.Item>
-            <Select.Item
-              value={UNCONFIRMED_SELECTED}
-              className='text-sm'
-              textValue='미확인'
-            >
-              <ExamConfirmStatusBadge status={UNCONFIRMED_SELECTED} />
-            </Select.Item>
-          </Select.Content>
-        </Select>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${dateId}-confirmStatus`}>확인 상태</Label>
+                <Select value={confirmStatus} onValueChange={setConfirmStatus}>
+                  <Select.Trigger
+                    id={`${dateId}-confirmStatus`}
+                    className='h-9 w-full text-sm'
+                  >
+                    <Select.Value />
+                  </Select.Trigger>
+                  <Select.Content align='start'>
+                    <Select.Item value={ALL_SELECTED} className='text-sm'>
+                      전체
+                    </Select.Item>
+                    <Select.Item
+                      value={CONFIRMED_SELECTED}
+                      className='text-sm'
+                      textValue='확인완료'
+                    >
+                      <ExamConfirmStatusBadge status={CONFIRMED_SELECTED} />
+                    </Select.Item>
+                    <Select.Item
+                      value={UNCONFIRMED_SELECTED}
+                      className='text-sm'
+                      textValue='미확인'
+                    >
+                      <ExamConfirmStatusBadge status={UNCONFIRMED_SELECTED} />
+                    </Select.Item>
+                  </Select.Content>
+                </Select>
+              </div>
 
-        <Select value={discussionStatus} onValueChange={setDiscussionStatus}>
-          <Select.Trigger className='h-9 w-[150px] text-sm'>
-            {renderDiscussionStatusBadge(discussionStatus)}
-          </Select.Trigger>
-          <Select.Content align='start'>
-            <Select.Item value={ALL_SELECTED} className='text-sm'>
-              논의 여부 전체
-            </Select.Item>
-            <Select.Item
-              value={TRUE_SELECTED}
-              className='text-sm'
-              textValue='논의 있음'
-            >
-              {renderDiscussionStatusBadge(TRUE_SELECTED)}
-            </Select.Item>
-            <Select.Item
-              value={FALSE_SELECTED}
-              className='text-sm'
-              textValue='논의 없음'
-            >
-              {renderDiscussionStatusBadge(FALSE_SELECTED)}
-            </Select.Item>
-          </Select.Content>
-        </Select>
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label htmlFor={`${dateId}-discussionStatus`}>논의 여부</Label>
+                <Select
+                  value={discussionStatus}
+                  onValueChange={setDiscussionStatus}
+                >
+                  <Select.Trigger
+                    id={`${dateId}-discussionStatus`}
+                    className='h-9 w-full text-sm'
+                  >
+                    {renderDiscussionStatusBadge(discussionStatus)}
+                  </Select.Trigger>
+                  <Select.Content align='start'>
+                    <Select.Item value={ALL_SELECTED} className='text-sm'>
+                      전체
+                    </Select.Item>
+                    <Select.Item
+                      value={TRUE_SELECTED}
+                      className='text-sm'
+                      textValue='논의 있음'
+                    >
+                      {renderDiscussionStatusBadge(TRUE_SELECTED)}
+                    </Select.Item>
+                    <Select.Item
+                      value={FALSE_SELECTED}
+                      className='text-sm'
+                      textValue='논의 없음'
+                    >
+                      {renderDiscussionStatusBadge(FALSE_SELECTED)}
+                    </Select.Item>
+                  </Select.Content>
+                </Select>
+              </div>
 
-        <ExamMultiSelect
-          value={selectedStatuses}
-          onValueChange={setSelectedStatuses}
-          options={PROCESS_STATUS_OPTIONS}
-          contentClassName='w-[190px]'
-          renderOption={(option) => {
-            const statusCode = getStatusCodeFromLabel(option);
+              <div className='flex w-full min-w-0 flex-col gap-1 sm:w-40'>
+                <Label
+                  id={`${dateId}-statuses-label`}
+                  htmlFor={`${dateId}-statuses`}
+                >
+                  관리 상태
+                </Label>
+                <ExamMultiSelect
+                  value={selectedStatuses}
+                  onValueChange={setSelectedStatuses}
+                  options={PROCESS_STATUS_OPTIONS}
+                  contentClassName='w-[190px]'
+                  renderOption={(option) => {
+                    const statusCode = getStatusCodeFromLabel(option);
 
-            return statusCode ? (
-              <ExamReviewProcessStatusBadge status={statusCode} />
-            ) : (
-              option
-            );
-          }}
-        >
+                    return statusCode ? (
+                      <ExamReviewProcessStatusBadge status={statusCode} />
+                    ) : (
+                      option
+                    );
+                  }}
+                >
+                  <Button
+                    type='button'
+                    variant='outline'
+                    id={`${dateId}-statuses`}
+                    aria-labelledby={`${dateId}-statuses-label`}
+                    className='border-input h-9 w-full justify-between bg-transparent px-3 text-sm font-normal hover:bg-transparent'
+                  >
+                    <span className='truncate'>
+                      {selectedStatuses.length > 0
+                        ? `관리 상태 ${selectedStatuses.length}개`
+                        : '전체'}
+                    </span>
+                    <ChevronDown className='size-4 opacity-50' />
+                  </Button>
+                </ExamMultiSelect>
+              </div>
+              <label className='border-input flex h-9 w-fit cursor-pointer items-center gap-2 rounded-md border bg-white px-3 text-sm font-normal'>
+                <input
+                  type='checkbox'
+                  checked={reportStatus === TRUE_SELECTED}
+                  onChange={(e) => {
+                    const nextReportStatus = e.target.checked
+                      ? TRUE_SELECTED
+                      : ALL_SELECTED;
+                    setReportStatus(nextReportStatus);
+                    handleSearchWithParams({ reportStatus: nextReportStatus });
+                  }}
+                  className='relative h-3.5 w-3.5 shrink-0 cursor-pointer appearance-none rounded border-2 border-gray-300 bg-transparent checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[9px] checked:before:text-white checked:before:content-["✓"]'
+                />
+                <span>신고 있음</span>
+              </label>
+            </div>
+          </AdvancedSearchFilters>
+        </div>
+        <div className='flex flex-wrap justify-end gap-2'>
           <Button
             type='button'
+            size='sm'
+            className='w-24'
+            aria-label='검색 조건 초기화'
             variant='outline'
-            className='border-input h-9 w-[190px] justify-between bg-transparent px-3 text-sm font-normal hover:bg-transparent'
+            onClick={handleSearchOptionReset}
           >
-            <span className='truncate'>
-              {selectedStatuses.length > 0
-                ? `관리 상태 ${selectedStatuses.length}개`
-                : '관리 상태 전체'}
-            </span>
-            <ChevronDown className='size-4 opacity-50' />
+            초기화
           </Button>
-        </ExamMultiSelect>
-
-        <label className='border-input flex h-9 cursor-pointer items-center gap-2 rounded-md border bg-white px-3 text-sm font-normal'>
-          <input
-            type='checkbox'
-            checked={reportStatus === TRUE_SELECTED}
-            onChange={(e) => {
-              const nextReportStatus = e.target.checked
-                ? TRUE_SELECTED
-                : ALL_SELECTED;
-              setReportStatus(nextReportStatus);
-              handleSearchWithParams({ reportStatus: nextReportStatus });
-            }}
-            className='relative h-3.5 w-3.5 shrink-0 cursor-pointer appearance-none rounded border-2 border-gray-300 bg-transparent checked:border-blue-500 checked:bg-blue-500 checked:before:absolute checked:before:inset-0 checked:before:flex checked:before:items-center checked:before:justify-center checked:before:text-[9px] checked:before:text-white checked:before:content-["✓"]'
-          />
-          <span>신고 있음</span>
-        </label>
+          <Button
+            type='button'
+            size='sm'
+            className='w-16'
+            onClick={handleSearch}
+          >
+            검색
+          </Button>
+        </div>
       </div>
-
-      <div className='flex w-fit items-center gap-2'>
-        <Button className='min-w-[72px]' onClick={handleSearch}>
-          조회
-        </Button>
-        <Button
-          className='min-w-[136px]'
-          variant='outline'
-          onClick={handleSearchOptionReset}
-        >
-          검색 옵션 초기화
-        </Button>
-      </div>
-    </div>
+    </section>
   );
 }

@@ -11,6 +11,9 @@ export const useUpdateCommentVisibility = () => {
     mutationFn: (body: AdminCommentVisibilityUpdateRequest) =>
       updateCommentVisibility(body),
     onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ['commentStatusHistories'],
+      });
       queryClient.invalidateQueries({ queryKey: ['comments'] });
     },
     onError: (error) => {

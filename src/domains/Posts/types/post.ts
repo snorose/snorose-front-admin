@@ -1,3 +1,6 @@
+import type { AdminReportHistory } from '@/shared/types/report-history';
+import type { AdminStatusHistory } from '@/shared/types/status-history';
+
 export interface AdminGetPostResponse {
   postId: number;
   encryptedUserId: string;
@@ -26,15 +29,21 @@ export interface AdminPostListResult {
   data: AdminGetPostResponse[];
 }
 
-export interface AdminPostReportResponse {
-  reason: string;
-  reporterNickname: string;
-  reportedAt: string;
-}
+export type AdminPostReportResponse = AdminReportHistory;
 
 export interface AdminPostReportListResult {
   totalCount: number;
   reports: AdminPostReportResponse[];
+}
+
+export type AdminPostStatusHistory = AdminStatusHistory;
+
+export interface AdminPostStatusHistoryListResult {
+  hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  currentCount: number;
+  data: AdminPostStatusHistory[];
 }
 
 export interface AdminPostSearchRequest {
@@ -105,4 +114,19 @@ export interface AdminPostBulkUpdateResult {
     postId: number;
     reason: string;
   }[];
+}
+
+export interface AdminPostRestoreResponse {
+  post: AdminGetPostResponse;
+  attachmentRestore: {
+    status: 'NOT_APPLICABLE' | 'SUCCESS' | 'PARTIAL_FAILURE' | 'FAILURE';
+    restoredAttachmentIds: number[];
+    failedAttachments: {
+      attachmentId: number;
+      failedComponents: ('ORIGINAL' | 'OPTIMIZED')[];
+    }[];
+    thumbnailFailed: boolean;
+  };
+  restoredCommentIds: number[];
+  failedComments: { commentId: number; reason: string }[];
 }

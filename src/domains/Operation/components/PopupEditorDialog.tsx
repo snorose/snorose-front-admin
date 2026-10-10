@@ -147,6 +147,8 @@ export function PopupEditorDialog({
                 type='file'
                 accept='image/*'
                 className='sr-only'
+                tabIndex={-1}
+                aria-hidden='true'
                 onChange={(event) => {
                   const file = event.target.files?.[0];
 
@@ -155,10 +157,11 @@ export function PopupEditorDialog({
                   }
                 }}
               />
-              <div className='border-input bg-background focus-within:border-ring focus-within:ring-ring/50 flex h-9 min-w-0 items-center rounded-md border shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]'>
-                <button
+              <div className='flex min-w-0 items-center gap-2'>
+                <Button
                   type='button'
-                  className='h-full min-w-0 flex-1 cursor-pointer px-3 text-left text-sm focus-visible:outline-none'
+                  variant='outline'
+                  className='min-w-0 flex-1 justify-start'
                   aria-label='이미지 첨부'
                   aria-describedby='popup-image-file-description'
                   onClick={() => imageInputRef.current?.click()}
@@ -172,16 +175,17 @@ export function PopupEditorDialog({
                   >
                     {popup.imageFileName || '클릭하여 이미지를 첨부해 주세요.'}
                   </span>
-                </button>
+                </Button>
                 {popup.imageFileName && (
-                  <button
+                  <Button
                     type='button'
-                    className='mr-3 shrink-0 rounded-sm text-gray-500 transition-colors hover:text-gray-900 focus-visible:outline-none'
+                    variant='ghost'
+                    size='icon-sm'
                     aria-label='첨부 이미지 삭제'
                     onClick={handleImageRemove}
                   >
-                    <X className='size-4' />
-                  </button>
+                    <X className='size-4' aria-hidden='true' />
+                  </Button>
                 )}
               </div>
               <p

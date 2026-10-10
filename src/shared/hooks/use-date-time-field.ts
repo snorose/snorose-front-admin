@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { format } from 'date-fns';
+import { formatDateValue, parseLocalDateTime } from '@/shared/utils';
 
 interface UseDateTimeFieldOptions {
   initialDate?: Date | undefined;
@@ -27,45 +27,32 @@ export function useDateTimeField({
   initialDateTime,
   onDateTimeChange,
 }: UseDateTimeFieldOptions = {}): UseDateTimeFieldReturn {
-  // initialDateTime이 제공되면 파싱하여 초기값 설정
-  const parseDateTime = (dateTime: string | undefined) => {
-    if (!dateTime) return { date: undefined, time: '00:00' };
-    const parts = dateTime.split('T');
-    return {
-      date: parts[0] ? new Date(parts[0]) : undefined,
-      time: parts[1]?.slice(0, 5) || '00:00',
-    };
-  };
-
   const initial = initialDateTime
-    ? parseDateTime(initialDateTime)
-    : { date: initialDate, time: initialTime };
+    ? parseLocalDateTime(initialDateTime)
+    : {
+        date: formatDateValue(initialDate) ? initialDate : undefined,
+        time: initialTime,
+      };
 
   const [date, setDate] = useState<Date | undefined>(initial.date);
   const [time, setTime] = useState<string>(initial.time);
 
   const dateTime = useMemo(() => {
-    if (!date) return '';
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return `${dateStr}T${time}`;
+    const dateStr = formatDateValue(date);
+    return dateStr ? `${dateStr}T${time}` : '';
   }, [date, time]);
 
   const updateDateTime = useCallback(
     (newDate: Date | undefined, newTime: string) => {
-      if (newDate) {
-        const dateStr = format(newDate, 'yyyy-MM-dd');
-        const newDateTime = `${dateStr}T${newTime}`;
-        onDateTimeChange?.(newDateTime);
-      } else {
-        onDateTimeChange?.('');
-      }
+      const dateStr = formatDateValue(newDate);
+      onDateTimeChange?.(dateStr ? `${dateStr}T${newTime}` : '');
     },
     [onDateTimeChange]
   );
 
   const handleDateSelect = useCallback(
     (selectedDate: Date | undefined) => {
-      setDate(selectedDate);
+      setDate(formatDateValue(selectedDate) ? selectedDate : undefined);
       updateDateTime(selectedDate, time);
     },
     [time, updateDateTime]
@@ -80,9 +67,13 @@ export function useDateTimeField({
   );
 
   const setDateTime = useCallback((dateTimeString: string) => {
-    const parsed = parseDateTime(dateTimeString);
+    const parsed = parseLocalDateTime(dateTimeString);
     setDate(parsed.date);
     setTime(parsed.time);
+  }, []);
+
+  const setValidDate = useCallback((nextDate: Date | undefined) => {
+    setDate(formatDateValue(nextDate) ? nextDate : undefined);
   }, []);
 
   const reset = useCallback(() => {
@@ -97,7 +88,7 @@ export function useDateTimeField({
     dateTime,
     onDateSelect: handleDateSelect,
     onTimeChange: handleTimeChange,
-    setDate,
+    setDate: setValidDate,
     setTime,
     setDateTime,
     reset,

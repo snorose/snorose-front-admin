@@ -2,10 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { restorePost } from '@/apis';
 
-import type { AdminGetPostResponse } from '../types/post';
+import type { AdminPostRestoreResponse } from '../types/post';
 
 interface RestorePostResult {
-  restored: AdminGetPostResponse[];
+  restored: AdminPostRestoreResponse[];
   restoredIds: number[];
   failedIds: number[];
 }
@@ -14,12 +14,18 @@ export const useRestorePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (postIds: number[]): Promise<RestorePostResult> => {
+    mutationFn: async ({
+      postIds,
+      memo,
+    }: {
+      postIds: number[];
+      memo: string;
+    }): Promise<RestorePostResult> => {
       const results = await Promise.allSettled(
-        postIds.map((postId) => restorePost(postId))
+        postIds.map((postId) => restorePost(postId, memo))
       );
 
-      const restored: AdminGetPostResponse[] = [];
+      const restored: AdminPostRestoreResponse[] = [];
       const restoredIds: number[] = [];
       const failedIds: number[] = [];
 
@@ -44,6 +50,9 @@ export const useRestorePost = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['posts'] });
       void queryClient.invalidateQueries({ queryKey: ['post'] });
+      void queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      void queryClient.invalidateQueries({ queryKey: ['comments'] });
+      void queryClient.invalidateQueries({ queryKey: ['postStatusHistories'] });
     },
     onError: (error) => {
       console.error('게시글 복구 중 오류 발생:', error);

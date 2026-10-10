@@ -182,12 +182,13 @@ export default function WarnPenaltyTab({
           ) : null}
 
           <div className='flex justify-end gap-2'>
-            <Button variant='outline' onClick={resetWarnForm}>
-              초기화
+            <Button type='button' variant='outline' onClick={resetWarnForm}>
+              입력 초기화
             </Button>
 
             <Button
-              className='bg-red-600 text-white hover:bg-red-700'
+              type='button'
+              variant='destructive-outline'
               onClick={handleSubmit}
               disabled={isSubmitting || isPermanentDemotion}
             >
@@ -208,6 +209,8 @@ export default function WarnPenaltyTab({
 
       <ConfirmModal
         isOpen={openModal}
+        confirmVariant='destructive'
+        confirmDisabled={isSubmitting}
         onClose={() => setOpenModal(false)}
         onConfirm={handleConfirm}
         confirmText='예, 진행합니다'

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import {
   BulkActionBar,
+  ListResultHeader,
   PaginationBar,
   StatusChangeModal,
   TableStateRow,
@@ -15,6 +16,7 @@ import type { CommentSearchParams } from '../types';
 import CommentTableRow from './CommentTableRow';
 
 interface CommentTableProps {
+  titleId?: string;
   searchParams?: CommentSearchParams;
   refreshKey?: number;
   currentPage: number;
@@ -22,6 +24,7 @@ interface CommentTableProps {
 }
 
 export default function CommentTable({
+  titleId,
   searchParams = {},
   refreshKey,
   currentPage,
@@ -30,6 +33,8 @@ export default function CommentTable({
   const {
     comments,
     isLoading,
+    isFetching,
+    error,
     selectedIds,
     setSelectedIds,
     isAllSelected,
@@ -44,6 +49,9 @@ export default function CommentTable({
     setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
+    handleConfirmBulkRestore,
+    isRestoreModalOpen,
+    setIsRestoreModalOpen,
     isDeletePending,
     isVisibilityPending,
     totalPage,
@@ -66,7 +74,13 @@ export default function CommentTable({
   const isEmpty = !isLoading && comments.length === 0;
 
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex min-w-0 flex-col gap-3'>
+      <ListResultHeader
+        title='댓글 목록'
+        titleId={titleId}
+        totalCount={totalCount}
+        status={isLoading || isFetching ? 'loading' : error ? 'error' : 'ready'}
+      />
       <BulkActionBar
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
@@ -76,16 +90,6 @@ export default function CommentTable({
         onBulkDelete={handleBulkDelete}
         label='댓글'
       />
-
-      <div className='flex items-center justify-between px-1 text-xs text-gray-500'>
-        <span>
-          총{' '}
-          <span className='font-bold text-blue-600'>
-            {(totalCount ?? 0).toLocaleString('ko-KR')}
-          </span>
-          개의 댓글
-        </span>
-      </div>
 
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
@@ -193,6 +197,15 @@ export default function CommentTable({
         onPageChange={onPageChange}
         totalPage={paginationTotalPage}
       />
+
+      {isRestoreModalOpen && (
+        <StatusChangeModal
+          target='COMMENT'
+          modalType='RESTORE'
+          onClose={() => setIsRestoreModalOpen(false)}
+          onConfirmAction={handleConfirmBulkRestore}
+        />
+      )}
 
       {isDeleteModalOpen && (
         <StatusChangeModal

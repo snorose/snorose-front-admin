@@ -30,6 +30,7 @@ export function useCommentTableState({
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
 
   const [urlSearchParams] = useSearchParams();
   const parentIdStr = urlSearchParams.get('parentId');
@@ -37,6 +38,8 @@ export function useCommentTableState({
   const {
     data: totalCommentData,
     isLoading: isTotalLoading,
+    isFetching: isTotalFetching,
+    error: totalError,
     refetch: refetchTotal,
   } = useCommentList({
     page: currentPage,
@@ -47,6 +50,8 @@ export function useCommentTableState({
   const {
     data: childCommentData,
     isLoading: isChildLoading,
+    isFetching: isChildFetching,
+    error: childError,
     refetch: refetchChild,
   } = useCommentChildrenList({
     commentId: parentId,
@@ -78,6 +83,8 @@ export function useCommentTableState({
       : totalCommentData?.totalCount;
 
   const isLoading = parentId !== null ? isChildLoading : isTotalLoading;
+  const isFetching = parentId !== null ? isChildFetching : isTotalFetching;
+  const error = parentId !== null ? childError : totalError;
 
   const { mutate: bulkDelete, isPending: isDeletePending } = useBulkDelete({
     deleteFn: bulkDeleteComments,
@@ -140,21 +147,30 @@ export function useCommentTableState({
 
   const handleBulkRestore = () => {
     if (selectedIds.length === 0) return;
-    restoreComment(selectedIds, {
-      onSuccess: ({ restored, restoredIds, failedIds }) => {
-        if (failedIds.length > 0) {
-          toast.warning(
-            `${restored.length}개의 댓글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
-          );
-        } else {
-          toast.success(`${restored.length}개의 댓글이 복구되었습니다.`);
-        }
+    setIsRestoreModalOpen(true);
+  };
 
-        const restoredIdSet = new Set(restoredIds);
-        setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
-      },
-      onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
-    });
+  const handleConfirmBulkRestore = (memo: string) => {
+    if (selectedIds.length === 0 || !memo.trim() || isRestorePending) return;
+    restoreComment(
+      { commentIds: selectedIds, memo },
+      {
+        onSuccess: ({ restored, restoredIds, failedIds }) => {
+          setIsRestoreModalOpen(false);
+          if (failedIds.length > 0) {
+            toast.warning(
+              `${restored.length}개의 댓글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
+            );
+          } else {
+            toast.success(`${restored.length}개의 댓글이 복구되었습니다.`);
+          }
+
+          const restoredIdSet = new Set(restoredIds);
+          setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
+        },
+        onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
+      }
+    );
   };
 
   // 체크박스 제어
@@ -223,6 +239,8 @@ export function useCommentTableState({
   return {
     comments,
     isLoading,
+    isFetching,
+    error,
     selectedIds,
     setSelectedIds,
     isAllSelected,
@@ -238,6 +256,9 @@ export function useCommentTableState({
     setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
+    handleConfirmBulkRestore,
+    isRestoreModalOpen,
+    setIsRestoreModalOpen,
     isDeletePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
     totalPage,

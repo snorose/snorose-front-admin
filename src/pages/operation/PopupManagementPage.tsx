@@ -308,6 +308,7 @@ export default function PopupManagementPage() {
 
       <ConfirmModal
         isOpen={deletingPopupId !== null}
+        confirmVariant='destructive'
         title='팝업을 삭제할까요?'
         description='삭제한 팝업은 목록에서 제거됩니다.'
         confirmText='삭제'

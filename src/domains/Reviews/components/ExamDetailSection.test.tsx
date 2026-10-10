@@ -8,11 +8,7 @@ import type {
   ExamReviewDetailResult,
 } from '@/domains/Reviews/types';
 
-import {
-  deleteExamReview,
-  restoreExamReview,
-  updateExamReview,
-} from '@/apis/reviews';
+import { deleteExamReview, updateExamReview } from '@/apis/reviews';
 
 import { ExamDetailSection } from './ExamDetailSection';
 
@@ -164,11 +160,8 @@ describe('ExamDetailSection', () => {
   });
 
   test.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(
-    '%s 후기에서 복구 사유를 기존 메모 아래에 저장한 뒤 복구한다',
-    async (deletionStatus) => {
-      const user = userEvent.setup();
-      const onRestoreSuccess = vi.fn();
-      vi.mocked(restoreExamReview).mockResolvedValue({ postId: 101 });
+    '%s 후기에서는 복구 버튼을 표시하지 않는다',
+    (deletionStatus) => {
       render(
         <ExamDetailSection
           selectedExamReview={selectedExamReview}
@@ -176,100 +169,17 @@ describe('ExamDetailSection', () => {
             ...selectedExamReviewDetailWithMemo,
             deletionStatus,
           }}
-          onRestoreSuccess={onRestoreSuccess}
         />
       );
 
       expect(
         screen.queryByRole('button', { name: '시험 후기 삭제' })
-      ).toBeNull();
-      await user.click(
-        screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
-      );
-      expect(restoreExamReview).not.toHaveBeenCalled();
-      const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
-      expect(within(dialog).getByLabelText('기존 메모')).toHaveValue(
-        '기존 운영자 메모'
-      );
+      ).not.toBeInTheDocument();
       expect(
-        within(dialog).getByRole('button', { name: '복구' })
-      ).toBeDisabled();
-      await user.type(
-        within(dialog).getByLabelText('복구 사유'),
-        '  삭제 오류  '
-      );
-      await user.click(within(dialog).getByRole('button', { name: '복구' }));
-
-      await waitFor(() => {
-        expect(restoreExamReview).toHaveBeenCalledWith(101);
-        expect(onRestoreSuccess).toHaveBeenCalledWith(101);
-      });
-      expect(updateExamReview).toHaveBeenCalledWith(101, {
-        post: { memo: '기존 운영자 메모\n\n[복구 사유]\n삭제 오류' },
-      });
-      expect(
-        vi.mocked(updateExamReview).mock.invocationCallOrder[0]
-      ).toBeLessThan(vi.mocked(restoreExamReview).mock.invocationCallOrder[0]);
-      expect(toast.success).toHaveBeenCalledWith('시험 후기가 복구되었습니다.');
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        screen.queryByRole('button', { name: '삭제된 시험 후기 복구' })
+      ).not.toBeInTheDocument();
     }
   );
-
-  test('복구 실패 시 서버 오류를 표시하고 재시도할 수 있도록 확인 창을 유지한다', async () => {
-    const user = userEvent.setup();
-    const onRestoreSuccess = vi.fn();
-    vi.mocked(restoreExamReview).mockRejectedValue({
-      isAxiosError: true,
-      response: { data: { message: '복구할 수 없는 시험후기입니다.' } },
-    });
-    render(
-      <ExamDetailSection
-        selectedExamReview={selectedExamReview}
-        selectedExamReviewDetail={{
-          ...selectedExamReviewDetail,
-          deletionStatus: 'ADMIN_DELETED',
-        }}
-        onRestoreSuccess={onRestoreSuccess}
-      />
-    );
-
-    await user.click(
-      screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
-    );
-    const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
-    await user.type(within(dialog).getByLabelText('복구 사유'), '삭제 오류');
-    await user.click(within(dialog).getByRole('button', { name: '복구' }));
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        '복구할 수 없는 시험후기입니다.'
-      );
-    });
-    expect(onRestoreSuccess).not.toHaveBeenCalled();
-    expect(within(dialog).getByRole('button', { name: '복구' })).toBeEnabled();
-  });
-
-  test('복구 사유 저장에 실패하면 복구하지 않고 입력한 사유를 유지한다', async () => {
-    const user = userEvent.setup();
-    vi.mocked(updateExamReview).mockRejectedValueOnce(new Error('저장 실패'));
-    render(
-      <ExamDetailSection
-        selectedExamReview={selectedExamReview}
-        selectedExamReviewDetail={{
-          ...selectedExamReviewDetail,
-          deletionStatus: 'ADMIN_DELETED',
-        }}
-      />
-    );
-    await user.click(
-      screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
-    );
-    const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
-    await user.type(within(dialog).getByLabelText('복구 사유'), '삭제 오류');
-    await user.click(within(dialog).getByRole('button', { name: '복구' }));
-    await waitFor(() => expect(toast.error).toHaveBeenCalled());
-    expect(restoreExamReview).not.toHaveBeenCalled();
-    expect(within(dialog).getByLabelText('복구 사유')).toHaveValue('삭제 오류');
-  });
 
   test('삭제 사유를 메모로 저장한 뒤 시험 후기를 삭제한다', async () => {
     const user = userEvent.setup();
@@ -306,7 +216,7 @@ describe('ExamDetailSection', () => {
         post: { memo: '[삭제 사유]\n부적절한 시험후기' },
       });
     });
-    expect(deleteExamReview).toHaveBeenCalledWith(101);
+    await waitFor(() => expect(deleteExamReview).toHaveBeenCalledWith(101));
     expect(toast.success).toHaveBeenCalledWith(
       '시험 후기가 성공적으로 삭제되었습니다.'
     );

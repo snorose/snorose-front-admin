@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/components/ui';
@@ -10,10 +11,11 @@ import {
   deletePost,
   restorePost,
   searchComments,
+  updatePostVisibility,
 } from '@/apis';
 
-import { IS_POST_RESTORE_ENABLED } from '../../constants';
 import type { AdminGetPostResponse } from '../../types';
+import { getRestoreWarnings } from '../../utils/restoreResult';
 import PostDetailActionModal from './PostDetailActionModal';
 
 interface PostDetailManageCardProps {
@@ -89,9 +91,19 @@ export default function PostDetailManageCard({
   });
 
   const restoreMutation = useMutation({
-    mutationFn: () => restorePost(post.postId),
-    onSuccess: () => {
-      toast.success('게시글이 복구되었습니다.');
+    mutationFn: (memo: string) => restorePost(post.postId, memo),
+    onSuccess: (result) => {
+      const warnings = getRestoreWarnings(result);
+      if (warnings.length > 0)
+        toast.warning('게시글은 복구되었지만 일부 복구에 실패했습니다.', {
+          description: warnings.join(' / '),
+        });
+      else toast.success('게시글이 복구되었습니다.');
+      void queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      void queryClient.invalidateQueries({ queryKey: ['comments'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['postStatusHistories', post.postId],
+      });
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
@@ -102,6 +114,35 @@ export default function PostDetailManageCard({
       toast.error('게시글 복구에 실패했습니다.');
     },
   });
+
+  const visibilityMutation = useMutation({
+    mutationFn: ({ isVisible, memo }: { isVisible: boolean; memo: string }) =>
+      updatePostVisibility([post.postId], isVisible, memo),
+
+    onSuccess: (result) => {
+      if (result.succeededCount === 0) {
+        toast.error('게시글 공개 상태를 변경하지 못했습니다.');
+        return;
+      }
+
+      toast.success('게시글 공개 상태가 변경되었습니다.');
+      setIsModalOpen(false);
+      setReason('');
+
+      void queryClient.invalidateQueries({ queryKey: ['posts'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['post', post.postId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ['postStatusHistories', post.postId],
+      });
+    },
+
+    onError: () => {
+      toast.error('게시글 공개 상태 변경에 실패했습니다.');
+    },
+  });
+
   // 게시글 관리 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<
@@ -115,13 +156,15 @@ export default function PostDetailManageCard({
       if (!reason.trim()) return;
       deleteMutation.mutate(reason);
     } else if (modalType === 'RESTORE') {
-      restoreMutation.mutate();
+      if (!reason.trim() || restoreMutation.isPending) return;
+      restoreMutation.mutate(reason);
     } else {
-      // TODO: DELETE 외(RESTORE, HIDE) API 연동 시 아래 로직 구현
-      toast.info('개발 중입니다');
-      setIsModalOpen(false);
-      setReason('');
-      setDeleteCommentsAlso(false);
+      if (!reason.trim()) return;
+
+      visibilityMutation.mutate({
+        isVisible: modalType === 'SHOW',
+        memo: reason,
+      });
     }
   };
 
@@ -131,47 +174,55 @@ export default function PostDetailManageCard({
       <div className='flex w-full justify-center'>
         {isDeleted ? (
           <Button
+            type='button'
             variant='outline'
-            disabled={!IS_POST_RESTORE_ENABLED}
+            size='lg'
             onClick={() => {
               setModalType('RESTORE');
               setIsModalOpen(true);
             }}
-            className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
+            className='w-full'
           >
             게시글 복구
           </Button>
         ) : !isVisible ? (
           <Button
+            type='button'
             variant='outline'
+            size='lg'
             onClick={() => {
               setModalType('SHOW');
               setIsModalOpen(true);
             }}
-            className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
+            className='w-full'
           >
             게시글 공개
           </Button>
         ) : (
           <div className='flex w-full flex-col gap-2'>
             <Button
+              type='button'
               variant='outline'
+              size='lg'
               onClick={() => {
                 setModalType('HIDE');
                 setIsModalOpen(true);
               }}
-              className='flex h-10 w-full items-center justify-center rounded-lg border-gray-300 bg-white text-[13px] text-gray-700 hover:bg-gray-100'
+              className='w-full'
             >
               게시글 비공개
             </Button>
             <Button
-              variant='destructive'
+              type='button'
+              variant='destructive-outline'
+              size='lg'
               onClick={() => {
                 setModalType('DELETE');
                 setIsModalOpen(true);
               }}
-              className='flex h-10 w-full items-center justify-center rounded-lg bg-red-600 text-[13px] text-white hover:bg-red-700'
+              className='w-full'
             >
+              <Trash2 aria-hidden='true' />
               게시글 삭제
             </Button>
           </div>

@@ -4,7 +4,7 @@ import { Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PaginationBar } from '@/shared/components';
-import { Table } from '@/shared/components/ui';
+import { Button, Table } from '@/shared/components/ui';
 
 import { DOWNLOADEDEXAMREVIEW_SAMPLE_DATA } from '@/__mocks__';
 
@@ -71,27 +71,29 @@ export default function DownloadedExamReviewTab({
                 <Table.Cell className='text-center'>
                   <div className='flex items-center justify-center gap-1'>
                     <span>{history.postId}</span>
-                    <button
+                    <Button
                       type='button'
+                      variant='ghost'
+                      size='icon-sm'
                       onClick={() => handleCopy(history.postId)}
-                      aria-label='id 복사'
-                      className={`rounded p-1 transition hover:bg-gray-100`}
+                      aria-label={`시험후기 ID ${history.postId} 복사`}
                     >
                       <Copy className='h-4 w-4' />
-                    </button>
+                    </Button>
                   </div>
                 </Table.Cell>
 
                 <Table.Cell className='text-center'>{history.title}</Table.Cell>
                 <Table.Cell className='text-center'>
-                  <button
+                  <Button
                     type='button'
+                    variant='ghost'
+                    size='icon-sm'
                     onClick={() => handleGoToReview(history.title)}
-                    aria-label='시험후기 바로가기'
-                    className='rounded p-1 text-gray-600 transition hover:bg-gray-100 hover:text-blue-700'
+                    aria-label={`${history.title} 시험후기 바로가기`}
                   >
                     <ExternalLink className='h-4 w-4' />
-                  </button>
+                  </Button>
                 </Table.Cell>
               </Table.Row>
             ))

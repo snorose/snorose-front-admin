@@ -1,9 +1,11 @@
 import { useCallback, useId, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 
+import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
-import { Button, Input, Label } from '@/shared/components/ui';
+import { Button, InputGroup, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -23,10 +25,12 @@ export default function MemberPenaltyManagementPage() {
     null
   );
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // 회원 검색 API
   const handleSearch = useCallback(async () => {
+    if (isSearching) return;
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) {
@@ -36,6 +40,7 @@ export default function MemberPenaltyManagementPage() {
       return;
     }
 
+    setIsSearching(true);
     try {
       const member = await searchUsersAPI(query);
 
@@ -48,8 +53,15 @@ export default function MemberPenaltyManagementPage() {
       toast.error(getErrorMessage(error, '회원 검색에 실패했습니다.'));
       setSelectedMember(null);
       setErrorMessage('데이터가 없습니다');
+    } finally {
+      setIsSearching(false);
     }
-  }, [searchQuery]);
+  }, [isSearching, searchQuery]);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void handleSearch();
+  };
 
   const handlePenaltyApplied = useCallback(async () => {
     setHistoryRefreshKey((prev) => prev + 1);
@@ -87,26 +99,29 @@ export default function MemberPenaltyManagementPage() {
         <Label htmlFor={searchId} className='sr-only'>
           회원 검색 (아이디 또는 학번)
         </Label>
-        <div className='flex gap-2'>
-          <Input
-            id={searchId}
-            aria-describedby={errorMessage ? `${searchId}-error` : undefined}
-            type='text'
-            placeholder='아이디, 학번을 입력해주세요'
-            className='w-96'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          />
-          <Button
-            size='sm'
-            variant='outline'
-            className='h-auto w-20 text-black'
-            onClick={handleSearch}
-          >
-            검색
+        <form className='flex flex-wrap gap-2' onSubmit={handleSearchSubmit}>
+          <InputGroup className='max-w-96 min-w-0 flex-1'>
+            <InputGroup.Addon>
+              <Search aria-hidden='true' />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              id={searchId}
+              aria-describedby={errorMessage ? `${searchId}-error` : undefined}
+              type='text'
+              placeholder='아이디, 학번을 입력해주세요'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </InputGroup>
+          <Button type='submit' className='min-w-28' disabled={isSearching}>
+            {isSearching ? (
+              <Loader2 aria-hidden='true' className='animate-spin' />
+            ) : (
+              <Search aria-hidden='true' />
+            )}
+            {isSearching ? '검색 중...' : '검색'}
           </Button>
-        </div>
+        </form>
       </section>
       {errorMessage && (
         <p id={`${searchId}-error`} role='alert' className='font-medium'>

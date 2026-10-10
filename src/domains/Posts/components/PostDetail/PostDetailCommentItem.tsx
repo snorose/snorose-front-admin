@@ -7,6 +7,7 @@ import {
   Eye,
   Heart,
   MessageSquare,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -46,22 +47,27 @@ export default function PostDetailCommentItem({
   const isSubComment = comment.parentId !== null;
   // 댓글 상태 변경 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'HIDE' | 'SHOW' | 'DELETE'>(
-    'HIDE'
-  );
+  const [modalType, setModalType] = useState<
+    'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE'
+  >('HIDE');
 
   // 댓글 노출/숨김 변경 Mutation
   const visibilityMutation = useMutation({
-    mutationFn: (isVisible: boolean) =>
+    mutationFn: ({ isVisible, memo }: { isVisible: boolean; memo: string }) =>
       updateCommentVisibility({
         commentIds: [comment.commentId],
         isVisible,
+        memo,
       }),
-    onSuccess: (_, isVisible) => {
+    onSuccess: (_, { isVisible }) => {
       toast.success(
         isVisible ? '댓글이 공개되었습니다.' : '댓글이 비공개 처리되었습니다.'
       );
+      queryClient.invalidateQueries({
+        queryKey: ['commentStatusHistories', comment.commentId],
+      });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       setIsModalOpen(false);
     },
     onError: () => {
@@ -74,6 +80,9 @@ export default function PostDetailCommentItem({
     mutationFn: (memo: string) => deleteComment(comment.commentId, memo),
     onSuccess: () => {
       toast.success('댓글이 삭제되었습니다.');
+      queryClient.invalidateQueries({
+        queryKey: ['commentStatusHistories', comment.commentId],
+      });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
       setIsModalOpen(false);
@@ -85,9 +94,13 @@ export default function PostDetailCommentItem({
 
   // 댓글 복구 Mutation
   const restoreMutation = useMutation({
-    mutationFn: () => restoreComment(comment.commentId),
+    mutationFn: (memo: string) => restoreComment(comment.commentId, memo),
     onSuccess: () => {
       toast.success('댓글이 복구되었습니다.');
+      setIsModalOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ['commentStatusHistories', comment.commentId],
+      });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
     },
@@ -97,10 +110,18 @@ export default function PostDetailCommentItem({
   });
 
   const handleConfirmAction = (memo: string) => {
-    if (!memo.trim()) return;
-    if (modalType === 'HIDE') visibilityMutation.mutate(false);
-    else if (modalType === 'SHOW') visibilityMutation.mutate(true);
+    if (
+      !memo.trim() ||
+      restoreMutation.isPending ||
+      visibilityMutation.isPending
+    )
+      return;
+    if (modalType === 'HIDE')
+      visibilityMutation.mutate({ isVisible: false, memo });
+    else if (modalType === 'SHOW')
+      visibilityMutation.mutate({ isVisible: true, memo });
     else if (modalType === 'DELETE') deleteMutation.mutate(memo);
+    else if (modalType === 'RESTORE') restoreMutation.mutate(memo);
   };
 
   return (
@@ -150,9 +171,9 @@ export default function PostDetailCommentItem({
             {isNormal && (
               <>
                 <Button
+                  type='button'
                   variant='outline'
-                  size='sm'
-                  className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                  size='xs'
                   onClick={(e) => {
                     e.stopPropagation();
                     setModalType('HIDE');
@@ -162,24 +183,25 @@ export default function PostDetailCommentItem({
                   비공개
                 </Button>
                 <Button
-                  variant='destructive'
-                  size='sm'
-                  className='h-7 rounded-md bg-red-600 px-2 text-xs font-medium text-white hover:bg-red-700'
+                  type='button'
+                  variant='destructive-outline'
+                  size='xs'
                   onClick={(e) => {
                     e.stopPropagation();
                     setModalType('DELETE');
                     setIsModalOpen(true);
                   }}
                 >
+                  <Trash2 aria-hidden='true' className='size-3.5' />
                   삭제
                 </Button>
               </>
             )}
             {isHidden && (
               <Button
+                type='button'
                 variant='outline'
-                size='sm'
-                className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                size='xs'
                 onClick={(e) => {
                   e.stopPropagation();
                   setModalType('SHOW');
@@ -191,13 +213,14 @@ export default function PostDetailCommentItem({
             )}
             {isDeleted && (
               <Button
+                type='button'
                 variant='outline'
-                size='sm'
-                className='h-7 rounded-md border-gray-300 bg-white px-2 text-xs font-medium text-gray-600 hover:bg-gray-100'
+                size='xs'
                 disabled={restoreMutation.isPending}
                 onClick={(e) => {
                   e.stopPropagation();
-                  restoreMutation.mutate();
+                  setModalType('RESTORE');
+                  setIsModalOpen(true);
                 }}
               >
                 복구

@@ -2,7 +2,8 @@ import { useId } from 'react';
 
 import { Copy, type LucideIcon, UserRound } from 'lucide-react';
 
-import { Input, Label, Select } from '@/shared/components/ui';
+import { DatePicker } from '@/shared/components';
+import { Button, Input, Label, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
 import { EMPTY_TEXT } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -68,16 +69,34 @@ export function EditableField({
         <Icon className='h-4 w-4' />
         {label}
       </label>
-      <Input
-        id={inputId}
-        name={fieldName}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-      />
+      {type === 'date' ? (
+        <DatePicker
+          id={inputId}
+          name={fieldName}
+          value={value || undefined}
+          onValueChange={(nextValue) => onChange(nextValue ?? '')}
+          placeholder={placeholder}
+          captionLayout='dropdown'
+          maxDate={
+            fieldName === 'birthday'
+              ? `${new Date().getFullYear()}-12-31`
+              : undefined
+          }
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+        />
+      ) : (
+        <Input
+          id={inputId}
+          name={fieldName}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : undefined}
+        />
+      )}
       {error ? (
         <p id={errorId} role='alert' className='text-destructive text-sm'>
           {error}
@@ -149,14 +168,15 @@ export function ReadonlyField({
           {value}
         </p>
         {copyValue && !isEmpty && onCopy ? (
-          <button
+          <Button
             type='button'
+            variant='ghost'
+            size='icon'
             onClick={() => void onCopy(copyValue)}
-            className='rounded-md p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700'
             aria-label={`${label} 복사`}
           >
             <Copy className='h-4 w-4' />
-          </button>
+          </Button>
         ) : null}
       </div>
     </div>

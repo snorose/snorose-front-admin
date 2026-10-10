@@ -93,16 +93,16 @@ export default function AdjustAllMemberPointPage() {
           size='lg'
           variant='outline'
           onClick={handleResetButtonClick}
-          className='text-md h-10 w-32 cursor-pointer font-bold text-red-400 hover:text-red-400 active:text-red-600'
+          className='w-32'
         >
-          초기화
+          입력 초기화
         </Button>
         <Button
           type='submit'
           size='lg'
-          variant='outline'
+          variant='default'
           onClick={handleApplyButtonClick}
-          className='text-md h-10 w-32 cursor-pointer font-bold'
+          className='w-32'
         >
           적용
         </Button>

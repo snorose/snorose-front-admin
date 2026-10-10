@@ -19,6 +19,7 @@ import { searchComments } from '@/apis/comments';
 import PostDetailCommentItem from './PostDetailCommentItem';
 import PostDetailCommentReportCard from './PostDetailCommentReportCard';
 import PostDetailCommentSanctionCard from './PostDetailCommentSanctionCard';
+import PostDetailCommentStatusLogCard from './PostDetailCommentStatusLogCard';
 
 interface PostDetailCommentListProps {
   postId: number;
@@ -142,6 +143,10 @@ export default function PostDetailCommentList({
 
                   {isSelected && (
                     <div className='mt-4 flex flex-col gap-4 lg:hidden'>
+                      <PostDetailCommentStatusLogCard
+                        key={comment.commentId}
+                        commentId={comment.commentId}
+                      />
                       <PostDetailCommentReportCard
                         commentId={comment.commentId}
                       />
@@ -171,6 +176,10 @@ export default function PostDetailCommentList({
             className='flex flex-col gap-4'
             style={{ marginTop: selectedCommentTop }}
           >
+            <PostDetailCommentStatusLogCard
+              key={selectedComment.commentId}
+              commentId={selectedComment.commentId}
+            />
             <PostDetailCommentReportCard
               commentId={selectedComment.commentId}
             />

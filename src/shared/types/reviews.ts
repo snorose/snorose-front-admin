@@ -1,4 +1,7 @@
+export type ExamReviewPeriodType = 'WRITE' | 'ADMIN_EDIT';
+
 export interface ExamReviewPeriodBase {
+  type: ExamReviewPeriodType;
   title: string;
   startAt: string;
   endAt: string;

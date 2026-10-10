@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 import { PageHeader } from '@/shared/components';
 import { useManagePageUrl } from '@/shared/hooks';
 
@@ -22,28 +24,34 @@ const POST_SCHEMA = {
 } as const;
 
 export default function PostManagePage() {
+  const titleId = useId();
   const { searchParams, currentPage, handleSearchChange, handlePageChange } =
     useManagePageUrl<PostSearchParams>(POST_SCHEMA);
 
   return (
-    <div className='flex w-full flex-col gap-6 pb-12'>
+    <div className='flex w-full min-w-0 flex-col gap-6'>
       <PageHeader
         title='게시글 관리'
         description='커뮤니티에 등록된 게시글을 편집하거나 삭제하고, 더블클릭 및 필터 검색을 활용해 상세 내역을 파악할 수 있습니다.'
       />
-      <PostFilterPanel
-        key={JSON.stringify(searchParams)}
-        initialFilters={searchParams}
-        onFilterChange={handleSearchChange}
-      />
-      <div className='h-px w-full bg-gray-100' />
-      <div className='flex flex-col gap-4'>
-        <PostTable
-          searchParams={searchParams}
-          refreshKey={0}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
+      <div className='flex min-w-0 flex-col gap-6'>
+        <PostFilterPanel
+          key={JSON.stringify(searchParams)}
+          initialFilters={searchParams}
+          onFilterChange={handleSearchChange}
         />
+        <section
+          aria-labelledby={titleId}
+          className='flex min-w-0 flex-col gap-1'
+        >
+          <PostTable
+            titleId={titleId}
+            searchParams={searchParams}
+            refreshKey={0}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        </section>
       </div>
     </div>
   );

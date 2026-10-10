@@ -8,6 +8,10 @@ import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
+  PENALTY_ADD_BLOCKED_MESSAGE,
+  isPenaltyAddTemporarilyBlocked,
+} from '@/domains/MemberInfo/components/penalty-history/penalty-history-add-utils';
+import {
   getPenaltyBadgeMeta,
   getPenaltyProgressBadgeMeta,
   isOngoingPenalty,
@@ -43,6 +47,13 @@ export default function PenaltyHistoryTimelineDialog({
   open,
   totalCount,
 }: PenaltyHistoryTimelineDialogProps) {
+  const isPenaltyBlocked = isPenaltyAddTemporarilyBlocked(member);
+  const warningBlockedMessage = isPenaltyBlocked
+    ? PENALTY_ADD_BLOCKED_MESSAGE
+    : !canAddWarning
+      ? '영구강등 회원에게는 경고를 추가할 수 없습니다.'
+      : undefined;
+
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (!hasNext || isLoading) return;
 
@@ -73,33 +84,38 @@ export default function PenaltyHistoryTimelineDialog({
           <div className='grid grid-cols-2 gap-3 px-8 py-5'>
             <Button
               type='button'
-              variant='outline'
-              className='h-12 rounded-xl text-base font-semibold'
+              variant='destructive-outline'
+              size='default'
               onClick={onAddWarning}
-              disabled={!canAddWarning}
-              title={
-                canAddWarning
-                  ? undefined
-                  : '영구강등 회원에게는 경고를 추가할 수 없습니다.'
-              }
+              disabled={isPenaltyBlocked || !canAddWarning}
+              title={warningBlockedMessage}
             >
-              <Plus className='h-5 w-5' />
+              <Plus aria-hidden='true' />
               경고 추가
             </Button>
             <Button
               type='button'
-              variant='outline'
-              className='h-12 rounded-xl text-base font-semibold'
+              variant='destructive-outline'
+              size='default'
               onClick={onAddDemotion}
+              disabled={isPenaltyBlocked}
+              title={isPenaltyBlocked ? PENALTY_ADD_BLOCKED_MESSAGE : undefined}
             >
-              <Plus className='h-5 w-5' />
+              <Plus aria-hidden='true' />
               강등 추가
             </Button>
           </div>
 
-          {!canAddWarning ? (
+          {isPenaltyBlocked ? (
+            <p
+              role='alert'
+              className='px-8 pb-5 text-sm font-medium text-rose-600'
+            >
+              {PENALTY_ADD_BLOCKED_MESSAGE}
+            </p>
+          ) : !canAddWarning ? (
             <p className='px-8 pb-5 text-sm font-medium text-rose-600'>
-              영구강등 회원에게는 경고를 추가할 수 없습니다.
+              {warningBlockedMessage}
             </p>
           ) : null}
 
@@ -197,7 +213,7 @@ function PenaltyHistoryCard({
               variant='ghost'
               size='icon-sm'
               onClick={() => onDelete(history)}
-              className='rounded-lg text-rose-500 hover:text-rose-600'
+              className='text-destructive hover:text-destructive'
               aria-label='제재 삭제 요청 안내'
               title='제재 삭제는 담당자 요청이 필요합니다.'
               disabled={Boolean(history.deletedAt)}

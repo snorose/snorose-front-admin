@@ -7,7 +7,9 @@ import type {
   AdminPostBulkUpdateResult,
   AdminPostListResult,
   AdminPostReportListResult,
+  AdminPostRestoreResponse,
   AdminPostSearchRequest,
+  AdminPostStatusHistoryListResult,
 } from '@/domains/Posts/types/post';
 
 // 게시글 조건 조회 api
@@ -50,11 +52,12 @@ export const deletePost = async (
 
 // 게시글 복구 api
 export const restorePost = async (
-  postId: number
-): Promise<AdminGetPostResponse> => {
+  postId: number,
+  memo: string
+): Promise<AdminPostRestoreResponse> => {
   const response = await axiosInstance.patch<
-    BaseResponse<AdminGetPostResponse>
-  >(`/v1/admin/posts/${postId}/restore`);
+    BaseResponse<AdminPostRestoreResponse>
+  >(`/v1/admin/posts/${postId}/restore`, { memo });
   return response.data.result;
 };
 
@@ -74,13 +77,15 @@ export const bulkDeletePosts = async (
 // 게시글 노출/숨김 일괄 업데이트 api
 export const updatePostVisibility = async (
   postIds: number[],
-  isVisible: boolean
+  isVisible: boolean,
+  memo: string
 ): Promise<AdminPostBulkUpdateResult> => {
   const response = await axiosInstance.patch<
     BaseResponse<AdminPostBulkUpdateResult>
   >(`/v1/admin/posts/visibility`, {
     postIds,
     isVisible,
+    memo,
   });
   return response.data.result;
 };
@@ -105,6 +110,19 @@ export const getPostSanction = async (
   const response = await axiosInstance.get<
     BaseResponse<AdminSanctionListResult>
   >(`/v1/admin/posts/${postId}/sanctions`, {
+    params: { page: page - 1 },
+  });
+  return response.data.result;
+};
+
+// 게시글 상태 변경 내역 조회 api
+export const getPostStatusHistories = async (
+  postId: number,
+  page: number
+): Promise<AdminPostStatusHistoryListResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<AdminPostStatusHistoryListResult>
+  >(`/v1/admin/posts/${postId}/status-histories`, {
     params: { page: page - 1 },
   });
   return response.data.result;

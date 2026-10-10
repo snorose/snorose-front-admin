@@ -11,6 +11,23 @@ import { searchComments } from '@/apis/comments';
 
 import PostDetailCommentList from './PostDetailCommentList';
 
+vi.mock('@/apis', () => ({
+  getCommentStatusHistories: vi.fn().mockResolvedValue({
+    hasNext: false,
+    totalPage: 1,
+    totalCount: 1,
+    currentCount: 1,
+    data: [
+      {
+        actorNickname: null,
+        changedAt: '2026-10-10T12:00:00',
+        changedStatus: 'ADMIN_HIDDEN',
+        memo: '운영 정책 위반',
+      },
+    ],
+  }),
+}));
+
 vi.mock('@/apis/comments', () => ({
   searchComments: vi.fn(),
 }));
@@ -52,7 +69,7 @@ describe('PostDetailCommentList', () => {
     });
   });
 
-  test('댓글을 클릭하면 같은 행의 신고 및 제재 내역을 표시한다', async () => {
+  test('댓글을 클릭하면 상태 변경·신고·제재 내역을 표시한다', async () => {
     const user = userEvent.setup();
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
@@ -70,5 +87,8 @@ describe('PostDetailCommentList', () => {
 
     expect(screen.getAllByText('댓글 10 신고 내역')).toHaveLength(2);
     expect(screen.getAllByText('댓글 10 제재 내역')).toHaveLength(2);
+    expect(await screen.findAllByText('운영 정책 위반')).toHaveLength(2);
+    expect(screen.getAllByText('시스템')).toHaveLength(2);
+    expect(screen.getAllByText('관리자 비공개')).toHaveLength(2);
   });
 });

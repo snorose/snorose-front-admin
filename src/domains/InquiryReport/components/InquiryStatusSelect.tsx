@@ -110,7 +110,6 @@ export default function InquiryStatusSelect({
             : undefined
         }
         confirmText={isStatusUpdating ? '변경 중...' : '변경'}
-        confirmButtonClassName='bg-slate-900 text-white hover:bg-slate-700 focus-visible:ring-slate-300'
         closeText='취소'
         onClose={() => {
           if (!isStatusUpdating) setPendingStatus(null);

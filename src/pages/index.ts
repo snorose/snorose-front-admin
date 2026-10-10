@@ -5,6 +5,7 @@ export { default as LogInPage } from './login/LogInPage';
 export { default as MemberInfoPage } from './member/MemberInfoPage';
 export { default as MemberPenaltyManagementPage } from './member/MemberPenaltyManagementPage';
 export { default as PopupManagementPage } from './operation/PopupManagementPage';
+export { default as ServerMaintenancePage } from './operation/ServerMaintenancePage';
 export { default as AdjustAllMemberPointPage } from './points/AdjustAllMemberPointPage';
 export { default as AdjustSinglePointPage } from './points/AdjustSinglePointPage';
 export { default as ExcelPointUploadPage } from './points/ExcelPointUploadPage';

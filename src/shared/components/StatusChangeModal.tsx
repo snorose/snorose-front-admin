@@ -50,20 +50,15 @@ export default function StatusChangeModal({
           />
 
           <div className='mt-2 flex justify-end gap-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={onClose}
-              className='border-gray-300 bg-white text-xs text-gray-700 hover:bg-gray-50'
-            >
+            <Button type='button' variant='outline' size='sm' onClick={onClose}>
               취소
             </Button>
             <Button
+              type='button'
               variant={modalType === 'DELETE' ? 'destructive' : 'default'}
               size='sm'
               onClick={() => onConfirmAction(reason)}
               disabled={!reason.trim()}
-              className={`text-xs ${modalType === 'DELETE' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
             >
               확인
             </Button>
