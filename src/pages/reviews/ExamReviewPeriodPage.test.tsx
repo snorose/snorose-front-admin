@@ -28,6 +28,7 @@ vi.mock('@/domains/Reviews/components/ExamReviewPeriodScheduleForm', () => ({
 
 const period: ExamReviewPeriod = {
   id: 1,
+  type: 'WRITE',
   title: '중간고사 작성 기간',
   startAt: '2026-10-10 00:00:00',
   endAt: '2026-10-17 23:59:00',
