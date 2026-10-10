@@ -119,7 +119,8 @@ export const getExamReviewPeriodsAPI = async (): Promise<
   ExamReviewPeriod[]
 > => {
   const response = await axiosInstance.get<BaseResponse<ExamReviewPeriod[]>>(
-    '/v1/admin/reviews/period'
+    '/v1/admin/reviews/period',
+    { params: { type: 'WRITE' } }
   );
   return response.data.result;
 };
@@ -138,6 +139,7 @@ export const deleteExamReviewPeriodAPI = async (
   periodId: number
 ): Promise<void> => {
   await axiosInstance.delete<BaseResponse<void>>(
-    `/v1/admin/reviews/period/${periodId}`
+    `/v1/admin/reviews/period/${periodId}`,
+    { params: { type: 'WRITE' } }
   );
 };

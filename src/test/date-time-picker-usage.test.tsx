@@ -90,6 +90,7 @@ async function chooseTime(
 
 const initialItem: PointFreeze & ExamReviewPeriod = {
   id: 1,
+  type: 'WRITE',
   title: '기존 일정',
   startAt: '2026-10-09 08:30:00',
   endAt: '2026-10-17 23:59:00',

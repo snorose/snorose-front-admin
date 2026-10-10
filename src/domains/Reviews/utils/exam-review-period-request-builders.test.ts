@@ -15,6 +15,7 @@ describe('createExamReviewPeriodRequest', () => {
       })
     ).toEqual([
       {
+        type: 'WRITE',
         title: '2026-1 중간고사',
         startAt: '2026-04-01T00:00:00',
         endAt: '2026-04-10T23:59:00',
@@ -32,6 +33,7 @@ describe('updateExamReviewPeriodRequest', () => {
         endAt: '2026-06-10T23:59',
       })
     ).toEqual({
+      type: 'WRITE',
       title: '2026-1 기말고사',
       startAt: '2026-06-01T00:00:00',
       endAt: '2026-06-10T23:59:00',

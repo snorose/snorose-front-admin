@@ -17,6 +17,7 @@ export function createExamReviewPeriodRequest({
 }: ExamReviewPeriodFormValues): CreateExamReviewPeriod {
   return [
     {
+      type: 'WRITE',
       title,
       startAt: toTSeparatedDateTimeSeconds(startAt),
       endAt: toTSeparatedDateTimeSeconds(endAt),
@@ -30,6 +31,7 @@ export function updateExamReviewPeriodRequest({
   endAt,
 }: ExamReviewPeriodFormValues): UpdateExamReviewPeriod {
   return {
+    type: 'WRITE',
     title,
     startAt: toTSeparatedDateTimeSeconds(startAt),
     endAt: toTSeparatedDateTimeSeconds(endAt),
