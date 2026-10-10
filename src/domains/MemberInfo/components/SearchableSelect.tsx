@@ -58,8 +58,8 @@ export default function SearchableSelect({
   };
 
   return (
-    <div className='space-y-2'>
-      <span id={labelId} className='text-foreground text-sm font-medium'>
+    <div className='flex min-w-0 flex-col gap-1'>
+      <span id={labelId} className='py-1 text-sm leading-none font-semibold'>
         {label}
       </span>
       <Popover open={open} onOpenChange={handleOpenChange}>

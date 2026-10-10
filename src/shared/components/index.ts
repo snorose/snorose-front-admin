@@ -1,3 +1,4 @@
+export * from './AdvancedSearchFilters';
 export { AppSidebar } from './AppSidebar';
 export { BulkActionBar } from './BulkActionBar';
 export { DatePicker } from './DatePicker';
