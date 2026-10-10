@@ -1,14 +1,9 @@
 export interface ResultCountProps {
   totalCount: number | undefined;
-  unit?: '개' | '명' | '건';
   status: 'loading' | 'ready' | 'error';
 }
 
-export function ResultCount({
-  totalCount,
-  unit = '개',
-  status,
-}: ResultCountProps) {
+export function ResultCount({ totalCount, status }: ResultCountProps) {
   return (
     <span
       role='status'
@@ -27,7 +22,7 @@ export function ResultCount({
               ? '-'
               : totalCount.toLocaleString('ko-KR')}
           </span>
-          {unit}
+          건
         </>
       )}
     </span>

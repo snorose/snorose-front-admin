@@ -11,7 +11,6 @@ describe('ListResultHeader', () => {
           title='회원 목록'
           titleId='member-results-heading'
           totalCount={1234}
-          unit='명'
           status='ready'
         />
       </section>
@@ -23,7 +22,7 @@ describe('ListResultHeader', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: '회원 목록' })
     ).toHaveAttribute('id', 'member-results-heading');
-    expect(screen.getByRole('status')).toHaveTextContent('총 1,234명');
+    expect(screen.getByRole('status')).toHaveTextContent('총 1,234건');
   });
 
   test('제목 ID 없이도 조회 상태를 전달한다', () => {

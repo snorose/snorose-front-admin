@@ -9,7 +9,6 @@ export function ListResultHeader({
   title,
   titleId,
   totalCount,
-  unit,
   status,
 }: ListResultHeaderProps) {
   return (
@@ -20,7 +19,7 @@ export function ListResultHeader({
       >
         {title}
       </h2>
-      <ResultCount totalCount={totalCount} unit={unit} status={status} />
+      <ResultCount totalCount={totalCount} status={status} />
     </div>
   );
 }
