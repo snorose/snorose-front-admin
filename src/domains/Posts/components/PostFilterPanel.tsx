@@ -10,13 +10,11 @@ import type { PostSearchParams } from '../types';
 
 interface PostFilterPanelProps {
   onFilterChange: (filters: PostSearchParams) => void;
-  totalCount?: number;
   initialFilters?: PostSearchParams;
 }
 
 export const PostFilterPanel = ({
   onFilterChange,
-  totalCount,
   initialFilters = {},
 }: PostFilterPanelProps) => {
   const inputId = useId();
@@ -365,12 +363,6 @@ export const PostFilterPanel = ({
           </Button>
         </div>
       </div>
-      {totalCount !== undefined && (
-        <span className='text-sm text-gray-500'>
-          총 <span className='font-semibold text-blue-600'>{totalCount}</span>
-          개의 게시글
-        </span>
-      )}
     </section>
   );
 };

@@ -33,6 +33,7 @@ export default function MemberInfoPage() {
     isDetailRoute,
     isEdit,
     isListLoading,
+    isListError,
     isSortActive,
     isPenaltyHistoryLoading,
     penaltyHistory,
@@ -97,6 +98,7 @@ export default function MemberInfoPage() {
           members={members}
           isAllVisibleSelected={isAllVisibleSelected}
           isListLoading={isListLoading}
+          isListError={isListError}
           majorOptions={majorOptions}
           onOpenMemberDetail={handleOpenMemberDetail}
           onPageChange={setCurrentPage}

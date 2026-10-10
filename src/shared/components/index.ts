@@ -4,6 +4,10 @@ export { BulkActionBar } from './BulkActionBar';
 export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
 export { Header } from './Header';
+export {
+  ListResultHeader,
+  type ListResultHeaderProps,
+} from './ListResultHeader';
 export { default as MemberInfoModal } from './MemberInfoModal';
 export { MemberInfoPopover } from './MemberInfoPopover';
 export { NavUser } from './NavUser';
@@ -12,6 +16,7 @@ export { PageHeader } from './PageHeader';
 export { PaginationBar } from './PaginationBar';
 export { PeriodStatusBadge } from './PeriodStatusBadge';
 export { ProtectedRoute } from './ProtectedRoute';
+export { ResultCount, type ResultCountProps } from './ResultCount';
 export { default as SanctionModal } from './SanctionModal';
 export { StatusBadge, type StatusBadgeTone } from './StatusBadge';
 export { default as StatusChangeModal } from './StatusChangeModal';

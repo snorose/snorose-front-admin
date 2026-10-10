@@ -44,14 +44,16 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   const [isSortActive, setIsSortActive] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount, setTotalCount] = useState<number | undefined>(undefined);
   const [isListLoading, setIsListLoading] = useState(false);
+  const [isListError, setIsListError] = useState(false);
   const latestRequestIdRef = useRef(0);
 
   const loadMembers = useCallback(
     async (page: number) => {
       const requestId = ++latestRequestIdRef.current;
       setIsListLoading(true);
+      setIsListError(false);
       try {
         const params = buildAdminUserListParams({
           page: page - 1,
@@ -76,6 +78,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
       } catch (error) {
         if (requestId !== latestRequestIdRef.current) return;
 
+        setIsListError(true);
         toast.error(getErrorMessage(error, '회원 목록 조회에 실패했습니다.'));
       } finally {
         if (requestId === latestRequestIdRef.current) {
@@ -212,6 +215,7 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     handleToggleRow,
     isAllVisibleSelected,
     isListLoading,
+    isListError,
     isSortActive,
     loadMembers,
     majorOptions,

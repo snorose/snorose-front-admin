@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -37,6 +37,7 @@ import {
 import { getExamReviewDetail } from '@/apis';
 
 export default function ExamReviewPage() {
+  const titleId = useId();
   const queryClient = useQueryClient();
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
   const [selectedExamReview, setSelectedExamReview] =
@@ -413,11 +414,11 @@ export default function ExamReviewPage() {
           initialStartDate={searchParamsFromUrl.get('startDate') || ''}
         />
         <section
-          aria-label='시험후기 목록'
+          aria-labelledby={titleId}
           className='flex min-w-0 flex-col gap-1'
         >
-          <h2 className='text-lg font-bold'>시험후기 목록</h2>
           <ExamTable
+            titleId={titleId}
             onRowSelect={setSelectedExamReview}
             refreshKey={refreshKey}
             selectedId={selectedExamReview?.id}

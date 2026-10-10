@@ -2,7 +2,12 @@ import { useId } from 'react';
 
 import { Loader2, Search } from 'lucide-react';
 
-import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
+import {
+  ListResultHeader,
+  PaginationBar,
+  StatusBadge,
+  TableStateRow,
+} from '@/shared/components';
 import { Button, InputGroup, Label, Table } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 import { formatDateOnly } from '@/shared/utils';
@@ -21,6 +26,7 @@ interface MemberDirectorySectionProps {
   members: AdminUserListItem[];
   isAllVisibleSelected: boolean;
   isListLoading: boolean;
+  isListError: boolean;
   isSortActive: boolean;
   majorOptions: DirectoryFilterOption[];
   onOpenMemberDetail: (member: AdminUserListItem) => void | Promise<void>;
@@ -42,7 +48,7 @@ interface MemberDirectorySectionProps {
   selectedRole: string;
   sortType: string;
   sortDirection: string;
-  totalCount: number;
+  totalCount: number | undefined;
   totalPage: number;
   admissionYearOptions: DirectoryFilterOption[];
 }
@@ -52,6 +58,7 @@ export default function MemberDirectorySection({
   members,
   isAllVisibleSelected,
   isListLoading,
+  isListError,
   isSortActive,
   majorOptions,
   onOpenMemberDetail,
@@ -179,20 +186,14 @@ export default function MemberDirectorySection({
         aria-labelledby={`${searchInputId}-results-heading`}
         className='flex min-w-0 flex-col gap-1'
       >
-        <h2
-          id={`${searchInputId}-results-heading`}
-          className='text-lg font-bold'
-        >
-          회원 목록
-        </h2>
         <div className='flex min-w-0 flex-col gap-3'>
-          <div className='flex flex-wrap items-center justify-between gap-3'>
-            <MemberDirectoryActionBar />
-
-            <span className='text-sm text-slate-500'>
-              총 {totalCount.toLocaleString()}명
-            </span>
-          </div>
+          <ListResultHeader
+            title='회원 목록'
+            titleId={`${searchInputId}-results-heading`}
+            totalCount={totalCount}
+            status={isListLoading ? 'loading' : isListError ? 'error' : 'ready'}
+          />
+          <MemberDirectoryActionBar />
 
           <div className='overflow-hidden rounded-md border border-slate-200'>
             <Table className='min-w-230'>

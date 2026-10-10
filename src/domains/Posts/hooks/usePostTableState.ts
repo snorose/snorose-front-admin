@@ -50,6 +50,7 @@ export function usePostTableState({
   const {
     data: rawPosts,
     isLoading,
+    isFetching,
     error,
     totalPage,
     totalCount,
@@ -210,6 +211,7 @@ export function usePostTableState({
   return {
     posts,
     isLoading,
+    isFetching,
     error,
     selectedIds,
     setSelectedIds,

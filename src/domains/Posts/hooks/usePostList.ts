@@ -22,6 +22,7 @@ export const usePostList = (params: usePostListParams) => {
   return {
     data: sorted,
     isLoading: normalResult.isLoading,
+    isFetching: normalResult.isFetching,
     error: normalResult.error,
     hasNext: normalResult.data?.hasNext,
     totalPage: normalResult.data?.totalPage,
