@@ -47,9 +47,9 @@ export default function PostDetailCommentItem({
   const isSubComment = comment.parentId !== null;
   // 댓글 상태 변경 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'HIDE' | 'SHOW' | 'DELETE'>(
-    'HIDE'
-  );
+  const [modalType, setModalType] = useState<
+    'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE'
+  >('HIDE');
 
   // 댓글 노출/숨김 변경 Mutation
   const visibilityMutation = useMutation({
@@ -86,9 +86,10 @@ export default function PostDetailCommentItem({
 
   // 댓글 복구 Mutation
   const restoreMutation = useMutation({
-    mutationFn: () => restoreComment(comment.commentId),
+    mutationFn: (memo: string) => restoreComment(comment.commentId, memo),
     onSuccess: () => {
       toast.success('댓글이 복구되었습니다.');
+      setIsModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
     },
@@ -98,10 +99,11 @@ export default function PostDetailCommentItem({
   });
 
   const handleConfirmAction = (memo: string) => {
-    if (!memo.trim()) return;
+    if (!memo.trim() || restoreMutation.isPending) return;
     if (modalType === 'HIDE') visibilityMutation.mutate(false);
     else if (modalType === 'SHOW') visibilityMutation.mutate(true);
     else if (modalType === 'DELETE') deleteMutation.mutate(memo);
+    else if (modalType === 'RESTORE') restoreMutation.mutate(memo);
   };
 
   return (
@@ -199,7 +201,8 @@ export default function PostDetailCommentItem({
                 disabled={restoreMutation.isPending}
                 onClick={(e) => {
                   e.stopPropagation();
-                  restoreMutation.mutate();
+                  setModalType('RESTORE');
+                  setIsModalOpen(true);
                 }}
               >
                 복구

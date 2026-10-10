@@ -11,7 +11,6 @@ import { Table } from '@/shared/components/ui';
 import { useStableTotalPage } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
 
-import { IS_POST_RESTORE_ENABLED } from '../constants';
 import { usePostTableState } from '../hooks/usePostTableState';
 import type { PostSearchParams } from '../types';
 import PostTableRow from './PostTableRow';
@@ -50,6 +49,9 @@ export default function PostTable({
     setVisibilityModalType,
     handleConfirmBulkVisibility,
     handleBulkRestore,
+    handleConfirmBulkRestore,
+    isRestoreModalOpen,
+    setIsRestoreModalOpen,
     isDeletePending,
     isVisibilityPending,
     totalPage,
@@ -82,7 +84,6 @@ export default function PostTable({
         selectedCount={selectedIds.length}
         isVisibilityPending={isVisibilityPending}
         isDeletePending={isDeletePending}
-        isRestoreDisabled={!IS_POST_RESTORE_ENABLED}
         onBulkVisibility={handleBulkVisibility}
         onBulkRestore={handleBulkRestore}
         onBulkDelete={handleBulkDelete}
@@ -187,6 +188,14 @@ export default function PostTable({
         totalPage={paginationTotalPage}
       />
 
+      {isRestoreModalOpen && (
+        <StatusChangeModal
+          target='POST'
+          modalType='RESTORE'
+          onClose={() => setIsRestoreModalOpen(false)}
+          onConfirmAction={handleConfirmBulkRestore}
+        />
+      )}
       {isDeleteModalOpen && (
         <StatusChangeModal
           target='POST'

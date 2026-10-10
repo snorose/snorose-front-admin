@@ -49,6 +49,9 @@ export default function CommentTable({
     setIsDeleteModalOpen,
     handleBulkVisibility,
     handleBulkRestore,
+    handleConfirmBulkRestore,
+    isRestoreModalOpen,
+    setIsRestoreModalOpen,
     isDeletePending,
     isVisibilityPending,
     totalPage,
@@ -194,6 +197,15 @@ export default function CommentTable({
         onPageChange={onPageChange}
         totalPage={paginationTotalPage}
       />
+
+      {isRestoreModalOpen && (
+        <StatusChangeModal
+          target='COMMENT'
+          modalType='RESTORE'
+          onClose={() => setIsRestoreModalOpen(false)}
+          onConfirmAction={handleConfirmBulkRestore}
+        />
+      )}
 
       {isDeleteModalOpen && (
         <StatusChangeModal

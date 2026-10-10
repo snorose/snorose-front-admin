@@ -14,8 +14,8 @@ import {
   updatePostVisibility,
 } from '@/apis';
 
-import { IS_POST_RESTORE_ENABLED } from '../../constants';
 import type { AdminGetPostResponse } from '../../types';
+import { getRestoreWarnings } from '../../utils/restoreResult';
 import PostDetailActionModal from './PostDetailActionModal';
 
 interface PostDetailManageCardProps {
@@ -91,9 +91,19 @@ export default function PostDetailManageCard({
   });
 
   const restoreMutation = useMutation({
-    mutationFn: () => restorePost(post.postId),
-    onSuccess: () => {
-      toast.success('게시글이 복구되었습니다.');
+    mutationFn: (memo: string) => restorePost(post.postId, memo),
+    onSuccess: (result) => {
+      const warnings = getRestoreWarnings(result);
+      if (warnings.length > 0)
+        toast.warning('게시글은 복구되었지만 일부 복구에 실패했습니다.', {
+          description: warnings.join(' / '),
+        });
+      else toast.success('게시글이 복구되었습니다.');
+      void queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      void queryClient.invalidateQueries({ queryKey: ['comments'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['postStatusHistories', post.postId],
+      });
       setIsModalOpen(false);
       setReason('');
       setDeleteCommentsAlso(false);
@@ -146,7 +156,8 @@ export default function PostDetailManageCard({
       if (!reason.trim()) return;
       deleteMutation.mutate(reason);
     } else if (modalType === 'RESTORE') {
-      restoreMutation.mutate();
+      if (!reason.trim() || restoreMutation.isPending) return;
+      restoreMutation.mutate(reason);
     } else {
       if (!reason.trim()) return;
 
@@ -166,7 +177,6 @@ export default function PostDetailManageCard({
             type='button'
             variant='outline'
             size='lg'
-            disabled={!IS_POST_RESTORE_ENABLED}
             onClick={() => {
               setModalType('RESTORE');
               setIsModalOpen(true);
