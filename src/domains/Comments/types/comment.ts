@@ -83,6 +83,7 @@ export interface AdminCommentBulkDeleteResult {
 export interface AdminCommentVisibilityUpdateRequest {
   commentIds: number[];
   isVisible: boolean;
+  memo?: string;
 }
 
 export interface CommentSearchParams {

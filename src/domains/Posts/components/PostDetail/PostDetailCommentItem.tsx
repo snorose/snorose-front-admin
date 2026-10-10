@@ -53,16 +53,18 @@ export default function PostDetailCommentItem({
 
   // 댓글 노출/숨김 변경 Mutation
   const visibilityMutation = useMutation({
-    mutationFn: (isVisible: boolean) =>
+    mutationFn: ({ isVisible, memo }: { isVisible: boolean; memo: string }) =>
       updateCommentVisibility({
         commentIds: [comment.commentId],
         isVisible,
+        memo,
       }),
-    onSuccess: (_, isVisible) => {
+    onSuccess: (_, { isVisible }) => {
       toast.success(
         isVisible ? '댓글이 공개되었습니다.' : '댓글이 비공개 처리되었습니다.'
       );
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       setIsModalOpen(false);
     },
     onError: () => {
@@ -99,9 +101,16 @@ export default function PostDetailCommentItem({
   });
 
   const handleConfirmAction = (memo: string) => {
-    if (!memo.trim() || restoreMutation.isPending) return;
-    if (modalType === 'HIDE') visibilityMutation.mutate(false);
-    else if (modalType === 'SHOW') visibilityMutation.mutate(true);
+    if (
+      !memo.trim() ||
+      restoreMutation.isPending ||
+      visibilityMutation.isPending
+    )
+      return;
+    if (modalType === 'HIDE')
+      visibilityMutation.mutate({ isVisible: false, memo });
+    else if (modalType === 'SHOW')
+      visibilityMutation.mutate({ isVisible: true, memo });
     else if (modalType === 'DELETE') deleteMutation.mutate(memo);
     else if (modalType === 'RESTORE') restoreMutation.mutate(memo);
   };
