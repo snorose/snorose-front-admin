@@ -36,7 +36,7 @@ interface ExamReviewAdminStatusDialogProps {
 
 function AdminStatusSkeleton() {
   return (
-    <div className='grid gap-4 lg:grid-cols-2'>
+    <div className='grid gap-4 @min-[52rem]:grid-cols-2'>
       {[0, 1].map((item) => (
         <Card key={item} className='h-[392px] p-6'>
           <Skeleton className='h-6 w-40' />
@@ -101,7 +101,7 @@ export function ExamReviewAdminStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='max-h-[85vh] overflow-y-auto sm:max-w-5xl'>
+      <Dialog.Content className='@container max-h-[85vh] overflow-y-auto sm:w-[80vw] sm:max-w-[960px]'>
         <Dialog.Header className='pr-8'>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
             <div className='flex flex-col gap-2'>
@@ -223,7 +223,7 @@ export function ExamReviewAdminStatusDialog({
                 </Alert.Description>
               </Alert>
             ) : statusQuery.data ? (
-              <div className='grid items-stretch gap-4 lg:grid-cols-2'>
+              <div className='grid items-stretch gap-4 @min-[52rem]:grid-cols-2'>
                 <ExamReviewProgressChart summary={statusQuery.data.summary} />
                 <ExamReviewAdminStatusList
                   managers={statusQuery.data.managers}

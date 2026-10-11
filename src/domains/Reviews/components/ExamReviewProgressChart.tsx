@@ -43,7 +43,7 @@ export function ExamReviewProgressChart({
   ];
 
   return (
-    <Card className='h-[392px] bg-white'>
+    <Card className='bg-card @container/chart min-h-[392px] min-w-0'>
       <Card.Header className='px-6 pt-6'>
         <Card.Title>확인 진행률</Card.Title>
         <Card.Description>
@@ -51,14 +51,14 @@ export function ExamReviewProgressChart({
         </Card.Description>
       </Card.Header>
 
-      <Card.Content className='flex flex-col items-center gap-6 md:flex-row md:items-stretch'>
+      <Card.Content className='flex min-w-0 flex-col items-center gap-6 @min-[26rem]/chart:flex-row @min-[26rem]/chart:items-stretch'>
         <div
           role='progressbar'
           aria-label='시험후기 확인 완료율'
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={completionRate}
-          className='relative size-44 shrink-0'
+          className='relative aspect-square w-44 max-w-full shrink-0'
         >
           <svg
             aria-hidden='true'
@@ -91,17 +91,19 @@ export function ExamReviewProgressChart({
           </div>
         </div>
 
-        <dl className='flex w-full flex-1 flex-col justify-center divide-y'>
+        <dl className='flex w-full min-w-0 flex-1 flex-col justify-center divide-y'>
           {statusItems.map(({ label, value, icon: Icon, className }) => (
             <div
               key={label}
-              className='flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0'
+              className='flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0 last:pb-0'
             >
               <dt className='text-muted-foreground flex items-center gap-2 text-sm'>
-                <Icon className={className} />
+                <Icon className={`size-4 shrink-0 ${className}`} />
                 {label}
               </dt>
-              <dd className='text-lg font-semibold'>{value}건</dd>
+              <dd className='min-w-0 text-lg font-semibold break-all'>
+                {value}건
+              </dd>
             </div>
           ))}
         </dl>

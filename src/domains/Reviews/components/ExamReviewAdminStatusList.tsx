@@ -20,8 +20,8 @@ export function ExamReviewAdminStatusList({
   const averageProcessedCount = getAverageProcessedCount(managers);
 
   return (
-    <Card className='flex h-[392px] flex-col bg-white'>
-      <Card.Header className='flex-row items-start justify-between gap-4 px-6 pt-6'>
+    <Card className='bg-card flex min-h-[392px] min-w-0 flex-col'>
+      <Card.Header className='flex-row flex-wrap items-start justify-between gap-4 px-6 pt-6'>
         <div className='flex flex-col gap-1.5'>
           <Card.Title>관리자별 처리 현황</Card.Title>
           <Card.Description>
@@ -45,7 +45,7 @@ export function ExamReviewAdminStatusList({
             <p>처리 내역이 없습니다.</p>
           </div>
         ) : (
-          <ul className='flex h-full flex-col divide-y overflow-y-auto pr-1'>
+          <ul className='flex max-h-64 flex-col divide-y overflow-y-auto pr-1'>
             {managers.map((manager) => (
               <li
                 key={manager.encryptedAdminId}
