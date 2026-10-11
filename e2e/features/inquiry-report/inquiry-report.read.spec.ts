@@ -2,8 +2,6 @@
  * 실제 dev 데이터로 목록·필터·상세·댓글 표시·레이아웃 TC 20개를 검증합니다.
  * 서버 데이터를 변경하지 않는 조회 시나리오만 포함합니다.
  */
-import type { Locator } from '@playwright/test';
-
 import type {
   InquiryComment,
   InquiryDetail,
@@ -11,6 +9,7 @@ import type {
   InquiryStatus,
   InquirySubGroup,
 } from '../../../src/shared/types';
+import { getE2EAdminCredentials } from '../../shared/e2e-env';
 import {
   type LocatedInquiry,
   type RealInquiryFixture,
@@ -22,6 +21,7 @@ import type { InquiryReportPage } from './inquiry-report.page';
 
 const REQUIRED_COLUMNS = [
   '번호',
+  'postId',
   '분류',
   '중분류',
   '아이디',
@@ -36,6 +36,7 @@ const SUBGROUP_LABEL: Record<InquirySubGroup, string> = {
   EVENT_INQUIRY: '이벤트 관련 문의',
   NOTICE_INQUIRY: '공지 관련 문의',
   ETC_INQUIRY: '기타',
+  ETC: '기타',
   POST_REPORT: '게시글 신고',
   EXAM_REVIEW_REPORT: '족보 신고',
   COMMENT_REPORT: '댓글 신고',
@@ -67,6 +68,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
   });
 
   test('[TC-ADM-IR-002] 실제 목록의 필수 정보를 표시한다', async ({
+    page,
     inquiryReport,
     realInquiry,
   }) => {
@@ -84,11 +86,26 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       ).toBeVisible();
     }
     const row = inquiryReport.dataRows.first();
+    await expect(row.getByRole('cell').nth(1)).toHaveText(String(first.postId));
     await expect(row).toContainText('1');
     await expect(row).toContainText(GROUP_LABEL[first.group]);
     await expect(row).toContainText(SUBGROUP_LABEL[first.subGroup]);
     await expect(row).toContainText(STATUS_LABEL[first.status]);
     await expect(row).toContainText(first.title);
+    const listUrl = page.url();
+    await row
+      .getByRole('button', { name: `postId ${first.postId} 복사`, exact: true })
+      .click();
+    await expect
+      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+      .toBe(String(first.postId));
+    await expect(
+      page.getByText('postId가 복사되었습니다.', { exact: true })
+    ).toBeVisible();
+    await expect(page).toHaveURL(listUrl);
+    await expect(
+      page.getByRole('button', { name: '문의·신고 상세 닫기', exact: true })
+    ).toHaveCount(0);
   });
 
   test('[TC-ADM-IR-003] 분류·중분류·탈퇴 사용자를 칩으로 표시한다', async ({
@@ -185,9 +202,31 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await expect(inquiryReport.dataRows).toHaveCount(
       Math.min(
         10,
-        inquiries.filter((item) => item.subGroup === inquirySubGroup).length
+        inquiries.filter(
+          (item) =>
+            item.group === 'INQUIRY' &&
+            SUBGROUP_LABEL[item.subGroup] === SUBGROUP_LABEL[inquirySubGroup]
+        ).length
       )
     );
+
+    await inquiryReport.selectFilter(1, '기타');
+    const otherInquiries = inquiries.filter(
+      (item) =>
+        item.group === 'INQUIRY' &&
+        (item.subGroup === 'ETC' || item.subGroup === 'ETC_INQUIRY')
+    );
+    await expect(inquiryReport.dataRows).toHaveCount(
+      Math.min(10, otherInquiries.length)
+    );
+    for (const item of otherInquiries.slice(0, 10)) {
+      await expect(
+        inquiryReport.table.getByRole('button', {
+          name: `postId ${item.postId} 복사`,
+          exact: true,
+        })
+      ).toBeVisible();
+    }
 
     await inquiryReport.selectFilter(0, '신고');
     await expect(inquiryReport.filterTriggers.nth(1)).toContainText('중분류');
@@ -280,6 +319,8 @@ test.describe('문의 및 신고 실제 API read QA', () => {
   });
 
   test('[TC-ADM-IR-010] 행 선택과 상세 필수 정보를 확인한다', async ({
+    browser,
+    page,
     inquiryReport,
     realInquiry,
   }) => {
@@ -299,6 +340,59 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await expect(inquiryReport.rowAt(detailCase.rowIndex)).toHaveClass(
       /bg-blue-50/
     );
+    const detailUrl = page.url();
+    expect(new URL(detailUrl).searchParams.get('postId')).toBe(
+      String(detailCase.item.postId)
+    );
+
+    await page.reload();
+    await expect(inquiryReport.detailPanel).toContainText(
+      detailCase.detail.title
+    );
+
+    const sharedPage = await page.context().newPage();
+    const mixedUrl = new URL(detailUrl);
+    mixedUrl.searchParams.set('inquiryId', String(detailCase.item.postId + 1));
+    await sharedPage.goto(mixedUrl.toString());
+    await expect(sharedPage).toHaveURL(detailUrl);
+    await expect(
+      sharedPage.getByRole('button', {
+        name: '문의·신고 상세 닫기',
+        exact: true,
+      })
+    ).toBeVisible();
+    await expect(
+      sharedPage.getByTitle(detailCase.detail.title, { exact: true })
+    ).toBeVisible();
+    await sharedPage.close();
+
+    const loggedOutContext = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    try {
+      const loginPage = await loggedOutContext.newPage();
+      await loginPage.goto(detailUrl);
+      await expect(loginPage).toHaveURL(new URL('/', detailUrl).toString());
+      await loginPage.reload();
+      const { loginId, password } = getE2EAdminCredentials();
+      await loginPage.getByPlaceholder('스노로즈 아이디').fill(loginId);
+      await loginPage.getByPlaceholder('스노로즈 비밀번호').fill(password);
+      await loginPage
+        .getByRole('button', { name: '로그인', exact: true })
+        .click();
+      await expect(loginPage).toHaveURL(detailUrl);
+      await expect(
+        loginPage.getByRole('button', {
+          name: '문의·신고 상세 닫기',
+          exact: true,
+        })
+      ).toBeVisible();
+      await expect(
+        loginPage.getByTitle(detailCase.detail.title, { exact: true })
+      ).toBeVisible();
+    } finally {
+      await loggedOutContext.close();
+    }
   });
 
   test('[TC-ADM-IR-011] 수정된 글에 수정됨 칩과 수정일을 표시한다', async ({
@@ -361,7 +455,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     ).toHaveCount(0);
   });
 
-  test('[TC-ADM-IR-014] 문의글과 신고글 원문을 새 탭으로 연다', async ({
+  test('[TC-ADM-IR-014] 원본게시글 버튼으로 스노로즈 문의·신고 원문을 연결한다', async ({
     inquiryReport,
     realInquiry,
   }) => {
@@ -371,13 +465,23 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     ] as const) {
       const detailCase = await fixedDetailCase(realInquiry, postId, group);
       const panel = await openDetailCase(inquiryReport, detailCase);
-      const label = group === 'REPORT' ? '신고글 바로가기' : '문의글 바로가기';
+      const originalLink = panel.getByRole('link', {
+        name: '원본게시글 바로가기',
+        exact: true,
+      });
       const path = group === 'REPORT' ? 'report' : 'inquiry';
-      await expectNewTab(
-        inquiryReport,
-        panel.getByRole('link', { name: label }),
-        new RegExp(`/${path}/${detailCase.detail.inquiryId}$`)
+      await expect(originalLink).toHaveText('원본게시글');
+      await expect(originalLink).toHaveAttribute(
+        'href',
+        `${process.env.VITE_USER_FRONT_BASE_URL}/${path}/${detailCase.detail.inquiryId}`
       );
+      await expect(originalLink).toHaveAttribute('target', '_blank');
+      await expect(
+        panel.getByRole('link', { name: '신고글 바로가기' })
+      ).toHaveCount(0);
+      await expect(
+        panel.getByRole('link', { name: '문의글 바로가기' })
+      ).toHaveCount(0);
       await inquiryReport.closeDetail();
     }
   });
@@ -418,21 +522,40 @@ test.describe('문의 및 신고 실제 API read QA', () => {
         .toBeVisible();
       if (await targetLink.isVisible()) {
         await expect.soft(targetLink).toHaveAttribute('target', '_blank');
-        if (detail.targetBoardId === EXAM_REVIEW_BOARD_ID) {
-          const targetPostId =
-            subGroup === 'COMMENT_REPORT'
-              ? detail.targetPostId
-              : Number(detail.target);
-          await expect.soft(targetLink).toHaveAttribute(
-            'href',
-            `/reviews/exam?keywordPost=${targetPostId}&page=1`
-          );
-        } else {
+        if (subGroup === 'COMMENT_REPORT') {
           await expect
             .soft(targetLink)
             .toHaveAttribute(
               'href',
-            `/board/${detail.targetBoardId}/post/${detail.target}`);
+              detail.targetPostId > 0
+                ? `/posts/manage/${detail.targetPostId}?commentId=${detail.target}`
+                : `/posts/comments/${detail.target}`
+            );
+        } else if (detail.targetBoardId === EXAM_REVIEW_BOARD_ID) {
+          await expect
+            .soft(targetLink)
+            .toHaveAttribute(
+              'href',
+              `/reviews/exam?keywordPost=${detail.target}&page=1`
+            );
+        } else {
+          await expect
+            .soft(targetLink)
+            .toHaveAttribute('href', `/posts/manage/${detail.target}`);
+        }
+        if (subGroup === 'COMMENT_REPORT') {
+          const popup = await inquiryReport.openPopup(targetLink);
+          await expect(popup).toHaveURL(/\/posts\/manage\/\d+\?commentId=\d+$/);
+          expect(new URL(popup.url()).origin).toBe(
+            new URL(inquiryReport.page.url()).origin
+          );
+          const comment = popup.getByRole('article', {
+            name: `댓글 ${detail.target}`,
+            exact: true,
+          });
+          await expect(comment).toHaveAttribute('data-selected', 'true');
+          await expect(comment).toBeInViewport();
+          await popup.close();
         }
       }
       await inquiryReport.closeDetail();
@@ -494,7 +617,9 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     const panel = await openDetailCase(inquiryReport, cases[1]);
     await expect(panel).toContainText(cases[1].detail.title);
     await inquiryReport.closeDetail();
-    await expect(page.getByRole('button', { name: '닫기' })).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: '문의·신고 상세 닫기', exact: true })
+    ).toHaveCount(0);
   });
 
   test('[TC-ADM-IR-020] 숨김 댓글을 제외하고 공개 댓글과 건수를 표시한다', async ({
@@ -592,7 +717,10 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await page.setViewportSize({ width: 1000, height: 700 });
     await expect(layout).toHaveCSS('flex-direction', 'column');
     await expect(
-      inquiryReport.detailPanel.getByRole('button', { name: '닫기' })
+      inquiryReport.detailPanel.getByRole('button', {
+        name: '문의·신고 상세 닫기',
+        exact: true,
+      })
     ).toBeVisible();
   });
 });
@@ -695,17 +823,6 @@ function findEmptyAndFilledReportFilter(inquiries: InquiryListItem[]) {
     }
   }
   return null;
-}
-
-async function expectNewTab(
-  page: InquiryReportPage,
-  link: Locator,
-  expectedUrl: RegExp
-) {
-  await expect(link).toHaveAttribute('target', '_blank');
-  const popup = await page.openPopup(link);
-  await expect(popup).toHaveURL(expectedUrl);
-  await popup.close();
 }
 
 function isWithdrawnListItem(item: InquiryListItem) {
