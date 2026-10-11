@@ -7,11 +7,26 @@ import type {
   CreatePointFreeze,
   ExcelPointBulkRewardRequest,
   ExcelPointBulkRewardResult,
+  MemberPointHistoryResult,
   PointFreeze,
   UpdatePointFreeze,
 } from '@/shared/types';
 
 import { getAllUsersAPI } from './users';
+
+export const getMemberPointHistoryAPI = async (
+  encryptedUserId: string,
+  page: number = 0,
+  signal?: AbortSignal
+): Promise<MemberPointHistoryResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<MemberPointHistoryResult>
+  >(`/v1/admin/users/${encodeURIComponent(encryptedUserId)}/points/log`, {
+    params: { page },
+    signal,
+  });
+  return response.data.result;
+};
 
 export const searchSinglePointMemberAPI = async (
   keyword: string

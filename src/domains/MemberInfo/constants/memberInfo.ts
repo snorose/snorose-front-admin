@@ -1,14 +1,19 @@
+import type { StatusBadgeTone } from '@/shared/components';
 import type { PenaltyUserInfo } from '@/shared/types';
 
 export const MEMBER_INFO_EDIT_FORM_ID = 'member-info-edit-form';
 
-export const USER_ROLES = [
-  { id: 1, name: '준회원' },
-  { id: 2, name: '정회원' },
-  { id: 4, name: '리자' },
-  { id: 5, name: '공식' },
-  { id: 6, name: '강등자' },
-  { id: 7, name: '광고주' },
+export const USER_ROLES: {
+  id: number;
+  name: string;
+  tone: StatusBadgeTone;
+}[] = [
+  { id: 1, name: '준회원', tone: 'neutral' },
+  { id: 2, name: '정회원', tone: 'success' },
+  { id: 4, name: '리자', tone: 'accent' },
+  { id: 5, name: '공식', tone: 'info' },
+  { id: 6, name: '강등자', tone: 'danger' },
+  { id: 7, name: '광고주', tone: 'info' },
 ];
 
 export const PENALTY_USER_INFO: {

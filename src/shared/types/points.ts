@@ -1,3 +1,22 @@
+// GET /v1/admin/users/{encryptedUserId}/points/log
+export interface MemberPointHistory {
+  id: number;
+  difference: number;
+  category: string;
+  sourceId: number | null;
+  source: string;
+  sourceDetail: string | null;
+  createdAt: string;
+}
+
+export interface MemberPointHistoryResult {
+  hasNext: boolean;
+  totalPage: number;
+  totalCount: number;
+  currentCount?: number;
+  data: MemberPointHistory[];
+}
+
 export interface AdjustSinglePoint {
   encryptedUserId: string;
   difference?: number;

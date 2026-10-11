@@ -12,7 +12,7 @@ export function ListResultHeader({
   status,
 }: ListResultHeaderProps) {
   return (
-    <div className='flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-1'>
+    <div className='flex min-w-0 flex-wrap items-end justify-between gap-x-4 gap-y-1'>
       <h2
         id={titleId}
         className='max-w-full min-w-0 text-lg font-bold break-words'
