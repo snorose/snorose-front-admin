@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Copy, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { PaginationBar, TableStateRow } from '@/shared/components';
+import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
 import { Button, Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
@@ -12,6 +12,7 @@ import type {
 } from '@/shared/types';
 import { clampOneBasedPage, formatDateTimeToMinutes } from '@/shared/utils';
 
+import { getInquiryStatusBadgeMeta } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import { useInquiryList } from '@/domains/InquiryReport/hooks';
 import { isWithdrawnInquiryAuthor } from '@/domains/InquiryReport/utils/inquiryAuthorUtils';
 
@@ -34,7 +35,7 @@ interface InquiryReportTableProps {
 }
 
 const GROUP_OPTIONS = [
-  { label: '분류', value: 'ALL' },
+  { label: '분류 전체', value: 'ALL' },
   { label: '문의', value: 'INQUIRY' },
   { label: '신고', value: 'REPORT' },
   { label: '기타', value: 'ETC' },
@@ -57,7 +58,7 @@ const REPORT_SUB_GROUP_OPTIONS = [
 ] as const;
 
 const STATUS_OPTIONS = [
-  { label: '답변여부', value: 'ALL' },
+  { label: '답변 전체', value: 'ALL' },
   { label: '답변 전', value: 'PENDING' },
   { label: '답변 완료', value: 'COMPLETED' },
   // TODO: 백엔드 HOLD 상태 지원 후 주석 해제
@@ -153,7 +154,8 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[112px] ${groupFilter !== 'ALL' ? 'bg-primary/10' : 'bg-background'}`}
+              aria-label='분류'
+              className='bg-background h-9 w-[112px]'
             >
               <Select.Value />
             </Select.Trigger>
@@ -175,13 +177,15 @@ export default function InquiryReportTable({
           </Select>
           {groupFilter !== 'ALL' && (
             <button
+              type='button'
+              aria-label='분류 필터 초기화'
               onClick={(e) => {
                 e.stopPropagation();
                 setGroupFilter('ALL');
                 setSubGroupFilter('ALL');
                 onPageChange(1);
               }}
-              className='bg-primary/10 text-primary hover:text-primary/80 absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
+              className='bg-background text-muted-foreground hover:text-foreground absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
             >
               <X className='h-3 w-3' />
             </button>
@@ -198,7 +202,8 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[160px] ${groupFilter === 'ALL' || groupFilter === 'ETC' ? 'bg-muted' : subGroupFilter !== 'ALL' ? 'bg-primary/10' : 'bg-background'}`}
+              aria-label='중분류'
+              className={`h-9 w-[160px] ${groupFilter === 'ALL' || groupFilter === 'ETC' ? 'bg-muted' : 'bg-background'}`}
             >
               <Select.Value />
             </Select.Trigger>
@@ -216,12 +221,14 @@ export default function InquiryReportTable({
           </Select>
           {subGroupFilter !== 'ALL' && (
             <button
+              type='button'
+              aria-label='중분류 필터 초기화'
               onClick={(e) => {
                 e.stopPropagation();
                 setSubGroupFilter('ALL');
                 onPageChange(1);
               }}
-              className='bg-primary/10 text-primary hover:text-primary/80 absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
+              className='bg-background text-muted-foreground hover:text-foreground absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
             >
               <X className='h-3 w-3' />
             </button>
@@ -237,26 +244,41 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              className={`h-9 w-[124px] ${statusFilter !== 'ALL' ? 'bg-primary/10' : 'bg-background'}`}
+              aria-label='답변여부'
+              className='bg-background h-9 w-[124px]'
             >
               <Select.Value />
             </Select.Trigger>
             <Select.Content align='start'>
-              {STATUS_OPTIONS.map((option) => (
-                <Select.Item key={option.value} value={option.value}>
-                  {option.label}
-                </Select.Item>
-              ))}
+              {STATUS_OPTIONS.map((option) => {
+                const badge = getInquiryStatusBadgeMeta(option.value);
+
+                return (
+                  <Select.Item
+                    key={option.value}
+                    value={option.value}
+                    textValue={option.label}
+                  >
+                    {option.value === 'ALL' ? (
+                      option.label
+                    ) : (
+                      <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge>
+                    )}
+                  </Select.Item>
+                );
+              })}
             </Select.Content>
           </Select>
           {statusFilter !== 'ALL' && (
             <button
+              type='button'
+              aria-label='답변여부 필터 초기화'
               onClick={(e) => {
                 e.stopPropagation();
                 setStatusFilter('ALL');
                 onPageChange(1);
               }}
-              className='bg-primary/10 text-primary hover:text-primary/80 absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
+              className='bg-background text-muted-foreground hover:text-foreground absolute top-1/2 right-3 z-10 flex h-4 w-4 -translate-y-1/2 items-center justify-center'
             >
               <X className='h-3 w-3' />
             </button>
