@@ -2,7 +2,11 @@ import { type KeyboardEvent, useId, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
-import { DatePicker, FilterMultiSelect } from '@/shared/components';
+import {
+  DatePicker,
+  FilterMultiSelect,
+  SearchableSelect,
+} from '@/shared/components';
 import {
   Button,
   Checkbox,
@@ -14,6 +18,11 @@ import {
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { PostSearchParams } from '../types';
+
+const boardOptions = BOARD_OPTIONS.map((option) => ({
+  ...option,
+  value: String(option.value),
+}));
 
 interface PostFilterPanelProps {
   onFilterChange: (filters: PostSearchParams) => void;
@@ -208,9 +217,11 @@ export const PostFilterPanel = ({
                 </Select.Content>
               </Select>
             </div>
-            <div className='flex min-w-0 flex-col gap-1'>
-              <Label htmlFor={`${inputId}-board`}>게시판</Label>
-              <Select
+            <div className='min-w-0'>
+              <SearchableSelect
+                label='게시판'
+                placeholder='전체'
+                options={boardOptions}
                 value={
                   filters.boardId === undefined
                     ? 'ALL'
@@ -222,28 +233,7 @@ export const PostFilterPanel = ({
                     boardId: value === 'ALL' ? undefined : Number(value),
                   }))
                 }
-              >
-                <Select.Trigger
-                  id={`${inputId}-board`}
-                  className='h-9 w-full min-w-0 shadow-none'
-                >
-                  <Select.Value />
-                </Select.Trigger>
-                <Select.Content
-                  align='start'
-                  className='max-h-[min(15rem,var(--radix-select-content-available-height))]'
-                >
-                  <Select.Item value='ALL'>전체</Select.Item>
-                  {BOARD_OPTIONS.map((option) => (
-                    <Select.Item
-                      key={option.value}
-                      value={String(option.value)}
-                    >
-                      {option.label}
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select>
+              />
             </div>
             <div className='min-w-0'>
               <FilterMultiSelect

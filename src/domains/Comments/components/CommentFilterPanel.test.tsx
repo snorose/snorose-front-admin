@@ -20,13 +20,22 @@ describe('CommentFilterPanel', () => {
     render(<CommentFilterPanel onFilterChange={onFilterChange} />);
     const board = screen.getByRole('button', { name: '게시판' });
     await user.click(board);
+    const boardSearch = screen.getByRole('textbox', {
+      name: '게시판 목록 검색',
+    });
+    await user.type(boardSearch, BOARD_OPTIONS[0].label);
     await user.click(
-      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[0].label })
+      screen.getByRole('checkbox', { name: BOARD_OPTIONS[0].label })
     );
+    await user.clear(boardSearch);
+    await user.type(boardSearch, BOARD_OPTIONS[1].label);
     await user.click(
-      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[1].label })
+      screen.getByRole('checkbox', { name: BOARD_OPTIONS[1].label })
     );
     expect(board).toHaveTextContent('게시판 2개');
+    expect(
+      screen.queryByRole('checkbox', { name: BOARD_OPTIONS[0].label })
+    ).not.toBeInTheDocument();
     await user.keyboard('{Escape}');
     const status = screen.getByRole('button', { name: '관리 상태' });
     await user.click(status);
@@ -41,7 +50,10 @@ describe('CommentFilterPanel', () => {
       adminCommonStatuses: ['VISIBLE', 'SANCTIONED'],
     });
     await user.click(board);
-    await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
+    expect(
+      screen.getByRole('textbox', { name: '게시판 목록 검색' })
+    ).toHaveValue('');
+    await user.click(screen.getByRole('button', { name: '선택 해제' }));
     await user.keyboard('{Escape}');
     await user.click(status);
     await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
@@ -67,7 +79,7 @@ describe('CommentFilterPanel', () => {
     );
     await user.click(screen.getByRole('button', { name: '게시판' }));
     await user.click(
-      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[0].label })
+      screen.getByRole('checkbox', { name: BOARD_OPTIONS[0].label })
     );
     await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));

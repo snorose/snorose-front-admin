@@ -67,8 +67,8 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
   test('기존 선택 목록에서 빠졌던 게시판을 두 화면에서 선택하고 검색한다', async () => {
     const user = userEvent.setup();
     const posts = renderPage(PostManagePage, ['/posts/manage']);
-    await user.click(screen.getByRole('combobox', { name: '게시판' }));
-    await user.click(screen.getByRole('option', { name: '주거' }));
+    await user.click(screen.getByRole('button', { name: '게시판' }));
+    await user.click(screen.getByRole('button', { name: '주거' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     await waitFor(() =>
       expect(searchPosts).toHaveBeenLastCalledWith(1, { boardId: 41 })
@@ -78,9 +78,9 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
 
     renderPage(PostCommentPage, ['/posts/comments']);
     await user.click(screen.getByRole('button', { name: '게시판' }));
-    await user.click(screen.getByRole('menuitemcheckbox', { name: '주거' }));
+    await user.click(screen.getByRole('checkbox', { name: '주거' }));
     await user.click(
-      screen.getByRole('menuitemcheckbox', { name: '교환학생/어학연수' })
+      screen.getByRole('checkbox', { name: '교환학생/어학연수' })
     );
     await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));
@@ -99,7 +99,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
     renderPage(PostManagePage, [
       `/posts/manage?boardId=${board.value}&adminCommonStatuses=VISIBLE,ADMIN_HIDDEN&encryptedUserId=user-id&isVisible=false&isKeywordExist=false&sortTypes=VIEW_COUNT&sortDirection=DESC&startDate=2026-10-01&page=4`,
     ]);
-    expect(screen.getByRole('combobox', { name: '게시판' })).toHaveTextContent(
+    expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
       board.label
     );
     expect(screen.getByRole('button', { name: '관리 상태' })).toHaveTextContent(
@@ -153,7 +153,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
     );
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
     expect(screen.getByTestId('location')).toHaveTextContent('?page=1');
-    expect(screen.getByRole('combobox', { name: '게시판' })).toHaveTextContent(
+    expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
       '전체'
     );
     expect(screen.getByRole('button', { name: '관리 상태' })).toHaveTextContent(
@@ -199,7 +199,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
     );
     const calls = vi.mocked(searchComments).mock.calls.length;
     await user.click(screen.getByRole('button', { name: '게시판' }));
-    await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
+    await user.click(screen.getByRole('button', { name: '선택 해제' }));
     await user.keyboard('{Escape}');
     expect(searchComments).toHaveBeenCalledTimes(calls);
     await user.type(
