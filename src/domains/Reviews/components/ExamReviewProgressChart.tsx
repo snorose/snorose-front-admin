@@ -43,7 +43,7 @@ export function ExamReviewProgressChart({
   ];
 
   return (
-    <Card className='bg-card @container/chart min-h-[392px] min-w-0'>
+    <Card className='bg-card @container/chart flex min-h-[392px] min-w-0 flex-col'>
       <Card.Header className='px-6 pt-6'>
         <Card.Title>확인 진행률</Card.Title>
         <Card.Description>
@@ -51,7 +51,7 @@ export function ExamReviewProgressChart({
         </Card.Description>
       </Card.Header>
 
-      <Card.Content className='flex min-w-0 flex-col items-center gap-6 @min-[26rem]/chart:flex-row @min-[26rem]/chart:items-stretch'>
+      <Card.Content className='flex min-w-0 flex-1 flex-col items-center justify-center gap-6 @min-[26rem]/chart:flex-row'>
         <div
           role='progressbar'
           aria-label='시험후기 확인 완료율'
