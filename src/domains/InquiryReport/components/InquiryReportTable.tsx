@@ -35,7 +35,7 @@ interface InquiryReportTableProps {
 }
 
 const GROUP_OPTIONS = [
-  { label: '분류', value: 'ALL' },
+  { label: '분류 전체', value: 'ALL' },
   { label: '문의', value: 'INQUIRY' },
   { label: '신고', value: 'REPORT' },
   { label: '기타', value: 'ETC' },
@@ -58,7 +58,7 @@ const REPORT_SUB_GROUP_OPTIONS = [
 ] as const;
 
 const STATUS_OPTIONS = [
-  { label: '답변여부', value: 'ALL' },
+  { label: '답변 전체', value: 'ALL' },
   { label: '답변 전', value: 'PENDING' },
   { label: '답변 완료', value: 'COMPLETED' },
   // TODO: 백엔드 HOLD 상태 지원 후 주석 해제
