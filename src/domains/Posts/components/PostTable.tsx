@@ -73,7 +73,7 @@ export default function PostTable({
   const isEmpty = !isLoading && posts.length === 0;
 
   return (
-    <div className='flex min-w-0 flex-col gap-3'>
+    <div className='flex min-w-0 flex-col gap-1'>
       <ListResultHeader
         title='게시글 목록'
         titleId={titleId}

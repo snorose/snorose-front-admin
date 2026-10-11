@@ -74,7 +74,7 @@ export default function CommentTable({
   const isEmpty = !isLoading && comments.length === 0;
 
   return (
-    <div className='flex min-w-0 flex-col gap-3'>
+    <div className='flex min-w-0 flex-col gap-1'>
       <ListResultHeader
         title='댓글 목록'
         titleId={titleId}

@@ -197,7 +197,7 @@ export default function ExamTable({
   }, [selectedId, currentPageData, onRowSelect]);
 
   return (
-    <div className='flex min-w-0 flex-col gap-3'>
+    <div className='flex min-w-0 flex-col gap-1'>
       <ListResultHeader
         title='시험후기 목록'
         titleId={titleId}

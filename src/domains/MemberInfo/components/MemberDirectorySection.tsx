@@ -209,7 +209,7 @@ export default function MemberDirectorySection({
         aria-labelledby={`${searchInputId}-results-heading`}
         className='flex min-w-0 flex-col gap-1'
       >
-        <div className='flex min-w-0 flex-col gap-3'>
+        <div className='flex min-w-0 flex-col gap-1'>
           <ListResultHeader
             title='회원 목록'
             titleId={`${searchInputId}-results-heading`}
