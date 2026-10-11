@@ -3,7 +3,7 @@ import { type RefObject, useId, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
 
-import { Button, Dialog, Input, Label } from '@/shared/components/ui';
+import { Button, Dialog, InputGroup, Label } from '@/shared/components/ui';
 
 import type { RenameExamReviewFileResult } from '@/domains/Reviews/types';
 
@@ -35,7 +35,7 @@ const INVALID_FILE_NAME_CHARACTERS_TEXT =
 
 const getExtension = (fileName: string) => {
   const lastDot = fileName.lastIndexOf('.');
-  return lastDot > 0 ? fileName.slice(lastDot).toLowerCase() : '';
+  return lastDot > 0 ? fileName.slice(lastDot) : '';
 };
 
 export function ExamReviewFileNameModal({
@@ -48,10 +48,14 @@ export function ExamReviewFileNameModal({
   const inputId = useId();
   const helpId = `${inputId}-help`;
   const errorId = `${inputId}-error`;
-  const [newFileName, setNewFileName] = useState(currentFileName);
+  const extension = getExtension(currentFileName);
+  const [newFileName, setNewFileName] = useState(
+    extension ? currentFileName.slice(0, -extension.length) : currentFileName
+  );
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const trimmedFileName = newFileName.trim();
+  const fullFileName = `${trimmedFileName}${extension}`;
   const hasInvalidCharacters = INVALID_FILE_NAME_CHARACTERS.some((character) =>
     trimmedFileName.includes(character)
   );
@@ -59,14 +63,11 @@ export function ExamReviewFileNameModal({
     ? `파일명에 ${INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.`
     : '';
   const visibleErrorMessage = invalidCharacterErrorMessage || errorMessage;
-  const hasDifferentExtension =
-    getExtension(trimmedFileName) !== getExtension(currentFileName);
   const canSubmit =
     !isSaving &&
     Boolean(trimmedFileName) &&
-    trimmedFileName !== currentFileName &&
-    !hasInvalidCharacters &&
-    !hasDifferentExtension;
+    fullFileName !== currentFileName &&
+    !hasInvalidCharacters;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,7 +77,7 @@ export function ExamReviewFileNameModal({
       setErrorMessage('파일명을 입력해주세요.');
       return;
     }
-    if (trimmedFileName === currentFileName) {
+    if (fullFileName === currentFileName) {
       setErrorMessage('현재 파일명과 다른 이름을 입력해주세요.');
       return;
     }
@@ -84,15 +85,10 @@ export function ExamReviewFileNameModal({
       setErrorMessage(invalidCharacterErrorMessage);
       return;
     }
-    if (hasDifferentExtension) {
-      setErrorMessage('기존 파일의 확장자를 유지해주세요.');
-      return;
-    }
-
     setIsSaving(true);
     setErrorMessage('');
     try {
-      const result = await renameExamReviewFile(postId, trimmedFileName);
+      const result = await renameExamReviewFile(postId, fullFileName);
       onSuccess(postId, result);
       onClose();
     } catch (error: unknown) {
@@ -131,28 +127,36 @@ export function ExamReviewFileNameModal({
           </div>
           <div className='space-y-1.5'>
             <Label htmlFor={inputId}>새 파일명</Label>
-            <Input
-              id={inputId}
-              value={newFileName}
-              onChange={(event) => {
-                setNewFileName(event.target.value);
-                setErrorMessage('');
-              }}
-              aria-invalid={Boolean(visibleErrorMessage)}
-              aria-describedby={visibleErrorMessage ? errorId : helpId}
-              autoFocus
-              disabled={isSaving}
-            />
+            <InputGroup data-disabled={isSaving}>
+              <InputGroup.Input
+                id={inputId}
+                value={newFileName}
+                onChange={(event) => {
+                  setNewFileName(event.target.value);
+                  setErrorMessage('');
+                }}
+                aria-invalid={Boolean(visibleErrorMessage)}
+                aria-describedby={
+                  visibleErrorMessage ? `${helpId} ${errorId}` : helpId
+                }
+                autoFocus
+                disabled={isSaving}
+              />
+              {extension && (
+                <InputGroup.Addon align='inline-end' className='shrink-0'>
+                  <InputGroup.Text>{extension}</InputGroup.Text>
+                </InputGroup.Addon>
+              )}
+            </InputGroup>
+            <p id={helpId} className='text-sm text-gray-500'>
+              {extension && `확장자(${extension})는 변경할 수 없습니다. `}
+              {INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.
+            </p>
             {visibleErrorMessage ? (
               <p id={errorId} role='alert' className='text-sm text-red-600'>
                 {visibleErrorMessage}
               </p>
-            ) : (
-              <p id={helpId} className='text-sm text-gray-500'>
-                확장자를 유지해주세요. {INVALID_FILE_NAME_CHARACTERS_TEXT}는
-                사용할 수 없습니다.
-              </p>
-            )}
+            ) : null}
           </div>
           <Dialog.Footer>
             <Button
