@@ -1,24 +1,11 @@
-import type { ReactNode } from 'react';
-
-import {
-  BadgeCheck,
-  CalendarDays,
-  Coins,
-  Copy,
-  GraduationCap,
-  History,
-  IdCard,
-  type LucideIcon,
-  Mail,
-  UserRound,
-} from 'lucide-react';
+import { Coins, History, UserRound } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
+import { ReadonlyField } from '@/domains/MemberInfo/components/MemberInfoEditFormFields';
 import {
-  EMPTY_TEXT,
   formatDisplayValue,
   formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -62,63 +49,49 @@ export default function MemberDetailInfoGrid({
         </div>
       </div>
 
-      <div className='grid gap-x-10 gap-y-6 md:grid-cols-2'>
-        <DetailField
-          icon={UserRound}
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <ReadonlyField
           label='이름'
           value={formatDisplayValue(member.userName)}
         />
-        <DetailField
-          icon={IdCard}
+        <ReadonlyField
           label='아이디'
           value={formatDisplayValue(member.loginId)}
           copyValue={member.loginId}
           onCopy={onCopy}
         />
-        <DetailField
-          icon={UserRound}
+        <ReadonlyField
           label='닉네임'
           value={formatDisplayValue(member.nickname)}
         />
-        <DetailField
-          icon={GraduationCap}
+        <ReadonlyField
           label='학번'
           value={formatDisplayValue(member.studentNumber)}
           copyValue={member.studentNumber}
           onCopy={onCopy}
         />
-        <DetailField
-          icon={CalendarDays}
+        <ReadonlyField
           label='생년월일'
           value={formatDateOnly(member.birthday)}
         />
-        <DetailField
-          icon={GraduationCap}
-          label='전공'
-          value={formatDisplayValue(member.major)}
-        />
-        <DetailField
-          icon={CalendarDays}
+        <ReadonlyField label='전공' value={formatDisplayValue(member.major)} />
+        <ReadonlyField
           label='가입일'
           value={formatDateOnly(member.createdAt)}
         />
-        <DetailField
-          icon={CalendarDays}
+        <ReadonlyField
           label='등업일'
           value={formatDateOnly(member.authenticatedAt)}
         />
-        <DetailField
-          icon={CalendarDays}
+        <ReadonlyField
           label='최근 로그인 날짜'
           value={formatDateOnly(member.lastLoginAt)}
         />
-        <DetailField
-          icon={CalendarDays}
+        <ReadonlyField
           label='정보 수정일'
           value={formatDateTimeToMinutes(member.updatedAt)}
         />
-        <DetailField
-          icon={Coins}
+        <ReadonlyField
           label='보유 포인트'
           value={formatPoint(member.pointBalance)}
           action={
@@ -146,64 +119,17 @@ export default function MemberDetailInfoGrid({
             </div>
           }
         />
-        <DetailField
-          icon={IdCard}
+        <ReadonlyField
           label='회원 ID (암호화)'
           value={formatDisplayValue(member.encryptedUserId)}
           copyValue={member.encryptedUserId}
           onCopy={onCopy}
         />
-        <DetailField icon={BadgeCheck} label='회원 등급' value={roleLabel} />
-        <DetailField
-          icon={Mail}
+        <ReadonlyField label='회원 등급' value={roleLabel} />
+        <ReadonlyField
           label='이메일'
           value={formatDisplayValue(member.email)}
         />
-      </div>
-    </div>
-  );
-}
-
-function DetailField({
-  action,
-  copyValue,
-  icon: Icon,
-  label,
-  onCopy,
-  value,
-}: {
-  action?: ReactNode;
-  copyValue?: string;
-  icon: LucideIcon;
-  label: string;
-  onCopy?: (value: string) => void | Promise<void>;
-  value: string;
-}) {
-  return (
-    <div className='space-y-2'>
-      <div className='flex items-center gap-2 text-sm font-medium text-gray-700'>
-        <Icon className='h-4 w-4' />
-        {label}
-      </div>
-
-      <div
-        className={`flex items-start gap-2 ${action ? 'justify-between' : ''}`}
-      >
-        <p className='min-w-0 text-lg font-semibold break-all text-slate-950'>
-          {value}
-        </p>
-        {copyValue && onCopy && value !== EMPTY_TEXT && (
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            onClick={() => void onCopy(copyValue)}
-            aria-label={`${label} 복사`}
-          >
-            <Copy aria-hidden='true' />
-          </Button>
-        )}
-        {action}
       </div>
     </div>
   );
