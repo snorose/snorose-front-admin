@@ -74,7 +74,7 @@ export function ExamReviewAdminStatusDialog({
   const selectedPeriod = periods.find(
     (period) => period.id === selectedPeriodId
   );
-  const statusQuery = useExamReviewAdminStatus(selectedPeriodId, open);
+  const statusQuery = useExamReviewAdminStatus(selectedPeriod, open);
 
   useEffect(() => {
     if (periodsQuery.isPending) return;

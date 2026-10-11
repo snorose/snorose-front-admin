@@ -271,11 +271,14 @@ export async function deleteMockExamReviewAdminStatusPeriod(periodId: number) {
 }
 
 export async function getMockExamReviewAdminStatus(
-  periodId: number
+  periodOrId: number | ExamReviewAdminStatusPeriod
 ): Promise<ExamReviewAdminStatusResult> {
   await waitForMockResponse();
 
-  const period = periods.find((item) => item.id === periodId);
+  const period =
+    typeof periodOrId === 'number'
+      ? periods.find((item) => item.id === periodOrId)
+      : periodOrId;
 
   if (!period) {
     throw new Error('현황을 조회할 기간을 찾을 수 없습니다.');

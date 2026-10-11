@@ -5,10 +5,22 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { resetMockExamReviewAdminStatusPeriods } from '@/domains/Reviews/mocks';
+import {
+  getMockExamReviewAdminStatusPeriods,
+  resetMockExamReviewAdminStatusPeriods,
+} from '@/domains/Reviews/mocks';
+
+import { getExamReviewPeriodsAPI } from '@/apis';
 
 import { ExamReviewAdminStatusDialog } from './ExamReviewAdminStatusDialog';
 import { ExamReviewAdminStatusPeriodDialog } from './ExamReviewAdminStatusPeriodDialog';
+
+vi.mock('@/apis', () => ({
+  getExamReviewPeriodsAPI: vi.fn(),
+  postExamReviewPeriodAPI: vi.fn(),
+  patchExamReviewPeriodAPI: vi.fn(),
+  deleteExamReviewPeriodAPI: vi.fn(),
+}));
 
 function DialogHarness() {
   const [activeDialog, setActiveDialog] = useState<'status' | 'period-editor'>(
@@ -55,6 +67,12 @@ describe('ExamReviewAdminStatusDialog', () => {
   beforeEach(() => {
     vi.setSystemTime(new Date('2026-08-22T12:00:00'));
     resetMockExamReviewAdminStatusPeriods();
+    vi.mocked(getExamReviewPeriodsAPI).mockImplementation(async () =>
+      (await getMockExamReviewAdminStatusPeriods()).map((period) => ({
+        ...period,
+        type: 'ADMIN_EDIT',
+      }))
+    );
   });
 
   test('진행 중인 기간의 mock 관리자 현황을 기본으로 보여준다', async () => {
@@ -68,6 +86,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     const activeTab = await screen.findByRole('tab', {
       name: '2026 여름학기',
     });
+    expect(getExamReviewPeriodsAPI).toHaveBeenCalledWith('ADMIN_EDIT');
 
     await waitFor(() =>
       expect(activeTab).toHaveAttribute('data-state', 'active')

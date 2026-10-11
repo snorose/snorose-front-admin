@@ -3,6 +3,7 @@ import type { BaseResponse } from '@/shared/types';
 import type {
   CreateExamReviewPeriod,
   ExamReviewPeriod,
+  ExamReviewPeriodType,
   UpdateExamReviewPeriod,
 } from '@/shared/types';
 
@@ -115,12 +116,12 @@ export const postExamReviewPeriodAPI = async (
   );
 };
 
-export const getExamReviewPeriodsAPI = async (): Promise<
-  ExamReviewPeriod[]
-> => {
+export const getExamReviewPeriodsAPI = async (
+  type: ExamReviewPeriodType = 'WRITE'
+): Promise<ExamReviewPeriod[]> => {
   const response = await axiosInstance.get<BaseResponse<ExamReviewPeriod[]>>(
     '/v1/admin/reviews/period',
-    { params: { type: 'WRITE' } }
+    { params: { type } }
   );
   return response.data.result;
 };
@@ -136,10 +137,11 @@ export const patchExamReviewPeriodAPI = async (
 };
 
 export const deleteExamReviewPeriodAPI = async (
-  periodId: number
+  periodId: number,
+  type: ExamReviewPeriodType = 'WRITE'
 ): Promise<void> => {
   await axiosInstance.delete<BaseResponse<void>>(
     `/v1/admin/reviews/period/${periodId}`,
-    { params: { type: 'WRITE' } }
+    { params: { type } }
   );
 };

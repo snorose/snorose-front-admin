@@ -1,15 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type {
+  ExamReviewAdminStatusPeriod,
+  ExamReviewAdminStatusPeriodInput,
+} from '@/domains/Reviews/types';
+
 import {
-  createMockExamReviewAdminStatusPeriod,
-  deleteMockExamReviewAdminStatusPeriod,
-  getMockExamReviewAdminStatusPeriods,
-  updateMockExamReviewAdminStatusPeriod,
-} from '@/domains/Reviews/mocks';
-import type { ExamReviewAdminStatusPeriod } from '@/domains/Reviews/types';
+  deleteExamReviewPeriodAPI,
+  getExamReviewPeriodsAPI,
+  patchExamReviewPeriodAPI,
+  postExamReviewPeriodAPI,
+} from '@/apis';
 
 export const EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY = [
   'examReviewAdminStatusPeriods',
+  'ADMIN_EDIT',
 ] as const;
 
 export function useExamReviewAdminStatusPeriods(enabled: boolean) {
@@ -17,31 +22,54 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
 
   const periodsQuery = useQuery({
     queryKey: EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
-    queryFn: getMockExamReviewAdminStatusPeriods,
+    queryFn: () => getExamReviewPeriodsAPI('ADMIN_EDIT'),
     enabled,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const createPeriodMutation = useMutation({
-    mutationFn: createMockExamReviewAdminStatusPeriod,
-    onSuccess: (createdPeriod) => {
-      queryClient.setQueryData<ExamReviewAdminStatusPeriod[]>(
+    mutationFn: async (input: ExamReviewAdminStatusPeriodInput) => {
+      await postExamReviewPeriodAPI([toAdminEditPeriodRequest(input)]);
+      const periods = await getExamReviewPeriodsAPI('ADMIN_EDIT');
+      queryClient.setQueryData(
         EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
-        (currentPeriods = []) => [...currentPeriods, createdPeriod]
+        periods
       );
+      const createdPeriod = periods.find(
+        (period) => period.title === input.title
+      );
+      if (!createdPeriod) {
+        throw new Error(
+          '저장한 기간을 찾을 수 없습니다. 기간 목록을 다시 확인해주세요.'
+        );
+      }
+      return createdPeriod;
     },
   });
 
   const updatePeriodMutation = useMutation({
-    mutationFn: updateMockExamReviewAdminStatusPeriod,
-    onSuccess: (updatedPeriod) => {
-      queryClient.setQueryData<ExamReviewAdminStatusPeriod[]>(
+    mutationFn: async ({
+      periodId,
+      input,
+    }: {
+      periodId: number;
+      input: ExamReviewAdminStatusPeriodInput;
+    }) => {
+      await patchExamReviewPeriodAPI(periodId, toAdminEditPeriodRequest(input));
+      const periods = await getExamReviewPeriodsAPI('ADMIN_EDIT');
+      queryClient.setQueryData(
         EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
-        (currentPeriods = []) =>
-          currentPeriods.map((period) =>
-            period.id === updatedPeriod.id ? updatedPeriod : period
-          )
+        periods
       );
+      const updatedPeriod = periods.find((period) => period.id === periodId);
+      if (!updatedPeriod) {
+        throw new Error(
+          '수정한 기간을 찾을 수 없습니다. 기간 목록을 다시 확인해주세요.'
+        );
+      }
+      return updatedPeriod;
+    },
+    onSuccess: (updatedPeriod) => {
       void queryClient.invalidateQueries({
         queryKey: ['examReviewAdminStatus', updatedPeriod.id],
       });
@@ -49,7 +77,10 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
   });
 
   const deletePeriodMutation = useMutation({
-    mutationFn: deleteMockExamReviewAdminStatusPeriod,
+    mutationFn: async (periodId: number) => {
+      await deleteExamReviewPeriodAPI(periodId, 'ADMIN_EDIT');
+      return periodId;
+    },
     onSuccess: (deletedPeriodId) => {
       queryClient.setQueryData<ExamReviewAdminStatusPeriod[]>(
         EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
@@ -58,7 +89,6 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
       );
       queryClient.removeQueries({
         queryKey: ['examReviewAdminStatus', deletedPeriodId],
-        exact: true,
       });
     },
   });
@@ -72,5 +102,14 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
       createPeriodMutation.isPending ||
       updatePeriodMutation.isPending ||
       deletePeriodMutation.isPending,
+  };
+}
+
+function toAdminEditPeriodRequest(input: ExamReviewAdminStatusPeriodInput) {
+  return {
+    type: 'ADMIN_EDIT' as const,
+    title: input.title,
+    startAt: input.startAt,
+    endAt: input.endAt,
   };
 }

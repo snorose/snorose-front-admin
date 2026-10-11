@@ -1,14 +1,9 @@
 import { useMemo, useState } from 'react';
 
-import {
-  BarChart3Icon,
-  FlaskConicalIcon,
-  TriangleAlertIcon,
-} from 'lucide-react';
+import { BarChart3Icon, TriangleAlertIcon } from 'lucide-react';
 
 import {
   Alert,
-  Badge,
   Button,
   ConfirmModal,
   Dialog,
@@ -80,10 +75,6 @@ export function ExamReviewAdminStatusPeriodDialog({
             <div className='flex flex-col gap-2'>
               <div className='flex flex-wrap items-center gap-2'>
                 <Dialog.Title>기간 편집</Dialog.Title>
-                <Badge variant='secondary'>
-                  <FlaskConicalIcon />
-                  Mock 데이터
-                </Badge>
               </div>
               <Dialog.Description>
                 담당 관리자 현황을 조회할 커스텀 기간을 관리합니다.

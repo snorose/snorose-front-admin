@@ -1,6 +1,6 @@
 # 시험후기 담당 관리자 현황 기능 작업 문서
 
-> 문서 상태: 프런트엔드 Mock 구현  
+> 문서 상태: 기간 API 연동, 관리자 현황 Mock 구현<br>
 > 대상 화면: [`/reviews/exam`](../src/pages/reviews/ExamReviewPage.tsx)  
 > 참고 화면: [`/reviews/exam-period`](../src/pages/reviews/ExamReviewPeriodPage.tsx) (작성 가능 기간 관리, 데이터는 분리)
 
@@ -58,7 +58,7 @@ flowchart LR
 | 데이터    | 기존 `ExamReviewPeriod`                           | 신규 `ExamReviewAdminStatusPeriod`    |
 | 편집 영향 | 실제 시험후기 작성 가능 여부에 영향               | 통계 조회 범위에만 영향               |
 
-현황 집계 기간을 기존 작성 기간 데이터에 연결하면 관리자가 통계 범위를 수정했을 때 일반 사용자의 시험후기 작성 가능 기간까지 바뀔 수 있다. 따라서 필드 구조가 같더라도 API와 데이터 모델은 분리한다.
+현황 집계 기간을 기존 작성 기간 데이터에 연결하면 관리자가 통계 범위를 수정했을 때 일반 사용자의 시험후기 작성 가능 기간까지 바뀔 수 있다. 기간 API는 기존 `/v1/admin/reviews/period`를 재사용하고, 작성 기간은 `WRITE`, 어드민 편집 기간은 `ADMIN_EDIT` 타입으로 구분한다.
 
 ### 3.2 기존 UI 기반 재사용
 
@@ -70,17 +70,17 @@ flowchart LR
 | 삭제 확인                  | 기존 확인 다이얼로그 패턴 재사용                 |
 | 서버 상태 조회             | TanStack Query로 기간별 캐시와 로딩 상태 관리    |
 
-기간 UI의 형태는 기존 작성 기간 관리 컴포넌트를 참고할 수 있지만, 업무 의미와 API가 다르므로 기존 컴포넌트 안에서 도메인을 조건 분기하지 않는다.
+기간 UI의 형태는 기존 작성 기간 관리 컴포넌트를 참고할 수 있지만, 업무 의미가 다르므로 기존 컴포넌트 안에서 도메인을 조건 분기하지 않는다.
 
 ### 3.3 현재 Mock 구현 방식
 
 백엔드 연결 전에도 전체 흐름을 확인할 수 있도록 프런트엔드 mock 서비스를 사용한다.
 
-- 기간 CRUD는 [`exam-admin-status.ts`](../src/domains/Reviews/mocks/exam-admin-status.ts)의 메모리 데이터로 동작한다.
+- 기간 CRUD는 기존 작성 기간 API에 `type: ADMIN_EDIT`를 전달해 동작한다. 조회·삭제는 쿼리 파라미터, 추가·수정은 요청 본문에 타입을 포함한다.
 - 커스텀 기간의 현황은 고정된 결과를 반환하지 않고, mock 시험후기의 `createdAt`을 새 기간 범위로 다시 필터링해 계산한다.
 - 조회와 저장에는 짧은 지연 시간을 적용해 로딩·중복 제출 상태를 확인할 수 있다.
 - 추가·수정·삭제 결과는 TanStack Query 캐시에 즉시 반영한다.
-- 데이터는 브라우저 세션 메모리에만 유지되므로 페이지를 새로고침하면 초기 mock 값으로 돌아간다.
+- 기간 데이터는 서버에 저장되며 새로고침 후에도 유지된다. 관리자 현황 계산에 사용하는 시험후기 데이터만 mock이다.
 - 백엔드가 준비되면 Query·Mutation 훅의 mock 함수 import를 실제 API 함수로 교체한다.
 
 ### 3.4 차트 구현
@@ -325,28 +325,31 @@ confirmedCount = sum(managers[].processedCount) + unassignedCount
 
 ## 8. API 계약 제안
 
-아래 내용은 백엔드 연결 시 사용할 계약 제안이다. 현재 프런트엔드에서는 같은 입출력 타입을 가진 mock 서비스로 대체한다. 현황 집계 기간은 기존 작성 기간과 분리된 신규 API를 사용한다.
+아래 내용은 백엔드 연결 시 사용할 계약 제안이다. 현재 프런트엔드에서는 같은 입출력 타입을 가진 mock 서비스로 대체한다. 현황 집계 기간은 기존 작성 기간 API를 `ADMIN_EDIT` 타입으로 재사용한다.
 
 ### 8.1 현황 집계 기간 CRUD
 
-| 기능      | 메서드와 경로                                              | 응답 `result`                   |
-| --------- | ---------------------------------------------------------- | ------------------------------- |
-| 목록 조회 | `GET /v1/admin/reviews/admin-status/periods`               | `ExamReviewAdminStatusPeriod[]` |
-| 기간 추가 | `POST /v1/admin/reviews/admin-status/periods`              | 생성된 기간                     |
-| 기간 수정 | `PATCH /v1/admin/reviews/admin-status/periods/{periodId}`  | 수정된 기간                     |
-| 기간 삭제 | `DELETE /v1/admin/reviews/admin-status/periods/{periodId}` | 삭제한 `periodId`               |
+| 기능      | 메서드와 경로                                | 타입 전달                                |
+| --------- | -------------------------------------------- | ---------------------------------------- |
+| 목록 조회 | `GET /v1/admin/reviews/period`               | 쿼리 `type=ADMIN_EDIT`                   |
+| 기간 추가 | `POST /v1/admin/reviews/period`              | 배열 본문의 각 항목에 `type: ADMIN_EDIT` |
+| 기간 수정 | `PATCH /v1/admin/reviews/period/{periodId}`  | 본문에 `type: ADMIN_EDIT`                |
+| 기간 삭제 | `DELETE /v1/admin/reviews/period/{periodId}` | 쿼리 `type=ADMIN_EDIT`                   |
 
-추가·수정 요청 본문은 다음 형식을 사용한다.
+추가 요청은 다음 배열 형식이며, 수정 요청은 배열 안의 객체 하나를 사용한다.
 
 ```json
-{
-  "title": "2026-1학기 중간고사",
-  "startAt": "2026-04-01T00:00:00",
-  "endAt": "2026-05-15T23:59:00"
-}
+[
+  {
+    "type": "ADMIN_EDIT",
+    "title": "2026-1학기 중간고사",
+    "startAt": "2026-04-01T00:00:00",
+    "endAt": "2026-05-15T23:59:00"
+  }
+]
 ```
 
-기간 응답은 `id`, `title`, `startAt`, `endAt`, `createdAt`, `updatedAt`을 포함한다. 생성 직후 새 기간을 정확히 선택할 수 있도록 추가 API는 생성된 기간의 `id`를 반드시 반환한다.
+추가·수정 API는 기존 계약대로 응답 본문을 사용하지 않고, 성공 후 `ADMIN_EDIT` 목록을 다시 조회한다. 추가한 기간의 서버 ID는 재조회한 목록에서 고유한 기간 이름으로 찾는다.
 
 ### 8.2 기간별 관리자 현황 조회
 

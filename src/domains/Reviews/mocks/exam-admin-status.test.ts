@@ -62,4 +62,17 @@ describe('시험후기 담당 관리자 현황 mock 서비스', () => {
       expect.objectContaining({ id: createdPeriod.id })
     );
   });
+
+  test('API에서 받은 기간의 날짜 범위로 mock 현황을 계산한다', async () => {
+    const result = await getMockExamReviewAdminStatus({
+      id: 9999,
+      title: 'API 편집 기간',
+      startAt: '2026-04-01T00:00:00',
+      endAt: '2026-04-10T23:59:00',
+      createdAt: '2026-04-01T00:00:00',
+      updatedAt: '2026-04-01T00:00:00',
+    });
+    expect(result.period.id).toBe(9999);
+    expect(result.summary.totalCount).toBe(2);
+  });
 });
