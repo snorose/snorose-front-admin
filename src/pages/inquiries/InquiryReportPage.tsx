@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '@/shared/components';
@@ -10,25 +10,46 @@ import {
   InquiryReportTable,
 } from '@/domains/InquiryReport';
 import { useUpdateInquiryStatus } from '@/domains/InquiryReport/hooks';
+import { parseInquiryPostId } from '@/domains/InquiryReport/utils/inquiryReportUrls';
 
 export default function InquiryReportPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const rawPage = searchParams.get('page');
   const currentPage = parseOneBasedPage(rawPage);
-  const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+  const selectedPostId = parseInquiryPostId(
+    searchParams.get('postId') ?? searchParams.get('inquiryId')
+  );
   const { mutateAsync: updateStatus } = useUpdateInquiryStatus();
 
-  useEffect(() => {
-    if (rawPage === null || rawPage === String(currentPage)) return;
-
-    const normalizedSearchParams = new URLSearchParams(searchParams);
+  const normalizedSearchParams = new URLSearchParams(searchParams);
+  normalizedSearchParams.delete('inquiryId');
+  if (rawPage !== null) {
     normalizedSearchParams.set('page', String(currentPage));
-    setSearchParams(normalizedSearchParams, { replace: true });
-  }, [currentPage, rawPage, searchParams, setSearchParams]);
+  }
+  if (!searchParams.has('postId') && selectedPostId !== null) {
+    normalizedSearchParams.set('postId', String(selectedPostId));
+  }
+  const normalizedSearch = normalizedSearchParams.toString();
+
+  useEffect(() => {
+    if (searchParams.toString() === normalizedSearch) return;
+
+    setSearchParams(normalizedSearch, { replace: true });
+  }, [normalizedSearch, searchParams, setSearchParams]);
 
   const handlePageChange = (page: number) => {
-    const nextSearchParams = new URLSearchParams(searchParams);
+    const nextSearchParams = new URLSearchParams(normalizedSearch);
     nextSearchParams.set('page', String(Math.max(1, page)));
+    setSearchParams(nextSearchParams, { replace: true });
+  };
+
+  const handleRowSelect = (postId: number | null) => {
+    const nextSearchParams = new URLSearchParams(normalizedSearch);
+    if (postId === null) {
+      nextSearchParams.delete('postId');
+    } else {
+      nextSearchParams.set('postId', String(postId));
+    }
     setSearchParams(nextSearchParams, { replace: true });
   };
 
@@ -52,7 +73,7 @@ export default function InquiryReportPage() {
             currentPage={currentPage}
             onPageChange={handlePageChange}
             selectedPostId={selectedPostId}
-            onRowSelect={setSelectedPostId}
+            onRowSelect={handleRowSelect}
             onStatusChange={handleStatusChange}
           />
         </div>
@@ -60,7 +81,7 @@ export default function InquiryReportPage() {
           <div className='w-full min-w-0 xl:sticky xl:top-4 xl:mt-[48px] xl:flex-1 xl:basis-0'>
             <InquiryReportDetailPanel
               postId={selectedPostId}
-              onClose={() => setSelectedPostId(null)}
+              onClose={() => handleRowSelect(null)}
               onStatusChange={handleStatusChange}
             />
           </div>

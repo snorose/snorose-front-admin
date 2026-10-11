@@ -29,10 +29,8 @@ import {
   getCommentAuthorDisplay,
 } from '../utils/inquiryCommentUtils';
 import {
-  buildInquiryPostUrl,
+  buildOriginalInquiryPostUrl,
   buildReportTargetUrl,
-  hasUnmappedReportTargetBoard,
-  isReportInquiry,
 } from '../utils/inquiryReportUrls';
 import {
   InquiryGroupBadge,
@@ -105,10 +103,8 @@ export default function InquiryReportDetailPanel({
   const replyParentComment = replyParentId
     ? findComment(visibleComments, replyParentId)
     : null;
-  const inquiryPostUrl = buildInquiryPostUrl(detail);
-  const inquiryPostLabel = isReportInquiry(detail) ? '신고글' : '문의글';
   const reportTargetUrl = buildReportTargetUrl(detail);
-  const hasUnmappedTargetBoard = hasUnmappedReportTargetBoard(detail);
+  const originalPostUrl = buildOriginalInquiryPostUrl(detail);
   const isWriterWithdrawn = isWithdrawnInquiryAuthor(detail);
   const canCopyAuthorLoginId = !isWriterWithdrawn && detail.userLoginId;
   const isCommentInputValid =
@@ -229,15 +225,15 @@ export default function InquiryReportDetailPanel({
             onStatusChange={onStatusChange}
           />
           <a
-            href={inquiryPostUrl}
+            href={originalPostUrl}
             target='_blank'
             rel='noopener noreferrer'
-            aria-label={`${inquiryPostLabel} 바로가기`}
-            title={`${inquiryPostLabel} 바로가기`}
+            aria-label='원본게시글 바로가기'
+            title='원본게시글 바로가기'
             className='flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[12px] font-medium !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
           >
             <ExternalLink className='h-3.5 w-3.5 shrink-0' />
-            {inquiryPostLabel}
+            원본게시글
           </a>
           {reportTargetUrl && (
             <a
@@ -251,21 +247,6 @@ export default function InquiryReportDetailPanel({
               <ExternalLink className='h-3.5 w-3.5 shrink-0' />
               대상글
             </a>
-          )}
-          {hasUnmappedTargetBoard && (
-            <span
-              title={`게시판 ID ${detail.targetBoardId}의 URL 매핑이 없습니다.`}
-            >
-              <button
-                type='button'
-                disabled
-                aria-label={`신고 대상 게시판 매핑 없음 (ID ${detail.targetBoardId})`}
-                className='flex h-8 cursor-not-allowed items-center gap-1.5 rounded-full border border-gray-200 bg-gray-100 px-3 text-[12px] font-medium text-gray-400'
-              >
-                <ExternalLink className='h-3.5 w-3.5 shrink-0' />
-                대상글 (매핑 없음)
-              </button>
-            </span>
           )}
           <Button
             type='button'

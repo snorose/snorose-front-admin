@@ -5,6 +5,7 @@ export type InquirySubGroup =
   | 'EVENT_INQUIRY'
   | 'NOTICE_INQUIRY'
   | 'ETC_INQUIRY'
+  | 'ETC'
   | 'POST_REPORT'
   | 'EXAM_REVIEW_REPORT'
   | 'COMMENT_REPORT'
