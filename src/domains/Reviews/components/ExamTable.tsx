@@ -221,7 +221,7 @@ export default function ExamTable({
             ))}
           </colgroup>
 
-          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+          <Table.Header className='z-10 h-[40px] shadow-sm [&_tr]:border-b'>
             <Table.Row>
               {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                 <Table.Head

@@ -269,7 +269,7 @@ export default function InquiryReportTable({
           <Table
             className={`w-full ${isDetailOpen ? 'min-w-[688px]' : 'min-w-[1168px]'} table-fixed text-[13px]`}
           >
-            <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
+            <Table.Header className='h-[42px] border-b border-gray-200'>
               <Table.Row>
                 <Table.Head
                   style={{ width: '64px' }}

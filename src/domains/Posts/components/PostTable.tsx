@@ -93,7 +93,7 @@ export default function PostTable({
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table className='w-full min-w-[1380px] table-fixed text-[13px]'>
-            <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
+            <Table.Header className='h-[42px] border-b border-gray-200'>
               <Table.Row>
                 <Table.Head
                   style={{ width: '40px' }}
@@ -109,39 +109,39 @@ export default function PostTable({
                     />
                   </label>
                 </Table.Head>
-                <Table.Head style={{ width: '80px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '80px' }} className='px-3'>
                   게시글 ID
                 </Table.Head>
-                <Table.Head style={{ width: '400px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '400px' }} className='px-3'>
                   제목/내용
                 </Table.Head>
-                <Table.Head style={{ width: '120px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '120px' }} className='px-3'>
                   작성자(닉네임)
                 </Table.Head>
-                <Table.Head style={{ width: '150px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '150px' }} className='px-3'>
                   게시판
                 </Table.Head>
                 <Table.Head
                   style={{ width: '140px' }}
-                  className='px-3 text-center text-xs'
+                  className='px-3 text-center'
                 >
                   상태
                 </Table.Head>
-                <Table.Head style={{ width: '160px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '160px' }} className='px-3'>
                   작성일
                 </Table.Head>
-                <Table.Head style={{ width: '90px' }} className='px-3 text-xs'>
+                <Table.Head style={{ width: '90px' }} className='px-3'>
                   카테고리
                 </Table.Head>
                 <Table.Head
                   style={{ width: '120px' }}
-                  className='px-3 text-center text-xs'
+                  className='px-3 text-center'
                 >
                   통계
                 </Table.Head>
                 <Table.Head
                   style={{ width: '80px' }}
-                  className='px-3 text-center text-xs'
+                  className='px-3 text-center'
                 >
                   의심 키워드
                 </Table.Head>

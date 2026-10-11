@@ -51,7 +51,7 @@ export default function PointHistoryTab({
     <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
       <Table className='border- w-full border-separate border-spacing-0 rounded-md border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
         {/* Header */}
-        <Table.Header className='bg-gray-100'>
+        <Table.Header>
           <Table.Row>
             <Table.Head className='text-center'>번호</Table.Head>
             <Table.Head className='text-center'>포인트 ID</Table.Head>

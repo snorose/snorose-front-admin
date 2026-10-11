@@ -221,7 +221,7 @@ export default function MemberDirectorySection({
           <div className='overflow-hidden rounded-md border border-slate-200'>
             <Table className='min-w-230'>
               <Table.Header>
-                <Table.Row className='border-b border-slate-200 bg-slate-50 hover:bg-slate-50'>
+                <Table.Row className='border-b border-slate-200'>
                   <Table.Head className='w-12 px-4'>
                     <input
                       type='checkbox'
