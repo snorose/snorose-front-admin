@@ -1,9 +1,9 @@
 import { useId, useState } from 'react';
 
-import { ChevronDown, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { DatePicker } from '@/shared/components';
+import { DatePicker, FilterMultiSelect } from '@/shared/components';
 import {
   Button,
   Checkbox,
@@ -29,7 +29,6 @@ import {
 
 import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
 import { ExamDiscussionStatusBadge } from './ExamDiscussionStatusBadge';
-import { ExamMultiSelect } from './ExamMultiSelect';
 import { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
 
 interface ExamSearchProps {
@@ -52,9 +51,11 @@ const TRUE_SELECTED = 'TRUE';
 const FALSE_SELECTED = 'FALSE';
 const CONFIRMED_SELECTED = 'CONFIRMED';
 const UNCONFIRMED_SELECTED = 'UNCONFIRMED';
-const PROCESS_STATUS_OPTIONS: string[] = EXAM_REVIEW_PROCESS_STATUS.map(
-  (status) => status.label
-);
+const PROCESS_STATUS_OPTIONS = EXAM_REVIEW_PROCESS_STATUS.map((status) => ({
+  value: status.label,
+  label: status.label,
+  content: <ExamReviewProcessStatusBadge status={status.code} />,
+}));
 
 const isDefined = <T,>(value: T | undefined): value is T => value !== undefined;
 
@@ -95,10 +96,6 @@ const getStatusCodesFromLabels = (statusLabels: string[]): string =>
     })
     .filter(isDefined)
     .join(',');
-
-const getStatusCodeFromLabel = (statusLabel: string) =>
-  EXAM_REVIEW_PROCESS_STATUS.find((status) => status.label === statusLabel)
-    ?.code;
 
 const renderDiscussionStatusBadge = (status: string) => {
   if (status === ALL_SELECTED) {
@@ -452,7 +449,7 @@ export default function ExamSearch({
             </fieldset>
           </div>
 
-          <div className='grid min-w-0 grid-cols-1 items-end gap-4 @md:grid-cols-2 @5xl:grid-cols-4'>
+          <div className='grid min-w-0 grid-cols-1 items-end gap-4 @md:grid-cols-2 @5xl:grid-cols-8'>
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor={`${dateId}-sort`}>정렬</Label>
               <Select value={sort} onValueChange={setSort}>
@@ -594,43 +591,13 @@ export default function ExamSearch({
               </Select>
             </div>
 
-            <div className='flex min-w-0 flex-col gap-1 @5xl:col-span-2'>
-              <Label
-                id={`${dateId}-statuses-label`}
-                htmlFor={`${dateId}-statuses`}
-              >
-                관리 상태
-              </Label>
-              <ExamMultiSelect
+            <div className='min-w-0 @5xl:col-span-2'>
+              <FilterMultiSelect
+                label='관리 상태'
                 value={selectedStatuses}
                 onValueChange={setSelectedStatuses}
                 options={PROCESS_STATUS_OPTIONS}
-                contentClassName='w-[var(--radix-popover-trigger-width)]'
-                renderOption={(option) => {
-                  const statusCode = getStatusCodeFromLabel(option);
-
-                  return statusCode ? (
-                    <ExamReviewProcessStatusBadge status={statusCode} />
-                  ) : (
-                    option
-                  );
-                }}
-              >
-                <Button
-                  type='button'
-                  variant='outline'
-                  id={`${dateId}-statuses`}
-                  aria-labelledby={`${dateId}-statuses-label`}
-                  className='border-input h-9 w-full min-w-0 justify-between bg-transparent px-3 text-sm font-normal shadow-none hover:bg-transparent'
-                >
-                  <span className='truncate'>
-                    {selectedStatuses.length > 0
-                      ? `관리 상태 ${selectedStatuses.length}개`
-                      : '전체'}
-                  </span>
-                  <ChevronDown className='size-4 shrink-0 opacity-50' />
-                </Button>
-              </ExamMultiSelect>
+              />
             </div>
           </div>
         </div>

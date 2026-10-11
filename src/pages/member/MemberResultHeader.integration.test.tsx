@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { AdminUserListResult } from '@/shared/types';
 
@@ -14,6 +14,8 @@ vi.mock('@/apis', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/apis')>()),
   getAllUsersAPI: vi.fn(),
 }));
+
+beforeEach(() => vi.resetAllMocks());
 
 const listResponse = (totalCount: number): AdminUserListResult => ({
   data: [],
@@ -33,6 +35,33 @@ function createDeferredResponse() {
 }
 
 describe('회원 목록 헤더', () => {
+  test('등급에는 검색창을 표시하지 않고 전공·입학연도 검색을 유지한다', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getAllUsersAPI).mockResolvedValue(listResponse(0));
+    render(
+      <MemoryRouter initialEntries={['/member/info']}>
+        <MemberInfoPage />
+      </MemoryRouter>
+    );
+    await user.click(screen.getByRole('button', { name: '등급' }));
+    expect(
+      screen.queryByRole('textbox', { name: '등급 목록 검색' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '정회원' }));
+    expect(screen.getByRole('button', { name: '등급' })).toHaveTextContent(
+      '정회원'
+    );
+    await user.click(screen.getByRole('button', { name: '전공' }));
+    expect(
+      screen.getByRole('textbox', { name: '전공 목록 검색' })
+    ).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: '입학연도' }));
+    expect(
+      screen.getByRole('textbox', { name: '입학연도 목록 검색' })
+    ).toBeInTheDocument();
+  });
+
   test('적용된 검색의 개수를 표시하고 검색·실패·재조회 상태를 반영한다', async () => {
     const user = userEvent.setup();
     const initialResponse = createDeferredResponse();

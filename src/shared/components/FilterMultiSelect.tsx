@@ -7,8 +7,12 @@ import { Button, DropdownMenu, Label } from '@/shared/components/ui';
 interface FilterMultiSelectProps<T extends string | number> {
   label: string;
   value: readonly T[];
-  options: readonly { value: T; label: string }[];
-  renderOption?: (option: { value: T; label: string }) => ReactNode;
+  options: readonly { value: T; label: string; content?: ReactNode }[];
+  renderOption?: (option: {
+    value: T;
+    label: string;
+    content?: ReactNode;
+  }) => ReactNode;
   onValueChange: (value: T[]) => void;
   disabled?: boolean;
 }
@@ -31,7 +35,7 @@ export function FilterMultiSelect<T extends string | number>({
     value.length === 0
       ? '전체'
       : value.length === 1
-        ? (selectedOption?.label ?? String(value[0]))
+        ? (selectedOption?.content ?? selectedOption?.label ?? String(value[0]))
         : `${label} ${value.length}개`;
 
   return (
@@ -55,12 +59,15 @@ export function FilterMultiSelect<T extends string | number>({
                 ? renderOption(selectedOption)
                 : summary}
             </span>
-            <ChevronDown aria-hidden='true' className='size-4 opacity-50' />
+            <ChevronDown
+              aria-hidden='true'
+              className='size-4 shrink-0 opacity-50'
+            />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           align='start'
-          className='w-[var(--radix-dropdown-menu-trigger-width)] max-w-[calc(100vw-2rem)] min-w-40'
+          className='max-h-[min(15rem,var(--radix-dropdown-menu-content-available-height))] w-[var(--radix-dropdown-menu-trigger-width)] max-w-[calc(100vw-2rem)] min-w-40'
         >
           <DropdownMenu.Item
             disabled={value.length === 0}
@@ -86,11 +93,12 @@ export function FilterMultiSelect<T extends string | number>({
                 )
               }
             >
-              {renderOption ? (
-                renderOption(option)
-              ) : (
-                <span className='truncate'>{option.label}</span>
-              )}
+              {option.content ??
+                (renderOption ? (
+                  renderOption(option)
+                ) : (
+                  <span className='truncate'>{option.label}</span>
+                ))}
             </DropdownMenu.CheckboxItem>
           ))}
         </DropdownMenu.Content>

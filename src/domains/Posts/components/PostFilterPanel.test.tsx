@@ -43,11 +43,18 @@ describe('PostFilterPanel', () => {
         onFilterChange={onFilterChange}
       />
     );
-    const board = screen.getByRole('combobox', { name: '게시판' });
+    const board = screen.getByRole('button', { name: '게시판' });
     expect(board).toHaveTextContent(BOARD_OPTIONS[0].label);
     await user.click(board);
+    await user.type(
+      screen.getByRole('textbox', { name: '게시판 목록 검색' }),
+      BOARD_OPTIONS[1].label
+    );
+    expect(
+      screen.queryByRole('button', { name: BOARD_OPTIONS[0].label })
+    ).not.toBeInTheDocument();
     await user.click(
-      screen.getByRole('option', { name: BOARD_OPTIONS[1].label })
+      screen.getByRole('button', { name: BOARD_OPTIONS[1].label })
     );
     expect(onFilterChange).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: '검색' }));
@@ -55,7 +62,13 @@ describe('PostFilterPanel', () => {
       boardId: BOARD_OPTIONS[1].value,
     });
     await user.click(board);
-    await user.click(screen.getByRole('option', { name: '전체' }));
+    expect(
+      screen.getByRole('textbox', { name: '게시판 목록 검색' })
+    ).toHaveValue('');
+    expect(
+      screen.queryByRole('button', { name: '선택 해제' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '전체' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onFilterChange).toHaveBeenLastCalledWith({ boardId: undefined });
   });

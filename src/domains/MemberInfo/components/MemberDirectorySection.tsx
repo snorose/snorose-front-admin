@@ -5,6 +5,7 @@ import { Loader2, Search } from 'lucide-react';
 import {
   ListResultHeader,
   PaginationBar,
+  SearchableSelect,
   StatusBadge,
   TableStateRow,
 } from '@/shared/components';
@@ -13,7 +14,6 @@ import type { AdminUserListItem } from '@/shared/types';
 import { formatDateOnly } from '@/shared/utils';
 
 import MemberDirectoryActionBar from '@/domains/MemberInfo/components/MemberDirectoryActionBar';
-import SearchableSelect from '@/domains/MemberInfo/components/SearchableSelect';
 import SortableHead from '@/domains/MemberInfo/components/SortableHead';
 import type { DirectoryFilterOption } from '@/domains/MemberInfo/utils/memberDirectory';
 import {
@@ -136,6 +136,7 @@ export default function MemberDirectorySection({
             <div className='min-w-0'>
               <SearchableSelect
                 label='등급'
+                searchable={false}
                 value={selectedRole}
                 placeholder='전체'
                 options={roleOptions}

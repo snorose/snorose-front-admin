@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import {
   DatePicker,
   FilterMultiSelect,
+  SearchableSelect,
   StatusBadge,
 } from '@/shared/components';
 import {
@@ -17,6 +18,11 @@ import {
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { CommentSearchParams } from '../types';
+
+const boardOptions = BOARD_OPTIONS.map((option) => ({
+  ...option,
+  value: String(option.value),
+}));
 
 interface CommentFilterPanelProps {
   onFilterChange: (filters: CommentSearchParams) => void;
@@ -224,14 +230,18 @@ export const CommentFilterPanel = ({
               </Select>
             </div>
             <div className='min-w-0'>
-              <FilterMultiSelect
+              <SearchableSelect
+                multiple
                 label='게시판'
-                value={filters.boardIds ?? []}
-                options={BOARD_OPTIONS}
+                placeholder='전체'
+                value={(filters.boardIds ?? []).map(String)}
+                options={boardOptions}
                 onValueChange={(boardIds) =>
                   setFilters((prev) => ({
                     ...prev,
-                    boardIds: boardIds.length ? boardIds : undefined,
+                    boardIds: boardIds.length
+                      ? boardIds.map(Number)
+                      : undefined,
                   }))
                 }
               />
