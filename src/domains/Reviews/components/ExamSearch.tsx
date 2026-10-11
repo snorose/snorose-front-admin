@@ -447,7 +447,7 @@ export default function ExamSearch({
             </fieldset>
           </div>
 
-          <div className='grid min-w-0 grid-cols-1 items-end gap-4 @md:grid-cols-2 @5xl:grid-cols-4'>
+          <div className='grid min-w-0 grid-cols-1 items-end gap-4 @md:grid-cols-2 @5xl:grid-cols-8'>
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor={`${dateId}-sort`}>정렬</Label>
               <Select value={sort} onValueChange={setSort}>
