@@ -1,5 +1,6 @@
 import { useId } from 'react';
 
+import { SectionTitle } from '@/shared/components';
 import { Input, Label } from '@/shared/components/ui';
 import type { AdminUserListItem } from '@/shared/types';
 
@@ -39,7 +40,7 @@ export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {
 
   return (
     <article className='flex flex-col gap-1'>
-      <h3 className='text-lg font-bold'>회원 정보 상세</h3>
+      <SectionTitle>회원 정보 상세</SectionTitle>
       <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
         {MEMBER_INFO.map(({ label, id, value }) => (
           <div className='flex flex-col gap-1' key={id}>

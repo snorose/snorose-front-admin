@@ -4,7 +4,12 @@ import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
-import { DateTimePicker, NoticePanel, PageHeader } from '@/shared/components';
+import {
+  DateTimePicker,
+  NoticePanel,
+  PageHeader,
+  SectionTitle,
+} from '@/shared/components';
 import {
   Button,
   InputGroup,
@@ -405,10 +410,8 @@ export default function ExcelPointUploadPage() {
         />
 
         <section className='flex flex-col gap-6'>
-          <div className='flex flex-col gap-2'>
-            <h2 className='text-foreground text-lg font-bold'>
-              엑셀 파일 업로드
-            </h2>
+          <div className='flex flex-col gap-1'>
+            <SectionTitle>엑셀 파일 업로드</SectionTitle>
             <div className='flex items-center gap-2'>
               <InputGroup>
                 <InputGroup.Button
@@ -536,8 +539,8 @@ export default function ExcelPointUploadPage() {
               </div>
             </section>
 
-            <div className='flex flex-col gap-3'>
-              <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
+            <div className='flex flex-col gap-1'>
+              <SectionTitle>지급 방식</SectionTitle>
               <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
                 <RadioGroup
                   value={paymentTiming}
@@ -656,12 +659,10 @@ export default function ExcelPointUploadPage() {
               </div>
             ) : null}
 
-            <div className='flex flex-col gap-3'>
+            <div className='flex flex-col gap-1'>
               {uploadResult ? (
                 <>
-                  <h2 className='text-foreground text-lg font-bold'>
-                    지급 결과
-                  </h2>
+                  <SectionTitle>지급 결과</SectionTitle>
                   <div className='flex flex-col gap-6'>
                     <section
                       aria-labelledby='excel-result-failure-heading'

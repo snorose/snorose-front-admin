@@ -6,6 +6,7 @@ import {
   ListResultHeader,
   PaginationBar,
   SearchableSelect,
+  SectionTitle,
   StatusBadge,
   TableStateRow,
 } from '@/shared/components';
@@ -91,12 +92,9 @@ export default function MemberDirectorySection({
         aria-labelledby={`${searchInputId}-search-heading`}
         className='flex w-full min-w-0 flex-col gap-1'
       >
-        <h2
-          id={`${searchInputId}-search-heading`}
-          className='text-lg font-bold'
-        >
+        <SectionTitle id={`${searchInputId}-search-heading`}>
           회원 검색
-        </h2>
+        </SectionTitle>
 
         <form
           aria-labelledby={`${searchInputId}-search-heading`}

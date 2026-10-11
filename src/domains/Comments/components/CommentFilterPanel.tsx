@@ -6,6 +6,7 @@ import {
   DatePicker,
   FilterMultiSelect,
   SearchableSelect,
+  SectionTitle,
   StatusBadge,
 } from '@/shared/components';
 import {
@@ -56,9 +57,7 @@ export const CommentFilterPanel = ({
       aria-labelledby={`${inputId}-heading`}
       className='flex min-w-0 flex-col gap-1'
     >
-      <h2 id={`${inputId}-heading`} className='text-lg font-bold'>
-        댓글 검색
-      </h2>
+      <SectionTitle id={`${inputId}-heading`}>댓글 검색</SectionTitle>
 
       <form
         aria-labelledby={`${inputId}-heading`}

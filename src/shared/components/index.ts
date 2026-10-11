@@ -20,6 +20,7 @@ export { ProtectedRoute } from './ProtectedRoute';
 export { ResultCount, type ResultCountProps } from './ResultCount';
 export { default as SanctionModal } from './SanctionModal';
 export { SearchableSelect } from './SearchableSelect';
+export { SectionTitle } from './SectionTitle';
 export { StatusBadge, type StatusBadgeTone } from './StatusBadge';
 export { default as StatusChangeModal } from './StatusChangeModal';
 export { type TableState, TableStateRow } from './TableStateRow';
