@@ -434,7 +434,7 @@ src/domains/Reviews/
 ├─ components/
 │  ├─ ExamReviewAdminStatusDialog.tsx
 │  ├─ ExamReviewAdminStatusPeriodDialog.tsx
-│  ├─ ExamReviewAdminStatusPeriodEditor.tsx
+│  ├─ ExamReviewAdminStatusPeriodList.tsx
 │  ├─ ExamReviewProgressChart.tsx
 │  └─ ExamReviewAdminStatusList.tsx
 └─ hooks/
@@ -457,7 +457,7 @@ src/domains/Reviews/
 | -------------------------------------- | ----------------------------------------------------- |
 | `ExamReviewAdminStatusDialog`          | 기본 탭 선택, 기간별 현황 레이아웃과 상태 분기        |
 | `ExamReviewAdminStatusPeriodDialog`    | 편집 다이얼로그 열림·닫힘, 미저장 변경 확인           |
-| `ExamReviewAdminStatusPeriodEditor`    | 기간 목록, 추가·수정 팝업과 삭제, 입력 검증           |
+| `ExamReviewAdminStatusPeriodList`      | 기간 목록, 추가·수정 모달 열기, 삭제                  |
 | `ExamReviewProgressChart`              | 도넛과 요약 수치 표시                                 |
 | `ExamReviewAdminStatusList`            | 관리자 목록, 평균, 담당자 미상 표시                   |
 | `use-exam-review-admin-status-periods` | 기간 조회·추가·수정·삭제 Mutation과 Query 캐시 무효화 |

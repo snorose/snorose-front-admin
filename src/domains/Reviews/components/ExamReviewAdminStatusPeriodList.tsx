@@ -18,7 +18,7 @@ type EditorState =
   | { type: 'update'; period: ExamReviewAdminStatusPeriod }
   | null;
 
-interface ExamReviewAdminStatusPeriodEditorProps {
+interface ExamReviewAdminStatusPeriodListProps {
   periods: ExamReviewAdminStatusPeriod[];
   isSubmitting: boolean;
   onCreate: (
@@ -33,7 +33,7 @@ interface ExamReviewAdminStatusPeriodEditorProps {
   onDirtyChange: (isDirty: boolean) => void;
 }
 
-export function ExamReviewAdminStatusPeriodEditor({
+export function ExamReviewAdminStatusPeriodList({
   periods,
   isSubmitting,
   onCreate,
@@ -41,7 +41,7 @@ export function ExamReviewAdminStatusPeriodEditor({
   onDelete,
   onSelectPeriod,
   onDirtyChange,
-}: ExamReviewAdminStatusPeriodEditorProps) {
+}: ExamReviewAdminStatusPeriodListProps) {
   const [editor, setEditor] = useState<EditorState>(null);
   const editorTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [deleteTarget, setDeleteTarget] =

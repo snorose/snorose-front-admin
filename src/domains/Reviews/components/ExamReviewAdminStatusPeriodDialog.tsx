@@ -13,7 +13,7 @@ import {
 import { useExamReviewAdminStatusPeriods } from '@/domains/Reviews/hooks';
 import { sortAdminStatusPeriods } from '@/domains/Reviews/utils';
 
-import { ExamReviewAdminStatusPeriodEditor } from './ExamReviewAdminStatusPeriodEditor';
+import { ExamReviewAdminStatusPeriodList } from './ExamReviewAdminStatusPeriodList';
 
 interface ExamReviewAdminStatusPeriodDialogProps {
   open: boolean;
@@ -115,7 +115,7 @@ export function ExamReviewAdminStatusPeriodDialog({
             </Alert.Description>
           </Alert>
         ) : (
-          <ExamReviewAdminStatusPeriodEditor
+          <ExamReviewAdminStatusPeriodList
             periods={periods}
             isSubmitting={isMutating}
             onCreate={createPeriodMutation.mutateAsync}
