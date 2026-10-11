@@ -132,6 +132,7 @@ export function EditableRoleField({
                 key={role.id}
                 value={String(role.id)}
                 textValue={role.name}
+                className='min-h-8 rounded-md py-2 pr-9 pl-3 [&>span:first-child]:right-3'
               >
                 <StatusBadge tone={role.tone}>{role.name}</StatusBadge>
               </Select.Item>
