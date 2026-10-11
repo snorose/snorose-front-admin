@@ -1,16 +1,25 @@
-import { type KeyboardEvent, useId, useRef, useState } from 'react';
+import {
+  type KeyboardEvent,
+  type ReactNode,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 import { Check, ChevronsUpDown, Search } from 'lucide-react';
 
 import { Button, InputGroup, Label, Popover } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
-type SearchableSelectProps = {
+type SearchableOption = { value: string; label: string };
+
+type SearchableSelectProps<TOption extends SearchableOption> = {
   label: string;
-  options: readonly { value: string; label: string }[];
+  options: readonly TOption[];
   placeholder: string;
   searchable?: boolean;
   isActive?: boolean;
+  renderOption?: (option: TOption) => ReactNode;
 } & (
   | {
       multiple?: false;
@@ -25,7 +34,9 @@ type SearchableSelectProps = {
     }
 );
 
-export function SearchableSelect(props: SearchableSelectProps) {
+export function SearchableSelect<TOption extends SearchableOption>(
+  props: SearchableSelectProps<TOption>
+) {
   const {
     label,
     options,
@@ -52,6 +63,10 @@ export function SearchableSelect(props: SearchableSelectProps) {
     : props.value === 'ALL'
       ? []
       : [props.value];
+  const selectedOption =
+    selectedValues.length === 1
+      ? options.find((option) => option.value === selectedValues[0])
+      : undefined;
   const summary =
     selectedValues.length === 0
       ? placeholder
@@ -119,7 +134,9 @@ export function SearchableSelect(props: SearchableSelectProps) {
             )}
           >
             <span id={`${id}-summary`} className='truncate'>
-              {summary}
+              {selectedOption && props.renderOption
+                ? props.renderOption(selectedOption)
+                : summary}
             </span>
             <ChevronsUpDown
               aria-hidden='true'
@@ -205,7 +222,11 @@ export function SearchableSelect(props: SearchableSelectProps) {
                         selected && 'font-semibold'
                       )}
                     >
-                      <span className='truncate'>{option.label}</span>
+                      {props.renderOption ? (
+                        props.renderOption(option as TOption)
+                      ) : (
+                        <span className='truncate'>{option.label}</span>
+                      )}
                       {selected && (
                         <Check
                           aria-hidden='true'
