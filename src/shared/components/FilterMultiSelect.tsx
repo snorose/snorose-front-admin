@@ -8,6 +8,11 @@ interface FilterMultiSelectProps<T extends string | number> {
   label: string;
   value: readonly T[];
   options: readonly { value: T; label: string; content?: ReactNode }[];
+  renderOption?: (option: {
+    value: T;
+    label: string;
+    content?: ReactNode;
+  }) => ReactNode;
   onValueChange: (value: T[]) => void;
   disabled?: boolean;
 }
@@ -16,12 +21,16 @@ export function FilterMultiSelect<T extends string | number>({
   label,
   value,
   options,
+  renderOption,
   onValueChange,
   disabled = false,
 }: FilterMultiSelectProps<T>) {
   const id = useId();
   const isDisabled = disabled || options.length === 0;
-  const selectedOption = options.find((option) => option.value === value[0]);
+  const selectedOption =
+    value.length === 1
+      ? options.find((option) => option.value === value[0])
+      : undefined;
   const summary =
     value.length === 0
       ? '전체'
@@ -45,8 +54,10 @@ export function FilterMultiSelect<T extends string | number>({
             disabled={isDisabled}
             className='border-input h-9 w-full justify-between bg-transparent px-3 font-normal shadow-none'
           >
-            <span id={`${id}-summary`} className='truncate'>
-              {summary}
+            <span id={`${id}-summary`} className='min-w-0 truncate'>
+              {selectedOption && renderOption
+                ? renderOption(selectedOption)
+                : summary}
             </span>
             <ChevronDown
               aria-hidden='true'
@@ -82,9 +93,12 @@ export function FilterMultiSelect<T extends string | number>({
                 )
               }
             >
-              <span className='min-w-0 truncate'>
-                {option.content ?? option.label}
-              </span>
+              {option.content ??
+                (renderOption ? (
+                  renderOption(option)
+                ) : (
+                  <span className='truncate'>{option.label}</span>
+                ))}
             </DropdownMenu.CheckboxItem>
           ))}
         </DropdownMenu.Content>

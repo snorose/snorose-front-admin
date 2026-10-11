@@ -10,6 +10,7 @@ import type {
   UserBlacklistHistory,
 } from '@/shared/types';
 
+import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
 import {
   convertBlacklistTypeToLabel,
   convertUserRoleIdToEnum,
@@ -55,6 +56,7 @@ export function buildAdminUserListParams({
 export type DirectoryFilterOption = {
   label: string;
   value: string;
+  tone?: StatusBadgeTone;
 };
 
 export type StatusBadgeMeta = {
@@ -120,22 +122,12 @@ export function toBlacklistHistoryItem(
   };
 }
 
-const ROLE_BADGE_META: Record<number, StatusBadgeMeta> = {
-  1: { label: '준회원', tone: 'neutral' },
-  2: { label: '정회원', tone: 'success' },
-  4: { label: '리자', tone: 'accent' },
-  5: { label: '공식', tone: 'info' },
-  6: { label: '강등자', tone: 'danger' },
-  7: { label: '광고주', tone: 'info' },
-};
-
 export function getRoleBadgeMeta(userRoleId: number): StatusBadgeMeta {
-  return (
-    ROLE_BADGE_META[userRoleId] ?? {
-      label: '알 수 없음',
-      tone: 'neutral',
-    }
-  );
+  const role = USER_ROLES.find((role) => role.id === userRoleId);
+  return {
+    label: role?.name ?? '알 수 없음',
+    tone: role?.tone ?? 'neutral',
+  };
 }
 
 // 현재 활성 제재가 '경고'인지 판별한다(강등 vs 경고 규칙의 단일 출처).
@@ -241,14 +233,11 @@ export function getRemainingPenaltyLabel(
 }
 
 export function getRoleOptions(): DirectoryFilterOption[] {
-  return [
-    { value: '1', label: '준회원' },
-    { value: '2', label: '정회원' },
-    { value: '4', label: '리자' },
-    { value: '5', label: '공식' },
-    { value: '6', label: '강등자' },
-    { value: '7', label: '광고주' },
-  ];
+  return USER_ROLES.map((role) => ({
+    value: String(role.id),
+    label: role.name,
+    tone: role.tone,
+  }));
 }
 
 const MIN_ADMISSION_YEAR = 1900;

@@ -6,6 +6,7 @@ import {
   DatePicker,
   FilterMultiSelect,
   SearchableSelect,
+  StatusBadge,
 } from '@/shared/components';
 import {
   Button,
@@ -240,6 +241,17 @@ export const PostFilterPanel = ({
                 label='관리 상태'
                 value={filters.adminCommonStatuses ?? []}
                 options={STATUS_OPTIONS}
+                renderOption={(option) => (
+                  <StatusBadge
+                    tone={
+                      STATUS_OPTIONS.find(
+                        (status) => status.value === option.value
+                      )?.tone ?? 'neutral'
+                    }
+                  >
+                    {option.label}
+                  </StatusBadge>
+                )}
                 onValueChange={(statuses) =>
                   setFilters((prev) => ({
                     ...prev,
