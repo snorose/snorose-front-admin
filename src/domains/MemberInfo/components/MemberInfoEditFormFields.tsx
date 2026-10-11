@@ -58,6 +58,7 @@ export function EditableField({
     <Field className='gap-0' data-invalid={Boolean(error)}>
       <Field.Label
         htmlFor={inputId}
+        required
         className={error ? 'text-destructive' : undefined}
       >
         {label}
@@ -76,6 +77,7 @@ export function EditableField({
                 ? `${new Date().getFullYear()}-12-31`
                 : undefined
             }
+            aria-required='true'
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : undefined}
           />
@@ -87,6 +89,7 @@ export function EditableField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
+            aria-required='true'
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : undefined}
           />
@@ -109,10 +112,12 @@ export function EditableRoleField({
   const inputId = useId();
   return (
     <Field className='gap-0'>
-      <Field.Label htmlFor={inputId}>회원 등급</Field.Label>
+      <Field.Label htmlFor={inputId} required>
+        회원 등급
+      </Field.Label>
       <Field.Content>
         <Select value={value} onValueChange={onChange}>
-          <Select.Trigger id={inputId} className='w-full'>
+          <Select.Trigger id={inputId} className='w-full' aria-required='true'>
             <Select.Value placeholder={currentLabel} />
           </Select.Trigger>
           <Select.Content>
@@ -145,7 +150,9 @@ export function ReadonlyField({
 
   return (
     <Field className='gap-0'>
-      <Field.Label htmlFor={inputId}>{label}</Field.Label>
+      <Field.Label htmlFor={inputId} required>
+        {label}
+      </Field.Label>
       <Field.Content>
         <div className='flex items-center gap-2'>
           <Input id={inputId} value={value} readOnly className='bg-muted' />

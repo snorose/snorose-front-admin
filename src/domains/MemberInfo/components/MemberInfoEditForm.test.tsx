@@ -57,7 +57,7 @@ describe('MemberInfoEditForm', () => {
       />
     );
 
-    const loginIdInput = screen.getByLabelText('아이디');
+    const loginIdInput = screen.getByLabelText(/^아이디/);
     await user.clear(loginIdInput);
     fireEvent.submit(loginIdInput.closest('form') as HTMLFormElement);
 
@@ -83,7 +83,7 @@ describe('MemberInfoEditForm', () => {
         onSubmit={onSubmit}
       />
     );
-    const birthday = screen.getByRole('button', { name: '생년월일' });
+    const birthday = screen.getByRole('button', { name: /^생년월일/ });
     expect(birthday).toHaveTextContent('2000-01-01');
     expect(birthday).toHaveAttribute('name', 'birthday');
     await user.click(birthday);
@@ -123,7 +123,7 @@ describe('MemberInfoEditForm', () => {
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith({
       birthday: '1980-02-29',
     });
-    expect(screen.getByLabelText('이메일')).toHaveAttribute('type', 'email');
+    expect(screen.getByLabelText(/^이메일/)).toHaveAttribute('type', 'email');
   });
 
   test('생년월일 해제 후 저장하면 날짜 버튼에 오류·포커스를 연결하고 재선택으로 복구한다', async () => {
@@ -136,7 +136,7 @@ describe('MemberInfoEditForm', () => {
         onSubmit={onSubmit}
       />
     );
-    const birthday = screen.getByRole('button', { name: '생년월일' });
+    const birthday = screen.getByRole('button', { name: /^생년월일/ });
     await user.click(birthday);
     await user.click(screen.getByRole('button', { name: '날짜 선택 해제' }));
     await waitFor(() => expect(birthday).toHaveFocus());

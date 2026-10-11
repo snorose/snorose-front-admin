@@ -51,30 +51,39 @@ export default function MemberDetailInfoGrid({
 
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         <ReadonlyField
+          required
           label='이름'
           value={formatDisplayValue(member.userName)}
         />
         <ReadonlyField
+          required
           label='아이디'
           value={formatDisplayValue(member.loginId)}
           copyValue={member.loginId}
           onCopy={onCopy}
         />
         <ReadonlyField
+          required
           label='닉네임'
           value={formatDisplayValue(member.nickname)}
         />
         <ReadonlyField
+          required
           label='학번'
           value={formatDisplayValue(member.studentNumber)}
           copyValue={member.studentNumber}
           onCopy={onCopy}
         />
         <ReadonlyField
+          required
           label='생년월일'
           value={formatDateOnly(member.birthday)}
         />
-        <ReadonlyField label='전공' value={formatDisplayValue(member.major)} />
+        <ReadonlyField
+          required
+          label='전공'
+          value={formatDisplayValue(member.major)}
+        />
         <ReadonlyField
           label='가입일'
           value={formatDateOnly(member.createdAt)}
@@ -125,8 +134,9 @@ export default function MemberDetailInfoGrid({
           copyValue={member.encryptedUserId}
           onCopy={onCopy}
         />
-        <ReadonlyField label='회원 등급' value={roleLabel} />
+        <ReadonlyField required label='회원 등급' value={roleLabel} />
         <ReadonlyField
+          required
           label='이메일'
           value={formatDisplayValue(member.email)}
         />
