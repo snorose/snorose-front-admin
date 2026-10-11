@@ -6,6 +6,7 @@ export { ExamReviewAdminStatusDialog } from './ExamReviewAdminStatusDialog';
 export { ExamReviewAdminStatusList } from './ExamReviewAdminStatusList';
 export { ExamReviewAdminStatusPeriodDialog } from './ExamReviewAdminStatusPeriodDialog';
 export { ExamReviewAdminStatusPeriodEditor } from './ExamReviewAdminStatusPeriodEditor';
+export { ExamReviewAdminStatusPeriodFormModal } from './ExamReviewAdminStatusPeriodFormModal';
 export { ExamReviewCommentSection } from './ExamReviewCommentSection';
 export { ExamReviewDeleteModal } from './ExamReviewDeleteModal';
 export { ExamReviewDetailInfoSection } from './ExamReviewDetailInfoSection';
