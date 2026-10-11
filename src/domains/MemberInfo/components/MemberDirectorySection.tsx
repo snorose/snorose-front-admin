@@ -139,6 +139,15 @@ export default function MemberDirectorySection({
                 value={selectedRole}
                 placeholder='전체'
                 options={roleOptions}
+                renderOption={(option) =>
+                  option.value === 'ALL' ? (
+                    option.label
+                  ) : (
+                    <StatusBadge tone={option.tone ?? 'neutral'}>
+                      {option.label}
+                    </StatusBadge>
+                  )
+                }
                 onValueChange={onSelectedRoleChange}
                 isActive={selectedRole !== 'ALL'}
               />
