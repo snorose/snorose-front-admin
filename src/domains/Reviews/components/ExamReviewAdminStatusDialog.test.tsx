@@ -83,13 +83,13 @@ describe('ExamReviewAdminStatusDialog', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Mock 데이터')).toBeInTheDocument();
 
-    const activeTab = await screen.findByRole('tab', {
+    const activePeriodButton = await screen.findByRole('button', {
       name: '2026 여름학기',
     });
     expect(getExamReviewPeriodsAPI).toHaveBeenCalledWith('ADMIN_EDIT');
 
     await waitFor(() =>
-      expect(activeTab).toHaveAttribute('data-state', 'active')
+      expect(activePeriodButton).toHaveAttribute('aria-pressed', 'true')
     );
 
     const progress = await screen.findByRole('progressbar', {
@@ -105,7 +105,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     const user = userEvent.setup();
     renderDialog();
 
-    await screen.findByRole('tab', { name: '2026 여름학기' });
+    await screen.findByRole('button', { name: '2026 여름학기' });
     await user.click(screen.getByRole('button', { name: '기간 편집' }));
     expect(
       screen.getByRole('dialog', { name: '기간 편집' })
@@ -150,7 +150,7 @@ describe('ExamReviewAdminStatusDialog', () => {
   test('수정 팝업에 기존 값을 채우고 저장하면 목록으로 돌아온다', async () => {
     const user = userEvent.setup();
     renderDialog();
-    await screen.findByRole('tab', { name: '2026 여름학기' });
+    await screen.findByRole('button', { name: '2026 여름학기' });
     await user.click(screen.getByRole('button', { name: '기간 편집' }));
     await user.click(
       screen.getByRole('button', { name: '2026 여름학기 수정' })

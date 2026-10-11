@@ -14,7 +14,6 @@ import {
   Card,
   Dialog,
   Skeleton,
-  Tabs,
 } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -95,7 +94,7 @@ export function ExamReviewAdminStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='h-[min(640px,85vh)] overflow-y-auto sm:max-w-5xl'>
+      <Dialog.Content className='max-h-[85vh] overflow-y-auto sm:max-w-5xl'>
         <Dialog.Header className='pr-8'>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
             <div className='flex flex-col gap-2'>
@@ -163,29 +162,35 @@ export function ExamReviewAdminStatusDialog({
         ) : (
           <div className='flex flex-col gap-4'>
             <div className='flex flex-col gap-2'>
-              <Tabs
-                value={String(selectedPeriodId)}
-                onValueChange={(value) => onSelectedPeriodChange(Number(value))}
+              <div
+                role='group'
+                aria-label='조회 기간 선택'
+                className='flex flex-wrap gap-2'
               >
-                <div className='overflow-x-auto px-1 pb-2'>
-                  <Tabs.List variant='default' className='w-max min-w-full'>
-                    {periods.map((period) => (
-                      <Tabs.Trigger key={period.id} value={String(period.id)}>
-                        {period.title}
-                      </Tabs.Trigger>
-                    ))}
-                  </Tabs.List>
-                </div>
-              </Tabs>
+                {periods.map((period) => (
+                  <Button
+                    key={period.id}
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    className='aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground h-auto min-h-11 max-w-full flex-none px-3 py-2 text-left whitespace-normal shadow-none transition-colors sm:min-h-9'
+                    aria-pressed={period.id === selectedPeriodId}
+                    onClick={() => onSelectedPeriodChange(period.id)}
+                  >
+                    <span className='min-w-0 break-words'>{period.title}</span>
+                  </Button>
+                ))}
+              </div>
               {selectedPeriod && (
-                <p className='bg-muted/60 text-muted-foreground flex flex-wrap items-center gap-x-2 rounded-md px-3 py-2 text-sm tabular-nums'>
-                  <span className='text-foreground/70 font-medium'>
-                    조회 기간
-                  </span>
-                  <span>
-                    {formatDateTimeToMinutes(selectedPeriod.startAt)} ~{' '}
+                <p className='text-muted-foreground pt-1 text-sm tabular-nums'>
+                  조회 기간:{' '}
+                  <time dateTime={selectedPeriod.startAt}>
+                    {formatDateTimeToMinutes(selectedPeriod.startAt)}
+                  </time>
+                  {' ~ '}
+                  <time dateTime={selectedPeriod.endAt}>
                     {formatDateTimeToMinutes(selectedPeriod.endAt)}
-                  </span>
+                  </time>
                 </p>
               )}
             </div>
