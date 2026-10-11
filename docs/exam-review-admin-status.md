@@ -232,14 +232,14 @@ flowchart LR
 
 #### 추가
 
-- `+ 기간 추가`를 누르면 목록 하단에 빈 입력 폼을 표시한다.
+- `+ 기간 추가`를 누르면 별도 팝업에 빈 입력 폼을 표시한다.
 - 저장 성공 후 기간 목록을 다시 조회하고 생성된 기간을 선택한다.
 - 생성 API는 안정적인 선택을 위해 생성된 `periodId`를 응답해야 한다.
 - 취소하면 입력값을 버리고 추가 폼을 닫는다.
 
 #### 수정
 
-- 수정 버튼을 누르면 해당 행을 인라인 입력 폼으로 전환한다.
+- 수정 버튼을 누르면 별도 팝업에 해당 기간의 기존 값을 채운 입력 폼을 표시한다.
 - 취소하면 서버 요청 없이 기존 값으로 되돌린다.
 - 저장 성공 후 같은 `periodId`를 유지하고 기간 목록과 해당 기간의 현황을 다시 조회한다.
 - 변경된 값이 없으면 저장 버튼을 비활성화한다.
@@ -457,7 +457,7 @@ src/domains/Reviews/
 | -------------------------------------- | ----------------------------------------------------- |
 | `ExamReviewAdminStatusDialog`          | 기본 탭 선택, 기간별 현황 레이아웃과 상태 분기        |
 | `ExamReviewAdminStatusPeriodDialog`    | 편집 다이얼로그 열림·닫힘, 미저장 변경 확인           |
-| `ExamReviewAdminStatusPeriodEditor`    | 기간 목록, 추가·인라인 수정·삭제, 입력 검증           |
+| `ExamReviewAdminStatusPeriodEditor`    | 기간 목록, 추가·수정 팝업과 삭제, 입력 검증           |
 | `ExamReviewProgressChart`              | 도넛과 요약 수치 표시                                 |
 | `ExamReviewAdminStatusList`            | 관리자 목록, 평균, 담당자 미상 표시                   |
 | `use-exam-review-admin-status-periods` | 기간 조회·추가·수정·삭제 Mutation과 Query 캐시 무효화 |

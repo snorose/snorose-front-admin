@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   LoaderCircleIcon,
@@ -9,7 +9,13 @@ import {
 import { toast } from 'sonner';
 
 import { DateTimePicker } from '@/shared/components';
-import { Button, ConfirmModal, Input, Label } from '@/shared/components/ui';
+import {
+  Button,
+  ConfirmModal,
+  Dialog,
+  Input,
+  Label,
+} from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import {
   formatDateTimeToMinutes,
@@ -106,7 +112,7 @@ function PeriodForm({
   };
 
   return (
-    <div className='bg-muted/40 flex flex-col gap-4 rounded-lg border p-4'>
+    <div className='flex min-w-0 flex-col gap-4'>
       <div className='flex flex-col gap-1'>
         <Label
           htmlFor={`admin-status-period-title-${period?.id ?? 'new'}`}
@@ -126,7 +132,7 @@ function PeriodForm({
 
       <fieldset
         disabled={isSubmitting}
-        className='grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-2'
+        className='grid min-w-0 gap-4 border-0 p-0 sm:grid-cols-2'
       >
         <DateTimePicker
           label='시작 일시'
@@ -203,17 +209,35 @@ export function ExamReviewAdminStatusPeriodEditor({
   onDirtyChange,
 }: ExamReviewAdminStatusPeriodEditorProps) {
   const [editor, setEditor] = useState<EditorState>(null);
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [isDiscardConfirmOpen, setIsDiscardConfirmOpen] = useState(false);
+  const editorTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [deleteTarget, setDeleteTarget] =
     useState<ExamReviewAdminStatusPeriod | null>(null);
 
   useEffect(() => {
-    if (!editor) onDirtyChange(false);
-  }, [editor, onDirtyChange]);
+    onDirtyChange(Boolean(editor) && isFormDirty);
+  }, [editor, isFormDirty, onDirtyChange]);
+
+  const closeEditor = () => {
+    setIsDiscardConfirmOpen(false);
+    setIsFormDirty(false);
+    setEditor(null);
+  };
+
+  const requestEditorClose = () => {
+    if (isSubmitting) return;
+    if (isFormDirty) {
+      setIsDiscardConfirmOpen(true);
+      return;
+    }
+    closeEditor();
+  };
 
   const handleCreate = async (input: ExamReviewAdminStatusPeriodInput) => {
     const createdPeriod = await onCreate(input);
     onSelectPeriod(createdPeriod.id);
-    setEditor(null);
+    closeEditor();
     toast.success('현황 집계 기간을 추가했습니다.');
   };
 
@@ -223,7 +247,7 @@ export function ExamReviewAdminStatusPeriodEditor({
   ) => {
     await onUpdate(periodId, input);
     onSelectPeriod(periodId);
-    setEditor(null);
+    closeEditor();
     toast.success('현황 집계 기간을 수정했습니다.');
   };
 
@@ -252,77 +276,54 @@ export function ExamReviewAdminStatusPeriodEditor({
         </div>
 
         <div className='divide-y'>
-          {periods.length === 0 && editor?.type !== 'create' && (
+          {periods.length === 0 && (
             <div className='text-muted-foreground px-4 py-10 text-center text-sm'>
               등록된 현황 집계 기간이 없습니다.
             </div>
           )}
 
-          {periods.map((period) =>
-            editor?.type === 'update' && editor.period.id === period.id ? (
-              <div key={period.id} className='p-3'>
-                <PeriodForm
-                  key={period.id}
-                  period={period}
-                  periods={periods}
-                  isSubmitting={isSubmitting}
-                  onSubmit={(input) => handleUpdate(period.id, input)}
-                  onCancel={() => setEditor(null)}
-                  onDirtyChange={onDirtyChange}
-                />
+          {periods.map((period) => (
+            <div
+              key={period.id}
+              className='grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_1fr_1fr_auto] md:items-center md:gap-4'
+            >
+              <strong className='truncate text-sm'>{period.title}</strong>
+              <div className='text-muted-foreground text-sm'>
+                <span className='mr-2 font-medium md:hidden'>시작</span>
+                {formatDateTimeToMinutes(period.startAt)}
               </div>
-            ) : (
-              <div
-                key={period.id}
-                className='grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_1fr_1fr_auto] md:items-center md:gap-4'
-              >
-                <strong className='truncate text-sm'>{period.title}</strong>
-                <div className='text-muted-foreground text-sm'>
-                  <span className='mr-2 font-medium md:hidden'>시작</span>
-                  {formatDateTimeToMinutes(period.startAt)}
-                </div>
-                <div className='text-muted-foreground text-sm'>
-                  <span className='mr-2 font-medium md:hidden'>종료</span>
-                  {formatDateTimeToMinutes(period.endAt)}
-                </div>
-                <div className='flex justify-end gap-1'>
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon-sm'
-                    aria-label={`${period.title} 수정`}
-                    onClick={() => setEditor({ type: 'update', period })}
-                    disabled={Boolean(editor) || isSubmitting}
-                  >
-                    <PencilIcon />
-                  </Button>
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon-sm'
-                    className='text-destructive hover:text-destructive'
-                    aria-label={`${period.title} 삭제`}
-                    onClick={() => setDeleteTarget(period)}
-                    disabled={Boolean(editor) || isSubmitting}
-                  >
-                    <Trash2Icon />
-                  </Button>
-                </div>
+              <div className='text-muted-foreground text-sm'>
+                <span className='mr-2 font-medium md:hidden'>종료</span>
+                {formatDateTimeToMinutes(period.endAt)}
               </div>
-            )
-          )}
-
-          {editor?.type === 'create' && (
-            <div className='p-3'>
-              <PeriodForm
-                periods={periods}
-                isSubmitting={isSubmitting}
-                onSubmit={handleCreate}
-                onCancel={() => setEditor(null)}
-                onDirtyChange={onDirtyChange}
-              />
+              <div className='flex justify-end gap-1'>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon-sm'
+                  aria-label={`${period.title} 수정`}
+                  onClick={(event) => {
+                    editorTriggerRef.current = event.currentTarget;
+                    setEditor({ type: 'update', period });
+                  }}
+                  disabled={Boolean(editor) || isSubmitting}
+                >
+                  <PencilIcon />
+                </Button>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon-sm'
+                  className='text-destructive hover:text-destructive'
+                  aria-label={`${period.title} 삭제`}
+                  onClick={() => setDeleteTarget(period)}
+                  disabled={Boolean(editor) || isSubmitting}
+                >
+                  <Trash2Icon />
+                </Button>
+              </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
 
@@ -330,12 +331,66 @@ export function ExamReviewAdminStatusPeriodEditor({
         type='button'
         variant='outline'
         className='self-start'
-        onClick={() => setEditor({ type: 'create' })}
+        onClick={(event) => {
+          editorTriggerRef.current = event.currentTarget;
+          setEditor({ type: 'create' });
+        }}
         disabled={Boolean(editor) || isSubmitting}
       >
         <PlusIcon />
         기간 추가
       </Button>
+
+      <Dialog
+        open={Boolean(editor)}
+        onOpenChange={(open) => {
+          if (!open) requestEditorClose();
+        }}
+      >
+        <Dialog.Content
+          className='max-h-[85vh] overflow-y-auto sm:max-w-2xl'
+          showCloseButton={!isSubmitting}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            editorTriggerRef.current?.focus();
+          }}
+        >
+          <Dialog.Header>
+            <Dialog.Title>
+              {editor?.type === 'update' ? '기간 수정' : '기간 추가'}
+            </Dialog.Title>
+            <Dialog.Description>
+              기간 이름과 시작·종료 일시를 설정해주세요.
+            </Dialog.Description>
+          </Dialog.Header>
+          {editor && (
+            <PeriodForm
+              key={editor.type === 'update' ? editor.period.id : 'new'}
+              period={editor.type === 'update' ? editor.period : undefined}
+              periods={periods}
+              isSubmitting={isSubmitting}
+              onSubmit={
+                editor.type === 'update'
+                  ? (input) => handleUpdate(editor.period.id, input)
+                  : handleCreate
+              }
+              onCancel={requestEditorClose}
+              onDirtyChange={setIsFormDirty}
+            />
+          )}
+          {isDiscardConfirmOpen && (
+            <ConfirmModal
+              isOpen
+              title='저장하지 않은 변경사항이 있습니다.'
+              description='입력한 내용을 저장하지 않고 닫으시겠습니까?'
+              confirmText='변경사항 버리기'
+              confirmVariant='destructive'
+              onConfirm={closeEditor}
+              onClose={() => setIsDiscardConfirmOpen(false)}
+            />
+          )}
+        </Dialog.Content>
+      </Dialog>
 
       {deleteTarget && (
         <ConfirmModal

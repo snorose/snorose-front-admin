@@ -10,7 +10,7 @@ import {
   resetMockExamReviewAdminStatusPeriods,
 } from '@/domains/Reviews/mocks';
 
-import { getExamReviewPeriodsAPI } from '@/apis';
+import { getExamReviewPeriodsAPI, patchExamReviewPeriodAPI } from '@/apis';
 
 import { ExamReviewAdminStatusDialog } from './ExamReviewAdminStatusDialog';
 import { ExamReviewAdminStatusPeriodDialog } from './ExamReviewAdminStatusPeriodDialog';
@@ -114,6 +114,9 @@ describe('ExamReviewAdminStatusDialog', () => {
       screen.queryByRole('dialog', { name: '담당 관리자 현황' })
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '기간 추가' }));
+    expect(
+      screen.getByRole('dialog', { name: '기간 추가' })
+    ).toBeInTheDocument();
     await user.type(screen.getByLabelText(/기간 이름/), '새로운 기간');
     await user.click(screen.getByRole('button', { name: '저장' }));
 
@@ -121,7 +124,7 @@ describe('ExamReviewAdminStatusDialog', () => {
       '기간 이름과 시작·종료 일시를 모두 입력해주세요.'
     );
 
-    await user.click(screen.getByRole('button', { name: '현황 보기' }));
+    await user.click(screen.getByRole('button', { name: '취소' }));
     const discardDialog = screen.getByRole('dialog', {
       name: '저장하지 않은 변경사항이 있습니다.',
     });
@@ -132,7 +135,45 @@ describe('ExamReviewAdminStatusDialog', () => {
     );
 
     expect(
+      screen.queryByRole('dialog', { name: '기간 추가' })
+    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: '기간 추가' })).toHaveFocus()
+    );
+    await user.click(screen.getByRole('button', { name: '현황 보기' }));
+
+    expect(
       screen.getByRole('dialog', { name: '담당 관리자 현황' })
+    ).toBeInTheDocument();
+  });
+
+  test('수정 팝업에 기존 값을 채우고 저장하면 목록으로 돌아온다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await screen.findByRole('tab', { name: '2026 여름학기' });
+    await user.click(screen.getByRole('button', { name: '기간 편집' }));
+    await user.click(
+      screen.getByRole('button', { name: '2026 여름학기 수정' })
+    );
+    const dialog = screen.getByRole('dialog', { name: '기간 수정' });
+    const title = within(dialog).getByLabelText(/기간 이름/);
+    expect(title).toHaveValue('2026 여름학기');
+    await user.clear(title);
+    await user.type(title, '변경한 기간');
+    await user.click(within(dialog).getByRole('button', { name: '저장' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: '기간 수정' })
+      ).not.toBeInTheDocument()
+    );
+    expect(patchExamReviewPeriodAPI).toHaveBeenCalledWith(expect.any(Number), {
+      type: 'ADMIN_EDIT',
+      title: '변경한 기간',
+      startAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
+      endAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/),
+    });
+    expect(
+      screen.getByRole('dialog', { name: '기간 편집' })
     ).toBeInTheDocument();
   });
 });
