@@ -1,6 +1,7 @@
 import { Coins, History } from 'lucide-react';
 
-import { Button } from '@/shared/components/ui';
+import { StatusBadge } from '@/shared/components';
+import { Button, Field } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -8,6 +9,7 @@ import { ReadonlyField } from '@/domains/MemberInfo/components/MemberInfoEditFor
 import {
   formatDisplayValue,
   formatPoint,
+  getRoleBadgeMeta,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type MemberDetailInfoGridProps = {
@@ -93,7 +95,16 @@ export default function MemberDetailInfoGrid({
         copyValue={member.encryptedUserId}
         onCopy={onCopy}
       />
-      <ReadonlyField label='회원 등급' value={roleLabel} />
+      <Field className='gap-0'>
+        <Field.Label required>회원 등급</Field.Label>
+        <Field.Content>
+          <div className='border-input bg-muted flex min-h-9 items-center rounded-md border px-3 py-1'>
+            <StatusBadge tone={getRoleBadgeMeta(member.userRoleId).tone}>
+              {roleLabel}
+            </StatusBadge>
+          </div>
+        </Field.Content>
+      </Field>
       <ReadonlyField label='이메일' value={formatDisplayValue(member.email)} />
     </div>
   );

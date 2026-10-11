@@ -2,11 +2,14 @@ import { type ReactNode, useId } from 'react';
 
 import { Copy } from 'lucide-react';
 
-import { DatePicker } from '@/shared/components';
+import { DatePicker, StatusBadge } from '@/shared/components';
 import { Button, Field, Input, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
-import { EMPTY_TEXT } from '@/domains/MemberInfo/utils/memberDirectory';
+import {
+  EMPTY_TEXT,
+  getRoleBadgeMeta,
+} from '@/domains/MemberInfo/utils/memberDirectory';
 import type { MemberEditFormValues } from '@/domains/MemberInfo/utils/validateMemberEditForm';
 
 export type EditableFieldItem = {
@@ -110,6 +113,7 @@ export function EditableRoleField({
   value: string;
 }) {
   const inputId = useId();
+  const roleBadge = getRoleBadgeMeta(Number(value));
   return (
     <Field className='gap-0'>
       <Field.Label htmlFor={inputId} required>
@@ -118,12 +122,18 @@ export function EditableRoleField({
       <Field.Content>
         <Select value={value} onValueChange={onChange}>
           <Select.Trigger id={inputId} className='w-full' aria-required='true'>
-            <Select.Value placeholder={currentLabel} />
+            <Select.Value placeholder={currentLabel}>
+              <StatusBadge tone={roleBadge.tone}>{roleBadge.label}</StatusBadge>
+            </Select.Value>
           </Select.Trigger>
           <Select.Content>
             {USER_ROLES.map((role) => (
-              <Select.Item key={role.id} value={String(role.id)}>
-                {role.name}
+              <Select.Item
+                key={role.id}
+                value={String(role.id)}
+                textValue={role.name}
+              >
+                <StatusBadge tone={role.tone}>{role.name}</StatusBadge>
               </Select.Item>
             ))}
           </Select.Content>
