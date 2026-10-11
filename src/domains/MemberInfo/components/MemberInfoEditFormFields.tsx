@@ -161,9 +161,7 @@ export function ReadonlyField({
 
   return (
     <Field className='gap-0'>
-      <Field.Label htmlFor={inputId} required>
-        {label}
-      </Field.Label>
+      <Field.Label htmlFor={inputId}>{label}</Field.Label>
       <Field.Content>
         <div className='flex items-center gap-2'>
           <Input id={inputId} value={value} readOnly className='bg-muted' />

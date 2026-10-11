@@ -96,7 +96,7 @@ export default function MemberDetailInfoGrid({
         onCopy={onCopy}
       />
       <Field className='gap-0'>
-        <Field.Label required>회원 등급</Field.Label>
+        <Field.Label>회원 등급</Field.Label>
         <Field.Content>
           <div className='border-input bg-muted flex min-h-9 items-center rounded-md border px-3 py-1'>
             <StatusBadge tone={getRoleBadgeMeta(member.userRoleId).tone}>
