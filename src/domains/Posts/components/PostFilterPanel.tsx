@@ -2,7 +2,11 @@ import { type KeyboardEvent, useId, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
-import { DatePicker, FilterMultiSelect } from '@/shared/components';
+import {
+  DatePicker,
+  FilterMultiSelect,
+  StatusBadge,
+} from '@/shared/components';
 import {
   Button,
   Checkbox,
@@ -247,6 +251,17 @@ export const PostFilterPanel = ({
                 label='관리 상태'
                 value={filters.adminCommonStatuses ?? []}
                 options={STATUS_OPTIONS}
+                renderOption={(option) => (
+                  <StatusBadge
+                    tone={
+                      STATUS_OPTIONS.find(
+                        (status) => status.value === option.value
+                      )?.tone ?? 'neutral'
+                    }
+                  >
+                    {option.label}
+                  </StatusBadge>
+                )}
                 onValueChange={(statuses) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -286,7 +301,7 @@ export const PostFilterPanel = ({
             </div>
           </div>
         </div>
-        <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
+        <div className='flex flex-col gap-3 @md:flex-row @md:items-center'>
           {/* 공지만 보기 */}
           <div className='flex min-h-9 w-fit items-center gap-2'>
             <Checkbox

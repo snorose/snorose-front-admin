@@ -1,3 +1,5 @@
+import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
+
 // memberInfo
 /**
  *  userRoleId 숫자를 Enum으로 반환
@@ -6,16 +8,10 @@
  */
 
 export const convertUserRoleIdToEnum = (userRoleId: number): string => {
-  const userRoleIdMap: Record<number, string> = {
-    1: '준회원',
-    2: '정회원',
-    4: '리자',
-    5: '공식',
-    6: '강등자',
-    7: '광고주',
-  };
-
-  return userRoleIdMap[userRoleId] ?? String(userRoleId);
+  return (
+    USER_ROLES.find((role) => role.id === userRoleId)?.name ??
+    String(userRoleId)
+  );
 };
 
 export const convertBlacklistTypeToLabel = (

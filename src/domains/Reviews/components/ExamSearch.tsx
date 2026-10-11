@@ -634,7 +634,7 @@ export default function ExamSearch({
             </div>
           </div>
         </div>
-        <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
+        <div className='flex flex-col gap-3 @md:flex-row @md:items-center'>
           <div className='flex min-h-9 w-fit items-center gap-2'>
             <Checkbox
               id={`${dateId}-reported`}

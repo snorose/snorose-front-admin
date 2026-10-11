@@ -9,13 +9,13 @@ export const EXAM_CONFIRM_STATUS = [
 
 // 시험후기 게시글 처리 상태 리스트
 export const EXAM_REVIEW_PROCESS_STATUS = [
-  { code: 'VISIBLE', label: '노출' },
-  { code: 'USER_DELETED', label: '유저 삭제' },
-  { code: 'ADMIN_DELETED', label: '어드민 삭제' },
-  { code: 'ADMIN_HIDDEN', label: '어드민 비공개' },
-  { code: 'AUTO_HIDDEN', label: '비공개 (신고 5개 이상)' },
-  { code: 'SANCTIONED', label: '징계' },
-  { code: 'DESANCTIONED', label: '징계 없음' },
+  { code: 'VISIBLE', label: '노출', tone: 'success' },
+  { code: 'USER_DELETED', label: '유저 삭제', tone: 'danger' },
+  { code: 'ADMIN_DELETED', label: '어드민 삭제', tone: 'danger' },
+  { code: 'ADMIN_HIDDEN', label: '어드민 비공개', tone: 'warning' },
+  { code: 'AUTO_HIDDEN', label: '비공개 (신고 5개 이상)', tone: 'warning' },
+  { code: 'SANCTIONED', label: '징계', tone: 'accent' },
+  { code: 'DESANCTIONED', label: '징계 없음', tone: 'success' },
 ] as const;
 
 // 수강 학기 자동 생성 함수 (2007년 ~ 현재년도)

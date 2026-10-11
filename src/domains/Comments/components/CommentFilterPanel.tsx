@@ -2,7 +2,11 @@ import { type KeyboardEvent, useId, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
-import { DatePicker, FilterMultiSelect } from '@/shared/components';
+import {
+  DatePicker,
+  FilterMultiSelect,
+  StatusBadge,
+} from '@/shared/components';
 import {
   Button,
   Input,
@@ -237,6 +241,17 @@ export const CommentFilterPanel = ({
                 label='관리 상태'
                 value={filters.adminCommonStatuses ?? []}
                 options={STATUS_OPTIONS}
+                renderOption={(option) => (
+                  <StatusBadge
+                    tone={
+                      STATUS_OPTIONS.find(
+                        (status) => status.value === option.value
+                      )?.tone ?? 'neutral'
+                    }
+                  >
+                    {option.label}
+                  </StatusBadge>
+                )}
                 onValueChange={(statuses) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -276,7 +291,7 @@ export const CommentFilterPanel = ({
             </div>
           </div>
         </div>
-        <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
+        <div className='flex flex-col gap-3 @md:flex-row @md:items-center'>
           <div className='flex gap-2 @md:ml-auto'>
             <Button
               type='button'

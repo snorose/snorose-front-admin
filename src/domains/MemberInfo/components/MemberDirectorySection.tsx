@@ -139,6 +139,15 @@ export default function MemberDirectorySection({
                 value={selectedRole}
                 placeholder='전체'
                 options={roleOptions}
+                renderOption={(option) =>
+                  option.value === 'ALL' ? (
+                    option.label
+                  ) : (
+                    <StatusBadge tone={option.tone ?? 'neutral'}>
+                      {option.label}
+                    </StatusBadge>
+                  )
+                }
                 onValueChange={onSelectedRoleChange}
                 isActive={selectedRole !== 'ALL'}
               />
@@ -164,7 +173,7 @@ export default function MemberDirectorySection({
               />
             </div>
           </div>
-          <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
+          <div className='flex flex-col gap-3 @md:flex-row @md:items-center'>
             <div className='flex gap-2 @md:ml-auto'>
               <Button
                 type='button'

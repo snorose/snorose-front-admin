@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { type ReactNode, useId, useState } from 'react';
 
 import { Check, ChevronsUpDown, Search } from 'lucide-react';
 
@@ -13,6 +13,7 @@ type SearchableSelectProps = {
   options: DirectoryFilterOption[];
   placeholder: string;
   value: string;
+  renderOption?: (option: DirectoryFilterOption) => ReactNode;
   includeAllOption?: boolean;
   isActive?: boolean;
 };
@@ -23,6 +24,7 @@ export default function SearchableSelect({
   options,
   placeholder,
   value,
+  renderOption,
   includeAllOption = true,
   isActive = false,
 }: SearchableSelectProps) {
@@ -42,9 +44,8 @@ export default function SearchableSelect({
       )
     : allOptions;
 
-  const selectedLabel = allOptions.find(
-    (option) => option.value === value
-  )?.label;
+  const selectedOption = allOptions.find((option) => option.value === value);
+  const selectedLabel = selectedOption?.label;
   const hasSelection = Boolean(selectedLabel) && value !== 'ALL';
 
   const handleOpenChange = (next: boolean) => {
@@ -74,11 +75,15 @@ export default function SearchableSelect({
           >
             <span
               className={cn(
-                'truncate',
+                'min-w-0 truncate',
                 hasSelection ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
-              {hasSelection ? selectedLabel : placeholder}
+              {hasSelection && selectedOption
+                ? renderOption
+                  ? renderOption(selectedOption)
+                  : selectedLabel
+                : placeholder}
             </span>
             <ChevronsUpDown className='text-muted-foreground ml-2 h-4 w-4 shrink-0' />
           </button>
@@ -130,7 +135,9 @@ export default function SearchableSelect({
                         : 'text-foreground'
                     )}
                   >
-                    <span className='truncate'>{option.label}</span>
+                    <span className='min-w-0 truncate'>
+                      {renderOption ? renderOption(option) : option.label}
+                    </span>
                     {option.value === value && (
                       <Check className='text-primary ml-2 h-4 w-4 shrink-0' />
                     )}
