@@ -276,7 +276,7 @@ export const CommentFilterPanel = ({
             </div>
           </div>
         </div>
-        <div className='flex flex-col gap-3 pt-4 @md:flex-row @md:items-center'>
+        <div className='flex flex-col gap-3 @md:flex-row @md:items-center'>
           <div className='flex gap-2 @md:ml-auto'>
             <Button
               type='button'
