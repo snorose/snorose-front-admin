@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { ChevronDown } from 'lucide-react';
 
@@ -8,6 +8,7 @@ interface FilterMultiSelectProps<T extends string | number> {
   label: string;
   value: readonly T[];
   options: readonly { value: T; label: string }[];
+  renderOption?: (option: { value: T; label: string }) => ReactNode;
   onValueChange: (value: T[]) => void;
   disabled?: boolean;
 }
@@ -16,17 +17,21 @@ export function FilterMultiSelect<T extends string | number>({
   label,
   value,
   options,
+  renderOption,
   onValueChange,
   disabled = false,
 }: FilterMultiSelectProps<T>) {
   const id = useId();
   const isDisabled = disabled || options.length === 0;
+  const selectedOption =
+    value.length === 1
+      ? options.find((option) => option.value === value[0])
+      : undefined;
   const summary =
     value.length === 0
       ? '전체'
       : value.length === 1
-        ? (options.find((option) => option.value === value[0])?.label ??
-          String(value[0]))
+        ? (selectedOption?.label ?? String(value[0]))
         : `${label} ${value.length}개`;
 
   return (
@@ -45,8 +50,10 @@ export function FilterMultiSelect<T extends string | number>({
             disabled={isDisabled}
             className='border-input h-9 w-full justify-between bg-transparent px-3 font-normal shadow-none'
           >
-            <span id={`${id}-summary`} className='truncate'>
-              {summary}
+            <span id={`${id}-summary`} className='min-w-0 truncate'>
+              {selectedOption && renderOption
+                ? renderOption(selectedOption)
+                : summary}
             </span>
             <ChevronDown aria-hidden='true' className='size-4 opacity-50' />
           </Button>
@@ -68,6 +75,7 @@ export function FilterMultiSelect<T extends string | number>({
           {options.map((option) => (
             <DropdownMenu.CheckboxItem
               key={option.value}
+              textValue={option.label}
               checked={value.includes(option.value)}
               onSelect={(event) => event.preventDefault()}
               onCheckedChange={(checked) =>
@@ -78,7 +86,11 @@ export function FilterMultiSelect<T extends string | number>({
                 )
               }
             >
-              <span className='truncate'>{option.label}</span>
+              {renderOption ? (
+                renderOption(option)
+              ) : (
+                <span className='truncate'>{option.label}</span>
+              )}
             </DropdownMenu.CheckboxItem>
           ))}
         </DropdownMenu.Content>

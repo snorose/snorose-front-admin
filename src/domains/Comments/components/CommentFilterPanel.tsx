@@ -2,7 +2,11 @@ import { type KeyboardEvent, useId, useState } from 'react';
 
 import { Search } from 'lucide-react';
 
-import { DatePicker, FilterMultiSelect } from '@/shared/components';
+import {
+  DatePicker,
+  FilterMultiSelect,
+  StatusBadge,
+} from '@/shared/components';
 import {
   Button,
   Input,
@@ -237,6 +241,17 @@ export const CommentFilterPanel = ({
                 label='관리 상태'
                 value={filters.adminCommonStatuses ?? []}
                 options={STATUS_OPTIONS}
+                renderOption={(option) => (
+                  <StatusBadge
+                    tone={
+                      STATUS_OPTIONS.find(
+                        (status) => status.value === option.value
+                      )?.tone ?? 'neutral'
+                    }
+                  >
+                    {option.label}
+                  </StatusBadge>
+                )}
                 onValueChange={(statuses) =>
                   setFilters((prev) => ({
                     ...prev,
