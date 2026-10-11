@@ -139,7 +139,7 @@ export default function MemberPenaltySummaryCard({
           ) : null}
 
           {isDemotion && latestPayloadIsWarning && !ongoingDemotion ? (
-            <p className='rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600'>
+            <p className='rounded-md bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600'>
               강등 상세 정보는 제재 이력에서 확인할 수 있습니다.
             </p>
           ) : null}
@@ -161,7 +161,7 @@ export default function MemberPenaltySummaryCard({
           </div>
 
           <div
-            className={`rounded-2xl px-4 py-5 text-sm font-medium ${penaltyStatus.summaryTone}`}
+            className={`rounded-md px-4 py-5 text-sm font-medium ${penaltyStatus.summaryTone}`}
           >
             {penaltyStatus.summary}
           </div>
