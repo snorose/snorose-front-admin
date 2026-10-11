@@ -53,7 +53,7 @@ export function FilterMultiSelect<T extends string | number>({
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           align='start'
-          className='w-[var(--radix-dropdown-menu-trigger-width)] max-w-[calc(100vw-2rem)] min-w-40'
+          className='max-h-[min(15rem,var(--radix-dropdown-menu-content-available-height))] w-[var(--radix-dropdown-menu-trigger-width)] max-w-[calc(100vw-2rem)] min-w-40'
         >
           <DropdownMenu.Item
             disabled={value.length === 0}

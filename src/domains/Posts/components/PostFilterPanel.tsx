@@ -229,7 +229,10 @@ export const PostFilterPanel = ({
                 >
                   <Select.Value />
                 </Select.Trigger>
-                <Select.Content align='start'>
+                <Select.Content
+                  align='start'
+                  className='max-h-[min(15rem,var(--radix-select-content-available-height))]'
+                >
                   <Select.Item value='ALL'>전체</Select.Item>
                   {BOARD_OPTIONS.map((option) => (
                     <Select.Item
