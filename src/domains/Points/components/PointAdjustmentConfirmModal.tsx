@@ -53,12 +53,16 @@ export function PointAdjustmentConfirmModal({
         <div className='flex flex-col gap-3 py-4'>
           {CONFIRMATION_DATA.map((data) => (
             <div className='flex items-center gap-2' key={data.label}>
-              <span className='text-sm font-semibold'>{data.label}:</span>
+              <span className='text-sm font-semibold text-gray-700'>
+                {data.label}:
+              </span>
               <span className='text-sm'>{data.value}</span>
             </div>
           ))}
           <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold'>포인트 지급/차감량:</span>
+            <span className='text-sm font-semibold text-gray-700'>
+              포인트 지급/차감량:
+            </span>
             <span
               className={cn(
                 'text-sm',
@@ -71,7 +75,9 @@ export function PointAdjustmentConfirmModal({
           </div>
           {memo && (
             <div className='flex items-start gap-2'>
-              <span className='flex-shrink-0 text-sm font-semibold'>메모:</span>
+              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
+                메모:
+              </span>
               <span className='text-sm break-keep'>{memo}</span>
             </div>
           )}

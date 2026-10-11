@@ -137,7 +137,7 @@ export const PostFilterPanel = ({
             </div>
             {/* 작성 시작일 / 작성 종료일 */}
             <fieldset className='min-w-0 @md:col-span-2 @5xl:col-span-1'>
-              <legend className='mb-1 py-1 text-sm leading-none font-semibold'>
+              <legend className='mb-1 py-1 text-sm leading-none font-semibold text-gray-700'>
                 작성 기간
               </legend>
               <div className='flex min-w-0 items-center gap-1'>

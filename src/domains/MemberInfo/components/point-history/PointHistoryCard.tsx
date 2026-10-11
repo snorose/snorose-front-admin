@@ -109,7 +109,7 @@ export default function PointHistoryCard({
           </Info>
 
           <div className='col-span-2 space-y-2'>
-            <dt className='text-sm font-medium text-zinc-500'>{detailLabel}</dt>
+            <dt className='text-sm font-medium text-gray-700'>{detailLabel}</dt>
             <dd className='rounded-xl bg-[#ecebf0] px-4 py-3 text-base break-words whitespace-pre-wrap text-zinc-950'>
               {history.sourceDetail ?? '-'}
             </dd>
@@ -123,7 +123,7 @@ export default function PointHistoryCard({
 function Info({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className='min-w-0 space-y-2'>
-      <dt className='text-sm font-medium text-zinc-500'>{label}</dt>
+      <dt className='text-sm font-medium text-gray-700'>{label}</dt>
       <dd className='text-base font-medium break-words text-zinc-950'>
         {children}
       </dd>

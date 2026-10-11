@@ -49,19 +49,19 @@ export function ReportHistoryCard({
               className='flex flex-col gap-1.5 border-b border-gray-50 pb-3 last:border-none last:pb-0'
             >
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>신고자</span>
+                <span className='font-medium text-gray-700'>신고자</span>
                 <span className='font-semibold text-gray-700'>
                   {item.reporterNickname}
                 </span>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>날짜</span>
+                <span className='font-medium text-gray-700'>날짜</span>
                 <span className='font-mono text-gray-600'>
                   {formatDateTimeWithAmPm(item.reportedAt)}
                 </span>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>사유</span>
+                <span className='font-medium text-gray-700'>사유</span>
                 <span className='font-semibold text-red-600'>
                   {item.reason}
                 </span>

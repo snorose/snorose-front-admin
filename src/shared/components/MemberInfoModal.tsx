@@ -32,31 +32,31 @@ export default function MemberInfoModal({
         </Dialog.Header>
         {memberInfo && (
           <div className='grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 py-2 text-sm'>
-            <span className='text-gray-500'>이름</span>
+            <span className='text-gray-700'>이름</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.userName}
             </span>
-            <span className='text-gray-500'>아이디</span>
+            <span className='text-gray-700'>아이디</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.loginId}
             </span>
-            <span className='text-gray-500'>학번</span>
+            <span className='text-gray-700'>학번</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.studentNumber}
             </span>
-            <span className='text-gray-500'>닉네임</span>
+            <span className='text-gray-700'>닉네임</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.nickname}
             </span>
-            <span className='text-gray-500'>포인트</span>
+            <span className='text-gray-700'>포인트</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.pointBalance.toLocaleString()}P
             </span>
-            <span className='text-gray-500'>경고 이력</span>
+            <span className='text-gray-700'>경고 이력</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.totalWarningCount}회
             </span>
-            <span className='text-gray-500'>강등 이력</span>
+            <span className='text-gray-700'>강등 이력</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.isBlacklist
                 ? (memberInfo.blacklistType ?? '강등 중')

@@ -63,7 +63,7 @@ export function EditableField({
       <label
         htmlFor={inputId}
         className={`flex items-center gap-2 text-sm font-medium ${
-          error ? 'text-destructive' : 'text-slate-500'
+          error ? 'text-destructive' : 'text-gray-700'
         }`}
       >
         <Icon className='h-4 w-4' />
@@ -118,10 +118,7 @@ export function EditableRoleField({
   const inputId = useId();
   return (
     <div className='space-y-2'>
-      <Label
-        htmlFor={inputId}
-        className='gap-2 py-0 font-medium text-slate-500'
-      >
+      <Label htmlFor={inputId} className='gap-2 py-0 font-medium'>
         <UserRound className='h-4 w-4' />
         회원 등급
       </Label>
@@ -158,7 +155,7 @@ export function ReadonlyField({
 
   return (
     <div className='space-y-2'>
-      <div className='flex items-center gap-2 text-sm font-medium text-slate-500'>
+      <div className='flex items-center gap-2 text-sm font-medium text-gray-700'>
         <Icon className='h-4 w-4' />
         {label}
       </div>

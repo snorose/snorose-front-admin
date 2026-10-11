@@ -34,7 +34,9 @@ export function AllMemberPointAdjustmentConfirmModal({
         </Dialog.Header>
         <div className='flex flex-col gap-3 py-4'>
           <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold'>포인트 유형:</span>
+            <span className='text-sm font-semibold text-gray-700'>
+              포인트 유형:
+            </span>
             <span className='text-sm'>
               {selectedCategory
                 ? (POINT_CATEGORY_OPTIONS.find(
@@ -44,7 +46,9 @@ export function AllMemberPointAdjustmentConfirmModal({
             </span>
           </div>
           <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold'>포인트 지급/차감량:</span>
+            <span className='text-sm font-semibold text-gray-700'>
+              포인트 지급/차감량:
+            </span>
             <span
               className={cn(
                 'text-sm',
@@ -57,7 +61,9 @@ export function AllMemberPointAdjustmentConfirmModal({
           </div>
           {memo && (
             <div className='flex items-start gap-2'>
-              <span className='flex-shrink-0 text-sm font-semibold'>메모:</span>
+              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
+                메모:
+              </span>
               <span className='text-sm break-keep'>{memo}</span>
             </div>
           )}

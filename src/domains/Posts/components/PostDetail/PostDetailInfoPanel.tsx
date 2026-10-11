@@ -64,14 +64,14 @@ export default function PostDetailInfoPanel({
         {/* 좌측 열 */}
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-1'>
-            <span className='font-medium text-gray-400'>게시일자</span>
+            <span className='font-medium text-gray-700'>게시일자</span>
             <div className='flex flex-col font-mono text-[12px] leading-tight text-gray-800'>
               <span>{formatDateTimeWithAmPm(post.createdAt)}</span>
             </div>
           </div>
 
           <div className='flex flex-col gap-1'>
-            <span className='font-medium text-gray-400'>카테고리</span>
+            <span className='font-medium text-gray-700'>카테고리</span>
             <div>
               {post.category ? (
                 <StatusBadge tone='outline'>{post.category}</StatusBadge>
@@ -82,7 +82,7 @@ export default function PostDetailInfoPanel({
           </div>
 
           <div className='flex flex-col gap-1'>
-            <span className='font-medium text-gray-400'>게시글 상태</span>
+            <span className='font-medium text-gray-700'>게시글 상태</span>
             <div className='flex flex-wrap items-center gap-1.5'>
               {getPostStatusBadges(post).map((badge, idx) => (
                 <StatusBadge key={idx} tone={badge.tone}>
@@ -97,14 +97,14 @@ export default function PostDetailInfoPanel({
         {/* 우측 열 */}
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-1'>
-            <span className='font-medium text-gray-400'>게시판</span>
+            <span className='font-medium text-gray-700'>게시판</span>
             <div>
               <StatusBadge tone='outline'>{post.boardName}</StatusBadge>
             </div>
           </div>
 
           <div className='relative flex flex-col gap-1'>
-            <span className='font-medium text-gray-400'>작성자</span>
+            <span className='font-medium text-gray-700'>작성자</span>
             <div>
               <MemberInfoPopover
                 encryptedUserId={post.encryptedUserId}
@@ -126,14 +126,14 @@ export default function PostDetailInfoPanel({
       {/* 3. 제목 & 내용 */}
       <div className='flex flex-col gap-4 border-b border-gray-100 pb-5'>
         <div className='flex flex-col gap-1'>
-          <span className='text-xs font-semibold tracking-wider text-gray-400 uppercase'>
+          <span className='text-xs font-semibold tracking-wider text-gray-700 uppercase'>
             제목
           </span>
           <h1 className='text-lg font-bold text-gray-900'>{post.title}</h1>
         </div>
 
         <div className='flex flex-col gap-1'>
-          <span className='text-xs font-semibold tracking-wider text-gray-400 uppercase'>
+          <span className='text-xs font-semibold tracking-wider text-gray-700 uppercase'>
             내용
           </span>
           <div className='text-sm leading-relaxed whitespace-pre-wrap text-gray-800 select-text'>

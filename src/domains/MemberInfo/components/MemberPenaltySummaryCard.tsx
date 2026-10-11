@@ -87,7 +87,7 @@ export default function MemberPenaltySummaryCard({
       >
         <div className='space-y-6'>
           <div className='space-y-3'>
-            <p className='text-sm font-medium text-slate-500'>현재 상태</p>
+            <p className='text-sm font-medium text-gray-700'>현재 상태</p>
             <div className='flex flex-wrap items-center gap-2'>
               <StatusBadge tone={penaltyStatus.tone}>
                 {penaltyStatus.label}
@@ -145,7 +145,7 @@ export default function MemberPenaltySummaryCard({
           ) : null}
 
           <div className='space-y-2'>
-            <p className='text-sm font-medium text-slate-500'>누적 경고 수</p>
+            <p className='text-sm font-medium text-gray-700'>누적 경고 수</p>
             <p
               className={`text-3xl font-bold ${
                 member.totalWarningCount > 0
