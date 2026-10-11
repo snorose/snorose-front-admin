@@ -29,6 +29,7 @@ import {
 
 import { ExamConfirmStatusBadge } from './ExamConfirmStatusBadge';
 import { ExamDiscussionStatusBadge } from './ExamDiscussionStatusBadge';
+import { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
 
 interface ExamSearchProps {
   onSearchChange: (params: ExamReviewSearchParams) => void;
@@ -53,6 +54,7 @@ const UNCONFIRMED_SELECTED = 'UNCONFIRMED';
 const PROCESS_STATUS_OPTIONS = EXAM_REVIEW_PROCESS_STATUS.map((status) => ({
   value: status.label,
   label: status.label,
+  content: <ExamReviewProcessStatusBadge status={status.code} />,
 }));
 
 const isDefined = <T,>(value: T | undefined): value is T => value !== undefined;

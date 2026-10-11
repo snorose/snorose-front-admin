@@ -29,10 +29,13 @@ export function ExamReviewProcessStatusBadge({
   const label = getExamReviewProcessStatusLabel(status);
 
   return (
-    <div className={cn('flex items-center', className)} title={label}>
+    <span
+      className={cn('inline-flex min-w-0 items-center', className)}
+      title={label}
+    >
       <StatusBadge tone={PROCESS_STATUS_BADGE_TONES[status]}>
         {label}
       </StatusBadge>
-    </div>
+    </span>
   );
 }

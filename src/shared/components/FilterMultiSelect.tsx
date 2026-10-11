@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { ChevronDown } from 'lucide-react';
 
@@ -7,7 +7,7 @@ import { Button, DropdownMenu, Label } from '@/shared/components/ui';
 interface FilterMultiSelectProps<T extends string | number> {
   label: string;
   value: readonly T[];
-  options: readonly { value: T; label: string }[];
+  options: readonly { value: T; label: string; content?: ReactNode }[];
   onValueChange: (value: T[]) => void;
   disabled?: boolean;
 }
@@ -21,12 +21,12 @@ export function FilterMultiSelect<T extends string | number>({
 }: FilterMultiSelectProps<T>) {
   const id = useId();
   const isDisabled = disabled || options.length === 0;
+  const selectedOption = options.find((option) => option.value === value[0]);
   const summary =
     value.length === 0
       ? '전체'
       : value.length === 1
-        ? (options.find((option) => option.value === value[0])?.label ??
-          String(value[0]))
+        ? (selectedOption?.content ?? selectedOption?.label ?? String(value[0]))
         : `${label} ${value.length}개`;
 
   return (
@@ -48,7 +48,10 @@ export function FilterMultiSelect<T extends string | number>({
             <span id={`${id}-summary`} className='truncate'>
               {summary}
             </span>
-            <ChevronDown aria-hidden='true' className='size-4 opacity-50' />
+            <ChevronDown
+              aria-hidden='true'
+              className='size-4 shrink-0 opacity-50'
+            />
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
@@ -68,6 +71,7 @@ export function FilterMultiSelect<T extends string | number>({
           {options.map((option) => (
             <DropdownMenu.CheckboxItem
               key={option.value}
+              textValue={option.label}
               checked={value.includes(option.value)}
               onSelect={(event) => event.preventDefault()}
               onCheckedChange={(checked) =>
@@ -78,7 +82,9 @@ export function FilterMultiSelect<T extends string | number>({
                 )
               }
             >
-              <span className='truncate'>{option.label}</span>
+              <span className='min-w-0 truncate'>
+                {option.content ?? option.label}
+              </span>
             </DropdownMenu.CheckboxItem>
           ))}
         </DropdownMenu.Content>

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -15,6 +15,40 @@ beforeAll(() => {
 beforeEach(() => vi.clearAllMocks());
 
 describe('시험후기 날짜 검색', () => {
+  test('관리 상태의 목록과 단일 선택에 배지를 표시하고 다중 선택은 상태 코드로 검색한다', async () => {
+    const user = userEvent.setup();
+    const onSearchChange = vi.fn();
+    render(
+      <ExamSearch onSearchChange={onSearchChange} initialStatuses='VISIBLE' />
+    );
+    const trigger = screen.getByRole('button', { name: '관리 상태' });
+    expect(within(trigger).getByText('노출')).toHaveClass('bg-emerald-50');
+    await user.click(trigger);
+    const visible = screen.getByRole('menuitemcheckbox', { name: '노출' });
+    const hidden = screen.getByRole('menuitemcheckbox', {
+      name: '어드민 비공개',
+    });
+    expect(visible).toBeChecked();
+    expect(within(visible).getByText('노출')).toHaveClass('bg-emerald-50');
+    expect(within(hidden).getByText('어드민 비공개')).toHaveClass(
+      'bg-amber-50'
+    );
+    await user.click(hidden);
+    expect(trigger).toHaveTextContent('관리 상태 2개');
+    expect(onSearchChange).not.toHaveBeenCalled();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onSearchChange).toHaveBeenLastCalledWith({
+      statuses: 'VISIBLE,ADMIN_HIDDEN',
+    });
+    await user.click(trigger);
+    await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
+    await user.keyboard('{Escape}');
+    expect(trigger).toHaveTextContent('전체');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    expect(onSearchChange).toHaveBeenLastCalledWith({});
+  });
+
   test('초기 날짜를 표시하고 검색 버튼을 누를 때 기존 문자열과 필터를 전달한다', async () => {
     const user = userEvent.setup();
     const onSearchChange = vi.fn();
