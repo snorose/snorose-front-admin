@@ -102,7 +102,7 @@ export function ExamReviewAdminStatusDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className='@container max-h-[85vh] overflow-y-auto sm:w-[80vw] sm:max-w-[960px]'>
-        <Dialog.Header className='pr-8'>
+        <Dialog.Header className='pr-8 text-left'>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
             <div className='flex flex-col gap-2'>
               <div className='flex flex-wrap items-center gap-2'>
