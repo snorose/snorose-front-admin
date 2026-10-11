@@ -26,6 +26,7 @@ export const INQUIRY_SUB_GROUP_BADGE_META: Record<
   EVENT_INQUIRY: { label: '이벤트 관련 문의', tone: 'info' },
   NOTICE_INQUIRY: { label: '공지 관련 문의', tone: 'info' },
   ETC_INQUIRY: { label: '기타', tone: 'info' },
+  ETC: { label: '기타', tone: 'neutral' },
   POST_REPORT: { label: '게시글 신고', tone: 'danger' },
   EXAM_REVIEW_REPORT: { label: '족보 신고', tone: 'danger' },
   COMMENT_REPORT: { label: '댓글 신고', tone: 'danger' },

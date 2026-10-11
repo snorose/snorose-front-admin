@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { X } from 'lucide-react';
+import { Copy, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { PaginationBar, TableStateRow } from '@/shared/components';
-import { Select, Table } from '@/shared/components/ui';
+import { Button, Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
   InquiryStatus,
@@ -99,7 +100,9 @@ export default function InquiryReportTable({
     return (data ?? []).filter((inquiry) => {
       return (
         (groupFilter === 'ALL' || inquiry.group === groupFilter) &&
-        (subGroupFilter === 'ALL' || inquiry.subGroup === subGroupFilter) &&
+        (subGroupFilter === 'ALL' ||
+          inquiry.subGroup === subGroupFilter ||
+          (subGroupFilter === 'ETC_INQUIRY' && inquiry.subGroup === 'ETC')) &&
         (statusFilter === 'ALL' || inquiry.status === statusFilter)
       );
     });
@@ -127,6 +130,15 @@ export default function InquiryReportTable({
     subGroupFilter !== 'ALL',
     statusFilter !== 'ALL',
   ].filter(Boolean).length;
+
+  const handleCopyPostId = async (postId: number) => {
+    try {
+      await navigator.clipboard.writeText(String(postId));
+      toast.success('postId가 복사되었습니다.');
+    } catch {
+      toast.error('postId 복사에 실패했습니다.');
+    }
+  };
 
   return (
     <div className='flex flex-col gap-3'>
@@ -255,7 +267,7 @@ export default function InquiryReportTable({
       <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
-            className={`w-full ${isDetailOpen ? 'min-w-[560px]' : 'min-w-[1040px]'} table-fixed text-[13px]`}
+            className={`w-full ${isDetailOpen ? 'min-w-[688px]' : 'min-w-[1168px]'} table-fixed text-[13px]`}
           >
             <Table.Header className='h-[42px] border-b border-gray-200 bg-gray-50 font-semibold text-gray-700'>
               <Table.Row>
@@ -264,6 +276,12 @@ export default function InquiryReportTable({
                   className='px-3 text-center'
                 >
                   번호
+                </Table.Head>
+                <Table.Head
+                  style={{ width: '128px' }}
+                  className='px-3 text-center'
+                >
+                  postId
                 </Table.Head>
                 <Table.Head
                   style={{ width: '88px' }}
@@ -300,13 +318,13 @@ export default function InquiryReportTable({
               {isLoading ? (
                 <TableStateRow
                   state='loading'
-                  colSpan={isDetailOpen ? 5 : 7}
+                  colSpan={isDetailOpen ? 6 : 8}
                   message='문의 및 신고 목록을 불러오는 중입니다.'
                 />
               ) : isEmpty ? (
                 <TableStateRow
                   state='empty'
-                  colSpan={isDetailOpen ? 5 : 7}
+                  colSpan={isDetailOpen ? 6 : 8}
                   message={
                     activeFilterCount > 0
                       ? '필터 조건에 해당하는 항목이 없습니다.'
@@ -335,6 +353,25 @@ export default function InquiryReportTable({
                     >
                       <Table.Cell className='px-3 text-center text-gray-600'>
                         {pageStartNumber + index + 1}
+                      </Table.Cell>
+                      <Table.Cell className='px-3 text-center font-mono text-gray-600'>
+                        <div className='flex items-center justify-center gap-1'>
+                          <span>{inquiry.postId}</span>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='icon-sm'
+                            className='size-6'
+                            aria-label={`postId ${inquiry.postId} 복사`}
+                            title='postId 복사'
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              void handleCopyPostId(inquiry.postId);
+                            }}
+                          >
+                            <Copy aria-hidden='true' />
+                          </Button>
+                        </div>
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
                         <div className='flex justify-center'>
