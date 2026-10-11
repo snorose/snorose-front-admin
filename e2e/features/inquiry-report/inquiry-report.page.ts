@@ -23,7 +23,7 @@ export class InquiryReportPage {
 
   get detailPanel() {
     return this.page
-      .getByRole('button', { name: '닫기' })
+      .getByRole('button', { name: '문의·신고 상세 닫기', exact: true })
       .locator('xpath=ancestor::div[contains(@class,"overflow-y-auto")][1]');
   }
 
@@ -69,7 +69,9 @@ export class InquiryReportPage {
   }
 
   async closeDetail() {
-    await this.page.getByRole('button', { name: '닫기' }).click();
+    await this.page
+      .getByRole('button', { name: '문의·신고 상세 닫기', exact: true })
+      .click();
   }
 
   async openPopup(link: Locator) {

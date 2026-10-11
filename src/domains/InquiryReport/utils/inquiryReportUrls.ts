@@ -1,59 +1,54 @@
+import { PATHS } from '@/shared/constants';
 import type { InquiryDetail } from '@/shared/types';
-import { getBoardKey } from '@/shared/utils';
 
-// 문의/신고 글 위치
-const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL;
-const USER_FRONT_BOARD_BASE_URL = 'https://front.dev.snorose.com/board';
+import {
+  buildCommentDetailUrl,
+  parseCommentId,
+} from '@/domains/Comments/utils/commentUrls';
+
 const EXAM_REVIEW_BOARD_ID = 32;
 
-// 신고 여부는 group으로만 판단 (category/subGroup은 문의·신고 공용이라 제외)
-export function isReportInquiry(detail: InquiryDetail): boolean {
-  return detail.group === 'REPORT';
+// 문의·신고의 원문은 스노로즈 사용자 사이트에서 연다.
+export function buildOriginalInquiryPostUrl(detail: InquiryDetail): string {
+  const path = detail.group === 'REPORT' ? 'report' : 'inquiry';
+  return `${import.meta.env.VITE_USER_FRONT_BASE_URL}/${path}/${detail.inquiryId}`;
 }
 
-// 신고 → /report, 문의·기타 → /inquiry
-export function buildInquiryPostUrl(detail: InquiryDetail): string {
-  const path = isReportInquiry(detail) ? 'report' : 'inquiry';
-  return `${USER_FRONT_BASE_URL}/${path}/${detail.inquiryId}`;
+export function parseInquiryPostId(value: string | null): number | null {
+  if (value === null || !/^\d+$/.test(value)) return null;
+
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
-function getReportTargetPostId(detail: InquiryDetail): number | null {
-  switch (detail.subGroup) {
-    case 'POST_REPORT':
-    case 'EXAM_REVIEW_REPORT':
-      return Number(detail.target) || null;
-    case 'COMMENT_REPORT':
-      return detail.targetPostId || null;
-    default:
-      return null;
-  }
-}
-
-export function hasUnmappedReportTargetBoard(
-  detail: InquiryDetail
-): boolean {
-  return (
-    isReportInquiry(detail) &&
-    getReportTargetPostId(detail) !== null &&
-    !getBoardKey(detail.targetBoardId)
-  );
-}
-
-// 신고 대상 글 URL. 족보는 어드민 시험후기 관리로, 나머지는 사용자 프론트로 이동한다.
-// 족보 신고는 targetBoardId 32로 구분한다.
+// 신고 대상을 어드민 게시글·댓글 상세 또는 시험후기 관리로 연결한다.
 export function buildReportTargetUrl(detail: InquiryDetail): string | null {
-  if (!isReportInquiry(detail)) return null;
+  if (detail.group !== 'REPORT') return null;
 
-  const postId = getReportTargetPostId(detail);
-  if (!postId) return null;
+  if (detail.subGroup === 'COMMENT_REPORT') {
+    const commentId = parseCommentId(detail.target ?? '');
+    if (commentId === null) return null;
+
+    const postId = detail.targetPostId;
+    return buildCommentDetailUrl(
+      commentId,
+      Number.isSafeInteger(postId) && postId > 0 ? postId : undefined
+    );
+  }
+
+  if (
+    detail.subGroup !== 'POST_REPORT' &&
+    detail.subGroup !== 'EXAM_REVIEW_REPORT'
+  ) {
+    return null;
+  }
+
+  const postId = Number(detail.target);
+  if (!Number.isSafeInteger(postId) || postId <= 0) return null;
 
   if (detail.targetBoardId === EXAM_REVIEW_BOARD_ID) {
-    return `/reviews/exam?keywordPost=${postId}&page=1`;
+    return `${PATHS.REVIEW_EXAM}?keywordPost=${postId}&page=1`;
   }
 
-  const boardKey = getBoardKey(detail.targetBoardId);
-
-  if (!boardKey) return null;
-
-  return `${USER_FRONT_BOARD_BASE_URL}/${boardKey}/post/${postId}`;
+  return `${PATHS.POST_MANAGE}/${postId}`;
 }

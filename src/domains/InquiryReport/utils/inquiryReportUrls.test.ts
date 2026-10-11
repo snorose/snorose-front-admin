@@ -2,10 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { InquiryDetail } from '@/shared/types';
 
-import {
-  buildReportTargetUrl,
-  hasUnmappedReportTargetBoard,
-} from './inquiryReportUrls';
+import { buildReportTargetUrl, parseInquiryPostId } from './inquiryReportUrls';
 
 const createInquiryDetail = (
   overrides: Partial<InquiryDetail> = {}
@@ -34,6 +31,19 @@ const createInquiryDetail = (
   ...overrides,
 });
 
+describe('parseInquiryPostId', () => {
+  it('문의 번호를 읽는다', () => {
+    expect(parseInquiryPostId('1781296')).toBe(1781296);
+  });
+
+  it.each([null, '', '0', '-1', '1.5', 'abc', '1abc', '9007199254740992'])(
+    '잘못된 문의 번호 %s로 상세를 열지 않는다',
+    (value) => {
+      expect(parseInquiryPostId(value)).toBeNull();
+    }
+  );
+});
+
 describe('buildReportTargetUrl', () => {
   it('targetBoardId가 32이면 어드민 시험후기 관리로 이동한다', () => {
     const detail = createInquiryDetail();
@@ -43,52 +53,77 @@ describe('buildReportTargetUrl', () => {
     );
   });
 
-  it('족보 신고의 대상 번호가 없으면 링크를 만들지 않는다', () => {
-    const detail = createInquiryDetail({ target: null });
+  it.each([null, '', '0', '-1', '1.5', 'abc', '9007199254740992'])(
+    '대상 번호가 %s이면 링크를 만들지 않는다',
+    (target) => {
+      expect(buildReportTargetUrl(createInquiryDetail({ target }))).toBeNull();
+    }
+  );
 
-    expect(buildReportTargetUrl(detail)).toBeNull();
-  });
+  it.each([41, 43, 999, 0])(
+    '게시판 ID %i의 대상글을 게시판 URL 매핑 없이 어드민 상세로 연결한다',
+    (targetBoardId) => {
+      const detail = createInquiryDetail({
+        subGroup: 'POST_REPORT',
+        targetBoardId,
+      });
+      expect(buildReportTargetUrl(detail)).toBe('/posts/manage/1781296');
+    }
+  );
 
-  it('targetBoardId가 없으면 중분류만으로 족보 관리 링크를 만들지 않는다', () => {
-    const detail = createInquiryDetail({ targetBoardId: 0 });
-
-    expect(buildReportTargetUrl(detail)).toBeNull();
-  });
-
-  it.each([
-    [41, 'residence'],
-    [43, 'sookplace'],
-  ])(
-    '게시판 ID %i의 대상글을 dev 사용자 프론트로 연결한다',
-    (targetBoardId, boardKey) => {
-      const detail = createInquiryDetail({ targetBoardId });
-
+  it.each([41, 32, 0])(
+    '게시판 ID %i의 댓글 신고는 대상 게시글의 해당 댓글로 연결한다',
+    (targetBoardId) => {
+      const detail = createInquiryDetail({
+        subGroup: 'COMMENT_REPORT',
+        target: '123',
+        targetPostId: 456,
+        targetBoardId,
+      });
       expect(buildReportTargetUrl(detail)).toBe(
-        `https://front.dev.snorose.com/board/${boardKey}/post/1781296`
+        '/posts/manage/456?commentId=123'
       );
     }
   );
-});
 
-describe('hasUnmappedReportTargetBoard', () => {
-  it('대상글은 있지만 게시판 URL 매핑이 없으면 true를 반환한다', () => {
-    const detail = createInquiryDetail({ targetBoardId: 999 });
+  it.each([0, -1, 1.5, Number.NaN])(
+    '대상 게시글 번호가 %s이면 기존 댓글 상세 경로에서 게시글을 조회한다',
+    (targetPostId) => {
+      expect(
+        buildReportTargetUrl(
+          createInquiryDetail({
+            subGroup: 'COMMENT_REPORT',
+            target: '123',
+            targetPostId,
+          })
+        )
+      ).toBe('/posts/comments/123');
+    }
+  );
 
-    expect(hasUnmappedReportTargetBoard(detail)).toBe(true);
+  it.each([null, '', '0', '-1', '1abc'])(
+    '댓글 번호가 %s이면 링크를 만들지 않는다',
+    (target) => {
+      expect(
+        buildReportTargetUrl(
+          createInquiryDetail({ subGroup: 'COMMENT_REPORT', target })
+        )
+      ).toBeNull();
+    }
+  );
+
+  it('문의에는 신고 대상 링크가 없다', () => {
+    expect(
+      buildReportTargetUrl(createInquiryDetail({ group: 'INQUIRY' }))
+    ).toBeNull();
   });
 
-  it('게시판 URL 매핑이 있으면 false를 반환한다', () => {
-    const detail = createInquiryDetail({ targetBoardId: 41 });
-
-    expect(hasUnmappedReportTargetBoard(detail)).toBe(false);
-  });
-
-  it('대상글이 없는 이용자 신고는 false를 반환한다', () => {
+  it('이용자 신고에는 대상글 링크가 없다', () => {
     const detail = createInquiryDetail({
       subGroup: 'USER_REPORT',
       targetBoardId: 0,
     });
 
-    expect(hasUnmappedReportTargetBoard(detail)).toBe(false);
+    expect(buildReportTargetUrl(detail)).toBeNull();
   });
 });
