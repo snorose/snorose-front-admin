@@ -23,16 +23,24 @@ vi.mock('@/apis', () => ({
 }));
 
 function DialogHarness() {
-  const [activeDialog, setActiveDialog] = useState<'status' | 'period-editor'>(
-    'status'
-  );
+  const [activeDialog, setActiveDialog] = useState<
+    'closed' | 'status' | 'period-editor'
+  >('status');
   const [selectedPeriodId, setSelectedPeriodId] = useState<number | null>(null);
 
   return (
     <>
+      <button
+        onClick={() => {
+          setSelectedPeriodId(null);
+          setActiveDialog('status');
+        }}
+      >
+        현황 열기
+      </button>
       <ExamReviewAdminStatusDialog
         open={activeDialog === 'status'}
-        onOpenChange={() => undefined}
+        onOpenChange={(open) => setActiveDialog(open ? 'status' : 'closed')}
         selectedPeriodId={selectedPeriodId}
         onSelectedPeriodChange={setSelectedPeriodId}
         onOpenPeriodEditor={() => setActiveDialog('period-editor')}
@@ -75,7 +83,8 @@ describe('ExamReviewAdminStatusDialog', () => {
     );
   });
 
-  test('진행 중인 기간의 mock 관리자 현황을 기본으로 보여준다', async () => {
+  test('첫 번째 기간을 기본 선택하고 기간 버튼으로 현황을 전환한다', async () => {
+    const user = userEvent.setup();
     renderDialog();
 
     expect(
@@ -84,7 +93,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     expect(screen.getByText('Mock 데이터')).toBeInTheDocument();
 
     const activePeriodButton = await screen.findByRole('button', {
-      name: '2026 여름학기',
+      name: '2026-2학기 중간고사',
     });
     expect(getExamReviewPeriodsAPI).toHaveBeenCalledWith('ADMIN_EDIT');
 
@@ -92,6 +101,7 @@ describe('ExamReviewAdminStatusDialog', () => {
       expect(activePeriodButton).toHaveAttribute('aria-pressed', 'true')
     );
 
+    await user.click(screen.getByRole('button', { name: '2026 여름학기' }));
     const progress = await screen.findByRole('progressbar', {
       name: '시험후기 확인 완료율',
     });
@@ -99,6 +109,30 @@ describe('ExamReviewAdminStatusDialog', () => {
     expect(screen.getByText('눈송관리자')).toBeInTheDocument();
     expect(screen.getByText('로즈매니저')).toBeInTheDocument();
     expect(screen.getByText('1인당 평균')).toBeInTheDocument();
+  });
+
+  test('편집에서 돌아오면 선택을 유지하고 새로 열면 첫 기간을 선택한다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    const firstPeriod = await screen.findByRole('button', {
+      name: '2026-2학기 중간고사',
+    });
+    await waitFor(() =>
+      expect(firstPeriod).toHaveAttribute('aria-pressed', 'true')
+    );
+    await user.click(screen.getByRole('button', { name: '2026 여름학기' }));
+    await user.click(screen.getByRole('button', { name: '기간 편집' }));
+    await user.click(screen.getByRole('button', { name: '현황 보기' }));
+    expect(
+      screen.getByRole('button', { name: '2026 여름학기' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    await user.click(screen.getByRole('button', { name: '창 닫기' }));
+    await user.click(screen.getByRole('button', { name: '현황 열기' }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-pressed', 'true')
+    );
   });
 
   test('기간 편집 다이얼로그에서 입력을 검증하고 현황으로 돌아온다', async () => {

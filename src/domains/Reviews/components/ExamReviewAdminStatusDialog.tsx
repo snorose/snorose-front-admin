@@ -21,10 +21,7 @@ import {
   useExamReviewAdminStatus,
   useExamReviewAdminStatusPeriods,
 } from '@/domains/Reviews/hooks';
-import {
-  getDefaultAdminStatusPeriod,
-  sortAdminStatusPeriods,
-} from '@/domains/Reviews/utils';
+import { sortAdminStatusPeriods } from '@/domains/Reviews/utils';
 
 import { ExamReviewAdminStatusList } from './ExamReviewAdminStatusList';
 import { ExamReviewProgressChart } from './ExamReviewProgressChart';
@@ -76,7 +73,8 @@ export function ExamReviewAdminStatusDialog({
   const statusQuery = useExamReviewAdminStatus(selectedPeriod, open);
 
   useEffect(() => {
-    if (periodsQuery.isPending) return;
+    if (!open || periodsQuery.isPending || periodsQuery.isError) return;
+    if (selectedPeriodId === null && periodsQuery.isFetching) return;
 
     const selectedPeriodStillExists = periods.some(
       (period) => period.id === selectedPeriodId
@@ -84,11 +82,16 @@ export function ExamReviewAdminStatusDialog({
 
     if (selectedPeriodStillExists) return;
 
-    onSelectedPeriodChange(getDefaultAdminStatusPeriod(periods)?.id ?? null);
+    const firstPeriodId = periods[0]?.id ?? null;
+    if (firstPeriodId !== selectedPeriodId)
+      onSelectedPeriodChange(firstPeriodId);
   }, [
     onSelectedPeriodChange,
     periods,
     periodsQuery.isPending,
+    periodsQuery.isError,
+    periodsQuery.isFetching,
+    open,
     selectedPeriodId,
   ]);
 

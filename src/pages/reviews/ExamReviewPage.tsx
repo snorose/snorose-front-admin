@@ -389,7 +389,10 @@ export default function ExamReviewPage() {
         <Button
           type='button'
           variant='outline'
-          onClick={() => setAdminStatusDialog('status')}
+          onClick={() => {
+            setSelectedAdminStatusPeriodId(null);
+            setAdminStatusDialog('status');
+          }}
         >
           <UsersRoundIcon />
           담당 관리자 현황
