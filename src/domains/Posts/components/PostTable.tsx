@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 
 import {
   BulkActionBar,
-  ListResultHeader,
   PaginationBar,
+  SectionTitleWithCount,
   StatusChangeModal,
   TableStateRow,
 } from '@/shared/components';
@@ -74,7 +74,7 @@ export default function PostTable({
 
   return (
     <div className='flex min-w-0 flex-col gap-1'>
-      <ListResultHeader
+      <SectionTitleWithCount
         title='게시글 목록'
         titleId={titleId}
         totalCount={totalCount}

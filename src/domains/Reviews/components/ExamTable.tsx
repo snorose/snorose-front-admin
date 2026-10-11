@@ -8,8 +8,8 @@ import {
 } from 'react';
 
 import {
-  ListResultHeader,
   PaginationBar,
+  SectionTitleWithCount,
   StatusBadge,
 } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
@@ -198,7 +198,7 @@ export default function ExamTable({
 
   return (
     <div className='flex min-w-0 flex-col gap-1'>
-      <ListResultHeader
+      <SectionTitleWithCount
         title='시험후기 목록'
         titleId={titleId}
         totalCount={totalCount}

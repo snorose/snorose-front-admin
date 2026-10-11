@@ -3,10 +3,10 @@ import { useId } from 'react';
 import { Loader2, Search } from 'lucide-react';
 
 import {
-  ListResultHeader,
   PaginationBar,
   SearchableSelect,
   SectionTitle,
+  SectionTitleWithCount,
   StatusBadge,
   TableStateRow,
 } from '@/shared/components';
@@ -208,7 +208,7 @@ export default function MemberDirectorySection({
         className='flex min-w-0 flex-col gap-1'
       >
         <div className='flex min-w-0 flex-col gap-1'>
-          <ListResultHeader
+          <SectionTitleWithCount
             title='회원 목록'
             titleId={`${searchInputId}-results-heading`}
             totalCount={totalCount}

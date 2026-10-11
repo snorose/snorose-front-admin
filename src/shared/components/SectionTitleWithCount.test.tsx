@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
-import { ListResultHeader } from './ListResultHeader';
+import { SectionTitleWithCount } from './SectionTitleWithCount';
 
-describe('ListResultHeader', () => {
+describe('SectionTitleWithCount', () => {
   test('목록 제목으로 섹션을 연결하고 개수와 단위를 표시한다', () => {
     render(
       <section aria-labelledby='member-results-heading'>
-        <ListResultHeader
+        <SectionTitleWithCount
           title='회원 목록'
           titleId='member-results-heading'
           totalCount={1234}
@@ -27,7 +27,7 @@ describe('ListResultHeader', () => {
 
   test('제목 ID 없이도 조회 상태를 전달한다', () => {
     render(
-      <ListResultHeader
+      <SectionTitleWithCount
         title='게시글 목록'
         totalCount={undefined}
         status='loading'

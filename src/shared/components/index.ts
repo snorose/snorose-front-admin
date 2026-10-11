@@ -5,10 +5,6 @@ export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
 export { FilterMultiSelect } from './FilterMultiSelect';
 export { Header } from './Header';
-export {
-  ListResultHeader,
-  type ListResultHeaderProps,
-} from './ListResultHeader';
 export { default as MemberInfoModal } from './MemberInfoModal';
 export { MemberInfoPopover } from './MemberInfoPopover';
 export { NavUser } from './NavUser';
@@ -21,6 +17,10 @@ export { ResultCount, type ResultCountProps } from './ResultCount';
 export { default as SanctionModal } from './SanctionModal';
 export { SearchableSelect } from './SearchableSelect';
 export { SectionTitle } from './SectionTitle';
+export {
+  SectionTitleWithCount,
+  type SectionTitleWithCountProps,
+} from './SectionTitleWithCount';
 export { StatusBadge, type StatusBadgeTone } from './StatusBadge';
 export { default as StatusChangeModal } from './StatusChangeModal';
 export { type TableState, TableStateRow } from './TableStateRow';

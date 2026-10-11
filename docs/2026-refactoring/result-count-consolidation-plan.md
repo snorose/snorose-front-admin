@@ -8,7 +8,7 @@
 
 **조회 개수는 목록 제목과 같은 줄의 오른쪽에 표시한다.** 검색 영역 아래, 목록 작업 버튼 위에 고정해서 네 화면 모두 같은 순서로 읽히게 한다.
 
-공통 컴포넌트는 숫자 표현을 담당하는 `ResultCount`와 제목·개수 배치를 담당하는 `ListResultHeader`로 나눈다. 데이터 조회와 검색 조건 관리는 기존 도메인 훅에 남긴다.
+공통 컴포넌트는 숫자 표현을 담당하는 `ResultCount`와 제목·개수 배치를 담당하는 `SectionTitleWithCount`로 나눈다. 데이터 조회와 검색 조건 관리는 기존 도메인 훅에 남긴다.
 
 - 시험후기·게시글·댓글·회원 모두 `총 1,234건`으로 표시하며 단위는 `건`으로 고정한다.
 - 검색 후에도 같은 문구를 사용하며, 현재 적용된 조건에 맞는 서버 응답의 `totalCount`를 표시한다.
@@ -93,11 +93,11 @@
 
 ### 4.1 파일과 역할
 
-| 제안 파일                                    | 역할                                       |
-| -------------------------------------------- | ------------------------------------------ |
-| `src/shared/components/ResultCount.tsx`      | 개수 문구, 단위, 숫자 포맷, 조회 상태 표현 |
-| `src/shared/components/ListResultHeader.tsx` | `h2` 제목과 `ResultCount`의 배치           |
-| `src/shared/components/index.ts`             | 두 컴포넌트 export                         |
+| 제안 파일                                         | 역할                                       |
+| ------------------------------------------------- | ------------------------------------------ |
+| `src/shared/components/ResultCount.tsx`           | 개수 문구, 단위, 숫자 포맷, 조회 상태 표현 |
+| `src/shared/components/SectionTitleWithCount.tsx` | `h2` 제목과 `ResultCount`의 배치           |
+| `src/shared/components/index.ts`                  | 두 컴포넌트 export                         |
 
 개수 표현과 헤더 배치를 분리하면 이후 제목이 없는 작은 목록에서도 `ResultCount`를 재사용할 수 있다. 공통 컴포넌트에는 API 호출, 검색 조건 해석, 페이지 계산, 선택 개수 관리를 넣지 않는다.
 
@@ -111,7 +111,7 @@ type ResultCountProps = {
   status: 'loading' | 'ready' | 'error';
 };
 
-type ListResultHeaderProps = ResultCountProps & {
+type SectionTitleWithCountProps = ResultCountProps & {
   title: string;
   titleId?: string; // section의 aria-labelledby와 연결
 };
@@ -146,7 +146,7 @@ type ListResultHeaderProps = ResultCountProps & {
 
 ### 5.2 기존 조회 위치를 유지한다
 
-시험후기·게시글·댓글은 개수를 소유한 테이블 컴포넌트 안에서 `ListResultHeader`를 렌더링한다. 페이지의 기존 `h2`를 테이블로 옮겨 제목이 두 번 나타나지 않게 한다. 페이지의 목록 `section`은 유지하고 `aria-labelledby`로 새 제목과 연결한다.
+시험후기·게시글·댓글은 개수를 소유한 테이블 컴포넌트 안에서 `SectionTitleWithCount`를 렌더링한다. 페이지의 기존 `h2`를 테이블로 옮겨 제목이 두 번 나타나지 않게 한다. 페이지의 목록 `section`은 유지하고 `aria-labelledby`로 새 제목과 연결한다.
 
 이렇게 하면 개수를 페이지까지 올리기 위한 콜백, 추가 상태, 중복 API 요청이 필요 없다. 현재 세 테이블이 조회와 페이지네이션까지 포함한 목록 컨테이너라는 구조에도 맞는다.
 
@@ -168,7 +168,7 @@ type ListResultHeaderProps = ResultCountProps & {
 ### 1단계: 공통 표현과 위치 생성
 
 - [x] `ResultCount`를 생성하고 단위·숫자 포맷·상태 정책을 적용한다.
-- [x] `ListResultHeader`를 생성하고 제목 ID, 줄바꿈, 제목·개수 배치를 적용한다.
+- [x] `SectionTitleWithCount`를 생성하고 제목 ID, 줄바꿈, 제목·개수 배치를 적용한다.
 - [x] `shared/components/index.ts`에 export를 추가한다.
 
 ### 2단계: 게시글·댓글 적용
