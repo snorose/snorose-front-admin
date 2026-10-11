@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import {
   CalendarPlusIcon,
@@ -62,6 +62,7 @@ export function ExamReviewAdminStatusDialog({
   onSelectedPeriodChange,
   onOpenPeriodEditor,
 }: ExamReviewAdminStatusDialogProps) {
+  const isDefaultSelectionRef = useRef(false);
   const { periodsQuery } = useExamReviewAdminStatusPeriods(open);
   const periods = useMemo(
     () => sortAdminStatusPeriods(periodsQuery.data ?? []),
@@ -73,14 +74,18 @@ export function ExamReviewAdminStatusDialog({
   const statusQuery = useExamReviewAdminStatus(selectedPeriod, open);
 
   useEffect(() => {
-    if (!open || periodsQuery.isPending || periodsQuery.isError) return;
-    if (selectedPeriodId === null && periodsQuery.isFetching) return;
+    if (!open) {
+      isDefaultSelectionRef.current = false;
+      return;
+    }
+    if (periodsQuery.isPending || periodsQuery.isError) return;
+    if (selectedPeriodId === null) isDefaultSelectionRef.current = true;
 
     const selectedPeriodStillExists = periods.some(
       (period) => period.id === selectedPeriodId
     );
 
-    if (selectedPeriodStillExists) return;
+    if (selectedPeriodStillExists && !isDefaultSelectionRef.current) return;
 
     const firstPeriodId = periods[0]?.id ?? null;
     if (firstPeriodId !== selectedPeriodId)
@@ -90,7 +95,6 @@ export function ExamReviewAdminStatusDialog({
     periods,
     periodsQuery.isPending,
     periodsQuery.isError,
-    periodsQuery.isFetching,
     open,
     selectedPeriodId,
   ]);
@@ -178,7 +182,10 @@ export function ExamReviewAdminStatusDialog({
                     size='sm'
                     className='aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground h-auto min-h-11 max-w-full flex-none px-3 py-2 text-left whitespace-normal shadow-none transition-colors sm:min-h-9'
                     aria-pressed={period.id === selectedPeriodId}
-                    onClick={() => onSelectedPeriodChange(period.id)}
+                    onClick={() => {
+                      isDefaultSelectionRef.current = false;
+                      onSelectedPeriodChange(period.id);
+                    }}
                   >
                     <span className='min-w-0 break-words'>{period.title}</span>
                   </Button>

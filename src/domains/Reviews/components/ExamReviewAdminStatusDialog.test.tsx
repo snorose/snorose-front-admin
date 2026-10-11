@@ -1,9 +1,11 @@
 import { useState } from 'react';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import type { ExamReviewPeriod } from '@/shared/types';
 
 import {
   getMockExamReviewAdminStatusPeriods,
@@ -131,6 +133,51 @@ describe('ExamReviewAdminStatusDialog', () => {
     await waitFor(() =>
       expect(
         screen.getByRole('button', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-pressed', 'true')
+    );
+  });
+
+  test('재조회가 끝나기 전에 캐시된 첫 기간을 선택하고 최신 목록에 맞춘다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-pressed', 'true')
+    );
+    await user.click(screen.getByRole('button', { name: '창 닫기' }));
+
+    let resolvePeriods!: (periods: ExamReviewPeriod[]) => void;
+    vi.mocked(getExamReviewPeriodsAPI).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolvePeriods = resolve;
+      })
+    );
+    await user.click(screen.getByRole('button', { name: '현황 열기' }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-pressed', 'true')
+    );
+
+    const periods = (await getMockExamReviewAdminStatusPeriods()).map(
+      (period) => ({ ...period, type: 'ADMIN_EDIT' as const })
+    );
+    await act(async () =>
+      resolvePeriods([
+        ...periods,
+        {
+          ...periods[0],
+          id: 99,
+          title: '새로운 첫 기간',
+          startAt: '2027-01-01T00:00:00',
+          endAt: '2027-01-31T23:59:00',
+        },
+      ])
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: '새로운 첫 기간' })
       ).toHaveAttribute('aria-pressed', 'true')
     );
   });
