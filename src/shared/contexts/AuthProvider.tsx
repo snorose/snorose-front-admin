@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { isAxiosError } from 'axios';
 
@@ -33,6 +33,15 @@ type AuthProviderProps = {
 
 export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as { returnTo?: unknown } | null)?.returnTo;
+  const loginDestination =
+    typeof returnTo === 'string' &&
+    returnTo.startsWith('/') &&
+    !returnTo.startsWith('//') &&
+    !returnTo.includes('\\')
+      ? returnTo
+      : '/member/info';
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -130,7 +139,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         setIsLoading(false);
 
         // 로그인 성공 시 리다이렉트
-        navigate('/member/info');
+        navigate(loginDestination, { replace: true });
 
         return { success: true };
       } catch (error: unknown) {
@@ -148,7 +157,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): JSX.Element => {
         return { success: false, error: errorMessage };
       }
     },
-    [navigate]
+    [loginDestination, navigate]
   );
 
   // 로그아웃
