@@ -69,7 +69,7 @@ export function ExamReviewAdminStatusPeriodDialog({
         requestClose();
       }}
     >
-      <Dialog.Content className='max-h-[85vh] overflow-y-auto sm:max-w-5xl'>
+      <Dialog.Content className='max-h-[85vh] overflow-y-auto sm:max-w-3xl'>
         <Dialog.Header className='pr-8'>
           <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
             <div className='flex flex-col gap-2'>

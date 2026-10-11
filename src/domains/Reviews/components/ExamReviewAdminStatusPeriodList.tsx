@@ -83,7 +83,7 @@ export function ExamReviewAdminStatusPeriodList({
   return (
     <section className='flex flex-col gap-4'>
       <div className='overflow-hidden rounded-lg border'>
-        <div className='bg-muted/50 hidden grid-cols-[minmax(0,1.4fr)_1fr_1fr_auto] gap-4 border-b px-4 py-2 text-sm font-semibold md:grid'>
+        <div className='bg-muted/50 hidden grid-cols-[minmax(0,1fr)_9rem_9rem_5rem] gap-3 border-b px-4 py-2 text-sm font-semibold md:grid'>
           <span>기간 이름</span>
           <span>시작 일시</span>
           <span>종료 일시</span>
@@ -100,7 +100,7 @@ export function ExamReviewAdminStatusPeriodList({
           {periods.map((period) => (
             <div
               key={period.id}
-              className='grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1.4fr)_1fr_1fr_auto] md:items-center md:gap-4'
+              className='grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1fr)_9rem_9rem_5rem] md:items-center md:gap-3'
             >
               <strong className='truncate text-sm'>{period.title}</strong>
               <div className='text-muted-foreground text-sm'>
