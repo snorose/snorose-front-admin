@@ -41,7 +41,7 @@ export function MemberInfoSection({ searchedMember }: MemberInfoSectionProps) {
   return (
     <article className='flex flex-col gap-1'>
       <SectionTitle>회원 정보 상세</SectionTitle>
-      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
+      <div className='grid w-full grid-cols-2 gap-4 rounded-lg border p-4 pb-5'>
         {MEMBER_INFO.map(({ label, id, value }) => (
           <div className='flex flex-col gap-1' key={id}>
             <Label htmlFor={`${inputId}-${id}`} required>

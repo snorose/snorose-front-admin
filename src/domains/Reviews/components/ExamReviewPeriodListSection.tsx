@@ -58,7 +58,7 @@ export function ExamReviewPeriodListSection({
         {errorMessage && (
           <div
             role='alert'
-            className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3 text-sm'
+            className='flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm'
           >
             <span>{errorMessage}</span>
             {onRetry && (
@@ -75,7 +75,7 @@ export function ExamReviewPeriodListSection({
           </div>
         )}
         <div
-          className='overflow-x-auto rounded-md border'
+          className='overflow-x-auto rounded-lg border'
           aria-busy={isFetching}
         >
           <Table className='w-full'>

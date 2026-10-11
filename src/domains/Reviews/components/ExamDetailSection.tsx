@@ -657,7 +657,7 @@ export function ExamDetailSection({
 
   return (
     <article className='flex flex-col gap-1'>
-      <div className='flex w-full flex-col rounded-md border'>
+      <div className='flex w-full flex-col overflow-hidden rounded-lg border'>
         <div className='flex items-center justify-between bg-blue-100 px-4 py-3'>
           <div className='flex items-center gap-3'>
             <p className='font-semibold'>
@@ -702,7 +702,7 @@ export function ExamDetailSection({
         </div>
 
         {!selectedExamReview ? (
-          <div className='rounded-md bg-gray-50 p-4 text-sm text-gray-600'>
+          <div className='rounded-lg bg-gray-50 p-4 text-sm text-gray-600'>
             상단 시험후기 목록에서 시험후기를 선택해주세요.
           </div>
         ) : isLoadingDetail ? (

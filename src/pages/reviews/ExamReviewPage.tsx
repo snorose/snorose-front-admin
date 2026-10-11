@@ -432,7 +432,7 @@ export default function ExamReviewPage() {
       {selectedExamReview && detailError && (
         <div
           role='alert'
-          className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3 text-sm'
+          className='flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm'
         >
           <span>
             {getErrorMessage(

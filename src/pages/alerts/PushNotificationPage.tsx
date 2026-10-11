@@ -234,7 +234,7 @@ export default function PushNotificationPage() {
       <section className='flex gap-4'>
         <article className='flex w-full flex-col gap-1'>
           <SectionTitle>필수 정보</SectionTitle>
-          <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+          <div className='flex w-full flex-col gap-4 rounded-lg border p-4 pb-5'>
             <div className='flex flex-col gap-1'>
               <Label htmlFor={`${inputId}-name`} required>
                 알림명
@@ -372,7 +372,7 @@ export default function PushNotificationPage() {
         <article className='flex w-full flex-col gap-1'>
           <SectionTitle>발송 옵션</SectionTitle>
           <div className='flex flex-col gap-2'>
-            <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
+            <div className='flex items-center justify-between rounded-lg border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
                 <Label id={`${inputId}-isMarketing-label`} required>
                   메시지 유형
@@ -415,7 +415,7 @@ export default function PushNotificationPage() {
                 </RadioGroup>
               </div>
             </div>
-            <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
+            <div className='flex items-center justify-between rounded-lg border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
                 <Label id={`${inputId}-isTest-label`} required>
                   발송 대상

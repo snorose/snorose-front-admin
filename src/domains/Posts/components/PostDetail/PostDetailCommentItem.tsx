@@ -135,7 +135,7 @@ export default function PostDetailCommentItem({
 
       <div
         className={cn(
-          'relative flex-1 cursor-pointer rounded-xl border bg-gray-50/50 p-4 transition-colors',
+          'relative flex-1 cursor-pointer rounded-lg border bg-gray-50/50 p-4 transition-colors',
           isSelected
             ? 'border-blue-400 ring-2 ring-blue-100'
             : 'border-gray-200 hover:border-gray-300'

@@ -6,13 +6,13 @@ import { WITHDRAWAL_WARNINGS } from '@/domains/MemberInfo/components/memberDetai
 
 export default function MemberWithdrawalSection() {
   return (
-    <section className='rounded-md border border-rose-200 bg-white p-6 shadow-sm'>
+    <section className='rounded-lg border border-rose-200 bg-white p-6 shadow-sm'>
       <div className='flex items-center gap-2 text-lg font-semibold text-rose-600'>
         <TriangleAlert className='h-5 w-5' />
         회원 탈퇴
       </div>
 
-      <div className='mt-5 rounded-md border border-rose-200 bg-rose-50 p-5'>
+      <div className='mt-5 rounded-lg border border-rose-200 bg-rose-50 p-5'>
         <p className='text-base font-semibold text-rose-700'>
           회원 탈퇴 시 주의사항
         </p>

@@ -79,7 +79,7 @@ export function PointFreezeScheduleForm() {
     <section className='flex flex-col gap-4'>
       <article className='flex w-full flex-col gap-1'>
         <SectionTitle>미지급 일정 생성</SectionTitle>
-        <div className='@container flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+        <div className='@container flex w-full flex-col gap-4 rounded-lg border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor={titleId} required>
               일정 제목

@@ -98,7 +98,7 @@ export default function MemberDirectorySection({
 
         <form
           aria-labelledby={`${searchInputId}-search-heading`}
-          className='border-border bg-background @container flex min-w-0 flex-col gap-4 rounded-md border p-4'
+          className='border-border bg-background @container flex min-w-0 flex-col gap-4 rounded-lg border p-4'
           onSubmit={(event) => {
             event.preventDefault();
             if (!isListLoading) {
@@ -216,7 +216,7 @@ export default function MemberDirectorySection({
           />
           <MemberDirectoryActionBar />
 
-          <div className='overflow-hidden rounded-md border border-slate-200'>
+          <div className='overflow-hidden rounded-lg border border-slate-200'>
             <Table className='min-w-230'>
               <Table.Header>
                 <Table.Row className='border-b border-slate-200'>

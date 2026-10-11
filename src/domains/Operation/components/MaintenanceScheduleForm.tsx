@@ -45,7 +45,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
         {initial ? '서버 점검 일정 수정' : '서버 점검 일정 등록'}
       </SectionTitle>
       <form
-        className='flex flex-col gap-4 rounded-md border p-4 pb-5'
+        className='flex flex-col gap-4 rounded-lg border p-4 pb-5'
         onSubmit={(event) => {
           event.preventDefault();
           if (!draft.title.trim() || !draft.startAt || !draft.endAt) {

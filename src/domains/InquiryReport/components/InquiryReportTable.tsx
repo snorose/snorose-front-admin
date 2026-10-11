@@ -286,7 +286,7 @@ export default function InquiryReportTable({
         </div>
       </div>
 
-      <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
+      <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
             className={`w-full ${isDetailOpen ? 'min-w-[688px]' : 'min-w-[1168px]'} table-fixed text-[13px]`}

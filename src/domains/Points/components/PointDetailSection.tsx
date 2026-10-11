@@ -56,7 +56,7 @@ export function PointDetailSection({
   return (
     <article className='flex flex-col gap-1'>
       <SectionTitle>지급할 포인트 상세</SectionTitle>
-      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
+      <div className='grid w-full grid-cols-2 gap-4 rounded-lg border p-4 pb-5'>
         <div className='flex flex-col gap-1'>
           <Label htmlFor={`${inputId}-category`} required>
             포인트 유형

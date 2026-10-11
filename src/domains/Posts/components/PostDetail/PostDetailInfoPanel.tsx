@@ -55,7 +55,7 @@ export default function PostDetailInfoPanel({
   };
 
   return (
-    <div className='relative flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm'>
+    <div className='relative flex flex-col gap-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm'>
       {/* 1. 패널 타이틀 */}
       <h2 className='text-lg font-bold text-gray-900'>게시글 상세 정보</h2>
 
