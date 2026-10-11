@@ -132,7 +132,7 @@ export default function MemberPenaltyManagementPage() {
       <article>
         <SectionTitle>회원정보</SectionTitle>
 
-        <div className='flex flex-row gap-4 rounded-md p-4 pb-5'>
+        <div className='flex flex-row gap-4 rounded-lg p-4 pb-5'>
           <div className='w-2/5'>
             <PenaltyUserInfoView member={selectedMember} />
           </div>
@@ -147,7 +147,7 @@ export default function MemberPenaltyManagementPage() {
         </div>
       </article>
 
-      <article className='rounded-md border p-2'>
+      <article className='rounded-lg border p-2'>
         <TabList defaultTab='warn' tabs={tabs} />
       </article>
     </div>

@@ -149,7 +149,7 @@ export default function PostDetailCommentList({
     <div className='mt-6 grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:gap-6'>
       <div
         ref={commentPanelRef}
-        className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2'
+        className='flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2'
       >
         <h2 className='text-base font-bold text-gray-900'>
           댓글 ({commentCount})

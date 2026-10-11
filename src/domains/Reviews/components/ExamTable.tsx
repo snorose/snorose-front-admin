@@ -213,8 +213,8 @@ export default function ExamTable({
         }
       />
 
-      <div className='w-full overflow-x-auto rounded-md border'>
-        <Table className='w-full table-fixed rounded-lg bg-white shadow'>
+      <div className='w-full overflow-x-auto rounded-lg border'>
+        <Table className='w-full table-fixed bg-white shadow'>
           <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <col key={column.key} style={{ width: column.width }} />

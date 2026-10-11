@@ -43,14 +43,14 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
 
   if (safeLogs.length === 0) {
     return (
-      <div className='flex min-h-[240px] items-center justify-center rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-500'>
+      <div className='flex min-h-[240px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500'>
         관리 이력이 없습니다.
       </div>
     );
   }
 
   return (
-    <div className='overflow-hidden rounded-md border border-gray-200'>
+    <div className='overflow-hidden rounded-lg border border-gray-200'>
       <Table className='table-fixed bg-white'>
         <colgroup>
           <col className='w-[150px]' />

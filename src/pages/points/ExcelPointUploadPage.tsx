@@ -456,7 +456,7 @@ export default function ExcelPointUploadPage() {
           <div className='flex flex-col gap-4'>
             <section
               aria-labelledby='excel-preview-heading'
-              className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
+              className='flex min-h-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xs'
             >
               <div className='flex flex-col gap-0.5 border-b border-slate-100 bg-slate-50/90 px-4 py-3'>
                 <div className='flex items-center gap-2'>
@@ -541,7 +541,7 @@ export default function ExcelPointUploadPage() {
 
             <div className='flex flex-col gap-1'>
               <SectionTitle>지급 방식</SectionTitle>
-              <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+              <div className='flex w-full flex-col gap-4 rounded-lg border p-4 pb-5'>
                 <RadioGroup
                   value={paymentTiming}
                   onValueChange={handlePaymentTimingChange}
@@ -628,7 +628,7 @@ export default function ExcelPointUploadPage() {
             </div>
 
             {uploadResult ? (
-              <div className='rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 shadow-xs sm:px-5'>
+              <div className='rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 shadow-xs sm:px-5'>
                 <p className='flex flex-nowrap items-center gap-x-2 overflow-x-auto text-sm sm:gap-x-3'>
                   <span className='shrink-0 font-semibold'>처리 결과 요약</span>
                   <span>·</span>
@@ -666,7 +666,7 @@ export default function ExcelPointUploadPage() {
                   <div className='flex flex-col gap-6'>
                     <section
                       aria-labelledby='excel-result-failure-heading'
-                      className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-amber-200 bg-white shadow-xs'
+                      className='flex min-h-0 flex-col overflow-hidden rounded-lg border border-amber-200 bg-white shadow-xs'
                     >
                       <div className='flex flex-col gap-2 border-b border-amber-100 bg-amber-50/90 px-4 py-3'>
                         <div className='flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between'>
@@ -784,7 +784,7 @@ export default function ExcelPointUploadPage() {
 
                     <section
                       aria-labelledby='excel-result-success-heading'
-                      className='flex min-h-0 flex-col overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-xs'
+                      className='flex min-h-0 flex-col overflow-hidden rounded-lg border border-emerald-200 bg-white shadow-xs'
                     >
                       <div className='flex flex-col gap-0.5 border-b border-emerald-100 bg-emerald-50/90 px-4 py-3'>
                         <div className='flex items-center gap-2'>

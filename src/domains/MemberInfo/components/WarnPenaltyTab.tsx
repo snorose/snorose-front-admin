@@ -110,7 +110,7 @@ export default function WarnPenaltyTab({
   return (
     <div className='mt-4 flex flex-row gap-8'>
       {/* 경고하기 */}
-      <section className='w-1/2 rounded-md border border-red-300 bg-red-50 p-4'>
+      <section className='w-1/2 rounded-lg border border-red-300 bg-red-50 p-4'>
         <h3 className='mb-3 font-semibold text-red-700'>경고하기</h3>
 
         {/* 경고 사유 선택 */}
@@ -199,9 +199,9 @@ export default function WarnPenaltyTab({
       </section>
 
       {/* 경고 차감하기 */}
-      <section className='w-1/2 rounded-md border border-blue-300 bg-blue-50 p-4'>
+      <section className='w-1/2 rounded-lg border border-blue-300 bg-blue-50 p-4'>
         <h3 className='mb-3 font-semibold text-blue-700'>경고 차감하기</h3>
-        <div className='bg-background/70 rounded-md border border-blue-200 p-4 text-sm font-medium text-blue-700'>
+        <div className='bg-background/70 rounded-lg border border-blue-200 p-4 text-sm font-medium text-blue-700'>
           경고 차감 API가 준비되지 않았습니다. 차감이 필요한 경우 담당자에게
           요청해주세요.
         </div>

@@ -20,7 +20,7 @@ export function MaintenanceListSection({ items, onEdit, onDelete }: Props) {
       <SectionTitle id='maintenance-list-title'>
         서버 점검 일정 조회
       </SectionTitle>
-      <div className='overflow-x-auto rounded-md border'>
+      <div className='overflow-x-auto rounded-lg border'>
         <Table className='w-full min-w-[920px]'>
           <Table.Header>
             <Table.Row>

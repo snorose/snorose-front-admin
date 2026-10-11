@@ -1,13 +1,5 @@
 import { type FormEvent, useRef, useState } from 'react';
 
-import {
-  CalendarDays,
-  Coins,
-  GraduationCap,
-  IdCard,
-  Mail,
-  UserRound,
-} from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { EditMemberInfo, MemberInfo } from '@/shared/types';
@@ -95,7 +87,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'userName',
-      icon: UserRound,
+
       label: '이름',
       value: userName,
       onChange: (value) => {
@@ -106,7 +98,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'loginId',
-      icon: IdCard,
+
       label: '아이디',
       value: loginId,
       onChange: (value) => {
@@ -117,7 +109,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'nickname',
-      icon: UserRound,
+
       label: '닉네임',
       value: nickname,
       onChange: (value) => {
@@ -128,7 +120,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'studentNumber',
-      icon: GraduationCap,
+
       label: '학번',
       value: studentNumber,
       onChange: (value) => {
@@ -139,7 +131,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'birthday',
-      icon: CalendarDays,
+
       label: '생년월일',
       value: birthday,
       onChange: (value) => {
@@ -152,7 +144,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'major',
-      icon: GraduationCap,
+
       label: '전공',
       value: major,
       onChange: (value) => {
@@ -162,37 +154,37 @@ export default function MemberInfoEditForm({
     },
     {
       type: 'readonly',
-      icon: CalendarDays,
+
       label: '가입일',
       value: formatDateOnly(member.createdAt),
     },
     {
       type: 'readonly',
-      icon: CalendarDays,
+
       label: '등업일',
       value: formatDateOnly(member.authenticatedAt),
     },
     {
       type: 'readonly',
-      icon: CalendarDays,
+
       label: '최근 로그인 날짜',
       value: formatDateOnly(member.lastLoginAt),
     },
     {
       type: 'readonly',
-      icon: CalendarDays,
+
       label: '정보 수정일',
       value: formatDateTimeToMinutes(member.updatedAt),
     },
     {
       type: 'readonly',
-      icon: Coins,
+
       label: '보유 포인트',
       value: formatPoint(member.pointBalance),
     },
     {
       type: 'readonly',
-      icon: IdCard,
+
       label: '회원 ID (암호화)',
       value: formatDisplayValue(member.encryptedUserId),
       copyValue: member.encryptedUserId,
@@ -204,7 +196,7 @@ export default function MemberInfoEditForm({
     {
       type: 'editable',
       fieldName: 'email',
-      icon: Mail,
+
       label: '이메일',
       value: email,
       onChange: (value) => {
@@ -222,34 +214,14 @@ export default function MemberInfoEditForm({
       onSubmit={handleSubmit}
       className='space-y-8'
     >
-      <div className='flex flex-col items-center gap-4 border-b border-slate-100 pb-8'>
-        <div className='relative'>
-          <div className='flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-slate-400 shadow-sm'>
-            {member.profileImageUrl ? (
-              <img
-                src={member.profileImageUrl}
-                alt={`${member.userName} 프로필`}
-                className='h-full w-full object-cover'
-              />
-            ) : (
-              <UserRound className='h-12 w-12' />
-            )}
-          </div>
-        </div>
-
-        <div className='space-y-1 text-center text-sm font-medium text-slate-400'>
-          <p>프로필 이미지 변경 또는 삭제는 담당자에게 요청해주세요.</p>
-        </div>
-      </div>
-
-      <div className='grid gap-x-10 gap-y-6 md:grid-cols-2'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {fieldItems.map((field) => {
           if (field.type === 'editable') {
             return (
               <EditableField
                 key={field.label}
                 fieldName={field.fieldName}
-                icon={field.icon}
+
                 label={field.label}
                 value={field.value}
                 onChange={field.onChange}
@@ -274,7 +246,7 @@ export default function MemberInfoEditForm({
           return (
             <ReadonlyField
               key={field.label}
-              icon={field.icon}
+
               label={field.label}
               value={field.value}
               copyValue={field.copyValue}

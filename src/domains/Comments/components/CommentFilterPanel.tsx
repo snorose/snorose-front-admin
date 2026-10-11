@@ -61,7 +61,7 @@ export const CommentFilterPanel = ({
 
       <form
         aria-labelledby={`${inputId}-heading`}
-        className='border-border bg-background @container flex min-w-0 flex-col gap-4 rounded-md border p-4'
+        className='border-border bg-background @container flex min-w-0 flex-col gap-4 rounded-lg border p-4'
         onSubmit={(event) => {
           event.preventDefault();
           onFilterChange(filters);

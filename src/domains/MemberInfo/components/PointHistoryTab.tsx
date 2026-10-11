@@ -49,7 +49,7 @@ export default function PointHistoryTab({
 
   return (
     <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
-      <Table className='border- w-full border-separate border-spacing-0 rounded-md border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
+      <Table className='border- w-full border-separate border-spacing-0 rounded-lg border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
         {/* Header */}
         <Table.Header>
           <Table.Row>

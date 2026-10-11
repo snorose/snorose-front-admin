@@ -24,7 +24,7 @@ export function PopupManagementTable({
   onDelete,
 }: PopupManagementTableProps) {
   return (
-    <div className='overflow-x-auto rounded-md border'>
+    <div className='overflow-x-auto rounded-lg border'>
       <Table>
         <Table.Header>
           <Table.Row>

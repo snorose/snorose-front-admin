@@ -90,7 +90,7 @@ export default function PostTable({
         label='게시글'
       />
 
-      <div className='overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm'>
+      <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table className='w-full min-w-[1380px] table-fixed text-[13px]'>
             <Table.Header className='h-[42px] border-b border-gray-200'>

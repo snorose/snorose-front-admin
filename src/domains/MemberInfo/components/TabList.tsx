@@ -60,7 +60,7 @@ export default function TabList({ tabs, defaultTab }: TabListsProps) {
 
       <div className='mt-4'>
         {tabs.length === 0 ? (
-          <div className='rounded-md border bg-white px-4 py-6 text-center text-gray-500'>
+          <div className='rounded-lg border bg-white px-4 py-6 text-center text-gray-500'>
             회원을 검색해 주세요.
           </div>
         ) : (

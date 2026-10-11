@@ -57,7 +57,7 @@ export default function InquiryCommentItem({
   return (
     <li className={depth > 0 ? 'ml-4 border-l-2 border-gray-100 pl-3' : ''}>
       <article
-        className={`rounded-md border px-3 py-2.5 transition ${
+        className={`rounded-lg border px-3 py-2.5 transition ${
           isReplying
             ? 'border-slate-300 bg-slate-50 shadow-[inset_3px_0_0_#64748b]'
             : 'border-gray-200 bg-white'
