@@ -64,6 +64,35 @@ const urlParams = () =>
   new URLSearchParams(screen.getByTestId('location').textContent ?? '');
 
 describe('게시글·댓글 필터 URL와 요청 연결', () => {
+  test('기존 선택 목록에서 빠졌던 게시판을 두 화면에서 선택하고 검색한다', async () => {
+    const user = userEvent.setup();
+    const posts = renderPage(PostManagePage, ['/posts/manage']);
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '주거' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    await waitFor(() =>
+      expect(searchPosts).toHaveBeenLastCalledWith(1, { boardId: 41 })
+    );
+    expect(urlParams().get('boardId')).toBe('41');
+    posts.unmount();
+
+    renderPage(PostCommentPage, ['/posts/comments']);
+    await user.click(screen.getByRole('button', { name: '게시판' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: '주거' }));
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: '교환학생/어학연수' })
+    );
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: '검색' }));
+    await waitFor(() =>
+      expect(searchComments).toHaveBeenLastCalledWith(1, {
+        searchScope: 'CONTENT',
+        boardIds: [41, 70],
+      })
+    );
+    expect(urlParams().get('boardIds')).toBe('41,70');
+  });
+
   test('게시글 URL의 선택을 복원하고 숨은 조건·false를 보존해 1페이지에서 검색한다', async () => {
     const user = userEvent.setup();
     const board = BOARD_OPTIONS[0];

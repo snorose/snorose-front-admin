@@ -25,9 +25,9 @@ export const BOARD_NAMES: Record<number, string> = {
   91: '홍보게시판',
 };
 
-export const BOARD_OPTIONS = [11, 12, 21, 22, 23, 32, 60, 61, 62].map((id) => ({
-  label: BOARD_NAMES[id] ?? `게시판 ${id}`,
-  value: id,
+export const BOARD_OPTIONS = Object.entries(BOARD_NAMES).map(([id, name]) => ({
+  label: name,
+  value: Number(id),
 }));
 
 // boardId → URL board key (예: 22 → large-snow). 출처: snorose-front board-registry.ts
