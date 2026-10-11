@@ -4,7 +4,12 @@ import { AlertTriangle, CheckCircle2, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
-import { DateTimePicker, NoticePanel, PageHeader } from '@/shared/components';
+import {
+  DateTimePicker,
+  NoticePanel,
+  PageHeader,
+  SectionTitle,
+} from '@/shared/components';
 import {
   Button,
   InputGroup,
@@ -15,7 +20,6 @@ import {
   Tooltip,
 } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import { cn } from '@/shared/lib';
 import type {
   ExcelPointBulkNotProcessedRow,
   ExcelPointBulkRewardResult,
@@ -227,16 +231,9 @@ function formatRowFailureReason(reason: string): string {
 const ROW_NUMBER_TOOLTIP_TEXT =
   '1행은 제목 행이며, 데이터는 2행부터 시작합니다.';
 
-function RowNumberColumnHead({ variant }: { variant: 'preview' | 'failure' }) {
-  const isFailure = variant === 'failure';
-
+function RowNumberColumnHead() {
   return (
-    <Table.Head
-      className={cn(
-        'h-11 px-3 text-center text-xs font-semibold',
-        isFailure ? 'text-amber-950' : 'text-slate-950'
-      )}
-    >
+    <Table.Head className='h-11 px-3 text-center'>
       <div className='flex items-center justify-center gap-1'>
         <span>행 번호</span>
         <Tooltip>
@@ -245,7 +242,6 @@ function RowNumberColumnHead({ variant }: { variant: 'preview' | 'failure' }) {
               type='button'
               variant='ghost'
               size='icon-sm'
-              className={cn(isFailure ? 'text-amber-700/90' : 'text-slate-500')}
               aria-label='행 번호 안내'
             >
               <Info className='size-3.5' aria-hidden />
@@ -414,10 +410,8 @@ export default function ExcelPointUploadPage() {
         />
 
         <section className='flex flex-col gap-6'>
-          <div className='flex flex-col gap-2'>
-            <h2 className='text-foreground text-lg font-bold'>
-              엑셀 파일 업로드
-            </h2>
+          <div className='flex flex-col gap-1'>
+            <SectionTitle>엑셀 파일 업로드</SectionTitle>
             <div className='flex items-center gap-2'>
               <InputGroup>
                 <InputGroup.Button
@@ -484,15 +478,15 @@ export default function ExcelPointUploadPage() {
               </div>
               <div className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}>
                 <table className='w-full caption-bottom text-sm'>
-                  <Table.Header className='sticky top-0 z-10 border-b border-slate-100 bg-slate-50 shadow-xs'>
-                    <Table.Row className='hover:bg-slate-50/40'>
+                  <Table.Header className='sticky top-0 z-10 border-b border-slate-100 shadow-xs'>
+                    <Table.Row>
                       {PREVIEW_TABLE_HEADERS.map((header) =>
                         header === '행 번호' ? (
-                          <RowNumberColumnHead key={header} variant='preview' />
+                          <RowNumberColumnHead key={header} />
                         ) : (
                           <Table.Head
                             key={header}
-                            className='h-11 px-3 text-center text-xs font-semibold text-slate-950'
+                            className='h-11 px-3 text-center'
                           >
                             {header}
                           </Table.Head>
@@ -545,8 +539,8 @@ export default function ExcelPointUploadPage() {
               </div>
             </section>
 
-            <div className='flex flex-col gap-3'>
-              <h2 className='text-foreground text-lg font-bold'>지급 방식</h2>
+            <div className='flex flex-col gap-1'>
+              <SectionTitle>지급 방식</SectionTitle>
               <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
                 <RadioGroup
                   value={paymentTiming}
@@ -665,12 +659,10 @@ export default function ExcelPointUploadPage() {
               </div>
             ) : null}
 
-            <div className='flex flex-col gap-3'>
+            <div className='flex flex-col gap-1'>
               {uploadResult ? (
                 <>
-                  <h2 className='text-foreground text-lg font-bold'>
-                    지급 결과
-                  </h2>
+                  <SectionTitle>지급 결과</SectionTitle>
                   <div className='flex flex-col gap-6'>
                     <section
                       aria-labelledby='excel-result-failure-heading'
@@ -717,18 +709,15 @@ export default function ExcelPointUploadPage() {
                         className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
                       >
                         <table className='w-full caption-bottom text-sm'>
-                          <Table.Header className='sticky top-0 z-10 border-b border-amber-100 bg-amber-50 shadow-xs'>
-                            <Table.Row className='hover:bg-amber-50/40'>
+                          <Table.Header className='sticky top-0 z-10 border-b border-amber-100 shadow-xs'>
+                            <Table.Row>
                               {FAILURE_TABLE_HEADERS.map((header) =>
                                 header === '행 번호' ? (
-                                  <RowNumberColumnHead
-                                    key={header}
-                                    variant='failure'
-                                  />
+                                  <RowNumberColumnHead key={header} />
                                 ) : (
                                   <Table.Head
                                     key={header}
-                                    className='h-11 px-3 text-center text-xs font-semibold text-amber-950'
+                                    className='h-11 px-3 text-center'
                                   >
                                     {header}
                                   </Table.Head>
@@ -821,12 +810,12 @@ export default function ExcelPointUploadPage() {
                         className={`min-h-0 ${RESULT_TABLE_BODY_MAX_HEIGHT_CLASS}`}
                       >
                         <table className='w-full caption-bottom text-sm'>
-                          <Table.Header className='sticky top-0 z-10 border-b border-emerald-100 bg-emerald-50 shadow-xs'>
-                            <Table.Row className='hover:bg-emerald-50/40'>
+                          <Table.Header className='sticky top-0 z-10 border-b border-emerald-100 shadow-xs'>
+                            <Table.Row>
                               {SUCCESS_TABLE_HEADERS.map((header) => (
                                 <Table.Head
                                   key={header}
-                                  className='h-11 px-4 text-center text-xs font-semibold text-emerald-900'
+                                  className='h-11 px-4 text-center'
                                 >
                                   {header}
                                 </Table.Head>

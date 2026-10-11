@@ -8,8 +8,8 @@ import {
 } from 'react';
 
 import {
-  ListResultHeader,
   PaginationBar,
+  SectionTitleWithCount,
   StatusBadge,
 } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
@@ -197,8 +197,8 @@ export default function ExamTable({
   }, [selectedId, currentPageData, onRowSelect]);
 
   return (
-    <div className='flex min-w-0 flex-col gap-3'>
-      <ListResultHeader
+    <div className='flex min-w-0 flex-col gap-1'>
+      <SectionTitleWithCount
         title='시험후기 목록'
         titleId={titleId}
         totalCount={totalCount}
@@ -221,7 +221,7 @@ export default function ExamTable({
             ))}
           </colgroup>
 
-          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+          <Table.Header className='z-10 h-[40px] shadow-sm [&_tr]:border-b'>
             <Table.Row>
               {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                 <Table.Head

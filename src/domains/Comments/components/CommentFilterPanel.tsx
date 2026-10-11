@@ -6,6 +6,7 @@ import {
   DatePicker,
   FilterMultiSelect,
   SearchableSelect,
+  SectionTitle,
   StatusBadge,
 } from '@/shared/components';
 import {
@@ -56,9 +57,7 @@ export const CommentFilterPanel = ({
       aria-labelledby={`${inputId}-heading`}
       className='flex min-w-0 flex-col gap-1'
     >
-      <h2 id={`${inputId}-heading`} className='text-lg font-bold'>
-        댓글 검색
-      </h2>
+      <SectionTitle id={`${inputId}-heading`}>댓글 검색</SectionTitle>
 
       <form
         aria-labelledby={`${inputId}-heading`}
@@ -148,7 +147,7 @@ export const CommentFilterPanel = ({
             </div>
             {/* 작성 시작일 / 작성 종료일 */}
             <fieldset className='min-w-0 @md:col-span-2 @5xl:col-span-1'>
-              <legend className='mb-1 py-1 text-sm leading-none font-semibold'>
+              <legend className='mb-1 py-1 text-sm leading-none font-semibold text-gray-700'>
                 작성 기간
               </legend>
               <div className='flex min-w-0 items-center gap-1'>

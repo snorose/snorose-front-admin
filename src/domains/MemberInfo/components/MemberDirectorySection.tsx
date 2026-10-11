@@ -3,9 +3,10 @@ import { useId } from 'react';
 import { Loader2, Search } from 'lucide-react';
 
 import {
-  ListResultHeader,
   PaginationBar,
   SearchableSelect,
+  SectionTitle,
+  SectionTitleWithCount,
   StatusBadge,
   TableStateRow,
 } from '@/shared/components';
@@ -91,12 +92,9 @@ export default function MemberDirectorySection({
         aria-labelledby={`${searchInputId}-search-heading`}
         className='flex w-full min-w-0 flex-col gap-1'
       >
-        <h2
-          id={`${searchInputId}-search-heading`}
-          className='text-lg font-bold'
-        >
+        <SectionTitle id={`${searchInputId}-search-heading`}>
           회원 검색
-        </h2>
+        </SectionTitle>
 
         <form
           aria-labelledby={`${searchInputId}-search-heading`}
@@ -209,8 +207,8 @@ export default function MemberDirectorySection({
         aria-labelledby={`${searchInputId}-results-heading`}
         className='flex min-w-0 flex-col gap-1'
       >
-        <div className='flex min-w-0 flex-col gap-3'>
-          <ListResultHeader
+        <div className='flex min-w-0 flex-col gap-1'>
+          <SectionTitleWithCount
             title='회원 목록'
             titleId={`${searchInputId}-results-heading`}
             totalCount={totalCount}
@@ -221,7 +219,7 @@ export default function MemberDirectorySection({
           <div className='overflow-hidden rounded-md border border-slate-200'>
             <Table className='min-w-230'>
               <Table.Header>
-                <Table.Row className='border-b border-slate-200 bg-slate-50 hover:bg-slate-50'>
+                <Table.Row className='border-b border-slate-200'>
                   <Table.Head className='w-12 px-4'>
                     <input
                       type='checkbox'

@@ -57,7 +57,7 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
           <col className='w-[120px]' />
           <col className='w-full' />
         </colgroup>
-        <Table.Header className='bg-gray-100'>
+        <Table.Header>
           <Table.Row>
             <Table.Head>변경일시</Table.Head>
             <Table.Head>관리자</Table.Head>

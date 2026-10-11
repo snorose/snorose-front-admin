@@ -52,10 +52,7 @@ export default function PenaltyUserInfo({
 
             return (
               <div key={key} className='flex gap-4'>
-                <Label
-                  htmlFor={`${inputId}-${key}`}
-                  className='text-foreground w-32'
-                >
+                <Label htmlFor={`${inputId}-${key}`} className='w-32'>
                   {label}
                 </Label>
 
@@ -72,10 +69,7 @@ export default function PenaltyUserInfo({
 
           return (
             <div key={key} className='flex gap-4'>
-              <Label
-                htmlFor={`${inputId}-${key}`}
-                className='text-foreground w-32'
-              >
+              <Label htmlFor={`${inputId}-${key}`} className='w-32'>
                 {label}
               </Label>
 

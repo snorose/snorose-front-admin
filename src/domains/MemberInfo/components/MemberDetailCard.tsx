@@ -24,7 +24,7 @@ export function InfoBlock({
 }: InfoBlockProps) {
   return (
     <div className='space-y-2'>
-      <p className='text-sm font-medium text-slate-500'>{label}</p>
+      <p className='text-sm font-medium text-gray-700'>{label}</p>
       <div
         className={
           tone === 'muted'

@@ -48,7 +48,7 @@ export default function DownloadedExamReviewTab({
     <div className='no-scrollbar scroll-hidden overflow-x-scroll'>
       <Table className='w-full border-separate border-spacing-0 rounded-md border-2 border-solid [&_td]:border-r [&_td]:border-b [&_th]:border-r [&_th]:border-b'>
         {/* Table Header */}
-        <Table.Header className='z-10 bg-gray-100 shadow-sm'>
+        <Table.Header className='z-10 shadow-sm'>
           <Table.Row>
             <Table.Head className='text-center'>번호</Table.Head>
             <Table.Head className='text-center'>id</Table.Head>

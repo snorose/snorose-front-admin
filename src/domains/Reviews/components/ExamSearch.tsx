@@ -3,7 +3,11 @@ import { useId, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { DatePicker, FilterMultiSelect } from '@/shared/components';
+import {
+  DatePicker,
+  FilterMultiSelect,
+  SectionTitle,
+} from '@/shared/components';
 import {
   Button,
   Checkbox,
@@ -342,9 +346,7 @@ export default function ExamSearch({
       aria-labelledby={`${dateId}-heading`}
       className='flex w-full min-w-0 flex-col gap-1'
     >
-      <h2 id={`${dateId}-heading`} className='text-lg font-bold'>
-        시험후기 검색
-      </h2>
+      <SectionTitle id={`${dateId}-heading`}>시험후기 검색</SectionTitle>
       <form
         aria-labelledby={`${dateId}-heading`}
         className='border-border bg-background @container flex min-w-0 flex-col gap-4 rounded-md border p-4'
@@ -412,7 +414,7 @@ export default function ExamSearch({
               </InputGroup>
             </div>
             <fieldset className='min-w-0 @md:col-span-2 @5xl:col-span-1'>
-              <legend className='mb-1 py-1 text-sm leading-none font-semibold'>
+              <legend className='mb-1 py-1 text-sm leading-none font-semibold text-gray-700'>
                 작성 기간
               </legend>
               <div className='flex min-w-0 items-center gap-1'>

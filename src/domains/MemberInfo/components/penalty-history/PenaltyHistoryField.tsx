@@ -9,7 +9,7 @@ export default function PenaltyHistoryField({
 }) {
   return (
     <label className='block space-y-2'>
-      <span className='text-sm font-bold text-slate-900'>{label}</span>
+      <span className='text-sm font-bold text-gray-700'>{label}</span>
       {children}
     </label>
   );

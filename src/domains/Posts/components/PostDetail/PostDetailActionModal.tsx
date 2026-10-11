@@ -69,7 +69,7 @@ export default function PostDetailActionModal({
           )}
 
           {modalType === 'DELETE' && (
-            <label className='mt-1 flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-600 select-none'>
+            <label className='mt-1 flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700 select-none'>
               <input
                 type='checkbox'
                 checked={deleteCommentsAlso}

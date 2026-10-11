@@ -235,7 +235,7 @@ function PenaltyHistoryCard({
         </div>
 
         <div className='mt-5 space-y-2'>
-          <p className='text-sm font-semibold text-slate-400'>운영자 메모</p>
+          <p className='text-sm font-semibold text-gray-700'>운영자 메모</p>
           <p className='rounded-xl bg-slate-100 px-4 py-3 text-sm font-medium text-slate-700'>
             {history.operatorMemo || '-'}
           </p>
@@ -265,7 +265,7 @@ function Info({ label, value }: { label: string; value?: string | null }) {
 
   return (
     <div className='space-y-2'>
-      <p className='text-sm font-semibold text-slate-400'>{label}</p>
+      <p className='text-sm font-semibold text-gray-700'>{label}</p>
       <p className='text-sm font-semibold text-slate-800'>
         {displayValue || '-'}
       </p>

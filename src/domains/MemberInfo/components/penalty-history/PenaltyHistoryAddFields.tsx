@@ -197,7 +197,7 @@ export function Field({
 }) {
   return (
     <div className='space-y-2'>
-      <Label htmlFor={htmlFor} className='text-base font-bold text-slate-950'>
+      <Label htmlFor={htmlFor} className='text-base font-bold'>
         {label}
       </Label>
       {children}

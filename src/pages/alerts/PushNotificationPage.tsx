@@ -2,7 +2,7 @@ import { useId, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { PageHeader } from '@/shared/components';
+import { PageHeader, SectionTitle } from '@/shared/components';
 import {
   Button,
   Input,
@@ -233,7 +233,7 @@ export default function PushNotificationPage() {
       />
       <section className='flex gap-4'>
         <article className='flex w-full flex-col gap-1'>
-          <h3 className='text-lg font-bold'>필수 정보</h3>
+          <SectionTitle>필수 정보</SectionTitle>
           <div className='flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
             <div className='flex flex-col gap-1'>
               <Label htmlFor={`${inputId}-name`} required>
@@ -370,7 +370,7 @@ export default function PushNotificationPage() {
         </article>
 
         <article className='flex w-full flex-col gap-1'>
-          <h3 className='text-lg font-bold'>발송 옵션</h3>
+          <SectionTitle>발송 옵션</SectionTitle>
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between rounded-md border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>

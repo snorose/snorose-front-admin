@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
-import { PeriodStatusBadge } from '@/shared/components';
+import { PeriodStatusBadge, SectionTitle } from '@/shared/components';
 import { Button, DropdownMenu, Skeleton, Table } from '@/shared/components/ui';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -54,7 +54,7 @@ export function ExamReviewPeriodListSection({
   return (
     <>
       <article className='flex w-full flex-col gap-1'>
-        <h3 className='text-lg font-bold'>시험 후기 작성 기간 조회</h3>
+        <SectionTitle>시험 후기 작성 기간 조회</SectionTitle>
         {errorMessage && (
           <div
             role='alert'

@@ -1,6 +1,6 @@
 import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
-import { PeriodStatusBadge } from '@/shared/components';
+import { PeriodStatusBadge, SectionTitle } from '@/shared/components';
 import { Button, DropdownMenu, Table } from '@/shared/components/ui';
 
 import type { ServerMaintenance } from '../types/maintenance';
@@ -17,9 +17,9 @@ export function MaintenanceListSection({ items, onEdit, onDelete }: Props) {
       className='flex w-full flex-col gap-1'
       aria-labelledby='maintenance-list-title'
     >
-      <h2 id='maintenance-list-title' className='text-lg font-bold'>
+      <SectionTitle id='maintenance-list-title'>
         서버 점검 일정 조회
-      </h2>
+      </SectionTitle>
       <div className='overflow-x-auto rounded-md border'>
         <Table className='w-full min-w-[920px]'>
           <Table.Header>
