@@ -68,6 +68,7 @@ export function ExamReviewDeleteModal({
             onKeyDown={(event) => {
               if (
                 event.key === 'Enter' &&
+                !event.nativeEvent.isComposing &&
                 (event.metaKey || event.ctrlKey) &&
                 deleteReason.trim() &&
                 !isDeleting

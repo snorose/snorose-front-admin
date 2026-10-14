@@ -66,6 +66,7 @@ export function ExamReviewRestoreModal({
             onKeyDown={(event) => {
               if (
                 event.key === 'Enter' &&
+                !event.nativeEvent.isComposing &&
                 (event.metaKey || event.ctrlKey) &&
                 restoreReason.trim() &&
                 !isRestoring
