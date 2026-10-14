@@ -34,8 +34,8 @@ export const AppSidebar = ({
   return (
     <Sidebar
       {...props}
-      collapsible='none'
-      className={cn('sticky top-0 h-svh shrink-0', className)}
+      collapsible='offcanvas'
+      className={cn('border-sidebar-border', className)}
     >
       <Sidebar.Content className='gap-0'>
         <div className='flex items-center justify-start px-4 pt-4 pb-2'>
@@ -73,6 +73,7 @@ export const AppSidebar = ({
           </Sidebar.Menu>
         </Sidebar.Group>
       </Sidebar.Content>
+      <Sidebar.Rail />
       <Sidebar.Footer>
         <NavUser />
       </Sidebar.Footer>
