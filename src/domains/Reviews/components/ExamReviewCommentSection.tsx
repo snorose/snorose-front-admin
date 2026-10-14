@@ -64,7 +64,7 @@ export function ExamReviewCommentSection({
     return (
       <div key={comment.id} className='flex flex-col gap-2'>
         <article
-          className='rounded-md border border-gray-200 bg-gray-50 px-4 py-3'
+          className='rounded-lg border border-gray-200 bg-gray-50 px-4 py-3'
           style={{ marginLeft: depth * 20 }}
         >
           <div className='flex flex-wrap items-center gap-2'>
@@ -99,11 +99,11 @@ export function ExamReviewCommentSection({
           불러오는 중...
         </div>
       ) : commentsQuery.isError ? (
-        <div className='rounded-md border border-dashed border-red-200 bg-red-50 px-4 py-8 text-center text-sm text-red-500'>
+        <div className='rounded-lg border border-dashed border-red-200 bg-red-50 px-4 py-8 text-center text-sm text-red-500'>
           댓글 목록을 불러오지 못했습니다.
         </div>
       ) : comments.length === 0 ? (
-        <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500'>
+        <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500'>
           표시할 댓글이 없습니다.
         </div>
       ) : (

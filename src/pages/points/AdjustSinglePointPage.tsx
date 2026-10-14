@@ -3,7 +3,7 @@ import { useId, useRef, useState } from 'react';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { PageHeader } from '@/shared/components';
+import { PageHeader, SectionTitle } from '@/shared/components';
 import { Button, InputGroup, Label } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import type { AdminUserListItem } from '@/shared/types';
@@ -102,7 +102,7 @@ export default function AdjustSinglePointPage() {
         description='특정 회원에게 포인트를 지급/차감할 수 있어요.'
       />
       <article className='flex flex-col gap-1'>
-        <h3 className='text-lg font-bold'>회원 검색</h3>
+        <SectionTitle>회원 검색</SectionTitle>
         <Label htmlFor={searchInputId} className='sr-only'>
           회원 검색 (아이디 또는 학번)
         </Label>

@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { DateTimePicker } from '@/shared/components';
+import { DateTimePicker, SectionTitle } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 
@@ -41,11 +41,11 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
 
   return (
     <section className='flex flex-col gap-1' aria-labelledby={headingId}>
-      <h2 id={headingId} className='text-lg font-bold'>
+      <SectionTitle id={headingId}>
         {initial ? '서버 점검 일정 수정' : '서버 점검 일정 등록'}
-      </h2>
+      </SectionTitle>
       <form
-        className='flex flex-col gap-4 rounded-md border p-4 pb-5'
+        className='flex flex-col gap-4 rounded-lg border p-4 pb-5'
         onSubmit={(event) => {
           event.preventDefault();
           if (!draft.title.trim() || !draft.startAt || !draft.endAt) {

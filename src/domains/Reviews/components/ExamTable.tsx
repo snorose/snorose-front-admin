@@ -8,12 +8,12 @@ import {
 } from 'react';
 
 import {
-  ListResultHeader,
   PaginationBar,
+  SectionTitleWithCount,
   StatusBadge,
 } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
-import { useStableTotalPage } from '@/shared/hooks';
+import { useStableTotalCount, useStableTotalPage } from '@/shared/hooks';
 import { cn } from '@/shared/lib';
 import { clampOneBasedPage } from '@/shared/utils';
 
@@ -59,19 +59,26 @@ const renderProcessStatusBadge = (review: ExamReview) => {
 
   return (
     <div className='flex flex-wrap gap-1' title={label}>
-      {renderReportedStatusBadge(review)}
+      {review.isReported && (
+        <div className='shrink-0'>{renderReportedStatusBadge(review)}</div>
+      )}
       {review.processStatuses.map((status) => (
-        <ExamReviewProcessStatusBadge key={status} status={status} />
+        <ExamReviewProcessStatusBadge
+          key={status}
+          status={status}
+          className='shrink-0'
+        />
       ))}
     </div>
   );
 };
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
+  { key: 'id', label: 'postId', width: '80px' },
   {
     key: 'status',
     label: '확인여부',
-    width: '78px',
+    width: '90px',
     render: (review: ExamReview) => (
       <ExamConfirmStatusBadge
         status={review.status}
@@ -79,13 +86,12 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       />
     ),
   },
-  { key: 'id', label: 'postId', width: '90px' },
-  { key: 'reviewTitle', label: '시험후기명', width: '320px' },
+  { key: 'reviewTitle', label: '시험후기명', width: '260px' },
   { key: 'userDisplay', label: '작성자', width: '120px' },
   {
     key: 'isDiscussed',
     label: '논의 여부',
-    width: '92px',
+    width: '100px',
     render: (review: ExamReview) => (
       <ExamDiscussionStatusBadge isDiscussed={review.isDiscussed} />
     ),
@@ -93,7 +99,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
   {
     key: 'processStatuses',
     label: '관리 상태',
-    width: '150px',
+    width: '200px',
     render: renderProcessStatusBadge,
   },
   { key: 'uploadTime', label: '작성일', width: '150px' },
@@ -167,7 +173,10 @@ export default function ExamTable({
   const isLoading = !hasProvidedData && isQueryLoading;
   const responseTotalPage = hasProvidedData ? undefined : queryData?.totalPage;
   const totalPage = useStableTotalPage(responseTotalPage, currentPage);
-  const totalCount = hasProvidedData ? undefined : queryData?.totalCount;
+  const totalCount = useStableTotalCount(
+    hasProvidedData ? undefined : queryData?.totalCount,
+    { searchParams, hasProvidedData }
+  );
   const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
 
   useEffect(() => {
@@ -197,8 +206,8 @@ export default function ExamTable({
   }, [selectedId, currentPageData, onRowSelect]);
 
   return (
-    <div className='flex min-w-0 flex-col gap-3'>
-      <ListResultHeader
+    <div className='flex min-w-0 flex-col gap-1'>
+      <SectionTitleWithCount
         title='시험후기 목록'
         titleId={titleId}
         totalCount={totalCount}
@@ -213,22 +222,23 @@ export default function ExamTable({
         }
       />
 
-      <div className='w-full overflow-x-auto rounded-md border'>
-        <Table className='w-full table-fixed rounded-lg bg-white shadow'>
+      <div className='w-full overflow-x-auto rounded-lg border'>
+        <Table className='w-full min-w-[1020px] table-fixed bg-white shadow'>
           <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <col key={column.key} style={{ width: column.width }} />
             ))}
           </colgroup>
 
-          <Table.Header className='z-10 h-[40px] bg-gray-100 shadow-sm [&_tr]:border-b'>
+          <Table.Header className='z-10 h-[40px] shadow-sm [&_tr]:border-b'>
             <Table.Row>
               {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                 <Table.Head
                   key={column.key}
                   className={cn(
                     'relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap',
-                    column.key === 'status' && 'text-center'
+                    (column.key === 'id' || column.key === 'status') &&
+                      'text-center'
                   )}
                 >
                   {column.label}
@@ -252,7 +262,7 @@ export default function ExamTable({
                     <Table.Row
                       key={review.id}
                       className={cn(
-                        'hover:cursor-pointer [&_td]:h-[40px]',
+                        'hover:cursor-pointer',
                         selectedId === review.id &&
                           'bg-blue-100 hover:bg-blue-100'
                       )}
@@ -268,11 +278,19 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
+                          title={
+                            column.key === 'id' ? String(review.id) : undefined
+                          }
                           className={cn(
-                            'overflow-hidden text-ellipsis whitespace-nowrap',
-                            column.key === 'status' && 'text-center',
+                            'whitespace-nowrap',
+                            column.key !== 'processStatuses' && 'h-[40px]',
+                            column.key !== 'id' &&
+                              column.key !== 'processStatuses' &&
+                              'overflow-hidden text-ellipsis',
+                            (column.key === 'id' || column.key === 'status') &&
+                              'text-center',
                             column.key === 'processStatuses' &&
-                              'whitespace-normal'
+                              'min-w-[200px] overflow-visible whitespace-normal'
                           )}
                         >
                           {column.render

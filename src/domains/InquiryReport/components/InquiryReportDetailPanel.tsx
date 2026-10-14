@@ -82,7 +82,7 @@ export default function InquiryReportDetailPanel({
 
   if (isDetailLoading) {
     return (
-      <div className='flex h-40 w-full items-center justify-center overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
+      <div className='flex h-40 w-full items-center justify-center overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
         <p className='text-sm text-gray-400'>
           문의 및 신고 상세를 불러오는 중입니다...
         </p>
@@ -92,7 +92,7 @@ export default function InquiryReportDetailPanel({
 
   if (!detail) {
     return (
-      <div className='flex h-40 w-full items-center justify-center overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
+      <div className='flex h-40 w-full items-center justify-center overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
         <p className='text-sm text-gray-400'>해당 항목을 찾을 수 없습니다.</p>
       </div>
     );
@@ -201,7 +201,7 @@ export default function InquiryReportDetailPanel({
   };
 
   return (
-    <div className='max-h-[calc(100vh-180px)] overflow-y-auto rounded-md border border-gray-200 bg-white shadow-sm'>
+    <div className='max-h-[calc(100vh-180px)] overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
       {/* 헤더 */}
       <div className='flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3'>
         <div className='flex min-w-0 flex-1 items-center gap-2'>
@@ -264,14 +264,14 @@ export default function InquiryReportDetailPanel({
       <div className='grid grid-cols-1 gap-x-8 gap-y-2 border-b border-gray-100 px-4 py-3 text-[13px] sm:grid-cols-2'>
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-500'>분류</span>
+            <span className='shrink-0 text-gray-700'>분류</span>
             <span className='flex min-w-0 items-center'>
               <InquiryGroupBadge group={detail.group} />
             </span>
           </div>
 
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-500'>중분류</span>
+            <span className='shrink-0 text-gray-700'>중분류</span>
             <span className='flex min-w-0 items-center'>
               <InquirySubGroupBadge subGroup={detail.subGroup} />
             </span>
@@ -279,7 +279,7 @@ export default function InquiryReportDetailPanel({
 
           {detail.reportCause && (
             <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-500'>신고 사유</span>
+              <span className='shrink-0 text-gray-700'>신고 사유</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {INQUIRY_REPORT_CAUSE_LABELS[detail.reportCause] ??
                   detail.reportCause}
@@ -289,7 +289,7 @@ export default function InquiryReportDetailPanel({
 
           {detail.target && (
             <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-500'>신고 대상</span>
+              <span className='shrink-0 text-gray-700'>신고 대상</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {detail.target}
               </span>
@@ -299,7 +299,7 @@ export default function InquiryReportDetailPanel({
 
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-500'>작성자</span>
+            <span className='shrink-0 text-gray-700'>작성자</span>
             <span className='flex min-w-0 items-center gap-1.5 text-gray-800'>
               <span className='min-w-0 truncate'>
                 {isWriterWithdrawn ? (
@@ -324,7 +324,7 @@ export default function InquiryReportDetailPanel({
           </div>
 
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-500'>작성일</span>
+            <span className='shrink-0 text-gray-700'>작성일</span>
             <span className='min-w-0 break-words text-gray-800'>
               {formatDateTimeToMinutes(detail.createdAt)}
             </span>
@@ -332,7 +332,7 @@ export default function InquiryReportDetailPanel({
 
           {detail.updatedAt && (
             <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-500'>수정일</span>
+              <span className='shrink-0 text-gray-700'>수정일</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {formatDateTimeToMinutes(detail.updatedAt)}
               </span>
@@ -340,7 +340,7 @@ export default function InquiryReportDetailPanel({
           )}
 
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-500'>답변</span>
+            <span className='shrink-0 text-gray-700'>답변</span>
             <span className='min-w-0 break-words text-gray-800'>
               {commentCount}건
             </span>
@@ -364,7 +364,7 @@ export default function InquiryReportDetailPanel({
         </div>
 
         {isCommentsLoading ? (
-          <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
+          <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
             댓글을 불러오는 중입니다...
           </div>
         ) : visibleComments.length > 0 ? (
@@ -387,17 +387,17 @@ export default function InquiryReportDetailPanel({
             ))}
           </ul>
         ) : (
-          <div className='rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
+          <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
             등록된 댓글이 없습니다.
           </div>
         )}
 
         <form
-          className='flex flex-col gap-2 rounded-md border border-slate-200 bg-slate-50 p-3'
+          className='flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3'
           onSubmit={handleCommentSubmit}
         >
           {replyParentComment && (
-            <div className='flex items-center justify-between gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-600'>
+            <div className='flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-600'>
               <span className='min-w-0 truncate'>
                 {getCommentAuthorDisplay(replyParentComment)} 댓글에 대댓글 작성
               </span>

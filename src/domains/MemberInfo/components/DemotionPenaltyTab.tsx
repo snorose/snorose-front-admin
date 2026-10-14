@@ -144,7 +144,7 @@ export default function DemotionPenaltyTab({
   return (
     <div className='mt-4 flex flex-row gap-8'>
       {/* 강등하기 */}
-      <section className='w-1/2 rounded-md border border-red-300 bg-red-50 p-4'>
+      <section className='w-1/2 rounded-lg border border-red-300 bg-red-50 p-4'>
         <h3 className='mb-3 font-semibold text-red-700'>강등하기</h3>
 
         {/* 강등 유형 선택 */}
@@ -256,9 +256,9 @@ export default function DemotionPenaltyTab({
       </section>
 
       {/* 강등 해제하기 */}
-      <section className='w-1/2 rounded-md border border-blue-300 bg-blue-50 p-4'>
+      <section className='w-1/2 rounded-lg border border-blue-300 bg-blue-50 p-4'>
         <h3 className='mb-3 font-semibold text-blue-700'>강등 해제하기</h3>
-        <div className='bg-background/70 rounded-md border border-blue-200 p-4 text-sm font-medium text-blue-700'>
+        <div className='bg-background/70 rounded-lg border border-blue-200 p-4 text-sm font-medium text-blue-700'>
           강등 해제 API가 준비되지 않았습니다. 해제가 필요한 경우 담당자에게
           요청해주세요.
         </div>

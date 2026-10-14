@@ -1,24 +1,22 @@
 import { ResultCount, type ResultCountProps } from './ResultCount';
+import { SectionTitle } from './SectionTitle';
 
-export interface ListResultHeaderProps extends ResultCountProps {
+export interface SectionTitleWithCountProps extends ResultCountProps {
   title: string;
   titleId?: string;
 }
 
-export function ListResultHeader({
+export function SectionTitleWithCount({
   title,
   titleId,
   totalCount,
   status,
-}: ListResultHeaderProps) {
+}: SectionTitleWithCountProps) {
   return (
     <div className='flex min-w-0 flex-wrap items-end justify-between gap-x-4 gap-y-1'>
-      <h2
-        id={titleId}
-        className='max-w-full min-w-0 text-lg font-bold break-words'
-      >
+      <SectionTitle id={titleId} className='max-w-full min-w-0 break-words'>
         {title}
-      </h2>
+      </SectionTitle>
       <ResultCount totalCount={totalCount} status={status} />
     </div>
   );

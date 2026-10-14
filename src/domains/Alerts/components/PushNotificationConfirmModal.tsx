@@ -61,7 +61,7 @@ export function PushNotificationConfirmModal({
         <div className='flex flex-col gap-3 py-4'>
           {CONFIRMATION_DATA.map((data) => (
             <div className='flex items-start gap-2' key={data.label}>
-              <span className='flex-shrink-0 text-sm font-semibold'>
+              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
                 {data.label}:
               </span>
               <span className='text-sm break-keep'>{data.value}</span>

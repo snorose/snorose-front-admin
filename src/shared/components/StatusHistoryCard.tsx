@@ -39,7 +39,7 @@ export function StatusHistoryCard({
   }, [currentPage, isLoading, totalPage, onPageChange]);
 
   return (
-    <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
+    <div className='flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-5 shadow-sm'>
       <h3 className='text-[14px] font-bold text-gray-900'>{title}</h3>
       {isLoading ? (
         <div className='flex items-center justify-center gap-2 py-4 text-xs text-gray-400'>
@@ -62,7 +62,7 @@ export function StatusHistoryCard({
               className='flex flex-col gap-1.5 border-b border-gray-50 pb-3 last:border-none last:pb-0'
             >
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2'>
-                <span className='font-medium text-gray-400'>변경 상태</span>
+                <span className='font-medium text-gray-700'>변경 상태</span>
                 <div>
                   <div className='flex flex-wrap gap-1'>
                     <StatusBadge tone='accent'>
@@ -72,20 +72,20 @@ export function StatusHistoryCard({
                 </div>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>처리자</span>
+                <span className='font-medium text-gray-700'>처리자</span>
                 <span className='font-semibold text-gray-700'>
                   {log.actorNickname ?? '시스템'}
                 </span>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>변경 날짜</span>
+                <span className='font-medium text-gray-700'>변경 날짜</span>
                 <span className='font-mono text-gray-600'>
                   {formatDateTimeWithAmPm(log.changedAt)}
                 </span>
               </div>
               {log.memo && (
                 <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                  <span className='font-medium text-gray-400'>메모</span>
+                  <span className='font-medium text-gray-700'>메모</span>
                   <span className='text-gray-600'>{log.memo}</span>
                 </div>
               )}

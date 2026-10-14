@@ -15,3 +15,4 @@ export {
   createExamReviewPeriodRequest,
   updateExamReviewPeriodRequest,
 } from './exam-review-period-request-builders';
+export { buildOriginalExamReviewUrl } from './exam-review-urls';

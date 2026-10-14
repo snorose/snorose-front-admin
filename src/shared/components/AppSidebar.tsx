@@ -1,20 +1,11 @@
-import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
-import { ChevronRight } from 'lucide-react';
-
 import { NavUser } from '@/shared/components';
-import { Badge, Collapsible, Sidebar } from '@/shared/components/ui';
+import { Badge, Sidebar } from '@/shared/components/ui';
 import { SIDEBAR_MENUS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 
 import { snoroseLogo } from '@/assets';
-
-const sidebarMenuButtonClassName = cn(
-  'font-semibold hover:bg-blue-50 hover:!text-current',
-  'data-[active=true]:bg-blue-200 data-[active=true]:font-semibold',
-  'data-[active=true]:hover:!bg-blue-200 data-[active=true]:active:!bg-blue-200'
-);
 
 const sidebarMenuSubButtonClassName = cn(
   'hover:bg-blue-50 hover:!text-current',
@@ -23,9 +14,9 @@ const sidebarMenuSubButtonClassName = cn(
 );
 
 export const AppSidebar = ({
+  className,
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
-  const [openStates, setOpenStates] = useState<Record<string, boolean>>({});
   const location = useLocation();
 
   const isActive = (url: string) => {
@@ -40,25 +31,12 @@ export const AppSidebar = ({
     return location.pathname === url || location.pathname.startsWith(`${url}/`);
   };
 
-  useEffect(() => {
-    const stored = sessionStorage.getItem('sidebar-open-states');
-    if (stored) {
-      try {
-        setOpenStates(JSON.parse(stored));
-      } catch {
-        sessionStorage.removeItem('sidebar-open-states');
-      }
-    }
-  }, []);
-
-  const handleOpenChange = (title: string, open: boolean) => {
-    const updated = { ...openStates, [title]: open };
-    setOpenStates(updated);
-    sessionStorage.setItem('sidebar-open-states', JSON.stringify(updated));
-  };
-
   return (
-    <Sidebar {...props}>
+    <Sidebar
+      {...props}
+      collapsible='offcanvas'
+      className={cn('border-sidebar-border', className)}
+    >
       <Sidebar.Content className='gap-0'>
         <div className='flex items-center justify-start px-4 pt-4 pb-2'>
           <img src={snoroseLogo} alt='logo' className='box-content h-5' />
@@ -66,55 +44,32 @@ export const AppSidebar = ({
 
         <Sidebar.Group>
           <Sidebar.Menu className='p-2'>
-            {SIDEBAR_MENUS.map((menu) => {
-              const hasActiveSubItem = menu.items.some((subItem) =>
-                isActive(subItem.url)
-              );
-
-              return (
-                <Collapsible
-                  key={menu.title}
-                  asChild
-                  open={openStates[menu.title] ?? false}
-                  onOpenChange={(open) => handleOpenChange(menu.title, open)}
-                  className='group/collapsible'
-                >
-                  <Sidebar.MenuItem>
-                    <Collapsible.Trigger asChild>
-                      <Sidebar.MenuButton
-                        tooltip={menu.title}
-                        isActive={hasActiveSubItem}
-                        className={sidebarMenuButtonClassName}
+            {SIDEBAR_MENUS.map((menu) => (
+              <Sidebar.MenuItem key={menu.title}>
+                <div className='flex h-8 items-center gap-2 p-2 text-sm font-semibold [&>svg]:size-4 [&>svg]:shrink-0'>
+                  {menu.icon && <menu.icon />}
+                  <span>{menu.title}</span>
+                </div>
+                <Sidebar.MenuSub>
+                  {menu.items.map((subItem) => (
+                    <Sidebar.MenuSubItem key={subItem.title}>
+                      <Sidebar.MenuSubButton
+                        asChild
+                        isActive={isActive(subItem.url)}
+                        className={sidebarMenuSubButtonClassName}
                       >
-                        {menu.icon && <menu.icon />}
-                        <span>{menu.title}</span>
-                        <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                      </Sidebar.MenuButton>
-                    </Collapsible.Trigger>
-                    <Collapsible.Content>
-                      <Sidebar.MenuSub>
-                        {menu.items.map((subItem) => (
-                          <Sidebar.MenuSubItem key={subItem.title}>
-                            <Sidebar.MenuSubButton
-                              asChild
-                              isActive={isActive(subItem.url)}
-                              className={sidebarMenuSubButtonClassName}
-                            >
-                              <NavLink to={subItem.url}>
-                                <span>{subItem.title}</span>
-                                {subItem.beta && (
-                                  <Badge variant='outline'>Beta</Badge>
-                                )}
-                              </NavLink>
-                            </Sidebar.MenuSubButton>
-                          </Sidebar.MenuSubItem>
-                        ))}
-                      </Sidebar.MenuSub>
-                    </Collapsible.Content>
-                  </Sidebar.MenuItem>
-                </Collapsible>
-              );
-            })}
+                        <NavLink to={subItem.url}>
+                          <span>{subItem.title}</span>
+                          {subItem.beta && (
+                            <Badge variant='outline'>Beta</Badge>
+                          )}
+                        </NavLink>
+                      </Sidebar.MenuSubButton>
+                    </Sidebar.MenuSubItem>
+                  ))}
+                </Sidebar.MenuSub>
+              </Sidebar.MenuItem>
+            ))}
           </Sidebar.Menu>
         </Sidebar.Group>
       </Sidebar.Content>

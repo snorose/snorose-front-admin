@@ -12,7 +12,7 @@ export function ResultCount({ totalCount, status }: ResultCountProps) {
     >
       {status === 'error' ? (
         '개수 확인 불가'
-      ) : status === 'loading' ? (
+      ) : status === 'loading' && totalCount === undefined ? (
         '조회 중…'
       ) : (
         <>

@@ -312,11 +312,7 @@ function Field({
 }) {
   return (
     <div className='space-y-2'>
-      <Label
-        htmlFor={htmlFor}
-        required={required}
-        className='py-0 font-bold text-slate-900'
-      >
+      <Label htmlFor={htmlFor} required={required} className='py-0 font-bold'>
         {label}
       </Label>
       {children}

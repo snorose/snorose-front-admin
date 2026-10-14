@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { DateTimePicker } from '@/shared/components';
+import { DateTimePicker, SectionTitle } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { getErrorMessage } from '@/shared/utils';
@@ -85,8 +85,8 @@ export function ExamReviewPeriodScheduleForm({
   return (
     <section className='flex flex-col gap-4'>
       <article className='flex w-full flex-col gap-1'>
-        <h3 className='text-lg font-bold'>시험 후기 작성 기간 생성</h3>
-        <div className='@container flex w-full flex-col gap-4 rounded-md border p-4 pb-5'>
+        <SectionTitle>시험 후기 작성 기간 생성</SectionTitle>
+        <div className='@container flex w-full flex-col gap-4 rounded-lg border p-4 pb-5'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor={titleId} required>
               기간 제목

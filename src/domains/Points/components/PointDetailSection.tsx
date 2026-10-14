@@ -1,5 +1,6 @@
 import { useEffect, useId } from 'react';
 
+import { SectionTitle } from '@/shared/components';
 import { Input, Label, Select } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 
@@ -54,8 +55,8 @@ export function PointDetailSection({
 
   return (
     <article className='flex flex-col gap-1'>
-      <h3 className='text-lg font-bold'>지급할 포인트 상세</h3>
-      <div className='grid w-full grid-cols-2 gap-4 rounded-md border p-4 pb-5'>
+      <SectionTitle>지급할 포인트 상세</SectionTitle>
+      <div className='grid w-full grid-cols-2 gap-4 rounded-lg border p-4 pb-5'>
         <div className='flex flex-col gap-1'>
           <Label htmlFor={`${inputId}-category`} required>
             포인트 유형

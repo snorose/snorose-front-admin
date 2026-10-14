@@ -23,7 +23,7 @@ const CHANGE_FIELD_LABELS: Record<string, string> = {
   examType: '시험종류',
   isPF: 'P/F',
   isOnline: '온라인 여부',
-  questionDetail: '시험 유형 및 문항수',
+  questionDetail: '시험 유형 및 문항 수',
   deletionStatus: '삭제 상태',
   isSanctioned: '징계 여부',
   visibilityStatus: '공개 상태',
@@ -43,21 +43,21 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
 
   if (safeLogs.length === 0) {
     return (
-      <div className='flex min-h-[240px] items-center justify-center rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-500'>
+      <div className='flex min-h-[240px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500'>
         관리 이력이 없습니다.
       </div>
     );
   }
 
   return (
-    <div className='overflow-hidden rounded-md border border-gray-200'>
+    <div className='overflow-hidden rounded-lg border border-gray-200'>
       <Table className='table-fixed bg-white'>
         <colgroup>
           <col className='w-[150px]' />
           <col className='w-[120px]' />
           <col className='w-full' />
         </colgroup>
-        <Table.Header className='bg-gray-100'>
+        <Table.Header>
           <Table.Row>
             <Table.Head>변경일시</Table.Head>
             <Table.Head>관리자</Table.Head>

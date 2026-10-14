@@ -34,7 +34,7 @@ Field.Legend = function FieldLegend({
       data-slot='field-legend'
       data-variant={variant}
       className={cn(
-        'mb-3 font-medium',
+        'mb-3 font-medium text-gray-700',
         'data-[variant=legend]:text-base',
         'data-[variant=label]:text-sm',
         className
@@ -142,7 +142,7 @@ Field.Title = function FieldTitle({
     <div
       data-slot='field-label'
       className={cn(
-        'flex w-fit items-center gap-2 text-sm leading-snug font-medium group-data-[disabled=true]/field:opacity-50',
+        'flex w-fit items-center gap-2 text-sm leading-snug font-medium text-gray-700 group-data-[disabled=true]/field:opacity-50',
         className
       )}
       {...props}

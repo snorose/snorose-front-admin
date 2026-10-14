@@ -22,7 +22,7 @@ describe('ResultCount', () => {
     expect(screen.getByRole('status')).toHaveTextContent('총 0건');
   });
 
-  test('상태 알림 영역을 유지하고 재조회와 오류에서 이전 숫자를 숨긴다', () => {
+  test('상태 알림 영역과 재조회 중 건수를 유지하고 오류에서는 숫자를 숨긴다', () => {
     const { rerender } = render(
       <ResultCount totalCount={1234} status='ready' />
     );
@@ -33,8 +33,7 @@ describe('ResultCount', () => {
     rerender(<ResultCount totalCount={1234} status='loading' />);
 
     expect(screen.getByRole('status')).toBe(statusRegion);
-    expect(statusRegion).toHaveTextContent('조회 중…');
-    expect(statusRegion).not.toHaveTextContent('1,234');
+    expect(statusRegion).toHaveTextContent('총 1,234건');
 
     rerender(<ResultCount totalCount={1234} status='error' />);
 

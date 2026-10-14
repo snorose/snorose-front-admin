@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
-import { PeriodStatusBadge } from '@/shared/components';
+import { PeriodStatusBadge, SectionTitle } from '@/shared/components';
 import { Button, DropdownMenu, Skeleton, Table } from '@/shared/components/ui';
 import type { PointFreeze } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -49,11 +49,11 @@ export function PointFreezeListSection({
   return (
     <>
       <article className='flex w-full flex-col gap-1'>
-        <h3 className='text-lg font-bold'>미지급 일정 조회</h3>
+        <SectionTitle>미지급 일정 조회</SectionTitle>
         {errorMessage && (
           <div
             role='alert'
-            className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3 text-sm'
+            className='flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm'
           >
             <span>{errorMessage}</span>
             {onRetry && (
@@ -70,13 +70,13 @@ export function PointFreezeListSection({
           </div>
         )}
         <div
-          className='overflow-x-auto rounded-md border'
+          className='overflow-x-auto rounded-lg border'
           aria-busy={isFetching}
         >
           <Table className='w-full'>
             <Table.Header>
               <Table.Row className='text-center'>
-                <Table.Head className='text-center'>번호</Table.Head>
+                <Table.Head className='text-center'>Id</Table.Head>
                 <Table.Head className='text-center'>상태</Table.Head>
                 <Table.Head className='text-center'>일정 제목</Table.Head>
                 <Table.Head className='text-center'>시작 일시</Table.Head>
@@ -98,14 +98,9 @@ export function PointFreezeListSection({
                 </Table.Row>
               ) : pointFreezes.length > 0 ? (
                 pointFreezes.map(
-                  (
-                    { id, title, startAt, endAt, createdAt, updatedAt },
-                    index
-                  ) => (
+                  ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
                     <Table.Row key={id}>
-                      <Table.Cell className='text-center'>
-                        {index + 1}
-                      </Table.Cell>
+                      <Table.Cell className='text-center'>{id}</Table.Cell>
                       <Table.Cell className='text-center'>
                         <PeriodStatusBadge startAt={startAt} endAt={endAt} />
                       </Table.Cell>

@@ -66,7 +66,7 @@ beforeEach(() => {
 describe.each(cases)(
   '$path 목록 헤더',
   ({ title, path, Page, request, queryKey }) => {
-    test('활성 조회의 개수와 상태를 연결하고 재조회 오류에서 이전 숫자를 숨긴다', async () => {
+    test('재조회 중 건수를 유지하고 재조회 오류에서 이전 숫자를 숨긴다', async () => {
       const initialResponse = createDeferredResponse();
       request.mockReturnValueOnce(initialResponse.promise);
       const queryClient = new QueryClient({
@@ -108,8 +108,8 @@ describe.each(cases)(
         void queryClient.invalidateQueries({ queryKey });
       });
 
-      await waitFor(() => expect(status).toHaveTextContent('조회 중…'));
-      expect(status).not.toHaveTextContent('1,234');
+      await waitFor(() => expect(request).toHaveBeenCalledTimes(2));
+      expect(status).toHaveTextContent('총 1,234건');
 
       await act(async () => refreshedResponse.reject(new Error('조회 실패')));
 

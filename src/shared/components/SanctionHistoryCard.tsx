@@ -44,7 +44,7 @@ export function SanctionHistoryCard({
   }, [currentPage, isLoading, totalPage, onPageChange]);
 
   return (
-    <div className='flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm'>
+    <div className='flex flex-col gap-4 rounded-lg border border-gray-200 bg-white p-5 shadow-sm'>
       <h3 className='text-[14px] font-bold text-gray-900'>{title}</h3>
       {isLoading ? (
         <div className='flex items-center justify-center gap-2 py-4 text-xs text-gray-400'>
@@ -67,20 +67,20 @@ export function SanctionHistoryCard({
               className='flex flex-col gap-1.5 border-b border-gray-50 pb-3 last:border-none last:pb-0'
             >
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2'>
-                <span className='font-medium text-gray-400'>징계 종류</span>
+                <span className='font-medium text-gray-700'>징계 종류</span>
                 <div>
                   <StatusBadge tone='danger'>{item.type}</StatusBadge>
                 </div>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>부여 일자</span>
+                <span className='font-medium text-gray-700'>부여 일자</span>
                 <span className='font-mono text-gray-600'>
                   {formatDateTimeWithAmPm(item.createdAt)}
                 </span>
               </div>
 
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>처리자</span>
+                <span className='font-medium text-gray-700'>처리자</span>
                 <span className='break-all text-gray-600'>
                   {item.encryptedAdminId}
                 </span>
@@ -88,7 +88,7 @@ export function SanctionHistoryCard({
 
               {item.startAt && (
                 <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                  <span className='font-medium text-gray-400'>징계 기간</span>
+                  <span className='font-medium text-gray-700'>징계 기간</span>
                   <span className='font-mono text-gray-600'>
                     {item.startAt.substring(0, 10)} ~{' '}
                     {item.endAt?.substring(0, 10) ?? '종료일 없음'}
@@ -97,13 +97,13 @@ export function SanctionHistoryCard({
               )}
 
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-400'>징계 사유</span>
+                <span className='font-medium text-gray-700'>징계 사유</span>
                 <span className='text-gray-700'>{item.reason}</span>
               </div>
 
               {item.memo && (
                 <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                  <span className='font-medium text-gray-400'>메모</span>
+                  <span className='font-medium text-gray-700'>메모</span>
                   <span className='text-gray-700'>{item.memo}</span>
                 </div>
               )}

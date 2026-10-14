@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import { ExternalLink, Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
@@ -23,6 +24,7 @@ import type {
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 import {
+  buildOriginalExamReviewUrl,
   convertExamTypeEnumToString,
   convertExamTypeToEnum,
   convertLectureTypeToString,
@@ -157,7 +159,7 @@ const getRequiredFieldErrorMessage = (formData: FormData): string | null => {
   }
 
   if (formData.examTypeAndQuestions.trim() === '') {
-    return '시험 유형 및 문항수를 입력해주세요.';
+    return '시험 유형 및 문항 수를 입력해주세요.';
   }
 
   return null;
@@ -382,7 +384,7 @@ export function ExamDetailSection({
     add('P/F', initialValues.isPF, formData.isPF);
     add('온라인 수업', initialValues.isOnline, formData.isOnline);
     add(
-      '시험 유형 및 문항수',
+      '시험 유형 및 문항 수',
       initialValues.questionDetail,
       formData.examTypeAndQuestions
     );
@@ -657,7 +659,7 @@ export function ExamDetailSection({
 
   return (
     <article className='flex flex-col gap-1'>
-      <div className='flex w-full flex-col rounded-md border'>
+      <div className='flex w-full flex-col overflow-hidden rounded-lg border'>
         <div className='flex items-center justify-between bg-blue-100 px-4 py-3'>
           <div className='flex items-center gap-3'>
             <p className='font-semibold'>
@@ -667,9 +669,20 @@ export function ExamDetailSection({
               <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
             )}
           </div>
-          {selectedExamReview &&
-            (isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (
-              /*
+          {selectedExamReview && (
+            <div className='flex items-center gap-2'>
+              <Button asChild type='button' variant='outline' size='sm'>
+                <Link
+                  to={buildOriginalExamReviewUrl(selectedExamReview.id)}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <ExternalLink aria-hidden='true' />
+                  스노로즈에서 보기
+                </Link>
+              </Button>
+              {isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (
+                /*
               <Button
                 type='button'
                 variant='outline'
@@ -687,22 +700,24 @@ export function ExamDetailSection({
                 삭제된 시험 후기 복구
               </Button>
               */
-              <Button
-                type='button'
-                variant='destructive-outline'
-                size='sm'
-                aria-label='시험 후기 삭제'
-                onClick={openDeleteModal}
-                disabled={isDisabled}
-              >
-                <Trash2 aria-hidden='true' />
-                삭제
-              </Button>
-            ))}
+                <Button
+                  type='button'
+                  variant='destructive-outline'
+                  size='sm'
+                  aria-label='시험 후기 삭제'
+                  onClick={openDeleteModal}
+                  disabled={isDisabled}
+                >
+                  <Trash2 aria-hidden='true' />
+                  삭제
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {!selectedExamReview ? (
-          <div className='rounded-md bg-gray-50 p-4 text-sm text-gray-600'>
+          <div className='rounded-lg bg-gray-50 p-4 text-sm text-gray-600'>
             상단 시험후기 목록에서 시험후기를 선택해주세요.
           </div>
         ) : isLoadingDetail ? (

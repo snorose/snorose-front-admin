@@ -45,7 +45,7 @@ export default function LogInPage() {
 
   return (
     <main className='flex min-h-screen items-center justify-center p-4'>
-      <div className='flex w-full max-w-lg flex-col items-center justify-center gap-8 rounded-2xl bg-white px-6 py-12 shadow-[0_-2px_8px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.10)] sm:px-16 sm:py-20'>
+      <div className='flex w-full max-w-lg flex-col items-center justify-center gap-8 rounded-lg bg-white px-6 py-12 shadow-[0_-2px_8px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.10)] sm:px-16 sm:py-20'>
         <div className='flex flex-col items-center gap-2'>
           <img className='h-12 w-auto' src={snoroseLogo} alt='스노로즈 로고' />
           <p className='text-sm text-gray-600'>

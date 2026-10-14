@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { PageHeader } from '@/shared/components';
+import { PageHeader, SectionTitle } from '@/shared/components';
 import { Button, InputGroup, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
@@ -130,9 +130,9 @@ export default function MemberPenaltyManagementPage() {
       )}
 
       <article>
-        <h3 className='text-lg font-bold'>회원정보</h3>
+        <SectionTitle>회원정보</SectionTitle>
 
-        <div className='flex flex-row gap-4 rounded-md p-4 pb-5'>
+        <div className='flex flex-row gap-4 rounded-lg p-4 pb-5'>
           <div className='w-2/5'>
             <PenaltyUserInfoView member={selectedMember} />
           </div>
@@ -147,7 +147,7 @@ export default function MemberPenaltyManagementPage() {
         </div>
       </article>
 
-      <article className='rounded-md border p-2'>
+      <article className='rounded-lg border p-2'>
         <TabList defaultTab='warn' tabs={tabs} />
       </article>
     </div>

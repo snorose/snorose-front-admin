@@ -24,7 +24,10 @@ Table.Header = function TableHeader({
   return (
     <thead
       data-slot='table-header'
-      className={cn('[&_tr]:border-b', className)}
+      className={cn(
+        'bg-muted [&_tr]:border-b [&_tr:hover]:bg-transparent',
+        className
+      )}
       {...props}
     />
   );
@@ -83,7 +86,7 @@ Table.Head = function TableHead({
     <th
       data-slot='table-head'
       className={cn(
-        'text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+        'h-10 px-2 text-left align-middle text-sm font-medium whitespace-nowrap text-gray-700 [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
         className
       )}
       {...props}

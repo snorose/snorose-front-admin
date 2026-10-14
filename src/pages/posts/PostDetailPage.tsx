@@ -37,7 +37,7 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className='flex h-full w-full flex-col items-center justify-center gap-4 rounded-xl border border-gray-200 bg-white p-6 shadow-sm'>
+      <div className='flex h-full w-full flex-col items-center justify-center gap-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm'>
         <FileX className='h-12 w-12 text-gray-300' />
         <p className='text-base font-semibold text-gray-700'>
           게시글 정보를 찾을 수 없거나 불러오지 못했습니다.

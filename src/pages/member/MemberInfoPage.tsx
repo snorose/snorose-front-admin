@@ -88,7 +88,7 @@ export default function MemberInfoPage() {
             penaltyHistoryTotalCount={penaltyHistoryTotalCount}
           />
         ) : (
-          <div className='rounded-3xl border border-slate-200 bg-white px-6 py-16 text-center text-sm text-slate-500 shadow-sm'>
+          <div className='rounded-lg border border-slate-200 bg-white px-6 py-16 text-center text-sm text-slate-500 shadow-sm'>
             회원 정보를 불러오는 중입니다.
           </div>
         )

@@ -1,18 +1,20 @@
-import { useId } from 'react';
+import { type ReactNode, useId } from 'react';
 
-import { Copy, type LucideIcon, UserRound } from 'lucide-react';
+import { Copy } from 'lucide-react';
 
-import { DatePicker } from '@/shared/components';
-import { Button, Input, Label, Select } from '@/shared/components/ui';
+import { DatePicker, StatusBadge } from '@/shared/components';
+import { Button, Field, Input, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
-import { EMPTY_TEXT } from '@/domains/MemberInfo/utils/memberDirectory';
+import {
+  EMPTY_TEXT,
+  getRoleBadgeMeta,
+} from '@/domains/MemberInfo/utils/memberDirectory';
 import type { MemberEditFormValues } from '@/domains/MemberInfo/utils/validateMemberEditForm';
 
 export type EditableFieldItem = {
   type: 'editable';
   fieldName: keyof MemberEditFormValues;
-  icon: LucideIcon;
   inputType?: string;
   label: string;
   onChange: (value: string) => void;
@@ -23,7 +25,6 @@ export type EditableFieldItem = {
 export type ReadonlyFieldItem = {
   type: 'readonly';
   copyValue?: string;
-  icon: LucideIcon;
   label: string;
   value: string;
 };
@@ -38,7 +39,6 @@ export type FieldItem = EditableFieldItem | ReadonlyFieldItem | RoleFieldItem;
 export function EditableField({
   error,
   fieldName,
-  icon: Icon,
   label,
   onChange,
   placeholder,
@@ -47,7 +47,6 @@ export function EditableField({
 }: {
   error?: string;
   fieldName: keyof MemberEditFormValues;
-  icon: LucideIcon;
   label: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -59,50 +58,48 @@ export function EditableField({
   const errorId = `${inputId}-error`;
 
   return (
-    <div className='space-y-2'>
-      <label
+    <Field className='gap-0' data-invalid={Boolean(error)}>
+      <Field.Label
         htmlFor={inputId}
-        className={`flex items-center gap-2 text-sm font-medium ${
-          error ? 'text-destructive' : 'text-slate-500'
-        }`}
+        required
+        className={error ? 'text-destructive' : undefined}
       >
-        <Icon className='h-4 w-4' />
         {label}
-      </label>
-      {type === 'date' ? (
-        <DatePicker
-          id={inputId}
-          name={fieldName}
-          value={value || undefined}
-          onValueChange={(nextValue) => onChange(nextValue ?? '')}
-          placeholder={placeholder}
-          captionLayout='dropdown'
-          maxDate={
-            fieldName === 'birthday'
-              ? `${new Date().getFullYear()}-12-31`
-              : undefined
-          }
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? errorId : undefined}
-        />
-      ) : (
-        <Input
-          id={inputId}
-          name={fieldName}
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? errorId : undefined}
-        />
-      )}
-      {error ? (
-        <p id={errorId} role='alert' className='text-destructive text-sm'>
-          {error}
-        </p>
-      ) : null}
-    </div>
+      </Field.Label>
+      <Field.Content>
+        {type === 'date' ? (
+          <DatePicker
+            id={inputId}
+            name={fieldName}
+            value={value || undefined}
+            onValueChange={(nextValue) => onChange(nextValue ?? '')}
+            placeholder={placeholder}
+            captionLayout='dropdown'
+            maxDate={
+              fieldName === 'birthday'
+                ? `${new Date().getFullYear()}-12-31`
+                : undefined
+            }
+            aria-required='true'
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
+          />
+        ) : (
+          <Input
+            id={inputId}
+            name={fieldName}
+            type={type}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            aria-required='true'
+            aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
+          />
+        )}
+        {error ? <Field.Error id={errorId}>{error}</Field.Error> : null}
+      </Field.Content>
+    </Field>
   );
 }
 
@@ -116,69 +113,73 @@ export function EditableRoleField({
   value: string;
 }) {
   const inputId = useId();
+  const roleBadge = getRoleBadgeMeta(Number(value));
   return (
-    <div className='space-y-2'>
-      <Label
-        htmlFor={inputId}
-        className='gap-2 py-0 font-medium text-slate-500'
-      >
-        <UserRound className='h-4 w-4' />
+    <Field className='gap-0'>
+      <Field.Label htmlFor={inputId} required>
         회원 등급
-      </Label>
-      <Select value={value} onValueChange={onChange}>
-        <Select.Trigger id={inputId} className='w-full'>
-          <Select.Value placeholder={currentLabel} />
-        </Select.Trigger>
-        <Select.Content>
-          {USER_ROLES.map((role) => (
-            <Select.Item key={role.id} value={String(role.id)}>
-              {role.name}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select>
-    </div>
+      </Field.Label>
+      <Field.Content>
+        <Select value={value} onValueChange={onChange}>
+          <Select.Trigger id={inputId} className='w-full' aria-required='true'>
+            <Select.Value placeholder={currentLabel}>
+              <StatusBadge tone={roleBadge.tone}>{roleBadge.label}</StatusBadge>
+            </Select.Value>
+          </Select.Trigger>
+          <Select.Content>
+            {USER_ROLES.map((role) => (
+              <Select.Item
+                key={role.id}
+                value={String(role.id)}
+                textValue={role.name}
+                className='min-h-8 rounded-md py-2 pr-9 pl-3 [&>span:first-child]:right-3'
+              >
+                <StatusBadge tone={role.tone}>{role.name}</StatusBadge>
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select>
+      </Field.Content>
+    </Field>
   );
 }
 
 export function ReadonlyField({
+  action,
   copyValue,
-  icon: Icon,
   label,
   onCopy,
   value,
 }: {
+  action?: ReactNode;
   copyValue?: string;
-  icon: LucideIcon;
   label: string;
   onCopy?: (value: string) => void | Promise<void>;
   value: string;
 }) {
-  const isEmpty = value === EMPTY_TEXT;
+  const inputId = useId();
 
   return (
-    <div className='space-y-2'>
-      <div className='flex items-center gap-2 text-sm font-medium text-slate-500'>
-        <Icon className='h-4 w-4' />
-        {label}
-      </div>
-
-      <div className='flex items-center gap-2'>
-        <p className='text-lg font-semibold break-all text-slate-950'>
-          {value}
-        </p>
-        {copyValue && !isEmpty && onCopy ? (
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            onClick={() => void onCopy(copyValue)}
-            aria-label={`${label} 복사`}
-          >
-            <Copy className='h-4 w-4' />
-          </Button>
-        ) : null}
-      </div>
-    </div>
+    <Field className='gap-0'>
+      <Field.Label htmlFor={inputId}>{label}</Field.Label>
+      <Field.Content>
+        <div className='flex items-center gap-2'>
+          <Input id={inputId} value={value} readOnly className='bg-muted' />
+          {copyValue && value !== EMPTY_TEXT && onCopy ? (
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              className='shrink-0'
+              onClick={() => void onCopy(copyValue)}
+              aria-label={`${label} 복사`}
+            >
+              <Copy aria-hidden='true' />
+            </Button>
+          ) : null}
+          {action}
+        </div>
+      </Field.Content>
+    </Field>
   );
 }

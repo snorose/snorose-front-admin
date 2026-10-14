@@ -37,11 +37,11 @@ export default function PointHistoryCard({
           isDeduction ? 'border-rose-600' : 'border-zinc-950'
         }`}
       />
-      <article className='rounded-2xl border border-zinc-200 bg-white p-5'>
+      <article className='rounded-lg border border-zinc-200 bg-white p-5'>
         <div className='flex flex-wrap items-center justify-between gap-3'>
           <div className='flex items-center gap-3'>
             <span
-              className={`rounded-xl border px-3 py-1 text-sm font-medium ${
+              className={`rounded-lg border px-3 py-1 text-sm font-medium ${
                 isDeduction
                   ? 'border-rose-600 bg-rose-600 text-white'
                   : 'border-zinc-200 text-zinc-950'
@@ -109,8 +109,8 @@ export default function PointHistoryCard({
           </Info>
 
           <div className='col-span-2 space-y-2'>
-            <dt className='text-sm font-medium text-zinc-500'>{detailLabel}</dt>
-            <dd className='rounded-xl bg-[#ecebf0] px-4 py-3 text-base break-words whitespace-pre-wrap text-zinc-950'>
+            <dt className='text-sm font-medium text-gray-700'>{detailLabel}</dt>
+            <dd className='rounded-lg bg-[#ecebf0] px-4 py-3 text-base break-words whitespace-pre-wrap text-zinc-950'>
               {history.sourceDetail ?? '-'}
             </dd>
           </div>
@@ -123,7 +123,7 @@ export default function PointHistoryCard({
 function Info({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className='min-w-0 space-y-2'>
-      <dt className='text-sm font-medium text-zinc-500'>{label}</dt>
+      <dt className='text-sm font-medium text-gray-700'>{label}</dt>
       <dd className='text-base font-medium break-words text-zinc-950'>
         {children}
       </dd>

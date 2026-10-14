@@ -87,7 +87,7 @@ export default function MemberPenaltySummaryCard({
       >
         <div className='space-y-6'>
           <div className='space-y-3'>
-            <p className='text-sm font-medium text-slate-500'>현재 상태</p>
+            <p className='text-sm font-medium text-gray-700'>현재 상태</p>
             <div className='flex flex-wrap items-center gap-2'>
               <StatusBadge tone={penaltyStatus.tone}>
                 {penaltyStatus.label}
@@ -139,13 +139,13 @@ export default function MemberPenaltySummaryCard({
           ) : null}
 
           {isDemotion && latestPayloadIsWarning && !ongoingDemotion ? (
-            <p className='rounded-xl bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600'>
+            <p className='rounded-lg bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600'>
               강등 상세 정보는 제재 이력에서 확인할 수 있습니다.
             </p>
           ) : null}
 
           <div className='space-y-2'>
-            <p className='text-sm font-medium text-slate-500'>누적 경고 수</p>
+            <p className='text-sm font-medium text-gray-700'>누적 경고 수</p>
             <p
               className={`text-3xl font-bold ${
                 member.totalWarningCount > 0
@@ -161,7 +161,7 @@ export default function MemberPenaltySummaryCard({
           </div>
 
           <div
-            className={`rounded-2xl px-4 py-5 text-sm font-medium ${penaltyStatus.summaryTone}`}
+            className={`rounded-lg px-4 py-5 text-sm font-medium ${penaltyStatus.summaryTone}`}
           >
             {penaltyStatus.summary}
           </div>

@@ -29,7 +29,7 @@ export default function PenaltyUserInfo({
 
   return (
     <article>
-      <div className='grid grid-cols-2 gap-x-5 gap-y-1 rounded-md border p-4 pb-5'>
+      <div className='grid grid-cols-2 gap-x-5 gap-y-1 rounded-lg border p-4 pb-5'>
         {PENALTY_USER_INFO.map(({ label, key }) => {
           const rawValue = member?.[key];
 
@@ -52,10 +52,7 @@ export default function PenaltyUserInfo({
 
             return (
               <div key={key} className='flex gap-4'>
-                <Label
-                  htmlFor={`${inputId}-${key}`}
-                  className='text-foreground w-32'
-                >
+                <Label htmlFor={`${inputId}-${key}`} className='w-32'>
                   {label}
                 </Label>
 
@@ -72,10 +69,7 @@ export default function PenaltyUserInfo({
 
           return (
             <div key={key} className='flex gap-4'>
-              <Label
-                htmlFor={`${inputId}-${key}`}
-                className='text-foreground w-32'
-              >
+              <Label htmlFor={`${inputId}-${key}`} className='w-32'>
                 {label}
               </Label>
 
