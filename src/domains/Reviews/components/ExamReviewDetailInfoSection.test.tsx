@@ -74,7 +74,7 @@ describe('ExamReviewDetailInfoSection', () => {
       '분반',
       'P/F',
       '온라인 강의 여부',
-      '시험 유형 및 문항수',
+      '시험 유형 및 문항 수',
     ].forEach((label) => {
       expect(getFieldByLabel(label)).toHaveTextContent(`${label}*`);
     });
@@ -95,10 +95,10 @@ describe('ExamReviewDetailInfoSection', () => {
     ).toBeEnabled();
   });
 
-  test('메모 입력란은 시험 유형 및 문항수 오른쪽 칸에 배치된다', () => {
+  test('메모 입력란은 시험 유형 및 문항 수 오른쪽 칸에 배치된다', () => {
     renderExamReviewDetailInfoSection();
 
-    const examTypeAndQuestionsField = getFieldByLabel('시험 유형 및 문항수');
+    const examTypeAndQuestionsField = getFieldByLabel('시험 유형 및 문항 수');
     const memoField = getFieldByLabel('메모');
 
     expect(examTypeAndQuestionsField.parentElement).toBe(
@@ -111,10 +111,10 @@ describe('ExamReviewDetailInfoSection', () => {
     expect(memoField).not.toHaveClass('md:col-span-2');
   });
 
-  test('메모 입력란은 시험 유형 및 문항수 입력란과 같은 높이를 사용한다', () => {
+  test('메모 입력란은 시험 유형 및 문항 수 입력란과 같은 높이를 사용한다', () => {
     renderExamReviewDetailInfoSection();
 
-    const examTypeAndQuestionsField = getFieldByLabel('시험 유형 및 문항수');
+    const examTypeAndQuestionsField = getFieldByLabel('시험 유형 및 문항 수');
     const memoField = getFieldByLabel('메모');
     const examTypeAndQuestionsTextarea =
       examTypeAndQuestionsField.querySelector('textarea');
