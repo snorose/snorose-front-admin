@@ -63,6 +63,17 @@ export function ExamReviewRestoreModal({
             id='exam-review-restore-reason'
             value={restoreReason}
             onChange={(event) => onReasonChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (
+                event.key === 'Enter' &&
+                (event.metaKey || event.ctrlKey) &&
+                restoreReason.trim() &&
+                !isRestoring
+              ) {
+                event.preventDefault();
+                onConfirm();
+              }
+            }}
             placeholder='복구 사유를 입력해주세요.'
             className='min-h-[120px] resize-none'
             disabled={isRestoring}
