@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { isAxiosError } from 'axios';
-import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import { ExternalLink, Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
@@ -23,6 +24,7 @@ import type {
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 import {
+  buildOriginalExamReviewUrl,
   convertExamTypeEnumToString,
   convertExamTypeToEnum,
   convertLectureTypeToString,
@@ -667,9 +669,20 @@ export function ExamDetailSection({
               <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
             )}
           </div>
-          {selectedExamReview &&
-            (isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (
-              /*
+          {selectedExamReview && (
+            <div className='flex items-center gap-2'>
+              <Button asChild type='button' variant='outline' size='sm'>
+                <Link
+                  to={buildOriginalExamReviewUrl(selectedExamReview.id)}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  <ExternalLink aria-hidden='true' />
+                  스노로즈에서 보기
+                </Link>
+              </Button>
+              {isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (
+                /*
               <Button
                 type='button'
                 variant='outline'
@@ -687,18 +700,20 @@ export function ExamDetailSection({
                 삭제된 시험 후기 복구
               </Button>
               */
-              <Button
-                type='button'
-                variant='destructive-outline'
-                size='sm'
-                aria-label='시험 후기 삭제'
-                onClick={openDeleteModal}
-                disabled={isDisabled}
-              >
-                <Trash2 aria-hidden='true' />
-                삭제
-              </Button>
-            ))}
+                <Button
+                  type='button'
+                  variant='destructive-outline'
+                  size='sm'
+                  aria-label='시험 후기 삭제'
+                  onClick={openDeleteModal}
+                  disabled={isDisabled}
+                >
+                  <Trash2 aria-hidden='true' />
+                  삭제
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {!selectedExamReview ? (
