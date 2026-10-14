@@ -115,7 +115,6 @@ export default function InquiryReportTable({
   }, [currentPage, filteredInquiries]);
 
   const totalPage = Math.ceil(filteredInquiries.length / PAGE_SIZE);
-  const pageStartNumber = (currentPage - 1) * PAGE_SIZE;
   const isEmpty = !isLoading && inquiries.length === 0;
   const isDetailOpen = selectedPostId !== null;
 
@@ -289,16 +288,10 @@ export default function InquiryReportTable({
       <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
-            className={`w-full ${isDetailOpen ? 'min-w-[688px]' : 'min-w-[1168px]'} table-fixed text-[13px]`}
+            className={`w-full ${isDetailOpen ? 'min-w-[624px]' : 'min-w-[1104px]'} table-fixed text-[13px]`}
           >
             <Table.Header className='h-[42px] border-b border-gray-200'>
               <Table.Row>
-                <Table.Head
-                  style={{ width: '64px' }}
-                  className='px-3 text-center'
-                >
-                  번호
-                </Table.Head>
                 <Table.Head
                   style={{ width: '128px' }}
                   className='px-3 text-center'
@@ -340,13 +333,13 @@ export default function InquiryReportTable({
               {isLoading ? (
                 <TableStateRow
                   state='loading'
-                  colSpan={isDetailOpen ? 6 : 8}
+                  colSpan={isDetailOpen ? 5 : 7}
                   message='문의 및 신고 목록을 불러오는 중입니다.'
                 />
               ) : isEmpty ? (
                 <TableStateRow
                   state='empty'
-                  colSpan={isDetailOpen ? 6 : 8}
+                  colSpan={isDetailOpen ? 5 : 7}
                   message={
                     activeFilterCount > 0
                       ? '필터 조건에 해당하는 항목이 없습니다.'
@@ -354,7 +347,7 @@ export default function InquiryReportTable({
                   }
                 />
               ) : (
-                inquiries.map((inquiry, index) => {
+                inquiries.map((inquiry) => {
                   const inquiryStatus = inquiry.status;
 
                   return (
@@ -373,9 +366,6 @@ export default function InquiryReportTable({
                           : 'bg-white hover:bg-gray-50'
                       }`}
                     >
-                      <Table.Cell className='px-3 text-center text-gray-600'>
-                        {pageStartNumber + index + 1}
-                      </Table.Cell>
                       <Table.Cell className='px-3 text-center font-mono text-gray-600'>
                         <div className='flex items-center justify-center gap-1'>
                           <span>{inquiry.postId}</span>
