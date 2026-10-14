@@ -23,7 +23,7 @@ const CHANGE_FIELD_LABELS: Record<string, string> = {
   examType: '시험종류',
   isPF: 'P/F',
   isOnline: '온라인 여부',
-  questionDetail: '시험 유형 및 문항수',
+  questionDetail: '시험 유형 및 문항 수',
   deletionStatus: '삭제 상태',
   isSanctioned: '징계 여부',
   visibilityStatus: '공개 상태',

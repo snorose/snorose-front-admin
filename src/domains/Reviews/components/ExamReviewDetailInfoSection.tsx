@@ -378,7 +378,7 @@ export function ExamReviewDetailInfoSection({
         </Field>
         <Field className='gap-0'>
           <Field.Label htmlFor={examTypeAndQuestionsId} required>
-            시험 유형 및 문항수
+            시험 유형 및 문항 수
           </Field.Label>
           <Field.Content>
             <Textarea

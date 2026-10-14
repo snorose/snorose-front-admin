@@ -157,7 +157,7 @@ const getRequiredFieldErrorMessage = (formData: FormData): string | null => {
   }
 
   if (formData.examTypeAndQuestions.trim() === '') {
-    return '시험 유형 및 문항수를 입력해주세요.';
+    return '시험 유형 및 문항 수를 입력해주세요.';
   }
 
   return null;
@@ -382,7 +382,7 @@ export function ExamDetailSection({
     add('P/F', initialValues.isPF, formData.isPF);
     add('온라인 수업', initialValues.isOnline, formData.isOnline);
     add(
-      '시험 유형 및 문항수',
+      '시험 유형 및 문항 수',
       initialValues.questionDetail,
       formData.examTypeAndQuestions
     );
