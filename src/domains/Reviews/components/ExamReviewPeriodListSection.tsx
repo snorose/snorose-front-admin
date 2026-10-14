@@ -81,8 +81,8 @@ export function ExamReviewPeriodListSection({
           <Table className='w-full'>
             <Table.Header>
               <Table.Row className='text-center'>
-                <Table.Head className='text-center'>상태</Table.Head>
                 <Table.Head className='text-center'>Id</Table.Head>
+                <Table.Head className='text-center'>상태</Table.Head>
                 <Table.Head className='text-center'>기간 제목</Table.Head>
                 <Table.Head className='text-center'>시작 일시</Table.Head>
                 <Table.Head className='text-center'>종료 일시</Table.Head>
@@ -105,10 +105,10 @@ export function ExamReviewPeriodListSection({
                 examReviewPeriods.map(
                   ({ id, title, startAt, endAt, createdAt, updatedAt }) => (
                     <Table.Row key={id}>
+                      <Table.Cell className='text-center'>{id}</Table.Cell>
                       <Table.Cell className='text-center'>
                         <PeriodStatusBadge startAt={startAt} endAt={endAt} />
                       </Table.Cell>
-                      <Table.Cell className='text-center'>{id}</Table.Cell>
                       <Table.Cell className='text-center'>{title}</Table.Cell>
                       <Table.Cell className='text-center'>
                         {formatDateTimeToMinutes(startAt)}

@@ -68,6 +68,7 @@ const renderProcessStatusBadge = (review: ExamReview) => {
 };
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
+  { key: 'id', label: 'postId', width: '60px' },
   {
     key: 'status',
     label: '확인여부',
@@ -79,7 +80,6 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       />
     ),
   },
-  { key: 'id', label: 'postId', width: '90px' },
   { key: 'reviewTitle', label: '시험후기명', width: '320px' },
   { key: 'userDisplay', label: '작성자', width: '120px' },
   {
@@ -228,7 +228,8 @@ export default function ExamTable({
                   key={column.key}
                   className={cn(
                     'relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap',
-                    column.key === 'status' && 'text-center'
+                    (column.key === 'id' || column.key === 'status') &&
+                      'text-center'
                   )}
                 >
                   {column.label}
@@ -270,7 +271,8 @@ export default function ExamTable({
                           key={column.key}
                           className={cn(
                             'overflow-hidden text-ellipsis whitespace-nowrap',
-                            column.key === 'status' && 'text-center',
+                            (column.key === 'id' || column.key === 'status') &&
+                              'text-center',
                             column.key === 'processStatuses' &&
                               'whitespace-normal'
                           )}
