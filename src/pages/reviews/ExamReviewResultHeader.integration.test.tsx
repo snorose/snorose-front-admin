@@ -67,8 +67,8 @@ describe('시험후기 목록 헤더', () => {
       void queryClient.invalidateQueries({ queryKey: ['examReviews'] });
     });
 
-    await waitFor(() => expect(status).toHaveTextContent('조회 중…'));
-    expect(status).not.toHaveTextContent('1,234');
+    await waitFor(() => expect(getExamReviews).toHaveBeenCalledTimes(2));
+    expect(status).toHaveTextContent('총 1,234건');
 
     await act(async () => refreshedResponse.reject(new Error('조회 실패')));
     await waitFor(() => expect(status).toHaveTextContent('개수 확인 불가'));

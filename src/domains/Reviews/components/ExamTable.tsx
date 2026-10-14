@@ -13,7 +13,7 @@ import {
   StatusBadge,
 } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
-import { useStableTotalPage } from '@/shared/hooks';
+import { useStableTotalCount, useStableTotalPage } from '@/shared/hooks';
 import { cn } from '@/shared/lib';
 import { clampOneBasedPage } from '@/shared/utils';
 
@@ -167,7 +167,10 @@ export default function ExamTable({
   const isLoading = !hasProvidedData && isQueryLoading;
   const responseTotalPage = hasProvidedData ? undefined : queryData?.totalPage;
   const totalPage = useStableTotalPage(responseTotalPage, currentPage);
-  const totalCount = hasProvidedData ? undefined : queryData?.totalCount;
+  const totalCount = useStableTotalCount(
+    hasProvidedData ? undefined : queryData?.totalCount,
+    { searchParams, hasProvidedData }
+  );
   const columnCount = EXAM_REVIEW_TABLE_COLUMNS.length;
 
   useEffect(() => {

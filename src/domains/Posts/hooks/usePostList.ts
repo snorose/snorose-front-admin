@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { useStableTotalCount } from '@/shared/hooks';
+
 import { searchPosts } from '@/apis';
 
 import type { AdminPostSearchRequest } from '../types';
@@ -17,6 +19,8 @@ export const usePostList = (params: usePostListParams) => {
     queryFn: () => searchPosts(page, { ...body }),
   });
 
+  const totalCount = useStableTotalCount(normalResult.data?.totalCount, body);
+
   const sorted = normalResult.data?.data ?? [];
 
   return {
@@ -26,7 +30,7 @@ export const usePostList = (params: usePostListParams) => {
     error: normalResult.error,
     hasNext: normalResult.data?.hasNext,
     totalPage: normalResult.data?.totalPage,
-    totalCount: normalResult.data?.totalCount,
+    totalCount,
     refetch: normalResult.refetch,
   };
 };

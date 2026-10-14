@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { MAJOR_OPTIONS, PATHS } from '@/shared/constants';
+import { useStableTotalCount } from '@/shared/hooks';
 import type {
   AdminUserListItem,
+  AdminUserListResult,
   AdminUserSortType,
   MemberInfo,
   SortDirection,
@@ -27,7 +30,7 @@ const DEFAULT_SORT_DIRECTION: SortDirection = 'DESC';
 
 export function useMemberDirectoryState(isDetailRoute: boolean) {
   const navigate = useNavigate();
-  const [members, setMembers] = useState<AdminUserListItem[]>([]);
+  const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedKeyword, setAppliedKeyword] = useState('');
@@ -43,65 +46,54 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   // 사용자가 헤더 정렬을 직접 선택했는지 여부(초기/초기화 상태에서는 헤더를 중립으로 표시).
   const [isSortActive, setIsSortActive] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(0);
-  const [totalCount, setTotalCount] = useState<number | undefined>(undefined);
-  const [isListLoading, setIsListLoading] = useState(false);
-  const [isListError, setIsListError] = useState(false);
-  const latestRequestIdRef = useRef(0);
+  const conditions = {
+    keyword: appliedKeyword,
+    selectedRole,
+    selectedMajor,
+    selectedAdmissionYear,
+    sortType,
+    sortDirection,
+  };
+  const params = buildAdminUserListParams({
+    page: currentPage - 1,
+    ...conditions,
+  });
+  const queryKey = ['members', 'directory', params] as const;
+  const query = useQuery({
+    queryKey,
+    queryFn: () => getAllUsersAPI(params),
+    enabled: !isDetailRoute,
+    retry: false,
+  });
+  const members = useMemo(() => query.data?.data ?? [], [query.data]);
+  const totalPage = query.data?.totalPage ?? 0;
+  const totalCount = useStableTotalCount(query.data?.totalCount, conditions);
+  const isListLoading = query.isFetching;
+  const isListError = query.isError && !query.isFetching;
 
+  useEffect(() => {
+    if (query.error && !query.isFetching)
+      toast.error(
+        getErrorMessage(query.error, '회원 목록 조회에 실패했습니다.')
+      );
+  }, [query.error, query.isFetching]);
+
+  useEffect(() => {
+    if (!query.data) return;
+    setCurrentPage((current) =>
+      Math.min(current, Math.max(query.data.totalPage, 1))
+    );
+    setSelectedIds([]);
+  }, [query.data]);
+
+  const { refetch } = query;
   const loadMembers = useCallback(
     async (page: number) => {
-      const requestId = ++latestRequestIdRef.current;
-      setIsListLoading(true);
-      setIsListError(false);
-      try {
-        const params = buildAdminUserListParams({
-          page: page - 1,
-          keyword: appliedKeyword,
-          selectedRole,
-          selectedMajor,
-          selectedAdmissionYear,
-          sortType,
-          sortDirection,
-        });
-
-        const response = await getAllUsersAPI(params);
-        if (requestId !== latestRequestIdRef.current) return;
-
-        setMembers(response.data);
-        setTotalPage(response.totalPage);
-        setTotalCount(response.totalCount);
-        setCurrentPage((current) =>
-          Math.min(current, Math.max(response.totalPage, 1))
-        );
-        setSelectedIds([]);
-      } catch (error) {
-        if (requestId !== latestRequestIdRef.current) return;
-
-        setIsListError(true);
-        toast.error(getErrorMessage(error, '회원 목록 조회에 실패했습니다.'));
-      } finally {
-        if (requestId === latestRequestIdRef.current) {
-          setIsListLoading(false);
-        }
-      }
+      if (page !== currentPage) setCurrentPage(page);
+      else await refetch();
     },
-    [
-      appliedKeyword,
-      selectedRole,
-      selectedMajor,
-      selectedAdmissionYear,
-      sortType,
-      sortDirection,
-    ]
+    [currentPage, refetch]
   );
-
-  // 필터/검색/정렬/페이지 상태가 바뀔 때마다 서버에서 다시 조회한다.
-  useEffect(() => {
-    if (!isDetailRoute) {
-      void loadMembers(currentPage);
-    }
-  }, [currentPage, isDetailRoute, loadMembers]);
 
   const roleOptions = useMemo(() => getRoleOptions(), []);
   const admissionYearOptions = useMemo(() => getAdmissionYearOptions(), []);
@@ -191,15 +183,23 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
     );
   }, []);
 
-  const updateCachedMember = useCallback((member: MemberInfo) => {
-    setMembers((prev) =>
-      prev.map((listMember) =>
-        listMember.encryptedUserId === member.encryptedUserId
-          ? mapMemberInfoToAdminUserListItem(member)
-          : listMember
-      )
-    );
-  }, []);
+  const updateCachedMember = useCallback(
+    (member: MemberInfo) => {
+      queryClient.setQueriesData<AdminUserListResult>(
+        { queryKey: ['members', 'directory'] },
+        (previous) =>
+          previous && {
+            ...previous,
+            data: previous.data.map((item) =>
+              item.encryptedUserId === member.encryptedUserId
+                ? mapMemberInfoToAdminUserListItem(member)
+                : item
+            ),
+          }
+      );
+    },
+    [queryClient]
+  );
 
   return {
     admissionYearOptions,

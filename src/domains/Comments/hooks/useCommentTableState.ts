@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { toast } from 'sonner';
 
-import { useBulkDelete } from '@/shared/hooks';
+import { useBulkDelete, useStableTotalCount } from '@/shared/hooks';
 
 import { bulkDeleteComments } from '@/apis';
 
@@ -77,10 +77,15 @@ export function useCommentTableState({
       ? childCommentData?.totalPage
       : totalCommentData?.totalPage;
 
-  const totalCount =
+  const responseTotalCount =
     parentId !== null
       ? childCommentData?.totalCount
       : totalCommentData?.totalCount;
+
+  const totalCount = useStableTotalCount(responseTotalCount, {
+    parentId,
+    searchParams,
+  });
 
   const isLoading = parentId !== null ? isChildLoading : isTotalLoading;
   const isFetching = parentId !== null ? isChildFetching : isTotalFetching;
