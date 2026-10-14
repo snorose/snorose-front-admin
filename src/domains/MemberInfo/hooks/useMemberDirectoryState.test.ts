@@ -72,6 +72,46 @@ function createDeferred<T>() {
 }
 
 describe('useMemberDirectoryState 페이지 기준', () => {
+  test.each([true, false])(
+    '동일한 목록 재조회 성공 여부(%s)에 따라 선택을 초기화한다',
+    async (isSuccess) => {
+      const member = createMember('selected');
+      const response: AdminUserListResult = {
+        data: [member],
+        totalCount: 1,
+        totalPage: 1,
+        hasNext: false,
+      };
+      getAllUsersAPIMock.mockResolvedValueOnce(response);
+      const { result } = renderHook(() => useMemberDirectoryState(false));
+      await waitFor(() => expect(result.current.members).toEqual([member]));
+      const previousMembers = result.current.members;
+      act(() => result.current.handleToggleRow(member.encryptedUserId));
+      expect(result.current.selectedIds).toEqual([member.encryptedUserId]);
+
+      const request = createDeferred<AdminUserListResult>();
+      getAllUsersAPIMock.mockReturnValueOnce(request.promise);
+      let refresh!: Promise<void>;
+      act(() => {
+        refresh = result.current.loadMembers(1);
+      });
+      expect(result.current.selectedIds).toEqual([member.encryptedUserId]);
+      await act(async () => {
+        if (isSuccess) {
+          request.resolve({ ...response, data: [{ ...member }] });
+        } else {
+          request.reject(new Error('조회 실패'));
+        }
+        await refresh;
+      });
+
+      expect(result.current.members).toBe(previousMembers);
+      expect(result.current.selectedIds).toEqual(
+        isSuccess ? [] : [member.encryptedUserId]
+      );
+    }
+  );
+
   test('회원 등급 수정 후 캐시된 이전 등급 목록과 건수를 다시 조회한다', async () => {
     const client = new QueryClient({
       defaultOptions: {

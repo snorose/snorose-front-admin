@@ -90,7 +90,10 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
   const loadMembers = useCallback(
     async (page: number) => {
       if (page !== currentPage) setCurrentPage(page);
-      else await refetch();
+      else {
+        const result = await refetch();
+        if (result.isSuccess) setSelectedIds([]);
+      }
     },
     [currentPage, refetch]
   );
