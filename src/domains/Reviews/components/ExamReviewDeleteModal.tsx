@@ -65,6 +65,18 @@ export function ExamReviewDeleteModal({
             id='exam-review-delete-reason'
             value={deleteReason}
             onChange={(event) => onReasonChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (
+                event.key === 'Enter' &&
+                !event.nativeEvent.isComposing &&
+                (event.metaKey || event.ctrlKey) &&
+                deleteReason.trim() &&
+                !isDeleting
+              ) {
+                event.preventDefault();
+                onConfirm();
+              }
+            }}
             placeholder='삭제 사유를 입력해주세요.'
             className='min-h-[120px] resize-none'
             disabled={isDeleting}
