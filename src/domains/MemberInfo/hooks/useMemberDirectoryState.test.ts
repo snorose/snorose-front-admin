@@ -1,7 +1,18 @@
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { type PropsWithChildren, createElement } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  act,
+  renderHook as originalRenderHook,
+  waitFor,
+} from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import type { AdminUserListItem, AdminUserListResult } from '@/shared/types';
+import type {
+  AdminUserListItem,
+  AdminUserListResult,
+  MemberInfo,
+} from '@/shared/types';
 
 import { getAllUsersAPI } from '@/apis';
 
@@ -19,6 +30,18 @@ vi.mock('react-router-dom', async (importOriginal) => {
 vi.mock('@/apis', () => ({
   getAllUsersAPI: vi.fn(),
 }));
+
+function renderHook(
+  callback: () => ReturnType<typeof useMemberDirectoryState>,
+  client = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  })
+) {
+  return originalRenderHook(callback, {
+    wrapper: ({ children }: PropsWithChildren) =>
+      createElement(QueryClientProvider, { client }, children),
+  });
+}
 
 const getAllUsersAPIMock = vi.mocked(getAllUsersAPI);
 
@@ -49,6 +72,99 @@ function createDeferred<T>() {
 }
 
 describe('useMemberDirectoryState 페이지 기준', () => {
+  test.each([true, false])(
+    '동일한 목록 재조회 성공 여부(%s)에 따라 선택을 초기화한다',
+    async (isSuccess) => {
+      const member = createMember('selected');
+      const response: AdminUserListResult = {
+        data: [member],
+        totalCount: 1,
+        totalPage: 1,
+        hasNext: false,
+      };
+      getAllUsersAPIMock.mockResolvedValueOnce(response);
+      const { result } = renderHook(() => useMemberDirectoryState(false));
+      await waitFor(() => expect(result.current.members).toEqual([member]));
+      const previousMembers = result.current.members;
+      act(() => result.current.handleToggleRow(member.encryptedUserId));
+      expect(result.current.selectedIds).toEqual([member.encryptedUserId]);
+
+      const request = createDeferred<AdminUserListResult>();
+      getAllUsersAPIMock.mockReturnValueOnce(request.promise);
+      let refresh!: Promise<void>;
+      act(() => {
+        refresh = result.current.loadMembers(1);
+      });
+      expect(result.current.selectedIds).toEqual([member.encryptedUserId]);
+      await act(async () => {
+        if (isSuccess) {
+          request.resolve({ ...response, data: [{ ...member }] });
+        } else {
+          request.reject(new Error('조회 실패'));
+        }
+        await refresh;
+      });
+
+      expect(result.current.members).toBe(previousMembers);
+      expect(result.current.selectedIds).toEqual(
+        isSuccess ? [] : [member.encryptedUserId]
+      );
+    }
+  );
+
+  test('회원 등급 수정 후 캐시된 이전 등급 목록과 건수를 다시 조회한다', async () => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: 5 * 60 * 1000 },
+      },
+    });
+    const originalMember = createMember('role-change');
+    const changedMember: MemberInfo = {
+      ...originalMember,
+      userRoleId: 3,
+      birthday: '2000-01-01',
+      totalWarningCount: 0,
+      isBlacklist: false,
+      blacklistStartDate: null,
+      blacklistEndDate: null,
+    };
+    let isUpdated = false;
+    getAllUsersAPIMock.mockImplementation(async (params) => {
+      const data =
+        isUpdated && params?.userRoleId === 2
+          ? []
+          : [{ ...originalMember, userRoleId: isUpdated ? 3 : 2 }];
+      return { data, totalCount: data.length, totalPage: 1, hasNext: false };
+    });
+    const { result, unmount } = renderHook(
+      () => useMemberDirectoryState(false),
+      client
+    );
+    await waitFor(() => expect(result.current.totalCount).toBe(1));
+    act(() => result.current.handleSelectedRoleChange('2'));
+    await waitFor(() => expect(getAllUsersAPIMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
+    act(() => result.current.handleSelectedRoleChange('ALL'));
+    expect(getAllUsersAPIMock).toHaveBeenCalledTimes(2);
+
+    isUpdated = true;
+    await act(async () => {
+      result.current.updateCachedMember(changedMember);
+      await result.current.loadMembers(1);
+    });
+    expect(getAllUsersAPIMock).toHaveBeenCalledTimes(3);
+
+    act(() => result.current.handleSelectedRoleChange('2'));
+    await waitFor(() => expect(getAllUsersAPIMock).toHaveBeenCalledTimes(4));
+    await waitFor(() => expect(result.current.totalCount).toBe(0));
+    expect(result.current.members).toEqual([]);
+    expect(getAllUsersAPIMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ userRoleId: 2 })
+    );
+    unmount();
+    client.clear();
+  });
+
   beforeEach(() => {
     getAllUsersAPIMock.mockReset();
     getAllUsersAPIMock.mockResolvedValue({
@@ -78,8 +194,8 @@ describe('useMemberDirectoryState 페이지 기준', () => {
       await request.promise;
     });
 
-    expect(result.current.totalCount).toBe(0);
-    expect(result.current.isListLoading).toBe(false);
+    await waitFor(() => expect(result.current.totalCount).toBe(0));
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
     expect(result.current.isListError).toBe(false);
   });
 
@@ -88,23 +204,23 @@ describe('useMemberDirectoryState 페이지 기준', () => {
     const { result } = renderHook(() => useMemberDirectoryState(false));
     await waitFor(() => expect(result.current.isListError).toBe(true));
     expect(result.current.totalCount).toBeUndefined();
-    expect(result.current.isListLoading).toBe(false);
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
 
     const retry = createDeferred<AdminUserListResult>();
     getAllUsersAPIMock.mockReturnValueOnce(retry.promise);
     act(() => {
       void result.current.loadMembers(1);
     });
+    await waitFor(() => expect(result.current.isListLoading).toBe(true));
     expect(result.current.isListError).toBe(false);
-    expect(result.current.isListLoading).toBe(true);
 
     await act(async () => {
       retry.resolve({ data: [], hasNext: false, totalCount: 12, totalPage: 1 });
       await retry.promise;
     });
-    expect(result.current.totalCount).toBe(12);
+    await waitFor(() => expect(result.current.totalCount).toBe(12));
     expect(result.current.isListError).toBe(false);
-    expect(result.current.isListLoading).toBe(false);
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
   });
 
   test.each(['진행 중', '성공', '실패'] as const)(
@@ -117,7 +233,7 @@ describe('useMemberDirectoryState 페이지 기준', () => {
         .mockReturnValueOnce(latestRequest.promise);
       const { result } = renderHook(() => useMemberDirectoryState(false));
       act(() => {
-        void result.current.loadMembers(1);
+        result.current.handleSelectedRoleChange('2');
       });
 
       if (latestState !== '진행 중') {
@@ -139,7 +255,9 @@ describe('useMemberDirectoryState 페이지 기준', () => {
         previousRequest.reject(new Error('이전 요청 실패'))
       );
 
-      expect(result.current.isListLoading).toBe(latestState === '진행 중');
+      await waitFor(() =>
+        expect(result.current.isListLoading).toBe(latestState === '진행 중')
+      );
       expect(result.current.isListError).toBe(latestState === '실패');
       expect(result.current.totalCount).toBe(
         latestState === '성공' ? 21 : undefined
@@ -157,6 +275,44 @@ describe('useMemberDirectoryState 페이지 기준', () => {
       }
     }
   );
+
+  test('페이지 이동 중 건수를 유지하고 필터 변경 시 이전 건수를 숨긴다', async () => {
+    const pageRequest = createDeferred<AdminUserListResult>();
+    const filterRequest = createDeferred<AdminUserListResult>();
+    getAllUsersAPIMock
+      .mockResolvedValueOnce({
+        data: [],
+        hasNext: true,
+        totalCount: 30,
+        totalPage: 3,
+      })
+      .mockReturnValueOnce(pageRequest.promise)
+      .mockReturnValueOnce(filterRequest.promise);
+    const { result } = renderHook(() => useMemberDirectoryState(false));
+    await waitFor(() => expect(result.current.totalCount).toBe(30));
+    act(() => result.current.setCurrentPage(2));
+    expect(result.current.totalCount).toBe(30);
+    await act(async () =>
+      pageRequest.resolve({
+        data: [],
+        hasNext: false,
+        totalCount: 29,
+        totalPage: 3,
+      })
+    );
+    await waitFor(() => expect(result.current.totalCount).toBe(29));
+    act(() => result.current.handleSelectedRoleChange('2'));
+    expect(result.current.totalCount).toBeUndefined();
+    await act(async () =>
+      filterRequest.resolve({
+        data: [],
+        hasNext: false,
+        totalCount: 0,
+        totalPage: 1,
+      })
+    );
+    await waitFor(() => expect(result.current.totalCount).toBe(0));
+  });
 
   test('화면 1페이지는 API 0페이지, 화면 2페이지는 API 1페이지를 요청한다', async () => {
     const { result } = renderHook(() => useMemberDirectoryState(false));
@@ -183,10 +339,8 @@ describe('useMemberDirectoryState 페이지 기준', () => {
       .mockReturnValueOnce(previousRequest.promise)
       .mockRejectedValueOnce(new Error('최신 요청 실패'));
     const { result } = renderHook(() => useMemberDirectoryState(false));
-    await act(async () => {
-      await result.current.loadMembers(1);
-    });
-    expect(result.current.isListError).toBe(true);
+    act(() => result.current.handleSelectedRoleChange('2'));
+    await waitFor(() => expect(result.current.isListError).toBe(true));
 
     await act(async () => {
       previousRequest.resolve({
@@ -198,7 +352,7 @@ describe('useMemberDirectoryState 페이지 기준', () => {
       await previousRequest.promise;
     });
     expect(result.current.isListError).toBe(true);
-    expect(result.current.isListLoading).toBe(false);
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
     expect(result.current.totalCount).toBeUndefined();
   });
 
@@ -265,9 +419,11 @@ describe('useMemberDirectoryState 페이지 기준', () => {
     });
 
     expect(result.current.currentPage).toBe(3);
-    expect(result.current.members).toEqual([createMember('latest')]);
+    await waitFor(() =>
+      expect(result.current.members).toEqual([createMember('latest')])
+    );
     expect(result.current.totalCount).toBe(21);
-    expect(result.current.isListLoading).toBe(false);
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
 
     await act(async () => {
       previousRequest.resolve({
@@ -280,7 +436,9 @@ describe('useMemberDirectoryState 페이지 기준', () => {
     });
 
     expect(result.current.currentPage).toBe(3);
-    expect(result.current.members).toEqual([createMember('latest')]);
+    await waitFor(() =>
+      expect(result.current.members).toEqual([createMember('latest')])
+    );
     expect(result.current.totalPage).toBe(3);
     expect(result.current.totalCount).toBe(21);
     expect(getAllUsersAPIMock).toHaveBeenCalledTimes(3);
@@ -332,8 +490,10 @@ describe('useMemberDirectoryState 페이지 기준', () => {
       await latestRequest.promise;
     });
 
-    expect(result.current.isListLoading).toBe(false);
-    expect(result.current.members).toEqual([createMember('latest')]);
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
+    await waitFor(() =>
+      expect(result.current.members).toEqual([createMember('latest')])
+    );
   });
 
   test('검색·필터·정렬·초기화 시 화면 1페이지로 돌아간다', () => {
