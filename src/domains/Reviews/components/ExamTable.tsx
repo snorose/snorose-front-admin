@@ -68,7 +68,7 @@ const renderProcessStatusBadge = (review: ExamReview) => {
 };
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
-  { key: 'id', label: 'postId', width: '60px' },
+  { key: 'id', label: 'postId' },
   {
     key: 'status',
     label: '확인여부',
@@ -214,7 +214,7 @@ export default function ExamTable({
       />
 
       <div className='w-full overflow-x-auto rounded-lg border'>
-        <Table className='w-full table-fixed bg-white shadow'>
+        <Table className='w-full table-auto bg-white shadow'>
           <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <col key={column.key} style={{ width: column.width }} />
@@ -269,8 +269,13 @@ export default function ExamTable({
                       {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
                         <Table.Cell
                           key={column.key}
+                          title={
+                            column.key === 'id' ? String(review.id) : undefined
+                          }
                           className={cn(
-                            'overflow-hidden text-ellipsis whitespace-nowrap',
+                            'whitespace-nowrap',
+                            column.key !== 'id' &&
+                              'overflow-hidden text-ellipsis',
                             (column.key === 'id' || column.key === 'status') &&
                               'text-center',
                             column.key === 'processStatuses' &&
