@@ -58,7 +58,7 @@ const renderProcessStatusBadge = (review: ExamReview) => {
   const label = [reportLabel, ...statusLabels].filter(Boolean).join(', ');
 
   return (
-    <div className='flex flex-wrap gap-1' title={label}>
+    <div className='flex flex-nowrap gap-1' title={label}>
       {renderReportedStatusBadge(review)}
       {review.processStatuses.map((status) => (
         <ExamReviewProcessStatusBadge key={status} status={status} />
@@ -68,11 +68,11 @@ const renderProcessStatusBadge = (review: ExamReview) => {
 };
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
-  { key: 'id', label: 'postId', width: '1px' },
+  { key: 'id', label: 'postId', width: '80px' },
   {
     key: 'status',
     label: '확인여부',
-    width: '78px',
+    width: '90px',
     render: (review: ExamReview) => (
       <ExamConfirmStatusBadge
         status={review.status}
@@ -80,12 +80,12 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       />
     ),
   },
-  { key: 'reviewTitle', label: '시험후기명' },
+  { key: 'reviewTitle', label: '시험후기명', width: '260px' },
   { key: 'userDisplay', label: '작성자', width: '120px' },
   {
     key: 'isDiscussed',
     label: '논의 여부',
-    width: '92px',
+    width: '100px',
     render: (review: ExamReview) => (
       <ExamDiscussionStatusBadge isDiscussed={review.isDiscussed} />
     ),
@@ -93,7 +93,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
   {
     key: 'processStatuses',
     label: '관리 상태',
-    width: '150px',
+    width: '200px',
     render: renderProcessStatusBadge,
   },
   { key: 'uploadTime', label: '작성일', width: '150px' },
@@ -217,7 +217,7 @@ export default function ExamTable({
       />
 
       <div className='w-full overflow-x-auto rounded-lg border'>
-        <Table className='w-full table-auto bg-white shadow'>
+        <Table className='w-full min-w-[1020px] table-fixed bg-white shadow'>
           <colgroup>
             {EXAM_REVIEW_TABLE_COLUMNS.map((column) => (
               <col key={column.key} style={{ width: column.width }} />
@@ -281,8 +281,7 @@ export default function ExamTable({
                               'overflow-hidden text-ellipsis',
                             (column.key === 'id' || column.key === 'status') &&
                               'text-center',
-                            column.key === 'processStatuses' &&
-                              'whitespace-normal'
+                            column.key === 'processStatuses' && 'min-w-[220px]'
                           )}
                         >
                           {column.render
