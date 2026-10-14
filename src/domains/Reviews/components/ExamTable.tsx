@@ -68,7 +68,7 @@ const renderProcessStatusBadge = (review: ExamReview) => {
 };
 
 const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
-  { key: 'id', label: 'postId' },
+  { key: 'id', label: 'postId', width: '1px' },
   {
     key: 'status',
     label: '확인여부',
@@ -80,7 +80,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       />
     ),
   },
-  { key: 'reviewTitle', label: '시험후기명', width: '320px' },
+  { key: 'reviewTitle', label: '시험후기명' },
   { key: 'userDisplay', label: '작성자', width: '120px' },
   {
     key: 'isDiscussed',
