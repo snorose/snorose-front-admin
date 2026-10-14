@@ -197,6 +197,12 @@ export function useMemberDirectoryState(isDetailRoute: boolean) {
             ),
           }
       );
+      // 등급·검색 조건과 정렬 순서, 건수는 회원 값만 교체해서 맞출 수 없다.
+      // 현재 목록은 이어지는 loadMembers에서 조회하고, 다른 목록도 재진입 시 갱신한다.
+      void queryClient.invalidateQueries({
+        queryKey: ['members', 'directory'],
+        refetchType: 'none',
+      });
     },
     [queryClient]
   );

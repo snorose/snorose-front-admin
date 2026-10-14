@@ -8,7 +8,11 @@ import {
 } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import type { AdminUserListItem, AdminUserListResult } from '@/shared/types';
+import type {
+  AdminUserListItem,
+  AdminUserListResult,
+  MemberInfo,
+} from '@/shared/types';
 
 import { getAllUsersAPI } from '@/apis';
 
@@ -28,11 +32,11 @@ vi.mock('@/apis', () => ({
 }));
 
 function renderHook(
-  callback: () => ReturnType<typeof useMemberDirectoryState>
-) {
-  const client = new QueryClient({
+  callback: () => ReturnType<typeof useMemberDirectoryState>,
+  client = new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: 0 } },
-  });
+  })
+) {
   return originalRenderHook(callback, {
     wrapper: ({ children }: PropsWithChildren) =>
       createElement(QueryClientProvider, { client }, children),
@@ -68,6 +72,59 @@ function createDeferred<T>() {
 }
 
 describe('useMemberDirectoryState 페이지 기준', () => {
+  test('회원 등급 수정 후 캐시된 이전 등급 목록과 건수를 다시 조회한다', async () => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false, staleTime: 5 * 60 * 1000 },
+      },
+    });
+    const originalMember = createMember('role-change');
+    const changedMember: MemberInfo = {
+      ...originalMember,
+      userRoleId: 3,
+      birthday: '2000-01-01',
+      totalWarningCount: 0,
+      isBlacklist: false,
+      blacklistStartDate: null,
+      blacklistEndDate: null,
+    };
+    let isUpdated = false;
+    getAllUsersAPIMock.mockImplementation(async (params) => {
+      const data =
+        isUpdated && params?.userRoleId === 2
+          ? []
+          : [{ ...originalMember, userRoleId: isUpdated ? 3 : 2 }];
+      return { data, totalCount: data.length, totalPage: 1, hasNext: false };
+    });
+    const { result, unmount } = renderHook(
+      () => useMemberDirectoryState(false),
+      client
+    );
+    await waitFor(() => expect(result.current.totalCount).toBe(1));
+    act(() => result.current.handleSelectedRoleChange('2'));
+    await waitFor(() => expect(getAllUsersAPIMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(result.current.isListLoading).toBe(false));
+    act(() => result.current.handleSelectedRoleChange('ALL'));
+    expect(getAllUsersAPIMock).toHaveBeenCalledTimes(2);
+
+    isUpdated = true;
+    await act(async () => {
+      result.current.updateCachedMember(changedMember);
+      await result.current.loadMembers(1);
+    });
+    expect(getAllUsersAPIMock).toHaveBeenCalledTimes(3);
+
+    act(() => result.current.handleSelectedRoleChange('2'));
+    await waitFor(() => expect(getAllUsersAPIMock).toHaveBeenCalledTimes(4));
+    await waitFor(() => expect(result.current.totalCount).toBe(0));
+    expect(result.current.members).toEqual([]);
+    expect(getAllUsersAPIMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ userRoleId: 2 })
+    );
+    unmount();
+    client.clear();
+  });
+
   beforeEach(() => {
     getAllUsersAPIMock.mockReset();
     getAllUsersAPIMock.mockResolvedValue({
