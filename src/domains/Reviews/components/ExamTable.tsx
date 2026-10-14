@@ -58,10 +58,16 @@ const renderProcessStatusBadge = (review: ExamReview) => {
   const label = [reportLabel, ...statusLabels].filter(Boolean).join(', ');
 
   return (
-    <div className='flex flex-nowrap gap-1' title={label}>
-      {renderReportedStatusBadge(review)}
+    <div className='flex flex-wrap gap-1' title={label}>
+      {review.isReported && (
+        <div className='shrink-0'>{renderReportedStatusBadge(review)}</div>
+      )}
       {review.processStatuses.map((status) => (
-        <ExamReviewProcessStatusBadge key={status} status={status} />
+        <ExamReviewProcessStatusBadge
+          key={status}
+          status={status}
+          className='shrink-0'
+        />
       ))}
     </div>
   );
@@ -256,7 +262,7 @@ export default function ExamTable({
                     <Table.Row
                       key={review.id}
                       className={cn(
-                        'hover:cursor-pointer [&_td]:h-[40px]',
+                        'hover:cursor-pointer',
                         selectedId === review.id &&
                           'bg-blue-100 hover:bg-blue-100'
                       )}
@@ -277,11 +283,14 @@ export default function ExamTable({
                           }
                           className={cn(
                             'whitespace-nowrap',
+                            column.key !== 'processStatuses' && 'h-[40px]',
                             column.key !== 'id' &&
+                              column.key !== 'processStatuses' &&
                               'overflow-hidden text-ellipsis',
                             (column.key === 'id' || column.key === 'status') &&
                               'text-center',
-                            column.key === 'processStatuses' && 'min-w-[220px]'
+                            column.key === 'processStatuses' &&
+                              'min-w-[200px] overflow-visible whitespace-normal'
                           )}
                         >
                           {column.render
