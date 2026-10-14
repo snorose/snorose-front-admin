@@ -1,11 +1,12 @@
 import {
-  ExternalLink,
   ChevronsUpDown,
-  LogOut,
-  Rose,
+  ExternalLink,
   Instagram,
+  LogOut,
   NotebookPen,
+  Rose,
 } from 'lucide-react';
+
 import { DropdownMenu, Sidebar } from '@/shared/components/ui';
 import { useAuth } from '@/shared/hooks';
 
@@ -42,9 +43,11 @@ export function NavUser() {
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
             >
-              <div className='flex items-center'>
-                <Rose size={ICON_SIZE} className='mr-2 text-red-400' />
-                <span>{user?.nickname || '리자'}</span>
+              <div className='flex min-w-0 flex-1 items-center'>
+                <Rose size={ICON_SIZE} className='mr-2 shrink-0 text-red-400' />
+                <span className='truncate' title={user?.nickname || '리자'}>
+                  {user?.nickname || '리자'}
+                </span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
             </Sidebar.MenuButton>
