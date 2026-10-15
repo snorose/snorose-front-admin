@@ -11,7 +11,7 @@ const EXAM_REVIEW_BOARD_ID = 32;
 // 문의·신고의 원문은 스노로즈 사용자 사이트에서 연다.
 export function buildOriginalInquiryPostUrl(detail: InquiryDetail): string {
   const path = detail.group === 'REPORT' ? 'report' : 'inquiry';
-  return `${import.meta.env.VITE_USER_FRONT_BASE_URL}/${path}/${detail.inquiryId}`;
+  return `/${path}/${detail.inquiryId}`;
 }
 
 export function parseInquiryPostId(value: string | null): number | null {

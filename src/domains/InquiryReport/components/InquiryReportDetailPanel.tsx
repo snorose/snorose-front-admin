@@ -1,8 +1,8 @@
 import { type FormEvent, useEffect, useId, useState } from 'react';
 
-import { Copy, ExternalLink, X } from 'lucide-react';
+import { Copy, X } from 'lucide-react';
 
-import { StatusBadge } from '@/shared/components';
+import { OriginalPostButton, StatusBadge } from '@/shared/components';
 import { Button, Textarea } from '@/shared/components/ui';
 import type { InquiryComment, InquiryStatus } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -203,8 +203,8 @@ export default function InquiryReportDetailPanel({
   return (
     <div className='max-h-[calc(100vh-180px)] overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm'>
       {/* 헤더 */}
-      <div className='flex items-center justify-between gap-2 border-b border-gray-100 px-4 py-3'>
-        <div className='flex min-w-0 flex-1 items-center gap-2'>
+      <div className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-gray-100 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]'>
+        <div className='flex min-w-0 items-center gap-2'>
           <p
             className='truncate text-sm font-semibold text-gray-900'
             title={detail.title}
@@ -217,47 +217,34 @@ export default function InquiryReportDetailPanel({
             </StatusBadge>
           )}
         </div>
-        <div className='flex shrink-0 items-center gap-2'>
+        <div className='col-span-2 row-start-2 flex min-w-0 flex-wrap items-center gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1'>
           <InquiryStatusSelect
             inquiryId={detail.inquiryId}
             status={currentStatus}
             title={detail.title}
             onStatusChange={onStatusChange}
           />
-          <a
+          <OriginalPostButton
             href={originalPostUrl}
-            target='_blank'
-            rel='noopener noreferrer'
-            aria-label='원본게시글 바로가기'
-            title='원본게시글 바로가기'
-            className='flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[12px] font-medium !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
-          >
-            <ExternalLink className='h-3.5 w-3.5 shrink-0' />
-            원본게시글
-          </a>
-          {reportTargetUrl && (
-            <a
-              href={reportTargetUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-              aria-label='신고 대상 글 바로가기'
-              title='신고 대상 글 바로가기'
-              className='flex h-8 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-[12px] font-medium !text-slate-600 shadow-xs transition hover:border-slate-300 hover:bg-slate-50'
-            >
-              <ExternalLink className='h-3.5 w-3.5 shrink-0' />
-              대상글
-            </a>
-          )}
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon-sm'
-            onClick={onClose}
-            aria-label='문의·신고 상세 닫기'
-          >
-            <X aria-hidden='true' />
-          </Button>
+            label={detail.group === 'REPORT' ? '신고 원문' : '문의 원문'}
+            isUserSnorose
+          />
+          <OriginalPostButton
+            href={reportTargetUrl}
+            label='신고 대상 (어드민)'
+            isUserSnorose={false}
+          />
         </div>
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon-sm'
+          className='col-start-2 row-start-1 sm:col-start-3'
+          onClick={onClose}
+          aria-label='문의·신고 상세 닫기'
+        >
+          <X aria-hidden='true' />
+        </Button>
       </div>
 
       {/* 메타 정보 */}

@@ -9,6 +9,10 @@ export { default as MemberInfoModal } from './MemberInfoModal';
 export { MemberInfoPopover } from './MemberInfoPopover';
 export { NavUser } from './NavUser';
 export { NoticePanel } from './NoticePanel';
+export {
+  OriginalPostButton,
+  type OriginalPostButtonProps,
+} from './OriginalPostButton';
 export { PageHeader } from './PageHeader';
 export { PaginationBar } from './PaginationBar';
 export { PeriodStatusBadge } from './PeriodStatusBadge';
