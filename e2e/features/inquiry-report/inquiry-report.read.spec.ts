@@ -455,7 +455,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     ).toHaveCount(0);
   });
 
-  test('[TC-ADM-IR-014] 원본 게시글 버튼으로 스노로즈 문의·신고 원문을 연결한다', async ({
+  test('[TC-ADM-IR-014] 게시글 원문 버튼으로 스노로즈 문의·신고 원문을 연결한다', async ({
     inquiryReport,
     realInquiry,
   }) => {

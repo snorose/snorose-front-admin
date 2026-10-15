@@ -89,7 +89,7 @@ export default function PostDetailPage() {
 
           <OriginalPostButton
             href={originalPostUrl}
-            label='원본 게시글'
+            label='게시글 원문'
             isUserSnorose
           />
         </div>

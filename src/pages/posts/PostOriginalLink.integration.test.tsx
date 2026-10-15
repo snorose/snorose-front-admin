@@ -121,7 +121,7 @@ function renderPage(url = `/posts/manage/${post.postId}`) {
   return client;
 }
 
-const originalLink = () => screen.queryByRole('link', { name: /^원본 게시글/ });
+const originalLink = () => screen.queryByRole('link', { name: /^게시글 원문/ });
 
 describe('게시글·댓글에서 문의·신고 원문 열기', () => {
   beforeEach(() => {

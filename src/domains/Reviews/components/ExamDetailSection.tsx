@@ -676,7 +676,7 @@ export function ExamDetailSection({
             <div className='flex shrink-0 flex-wrap items-center gap-2'>
               <OriginalPostButton
                 href={originalPostUrl}
-                label='원본 게시글'
+                label='게시글 원문'
                 isUserSnorose
               />
               {isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (

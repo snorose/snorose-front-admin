@@ -1,4 +1,4 @@
-# 원본 게시글 버튼 공통화 작업 계획
+# 게시글 원문 버튼 공통화 작업 계획
 
 > 조사 기준: 2026-10-15 현재 소스 코드
 > 상태: 1~5단계 완료 / 전체 테스트의 기존 실패 3개 확인
@@ -9,7 +9,7 @@
 
 사용자 사이트의 원본을 여는 UI를 `OriginalPostButton`으로 공통화한다. 기존 `Button`의 `outline`, `sm`을 사용하고, 문구·아이콘·새 탭 동작을 한곳에서 관리한다. 페이지 또는 도메인 컨테이너는 경로와 사용자 사이트 이동 여부를 전달한다. 공통 버튼은 사용자 사이트 이동일 때만 환경변수의 기준 주소를 붙인다. URL 생성은 도메인 일반 함수로 유지하고, 시험후기의 선택·조회 상태 판단은 페이지에서 직접 처리한다. 별도 원본 URL 훅은 만들지 않는다. 기존 데이터 조회는 유지한다.
 
-- 문구는 필수 `label` prop으로 전달하며 기본값은 두지 않는다. 게시글은 `원본 게시글`, 문의·신고 자체 원본은 `문의 원문` 또는 `신고 원문`, 신고 대상 링크는 `신고 대상`로 구분한다.
+- 문구는 필수 `label` prop으로 전달하며 기본값은 두지 않는다. 게시글은 `게시글 원문`, 문의·신고 자체 원본은 `문의 원문` 또는 `신고 원문`, 신고 대상 링크는 `신고 대상`로 구분한다.
 - 오른쪽에 `ExternalLink` 아이콘을 배치한다.
 - 실제 요소는 `<a>`로 구현해 새 탭 열기·링크 주소 복사 등 브라우저 기본 동작을 지원한다.
 - 시험후기·문의·신고·게시글 상세의 기존 원본 링크를 공통 버튼으로 교체한다.
@@ -92,7 +92,7 @@ const originalPostUrl =
 <ExamDetailSection originalPostUrl={originalPostUrl} />;
 
 // ExamDetailSection 헤더 내부
-<OriginalPostButton href={originalPostUrl} label='원본 게시글' isUserSnorose />;
+<OriginalPostButton href={originalPostUrl} label='게시글 원문' isUserSnorose />;
 ```
 
 미선택, 상세 없음, 로딩·재조회 중, 오류, 선택/응답 ID 불일치이면 `null`을 주입한다. 현재 입력으로 매 렌더에서 계산하므로 이전 URL을 별도 상태에 저장하지 않는다. 같은 상태 판단이 여러 곳에서 반복되거나 복잡해질 때 훅 분리를 검토한다.
@@ -100,7 +100,7 @@ const originalPostUrl =
 게시글과 문의·신고는 기존 URL 함수의 결과를 바로 주입한다.
 
 ```tsx
-<OriginalPostButton href={buildOriginalPostUrl(post)} label='원본 게시글' isUserSnorose />
+<OriginalPostButton href={buildOriginalPostUrl(post)} label='게시글 원문' isUserSnorose />
 <OriginalPostButton
   href={buildOriginalInquiryPostUrl(detail)}
   label={detail.group === 'REPORT' ? '신고 원문' : '문의 원문'}
@@ -213,7 +213,7 @@ const originalPostUrl =
 
 ### 최종 구현·검증 결과
 
-- 시험후기의 기존 `Link`·개별 아이콘을 `OriginalPostButton`으로 교체하고 `label='원본 게시글'`을 명시했다. `ExamReviewPage`가 기존 URL 함수로 주소를 만들고 `ExamDetailSection`에 전달한다. 별도 훅과 URL 저장 상태는 추가하지 않았다.
+- 시험후기의 기존 `Link`·개별 아이콘을 `OriginalPostButton`으로 교체하고 `label='게시글 원문'`을 명시했다. `ExamReviewPage`가 기존 URL 함수로 주소를 만들고 `ExamDetailSection`에 전달한다. 별도 훅과 URL 저장 상태는 추가하지 않았다.
 - 페이지에서 미선택·상세 없음·로딩·재조회·오류·잘못된 선택 ID·선택/응답 ID 불일치에 `null`을 전달한다. 삭제 상태는 원본 버튼을 숨기는 조건으로 사용하지 않는다.
 - 제목·작성자와 작업 버튼은 좁은 화면에서 줄을 나누어 긴 제목과 버튼이 겹치지 않게 했다. 수정·저장·삭제·탭과 기존 조회 흐름은 유지한다.
 - 새 통합 테스트 5개로 선택 변경·늦은 응답, 재조회·캐시가 있는 실패·재시도, ID 불일치·잘못된 ID, 삭제된 후기의 원본 링크와 탭 전환을 검증했다. 기존 상세 테스트 9개도 통과했다.
@@ -249,7 +249,7 @@ export const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL;
 // 사용자 사이트 원문
 <OriginalPostButton
   href='/board/exam-review/post/1911295'
-  label='원본 게시글'
+  label='게시글 원문'
   isUserSnorose
 />
 

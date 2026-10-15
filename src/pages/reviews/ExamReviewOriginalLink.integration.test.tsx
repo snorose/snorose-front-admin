@@ -108,7 +108,7 @@ function renderPage() {
   return client;
 }
 
-const link = () => screen.queryByRole('link', { name: /^원본 게시글/ });
+const link = () => screen.queryByRole('link', { name: /^게시글 원문/ });
 
 describe('시험후기 원본 링크 주입', () => {
   beforeEach(() => {
@@ -168,7 +168,7 @@ describe('시험후기 원본 링크 주입', () => {
     await waitFor(() => expect(link()).toBeInTheDocument());
     expect(link()).toHaveAttribute('target', '_blank');
     expect(link()).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(link()).toHaveAttribute('title', '원본 게시글 바로가기');
+    expect(link()).toHaveAttribute('title', '게시글 원문 바로가기');
     client.clear();
   });
 
