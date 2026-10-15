@@ -518,7 +518,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
         item.title,
         located.pageNumber
       );
-      const targetLink = panel.getByTitle('신고 대상 바로가기', {
+      const targetLink = panel.getByTitle('신고 대상 (어드민) 바로가기', {
         exact: true,
       });
       await expect
@@ -576,7 +576,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       locatedUserReport.pageNumber
     );
     await expect(
-      panel.getByTitle('신고 대상 바로가기', { exact: true })
+      panel.getByTitle('신고 대상 (어드민) 바로가기', { exact: true })
     ).toHaveCount(0);
   });
 
