@@ -1,7 +1,8 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import { ArrowLeft, ExternalLink, FileX, Loader2 } from 'lucide-react';
+import { ArrowLeft, FileX, Loader2 } from 'lucide-react';
 
+import { OriginalPostButton } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 
 import { parseCommentId } from '@/domains/Comments/utils/commentUrls';
@@ -70,18 +71,7 @@ export default function PostDetailPage() {
             <ArrowLeft className='h-3.5 w-3.5' /> 목록으로
           </Button>
 
-          {originalPostUrl && (
-            <Button asChild variant='outline' size='sm'>
-              <a
-                href={originalPostUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                원본 게시글
-                <ExternalLink className='h-3.5 w-3.5' />
-              </a>
-            </Button>
-          )}
+          <OriginalPostButton href={originalPostUrl} label='원본 게시글' />
         </div>
 
         <div className='grid grid-cols-1 items-start gap-6 lg:grid-cols-3'>
