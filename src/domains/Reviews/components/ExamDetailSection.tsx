@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { isAxiosError } from 'axios';
-import { ExternalLink, Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { OriginalPostButton } from '@/shared/components';
 import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
 
 import {
@@ -24,7 +24,6 @@ import type {
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
 import {
-  buildOriginalExamReviewUrl,
   convertExamTypeEnumToString,
   convertExamTypeToEnum,
   convertLectureTypeToString,
@@ -48,6 +47,7 @@ interface ExamDetailSectionProps {
   selectedExamReview?: ExamReview | null;
   selectedExamReviewDetail?: ExamReviewDetailResult | null;
   isLoadingDetail?: boolean;
+  originalPostUrl?: string | null;
   onSaveSuccess?: (updatedDetail?: ExamReviewDetailResult) => void;
   onFileNameChangeSuccess?: (
     postId: number,
@@ -169,6 +169,7 @@ export function ExamDetailSection({
   selectedExamReview,
   selectedExamReviewDetail,
   isLoadingDetail,
+  originalPostUrl,
   onSaveSuccess,
   onFileNameChangeSuccess,
   onDeleteSuccess,
@@ -660,27 +661,20 @@ export function ExamDetailSection({
   return (
     <article className='flex flex-col gap-1'>
       <div className='flex w-full flex-col overflow-hidden rounded-lg border'>
-        <div className='flex items-center justify-between bg-blue-100 px-4 py-3'>
-          <div className='flex items-center gap-3'>
-            <p className='font-semibold'>
+        <div className='flex flex-wrap items-center justify-between gap-3 bg-blue-100 px-4 py-3'>
+          <div className='flex min-w-0 flex-1 basis-full flex-wrap items-center gap-x-3 gap-y-1 sm:basis-0'>
+            <p className='min-w-0 font-semibold wrap-break-word'>
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
             {selectedExamReviewDetail?.userDisplay && (
-              <span>(작성자: {selectedExamReviewDetail.userDisplay})</span>
+              <span className='min-w-0 wrap-break-word'>
+                (작성자: {selectedExamReviewDetail.userDisplay})
+              </span>
             )}
           </div>
           {selectedExamReview && (
-            <div className='flex items-center gap-2'>
-              <Button asChild type='button' variant='outline' size='sm'>
-                <Link
-                  to={buildOriginalExamReviewUrl(selectedExamReview.id)}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  <ExternalLink aria-hidden='true' />
-                  스노로즈에서 보기
-                </Link>
-              </Button>
+            <div className='flex shrink-0 flex-wrap items-center gap-2'>
+              <OriginalPostButton href={originalPostUrl} label='원본 게시글' />
               {isDeleted /* 복구 버튼은 추후 다시 사용할 수 있도록 코드를 보존합니다. */ ? null : (
                 /*
               <Button

@@ -29,6 +29,7 @@ import type {
   Semester,
 } from '@/domains/Reviews/types';
 import {
+  buildOriginalExamReviewUrl,
   convertExamTypeEnumToString,
   convertSemesterEnumToString,
   getExamReviewProcessStatuses,
@@ -49,6 +50,17 @@ export default function ExamReviewPage() {
     error: detailError,
     refetch: refetchDetail,
   } = useExamReviewDetail(selectedExamReview?.id ?? null);
+  const originalPostUrl =
+    selectedExamReview &&
+    selectedExamReviewDetail &&
+    Number.isSafeInteger(selectedExamReview.id) &&
+    selectedExamReview.id > 0 &&
+    selectedExamReview.id === selectedExamReviewDetail.postId &&
+    !isLoadingDetail &&
+    !isFetchingDetail &&
+    !detailError
+      ? buildOriginalExamReviewUrl(selectedExamReviewDetail.postId)
+      : null;
   const [refreshKey, setRefreshKey] = useState(0);
   const selectedReviewIdRef = useRef<number | null>(null);
   selectedReviewIdRef.current = selectedExamReview?.id ?? null;
@@ -455,6 +467,7 @@ export default function ExamReviewPage() {
       )}
 
       <ExamDetailSection
+        originalPostUrl={originalPostUrl}
         selectedExamReview={selectedExamReview}
         selectedExamReviewDetail={selectedExamReviewDetail}
         isLoadingDetail={isLoadingDetail}
