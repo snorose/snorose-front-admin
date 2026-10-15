@@ -4,8 +4,11 @@ import { ArrowLeft, FileX, Loader2 } from 'lucide-react';
 
 import { OriginalPostButton } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
+import { getBoardKeyByName } from '@/shared/utils';
 
 import { parseCommentId } from '@/domains/Comments/utils/commentUrls';
+import { useInquiryDetail } from '@/domains/InquiryReport/hooks/useInquiryDetail';
+import { buildOriginalInquiryPostUrl } from '@/domains/InquiryReport/utils/inquiryReportUrls';
 import PostDetailBlacklistCard from '@/domains/Posts/components/PostDetail/PostDetailBlacklistCard';
 import PostDetailCommentList from '@/domains/Posts/components/PostDetail/PostDetailCommentList';
 import PostDetailInfoPanel from '@/domains/Posts/components/PostDetail/PostDetailInfoPanel';
@@ -25,6 +28,13 @@ export default function PostDetailPage() {
 
   // 게시글 상세조회 쿼리
   const { post, isLoading, error } = usePost(numericPostId);
+  const isInquiryReportPost =
+    !!post && getBoardKeyByName(post.boardName) === 'support';
+  const {
+    data: inquiryDetail,
+    isFetching: isInquiryFetching,
+    isError: isInquiryError,
+  } = useInquiryDetail(isInquiryReportPost ? post.postId : null);
 
   // 상세 뷰 구성
   if (isLoading) {
@@ -56,7 +66,13 @@ export default function PostDetailPage() {
     );
   }
 
-  const originalPostUrl = buildOriginalPostUrl(post);
+  const originalPostUrl = isInquiryReportPost
+    ? !isInquiryFetching &&
+      !isInquiryError &&
+      inquiryDetail?.inquiryId === post.postId
+      ? buildOriginalInquiryPostUrl(inquiryDetail)
+      : null
+    : buildOriginalPostUrl(post);
 
   return (
     <div className='flex w-full flex-col gap-6 pb-12'>
@@ -71,7 +87,11 @@ export default function PostDetailPage() {
             <ArrowLeft className='h-3.5 w-3.5' /> 목록으로
           </Button>
 
-          <OriginalPostButton href={originalPostUrl} label='원본 게시글' />
+          <OriginalPostButton
+            href={originalPostUrl}
+            label='원본 게시글'
+            isUserSnorose
+          />
         </div>
 
         <div className='grid grid-cols-1 items-start gap-6 lg:grid-cols-3'>

@@ -2,11 +2,12 @@
 
 > 조사 기준: 2026-10-15 현재 소스 코드
 > 상태: 1~5단계 완료 / 전체 테스트의 기존 실패 3개 확인
+> 후속 작업: 8절 사용자 사이트 기준 주소 공통화 완료 / 환경변수 기반 공유 상수 및 isUserSnorose 분기 적용
 > 대상: 시험후기, 문의 및 신고, 게시글·댓글 관리
 
 ## 1. 작업 방향
 
-사용자 사이트의 원본을 여는 UI를 `OriginalPostButton`으로 공통화한다. 기존 `Button`의 `outline`, `sm`을 사용하고, 문구·아이콘·새 탭 동작을 한곳에서 관리한다. 페이지 또는 도메인 컨테이너가 완성된 URL을 주입한다. URL 생성은 도메인 일반 함수로 유지하고, 시험후기의 선택·조회 상태 판단은 페이지에서 직접 처리한다. 별도 원본 URL 훅은 만들지 않는다. 기존 데이터 조회는 유지한다.
+사용자 사이트의 원본을 여는 UI를 `OriginalPostButton`으로 공통화한다. 기존 `Button`의 `outline`, `sm`을 사용하고, 문구·아이콘·새 탭 동작을 한곳에서 관리한다. 페이지 또는 도메인 컨테이너는 경로와 사용자 사이트 이동 여부를 전달한다. 공통 버튼은 사용자 사이트 이동일 때만 환경변수의 기준 주소를 붙인다. URL 생성은 도메인 일반 함수로 유지하고, 시험후기의 선택·조회 상태 판단은 페이지에서 직접 처리한다. 별도 원본 URL 훅은 만들지 않는다. 기존 데이터 조회는 유지한다.
 
 - 문구는 필수 `label` prop으로 전달하며 기본값은 두지 않는다. 게시글은 `원본 게시글`, 문의·신고 자체 원본은 `문의 원문` 또는 `신고 원문`, 신고 대상 링크는 `신고 대상`로 구분한다.
 - 오른쪽에 `ExternalLink` 아이콘을 배치한다.
@@ -38,7 +39,7 @@
               ExamDetailSection(originalPostUrl) → OriginalPostButton(href)
 ```
 
-공통 컴포넌트는 `href`와 필수 `label`을 받아 표현을 담당한다. `title` 툴팁은 내부에서 `${label} 바로가기`로 자동 생성한다. 아이콘·스타일·새 탭 동작은 공통으로 유지한다. 도메인 종류, 게시판 ID, 경로 템플릿, URL 생성 콜백을 공통 UI에 전달하지 않는다. 페이지에서 필요한 주소를 결정하므로 다른 화면에도 같은 컴포넌트를 사용할 수 있다.
+공통 컴포넌트는 `href`, 필수 `label`과 `isUserSnorose`를 받는다. `isUserSnorose=true`이면 환경변수 기준 주소와 경로를 조합하고, `false`이면 경로를 그대로 사용한다. `title` 툴팁은 내부에서 `${label} 바로가기`로 자동 생성한다. 아이콘·스타일·새 탭 동작은 공통으로 유지한다. 도메인 종류, 게시판 ID, 경로 템플릿, URL 생성 콜백을 공통 UI에 전달하지 않는다. 페이지에서 필요한 주소를 결정하므로 다른 화면에도 같은 컴포넌트를 사용할 수 있다.
 
 - **URL 함수**: 기존 ID·도메인 정보로 주소를 생성한다. 기존 함수의 주소 생성 규칙과 반환 타입을 유지한다. 문자열 조합을 위해 React 훅이나 별도 상태를 만들지 않는다.
 - **페이지/컨테이너**: 이미 보유한 조회 데이터와 상태로 표시 여부를 판단하고 최종 URL을 주입한다. 시험후기의 미선택·로딩·오류·응답 ID 불일치는 페이지에서 처리한다. URL 저장용 상태나 effect는 추가하지 않는다.
@@ -59,6 +60,7 @@
 type OriginalPostButtonProps = {
   href: string | null | undefined;
   label: string; // 호출부에서 문구를 명시
+  isUserSnorose: boolean; // true: 사용자 사이트, false: 전달 경로 그대로
 };
 ```
 
@@ -68,7 +70,7 @@ type OriginalPostButtonProps = {
 - `target='_blank'`, `rel='noopener noreferrer'`를 고정한다.
 - 화면 판독용 `sr-only` 문구로 `(새 탭에서 열림)`을 덧붙인다. 전달한 문구가 접근 가능한 이름에 포함되게 한다.
 - `href`가 없거나 공백뿐이면 렌더링하지 않는다. `href='#'`나 링크에 효력이 없는 `disabled` 속성을 사용하지 않는다.
-- 도메인 데이터를 props로 받거나 내부에서 API를 호출하지 않는다. `href`는 호출부의 URL 생성 함수가 만든 유효한 주소라는 계약을 둔다.
+- 도메인 데이터를 props로 받거나 내부에서 API를 호출하지 않는다. 사용자 사이트 이동의 `href`는 기준 주소를 제외한 경로다. 기준 주소는 공유 상수를 통해 환경변수에서 읽는다.
 - `label`로 문구를 전달하고 `variant`, `size`, 아이콘 변경 props는 제공하지 않는다. 위치·간격·줄바꿈은 부모 컨테이너에서 관리한다.
 
 ### 페이지에서 URL을 결정하는 예시
@@ -90,7 +92,7 @@ const originalPostUrl =
 <ExamDetailSection originalPostUrl={originalPostUrl} />;
 
 // ExamDetailSection 헤더 내부
-<OriginalPostButton href={originalPostUrl} label='원본 게시글' />;
+<OriginalPostButton href={originalPostUrl} label='원본 게시글' isUserSnorose />;
 ```
 
 미선택, 상세 없음, 로딩·재조회 중, 오류, 선택/응답 ID 불일치이면 `null`을 주입한다. 현재 입력으로 매 렌더에서 계산하므로 이전 URL을 별도 상태에 저장하지 않는다. 같은 상태 판단이 여러 곳에서 반복되거나 복잡해질 때 훅 분리를 검토한다.
@@ -98,10 +100,11 @@ const originalPostUrl =
 게시글과 문의·신고는 기존 URL 함수의 결과를 바로 주입한다.
 
 ```tsx
-<OriginalPostButton href={buildOriginalPostUrl(post)} label='원본 게시글' />
+<OriginalPostButton href={buildOriginalPostUrl(post)} label='원본 게시글' isUserSnorose />
 <OriginalPostButton
   href={buildOriginalInquiryPostUrl(detail)}
   label={detail.group === 'REPORT' ? '신고 원문' : '문의 원문'}
+  isUserSnorose
 />
 ```
 
@@ -117,15 +120,15 @@ const originalPostUrl =
 
 [buildOriginalInquiryPostUrl](../../src/domains/InquiryReport/utils/inquiryReportUrls.ts)을 유지한다. `REPORT`는 `/report/{inquiryId}`, 나머지는 `/inquiry/{inquiryId}`로 연결하며 `target`이나 `targetPostId`로 대체하지 않는다.
 
-문의·신고의 기준 주소는 기존처럼 `VITE_USER_FRONT_BASE_URL`을 사용한다. 사용자 요청에 따라 추가했던 기준 주소·ID 검증, 기본 운영 주소와 슬래시 정규화를 제거하고 기존 URL 조합 코드를 유지한다. 환경설정 값의 준비는 기존 실행 환경에서 담당한다.
+문의·신고 함수는 원문 경로만 반환한다. 공통 버튼이 공유 상수 `USER_FRONT_BASE_URL`을 통해 `VITE_USER_FRONT_BASE_URL`에서 기준 주소를 읽어 붙인다. 경로 조합·ID·반환 타입은 기존대로 유지하며 추가 검증·기본 운영 주소·슬래시 정규화는 적용하지 않는다. 환경설정 값의 준비는 기존 실행 환경에서 담당한다.
 
-게시글의 고정 운영 주소와 문의·신고의 환경변수 사용 차이는 현재 동작이다. 이번 UI 공통화에서 일괄 변경하지 않는다. 환경별 주소 정책 통일이 필요하면 별도 변경으로 다룬다.
+8절 후속 작업에서 게시글·시험후기·문의 및 신고 원문의 기준 주소를 동일한 환경변수 기반 공유 상수로 통일했다. 어드민 신고 대상 URL은 기존 상대 경로를 유지한다.
 
 ### 시험후기
 
-[exam-review-urls.ts](../../src/domains/Reviews/utils/exam-review-urls.ts)의 기존 `buildOriginalExamReviewUrl`을 사용한다. 시험후기도 게시글과 같은 `https://www.snorose.com` 기준 주소와 ID로 절대 URL을 생성한다. 공통 UI가 시험후기 경로나 게시판 ID를 알게 하지 않는다.
+[exam-review-urls.ts](../../src/domains/Reviews/utils/exam-review-urls.ts)의 기존 `buildOriginalExamReviewUrl`을 사용한다. 시험후기도 ID로 원문 경로만 생성하고 공통 버튼에 전달한다. 공통 버튼이 환경변수 기반 공유 상수로 사용자 사이트 주소를 결정한다. 공통 UI가 시험후기 경로나 게시판 ID를 알게 하지 않는다.
 
-- 사용자 프런트 소스에서 `/board/exam-review/post/:postId`를 확인했다. 기준 주소는 게시글과 같은 `https://www.snorose.com`이다. 후속 요청에 따라 환경변수 의존을 제거해 localhost 상대 경로로 연결되지 않게 했다.
+- 사용자 프런트 소스에서 `/board/exam-review/post/:postId`를 확인했다. 경로는 `/board/exam-review/post/:postId`이며 기준 주소는 게시글과 동일한 환경변수 기반 공유 상수를 사용한다. 운영 환경의 설정값은 `https://www.snorose.com`이다.
 - `selectedExamReview.id`와 조회된 `selectedExamReviewDetail.postId`가 일치하는 상세 데이터 기준으로 링크를 만든다. 빠르게 선택을 바꿨을 때 이전 후기의 링크를 노출하지 않는다.
 - 미선택·상세 로딩·조회 실패·ID 불일치에서는 버튼을 숨긴다.
 - 삭제 상태만으로 버튼을 숨기지는 않는 것을 기본안으로 한다. 원본 접근 가능 여부는 사용자 서비스의 권한·삭제 정책을 따른다. 링크를 제공해도 사용자 사이트에서 제한될 수 있음을 구현 검증에서 확인한다.
@@ -153,7 +156,7 @@ const originalPostUrl =
 ### 1단계 확인 결과 (2026-10-15)
 
 - 사용자 프런트 로컬 체크아웃 `snorose-front`의 커밋 `13b00a95`에서 실제 사용하는 `src/router.js`를 확인했다. 시험후기 상세는 `/board/exam-review/post/:postId`, 이벤트 공지는 `/board/event-notice/post/:postId`, 시험후기 공지는 `/board/exam-review-notice/post/:postId`다.
-- 사용자 프런트 `public/index.html`의 `og:url`은 `https://www.snorose.com`이다. 문의·신고는 `VITE_USER_FRONT_BASE_URL`, 게시글과 시험후기는 고정 운영 주소를 사용한다. 이는 로컬 소스 기준 확인이며 운영 원문 열기까지 검증한 것은 아니다.
+- 사용자 프런트 `public/index.html`의 `og:url`은 `https://www.snorose.com`이다. 현재 원문 버튼은 8절 작업을 통해 `VITE_USER_FRONT_BASE_URL` 기반 공유 상수를 사용한다. 이는 로컬 소스 기준 확인이며 운영 원문 열기까지 검증한 것은 아니다.
 - `ExamReviewPage`는 선택 ID로 상세를 조회한다. 기존 선택 ID·상세 응답 ID·조회 상태로 링크 표시 여부를 판단하고, 상세 컴포넌트에는 최종 URL만 주입한다.
 - 초기 작업에 포함했던 문의·신고 URL 검증·기본 주소·슬래시 정규화와 그 전용 테스트는 사용자 요청으로 제거했다. URL 생성은 기존 코드 그대로 유지하고 버튼 공통화에 집중한다.
 
@@ -226,3 +229,75 @@ const originalPostUrl =
 이번 작업에서는 목록 행마다 원본 버튼 추가, `신고 대상`의 URL 생성·동작 공통화, 사용자 사이트 댓글 앵커 구현, API 계약 변경, 전체 외부 링크 공통화, 사용자 사이트의 삭제·권한 정책 변경을 다루지 않는다.
 
 관련 계획: [Button 공통화](./button-consolidation-plan.md), [페이지 레이아웃 정렬](./page-layout-alignment-plan.md).
+
+## 8. 후속 작업: 사용자 사이트·어드민 이동 구분
+
+### 8.1 최종 적용 방향
+
+사용자 사이트 기준 주소는 고정하지 않고 `VITE_USER_FRONT_BASE_URL`에서 읽는다. 공유 상수는 유지하고, **공통 버튼이 `isUserSnorose` prop으로 기준 주소를 붙일지 결정한다.** 환경설정 파일은 사용자가 관리한 값을 그대로 사용한다.
+
+```ts
+// src/shared/constants/urls.ts
+export const USER_FRONT_BASE_URL = import.meta.env.VITE_USER_FRONT_BASE_URL;
+```
+
+각 도메인의 기존 URL 함수는 기준 주소를 제외한 경로만 반환한다. 게시판 매핑, 공지 분기, 문의/신고 구분과 신고 대상의 어드민 경로 선택은 그대로 유지한다. 별도 훅·포트 탐색·기본 주소·ID 검증은 추가하지 않는다.
+
+### 8.2 사용 계약
+
+```tsx
+// 사용자 사이트 원문
+<OriginalPostButton
+  href='/board/exam-review/post/1911295'
+  label='원본 게시글'
+  isUserSnorose
+/>
+
+// 어드민 내부 상세
+<OriginalPostButton
+  href='/posts/manage/123?commentId=456'
+  label='신고 대상'
+  isUserSnorose={false}
+/>
+```
+
+| 대상               | 경로 출처                                                           | isUserSnorose |
+| ------------------ | ------------------------------------------------------------------- | ------------- |
+| 게시글·댓글의 원문 | `buildOriginalPostUrl`의 게시판 경로                                | `true`        |
+| 시험후기 원문      | `buildOriginalExamReviewUrl`의 `/board/exam-review/post/{postId}`   | `true`        |
+| 문의·신고 원문     | `buildOriginalInquiryPostUrl`의 `/inquiry/{id}` 또는 `/report/{id}` | `true`        |
+| 신고 대상          | `buildReportTargetUrl`의 어드민 상대 경로                           | `false`       |
+
+`true`인 경로는 `/` 유무와 관계없이 기준 주소 뒤에 슬래시 하나로 연결하고, 기존 쿼리·해시를 유지한다. `false`일 때는 전달 경로를 바꾸지 않는다. 문구, 툴팁 생성 규칙, 오른쪽 아이콘, 새 탭 속성은 기존 공통 버튼을 사용한다.
+
+### 8.3 환경설정 기준
+
+현재 사용자가 설정한 개발 사용자 사이트는 `https://front.dev.snorose.com`이다. 운영 등 다른 환경에서는 같은 변수의 값만 바꾼다.
+
+```dotenv
+VITE_USER_FRONT_BASE_URL=https://front.dev.snorose.com
+```
+
+기준 주소는 끝 슬래시 없이 제공한다. 포트를 포함한 로컬 주소도 설정값 그대로 적용한다. 하나의 `.env`에서 개발/운영 값을 주석으로 선택하는 경우 자동 전환되지 않으므로 실행 또는 빌드 전에 사용할 값을 활성화한다. 환경값 변경 후 개발 서버 재시작 또는 재빌드가 필요하다.
+
+### 8.4 적용·검증
+
+- [x] 공유 상수는 환경변수에서 읽고 고정 도메인을 제거한다.
+- [x] 세 도메인 함수는 경로만 반환하고 기존 분기를 유지한다.
+- [x] 원문 사용처에는 `isUserSnorose=true`, 어드민 신고 대상에는 `false`를 지정한다.
+- [x] 사용자 사이트/어드민 분기, 선행 슬래시·쿼리·해시, URL 없음, 문구·툴팁·새 탭 동작을 검증한다.
+- [x] 공통 버튼 테스트는 `http://localhost:5174`, 시험후기 통합 테스트는 `https://www.snorose.com`을 주입해 고정 주소에 의존하지 않는지 확인한다.
+- [x] 문의·신고 E2E 기대 주소는 같은 환경변수를 사용한다.
+- [x] 관련 테스트 5개 파일 총 62개, lint·빌드·E2E 타입 검사 결과를 확인한다.
+
+전체 테스트의 기존 실패 3개와 기타 기능은 이 범위에서 수정하지 않는다. 실제 API E2E와 브라우저 검증은 이번 후속 작업에서 다시 실행하지 않았다.
+
+## 9. 게시글·댓글 관리의 문의·신고 원문 경로 보완
+
+문의·신고 게시판은 일반 게시판의 `/board/support/post/{postId}`를 사용하지 않는다. 사용자 사이트에서는 문의는 `/inquiry/{postId}`, 신고는 `/report/{postId}`로 열린다.
+
+- `PostDetailPage`에서 게시판 key가 `support`일 때만 기존 `useInquiryDetail`로 문의·신고 상세를 조회하고, 응답의 `group`을 기존 `buildOriginalInquiryPostUrl`에 전달한다. 게시글 응답의 제목·category만으로 문의/신고를 추측하지 않는다.
+- `buildOriginalPostUrl`은 문의·신고 게시판에서 `null`을 반환해 잘못된 일반 게시판 경로를 만들지 않는다. 문의·신고 상세가 로딩·오류 상태이거나 응답 ID가 현재 게시글과 다르면 원문 링크를 숨긴다.
+- 댓글 관리는 기존처럼 부모 게시글 상세로 이동하므로 같은 로직을 재사용하고 `commentId` 전달과 강조 흐름을 유지한다. 다른 게시판에는 추가 문의·신고 조회를 하지 않는다.
+- 신고 ID `1725805`와 기준 주소 `https://front.dev.snorose.com`의 조합은 `https://front.dev.snorose.com/report/1725805`를 생성한다. 사용자 사이트 기준 주소는 계속 환경변수에서 읽는다.
+- 게시글·댓글 진입 각각의 문의/신고 경로, 조회 중·실패·ID 불일치 시 미노출, 일반 게시판의 기존 경로와 추가 조회 없음 사례를 통합 테스트 7개로 확인했다. 관련 테스트 4개 파일 총 56개가 통과했다.

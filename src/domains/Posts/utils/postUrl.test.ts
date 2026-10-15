@@ -10,7 +10,7 @@ describe('buildOriginalPostUrl', () => {
         isNotice: false,
         postId: 123,
       })
-    ).toBe('https://www.snorose.com/board/large-snow/post/123');
+    ).toBe('/board/large-snow/post/123');
   });
 
   it('이벤트 공지글은 공지 전용 경로를 사용한다', () => {
@@ -20,7 +20,7 @@ describe('buildOriginalPostUrl', () => {
         isNotice: true,
         postId: 456,
       })
-    ).toBe('https://www.snorose.com/board/event-notice/post/456');
+    ).toBe('/board/event-notice/post/456');
   });
 
   it('지원하지 않는 게시판이면 링크를 만들지 않는다', () => {
@@ -29,6 +29,16 @@ describe('buildOriginalPostUrl', () => {
         boardName: '알 수 없는 게시판',
         isNotice: false,
         postId: 789,
+      })
+    ).toBeNull();
+  });
+
+  it('문의·신고의 구분 없이 일반 게시판 경로를 만들지 않는다', () => {
+    expect(
+      buildOriginalPostUrl({
+        boardName: '문의게시판/신고게시판',
+        isNotice: false,
+        postId: 1725805,
       })
     ).toBeNull();
   });

@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { examReviewDetailQueryKey } from '@/domains/Reviews/hooks';
 import type {
@@ -14,6 +14,11 @@ import type {
 import { getExamReviewDetail } from '@/apis';
 
 import ExamReviewPage from './ExamReviewPage';
+
+vi.hoisted(() => {
+  vi.stubEnv('VITE_USER_FRONT_BASE_URL', 'https://www.snorose.com');
+});
+afterAll(() => vi.unstubAllEnvs());
 
 vi.mock('@/apis', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/apis')>()),
@@ -108,9 +113,7 @@ const link = () => screen.queryByRole('link', { name: /^원본 게시글/ });
 describe('시험후기 원본 링크 주입', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubEnv('VITE_USER_FRONT_BASE_URL', undefined);
   });
-  afterEach(() => vi.unstubAllEnvs());
 
   test('미선택·상세 로딩에는 숨기고 선택 변경 후 늦은 이전 응답을 노출하지 않는다', async () => {
     const user = userEvent.setup();

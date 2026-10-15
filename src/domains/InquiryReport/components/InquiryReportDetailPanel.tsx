@@ -227,8 +227,13 @@ export default function InquiryReportDetailPanel({
           <OriginalPostButton
             href={originalPostUrl}
             label={detail.group === 'REPORT' ? '신고 원문' : '문의 원문'}
+            isUserSnorose
           />
-          <OriginalPostButton href={reportTargetUrl} label='신고 대상' />
+          <OriginalPostButton
+            href={reportTargetUrl}
+            label='신고 대상 (어드민)'
+            isUserSnorose={false}
+          />
         </div>
         <Button
           type='button'

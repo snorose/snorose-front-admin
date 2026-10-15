@@ -1,19 +1,30 @@
 import { ExternalLink } from 'lucide-react';
 
+import { USER_FRONT_BASE_URL } from '@/shared/constants';
+
 import { Button } from './ui/button';
 
 export type OriginalPostButtonProps = {
   href: string | null | undefined;
   label: string;
+  isUserSnorose: boolean;
 };
 
-export function OriginalPostButton({ href, label }: OriginalPostButtonProps) {
+export function OriginalPostButton({
+  href,
+  label,
+  isUserSnorose,
+}: OriginalPostButtonProps) {
   if (!href?.trim()) return null;
+
+  const targetUrl = isUserSnorose
+    ? `${USER_FRONT_BASE_URL}${href.startsWith('/') ? '' : '/'}${href}`
+    : href;
 
   return (
     <Button asChild variant='outline' size='sm'>
       <a
-        href={href}
+        href={targetUrl}
         title={`${label} 바로가기`}
         target='_blank'
         rel='noopener noreferrer'
