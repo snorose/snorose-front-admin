@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 
-import {
-  CalendarPlusIcon,
-  Settings2Icon,
-  TriangleAlertIcon,
-} from 'lucide-react';
+import { CalendarPlusIcon, PencilIcon, TriangleAlertIcon } from 'lucide-react';
 
 import { Alert, Button, Dialog, Skeleton } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -192,12 +188,12 @@ export function ExamReviewAdminStatusDialog({
                     </div>
                     <Button
                       type='button'
-                      variant='outline'
+                      variant='secondary'
                       size='sm'
-                      className='min-h-11 shrink-0 sm:min-h-9'
+                      className='border-border min-h-11 shrink-0 border sm:min-h-9'
                       onClick={onOpenPeriodEditor}
                     >
-                      <Settings2Icon />
+                      <PencilIcon className='size-3.5' aria-hidden='true' />
                       기간 편집
                     </Button>
                   </div>
