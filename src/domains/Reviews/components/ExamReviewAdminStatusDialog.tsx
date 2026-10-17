@@ -142,7 +142,28 @@ export function ExamReviewAdminStatusDialog({
           ) : (
             <div className='flex flex-col gap-6'>
               <div className='flex min-w-0 flex-col gap-2'>
-                <h3 className='text-base font-semibold'>조회 기간</h3>
+                <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
+                  <h3 className='shrink-0 text-base font-semibold'>
+                    조회 기간
+                  </h3>
+                  {selectedPeriod && (
+                    <p className='text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs leading-5 tabular-nums'>
+                      <time
+                        className='whitespace-nowrap'
+                        dateTime={selectedPeriod.startAt}
+                      >
+                        {formatDateTimeToMinutes(selectedPeriod.startAt)}
+                      </time>
+                      <span>~</span>
+                      <time
+                        className='whitespace-nowrap'
+                        dateTime={selectedPeriod.endAt}
+                      >
+                        {formatDateTimeToMinutes(selectedPeriod.endAt)}
+                      </time>
+                    </p>
+                  )}
+                </div>
                 <div className='flex flex-col gap-2'>
                   <div className='flex items-start gap-3'>
                     <div
@@ -180,23 +201,6 @@ export function ExamReviewAdminStatusDialog({
                       기간 편집
                     </Button>
                   </div>
-                  {selectedPeriod && (
-                    <p className='text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs leading-5 tabular-nums'>
-                      <time
-                        className='whitespace-nowrap'
-                        dateTime={selectedPeriod.startAt}
-                      >
-                        {formatDateTimeToMinutes(selectedPeriod.startAt)}
-                      </time>
-                      <span>~</span>
-                      <time
-                        className='whitespace-nowrap'
-                        dateTime={selectedPeriod.endAt}
-                      >
-                        {formatDateTimeToMinutes(selectedPeriod.endAt)}
-                      </time>
-                    </p>
-                  )}
                 </div>
               </div>
 
