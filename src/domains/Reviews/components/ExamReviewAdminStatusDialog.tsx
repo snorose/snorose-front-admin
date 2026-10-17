@@ -186,9 +186,9 @@ export function ExamReviewAdminStatusDialog({
                   </div>
                   <Button
                     type='button'
-                    variant='secondary'
+                    variant='outline'
                     size='sm'
-                    className='border-border min-h-11 shrink-0 border sm:min-h-9'
+                    className='border-foreground min-h-11 shrink-0 sm:min-h-9'
                     onClick={onOpenPeriodEditor}
                   >
                     <PencilIcon className='size-3.5' aria-hidden='true' />
