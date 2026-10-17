@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ExamReviewPeriod } from '@/shared/types';
 
+import { EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY } from '@/domains/Reviews/hooks';
 import type { ExamReviewAdminStatusResult } from '@/domains/Reviews/types';
 
 import {
@@ -131,11 +132,14 @@ const renderDialog = () => {
     },
   });
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <DialogHarness />
-    </QueryClientProvider>
-  );
+  return {
+    ...render(
+      <QueryClientProvider client={queryClient}>
+        <DialogHarness />
+      </QueryClientProvider>
+    ),
+    queryClient,
+  };
 };
 
 describe('ExamReviewAdminStatusDialog', () => {
@@ -485,7 +489,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     await user.keyboard('{Home}');
     await waitFor(() => expect(first).toHaveAttribute('aria-selected', 'true'));
   });
-  test('다시 선택한 기간은 캐시를 즉시 표시하고 백그라운드에서 갱신한다', async () => {
+  test('만료된 기간 캐시는 즉시 표시하고 백그라운드에서 갱신한다', async () => {
     const user = userEvent.setup();
     renderDialog();
     await screen.findByText('71.4%');
@@ -496,6 +500,8 @@ describe('ExamReviewAdminStatusDialog', () => {
     });
     await user.click(screen.getByRole('tab', { name: '2026 여름학기' }));
     await screen.findByText('50%');
+
+    vi.setSystemTime(new Date('2026-08-22T12:00:31'));
 
     let resolveStatus!: (value: ExamReviewAdminStatusResult) => void;
     vi.mocked(getExamReviewAdminStatus).mockReturnValueOnce(
@@ -517,5 +523,39 @@ describe('ExamReviewAdminStatusDialog', () => {
     );
     expect(await screen.findByText('85.7%')).toBeInTheDocument();
     expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-busy', 'false');
+  });
+  test('30초 안에 다시 선택한 기간은 추가 요청 없이 통계 캐시를 표시한다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await screen.findByText('71.4%');
+    vi.mocked(getExamReviewAdminStatus).mockResolvedValueOnce({
+      ...createStatus(3),
+      confirmedRate: 50,
+    });
+    await user.click(screen.getByRole('tab', { name: '2026 여름학기' }));
+    await screen.findByText('50%');
+    expect(getExamReviewAdminStatus).toHaveBeenCalledTimes(2);
+
+    await user.click(screen.getByRole('tab', { name: '2026-2학기 중간고사' }));
+    expect(screen.getByText('71.4%')).toBeInTheDocument();
+    expect(screen.queryByText('50%')).not.toBeInTheDocument();
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-busy', 'false');
+    expect(getExamReviewAdminStatus).toHaveBeenCalledTimes(2);
+  });
+
+  test('통계 캐시를 무효화하면 30초 안에도 최신 통계로 갱신한다', async () => {
+    const { queryClient } = renderDialog();
+    await screen.findByText('71.4%');
+    vi.mocked(getExamReviewAdminStatus).mockResolvedValue({
+      ...createStatus(4),
+      confirmedRate: 85.7,
+    });
+    await act(async () => {
+      await queryClient.invalidateQueries({
+        queryKey: EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY,
+      });
+    });
+    expect(await screen.findByText('85.7%')).toBeInTheDocument();
+    expect(getExamReviewAdminStatus).toHaveBeenCalledTimes(2);
   });
 });
