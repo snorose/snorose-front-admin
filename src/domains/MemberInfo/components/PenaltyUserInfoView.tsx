@@ -1,8 +1,7 @@
 import { useId } from 'react';
 
-import { Copy } from 'lucide-react';
-
-import { Input, InputGroup, Label } from '@/shared/components/ui';
+import { CopyableValue } from '@/shared/components';
+import { Input, Label } from '@/shared/components/ui';
 import type { PenaltyUserInfo } from '@/shared/types';
 
 import { PENALTY_USER_INFO } from '@/domains/MemberInfo/constants/memberInfo';
@@ -22,14 +21,14 @@ export default function PenaltyUserInfo({
     'blacklistEndDate',
   ];
 
-  const handleCopy = async (value: string) => {
-    if (!value) return;
-    await navigator.clipboard.writeText(value);
-  };
-
   return (
     <article>
-      <div className='grid grid-cols-2 gap-x-5 gap-y-1 rounded-lg border p-4 pb-5'>
+      {!member && (
+        <p className='text-muted-foreground mb-2 text-sm'>
+          회원을 검색해 주세요.
+        </p>
+      )}
+      <div className='grid grid-cols-1 gap-x-5 gap-y-1 rounded-lg border p-4 pb-5 xl:grid-cols-2'>
         {PENALTY_USER_INFO.map(({ label, key }) => {
           const rawValue = member?.[key];
 
@@ -51,8 +50,8 @@ export default function PenaltyUserInfo({
             const dateValue = rawValue ? String(rawValue).substring(0, 10) : '';
 
             return (
-              <div key={key} className='flex gap-4'>
-                <Label htmlFor={`${inputId}-${key}`} className='w-32'>
+              <div key={key} className='flex min-w-0 items-center gap-4'>
+                <Label htmlFor={`${inputId}-${key}`} className='w-32 shrink-0'>
                   {label}
                 </Label>
 
@@ -68,32 +67,19 @@ export default function PenaltyUserInfo({
           }
 
           return (
-            <div key={key} className='flex gap-4'>
-              <Label htmlFor={`${inputId}-${key}`} className='w-32'>
+            <div key={key} className='flex min-w-0 items-center gap-4'>
+              <Label htmlFor={`${inputId}-${key}`} className='w-32 shrink-0'>
                 {label}
               </Label>
 
               {isCopy ? (
-                <InputGroup
-                  className={`w-60 ${!rawValue ? 'bg-muted text-muted-foreground' : ''}`}
-                >
-                  <InputGroup.Input
-                    id={`${inputId}-${key}`}
-                    readOnly
-                    value={displayValue}
-                    placeholder='회원을 검색해 주세요.'
-                  />
-                  <InputGroup.Addon align='inline-end'>
-                    <InputGroup.Button
-                      size='icon-xs'
-                      onClick={() => handleCopy(String(displayValue))}
-                      disabled={!displayValue}
-                      aria-label={`${label} 복사`}
-                    >
-                      <Copy aria-hidden='true' />
-                    </InputGroup.Button>
-                  </InputGroup.Addon>
-                </InputGroup>
+                <CopyableValue
+                  id={`${inputId}-${key}`}
+                  variant='input'
+                  className='w-60'
+                  value={rawValue == null ? undefined : String(rawValue)}
+                  label={label}
+                />
               ) : (
                 <Input
                   id={`${inputId}-${key}`}

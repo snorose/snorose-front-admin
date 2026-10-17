@@ -94,13 +94,13 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await expect(row).toContainText(first.title);
     const listUrl = page.url();
     await row
-      .getByRole('button', { name: `postId ${first.postId} 복사`, exact: true })
+      .getByRole('button', { name: '게시글 ID 복사', exact: true })
       .click();
     await expect
       .poll(() => page.evaluate(() => navigator.clipboard.readText()))
       .toBe(String(first.postId));
     await expect(
-      page.getByText('postId가 복사되었습니다.', { exact: true })
+      page.getByText('복사되었습니다.', { exact: true })
     ).toBeVisible();
     await expect(page).toHaveURL(listUrl);
     await expect(
@@ -220,9 +220,14 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       Math.min(10, otherInquiries.length)
     );
     for (const item of otherInquiries.slice(0, 10)) {
+      const row = inquiryReport.dataRows.filter({
+        has: page
+          .locator('td:first-child')
+          .getByText(String(item.postId), { exact: true }),
+      });
       await expect(
-        inquiryReport.table.getByRole('button', {
-          name: `postId ${item.postId} 복사`,
+        row.getByRole('button', {
+          name: '게시글 ID 복사',
           exact: true,
         })
       ).toBeVisible();

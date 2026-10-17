@@ -10,14 +10,12 @@ import { useMemberPointHistory } from '@/domains/MemberInfo/hooks/useMemberPoint
 
 type MemberPointHistoryDialogProps = {
   member: MemberInfo;
-  onCopy: (value: string) => void | Promise<void>;
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
 
 export default function MemberPointHistoryDialog({
   member,
-  onCopy,
   onOpenChange,
   open,
 }: MemberPointHistoryDialogProps) {
@@ -102,11 +100,7 @@ export default function MemberPointHistoryDialog({
           ) : histories.length > 0 ? (
             <ol className='ml-2 space-y-7 border-l-2 border-[#ecebf0] pl-6 sm:ml-3 sm:pl-7'>
               {histories.map((history) => (
-                <PointHistoryCard
-                  key={history.id}
-                  history={history}
-                  onCopy={onCopy}
-                />
+                <PointHistoryCard key={history.id} history={history} />
               ))}
             </ol>
           ) : !isError && !isPending ? (

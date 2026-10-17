@@ -1,15 +1,10 @@
 import { type ReactNode, useId } from 'react';
 
-import { Copy } from 'lucide-react';
-
-import { DatePicker, StatusBadge } from '@/shared/components';
-import { Button, Field, Input, Select } from '@/shared/components/ui';
+import { CopyableValue, DatePicker, StatusBadge } from '@/shared/components';
+import { Field, Input, Select } from '@/shared/components/ui';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
-import {
-  EMPTY_TEXT,
-  getRoleBadgeMeta,
-} from '@/domains/MemberInfo/utils/memberDirectory';
+import { getRoleBadgeMeta } from '@/domains/MemberInfo/utils/memberDirectory';
 import type { MemberEditFormValues } from '@/domains/MemberInfo/utils/validateMemberEditForm';
 
 export type EditableFieldItem = {
@@ -148,35 +143,31 @@ export function ReadonlyField({
   action,
   copyValue,
   label,
-  onCopy,
   value,
 }: {
   action?: ReactNode;
   copyValue?: string;
   label: string;
-  onCopy?: (value: string) => void | Promise<void>;
   value: string;
 }) {
   const inputId = useId();
 
   return (
-    <Field className='gap-0'>
+    <Field className='min-w-0 gap-0'>
       <Field.Label htmlFor={inputId}>{label}</Field.Label>
-      <Field.Content>
-        <div className='flex items-center gap-2'>
-          <Input id={inputId} value={value} readOnly className='bg-muted' />
-          {copyValue && value !== EMPTY_TEXT && onCopy ? (
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon'
-              className='shrink-0'
-              onClick={() => void onCopy(copyValue)}
-              aria-label={`${label} 복사`}
-            >
-              <Copy aria-hidden='true' />
-            </Button>
-          ) : null}
+      <Field.Content className='min-w-0'>
+        <div className='flex min-w-0 items-center gap-2'>
+          {copyValue !== undefined ? (
+            <CopyableValue
+              id={inputId}
+              variant='input'
+              value={copyValue}
+              displayValue={value}
+              label={label}
+            />
+          ) : (
+            <Input id={inputId} value={value} readOnly className='bg-muted' />
+          )}
           {action}
         </div>
       </Field.Content>

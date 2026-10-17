@@ -1,8 +1,12 @@
 import { type FormEvent, useEffect, useId, useState } from 'react';
 
-import { Copy, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
-import { OriginalPostButton, StatusBadge } from '@/shared/components';
+import {
+  CopyableValue,
+  OriginalPostButton,
+  StatusBadge,
+} from '@/shared/components';
 import { Button, Textarea } from '@/shared/components/ui';
 import type { InquiryComment, InquiryStatus } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -106,7 +110,6 @@ export default function InquiryReportDetailPanel({
   const reportTargetUrl = buildReportTargetUrl(detail);
   const originalPostUrl = buildOriginalInquiryPostUrl(detail);
   const isWriterWithdrawn = isWithdrawnInquiryAuthor(detail);
-  const canCopyAuthorLoginId = !isWriterWithdrawn && detail.userLoginId;
   const isCommentInputValid =
     commentInput.trim().length > 0 &&
     commentInput.trim().length <= INQUIRY_COMMENT_MAX_LENGTH;
@@ -186,18 +189,6 @@ export default function InquiryReportDetailPanel({
     deleteComment.mutate(commentId, {
       onSuccess: handleCommentEditCancel,
     });
-  };
-
-  const handleAuthorLoginIdCopy = async () => {
-    if (!canCopyAuthorLoginId) return;
-
-    if (!navigator.clipboard) return;
-
-    try {
-      await navigator.clipboard.writeText(detail.userLoginId);
-    } catch {
-      return;
-    }
   };
 
   return (
@@ -287,25 +278,16 @@ export default function InquiryReportDetailPanel({
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-700'>작성자</span>
-            <span className='flex min-w-0 items-center gap-1.5 text-gray-800'>
-              <span className='min-w-0 truncate'>
-                {isWriterWithdrawn ? (
-                  <WithdrawnUserBadge />
-                ) : (
-                  detail.userLoginId
-                )}
-              </span>
-              {canCopyAuthorLoginId && (
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='icon-sm'
-                  onClick={handleAuthorLoginIdCopy}
-                  aria-label='작성자 아이디 복사'
-                  title='작성자 아이디 복사'
-                >
-                  <Copy aria-hidden='true' />
-                </Button>
+            <span className='flex min-w-0 items-center text-gray-800'>
+              {isWriterWithdrawn ? (
+                <WithdrawnUserBadge />
+              ) : detail.userLoginId ? (
+                <CopyableValue
+                  value={detail.userLoginId}
+                  label='작성자 아이디'
+                />
+              ) : (
+                <span>-</span>
               )}
             </span>
           </div>

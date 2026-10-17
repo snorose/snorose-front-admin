@@ -14,7 +14,6 @@ import {
 
 type MemberDetailInfoGridProps = {
   member: MemberInfo;
-  onCopy: (value: string) => void | Promise<void>;
   onPointAdjustmentOpen: () => void;
   onPointHistoryOpen: () => void;
   roleLabel: string;
@@ -22,7 +21,6 @@ type MemberDetailInfoGridProps = {
 
 export default function MemberDetailInfoGrid({
   member,
-  onCopy,
   onPointAdjustmentOpen,
   onPointHistoryOpen,
   roleLabel,
@@ -33,8 +31,7 @@ export default function MemberDetailInfoGrid({
       <ReadonlyField
         label='아이디'
         value={formatDisplayValue(member.loginId)}
-        copyValue={member.loginId}
-        onCopy={onCopy}
+        copyValue={member.loginId ?? ''}
       />
       <ReadonlyField
         label='닉네임'
@@ -43,8 +40,7 @@ export default function MemberDetailInfoGrid({
       <ReadonlyField
         label='학번'
         value={formatDisplayValue(member.studentNumber)}
-        copyValue={member.studentNumber}
-        onCopy={onCopy}
+        copyValue={member.studentNumber ?? ''}
       />
       <ReadonlyField label='생년월일' value={formatDateOnly(member.birthday)} />
       <ReadonlyField label='전공' value={formatDisplayValue(member.major)} />
@@ -92,8 +88,7 @@ export default function MemberDetailInfoGrid({
       <ReadonlyField
         label='회원 ID (암호화)'
         value={formatDisplayValue(member.encryptedUserId)}
-        copyValue={member.encryptedUserId}
-        onCopy={onCopy}
+        copyValue={member.encryptedUserId ?? ''}
       />
       <Field className='gap-0'>
         <Field.Label>회원 등급</Field.Label>

@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Copy, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
-import { PaginationBar, StatusBadge, TableStateRow } from '@/shared/components';
-import { Button, Select, Table } from '@/shared/components/ui';
+import {
+  CopyableValue,
+  PaginationBar,
+  StatusBadge,
+  TableStateRow,
+} from '@/shared/components';
+import { Select, Table } from '@/shared/components/ui';
 import type {
   InquiryGroup,
   InquiryStatus,
@@ -130,15 +134,6 @@ export default function InquiryReportTable({
     subGroupFilter !== 'ALL',
     statusFilter !== 'ALL',
   ].filter(Boolean).length;
-
-  const handleCopyPostId = async (postId: number) => {
-    try {
-      await navigator.clipboard.writeText(String(postId));
-      toast.success('postId가 복사되었습니다.');
-    } catch {
-      toast.error('postId 복사에 실패했습니다.');
-    }
-  };
 
   return (
     <div className='flex flex-col gap-3'>
@@ -367,23 +362,10 @@ export default function InquiryReportTable({
                       }`}
                     >
                       <Table.Cell className='px-3 text-center font-mono text-gray-600'>
-                        <div className='flex items-center justify-center gap-1'>
-                          <span>{inquiry.postId}</span>
-                          <Button
-                            type='button'
-                            variant='ghost'
-                            size='icon-sm'
-                            className='size-6'
-                            aria-label={`postId ${inquiry.postId} 복사`}
-                            title='postId 복사'
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              void handleCopyPostId(inquiry.postId);
-                            }}
-                          >
-                            <Copy aria-hidden='true' />
-                          </Button>
-                        </div>
+                        <CopyableValue
+                          value={inquiry.postId}
+                          label='게시글 ID'
+                        />
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
                         <div className='flex justify-center'>
