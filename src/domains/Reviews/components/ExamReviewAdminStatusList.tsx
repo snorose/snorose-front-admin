@@ -39,7 +39,7 @@ export function ExamReviewAdminStatusList({
         </div>
       ) : (
         <div className='mt-3 overflow-hidden rounded-lg border'>
-          <div className='bg-muted/40 text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-2.5 text-xs'>
+          <div className='bg-muted/40 text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-2.5 text-sm'>
             <span>관리자 닉네임</span>
             <span className='shrink-0'>처리 건수</span>
           </div>
