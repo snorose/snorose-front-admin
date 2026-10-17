@@ -100,7 +100,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       .poll(() => page.evaluate(() => navigator.clipboard.readText()))
       .toBe(String(first.postId));
     await expect(
-      page.getByText('복사되었습니다.', { exact: true })
+      page.getByText('게시글 ID가 복사되었습니다.', { exact: true })
     ).toBeVisible();
     await expect(page).toHaveURL(listUrl);
     await expect(

@@ -6,6 +6,18 @@ import { toast } from 'sonner';
 import { Button, InputGroup } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 
+/** 항목명 끝 글자의 받침에 따라 조사 '이/가'를 고른다. */
+function getSubjectParticle(label: string) {
+  const lastCharacter = label
+    .trim()
+    .replace(/[)\]]+$/, '')
+    .slice(-1);
+  const code = lastCharacter.charCodeAt(0);
+  const hasFinalConsonant =
+    code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
+  return hasFinalConsonant ? '이' : '가';
+}
+
 export type CopyableValueProps = {
   value: string | number | null | undefined;
   label: string;
@@ -46,9 +58,9 @@ export function CopyableValue({
         throw new Error('Clipboard unavailable');
       }
       await navigator.clipboard.writeText(copyValue);
-      toast.success('복사되었습니다.');
+      toast.success(`${label}${getSubjectParticle(label)} 복사되었습니다.`);
     } catch {
-      toast.error('복사에 실패했습니다.');
+      toast.error(`${label} 복사에 실패했습니다.`);
     } finally {
       isCopyingRef.current = false;
       setIsCopying(false);
