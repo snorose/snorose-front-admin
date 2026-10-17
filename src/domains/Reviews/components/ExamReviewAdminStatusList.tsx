@@ -36,14 +36,14 @@ export function ExamReviewAdminStatusList({
       </div>
 
       {managers.length === 0 ? (
-        <div className='bg-muted/30 mt-3 rounded-lg border px-4 py-6 text-center'>
+        <div className='bg-muted/30 mt-2 rounded-lg border px-4 py-6 text-center'>
           <p className='text-sm font-medium'>처리 내역이 없습니다.</p>
           <p className='text-muted-foreground mt-1 text-xs leading-relaxed'>
             확인 처리 이력이 생기면 관리자별 건수가 표시됩니다.
           </p>
         </div>
       ) : (
-        <div className='mt-3 overflow-hidden rounded-lg border'>
+        <div className='mt-2 overflow-hidden rounded-lg border'>
           <div className='bg-muted/40 text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-2.5 text-sm'>
             <span>관리자 닉네임</span>
             <span className='shrink-0'>처리 건수</span>

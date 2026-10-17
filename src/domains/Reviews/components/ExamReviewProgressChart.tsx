@@ -30,7 +30,7 @@ export function ExamReviewProgressChart({
         />
       </div>
 
-      <div className='bg-muted/30 mt-3 rounded-lg border p-4'>
+      <div className='bg-muted/30 mt-2 rounded-lg border p-4'>
         <dl className='grid grid-cols-3 gap-y-1 divide-x'>
           {statusItems.map(({ label, value }, index) => (
             <div
