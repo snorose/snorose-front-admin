@@ -29,15 +29,41 @@ function AdminStatusSkeleton() {
       aria-label='현황을 불러오는 중'
       className='grid gap-6 @min-[48rem]:grid-cols-2'
     >
-      <div className='space-y-2'>
-        <Skeleton className='h-6 w-36' />
-        <Skeleton className='h-4 w-full max-w-80' />
-        <Skeleton className='mt-3 h-36 w-full rounded-lg' />
-      </div>
-      <div className='space-y-2'>
+      <div>
         <Skeleton className='h-6 w-40' />
-        <Skeleton className='h-4 w-64 max-w-full' />
-        <Skeleton className='mt-3 h-24 w-full rounded-lg' />
+        <div className='bg-muted/30 mt-2 rounded-lg border p-4'>
+          <div className='grid grid-cols-3 gap-6'>
+            {[0, 1, 2].map((item) => (
+              <div key={item} className='space-y-1'>
+                <Skeleton className='h-5 w-full max-w-20' />
+                <Skeleton className='h-8 w-12 sm:h-9' />
+              </div>
+            ))}
+          </div>
+          <div className='mt-3 border-t pt-3'>
+            <div className='flex items-center justify-between'>
+              <Skeleton className='h-5 w-20' />
+              <Skeleton className='h-5 w-12' />
+            </div>
+            <Skeleton className='mt-2 h-1.5 w-full' />
+          </div>
+        </div>
+      </div>
+      <div>
+        <Skeleton className='h-6 w-44' />
+        <div className='mt-2 overflow-hidden rounded-lg border'>
+          <Skeleton className='h-10 rounded-none border-b' />
+          {[0, 1].map((item) => (
+            <div
+              key={item}
+              className='flex h-11 items-center justify-between border-b px-4 last:border-b-0'
+            >
+              <Skeleton className='h-5 w-28' />
+              <Skeleton className='h-5 w-10' />
+            </div>
+          ))}
+        </div>
+        <Skeleton className='mt-2 h-4 w-full max-w-80' />
       </div>
     </div>
   );
@@ -89,7 +115,7 @@ export function ExamReviewAdminStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='@container flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)] sm:max-w-[960px]'>
+      <Dialog.Content className='@container top-[10dvh] flex max-h-[85dvh] translate-y-0 flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)] sm:max-w-[960px]'>
         <Dialog.Header className='shrink-0 gap-1 px-5 pt-5 pr-14 text-left sm:px-6 sm:pt-6 sm:pr-14'>
           <Dialog.Title className='text-xl leading-7'>
             담당 관리자 현황
@@ -102,7 +128,16 @@ export function ExamReviewAdminStatusDialog({
         <div className='min-h-0 overflow-y-auto overscroll-contain px-5 pt-4 pb-5 sm:px-6 sm:pb-6'>
           {periodsQuery.isPending ? (
             <div className='flex flex-col gap-6'>
-              <Skeleton className='h-9 w-full' />
+              <div className='space-y-2'>
+                <div className='flex h-6 items-center gap-3 @max-[22rem]:h-11'>
+                  <Skeleton className='h-6 w-16' />
+                  <Skeleton className='h-4 w-56 max-w-full' />
+                </div>
+                <div className='flex h-12 items-center justify-between gap-3 sm:h-9'>
+                  <Skeleton className='h-full w-3/5' />
+                  <Skeleton className='h-11 w-24 shrink-0 sm:h-9' />
+                </div>
+              </div>
               <AdminStatusSkeleton />
             </div>
           ) : periodsQuery.isError ? (
