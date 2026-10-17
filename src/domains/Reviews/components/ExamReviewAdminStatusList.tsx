@@ -1,18 +1,15 @@
-import { UserRoundIcon } from 'lucide-react';
-
-import { Badge, Card } from '@/shared/components/ui';
+import { useId } from 'react';
 
 import type { ExamReviewAdminStatusManager } from '@/domains/Reviews/types';
 
 interface ExamReviewAdminStatusListProps {
   managers: ExamReviewAdminStatusManager[];
-  averagePerAdmin: number;
 }
 
 export function ExamReviewAdminStatusList({
   managers,
-  averagePerAdmin,
 }: ExamReviewAdminStatusListProps) {
+  const titleId = useId();
   const sortedManagers = [...managers].sort(
     (a, b) =>
       b.processedCount - a.processedCount ||
@@ -20,49 +17,58 @@ export function ExamReviewAdminStatusList({
   );
 
   return (
-    <Card className='bg-card flex min-h-[392px] min-w-0 flex-col'>
-      <Card.Header className='flex-row flex-wrap items-start justify-between gap-4 px-6 pt-6'>
-        <div className='flex flex-col gap-1.5'>
-          <Card.Title>관리자별 처리 현황</Card.Title>
-          <Card.Description>
-            미확인 → 확인 변경 이력 기준입니다.
-          </Card.Description>
-        </div>
-        <div className='bg-muted shrink-0 rounded-lg px-3 py-2 text-right'>
-          <p className='text-muted-foreground text-xs'>1인당 평균</p>
-          <p className='text-lg font-bold'>
-            {managers.length === 0 ? '-' : `${averagePerAdmin}건`}
+    <section
+      aria-labelledby={titleId}
+      className='min-w-0 border-t pt-6 @min-[48rem]:border-t-0 @min-[48rem]:pt-0'
+    >
+      <div className='flex flex-wrap items-baseline gap-x-2 gap-y-1'>
+        <h3 id={titleId} className='text-base font-semibold'>
+          관리자별 처리 현황
+        </h3>
+        <span className='text-muted-foreground text-xs tabular-nums'>
+          {managers.length.toLocaleString('ko-KR')}명
+        </span>
+      </div>
+      <p className='text-muted-foreground mt-2 text-sm leading-relaxed break-keep'>
+        미확인 → 확인으로 변경한 횟수입니다.
+      </p>
+
+      {managers.length === 0 ? (
+        <div className='bg-muted/30 mt-4 rounded-lg border px-4 py-6 text-center'>
+          <p className='text-sm font-medium'>처리 내역이 없습니다.</p>
+          <p className='text-muted-foreground mt-1 text-xs leading-relaxed'>
+            확인 처리 이력이 생기면 관리자별 건수가 표시됩니다.
           </p>
         </div>
-      </Card.Header>
-
-      <Card.Content className='min-h-0 flex-1 overflow-hidden pt-5'>
-        {managers.length === 0 ? (
-          <div className='text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-center text-sm'>
-            <UserRoundIcon className='size-8 opacity-40' />
-            <p>처리 내역이 없습니다.</p>
+      ) : (
+        <div className='mt-4 overflow-hidden rounded-lg border'>
+          <div className='bg-muted/40 text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-2.5 text-xs'>
+            <span>관리자 닉네임</span>
+            <span className='shrink-0'>처리 건수</span>
           </div>
-        ) : (
-          <ul className='flex max-h-64 flex-col divide-y overflow-y-auto pr-1'>
+          <ul
+            aria-labelledby={titleId}
+            className='max-h-80 divide-y overflow-y-auto overscroll-contain'
+          >
             {sortedManagers.map((manager) => (
               <li
                 key={manager.encryptedAdminId}
-                className='flex shrink-0 items-center justify-between gap-4 py-3 first:pt-0'
+                className='flex items-start justify-between gap-4 px-4 py-3'
               >
-                <span
-                  className='min-w-0 truncate text-sm font-medium'
-                  title={manager.nickname ?? '닉네임 없음'}
-                >
+                <span className='min-w-0 text-sm leading-5 font-medium [overflow-wrap:anywhere] break-words'>
                   {manager.nickname ?? '닉네임 없음'}
                 </span>
-                <Badge variant='secondary' className='shrink-0 px-2.5 py-1'>
-                  {manager.processedCount}건
-                </Badge>
+                <span className='shrink-0 text-sm leading-5 font-medium tabular-nums'>
+                  {manager.processedCount.toLocaleString('ko-KR')}건
+                </span>
               </li>
             ))}
           </ul>
-        )}
-      </Card.Content>
-    </Card>
+        </div>
+      )}
+      <p className='text-muted-foreground mt-2 text-xs leading-relaxed break-keep'>
+        확인 처리 횟수는 현재 확인 완료 건수와 다를 수 있습니다.
+      </p>
+    </section>
   );
 }

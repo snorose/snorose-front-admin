@@ -175,9 +175,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     expect(progress).toHaveAttribute('aria-valuenow', '71.4');
     expect(screen.getByText('눈송관리자')).toBeInTheDocument();
     expect(screen.getByText('로즈매니저')).toBeInTheDocument();
-    expect(screen.getByText('1인당 평균').parentElement).toHaveTextContent(
-      '4건'
-    );
+    expect(screen.queryByText('1인당 평균')).not.toBeInTheDocument();
     expect(getExamReviewAdminStatus).toHaveBeenLastCalledWith(3);
     expect(screen.queryByText('담당자 미상')).not.toBeInTheDocument();
     const names = screen
@@ -384,9 +382,11 @@ describe('ExamReviewAdminStatusDialog', () => {
     });
     renderDialog();
     expect(await screen.findByText('0%')).toBeInTheDocument();
-    expect(screen.getAllByText('0건')).toHaveLength(3);
+    for (const label of ['기간 내 업로드', '확인 완료', '미확인']) {
+      expect(screen.getByText(label).parentElement).toHaveTextContent(/0\s*건/);
+    }
     expect(screen.getByText('처리 내역이 없습니다.')).toBeInTheDocument();
-    expect(screen.getByText('1인당 평균').parentElement).toHaveTextContent('-');
+    expect(screen.queryByText('1인당 평균')).not.toBeInTheDocument();
   });
 
   test('통계와 관리자 처리 합계가 달라도 미상 건수를 추정하지 않는다', async () => {
@@ -404,9 +404,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     renderDialog();
     expect(await screen.findByText('닉네임 없음')).toBeInTheDocument();
     expect(screen.getByText('9건')).toBeInTheDocument();
-    expect(screen.getByText('1인당 평균').parentElement).toHaveTextContent(
-      '7건'
-    );
+    expect(screen.queryByText('1인당 평균')).not.toBeInTheDocument();
     expect(screen.queryByText('담당자 미상')).not.toBeInTheDocument();
   });
 
