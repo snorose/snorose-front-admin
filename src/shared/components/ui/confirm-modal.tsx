@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import type { VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 
@@ -37,6 +39,8 @@ export function ConfirmModal({
   className,
   children,
 }: ConfirmModalProps) {
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+
   return (
     <Dialog
       open={isOpen}
@@ -49,6 +53,18 @@ export function ConfirmModal({
         closeButtonDisabled={isPending}
         aria-busy={isPending}
         {...(!description && { 'aria-describedby': undefined })}
+        onOpenAutoFocus={() => {
+          returnFocusRef.current =
+            document.activeElement instanceof HTMLElement
+              ? document.activeElement
+              : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          if (returnFocusRef.current?.isConnected) {
+            event.preventDefault();
+            returnFocusRef.current.focus();
+          }
+        }}
         onEscapeKeyDown={(event) => {
           if (isPending) event.preventDefault();
         }}

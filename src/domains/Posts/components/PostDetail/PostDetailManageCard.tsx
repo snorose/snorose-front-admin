@@ -231,6 +231,11 @@ export default function PostDetailManageCard({
       {/* 상태 변경 사유 모달 */}
       <PostDetailActionModal
         isOpen={isModalOpen}
+        isPending={
+          deleteMutation.isPending ||
+          restoreMutation.isPending ||
+          visibilityMutation.isPending
+        }
         onClose={() => {
           setIsModalOpen(false);
           setReason('');

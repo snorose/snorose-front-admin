@@ -263,6 +263,11 @@ export default function PostDetailCommentItem({
       {isModalOpen && comment && (
         <StatusChangeModal
           target='COMMENT'
+          isPending={
+            deleteMutation.isPending ||
+            restoreMutation.isPending ||
+            visibilityMutation.isPending
+          }
           modalType={modalType}
           onClose={() => {
             setIsModalOpen(false);
