@@ -40,7 +40,7 @@ function AdminStatusSkeleton() {
               </div>
             ))}
           </div>
-          <div className='mt-4 border-t pt-4'>
+          <div className='mt-4 border-t pt-8 pb-4'>
             <Skeleton className='mx-auto size-36 rounded-full' />
           </div>
         </div>

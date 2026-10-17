@@ -54,7 +54,7 @@ export function ExamReviewProgressChart({
           ))}
         </dl>
 
-        <div className='mt-4 border-t pt-4'>
+        <div className='mt-4 border-t pt-8 pb-4'>
           <div
             role='progressbar'
             aria-label='시험후기 확인 완료율'
