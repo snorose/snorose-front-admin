@@ -22,6 +22,7 @@ export function ExamReviewUpdateConfirmModal({
   return (
     <ConfirmModal
       isOpen={isOpen}
+      className='sm:max-w-3xl'
       title='시험 후기 수정'
       description='아래 항목이 수정됩니다. 저장하시겠습니까?'
       confirmText='저장'
@@ -30,7 +31,7 @@ export function ExamReviewUpdateConfirmModal({
       onConfirm={onConfirm}
     >
       <div className='overflow-hidden rounded-md border'>
-        <div className='grid grid-cols-[140px_1fr_1fr] gap-3 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700'>
+        <div className='grid grid-cols-[140px_minmax(0,1fr)_minmax(0,1fr)] gap-3 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700'>
           <div>항목</div>
           <div>수정 전</div>
           <div>수정 후</div>
@@ -40,13 +41,13 @@ export function ExamReviewUpdateConfirmModal({
           {changes.map((change) => (
             <div
               key={change.label}
-              className='grid grid-cols-[140px_1fr_1fr] gap-3 px-3 py-2 text-sm'
+              className='grid grid-cols-[140px_minmax(0,1fr)_minmax(0,1fr)] gap-3 px-3 py-2 text-sm'
             >
               <div className='text-gray-700'>{change.label}</div>
-              <div className='break-words whitespace-pre-wrap text-gray-700'>
+              <div className='wrap-anywhere whitespace-pre-wrap text-gray-700'>
                 {change.before || '-'}
               </div>
-              <div className='break-words whitespace-pre-wrap text-blue-600'>
+              <div className='wrap-anywhere whitespace-pre-wrap text-blue-600'>
                 {change.after || '-'}
               </div>
             </div>
