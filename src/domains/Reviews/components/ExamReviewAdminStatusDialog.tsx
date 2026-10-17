@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { CalendarPlusIcon, PencilIcon, TriangleAlertIcon } from 'lucide-react';
 
-import { Alert, Button, Dialog, Skeleton } from '@/shared/components/ui';
+import { Alert, Button, Dialog, Skeleton, Tabs } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
@@ -136,7 +136,14 @@ export function ExamReviewAdminStatusDialog({
               </Button>
             </div>
           ) : (
-            <div className='flex flex-col gap-6'>
+            <Tabs
+              value={selectedPeriodId === null ? '' : String(selectedPeriodId)}
+              onValueChange={(value) => {
+                isDefaultSelectionRef.current = false;
+                onSelectedPeriodChange(Number(value));
+              }}
+              className='min-w-0 gap-6'
+            >
               <div className='flex min-w-0 flex-col gap-2'>
                 <div className='flex flex-wrap items-baseline gap-x-3 gap-y-1'>
                   <h3 className='shrink-0 text-base font-semibold'>
@@ -160,72 +167,70 @@ export function ExamReviewAdminStatusDialog({
                     </p>
                   )}
                 </div>
-                <div className='flex flex-col gap-2'>
-                  <div className='flex items-start gap-3'>
-                    <div
-                      role='group'
+                <div className='flex min-w-0 items-center gap-3'>
+                  <div className='min-w-0 flex-1 overflow-x-auto overscroll-x-contain'>
+                    <Tabs.List
                       aria-label='조회 기간 선택'
-                      className='flex min-w-0 flex-1 flex-wrap gap-2'
+                      className='justify-start p-0.5 group-data-[orientation=horizontal]/tabs:h-12 sm:p-[3px] sm:group-data-[orientation=horizontal]/tabs:h-9'
                     >
                       {periods.map((period) => (
-                        <Button
+                        <Tabs.Trigger
                           key={period.id}
-                          type='button'
-                          variant='outline'
-                          size='sm'
-                          className='aria-pressed:border-primary aria-pressed:bg-primary/5 aria-pressed:text-primary aria-pressed:hover:bg-primary/10 h-auto min-h-11 max-w-full flex-none px-3 py-2 text-left whitespace-normal shadow-none transition-colors sm:min-h-9'
-                          aria-pressed={period.id === selectedPeriodId}
-                          onClick={() => {
-                            isDefaultSelectionRef.current = false;
-                            onSelectedPeriodChange(period.id);
-                          }}
+                          value={String(period.id)}
+                          className='h-full flex-none px-3 focus-visible:outline-none focus-visible:ring-inset'
                         >
-                          <span className='min-w-0 [overflow-wrap:anywhere] break-keep'>
-                            {period.title}
-                          </span>
-                        </Button>
+                          {period.title}
+                        </Tabs.Trigger>
                       ))}
-                    </div>
-                    <Button
-                      type='button'
-                      variant='secondary'
-                      size='sm'
-                      className='border-border min-h-11 shrink-0 border sm:min-h-9'
-                      onClick={onOpenPeriodEditor}
-                    >
-                      <PencilIcon className='size-3.5' aria-hidden='true' />
-                      기간 편집
-                    </Button>
+                    </Tabs.List>
                   </div>
+                  <Button
+                    type='button'
+                    variant='secondary'
+                    size='sm'
+                    className='border-border min-h-11 shrink-0 border sm:min-h-9'
+                    onClick={onOpenPeriodEditor}
+                  >
+                    <PencilIcon className='size-3.5' aria-hidden='true' />
+                    기간 편집
+                  </Button>
                 </div>
               </div>
 
-              {statusQuery.isPending || statusQuery.isFetching ? (
-                <AdminStatusSkeleton />
-              ) : statusQuery.isError ? (
-                <Alert variant='destructive'>
-                  <TriangleAlertIcon />
-                  <Alert.Title>현황을 불러오지 못했습니다.</Alert.Title>
-                  <Alert.Description>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      onClick={() => statusQuery.refetch()}
-                    >
-                      다시 시도
-                    </Button>
-                  </Alert.Description>
-                </Alert>
-              ) : statusQuery.data ? (
-                <div className='grid gap-6 @min-[48rem]:grid-cols-2'>
-                  <ExamReviewProgressChart summary={statusQuery.data} />
-                  <ExamReviewAdminStatusList
-                    managers={statusQuery.data.adminStatics}
-                  />
-                </div>
-              ) : null}
-            </div>
+              <Tabs.Content
+                value={
+                  selectedPeriodId === null ? '' : String(selectedPeriodId)
+                }
+                aria-busy={statusQuery.isFetching}
+                className='min-w-0'
+              >
+                {statusQuery.isPending || statusQuery.isFetching ? (
+                  <AdminStatusSkeleton />
+                ) : statusQuery.isError ? (
+                  <Alert variant='destructive'>
+                    <TriangleAlertIcon />
+                    <Alert.Title>현황을 불러오지 못했습니다.</Alert.Title>
+                    <Alert.Description>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        onClick={() => statusQuery.refetch()}
+                      >
+                        다시 시도
+                      </Button>
+                    </Alert.Description>
+                  </Alert>
+                ) : statusQuery.data ? (
+                  <div className='grid gap-6 @min-[48rem]:grid-cols-2'>
+                    <ExamReviewProgressChart summary={statusQuery.data} />
+                    <ExamReviewAdminStatusList
+                      managers={statusQuery.data.adminStatics}
+                    />
+                  </div>
+                ) : null}
+              </Tabs.Content>
+            </Tabs>
           )}
         </div>
       </Dialog.Content>

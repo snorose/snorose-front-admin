@@ -150,7 +150,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     );
   });
 
-  test('첫 번째 기간을 기본 선택하고 기간 버튼으로 현황을 전환한다', async () => {
+  test('첫 번째 기간을 기본 선택하고 기간 탭으로 현황을 전환한다', async () => {
     const user = userEvent.setup();
     renderDialog();
 
@@ -159,16 +159,16 @@ describe('ExamReviewAdminStatusDialog', () => {
     ).toBeInTheDocument();
     expect(screen.queryByText('Mock 데이터')).not.toBeInTheDocument();
 
-    const activePeriodButton = await screen.findByRole('button', {
+    const activePeriodTab = await screen.findByRole('tab', {
       name: '2026-2학기 중간고사',
     });
     expect(getExamReviewPeriodsAPI).toHaveBeenCalledWith('ADMIN_EDIT');
 
     await waitFor(() =>
-      expect(activePeriodButton).toHaveAttribute('aria-pressed', 'true')
+      expect(activePeriodTab).toHaveAttribute('aria-selected', 'true')
     );
 
-    await user.click(screen.getByRole('button', { name: '2026 여름학기' }));
+    await user.click(screen.getByRole('tab', { name: '2026 여름학기' }));
     const progress = await screen.findByRole('progressbar', {
       name: '시험후기 확인 완료율',
     });
@@ -187,24 +187,25 @@ describe('ExamReviewAdminStatusDialog', () => {
   test('편집에서 돌아오면 선택을 유지하고 새로 열면 첫 기간을 선택한다', async () => {
     const user = userEvent.setup();
     renderDialog();
-    const firstPeriod = await screen.findByRole('button', {
+    const firstPeriod = await screen.findByRole('tab', {
       name: '2026-2학기 중간고사',
     });
     await waitFor(() =>
-      expect(firstPeriod).toHaveAttribute('aria-pressed', 'true')
+      expect(firstPeriod).toHaveAttribute('aria-selected', 'true')
     );
-    await user.click(screen.getByRole('button', { name: '2026 여름학기' }));
+    await user.click(screen.getByRole('tab', { name: '2026 여름학기' }));
     await user.click(screen.getByRole('button', { name: '기간 편집' }));
     await user.click(screen.getByRole('button', { name: '현황 보기' }));
-    expect(
-      screen.getByRole('button', { name: '2026 여름학기' })
-    ).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('tab', { name: '2026 여름학기' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
     await user.click(screen.getByRole('button', { name: '창 닫기' }));
     await user.click(screen.getByRole('button', { name: '현황 열기' }));
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: '2026-2학기 중간고사' })
-      ).toHaveAttribute('aria-pressed', 'true')
+        screen.getByRole('tab', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-selected', 'true')
     );
   });
 
@@ -213,8 +214,8 @@ describe('ExamReviewAdminStatusDialog', () => {
     renderDialog();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: '2026-2학기 중간고사' })
-      ).toHaveAttribute('aria-pressed', 'true')
+        screen.getByRole('tab', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-selected', 'true')
     );
     await user.click(screen.getByRole('button', { name: '창 닫기' }));
 
@@ -227,8 +228,8 @@ describe('ExamReviewAdminStatusDialog', () => {
     await user.click(screen.getByRole('button', { name: '현황 열기' }));
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: '2026-2학기 중간고사' })
-      ).toHaveAttribute('aria-pressed', 'true')
+        screen.getByRole('tab', { name: '2026-2학기 중간고사' })
+      ).toHaveAttribute('aria-selected', 'true')
     );
 
     const periods = PERIODS;
@@ -246,8 +247,8 @@ describe('ExamReviewAdminStatusDialog', () => {
     );
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: '새로운 첫 기간' })
-      ).toHaveAttribute('aria-pressed', 'true')
+        screen.getByRole('tab', { name: '새로운 첫 기간' })
+      ).toHaveAttribute('aria-selected', 'true')
     );
   });
 
@@ -255,7 +256,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     const user = userEvent.setup();
     renderDialog();
 
-    await screen.findByRole('button', { name: '2026 여름학기' });
+    await screen.findByRole('tab', { name: '2026 여름학기' });
     await user.click(screen.getByRole('button', { name: '기간 편집' }));
     expect(
       screen.getByRole('dialog', { name: '기간 편집' })
@@ -300,7 +301,7 @@ describe('ExamReviewAdminStatusDialog', () => {
   test('수정 팝업에 기존 값을 채우고 저장하면 목록으로 돌아온다', async () => {
     const user = userEvent.setup();
     renderDialog();
-    await screen.findByRole('button', { name: '2026 여름학기' });
+    await screen.findByRole('tab', { name: '2026 여름학기' });
     await user.click(screen.getByRole('button', { name: '기간 편집' }));
     await user.click(
       screen.getByRole('button', { name: '2026 여름학기 수정' })
@@ -336,7 +337,7 @@ describe('ExamReviewAdminStatusDialog', () => {
         resolveStatus = resolve;
       })
     );
-    await user.click(screen.getByRole('button', { name: '2026 여름학기' }));
+    await user.click(screen.getByRole('tab', { name: '2026 여름학기' }));
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     await act(async () =>
       resolveStatus({ ...createStatus(3), confirmedRate: 20 })
@@ -455,5 +456,33 @@ describe('ExamReviewAdminStatusDialog', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
       '미확인 → 확인으로 변경한 횟수입니다.'
     );
+  });
+  test('방향키와 Home·End 키로 기간 탭을 전환한다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    const first = await screen.findByRole('tab', {
+      name: '2026-2학기 중간고사',
+    });
+    await waitFor(() => expect(first).toHaveAttribute('aria-selected', 'true'));
+    act(() => first.focus());
+    await user.keyboard('{ArrowRight}');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('tab', { name: '2026 여름학기' })
+      ).toHaveAttribute('aria-selected', 'true')
+    );
+    expect(getExamReviewAdminStatus).toHaveBeenLastCalledWith(3);
+    expect(screen.getByRole('tabpanel')).toHaveAttribute(
+      'aria-labelledby',
+      screen.getByRole('tab', { name: '2026 여름학기' }).id
+    );
+    await user.keyboard('{End}');
+    await waitFor(() =>
+      expect(
+        screen.getByRole('tab', { name: '2026-1학기 중간고사' })
+      ).toHaveAttribute('aria-selected', 'true')
+    );
+    await user.keyboard('{Home}');
+    await waitFor(() => expect(first).toHaveAttribute('aria-selected', 'true'));
   });
 });
