@@ -204,7 +204,7 @@ export function ExamReviewAdminStatusDialog({
                 aria-busy={statusQuery.isFetching}
                 className='min-w-0'
               >
-                {statusQuery.isPending || statusQuery.isFetching ? (
+                {statusQuery.isPending ? (
                   <AdminStatusSkeleton />
                 ) : statusQuery.isError ? (
                   <Alert variant='destructive'>

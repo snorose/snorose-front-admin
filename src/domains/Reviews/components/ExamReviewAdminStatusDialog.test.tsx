@@ -485,4 +485,37 @@ describe('ExamReviewAdminStatusDialog', () => {
     await user.keyboard('{Home}');
     await waitFor(() => expect(first).toHaveAttribute('aria-selected', 'true'));
   });
+  test('다시 선택한 기간은 캐시를 즉시 표시하고 백그라운드에서 갱신한다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await screen.findByText('71.4%');
+
+    vi.mocked(getExamReviewAdminStatus).mockResolvedValueOnce({
+      ...createStatus(3),
+      confirmedRate: 50,
+    });
+    await user.click(screen.getByRole('tab', { name: '2026 여름학기' }));
+    await screen.findByText('50%');
+
+    let resolveStatus!: (value: ExamReviewAdminStatusResult) => void;
+    vi.mocked(getExamReviewAdminStatus).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveStatus = resolve;
+      })
+    );
+    await user.click(screen.getByRole('tab', { name: '2026-2학기 중간고사' }));
+    expect(screen.getByText('71.4%')).toBeInTheDocument();
+    expect(screen.queryByText('50%')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('status', { name: '현황을 불러오는 중' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-busy', 'true');
+    expect(getExamReviewAdminStatus).toHaveBeenLastCalledWith(4);
+
+    await act(async () =>
+      resolveStatus({ ...createStatus(4), confirmedRate: 85.7 })
+    );
+    expect(await screen.findByText('85.7%')).toBeInTheDocument();
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-busy', 'false');
+  });
 });
