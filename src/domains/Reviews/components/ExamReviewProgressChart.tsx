@@ -21,22 +21,22 @@ export function ExamReviewProgressChart({
       <h3 id={titleId} className='text-base font-semibold'>
         시험후기 확인 현황
       </h3>
-      <p className='text-muted-foreground mt-2 text-sm leading-relaxed break-keep'>
+      <p className='text-muted-foreground mt-1 text-sm leading-5 break-keep'>
         선택한 기간에 업로드된 시험후기의 현재 확인 상태입니다.
       </p>
 
-      <div className='bg-muted/30 mt-4 rounded-lg border p-4'>
-        <dl className='grid grid-cols-3 divide-x'>
+      <div className='bg-muted/30 mt-3 rounded-lg border p-4'>
+        <dl className='grid grid-cols-3 gap-y-1 divide-x'>
           {statusItems.map(({ label, value }, index) => (
             <div
               key={label}
-              className='min-w-0 px-3 first:pl-0 last:pr-0 sm:px-5'
+              className='row-span-2 grid min-w-0 grid-rows-subgrid px-3 first:pl-0 last:pr-0 sm:px-5'
             >
-              <dt className='text-muted-foreground text-xs leading-5 sm:text-sm'>
+              <dt className='text-muted-foreground text-xs leading-5 break-keep sm:text-sm'>
                 {label}
               </dt>
               <dd
-                className={`mt-2 flex flex-wrap items-baseline gap-1 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl ${index === 1 ? 'text-primary' : ''}`}
+                className={`flex flex-wrap items-baseline gap-1 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl ${index === 1 ? 'text-primary' : ''}`}
               >
                 <span className='break-all'>
                   {value.toLocaleString('ko-KR')}
@@ -49,7 +49,7 @@ export function ExamReviewProgressChart({
           ))}
         </dl>
 
-        <div className='mt-4 border-t pt-4'>
+        <div className='mt-3 border-t pt-3'>
           <div className='flex items-center justify-between gap-3 text-xs sm:text-sm'>
             <span className='text-muted-foreground'>확인 완료율</span>
             <span className='font-medium tabular-nums'>

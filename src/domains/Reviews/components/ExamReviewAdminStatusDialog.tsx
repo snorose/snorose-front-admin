@@ -34,14 +34,14 @@ function AdminStatusSkeleton() {
       className='grid gap-6 @min-[48rem]:grid-cols-2'
     >
       <div className='space-y-2'>
-        <Skeleton className='h-5 w-36' />
+        <Skeleton className='h-6 w-36' />
         <Skeleton className='h-4 w-full max-w-80' />
-        <Skeleton className='mt-4 h-40 w-full rounded-lg' />
+        <Skeleton className='mt-3 h-36 w-full rounded-lg' />
       </div>
-      <div className='space-y-3 border-t pt-6 @min-[48rem]:border-t-0 @min-[48rem]:pt-0'>
-        <Skeleton className='h-5 w-40' />
+      <div className='space-y-2'>
+        <Skeleton className='h-6 w-40' />
         <Skeleton className='h-4 w-64 max-w-full' />
-        <Skeleton className='h-24 w-full rounded-lg' />
+        <Skeleton className='mt-3 h-24 w-full rounded-lg' />
       </div>
     </div>
   );
@@ -94,16 +94,16 @@ export function ExamReviewAdminStatusDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <Dialog.Content className='@container flex max-h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)] sm:max-w-[960px]'>
-        <Dialog.Header className='shrink-0 border-b p-5 pr-14 text-left sm:p-6 sm:pr-14'>
+        <Dialog.Header className='shrink-0 gap-1 px-5 pt-5 pr-14 text-left sm:px-6 sm:pt-6 sm:pr-14'>
           <Dialog.Title className='text-xl leading-7'>
             담당 관리자 현황
           </Dialog.Title>
-          <Dialog.Description className='leading-relaxed break-keep'>
+          <Dialog.Description className='leading-5 break-keep'>
             기간별 확인 상태와 관리자별 처리 이력을 확인합니다.
           </Dialog.Description>
         </Dialog.Header>
 
-        <div className='min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6'>
+        <div className='min-h-0 overflow-y-auto overscroll-contain px-5 pt-4 pb-5 sm:px-6 sm:pb-6'>
           {periodsQuery.isPending ? (
             <div className='flex flex-col gap-6'>
               <Skeleton className='h-9 w-full' />
@@ -141,44 +141,44 @@ export function ExamReviewAdminStatusDialog({
             </div>
           ) : (
             <div className='flex flex-col gap-6'>
-              <div className='flex min-w-0 flex-col gap-3'>
-                <div className='flex items-center justify-between gap-4'>
-                  <h3 className='text-base font-semibold'>조회 기간</h3>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    className='min-h-11 sm:min-h-9'
-                    onClick={onOpenPeriodEditor}
-                  >
-                    <Settings2Icon />
-                    기간 편집
-                  </Button>
-                </div>
+              <div className='flex min-w-0 flex-col gap-2'>
+                <h3 className='text-base font-semibold'>조회 기간</h3>
                 <div className='flex flex-col gap-2'>
-                  <div
-                    role='group'
-                    aria-label='조회 기간 선택'
-                    className='flex flex-wrap gap-2'
-                  >
-                    {periods.map((period) => (
-                      <Button
-                        key={period.id}
-                        type='button'
-                        variant='outline'
-                        size='sm'
-                        className='aria-pressed:border-primary aria-pressed:bg-primary/5 aria-pressed:text-primary aria-pressed:hover:bg-primary/10 h-auto min-h-11 max-w-full flex-none px-3 py-2 text-left whitespace-normal shadow-none transition-colors sm:min-h-9'
-                        aria-pressed={period.id === selectedPeriodId}
-                        onClick={() => {
-                          isDefaultSelectionRef.current = false;
-                          onSelectedPeriodChange(period.id);
-                        }}
-                      >
-                        <span className='min-w-0 break-words'>
-                          {period.title}
-                        </span>
-                      </Button>
-                    ))}
+                  <div className='flex items-start gap-3'>
+                    <div
+                      role='group'
+                      aria-label='조회 기간 선택'
+                      className='flex min-w-0 flex-1 flex-wrap gap-2'
+                    >
+                      {periods.map((period) => (
+                        <Button
+                          key={period.id}
+                          type='button'
+                          variant='outline'
+                          size='sm'
+                          className='aria-pressed:border-primary aria-pressed:bg-primary/5 aria-pressed:text-primary aria-pressed:hover:bg-primary/10 h-auto min-h-11 max-w-full flex-none px-3 py-2 text-left whitespace-normal shadow-none transition-colors sm:min-h-9'
+                          aria-pressed={period.id === selectedPeriodId}
+                          onClick={() => {
+                            isDefaultSelectionRef.current = false;
+                            onSelectedPeriodChange(period.id);
+                          }}
+                        >
+                          <span className='min-w-0 [overflow-wrap:anywhere] break-keep'>
+                            {period.title}
+                          </span>
+                        </Button>
+                      ))}
+                    </div>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      className='min-h-11 shrink-0 sm:min-h-9'
+                      onClick={onOpenPeriodEditor}
+                    >
+                      <Settings2Icon />
+                      기간 편집
+                    </Button>
                   </div>
                   {selectedPeriod && (
                     <p className='text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs leading-5 tabular-nums'>
