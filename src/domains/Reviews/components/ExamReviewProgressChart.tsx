@@ -19,7 +19,7 @@ export function ExamReviewProgressChart({
 
   const statusItems = [
     {
-      label: '총 시험후기',
+      label: '기간 내 업로드',
       value: summary.totalCount,
       icon: FilesIcon,
       className: 'text-slate-600',
@@ -31,7 +31,7 @@ export function ExamReviewProgressChart({
       className: 'text-primary',
     },
     {
-      label: '남은 후기',
+      label: '미확인',
       value: summary.remainingCount,
       icon: Clock3Icon,
       className: 'text-amber-600',
@@ -41,9 +41,9 @@ export function ExamReviewProgressChart({
   return (
     <Card className='bg-card @container/chart flex min-h-[392px] min-w-0 flex-col'>
       <Card.Header className='px-6 pt-6'>
-        <Card.Title>확인 진행률</Card.Title>
+        <Card.Title>시험후기 확인 현황</Card.Title>
         <Card.Description>
-          선택한 기간에 등록된 시험후기 기준입니다.
+          선택한 기간에 업로드된 시험후기의 현재 확인 상태입니다.
         </Card.Description>
       </Card.Header>
 

@@ -101,7 +101,7 @@ export function ExamReviewAdminStatusDialog({
                 <Dialog.Title>담당 관리자 현황</Dialog.Title>
               </div>
               <Dialog.Description>
-                선택한 기간에 등록된 시험후기의 확인 현황입니다.
+                선택한 기간에 업로드된 시험후기의 확인 현황입니다.
               </Dialog.Description>
             </div>
             <Button
