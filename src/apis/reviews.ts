@@ -8,12 +8,22 @@ import type {
 } from '@/shared/types';
 
 import type {
+  ExamReviewAdminStatusResult,
   ExamReviewDetailResult,
   ExamReviewSearchParams,
   ExamReviewsResult,
   RenameExamReviewFileResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
+
+export const getExamReviewAdminStatus = async (
+  periodId: number
+): Promise<ExamReviewAdminStatusResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<ExamReviewAdminStatusResult>
+  >(`/v1/admin/reviews/statics/${periodId}`);
+  return response.data.result;
+};
 
 // 시험후기 목록 조회 api
 export const getExamReviews = async (

@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getMockExamReviewAdminStatus } from '@/domains/Reviews/mocks';
 import type { ExamReviewAdminStatusPeriod } from '@/domains/Reviews/types';
+
+import { getExamReviewAdminStatus } from '@/apis';
+
+import { EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY } from './exam-review-query-keys';
 
 export function useExamReviewAdminStatus(
   period: ExamReviewAdminStatusPeriod | undefined,
@@ -9,16 +12,16 @@ export function useExamReviewAdminStatus(
 ) {
   return useQuery({
     queryKey: [
-      'examReviewAdminStatus',
+      ...EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY,
       period?.id,
       period?.startAt,
       period?.endAt,
     ],
     queryFn: () => {
       if (!period) throw new Error('현황을 조회할 기간을 찾을 수 없습니다.');
-      return getMockExamReviewAdminStatus(period);
+      return getExamReviewAdminStatus(period.id);
     },
     enabled: enabled && Boolean(period),
-    staleTime: Infinity,
+    staleTime: 0,
   });
 }

@@ -2,19 +2,11 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import {
   CalendarPlusIcon,
-  FlaskConicalIcon,
   Settings2Icon,
   TriangleAlertIcon,
 } from 'lucide-react';
 
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Dialog,
-  Skeleton,
-} from '@/shared/components/ui';
+import { Alert, Button, Card, Dialog, Skeleton } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
@@ -107,10 +99,6 @@ export function ExamReviewAdminStatusDialog({
             <div className='flex flex-col gap-2'>
               <div className='flex flex-wrap items-center gap-2'>
                 <Dialog.Title>담당 관리자 현황</Dialog.Title>
-                <Badge variant='secondary'>
-                  <FlaskConicalIcon />
-                  Mock 데이터
-                </Badge>
               </div>
               <Dialog.Description>
                 선택한 기간에 등록된 시험후기의 확인 현황입니다.
@@ -205,7 +193,7 @@ export function ExamReviewAdminStatusDialog({
               )}
             </div>
 
-            {statusQuery.isPending ? (
+            {statusQuery.isPending || statusQuery.isFetching ? (
               <AdminStatusSkeleton />
             ) : statusQuery.isError ? (
               <Alert variant='destructive'>
@@ -224,10 +212,10 @@ export function ExamReviewAdminStatusDialog({
               </Alert>
             ) : statusQuery.data ? (
               <div className='grid items-stretch gap-4 @min-[52rem]:grid-cols-2'>
-                <ExamReviewProgressChart summary={statusQuery.data.summary} />
+                <ExamReviewProgressChart summary={statusQuery.data} />
                 <ExamReviewAdminStatusList
-                  managers={statusQuery.data.managers}
-                  summary={statusQuery.data.summary}
+                  managers={statusQuery.data.adminStatics}
+                  averagePerAdmin={statusQuery.data.averagePerAdmin}
                 />
               </div>
             ) : null}

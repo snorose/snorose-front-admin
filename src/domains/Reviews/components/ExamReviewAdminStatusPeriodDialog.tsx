@@ -77,7 +77,7 @@ export function ExamReviewAdminStatusPeriodDialog({
                 <Dialog.Title>기간 편집</Dialog.Title>
               </div>
               <Dialog.Description>
-                담당 관리자 현황을 조회할 커스텀 기간을 관리합니다.
+                관리자 편집 가능 기간과 현황 조회 기간을 함께 관리합니다.
               </Dialog.Description>
             </div>
             <Button

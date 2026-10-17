@@ -3,7 +3,6 @@ import { CheckCircle2Icon, Clock3Icon, FilesIcon } from 'lucide-react';
 import { Card } from '@/shared/components/ui';
 
 import type { ExamReviewAdminStatusSummary } from '@/domains/Reviews/types';
-import { getExamReviewCompletionRate } from '@/domains/Reviews/utils';
 
 interface ExamReviewProgressChartProps {
   summary: ExamReviewAdminStatusSummary;
@@ -15,10 +14,7 @@ const CHART_CIRCUMFERENCE = 2 * Math.PI * CHART_RADIUS;
 export function ExamReviewProgressChart({
   summary,
 }: ExamReviewProgressChartProps) {
-  const completionRate = getExamReviewCompletionRate(
-    summary.confirmedCount,
-    summary.totalCount
-  );
+  const completionRate = summary.confirmedRate;
   const chartOffset = CHART_CIRCUMFERENCE * (1 - completionRate / 100);
 
   const statusItems = [
@@ -36,7 +32,7 @@ export function ExamReviewProgressChart({
     },
     {
       label: '남은 후기',
-      value: summary.unconfirmedCount,
+      value: summary.remainingCount,
       icon: Clock3Icon,
       className: 'text-amber-600',
     },

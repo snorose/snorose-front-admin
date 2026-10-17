@@ -12,6 +12,8 @@ import {
   postExamReviewPeriodAPI,
 } from '@/apis';
 
+import { EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY } from './exam-review-query-keys';
+
 export const EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY = [
   'examReviewAdminStatusPeriods',
   'ADMIN_EDIT',
@@ -71,7 +73,7 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
     },
     onSuccess: (updatedPeriod) => {
       void queryClient.invalidateQueries({
-        queryKey: ['examReviewAdminStatus', updatedPeriod.id],
+        queryKey: [...EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY, updatedPeriod.id],
       });
     },
   });
@@ -88,7 +90,7 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
           currentPeriods.filter((period) => period.id !== deletedPeriodId)
       );
       queryClient.removeQueries({
-        queryKey: ['examReviewAdminStatus', deletedPeriodId],
+        queryKey: [...EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY, deletedPeriodId],
       });
     },
   });

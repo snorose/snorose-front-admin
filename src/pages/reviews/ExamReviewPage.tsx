@@ -20,6 +20,7 @@ import {
   ExamTable,
 } from '@/domains/Reviews/components';
 import {
+  EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY,
   examReviewDetailQueryKey,
   useExamReviewDetail,
 } from '@/domains/Reviews/hooks';
@@ -244,6 +245,9 @@ export default function ExamReviewPage() {
   const handleSaveSuccess = async (
     updatedDetailFromSave?: ExamReviewDetailResult
   ) => {
+    void queryClient.invalidateQueries({
+      queryKey: EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY,
+    });
     // 쿼리 캐시를 직접 업데이트하여 스켈레톤 없이 즉시 반영
     if (selectedExamReview && selectedExamReviewDetail) {
       try {
@@ -343,6 +347,9 @@ export default function ExamReviewPage() {
   };
 
   const handleDeleteSuccess = () => {
+    void queryClient.invalidateQueries({
+      queryKey: EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY,
+    });
     if (selectedExamReview) {
       void queryClient.invalidateQueries({
         queryKey: examReviewDetailQueryKey(selectedExamReview.id),
@@ -354,6 +361,9 @@ export default function ExamReviewPage() {
   };
 
   const handleRestoreSuccess = (postId: number) => {
+    void queryClient.invalidateQueries({
+      queryKey: EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY,
+    });
     void queryClient.invalidateQueries({
       queryKey: examReviewDetailQueryKey(postId),
     });

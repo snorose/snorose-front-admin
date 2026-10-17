@@ -1,7 +1,4 @@
-import type {
-  ExamReviewAdminStatusManager,
-  ExamReviewAdminStatusPeriod,
-} from '@/domains/Reviews/types';
+import type { ExamReviewAdminStatusPeriod } from '@/domains/Reviews/types';
 
 const toTimestamp = (value: string) => {
   const timestamp = new Date(value).getTime();
@@ -38,35 +35,4 @@ export const getDefaultAdminStatusPeriod = (
   return periods
     .filter((period) => toTimestamp(period.startAt) > nowTimestamp)
     .sort((a, b) => toTimestamp(a.startAt) - toTimestamp(b.startAt))[0];
-};
-
-export const getExamReviewCompletionRate = (
-  confirmedCount: number,
-  totalCount: number
-) => {
-  if (!Number.isFinite(totalCount) || totalCount <= 0) return 0;
-
-  const safeConfirmedCount = Number.isFinite(confirmedCount)
-    ? Math.max(0, confirmedCount)
-    : 0;
-  const rate = Math.round((safeConfirmedCount / totalCount) * 100);
-
-  return Math.min(100, Math.max(0, rate));
-};
-
-export const getAverageProcessedCount = (
-  managers: ExamReviewAdminStatusManager[]
-) => {
-  if (managers.length === 0) return null;
-
-  const processedCount = managers.reduce(
-    (total, manager) =>
-      total +
-      (Number.isFinite(manager.processedCount)
-        ? Math.max(0, manager.processedCount)
-        : 0),
-    0
-  );
-
-  return Math.ceil(processedCount / managers.length);
 };

@@ -4,6 +4,7 @@ import { axiosInstance } from '@/shared/axios/instance';
 
 import {
   downloadExamReviewFile,
+  getExamReviewAdminStatus,
   renameExamReviewFile,
   restoreExamReview,
 } from './reviews';
@@ -63,6 +64,30 @@ describe('시험후기 복구 API', () => {
     await expect(restoreExamReview(1725770)).resolves.toEqual(result);
     expect(axiosInstance.post).toHaveBeenLastCalledWith(
       '/v1/admin/reviews/1725770/restore'
+    );
+  });
+});
+
+describe('시험후기 담당 관리자 통계 API', () => {
+  test('상세 조회와 구분된 statics 경로로 기간을 조회하고 result를 반환한다', async () => {
+    const result = {
+      periodId: 3,
+      periodTitle: '어드민',
+      startAt: '2026-09-03T00:00:00',
+      endAt: '2026-10-12T00:00:00',
+      totalCount: 7,
+      confirmedCount: 5,
+      remainingCount: 2,
+      confirmedRate: 71.4,
+      averagePerAdmin: 4,
+      adminStatics: [
+        { encryptedAdminId: 'admin-1', nickname: '리자', processedCount: 4 },
+      ],
+    };
+    vi.mocked(axiosInstance.get).mockResolvedValue({ data: { result } });
+    await expect(getExamReviewAdminStatus(3)).resolves.toEqual(result);
+    expect(axiosInstance.get).toHaveBeenLastCalledWith(
+      '/v1/admin/reviews/statics/3'
     );
   });
 });

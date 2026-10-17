@@ -7,22 +7,87 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ExamReviewPeriod } from '@/shared/types';
 
-import {
-  getMockExamReviewAdminStatusPeriods,
-  resetMockExamReviewAdminStatusPeriods,
-} from '@/domains/Reviews/mocks';
+import type { ExamReviewAdminStatusResult } from '@/domains/Reviews/types';
 
-import { getExamReviewPeriodsAPI, patchExamReviewPeriodAPI } from '@/apis';
+import {
+  getExamReviewAdminStatus,
+  getExamReviewPeriodsAPI,
+  patchExamReviewPeriodAPI,
+} from '@/apis';
 
 import { ExamReviewAdminStatusDialog } from './ExamReviewAdminStatusDialog';
 import { ExamReviewAdminStatusPeriodDialog } from './ExamReviewAdminStatusPeriodDialog';
 
 vi.mock('@/apis', () => ({
+  getExamReviewAdminStatus: vi.fn(),
   getExamReviewPeriodsAPI: vi.fn(),
   postExamReviewPeriodAPI: vi.fn(),
   patchExamReviewPeriodAPI: vi.fn(),
   deleteExamReviewPeriodAPI: vi.fn(),
 }));
+
+const PERIODS: ExamReviewPeriod[] = [
+  {
+    type: 'ADMIN_EDIT',
+    id: 1,
+    title: '2026-1학기 중간고사',
+    startAt: '2026-04-01T00:00:00',
+    endAt: '2026-05-15T23:59:00',
+    createdAt: '2026-03-20T09:00:00',
+    updatedAt: '2026-03-20T09:00:00',
+  },
+  {
+    type: 'ADMIN_EDIT',
+    id: 2,
+    title: '2026-1학기 기말고사',
+    startAt: '2026-06-01T00:00:00',
+    endAt: '2026-07-15T23:59:00',
+    createdAt: '2026-05-20T09:00:00',
+    updatedAt: '2026-05-20T09:00:00',
+  },
+  {
+    type: 'ADMIN_EDIT',
+    id: 3,
+    title: '2026 여름학기',
+    startAt: '2026-07-16T00:00:00',
+    endAt: '2026-08-31T23:59:00',
+    createdAt: '2026-07-10T09:00:00',
+    updatedAt: '2026-07-10T09:00:00',
+  },
+  {
+    type: 'ADMIN_EDIT',
+    id: 4,
+    title: '2026-2학기 중간고사',
+    startAt: '2026-10-01T00:00:00',
+    endAt: '2026-11-15T23:59:00',
+    createdAt: '2026-08-10T09:00:00',
+    updatedAt: '2026-08-10T09:00:00',
+  },
+];
+
+const createStatus = (periodId: number): ExamReviewAdminStatusResult => ({
+  periodId,
+  periodTitle: '어드민',
+  startAt: '2026-09-03T00:00:00',
+  endAt: '2026-10-12T00:00:00',
+  totalCount: 7,
+  confirmedCount: 5,
+  remainingCount: 2,
+  confirmedRate: 71.4,
+  averagePerAdmin: 4,
+  adminStatics: [
+    {
+      encryptedAdminId: 'admin-rose',
+      nickname: '로즈매니저',
+      processedCount: 1,
+    },
+    {
+      encryptedAdminId: 'admin-snow',
+      nickname: '눈송관리자',
+      processedCount: 4,
+    },
+  ],
+});
 
 function DialogHarness() {
   const [activeDialog, setActiveDialog] = useState<
@@ -76,12 +141,12 @@ const renderDialog = () => {
 describe('ExamReviewAdminStatusDialog', () => {
   beforeEach(() => {
     vi.setSystemTime(new Date('2026-08-22T12:00:00'));
-    resetMockExamReviewAdminStatusPeriods();
+    vi.resetAllMocks();
     vi.mocked(getExamReviewPeriodsAPI).mockImplementation(async () =>
-      (await getMockExamReviewAdminStatusPeriods()).map((period) => ({
-        ...period,
-        type: 'ADMIN_EDIT',
-      }))
+      PERIODS.map((period) => ({ ...period }))
+    );
+    vi.mocked(getExamReviewAdminStatus).mockImplementation(async (periodId) =>
+      createStatus(periodId)
     );
   });
 
@@ -92,7 +157,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     expect(
       screen.getByRole('dialog', { name: '담당 관리자 현황' })
     ).toBeInTheDocument();
-    expect(screen.getByText('Mock 데이터')).toBeInTheDocument();
+    expect(screen.queryByText('Mock 데이터')).not.toBeInTheDocument();
 
     const activePeriodButton = await screen.findByRole('button', {
       name: '2026-2학기 중간고사',
@@ -107,10 +172,18 @@ describe('ExamReviewAdminStatusDialog', () => {
     const progress = await screen.findByRole('progressbar', {
       name: '시험후기 확인 완료율',
     });
-    expect(progress).toHaveAttribute('aria-valuenow', '60');
+    expect(progress).toHaveAttribute('aria-valuenow', '71.4');
     expect(screen.getByText('눈송관리자')).toBeInTheDocument();
     expect(screen.getByText('로즈매니저')).toBeInTheDocument();
-    expect(screen.getByText('1인당 평균')).toBeInTheDocument();
+    expect(screen.getByText('1인당 평균').parentElement).toHaveTextContent(
+      '4건'
+    );
+    expect(getExamReviewAdminStatus).toHaveBeenLastCalledWith(3);
+    expect(screen.queryByText('담당자 미상')).not.toBeInTheDocument();
+    const names = screen
+      .getAllByRole('listitem')
+      .map((item) => item.textContent);
+    expect(names).toEqual(['눈송관리자4건', '로즈매니저1건']);
   });
 
   test('편집에서 돌아오면 선택을 유지하고 새로 열면 첫 기간을 선택한다', async () => {
@@ -160,9 +233,7 @@ describe('ExamReviewAdminStatusDialog', () => {
       ).toHaveAttribute('aria-pressed', 'true')
     );
 
-    const periods = (await getMockExamReviewAdminStatusPeriods()).map(
-      (period) => ({ ...period, type: 'ADMIN_EDIT' as const })
-    );
+    const periods = PERIODS;
     await act(async () =>
       resolvePeriods([
         ...periods,
@@ -255,6 +326,99 @@ describe('ExamReviewAdminStatusDialog', () => {
     });
     expect(
       screen.getByRole('dialog', { name: '기간 편집' })
+    ).toBeInTheDocument();
+  });
+  test('기간 전환 중에는 이전 통계 대신 로딩을 표시한다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await screen.findByText('71.4%');
+    let resolveStatus!: (value: ExamReviewAdminStatusResult) => void;
+    vi.mocked(getExamReviewAdminStatus).mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveStatus = resolve;
+      })
+    );
+    await user.click(screen.getByRole('button', { name: '2026 여름학기' }));
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    await act(async () =>
+      resolveStatus({ ...createStatus(3), confirmedRate: 20 })
+    );
+    expect(await screen.findByText('20%')).toBeInTheDocument();
+  });
+
+  test('현황을 다시 열면 같은 기간의 최신 수치를 조회한다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await screen.findByText('71.4%');
+    await user.click(screen.getByRole('button', { name: '창 닫기' }));
+    vi.mocked(getExamReviewAdminStatus).mockResolvedValue({
+      ...createStatus(4),
+      confirmedRate: 100,
+    });
+    await user.click(screen.getByRole('button', { name: '현황 열기' }));
+    expect(await screen.findByText('100%')).toBeInTheDocument();
+  });
+
+  test('통계 조회가 실패하면 재시도할 수 있다', async () => {
+    vi.mocked(getExamReviewAdminStatus).mockRejectedValueOnce(
+      new Error('조회 실패')
+    );
+    const user = userEvent.setup();
+    renderDialog();
+    expect(
+      await screen.findByText('현황을 불러오지 못했습니다.')
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '다시 시도' }));
+    expect(await screen.findByText('71.4%')).toBeInTheDocument();
+  });
+
+  test('후기와 처리 관리자가 없으면 0%와 빈 목록을 표시한다', async () => {
+    vi.mocked(getExamReviewAdminStatus).mockResolvedValue({
+      ...createStatus(4),
+      totalCount: 0,
+      confirmedCount: 0,
+      remainingCount: 0,
+      confirmedRate: 0,
+      averagePerAdmin: 0,
+      adminStatics: [],
+    });
+    renderDialog();
+    expect(await screen.findByText('0%')).toBeInTheDocument();
+    expect(screen.getAllByText('0건')).toHaveLength(3);
+    expect(screen.getByText('처리 내역이 없습니다.')).toBeInTheDocument();
+    expect(screen.getByText('1인당 평균').parentElement).toHaveTextContent('-');
+  });
+
+  test('통계와 관리자 처리 합계가 달라도 미상 건수를 추정하지 않는다', async () => {
+    vi.mocked(getExamReviewAdminStatus).mockResolvedValue({
+      ...createStatus(4),
+      adminStatics: [
+        {
+          encryptedAdminId: 'deleted-admin',
+          nickname: null,
+          processedCount: 9,
+        },
+      ],
+      averagePerAdmin: 7,
+    });
+    renderDialog();
+    expect(await screen.findByText('닉네임 없음')).toBeInTheDocument();
+    expect(screen.getByText('9건')).toBeInTheDocument();
+    expect(screen.getByText('1인당 평균').parentElement).toHaveTextContent(
+      '7건'
+    );
+    expect(screen.queryByText('담당자 미상')).not.toBeInTheDocument();
+  });
+
+  test('등록된 기간이 없으면 통계를 요청하지 않고 기간 추가를 안내한다', async () => {
+    vi.mocked(getExamReviewPeriodsAPI).mockResolvedValue([]);
+    renderDialog();
+    expect(
+      await screen.findByText('등록된 현황 집계 기간이 없습니다.')
+    ).toBeInTheDocument();
+    expect(getExamReviewAdminStatus).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('button', { name: '기간 추가' })
     ).toBeInTheDocument();
   });
 });

@@ -165,8 +165,7 @@ export interface ExamReviewAdminStatusPeriodInput {
   endAt: string;
 }
 
-export interface ExamReviewAdminStatusPeriod
-  extends ExamReviewAdminStatusPeriodInput {
+export interface ExamReviewAdminStatusPeriod extends ExamReviewAdminStatusPeriodInput {
   id: number;
   createdAt: string;
   updatedAt: string;
@@ -174,19 +173,24 @@ export interface ExamReviewAdminStatusPeriod
 
 export interface ExamReviewAdminStatusManager {
   encryptedAdminId: string;
-  nickname: string;
+  nickname: string | null;
   processedCount: number;
 }
 
-export interface ExamReviewAdminStatusSummary {
+export interface ExamReviewAdminStatusResult {
+  periodId: number;
+  periodTitle: string;
+  startAt: string;
+  endAt: string;
   totalCount: number;
   confirmedCount: number;
-  unconfirmedCount: number;
-  unassignedCount: number;
+  remainingCount: number;
+  confirmedRate: number;
+  averagePerAdmin: number;
+  adminStatics: ExamReviewAdminStatusManager[];
 }
 
-export interface ExamReviewAdminStatusResult {
-  period: ExamReviewAdminStatusPeriod;
-  summary: ExamReviewAdminStatusSummary;
-  managers: ExamReviewAdminStatusManager[];
-}
+export type ExamReviewAdminStatusSummary = Pick<
+  ExamReviewAdminStatusResult,
+  'totalCount' | 'confirmedCount' | 'remainingCount' | 'confirmedRate'
+>;
