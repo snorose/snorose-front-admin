@@ -434,7 +434,7 @@ describe('ExamReviewAdminStatusDialog', () => {
       screen.getByRole('button', { name: '시험후기 확인 현황 설명' })
     );
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      '선택한 기간에 업로드된 시험후기의 현재 확인 상태입니다.'
+      '선택한 기간에 업로드된 시험후기의 현재 확인 상태'
     );
     await user.keyboard('{Escape}');
     await waitFor(() =>
@@ -446,7 +446,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     });
     act(() => managerInfo.focus());
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      '미확인 → 확인으로 변경한 횟수입니다.'
+      '미확인 → 확인으로 변경한 횟수'
     );
     await user.keyboard('{Escape}');
     await waitFor(() =>
@@ -458,7 +458,7 @@ describe('ExamReviewAdminStatusDialog', () => {
 
     await user.click(managerInfo);
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      '미확인 → 확인으로 변경한 횟수입니다.'
+      '미확인 → 확인으로 변경한 횟수'
     );
   });
   test('방향키와 Home·End 키로 기간 탭을 전환한다', async () => {
