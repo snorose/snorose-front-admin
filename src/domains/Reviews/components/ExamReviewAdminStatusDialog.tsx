@@ -52,11 +52,13 @@ function AdminStatusSkeleton() {
       <div>
         <Skeleton className='h-6 w-44' />
         <div className='mt-2 overflow-hidden rounded-lg border'>
-          <Skeleton className='h-10 rounded-none border-b' />
-          {[0, 1].map((item) => (
+          <div className='border-b px-4 py-2.5'>
+            <Skeleton className='h-5 w-full' />
+          </div>
+          {Array.from({ length: 6 }, (_, item) => (
             <div
               key={item}
-              className='flex h-11 items-center justify-between border-b px-4 last:border-b-0'
+              className='flex items-center justify-between border-b px-4 py-3 last:border-b-0'
             >
               <Skeleton className='h-5 w-28' />
               <Skeleton className='h-5 w-10' />
@@ -115,7 +117,7 @@ export function ExamReviewAdminStatusDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='@container top-[10dvh] flex max-h-[85dvh] translate-y-0 flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)] sm:max-w-[960px]'>
+      <Dialog.Content className='@container flex h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:w-[calc(100%-2rem)] sm:max-w-[960px] lg:h-[min(38rem,85dvh)]'>
         <Dialog.Header className='shrink-0 gap-1 px-5 pt-5 pr-14 text-left sm:px-6 sm:pt-6 sm:pr-14'>
           <Dialog.Title className='text-xl leading-7'>
             담당 관리자 현황
@@ -125,7 +127,7 @@ export function ExamReviewAdminStatusDialog({
           </Dialog.Description>
         </Dialog.Header>
 
-        <div className='min-h-0 overflow-y-auto overscroll-contain px-5 pt-4 pb-5 sm:px-6 sm:pb-6'>
+        <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pt-4 pb-5 sm:px-6 sm:pb-6'>
           {periodsQuery.isPending ? (
             <div className='flex flex-col gap-6'>
               <div className='space-y-2'>

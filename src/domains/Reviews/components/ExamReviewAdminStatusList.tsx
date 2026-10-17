@@ -50,7 +50,7 @@ export function ExamReviewAdminStatusList({
           </div>
           <ul
             aria-labelledby={titleId}
-            className='max-h-80 divide-y overflow-y-auto overscroll-contain'
+            className='max-h-72 divide-y overflow-y-auto overscroll-contain'
           >
             {sortedManagers.map((manager) => (
               <li
