@@ -69,7 +69,7 @@ export function CopyableValue({
         void handleCopy();
       }}
     >
-      <Copy className='size-4' aria-hidden='true' />
+      <Copy className='size-3.5' aria-hidden='true' />
     </Button>
   );
 
