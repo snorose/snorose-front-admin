@@ -40,12 +40,8 @@ function AdminStatusSkeleton() {
               </div>
             ))}
           </div>
-          <div className='mt-3 border-t pt-3'>
-            <div className='flex items-center justify-between'>
-              <Skeleton className='h-5 w-20' />
-              <Skeleton className='h-5 w-12' />
-            </div>
-            <Skeleton className='mt-2 h-1.5 w-full' />
+          <div className='mt-4 border-t pt-4'>
+            <Skeleton className='mx-auto size-36 rounded-full' />
           </div>
         </div>
       </div>

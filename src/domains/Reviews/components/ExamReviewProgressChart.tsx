@@ -54,25 +54,45 @@ export function ExamReviewProgressChart({
           ))}
         </dl>
 
-        <div className='mt-3 border-t pt-3'>
-          <div className='flex items-center justify-between gap-3 text-xs sm:text-sm'>
-            <span className='text-muted-foreground'>확인 완료율</span>
-            <span className='font-medium tabular-nums'>
-              {summary.confirmedRate}%
-            </span>
-          </div>
+        <div className='mt-4 border-t pt-4'>
           <div
             role='progressbar'
             aria-label='시험후기 확인 완료율'
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={summary.confirmedRate}
-            className='bg-muted mt-2 h-1.5 overflow-hidden rounded-full'
+            className='relative mx-auto size-36'
           >
-            <div
-              className='bg-primary h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none'
-              style={{ width: `${summary.confirmedRate}%` }}
-            />
+            <svg
+              viewBox='0 0 144 144'
+              className='size-full -rotate-90'
+              aria-hidden='true'
+            >
+              <circle
+                cx={72}
+                cy={72}
+                r={64}
+                fill='none'
+                strokeWidth={12}
+                className='stroke-muted'
+              />
+              <circle
+                cx={72}
+                cy={72}
+                r={64}
+                fill='none'
+                strokeWidth={12}
+                pathLength={100}
+                strokeDasharray={`${summary.confirmedRate} 100`}
+                className='stroke-primary'
+              />
+            </svg>
+            <div className='absolute inset-0 flex flex-col items-center justify-center gap-1'>
+              <span className='text-2xl font-semibold tracking-tight tabular-nums'>
+                {summary.confirmedRate}%
+              </span>
+              <span className='text-muted-foreground text-xs'>확인 완료율</span>
+            </div>
           </div>
         </div>
       </div>
