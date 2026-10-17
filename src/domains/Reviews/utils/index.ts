@@ -1,4 +1,8 @@
 export {
+  getDefaultAdminStatusPeriod,
+  sortAdminStatusPeriods,
+} from './exam-admin-status';
+export {
   convertExamTypeEnumToString,
   convertExamTypeToEnum,
   convertLectureTypeToString,
