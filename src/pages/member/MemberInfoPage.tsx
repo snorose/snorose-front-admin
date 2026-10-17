@@ -12,7 +12,6 @@ export default function MemberInfoPage() {
     currentPage,
     members,
     handleBack,
-    handleCopy,
     handleLoadMorePenaltyHistory,
     handleLoadPenaltyHistory,
     handleOpenMemberDetail,
@@ -70,7 +69,6 @@ export default function MemberInfoPage() {
             isDetailLoading={isDetailLoading}
             hasNextPenaltyHistory={hasNextPenaltyHistory}
             onBack={handleBack}
-            onCopy={handleCopy}
             onEditCancel={() => setIsEdit(false)}
             onEditStart={() => setIsEdit(true)}
             onChangedPenaltyHistory={async () => {

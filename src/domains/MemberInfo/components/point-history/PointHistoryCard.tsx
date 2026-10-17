@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-import { ArrowUpRight, Copy } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
-import { Button } from '@/shared/components/ui';
+import { CopyableValue } from '@/shared/components';
 import type { MemberPointHistory } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -16,13 +16,9 @@ import { getPointSourceTarget } from './point-history-source';
 
 type PointHistoryCardProps = {
   history: MemberPointHistory;
-  onCopy: (value: string) => void | Promise<void>;
 };
 
-export default function PointHistoryCard({
-  history,
-  onCopy,
-}: PointHistoryCardProps) {
+export default function PointHistoryCard({ history }: PointHistoryCardProps) {
   const isDeduction = history.difference < 0;
   const categoryLabel = getPointCategoryLabel(history.category);
   const sourceLabel = getPointSourceLabel(history.source);
@@ -75,7 +71,7 @@ export default function PointHistoryCard({
           <Info label='포인트 유형'>{categoryLabel}</Info>
           <Info label='출처'>{sourceLabel}</Info>
           <Info label='로그 ID'>
-            <CopyId label='로그 ID' value={history.id} onCopy={onCopy} />
+            <CopyableValue label='로그 ID' value={history.id} />
           </Info>
           <Info label={sourceTarget.idLabel}>
             {history.sourceId != null ? (
@@ -97,10 +93,9 @@ export default function PointHistoryCard({
                   />
                 </Link>
               ) : (
-                <CopyId
+                <CopyableValue
                   label={sourceTarget.idLabel}
                   value={history.sourceId}
-                  onCopy={onCopy}
                 />
               )
             ) : (
@@ -128,30 +123,5 @@ function Info({ label, children }: { label: string; children: ReactNode }) {
         {children}
       </dd>
     </div>
-  );
-}
-
-function CopyId({
-  label,
-  value,
-  onCopy,
-}: {
-  label: string;
-  value: number;
-  onCopy: PointHistoryCardProps['onCopy'];
-}) {
-  return (
-    <Button
-      type='button'
-      variant='ghost'
-      size='sm'
-      onClick={() => void onCopy(String(value))}
-      className='h-auto justify-start rounded-sm p-0 text-base text-zinc-500 hover:text-zinc-950 has-[>svg]:px-0'
-      aria-label={`${label} ${value} 복사`}
-      title={`${label} 복사`}
-    >
-      <span>{value}</span>
-      <Copy className='size-3.5 shrink-0' aria-hidden='true' />
-    </Button>
   );
 }

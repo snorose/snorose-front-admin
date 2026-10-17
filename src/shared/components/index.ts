@@ -1,6 +1,7 @@
 export * from './AdvancedSearchFilters';
 export { AppSidebar } from './AppSidebar';
 export { BulkActionBar } from './BulkActionBar';
+export { CopyableValue, type CopyableValueProps } from './CopyableValue';
 export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
 export { FilterMultiSelect } from './FilterMultiSelect';
