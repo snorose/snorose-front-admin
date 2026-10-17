@@ -2,6 +2,8 @@ import { useId } from 'react';
 
 import type { ExamReviewAdminStatusSummary } from '@/domains/Reviews/types';
 
+import { ExamReviewAdminStatusInfoTooltip } from './ExamReviewAdminStatusInfoTooltip';
+
 interface ExamReviewProgressChartProps {
   summary: ExamReviewAdminStatusSummary;
 }
@@ -18,12 +20,15 @@ export function ExamReviewProgressChart({
 
   return (
     <section aria-labelledby={titleId} className='min-w-0'>
-      <h3 id={titleId} className='text-base font-semibold'>
-        시험후기 확인 현황
-      </h3>
-      <p className='text-muted-foreground mt-1 text-sm leading-5 break-keep'>
-        선택한 기간에 업로드된 시험후기의 현재 확인 상태입니다.
-      </p>
+      <div className='flex items-center gap-1'>
+        <h3 id={titleId} className='text-base font-semibold'>
+          시험후기 확인 현황
+        </h3>
+        <ExamReviewAdminStatusInfoTooltip
+          label='시험후기 확인 현황 설명'
+          description='선택한 기간에 업로드된 시험후기의 현재 확인 상태입니다.'
+        />
+      </div>
 
       <div className='bg-muted/30 mt-3 rounded-lg border p-4'>
         <dl className='grid grid-cols-3 gap-y-1 divide-x'>

@@ -2,6 +2,8 @@ import { useId } from 'react';
 
 import type { ExamReviewAdminStatusManager } from '@/domains/Reviews/types';
 
+import { ExamReviewAdminStatusInfoTooltip } from './ExamReviewAdminStatusInfoTooltip';
+
 interface ExamReviewAdminStatusListProps {
   managers: ExamReviewAdminStatusManager[];
 }
@@ -19,16 +21,19 @@ export function ExamReviewAdminStatusList({
   return (
     <section aria-labelledby={titleId} className='min-w-0'>
       <div className='flex flex-wrap items-baseline gap-x-2 gap-y-1'>
-        <h3 id={titleId} className='text-base font-semibold'>
-          관리자별 처리 현황
-        </h3>
+        <div className='flex items-center gap-1'>
+          <h3 id={titleId} className='text-base font-semibold'>
+            관리자별 처리 현황
+          </h3>
+          <ExamReviewAdminStatusInfoTooltip
+            label='관리자별 처리 현황 설명'
+            description='미확인 → 확인으로 변경한 횟수입니다.'
+          />
+        </div>
         <span className='text-muted-foreground text-xs tabular-nums'>
           {managers.length.toLocaleString('ko-KR')}명
         </span>
       </div>
-      <p className='text-muted-foreground mt-1 text-sm leading-5 break-keep'>
-        미확인 → 확인으로 변경한 횟수입니다.
-      </p>
 
       {managers.length === 0 ? (
         <div className='bg-muted/30 mt-3 rounded-lg border px-4 py-6 text-center'>

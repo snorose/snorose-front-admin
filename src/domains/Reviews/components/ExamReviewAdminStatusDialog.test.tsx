@@ -419,4 +419,41 @@ describe('ExamReviewAdminStatusDialog', () => {
       screen.getByRole('button', { name: '기간 추가' })
     ).toBeInTheDocument();
   });
+  test('집계 설명은 제목 옆 버튼의 툴팁에서 확인하고 Escape로 닫는다', async () => {
+    const user = userEvent.setup();
+    renderDialog();
+    await screen.findByText('71.4%');
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+
+    await user.hover(
+      screen.getByRole('button', { name: '시험후기 확인 현황 설명' })
+    );
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      '선택한 기간에 업로드된 시험후기의 현재 확인 상태입니다.'
+    );
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    );
+
+    const managerInfo = screen.getByRole('button', {
+      name: '관리자별 처리 현황 설명',
+    });
+    act(() => managerInfo.focus());
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      '미확인 → 확인으로 변경한 횟수입니다.'
+    );
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    );
+    expect(
+      screen.getByRole('dialog', { name: '담당 관리자 현황' })
+    ).toBeInTheDocument();
+
+    await user.click(managerInfo);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      '미확인 → 확인으로 변경한 횟수입니다.'
+    );
+  });
 });
