@@ -29,23 +29,17 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
     staleTime: 0,
   });
 
+  const refreshPeriodsAfterSave = async () => {
+    // 저장이 끝난 뒤의 조회 오류는 목록에서 처리하고 저장 실패로 전파하지 않는다.
+    const result = await periodsQuery.refetch({ throwOnError: false });
+    return result.isError ? undefined : result.data;
+  };
+
   const createPeriodMutation = useMutation({
     mutationFn: async (input: ExamReviewAdminStatusPeriodInput) => {
       await postExamReviewPeriodAPI([toAdminEditPeriodRequest(input)]);
-      const periods = await getExamReviewPeriodsAPI('ADMIN_EDIT');
-      queryClient.setQueryData(
-        EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
-        periods
-      );
-      const createdPeriod = periods.find(
-        (period) => period.title === input.title
-      );
-      if (!createdPeriod) {
-        throw new Error(
-          '저장한 기간을 찾을 수 없습니다. 기간 목록을 다시 확인해주세요.'
-        );
-      }
-      return createdPeriod;
+      const periods = await refreshPeriodsAfterSave();
+      return periods?.find((period) => period.title === input.title);
     },
   });
 
@@ -58,22 +52,12 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
       input: ExamReviewAdminStatusPeriodInput;
     }) => {
       await patchExamReviewPeriodAPI(periodId, toAdminEditPeriodRequest(input));
-      const periods = await getExamReviewPeriodsAPI('ADMIN_EDIT');
-      queryClient.setQueryData(
-        EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
-        periods
-      );
-      const updatedPeriod = periods.find((period) => period.id === periodId);
-      if (!updatedPeriod) {
-        throw new Error(
-          '수정한 기간을 찾을 수 없습니다. 기간 목록을 다시 확인해주세요.'
-        );
-      }
-      return updatedPeriod;
+      const periods = await refreshPeriodsAfterSave();
+      return periods?.find((period) => period.id === periodId);
     },
-    onSuccess: (updatedPeriod) => {
+    onSuccess: (_updatedPeriod, { periodId }) => {
       void queryClient.invalidateQueries({
-        queryKey: [...EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY, updatedPeriod.id],
+        queryKey: [...EXAM_REVIEW_ADMIN_STATUS_QUERY_KEY, periodId],
       });
     },
   });

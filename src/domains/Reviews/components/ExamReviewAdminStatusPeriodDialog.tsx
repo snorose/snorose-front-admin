@@ -104,11 +104,16 @@ export function ExamReviewAdminStatusPeriodDialog({
             <TriangleAlertIcon />
             <Alert.Title>기간을 불러오지 못했습니다.</Alert.Title>
             <Alert.Description>
+              {(createPeriodMutation.isSuccess ||
+                updatePeriodMutation.isSuccess) && (
+                <p>기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.</p>
+              )}
               <Button
                 type='button'
                 variant='outline'
                 size='sm'
                 onClick={() => periodsQuery.refetch()}
+                disabled={periodsQuery.isFetching || isMutating}
               >
                 다시 시도
               </Button>

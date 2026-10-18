@@ -23,11 +23,11 @@ interface ExamReviewAdminStatusPeriodListProps {
   isSubmitting: boolean;
   onCreate: (
     input: ExamReviewAdminStatusPeriodInput
-  ) => Promise<ExamReviewAdminStatusPeriod>;
+  ) => Promise<ExamReviewAdminStatusPeriod | undefined>;
   onUpdate: (
     periodId: number,
     input: ExamReviewAdminStatusPeriodInput
-  ) => Promise<ExamReviewAdminStatusPeriod>;
+  ) => Promise<ExamReviewAdminStatusPeriod | undefined>;
   onDelete: (periodId: number) => Promise<number>;
   onSelectPeriod: (periodId: number) => void;
   onDirtyChange: (isDirty: boolean) => void;
@@ -51,7 +51,7 @@ export function ExamReviewAdminStatusPeriodList({
 
   const handleCreate = async (input: ExamReviewAdminStatusPeriodInput) => {
     const createdPeriod = await onCreate(input);
-    onSelectPeriod(createdPeriod.id);
+    if (createdPeriod) onSelectPeriod(createdPeriod.id);
     closeEditor();
     toast.success('현황 집계 기간을 추가했습니다.');
   };

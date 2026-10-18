@@ -59,7 +59,7 @@ test('폼의 초 단위 날짜를 유지하며 기간 CRUD에 ADMIN_EDIT를 전�
   await act(async () => {
     const created =
       await result.current.createPeriodMutation.mutateAsync(input);
-    expect(created.id).toBe(301);
+    expect(created?.id).toBe(301);
   });
   expect(postExamReviewPeriodAPI).toHaveBeenCalledWith([request]);
 
@@ -84,3 +84,138 @@ test('폼의 초 단위 날짜를 유지하며 기간 CRUD에 ADMIN_EDIT를 전�
     client.getQueriesData({ queryKey: ['examReviewAdminStatus', 301] })
   ).toEqual([]);
 });
+
+test.each(['create', 'update'] as const)(
+  '%s 저장 후 목록 조회가 실패해도 저장 성공을 유지하고 조회만 재시도한다',
+  async (operation) => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const { result } = renderHook(() => useExamReviewAdminStatusPeriods(true), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      ),
+    });
+    await waitFor(() =>
+      expect(result.current.periodsQuery.isSuccess).toBe(true)
+    );
+    client.setQueryData(['examReviewAdminStatus', period.id], {});
+    vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+      new Error('목록 조회 실패')
+    );
+
+    await act(async () => {
+      const saved =
+        operation === 'create'
+          ? result.current.createPeriodMutation.mutateAsync(input)
+          : result.current.updatePeriodMutation.mutateAsync({
+              periodId: period.id,
+              input,
+            });
+      await expect(saved).resolves.toBeUndefined();
+    });
+
+    await waitFor(() =>
+      expect(
+        operation === 'create'
+          ? result.current.createPeriodMutation.isSuccess
+          : result.current.updatePeriodMutation.isSuccess
+      ).toBe(true)
+    );
+    expect(result.current.periodsQuery.isError).toBe(true);
+    expect(result.current.isMutating).toBe(false);
+    if (operation === 'update') {
+      expect(
+        client.getQueryState(['examReviewAdminStatus', period.id])
+          ?.isInvalidated
+      ).toBe(true);
+    }
+
+    await act(async () => {
+      await result.current.periodsQuery.refetch();
+    });
+    expect(result.current.periodsQuery.data).toEqual([period]);
+    await waitFor(() =>
+      expect(result.current.periodsQuery.isSuccess).toBe(true)
+    );
+    expect(getExamReviewPeriodsAPI).toHaveBeenCalledTimes(3);
+    expect(postExamReviewPeriodAPI).toHaveBeenCalledTimes(
+      operation === 'create' ? 1 : 0
+    );
+    expect(patchExamReviewPeriodAPI).toHaveBeenCalledTimes(
+      operation === 'update' ? 1 : 0
+    );
+  }
+);
+
+test.each(['create', 'update'] as const)(
+  '%s 저장한 기간이 갱신된 목록에 없어도 저장 실패로 처리하지 않는다',
+  async (operation) => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const { result } = renderHook(() => useExamReviewAdminStatusPeriods(true), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      ),
+    });
+    await waitFor(() =>
+      expect(result.current.periodsQuery.isSuccess).toBe(true)
+    );
+    vi.mocked(getExamReviewPeriodsAPI).mockResolvedValueOnce([]);
+
+    await act(async () => {
+      const saved =
+        operation === 'create'
+          ? result.current.createPeriodMutation.mutateAsync(input)
+          : result.current.updatePeriodMutation.mutateAsync({
+              periodId: period.id,
+              input,
+            });
+      await expect(saved).resolves.toBeUndefined();
+    });
+    await waitFor(() => expect(result.current.periodsQuery.data).toEqual([]));
+  }
+);
+
+test.each(['create', 'update'] as const)(
+  '%s 저장 요청이 실패하면 오류를 전달하고 목록을 갱신하지 않는다',
+  async (operation) => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const { result } = renderHook(() => useExamReviewAdminStatusPeriods(true), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      ),
+    });
+    await waitFor(() =>
+      expect(result.current.periodsQuery.isSuccess).toBe(true)
+    );
+    const error = new Error('저장 실패');
+    vi.mocked(postExamReviewPeriodAPI).mockRejectedValueOnce(error);
+    vi.mocked(patchExamReviewPeriodAPI).mockRejectedValueOnce(error);
+
+    await act(async () => {
+      const saved =
+        operation === 'create'
+          ? result.current.createPeriodMutation.mutateAsync(input)
+          : result.current.updatePeriodMutation.mutateAsync({
+              periodId: period.id,
+              input,
+            });
+      await expect(saved).rejects.toBe(error);
+    });
+    expect(getExamReviewPeriodsAPI).toHaveBeenCalledTimes(1);
+    expect(result.current.periodsQuery.isSuccess).toBe(true);
+  }
+);
