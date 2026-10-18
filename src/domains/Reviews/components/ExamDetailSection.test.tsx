@@ -160,7 +160,7 @@ describe('ExamDetailSection', () => {
   });
 
   test.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(
-    '%s 후기에서는 복구 버튼을 표시하지 않는다',
+    '%s 후기에서는 삭제 대신 복구 버튼을 표시한다',
     (deletionStatus) => {
       render(
         <ExamDetailSection
@@ -176,8 +176,8 @@ describe('ExamDetailSection', () => {
         screen.queryByRole('button', { name: '시험 후기 삭제' })
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: '삭제된 시험 후기 복구' })
-      ).not.toBeInTheDocument();
+        screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
+      ).toBeEnabled();
     }
   );
 
