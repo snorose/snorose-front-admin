@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { NoticePanel, PageHeader } from '@/shared/components';
@@ -17,6 +18,7 @@ import { postAllMemberPointAPI } from '@/apis/points';
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 export default function AdjustAllMemberPointPage() {
+  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<
     (typeof POINT_CATEGORY_OPTIONS)[number]['value'] | ''
   >('');
@@ -55,6 +57,9 @@ export default function AdjustAllMemberPointPage() {
         difference: Number(difference),
       });
 
+      void queryClient.invalidateQueries({
+        queryKey: ['members', 'directory'],
+      });
       toast.success('포인트 지급/차감이 완료되었어요.');
       handleResetButtonClick();
     } catch (error: unknown) {
