@@ -158,3 +158,39 @@ export interface ExamReviewsResult {
   totalPage?: number;
   totalCount?: number;
 }
+
+export interface ExamReviewAdminStatusPeriodInput {
+  title: string;
+  startAt: string;
+  endAt: string;
+}
+
+export interface ExamReviewAdminStatusPeriod extends ExamReviewAdminStatusPeriodInput {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExamReviewAdminStatusManager {
+  encryptedAdminId: string;
+  nickname: string | null;
+  processedCount: number;
+}
+
+export interface ExamReviewAdminStatusResult {
+  periodId: number;
+  periodTitle: string;
+  startAt: string;
+  endAt: string;
+  totalCount: number;
+  confirmedCount: number;
+  remainingCount: number;
+  confirmedRate: number;
+  averagePerAdmin: number;
+  adminStatics: ExamReviewAdminStatusManager[];
+}
+
+export type ExamReviewAdminStatusSummary = Pick<
+  ExamReviewAdminStatusResult,
+  'totalCount' | 'confirmedCount' | 'remainingCount' | 'confirmedRate'
+>;

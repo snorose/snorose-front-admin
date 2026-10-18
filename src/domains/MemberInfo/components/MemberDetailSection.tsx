@@ -35,7 +35,6 @@ type MemberDetailSectionProps = {
   penaltyHistoryTotalCount: number;
   hasNextPenaltyHistory: boolean;
   onBack: () => void;
-  onCopy: (value: string) => void | Promise<void>;
   onEditCancel: () => void;
   onEditStart: () => void;
   onChangedPenaltyHistory?: () => void | Promise<void>;
@@ -54,7 +53,6 @@ export default function MemberDetailSection({
   penaltyHistory,
   penaltyHistoryTotalCount,
   onBack,
-  onCopy,
   onChangedPenaltyHistory,
   onEditCancel,
   onEditStart,
@@ -143,17 +141,12 @@ export default function MemberDetailSection({
           {!isEdit ? (
             <MemberDetailInfoGrid
               member={member}
-              onCopy={onCopy}
               onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
               onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
               roleLabel={roleLabel}
             />
           ) : (
-            <MemberInfoEditForm
-              member={member}
-              onSubmit={onSaveEdit}
-              onCopy={onCopy}
-            />
+            <MemberInfoEditForm member={member} onSubmit={onSaveEdit} />
           )}
         </SectionCard>
 
@@ -186,7 +179,6 @@ export default function MemberDetailSection({
       <MemberPointHistoryDialog
         key={member.encryptedUserId}
         member={member}
-        onCopy={onCopy}
         open={isPointHistoryOpen}
         onOpenChange={setIsPointHistoryOpen}
       />

@@ -94,13 +94,13 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await expect(row).toContainText(first.title);
     const listUrl = page.url();
     await row
-      .getByRole('button', { name: `postId ${first.postId} 복사`, exact: true })
+      .getByRole('button', { name: '게시글 ID 복사', exact: true })
       .click();
     await expect
       .poll(() => page.evaluate(() => navigator.clipboard.readText()))
       .toBe(String(first.postId));
     await expect(
-      page.getByText('postId가 복사되었습니다.', { exact: true })
+      page.getByText('게시글 ID가 복사되었습니다.', { exact: true })
     ).toBeVisible();
     await expect(page).toHaveURL(listUrl);
     await expect(
@@ -220,9 +220,14 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       Math.min(10, otherInquiries.length)
     );
     for (const item of otherInquiries.slice(0, 10)) {
+      const row = inquiryReport.dataRows.filter({
+        has: page
+          .locator('td:first-child')
+          .getByText(String(item.postId), { exact: true }),
+      });
       await expect(
-        inquiryReport.table.getByRole('button', {
-          name: `postId ${item.postId} 복사`,
+        row.getByRole('button', {
+          name: '게시글 ID 복사',
           exact: true,
         })
       ).toBeVisible();
@@ -455,7 +460,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     ).toHaveCount(0);
   });
 
-  test('[TC-ADM-IR-014] 원본게시글 버튼으로 스노로즈 문의·신고 원문을 연결한다', async ({
+  test('[TC-ADM-IR-014] 게시글 원문 버튼으로 스노로즈 문의·신고 원문을 연결한다', async ({
     inquiryReport,
     realInquiry,
   }) => {
@@ -465,28 +470,32 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     ] as const) {
       const detailCase = await fixedDetailCase(realInquiry, postId, group);
       const panel = await openDetailCase(inquiryReport, detailCase);
-      const originalLink = panel.getByRole('link', {
-        name: '원본게시글 바로가기',
-        exact: true,
-      });
+      const originalLink = panel.getByTitle(
+        `${group === 'REPORT' ? '신고 원문' : '문의 원문'} 바로가기`,
+        { exact: true }
+      );
       const path = group === 'REPORT' ? 'report' : 'inquiry';
-      await expect(originalLink).toHaveText('원본게시글');
+      await expect(originalLink).toHaveText(
+        new RegExp(
+          `${group === 'REPORT' ? '신고 원문' : '문의 원문'}\\s*\\(새 탭에서 열림\\)`
+        )
+      );
       await expect(originalLink).toHaveAttribute(
         'href',
         `${process.env.VITE_USER_FRONT_BASE_URL}/${path}/${detailCase.detail.inquiryId}`
       );
       await expect(originalLink).toHaveAttribute('target', '_blank');
       await expect(
-        panel.getByRole('link', { name: '신고글 바로가기' })
-      ).toHaveCount(0);
-      await expect(
-        panel.getByRole('link', { name: '문의글 바로가기' })
+        panel.getByTitle(
+          `${group === 'REPORT' ? '문의 원문' : '신고 원문'} 바로가기`,
+          { exact: true }
+        )
       ).toHaveCount(0);
       await inquiryReport.closeDetail();
     }
   });
 
-  test('[TC-ADM-IR-015] 신고 유형별 대상글 링크를 확인한다', async ({
+  test('[TC-ADM-IR-015] 신고 유형별 신고 대상 링크를 확인한다', async ({
     inquiryReport,
     realInquiry,
   }) => {
@@ -514,11 +523,11 @@ test.describe('문의 및 신고 실제 API read QA', () => {
         item.title,
         located.pageNumber
       );
-      const targetLink = panel.getByRole('link', {
-        name: '신고 대상 글 바로가기',
+      const targetLink = panel.getByTitle('신고 대상 (어드민) 바로가기', {
+        exact: true,
       });
       await expect
-        .soft(targetLink, `${SUBGROUP_LABEL[subGroup]} 대상글 링크`)
+        .soft(targetLink, `${SUBGROUP_LABEL[subGroup]} 신고 대상 링크`)
         .toBeVisible();
       if (await targetLink.isVisible()) {
         await expect.soft(targetLink).toHaveAttribute('target', '_blank');
@@ -572,7 +581,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       locatedUserReport.pageNumber
     );
     await expect(
-      panel.getByRole('link', { name: '신고 대상 글 바로가기' })
+      panel.getByTitle('신고 대상 (어드민) 바로가기', { exact: true })
     ).toHaveCount(0);
   });
 

@@ -3,16 +3,27 @@ import type { BaseResponse } from '@/shared/types';
 import type {
   CreateExamReviewPeriod,
   ExamReviewPeriod,
+  ExamReviewPeriodType,
   UpdateExamReviewPeriod,
 } from '@/shared/types';
 
 import type {
+  ExamReviewAdminStatusResult,
   ExamReviewDetailResult,
   ExamReviewSearchParams,
   ExamReviewsResult,
   RenameExamReviewFileResult,
   UpdateExamReviewRequest,
 } from '@/domains/Reviews/types';
+
+export const getExamReviewAdminStatus = async (
+  periodId: number
+): Promise<ExamReviewAdminStatusResult> => {
+  const response = await axiosInstance.get<
+    BaseResponse<ExamReviewAdminStatusResult>
+  >(`/v1/admin/reviews/statics/${periodId}`);
+  return response.data.result;
+};
 
 // 시험후기 목록 조회 api
 export const getExamReviews = async (
@@ -115,12 +126,12 @@ export const postExamReviewPeriodAPI = async (
   );
 };
 
-export const getExamReviewPeriodsAPI = async (): Promise<
-  ExamReviewPeriod[]
-> => {
+export const getExamReviewPeriodsAPI = async (
+  type: ExamReviewPeriodType = 'WRITE'
+): Promise<ExamReviewPeriod[]> => {
   const response = await axiosInstance.get<BaseResponse<ExamReviewPeriod[]>>(
     '/v1/admin/reviews/period',
-    { params: { type: 'WRITE' } }
+    { params: { type } }
   );
   return response.data.result;
 };
@@ -136,10 +147,11 @@ export const patchExamReviewPeriodAPI = async (
 };
 
 export const deleteExamReviewPeriodAPI = async (
-  periodId: number
+  periodId: number,
+  type: ExamReviewPeriodType = 'WRITE'
 ): Promise<void> => {
   await axiosInstance.delete<BaseResponse<void>>(
     `/v1/admin/reviews/period/${periodId}`,
-    { params: { type: 'WRITE' } }
+    { params: { type } }
   );
 };

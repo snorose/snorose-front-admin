@@ -26,13 +26,11 @@ import {
 type MemberInfoEditFormProps = {
   member: MemberInfo;
   onSubmit: (changes: Partial<EditMemberInfo>) => void;
-  onCopy: (value: string) => void | Promise<void>;
 };
 
 export default function MemberInfoEditForm({
   member,
   onSubmit,
-  onCopy,
 }: MemberInfoEditFormProps) {
   const [selectedRoleId, setSelectedRoleId] = useState(
     String(member.userRoleId)
@@ -187,7 +185,7 @@ export default function MemberInfoEditForm({
 
       label: '회원 ID (암호화)',
       value: formatDisplayValue(member.encryptedUserId),
-      copyValue: member.encryptedUserId,
+      copyValue: member.encryptedUserId ?? '',
     },
     {
       type: 'role',
@@ -221,7 +219,6 @@ export default function MemberInfoEditForm({
               <EditableField
                 key={field.label}
                 fieldName={field.fieldName}
-
                 label={field.label}
                 value={field.value}
                 onChange={field.onChange}
@@ -246,11 +243,9 @@ export default function MemberInfoEditForm({
           return (
             <ReadonlyField
               key={field.label}
-
               label={field.label}
               value={field.value}
               copyValue={field.copyValue}
-              onCopy={onCopy}
             />
           );
         })}

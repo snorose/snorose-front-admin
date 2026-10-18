@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { InquiryDetail } from '@/shared/types';
 
-import { buildReportTargetUrl, parseInquiryPostId } from './inquiryReportUrls';
+import {
+  buildOriginalInquiryPostUrl,
+  buildReportTargetUrl,
+  parseInquiryPostId,
+} from './inquiryReportUrls';
 
 const createInquiryDetail = (
   overrides: Partial<InquiryDetail> = {}
@@ -29,6 +33,21 @@ const createInquiryDetail = (
   isWriterWithdrawn: false,
   attachments: [],
   ...overrides,
+});
+
+describe('buildOriginalInquiryPostUrl', () => {
+  it.each(['INQUIRY', 'REPORT'] as const)(
+    '%s 원문 경로를 생성하고 어드민 신고 대상 경로와 구분한다',
+    (group) => {
+      const detail = createInquiryDetail({ group });
+      expect(buildOriginalInquiryPostUrl(detail)).toBe(
+        `/${group === 'REPORT' ? 'report' : 'inquiry'}/1`
+      );
+      expect(buildReportTargetUrl(detail)).toBe(
+        group === 'REPORT' ? '/reviews/exam?keywordPost=1781296&page=1' : null
+      );
+    }
+  );
 });
 
 describe('parseInquiryPostId', () => {

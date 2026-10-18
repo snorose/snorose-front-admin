@@ -300,11 +300,6 @@ export function useMemberDetailState({
     }
   }, [refreshMemberFromServer, selectedMember]);
 
-  const handleCopy = useCallback(async (value: string) => {
-    await navigator.clipboard.writeText(value);
-    toast.success('복사되었습니다.');
-  }, []);
-
   const handleBack = useCallback(() => {
     setIsEdit(false);
 
@@ -318,7 +313,6 @@ export function useMemberDetailState({
 
   return {
     handleBack,
-    handleCopy,
     handleLoadMorePenaltyHistory,
     handleLoadPenaltyHistory,
     handleRefreshMemberDetail,

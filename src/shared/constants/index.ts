@@ -21,3 +21,4 @@ export {
   type SidebarMenu,
   type SidebarSubMenu,
 } from './sidebar-menus';
+export { USER_FRONT_BASE_URL } from './urls';

@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,6 +20,7 @@ import {
 import { postSinglePointAPI, searchSinglePointMemberAPI } from '@/apis';
 
 export default function AdjustSinglePointPage() {
+  const queryClient = useQueryClient();
   const searchInputId = useId();
   const [searchedMember, setSearchedMember] =
     useState<AdminUserListItem | null>(null);
@@ -86,6 +88,9 @@ export default function AdjustSinglePointPage() {
         ...(memo && { memo }),
       });
 
+      void queryClient.invalidateQueries({
+        queryKey: ['members', 'directory'],
+      });
       toast.success('포인트 지급/차감이 완료되었어요.');
       handleResetButtonClick();
     } catch (error: unknown) {

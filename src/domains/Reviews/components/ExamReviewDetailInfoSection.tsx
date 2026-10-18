@@ -202,15 +202,15 @@ export function ExamReviewDetailInfoSection({
                   {selectedFile?.name || formData.fileName || '파일 없음'}
                 </span>
               </Button>
-              <button
+              <Button
                 ref={renameButtonRef}
                 type='button'
+                variant='outline'
                 onClick={onFileNameRename}
                 disabled={!canRenameFileName}
-                className='min-h-9 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60'
               >
                 파일명 변경
-              </button>
+              </Button>
               <Button
                 type='button'
                 variant='outline'

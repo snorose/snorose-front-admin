@@ -8,6 +8,7 @@ import MemberInfoEditForm from './MemberInfoEditForm';
 
 vi.mock('sonner', () => ({
   toast: {
+    success: vi.fn(),
     error: vi.fn(),
     info: vi.fn(),
   },
@@ -46,16 +47,22 @@ describe('MemberInfoEditForm', () => {
     });
   });
 
+  test('암호화 회원 ID는 읽기 전용 입력과 복사 아이콘으로 표시하고 수정 입력은 유지한다', () => {
+    render(<MemberInfoEditForm member={MEMBER} onSubmit={vi.fn()} />);
+    const input = screen.getByRole('textbox', { name: '회원 ID (암호화)' });
+    expect(input).toHaveValue(MEMBER.encryptedUserId);
+    expect(input).toHaveAttribute('readonly');
+    expect(
+      screen.getByRole('button', { name: '회원 ID (암호화) 복사' })
+    ).toHaveAttribute('type', 'button');
+    expect(screen.getByLabelText(/^아이디/)).toHaveValue(MEMBER.loginId);
+    expect(screen.getByLabelText(/^학번/)).toHaveValue(MEMBER.studentNumber);
+  });
+
   test('유효하지 않은 첫 번째 변경 필드로 이동하고 포커스한다', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(
-      <MemberInfoEditForm
-        member={MEMBER}
-        onCopy={vi.fn()}
-        onSubmit={onSubmit}
-      />
-    );
+    render(<MemberInfoEditForm member={MEMBER} onSubmit={onSubmit} />);
 
     const loginIdInput = screen.getByLabelText(/^아이디/);
     await user.clear(loginIdInput);
@@ -76,13 +83,7 @@ describe('MemberInfoEditForm', () => {
   test('생년월일의 월·연도를 빠르게 이동하고 선택한 문자열만 저장한다', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(
-      <MemberInfoEditForm
-        member={MEMBER}
-        onCopy={vi.fn()}
-        onSubmit={onSubmit}
-      />
-    );
+    render(<MemberInfoEditForm member={MEMBER} onSubmit={onSubmit} />);
     const birthday = screen.getByRole('button', { name: /^생년월일/ });
     expect(birthday).toHaveTextContent('2000-01-01');
     expect(birthday).toHaveAttribute('name', 'birthday');
@@ -129,13 +130,7 @@ describe('MemberInfoEditForm', () => {
   test('생년월일 해제 후 저장하면 날짜 버튼에 오류·포커스를 연결하고 재선택으로 복구한다', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(
-      <MemberInfoEditForm
-        member={MEMBER}
-        onCopy={vi.fn()}
-        onSubmit={onSubmit}
-      />
-    );
+    render(<MemberInfoEditForm member={MEMBER} onSubmit={onSubmit} />);
     const birthday = screen.getByRole('button', { name: /^생년월일/ });
     await user.click(birthday);
     await user.click(screen.getByRole('button', { name: '날짜 선택 해제' }));

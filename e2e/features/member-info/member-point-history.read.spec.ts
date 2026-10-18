@@ -527,7 +527,7 @@ test('이동 대상이 없는 실제 출처 ID는 복사 아이콘으로 클립�
   });
   await expect(card.getByRole('link')).toHaveCount(0);
   const copy = card.getByRole('button', {
-    name: `관리자 ID ${source.log.sourceId} 복사`,
+    name: '관리자 ID 복사',
     exact: true,
   });
   await expect(copy.locator('svg.lucide-copy')).toHaveCount(1);
@@ -538,9 +538,7 @@ test('이동 대상이 없는 실제 출처 ID는 복사 아이콘으로 클립�
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toBe(String(source.log.sourceId));
   expect(page.url()).toBe(currentUrl);
-  await card
-    .getByRole('button', { name: `로그 ID ${source.log.id} 복사`, exact: true })
-    .click();
+  await card.getByRole('button', { name: '로그 ID 복사', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toBe(String(source.log.id));
