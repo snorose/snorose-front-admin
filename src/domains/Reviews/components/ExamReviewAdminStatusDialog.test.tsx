@@ -14,6 +14,7 @@ import {
   getExamReviewAdminStatus,
   getExamReviewPeriodsAPI,
   patchExamReviewPeriodAPI,
+  postExamReviewPeriodAPI,
 } from '@/apis';
 
 import { ExamReviewAdminStatusDialog } from './ExamReviewAdminStatusDialog';
@@ -331,6 +332,142 @@ describe('ExamReviewAdminStatusDialog', () => {
       screen.getByRole('dialog', { name: '기간 편집' })
     ).toBeInTheDocument();
   });
+  test.each(['추가', '수정'] as const)(
+    '기간 %s 후 목록 갱신 실패 시 저장 완료를 안내하고 목록만 재조회한다',
+    async (operation) => {
+      const user = userEvent.setup();
+      const { queryClient } = renderDialog();
+      await screen.findByRole('tab', { name: '2026 여름학기' });
+      await user.click(screen.getByRole('button', { name: '기간 편집' }));
+      await user.click(
+        screen.getByRole('button', {
+          name: operation === '추가' ? '기간 추가' : '2026 여름학기 수정',
+        })
+      );
+      const form = screen.getByRole('dialog', { name: `기간 ${operation}` });
+      const title = within(form).getByLabelText(/기간 이름/);
+      await user.clear(title);
+      await user.type(title, '저장된 기간');
+      if (operation === '추가') {
+        await user.click(
+          within(form).getByRole('button', { name: '시작 일시' })
+        );
+        await user.click(
+          screen.getByRole('button', { name: /2026년 8월 1일/ })
+        );
+        await user.click(
+          within(form).getByRole('button', { name: '종료 일시' })
+        );
+        await user.click(
+          screen.getByRole('button', { name: /2026년 8월 31일/ })
+        );
+      }
+      const savedPeriod = {
+        ...PERIODS[2],
+        id: operation === '추가' ? 5 : 3,
+        title: '저장된 기간',
+      };
+      vi.mocked(getExamReviewPeriodsAPI)
+        .mockRejectedValueOnce(new Error('목록 조회 실패'))
+        .mockResolvedValueOnce([
+          ...PERIODS.filter((period) => period.id !== savedPeriod.id),
+          savedPeriod,
+        ]);
+      await user.click(within(form).getByRole('button', { name: '저장' }));
+
+      expect(
+        await screen.findByText(
+          '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+        )
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('dialog', { name: `기간 ${operation}` })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: '저장' })
+      ).not.toBeInTheDocument();
+      const getCount = vi.mocked(getExamReviewPeriodsAPI).mock.calls.length;
+      await user.click(screen.getByRole('button', { name: '다시 시도' }));
+
+      expect(await screen.findByText('저장된 기간')).toBeInTheDocument();
+      expect(getExamReviewPeriodsAPI).toHaveBeenCalledTimes(getCount + 1);
+      expect(postExamReviewPeriodAPI).toHaveBeenCalledTimes(
+        operation === '추가' ? 1 : 0
+      );
+      expect(patchExamReviewPeriodAPI).toHaveBeenCalledTimes(
+        operation === '수정' ? 1 : 0
+      );
+
+      vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+        new Error('별개의 목록 조회 실패')
+      );
+      await act(async () => {
+        await queryClient.refetchQueries({
+          queryKey: ['examReviewAdminStatusPeriods', 'ADMIN_EDIT'],
+        });
+      });
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '기간을 불러오지 못했습니다.'
+      );
+      expect(
+        screen.queryByText(
+          '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+        )
+      ).not.toBeInTheDocument();
+    }
+  );
+
+  test.each([false, true])(
+    '저장 후 목록 조회 실패 여부(%s)와 관계없이 편집 재진입 시 이전 저장 안내를 표시하지 않는다',
+    async (refreshFailed) => {
+      const user = userEvent.setup();
+      const { queryClient } = renderDialog();
+      await screen.findByRole('tab', { name: '2026 여름학기' });
+      await user.click(screen.getByRole('button', { name: '기간 편집' }));
+      await user.click(
+        screen.getByRole('button', { name: '2026 여름학기 수정' })
+      );
+      const form = screen.getByRole('dialog', { name: '기간 수정' });
+      await user.type(within(form).getByLabelText(/기간 이름/), ' 변경');
+      if (refreshFailed) {
+        vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+          new Error('저장 후 조회 실패')
+        );
+      }
+      await user.click(within(form).getByRole('button', { name: '저장' }));
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: '기간 수정' })
+        ).not.toBeInTheDocument()
+      );
+      if (refreshFailed) {
+        expect(
+          await screen.findByText(
+            '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+          )
+        ).toBeInTheDocument();
+      }
+
+      await user.click(screen.getByRole('button', { name: '현황 보기' }));
+      await screen.findByRole('tab', { name: '2026 여름학기' });
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0));
+      vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+        new Error('재진입 조회 실패')
+      );
+      await user.click(screen.getByRole('button', { name: '기간 편집' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '기간을 불러오지 못했습니다.'
+      );
+      expect(
+        screen.queryByText(
+          '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+        )
+      ).not.toBeInTheDocument();
+      expect(patchExamReviewPeriodAPI).toHaveBeenCalledTimes(1);
+    }
+  );
+
   test('기간 전환 중에는 이전 통계 대신 로딩을 표시한다', async () => {
     const user = userEvent.setup();
     renderDialog();
@@ -434,7 +571,7 @@ describe('ExamReviewAdminStatusDialog', () => {
       screen.getByRole('button', { name: '시험후기 확인 현황 설명' })
     );
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      '선택한 기간에 업로드된 시험후기의 현재 확인 상태'
+      '선택한 기간에 업로드된 시험후기의 확인 상태'
     );
     await user.keyboard('{Escape}');
     await waitFor(() =>
