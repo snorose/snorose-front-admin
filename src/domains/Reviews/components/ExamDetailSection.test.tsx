@@ -8,7 +8,11 @@ import type {
   ExamReviewDetailResult,
 } from '@/domains/Reviews/types';
 
-import { deleteExamReview, updateExamReview } from '@/apis/reviews';
+import {
+  deleteExamReview,
+  restoreExamReview,
+  updateExamReview,
+} from '@/apis/reviews';
 
 import { ExamDetailSection } from './ExamDetailSection';
 
@@ -156,7 +160,7 @@ const selectedExamReviewDetailWithMemo: ExamReviewDetailResult = {
 
 describe('ExamDetailSection', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   test.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(
@@ -176,6 +180,135 @@ describe('ExamDetailSection', () => {
         screen.queryByRole('button', { name: '시험 후기 삭제' })
       ).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: '삭제 복구' })).toBeEnabled();
+    }
+  );
+
+  test.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(
+    '%s 후기의 복구 사유를 저장한 뒤 복구하고 해당 ID로 성공을 알린다',
+    async (deletionStatus) => {
+      const user = userEvent.setup();
+      const onRestoreSuccess = vi.fn();
+      const restoredMemo = '기존 운영자 메모\n\n[복구 사유]\n삭제 취소 요청';
+      vi.mocked(updateExamReview).mockResolvedValueOnce({
+        ...selectedExamReviewDetailWithMemo,
+        memo: restoredMemo,
+        deletionStatus,
+      });
+      vi.mocked(restoreExamReview).mockResolvedValueOnce({ postId: 101 });
+
+      render(
+        <ExamDetailSection
+          selectedExamReview={selectedExamReview}
+          selectedExamReviewDetail={{
+            ...selectedExamReviewDetailWithMemo,
+            deletionStatus,
+          }}
+          onRestoreSuccess={onRestoreSuccess}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: '삭제 복구' }));
+      const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
+      const confirmButton = within(dialog).getByRole('button', {
+        name: '복구',
+      });
+      expect(within(dialog).getByLabelText('기존 메모')).toHaveValue(
+        '기존 운영자 메모'
+      );
+      expect(confirmButton).toBeDisabled();
+      await user.type(
+        within(dialog).getByLabelText('복구 사유'),
+        '  삭제 취소 요청  '
+      );
+      expect(confirmButton).toBeEnabled();
+      await user.click(confirmButton);
+
+      await waitFor(() => expect(onRestoreSuccess).toHaveBeenCalledWith(101));
+      expect(updateExamReview).toHaveBeenCalledExactlyOnceWith(101, {
+        post: { memo: restoredMemo },
+      });
+      expect(restoreExamReview).toHaveBeenCalledExactlyOnceWith(101);
+      expect(updateExamReview).toHaveBeenCalledBefore(
+        vi.mocked(restoreExamReview)
+      );
+      expect(restoreExamReview).toHaveBeenCalledBefore(onRestoreSuccess);
+      expect(onRestoreSuccess).toHaveBeenCalledTimes(1);
+      expect(toast.success).toHaveBeenCalledWith('시험 후기가 복구되었습니다.');
+      expect(
+        screen.queryByRole('dialog', { name: '시험 후기 복구' })
+      ).not.toBeInTheDocument();
+    }
+  );
+
+  describe.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(
+    '%s 후기 복구 실패',
+    (deletionStatus) => {
+      test.each(['메모 저장', '복구 요청'] as const)(
+        '%s 실패 시 성공 처리를 실행하지 않는다',
+        async (failureStep) => {
+          const user = userEvent.setup();
+          const onRestoreSuccess = vi.fn();
+          if (failureStep === '메모 저장') {
+            vi.mocked(updateExamReview).mockRejectedValueOnce(
+              new Error('메모 저장 실패')
+            );
+          } else {
+            vi.mocked(updateExamReview).mockResolvedValueOnce(
+              selectedExamReviewDetailWithMemo
+            );
+            vi.mocked(restoreExamReview).mockRejectedValueOnce(
+              new Error('복구 요청 실패')
+            );
+          }
+
+          render(
+            <ExamDetailSection
+              selectedExamReview={selectedExamReview}
+              selectedExamReviewDetail={{
+                ...selectedExamReviewDetailWithMemo,
+                deletionStatus,
+              }}
+              onRestoreSuccess={onRestoreSuccess}
+            />
+          );
+
+          await user.click(screen.getByRole('button', { name: '삭제 복구' }));
+          const dialog = screen.getByRole('dialog', { name: '시험 후기 복구' });
+          await user.type(
+            within(dialog).getByLabelText('복구 사유'),
+            '삭제 취소 요청'
+          );
+          await user.click(
+            within(dialog).getByRole('button', { name: '복구' })
+          );
+
+          await waitFor(() =>
+            expect(toast.error).toHaveBeenCalledWith(
+              '시험 후기 복구에 실패했습니다. 다시 시도해주세요.'
+            )
+          );
+          expect(updateExamReview).toHaveBeenCalledExactlyOnceWith(101, {
+            post: { memo: '기존 운영자 메모\n\n[복구 사유]\n삭제 취소 요청' },
+          });
+          if (failureStep === '메모 저장') {
+            expect(restoreExamReview).not.toHaveBeenCalled();
+          } else {
+            expect(restoreExamReview).toHaveBeenCalledExactlyOnceWith(101);
+            expect(updateExamReview).toHaveBeenCalledBefore(
+              vi.mocked(restoreExamReview)
+            );
+          }
+          expect(onRestoreSuccess).not.toHaveBeenCalled();
+          expect(toast.success).not.toHaveBeenCalled();
+          expect(dialog).toBeInTheDocument();
+          expect(within(dialog).getByLabelText('복구 사유')).toHaveValue(
+            '삭제 취소 요청'
+          );
+          expect(
+            within(dialog).getByRole('button', { name: '복구' })
+          ).toBeEnabled();
+        }
+      );
     }
   );
 
