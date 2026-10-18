@@ -175,9 +175,7 @@ describe('ExamDetailSection', () => {
       expect(
         screen.queryByRole('button', { name: '시험 후기 삭제' })
       ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: '삭제된 시험 후기 복구' })
-      ).toBeEnabled();
+      expect(screen.getByRole('button', { name: '삭제 복구' })).toBeEnabled();
     }
   );
 

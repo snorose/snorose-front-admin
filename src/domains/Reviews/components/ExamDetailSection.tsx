@@ -691,8 +691,8 @@ export function ExamDetailSection({
                     selectedExamReviewDetail?.postId !== selectedExamReview.id
                   }
                 >
-                  <RotateCcw className='mr-1.5 h-4 w-4' />
-                  삭제된 시험 후기 복구
+                  <RotateCcw className='h-4 w-4' />
+                  삭제 복구
                 </Button>
               ) : (
                 <Button
