@@ -336,7 +336,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     '기간 %s 후 목록 갱신 실패 시 저장 완료를 안내하고 목록만 재조회한다',
     async (operation) => {
       const user = userEvent.setup();
-      renderDialog();
+      const { queryClient } = renderDialog();
       await screen.findByRole('tab', { name: '2026 여름학기' });
       await user.click(screen.getByRole('button', { name: '기간 편집' }));
       await user.click(
@@ -397,6 +397,74 @@ describe('ExamReviewAdminStatusDialog', () => {
       expect(patchExamReviewPeriodAPI).toHaveBeenCalledTimes(
         operation === '수정' ? 1 : 0
       );
+
+      vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+        new Error('별개의 목록 조회 실패')
+      );
+      await act(async () => {
+        await queryClient.refetchQueries({
+          queryKey: ['examReviewAdminStatusPeriods', 'ADMIN_EDIT'],
+        });
+      });
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '기간을 불러오지 못했습니다.'
+      );
+      expect(
+        screen.queryByText(
+          '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+        )
+      ).not.toBeInTheDocument();
+    }
+  );
+
+  test.each([false, true])(
+    '저장 후 목록 조회 실패 여부(%s)와 관계없이 편집 재진입 시 이전 저장 안내를 표시하지 않는다',
+    async (refreshFailed) => {
+      const user = userEvent.setup();
+      const { queryClient } = renderDialog();
+      await screen.findByRole('tab', { name: '2026 여름학기' });
+      await user.click(screen.getByRole('button', { name: '기간 편집' }));
+      await user.click(
+        screen.getByRole('button', { name: '2026 여름학기 수정' })
+      );
+      const form = screen.getByRole('dialog', { name: '기간 수정' });
+      await user.type(within(form).getByLabelText(/기간 이름/), ' 변경');
+      if (refreshFailed) {
+        vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+          new Error('저장 후 조회 실패')
+        );
+      }
+      await user.click(within(form).getByRole('button', { name: '저장' }));
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: '기간 수정' })
+        ).not.toBeInTheDocument()
+      );
+      if (refreshFailed) {
+        expect(
+          await screen.findByText(
+            '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+          )
+        ).toBeInTheDocument();
+      }
+
+      await user.click(screen.getByRole('button', { name: '현황 보기' }));
+      await screen.findByRole('tab', { name: '2026 여름학기' });
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0));
+      vi.mocked(getExamReviewPeriodsAPI).mockRejectedValueOnce(
+        new Error('재진입 조회 실패')
+      );
+      await user.click(screen.getByRole('button', { name: '기간 편집' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        '기간을 불러오지 못했습니다.'
+      );
+      expect(
+        screen.queryByText(
+          '기간 저장은 완료되었습니다. 목록만 다시 불러와주세요.'
+        )
+      ).not.toBeInTheDocument();
+      expect(patchExamReviewPeriodAPI).toHaveBeenCalledTimes(1);
     }
   );
 

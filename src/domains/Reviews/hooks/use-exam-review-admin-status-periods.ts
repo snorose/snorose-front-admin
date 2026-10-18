@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type {
@@ -21,6 +23,8 @@ export const EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY = [
 
 export function useExamReviewAdminStatusPeriods(enabled: boolean) {
   const queryClient = useQueryClient();
+  const [hasSavedPeriodRefreshError, setHasSavedPeriodRefreshError] =
+    useState(false);
 
   const periodsQuery = useQuery({
     queryKey: EXAM_REVIEW_ADMIN_STATUS_PERIODS_QUERY_KEY,
@@ -29,9 +33,16 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
     staleTime: 0,
   });
 
+  useEffect(() => {
+    if (hasSavedPeriodRefreshError && (!enabled || periodsQuery.isSuccess)) {
+      setHasSavedPeriodRefreshError(false);
+    }
+  }, [enabled, periodsQuery.isSuccess, hasSavedPeriodRefreshError]);
+
   const refreshPeriodsAfterSave = async () => {
     // 저장이 끝난 뒤의 조회 오류는 목록에서 처리하고 저장 실패로 전파하지 않는다.
     const result = await periodsQuery.refetch({ throwOnError: false });
+    setHasSavedPeriodRefreshError(result.isError);
     return result.isError ? undefined : result.data;
   };
 
@@ -84,6 +95,7 @@ export function useExamReviewAdminStatusPeriods(enabled: boolean) {
     createPeriodMutation,
     updatePeriodMutation,
     deletePeriodMutation,
+    hasSavedPeriodRefreshError,
     isMutating:
       createPeriodMutation.isPending ||
       updatePeriodMutation.isPending ||

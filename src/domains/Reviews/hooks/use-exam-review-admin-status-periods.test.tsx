@@ -126,6 +126,7 @@ test.each(['create', 'update'] as const)(
       ).toBe(true)
     );
     expect(result.current.periodsQuery.isError).toBe(true);
+    expect(result.current.hasSavedPeriodRefreshError).toBe(true);
     expect(result.current.isMutating).toBe(false);
     if (operation === 'update') {
       expect(
@@ -141,6 +142,7 @@ test.each(['create', 'update'] as const)(
     await waitFor(() =>
       expect(result.current.periodsQuery.isSuccess).toBe(true)
     );
+    expect(result.current.hasSavedPeriodRefreshError).toBe(false);
     expect(getExamReviewPeriodsAPI).toHaveBeenCalledTimes(3);
     expect(postExamReviewPeriodAPI).toHaveBeenCalledTimes(
       operation === 'create' ? 1 : 0
@@ -150,6 +152,43 @@ test.each(['create', 'update'] as const)(
     );
   }
 );
+
+test('편집 종료 시 목록 조회가 복구되지 않아도 저장 후 조회 실패 안내를 해제한다', async () => {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const { result, rerender } = renderHook(
+    ({ enabled }) => useExamReviewAdminStatusPeriods(enabled),
+    {
+      initialProps: { enabled: true },
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      ),
+    }
+  );
+  await waitFor(() => expect(result.current.periodsQuery.isSuccess).toBe(true));
+  vi.mocked(getExamReviewPeriodsAPI).mockRejectedValue(
+    new Error('목록 조회 실패')
+  );
+  await act(async () => {
+    await result.current.createPeriodMutation.mutateAsync(input);
+  });
+  await waitFor(() =>
+    expect(result.current.hasSavedPeriodRefreshError).toBe(true)
+  );
+
+  rerender({ enabled: false });
+  expect(result.current.periodsQuery.isError).toBe(true);
+  expect(result.current.hasSavedPeriodRefreshError).toBe(false);
+  expect(getExamReviewPeriodsAPI).toHaveBeenCalledTimes(2);
+
+  rerender({ enabled: true });
+  await waitFor(() => expect(getExamReviewPeriodsAPI).toHaveBeenCalledTimes(3));
+  await waitFor(() => expect(client.isFetching()).toBe(0));
+  expect(result.current.periodsQuery.isError).toBe(true);
+  expect(result.current.hasSavedPeriodRefreshError).toBe(false);
+  expect(postExamReviewPeriodAPI).toHaveBeenCalledTimes(1);
+});
 
 test.each(['create', 'update'] as const)(
   '%s 저장한 기간이 갱신된 목록에 없어도 저장 실패로 처리하지 않는다',
