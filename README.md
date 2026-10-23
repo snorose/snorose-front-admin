@@ -25,14 +25,23 @@
 - 배포: `Cloudflare Pages`
 - 테스트: `Vitest`, `Testing Library`, `Playwright` (E2E)
 
-운영 환경(main) 배포 성공 시 버전 태그와 GitHub Release를 자동 생성합니다. 동작과 재실행 방법은 [릴리스 자동화 문서](./docs/release-automation.md)를 참고합니다.
+<br>
+
+## 📦 배포 및 릴리스
+
+- 배포 대상: 운영 환경 (`main`)
+- 자동화: 배포 성공 → minor 버전 증가 → 태그·GitHub Release 생성
+- 릴리스 노트: 이전 버전 이후 변경 내역 자동 생성
+- 운영 가이드: [릴리스 자동화 및 재실행](./docs/release-automation.md)
 
 <br>
 
 ## 🧪 테스트 및 검증
 
-Vitest·Testing Library 기반 테스트와 Playwright E2E 테스트를 사용합니다.
-E2E는 실제 dev API·DB를 사용하는 조회·변경 테스트로 구성되어 있으며, 실행 방법과 기능별 안내는 [E2E 문서](./e2e/README.md)를 참고합니다.
+- 테스트 도구: `Vitest`, `Testing Library`
+- E2E 도구: `Playwright`
+- E2E 환경: 실제 dev API·DB를 사용하는 조회·변경 테스트
+- 실행 가이드: [E2E 실행 방법 및 기능별 안내](./e2e/README.md)
 
 <br>
 
