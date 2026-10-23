@@ -200,17 +200,17 @@ export function ExamReviewAdminStatusDialog({
                     </p>
                   )}
                 </div>
-                <div className='flex min-w-0 items-center gap-3'>
-                  <div className='min-w-0 flex-1 overflow-x-auto overscroll-x-contain'>
+                <div className='flex min-w-0 items-start gap-3'>
+                  <div className='min-w-0 flex-1'>
                     <Tabs.List
                       aria-label='조회 기간 선택'
-                      className='justify-start p-0.5 group-data-[orientation=horizontal]/tabs:h-12 sm:p-[3px] sm:group-data-[orientation=horizontal]/tabs:h-9'
+                      className='max-w-full flex-wrap justify-start p-0.5 group-data-[orientation=horizontal]/tabs:h-auto sm:p-[3px]'
                     >
                       {periods.map((period) => (
                         <Tabs.Trigger
                           key={period.id}
                           value={String(period.id)}
-                          className='h-full flex-none px-3 focus-visible:outline-none focus-visible:ring-inset'
+                          className='min-h-11 max-w-full flex-none px-3 break-all whitespace-normal focus-visible:outline-none focus-visible:ring-inset sm:min-h-[30px]'
                         >
                           {period.title}
                         </Tabs.Trigger>
