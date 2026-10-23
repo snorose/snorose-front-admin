@@ -176,7 +176,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
     const user = userEvent.setup();
     const boards = BOARD_OPTIONS.slice(0, 2);
     renderPage(PostCommentPage, [
-      `/posts/comments?boardIds=${boards.map((b) => b.value).join(',')}&adminCommonStatuses=VISIBLE,SANCTIONED&sortTypes=REPORT_COUNT,LIKE_COUNT&sortDirection=DESC&isReported=false&isKeywordExist=false&searchScope=POST_ID&searchQuery=42&page=3`,
+      `/posts/comments?boardIds=${boards.map((b) => b.value).join(',')}&adminCommonStatuses=VISIBLE,ADMIN_HIDDEN&sortTypes=REPORT_COUNT,LIKE_COUNT&sortDirection=DESC&isReported=false&isKeywordExist=false&searchScope=POST_ID&searchQuery=42&page=3`,
     ]);
     expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
       '게시판 2개'
@@ -218,7 +218,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
       )
     );
     expect(urlParams().has('boardIds')).toBe(false);
-    expect(urlParams().get('adminCommonStatuses')).toBe('VISIBLE,SANCTIONED');
+    expect(urlParams().get('adminCommonStatuses')).toBe('VISIBLE,ADMIN_HIDDEN');
     expect(urlParams().get('page')).toBe('1');
     expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
       '전체'
@@ -259,7 +259,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
     const [first, second] = BOARD_OPTIONS;
     renderPage(PostCommentPage, [
       `/posts/comments?boardIds=${first.value}&adminCommonStatuses=VISIBLE`,
-      `/posts/comments?boardIds=${second.value}&adminCommonStatuses=SANCTIONED`,
+      `/posts/comments?boardIds=${second.value}&adminCommonStatuses=ADMIN_HIDDEN`,
     ]);
     expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
       second.label
@@ -276,7 +276,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
       second.label
     );
     expect(screen.getByRole('button', { name: '관리 상태' })).toHaveTextContent(
-      '징계'
+      '어드민 비공개'
     );
   });
 
