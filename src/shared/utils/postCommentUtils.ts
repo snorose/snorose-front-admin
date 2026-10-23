@@ -129,6 +129,19 @@ export const STATUS_OPTIONS: {
   { label: '노출', value: 'VISIBLE', tone: 'success' },
 ];
 
+export function removeObsoleteAdminStatuses<
+  T extends { adminCommonStatuses?: string[] },
+>(params: T): T {
+  if (!params.adminCommonStatuses) return params;
+  const statuses = params.adminCommonStatuses.filter(
+    (status) => status !== 'SANCTIONED' && status !== 'DESANCTIONED'
+  );
+  return {
+    ...params,
+    adminCommonStatuses: statuses.length ? statuses : undefined,
+  };
+}
+
 /**
  * 게시글에 대한 상태 배지 리스트 반환
  */

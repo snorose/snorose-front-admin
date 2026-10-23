@@ -2,6 +2,7 @@ import { useId } from 'react';
 
 import { PageHeader } from '@/shared/components';
 import { useManagePageUrl } from '@/shared/hooks';
+import { removeObsoleteAdminStatuses } from '@/shared/utils';
 
 import { CommentFilterPanel } from '@/domains/Comments/components/CommentFilterPanel';
 import CommentTable from '@/domains/Comments/components/CommentTable';
@@ -24,7 +25,10 @@ const COMMENT_SCHEMA = {
 export default function PostCommentPage() {
   const titleId = useId();
   const { searchParams, currentPage, handleSearchChange, handlePageChange } =
-    useManagePageUrl<CommentSearchParams>(COMMENT_SCHEMA);
+    useManagePageUrl<CommentSearchParams>(
+      COMMENT_SCHEMA,
+      removeObsoleteAdminStatuses
+    );
 
   return (
     <div className='flex w-full min-w-0 flex-col gap-6'>

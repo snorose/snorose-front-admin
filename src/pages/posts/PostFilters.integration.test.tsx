@@ -64,6 +64,57 @@ const urlParams = () =>
   new URLSearchParams(screen.getByTestId('location').textContent ?? '');
 
 describe('게시글·댓글 필터 URL와 요청 연결', () => {
+  test.each([
+    {
+      name: '게시글',
+      Page: PostManagePage,
+      path: '/posts/manage',
+      search: searchPosts,
+    },
+    {
+      name: '댓글',
+      Page: PostCommentPage,
+      path: '/posts/comments',
+      search: searchComments,
+    },
+  ])(
+    '$name의 이전 URL에서 징계 상태를 제외하고 노출만 검색한다',
+    async ({ Page, path, search }) => {
+      const user = userEvent.setup();
+      renderPage(Page, [
+        `${path}?adminCommonStatuses=SANCTIONED`,
+        `${path}?adminCommonStatuses=DESANCTIONED,VISIBLE`,
+      ]);
+      const status = () => screen.getByRole('button', { name: '관리 상태' });
+      expect(status()).toHaveTextContent('노출');
+      await waitFor(() =>
+        expect(search).toHaveBeenLastCalledWith(
+          1,
+          expect.objectContaining({ adminCommonStatuses: ['VISIBLE'] })
+        )
+      );
+      await user.click(screen.getByRole('button', { name: '이전 URL' }));
+      expect(status()).toHaveTextContent('전체');
+      await waitFor(() =>
+        expect(search).toHaveBeenLastCalledWith(
+          1,
+          expect.objectContaining({ adminCommonStatuses: undefined })
+        )
+      );
+      await user.click(status());
+      await user.click(screen.getByRole('menuitemcheckbox', { name: '노출' }));
+      await user.keyboard('{Escape}');
+      await user.click(screen.getByRole('button', { name: '검색' }));
+      await waitFor(() =>
+        expect(search).toHaveBeenLastCalledWith(
+          1,
+          expect.objectContaining({ adminCommonStatuses: ['VISIBLE'] })
+        )
+      );
+      expect(urlParams().get('adminCommonStatuses')).toBe('VISIBLE');
+    }
+  );
+
   test('기존 선택 목록에서 빠졌던 게시판을 두 화면에서 선택하고 검색한다', async () => {
     const user = userEvent.setup();
     const posts = renderPage(PostManagePage, ['/posts/manage']);
