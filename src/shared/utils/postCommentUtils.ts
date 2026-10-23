@@ -124,12 +124,23 @@ export const STATUS_OPTIONS: {
 }[] = [
   { label: '유저 삭제', value: 'USER_DELETED', tone: 'danger' },
   { label: '어드민 삭제', value: 'ADMIN_DELETED', tone: 'danger' },
-  { label: '징계', value: 'SANCTIONED', tone: 'accent' },
   { label: '신고다수+비공개', value: 'AUTO_HIDDEN', tone: 'warning' },
   { label: '어드민 비공개', value: 'ADMIN_HIDDEN', tone: 'warning' },
   { label: '노출', value: 'VISIBLE', tone: 'success' },
-  { label: '징계없음', value: 'DESANCTIONED', tone: 'success' },
 ];
+
+export function removeObsoleteAdminStatuses<
+  T extends { adminCommonStatuses?: string[] },
+>(params: T): T {
+  if (!params.adminCommonStatuses) return params;
+  const statuses = params.adminCommonStatuses.filter(
+    (status) => status !== 'SANCTIONED' && status !== 'DESANCTIONED'
+  );
+  return {
+    ...params,
+    adminCommonStatuses: statuses.length ? statuses : undefined,
+  };
+}
 
 /**
  * 게시글에 대한 상태 배지 리스트 반환
