@@ -7,6 +7,23 @@ on:
       - dev
 
 jobs:
+  release-check:
+    name: 릴리스 자동화 검사
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check release automation
+        run: node --test .github/scripts/release-check.cjs
+
   # 1. 타입 검사 (Type Check) Job
   type-check:
     name: 🔍 TypeScript Check

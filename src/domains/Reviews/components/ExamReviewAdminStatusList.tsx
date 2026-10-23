@@ -30,9 +30,6 @@ export function ExamReviewAdminStatusList({
             description='미확인 → 확인으로 변경한 횟수'
           />
         </div>
-        <span className='text-muted-foreground text-xs tabular-nums'>
-          {managers.length.toLocaleString('ko-KR')}명
-        </span>
       </div>
 
       {managers.length === 0 ? (

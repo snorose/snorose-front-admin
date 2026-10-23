@@ -35,17 +35,15 @@ export function ExamReviewProgressChart({
           {statusItems.map(({ label, value }, index) => (
             <div
               key={label}
-              className='row-span-2 grid min-w-0 grid-rows-subgrid px-3 first:pl-0 last:pr-0 sm:px-5'
+              className='row-span-2 grid min-w-0 grid-rows-subgrid px-2 first:pl-0 last:pr-0 sm:px-3'
             >
               <dt className='text-muted-foreground text-xs leading-5 break-keep sm:text-sm'>
                 {label}
               </dt>
               <dd
-                className={`flex flex-wrap items-baseline gap-1 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl ${index === 1 ? 'text-primary' : ''}`}
+                className={`flex items-baseline gap-0.5 text-lg font-semibold tracking-tight whitespace-nowrap tabular-nums sm:text-xl ${index === 1 ? 'text-primary' : ''}`}
               >
-                <span className='break-all'>
-                  {value.toLocaleString('ko-KR')}
-                </span>
+                <span>{value.toLocaleString('ko-KR')}</span>
                 <span className='text-muted-foreground text-xs font-normal tracking-normal sm:text-sm'>
                   건
                 </span>
