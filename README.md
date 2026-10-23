@@ -25,6 +25,8 @@
 - 배포: `Cloudflare Pages`
 - 테스트: `Vitest`, `Testing Library`, `Playwright` (E2E)
 
+운영 환경(main) 배포 성공 시 버전 태그와 GitHub Release를 자동 생성합니다. 동작과 재실행 방법은 [릴리스 자동화 문서](./docs/release-automation.md)를 참고합니다.
+
 <br>
 
 ## 🧪 테스트 및 검증
