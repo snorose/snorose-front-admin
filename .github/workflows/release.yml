@@ -25,13 +25,13 @@ jobs:
       contents: write
     steps:
       - name: Checkout deployed commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
 
       - name: Wait for deployment and publish release
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const release = require('./.github/scripts/release.cjs');
