@@ -18,15 +18,17 @@ export default function MemberWithdrawalSection() {
         회원 탈퇴
       </SectionTitle>
 
-      <Button
-        type='button'
-        variant='destructive-outline'
-        className='w-full'
-        title='준비 중인 기능입니다.'
-        disabled
-      >
-        회원 탈퇴 (준비중)
-      </Button>
+      <div className='border-border bg-background min-w-0 rounded-lg border p-4'>
+        <Button
+          type='button'
+          variant='destructive-outline'
+          className='w-full'
+          title='준비 중인 기능입니다.'
+          disabled
+        >
+          회원 탈퇴 (준비중)
+        </Button>
+      </div>
     </section>
   );
 }
