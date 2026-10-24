@@ -1,25 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { AlertTriangleIcon, Plus } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { NoticePanel, PageHeader } from '@/shared/components';
+import { NoticePanel, PageHeader, PaginationBar } from '@/shared/components';
 import { Alert, Button, ConfirmModal } from '@/shared/components/ui';
+import { getErrorMessage } from '@/shared/utils';
 
 import {
   PopupEditorDialog,
   PopupManagementTable,
 } from '@/domains/Operation/components';
-import { MOCK_POPUP_CONTENTS } from '@/domains/Operation/mocks';
 import type { PopupContent } from '@/domains/Operation/types';
-import {
-  getNextPopupDisplayPriority,
-  sortPopupsByDisplayOrder,
-  validatePopupContent,
-} from '@/domains/Operation/utils';
+import type {
+  CreatePopupRequest,
+  PopupDetail,
+  PopupStatus,
+  PopupSummary,
+  UpdatePopupRequest,
+} from '@/domains/Operation/types/popup';
+import { validatePopupContent } from '@/domains/Operation/utils';
+import { validatePopupImage } from '@/domains/Operation/utils/validate-popup';
 
-type PopupStatus = 'active' | 'reserved' | 'ended';
-type PopupEditorMode = 'create' | 'edit';
+import {
+  createPopup,
+  deletePopup,
+  getPopupDetail,
+  getPopups,
+  updatePopup,
+} from '@/apis/popups';
 
 const EMPTY_POPUP: PopupContent = {
   id: 0,
@@ -28,189 +38,161 @@ const EMPTY_POPUP: PopupContent = {
   imageFileName: '',
   startDate: '',
   endDate: '',
-  displayPriority: 10,
+  displayPriority: 0,
   createdAt: '',
   updatedAt: '',
 };
-
-function getPopupStatus(popup: PopupContent): PopupStatus {
-  const now = new Date();
-  const startDate = new Date(popup.startDate);
-  const endDate = new Date(popup.endDate);
-
-  if (now < startDate) {
-    return 'reserved';
-  }
-
-  if (now > endDate) {
-    return 'ended';
-  }
-
-  return 'active';
-}
-
-function getStatusLabel(status: PopupStatus) {
-  const statusMap = {
-    active: '진행중',
-    reserved: '예약',
-    ended: '종료',
-  } as const;
-
-  return statusMap[status];
-}
-
-function getStatusClassName(status: PopupStatus) {
-  const statusClassNameMap = {
-    active: 'border-green-200 bg-green-50 text-green-700',
-    reserved: 'border-blue-200 bg-blue-50 text-blue-700',
-    ended: 'border-gray-200 bg-gray-50 text-gray-600',
-  } as const;
-
-  return statusClassNameMap[status];
-}
-
-function createEmptyPopup(popups: PopupContent[]) {
-  return {
-    ...EMPTY_POPUP,
-    id: Date.now(),
-    displayPriority: getNextPopupDisplayPriority(popups),
-  };
-}
-
-function getCurrentDateTimeString() {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-
-  return now.toISOString().slice(0, 16).replace('T', ' ');
-}
+const STATUS_LABELS: Record<PopupStatus, string> = {
+  ACTIVE: '진행중',
+  SCHEDULED: '예약',
+  ENDED: '종료',
+};
+const STATUS_CLASSES: Record<PopupStatus, string> = {
+  ACTIVE: 'border-green-200 bg-green-50 text-green-700',
+  SCHEDULED: 'border-blue-200 bg-blue-50 text-blue-700',
+  ENDED: 'border-gray-200 bg-gray-50 text-gray-600',
+};
 
 export default function PopupManagementPage() {
-  const [popups, setPopups] = useState(MOCK_POPUP_CONTENTS);
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(0);
+  const list = useQuery({
+    queryKey: ['popups', page],
+    queryFn: () => getPopups(page),
+  });
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = useState(false);
   const [deletingPopupId, setDeletingPopupId] = useState<number | null>(null);
-  const [editorMode, setEditorMode] = useState<PopupEditorMode>('create');
+  const [originalPopup, setOriginalPopup] = useState<PopupDetail | null>(null);
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
-  const [editingImagePreviewUrl, setEditingImagePreviewUrl] = useState('');
+  const [imageFile, setImageFile] = useState<File>();
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const editorMode = originalPopup ? 'edit' : 'create';
+  const maxDisplayOrder = Math.max(
+    0,
+    (list.data?.totalCount ?? 0) - (originalPopup ? 1 : 0)
+  );
 
-  const handleEditorPopupChange = (
+  useEffect(
+    () => () => {
+      if (imagePreviewUrl.startsWith('blob:'))
+        URL.revokeObjectURL(imagePreviewUrl);
+    },
+    [imagePreviewUrl]
+  );
+
+  const detail = useMutation({
+    mutationFn: (id: number) => getPopupDetail(id),
+    onSuccess: (popup) => {
+      setOriginalPopup(popup);
+      setEditingPopup({
+        id: popup.id,
+        title: popup.title,
+        bodyMarkdown: popup.description ?? '',
+        imageFileName: popup.imageUrl ? '기존 이미지' : '',
+        startDate: popup.startDate,
+        endDate: popup.endDate,
+        displayPriority: popup.displayOrder,
+        createdAt: popup.createdAt,
+        updatedAt: popup.updatedAt ?? '',
+      });
+      setImageFile(undefined);
+      setImagePreviewUrl(popup.imageUrl ?? '');
+      setIsEditorOpen(true);
+    },
+    onError: (error) =>
+      toast.error(
+        getErrorMessage(error, '팝업 상세 정보를 불러오지 못했습니다.')
+      ),
+  });
+
+  const save = useMutation({
+    mutationFn: async () => {
+      const request: CreatePopupRequest = {
+        title: editingPopup.title.trim(),
+        description: editingPopup.bodyMarkdown || null,
+        startDate: editingPopup.startDate,
+        endDate: editingPopup.endDate,
+        displayOrder: editingPopup.displayPriority,
+      };
+      if (!originalPopup) return createPopup(request, imageFile);
+      const changes: UpdatePopupRequest = {};
+      if (request.title !== originalPopup.title) changes.title = request.title;
+      if (request.description !== originalPopup.description)
+        changes.description = request.description;
+      if (request.startDate !== originalPopup.startDate)
+        changes.startDate = request.startDate;
+      if (request.endDate !== originalPopup.endDate)
+        changes.endDate = request.endDate;
+      if (request.displayOrder !== originalPopup.displayOrder)
+        changes.displayOrder = request.displayOrder;
+      if (originalPopup.imageUrl && !imagePreviewUrl && !imageFile)
+        changes.removeImage = true;
+      return updatePopup(originalPopup.id, changes, imageFile);
+    },
+    onSuccess: async () => {
+      toast.success(
+        originalPopup ? '팝업이 수정되었습니다.' : '팝업이 등록되었습니다.'
+      );
+      setIsSaveConfirmOpen(false);
+      setIsEditorOpen(false);
+      setImageFile(undefined);
+      setImagePreviewUrl('');
+      if (!originalPopup) setPage(0);
+      await queryClient.invalidateQueries({ queryKey: ['popups'] });
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, '팝업을 저장하지 못했습니다.'));
+      setIsSaveConfirmOpen(false);
+    },
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: number) => deletePopup(id),
+    onSuccess: async () => {
+      toast.success('팝업이 삭제되었습니다.');
+      setDeletingPopupId(null);
+      if (page > 0 && list.data?.data.length === 1) setPage(page - 1);
+      await queryClient.invalidateQueries({ queryKey: ['popups'] });
+    },
+    onError: (error) =>
+      toast.error(getErrorMessage(error, '팝업을 삭제하지 못했습니다.')),
+  });
+  const busy = detail.isPending || save.isPending || remove.isPending;
+
+  const handleEditorOpenChange = (open: boolean) => {
+    if (save.isPending) return;
+    setIsEditorOpen(open);
+    if (!open) {
+      setIsSaveConfirmOpen(false);
+      setImageFile(undefined);
+      setImagePreviewUrl('');
+    }
+  };
+  const handlePopupChange = (
     field: keyof PopupContent,
     value: PopupContent[keyof PopupContent]
   ) => {
-    setEditingPopup((prevPopup) => ({ ...prevPopup, [field]: value }));
+    setEditingPopup((previous) => ({ ...previous, [field]: value }));
   };
-
   const handleImageAttach = (file: File) => {
-    const imagePreviewUrl = URL.createObjectURL(file);
-
-    setEditingImagePreviewUrl((prevUrl) => {
-      if (prevUrl) {
-        URL.revokeObjectURL(prevUrl);
-      }
-
-      return imagePreviewUrl;
-    });
-    handleEditorPopupChange('imageFileName', file.name);
-  };
-
-  const handleImageRemove = () => {
-    setEditingImagePreviewUrl((prevUrl) => {
-      if (prevUrl) {
-        URL.revokeObjectURL(prevUrl);
-      }
-
-      return '';
-    });
-    handleEditorPopupChange('imageFileName', '');
-  };
-
-  const handleEditorOpenChange = (open: boolean) => {
-    setIsEditorOpen(open);
-
-    if (!open) {
-      setEditingImagePreviewUrl((prevUrl) => {
-        if (prevUrl) {
-          URL.revokeObjectURL(prevUrl);
-        }
-
-        return '';
-      });
-    }
-  };
-
-  const handleNewPopupButtonClick = () => {
-    setEditorMode('create');
-    setEditingPopup(createEmptyPopup(popups));
-    setEditingImagePreviewUrl('');
-    setIsEditorOpen(true);
-  };
-
-  const handleUpdatePopupButtonClick = (popup: PopupContent) => {
-    setEditorMode('edit');
-    setEditingPopup({ ...popup });
-    setEditingImagePreviewUrl('');
-    setIsEditorOpen(true);
-  };
-
-  const handleDeletePopupButtonClick = (id: number) => {
-    setDeletingPopupId(id);
-  };
-
-  const handleSavePopupButtonClick = () => {
-    const validationMessage = validatePopupContent(editingPopup);
-
-    if (validationMessage) {
-      toast.error(validationMessage);
+    const message = validatePopupImage(file);
+    if (message) {
+      toast.error(message);
       return;
     }
-
+    setImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+    handlePopupChange('imageFileName', file.name);
+  };
+  const handleSave = () => {
+    const message = validatePopupContent(editingPopup, maxDisplayOrder);
+    if (message) {
+      toast.error(message);
+      return;
+    }
     setIsSaveConfirmOpen(true);
   };
-
-  const handleSaveConfirmButtonClick = () => {
-    const currentDateTime = getCurrentDateTimeString();
-    const savedPopup = {
-      ...editingPopup,
-      createdAt:
-        editorMode === 'create' ? currentDateTime : editingPopup.createdAt,
-      updatedAt: currentDateTime,
-    };
-
-    if (editorMode === 'create') {
-      setPopups((prevPopups) => [savedPopup, ...prevPopups]);
-    } else {
-      setPopups((prevPopups) =>
-        prevPopups.map((popup) =>
-          popup.id === savedPopup.id ? savedPopup : popup
-        )
-      );
-    }
-
-    toast.success(
-      editorMode === 'create'
-        ? '팝업이 등록되었습니다.'
-        : '팝업이 수정되었습니다.'
-    );
-
-    setIsSaveConfirmOpen(false);
-    handleEditorOpenChange(false);
-  };
-
-  const handleDeleteConfirmButtonClick = () => {
-    if (deletingPopupId === null) {
-      return;
-    }
-
-    setPopups((prevPopups) =>
-      prevPopups.filter((popup) => popup.id !== deletingPopupId)
-    );
-    toast.success('팝업이 삭제되었습니다.');
-    setDeletingPopupId(null);
-  };
-
-  // const handlePreviewPopupButtonClick = () => {
-  //   console.log('특정 날짜 기준으로 팝업 보기');
-  // };
 
   return (
     <div className='flex w-full flex-col gap-6'>
@@ -218,103 +200,148 @@ export default function PopupManagementPage() {
         title='팝업창 관리'
         description='사용자 홈 화면에 노출되는 공지 팝업 콘텐츠와 노출 기간을 관리할 수 있어요.'
       />
-
-      <Alert className='border-amber-300 bg-amber-50 text-amber-950'>
-        <AlertTriangleIcon aria-hidden='true' />
-        <Alert.Title>현재 임시 데이터를 표시하고 있습니다.</Alert.Title>
-        <Alert.Description className='text-amber-800'>
-          실제 데이터는 API 연결 후 제공될 예정이며, 해당 페이지는 동작
-          점검용으로만 확인 부탁드려요.
-        </Alert.Description>
-      </Alert>
-
       <NoticePanel
         items={[
           <>
-            <strong>노출 순서:</strong> 작은 숫자부터 표시되며, 같은 숫자는 먼저
-            등록한 팝업부터 표시됩니다.
+            <strong>게시 기간:</strong> 한국 시간(KST) 기준으로 시작일과
+            종료일을 포함해 날짜 단위로 노출됩니다.
           </>,
           <>
-            <strong>본문 서식:</strong>
-            <ul className='mt-1 ml-6 list-outside list-disc space-y-1 pl-4'>
-              <li>
-                <strong>마크다운:</strong> <code>**굵은 글씨**</code>,{' '}
-                <code>- 항목</code>, <code>1. 항목</code> 형식을 사용할 수
-                있습니다.
-              </li>
-              <li>
-                <strong>링크:</strong> <code>[링크명](URL)</code> 형식으로
-                추가할 수 있습니다.
-              </li>
-            </ul>
+            <strong>노출 순서:</strong> 0부터 시작하며 작은 숫자부터 표시됩니다.
+            등록·이동·삭제 시 다른 팝업의 순서도 조정됩니다. 관리자 목록은 최신
+            등록순입니다.
+          </>,
+          <>
+            <strong>본문 서식:</strong> 마크다운으로 굵은 글씨, 목록,
+            [링크명](URL)을 입력하고 미리 볼 수 있습니다.
           </>,
         ]}
       />
-
-      <section className='flex flex-col gap-4'>
-        <div className='flex gap-2'>
+      <section
+        className='flex flex-col gap-4'
+        aria-busy={list.isFetching || busy}
+      >
+        <div className='flex flex-wrap items-center gap-3'>
           <Button
             type='button'
             className='gap-2'
-            onClick={handleNewPopupButtonClick}
+            disabled={busy || list.isFetching || list.isError || !list.data}
+            onClick={() => {
+              setOriginalPopup(null);
+              setEditingPopup({
+                ...EMPTY_POPUP,
+                displayPriority: list.data?.totalCount ?? 0,
+              });
+              setImageFile(undefined);
+              setImagePreviewUrl('');
+              setIsEditorOpen(true);
+            }}
           >
             <Plus className='size-4' />새 팝업 등록
           </Button>
-          {/* <Button
-            type='button'
-            variant='outline'
-            className='gap-2'
-            onClick={handlePreviewPopupButtonClick}
-          >
-            <Eye className='size-4' />
-            특정 날짜 기준으로 팝업 보기
-          </Button> */}
+          {detail.isPending && (
+            <span role='status' className='text-muted-foreground text-sm'>
+              팝업 정보를 불러오는 중입니다.
+            </span>
+          )}
         </div>
-
-        <PopupManagementTable
-          popups={sortPopupsByDisplayOrder(popups)}
-          getStatusLabel={(popup) => getStatusLabel(getPopupStatus(popup))}
-          getStatusClassName={(popup) =>
-            getStatusClassName(getPopupStatus(popup))
-          }
-          onUpdate={handleUpdatePopupButtonClick}
-          onDelete={handleDeletePopupButtonClick}
-        />
+        {list.isPending ? (
+          <p role='status' className='py-12 text-center'>
+            팝업 목록을 불러오는 중입니다.
+          </p>
+        ) : list.isError ? (
+          <Alert variant='destructive'>
+            <Alert.Title>팝업 목록을 불러오지 못했습니다.</Alert.Title>
+            <Alert.Description>
+              {getErrorMessage(list.error)}
+              <Button
+                type='button'
+                variant='outline'
+                disabled={list.isFetching}
+                onClick={() => void list.refetch()}
+              >
+                다시 시도
+              </Button>
+            </Alert.Description>
+          </Alert>
+        ) : (
+          <>
+            <PopupManagementTable
+              popups={list.data.data}
+              getStatusLabel={(popup) => STATUS_LABELS[popup.status]}
+              getStatusClassName={(popup) => STATUS_CLASSES[popup.status]}
+              onUpdate={(popup: PopupSummary) => detail.mutate(popup.id)}
+              onDelete={setDeletingPopupId}
+              disabled={busy || list.isFetching}
+            />
+            {list.data.totalPage > 0 && (
+              <PaginationBar
+                currentPage={page + 1}
+                totalPage={list.data.totalPage}
+                onPageChange={(nextPage) => {
+                  if (!busy) setPage(nextPage - 1);
+                }}
+              />
+            )}
+          </>
+        )}
       </section>
-
-      <PopupEditorDialog
-        open={isEditorOpen}
-        mode={editorMode}
-        popup={editingPopup}
-        imagePreviewUrl={editingImagePreviewUrl}
-        onOpenChange={handleEditorOpenChange}
-        onPopupChange={handleEditorPopupChange}
-        onImageAttach={handleImageAttach}
-        onImageRemove={handleImageRemove}
-        onSave={handleSavePopupButtonClick}
-      />
-
+      {isEditorOpen && (
+        <PopupEditorDialog
+          open={isEditorOpen}
+          mode={editorMode}
+          popup={editingPopup}
+          imagePreviewUrl={imagePreviewUrl}
+          maxDisplayOrder={maxDisplayOrder}
+          disabled={save.isPending || isSaveConfirmOpen}
+          onOpenChange={handleEditorOpenChange}
+          onPopupChange={handlePopupChange}
+          onImageAttach={handleImageAttach}
+          onImageRemove={() => {
+            setImageFile(undefined);
+            setImagePreviewUrl('');
+            handlePopupChange('imageFileName', '');
+          }}
+          onSave={handleSave}
+        />
+      )}
       <ConfirmModal
         isOpen={isSaveConfirmOpen}
         title={
           editorMode === 'create' ? '팝업을 등록할까요?' : '팝업을 수정할까요?'
         }
         description='입력한 내용으로 저장합니다.'
-        confirmText={editorMode === 'create' ? '등록' : '수정'}
+        confirmText={
+          save.isPending
+            ? '저장 중…'
+            : editorMode === 'create'
+              ? '등록'
+              : '수정'
+        }
+        confirmDisabled={save.isPending}
         closeText='취소'
-        onConfirm={handleSaveConfirmButtonClick}
-        onClose={() => setIsSaveConfirmOpen(false)}
+        onConfirm={() => {
+          if (!save.isPending) save.mutate();
+        }}
+        onClose={() => {
+          if (!save.isPending) setIsSaveConfirmOpen(false);
+        }}
       />
-
       <ConfirmModal
         isOpen={deletingPopupId !== null}
         confirmVariant='destructive'
         title='팝업을 삭제할까요?'
         description='삭제한 팝업은 목록에서 제거됩니다.'
-        confirmText='삭제'
+        confirmText={remove.isPending ? '삭제 중…' : '삭제'}
+        confirmDisabled={remove.isPending}
         closeText='취소'
-        onConfirm={handleDeleteConfirmButtonClick}
-        onClose={() => setDeletingPopupId(null)}
+        onConfirm={() => {
+          if (deletingPopupId !== null && !remove.isPending)
+            remove.mutate(deletingPopupId);
+        }}
+        onClose={() => {
+          if (!remove.isPending) setDeletingPopupId(null);
+        }}
       />
     </div>
   );

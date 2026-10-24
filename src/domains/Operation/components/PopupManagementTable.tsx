@@ -3,14 +3,15 @@ import { CircleHelpIcon, Pencil, Trash2 } from 'lucide-react';
 import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import type { PopupContent } from '@/domains/Operation/types';
+import type { PopupSummary } from '@/domains/Operation/types/popup';
 
 type PopupManagementTableProps = {
-  popups: PopupContent[];
-  getStatusLabel: (popup: PopupContent) => string;
-  getStatusClassName: (popup: PopupContent) => string;
-  onUpdate: (popup: PopupContent) => void;
+  popups: PopupSummary[];
+  getStatusLabel: (popup: PopupSummary) => string;
+  getStatusClassName: (popup: PopupSummary) => string;
+  onUpdate: (popup: PopupSummary) => void;
   onDelete: (id: number) => void;
+  disabled?: boolean;
 };
 
 export function PopupManagementTable({
@@ -19,6 +20,7 @@ export function PopupManagementTable({
   getStatusClassName,
   onUpdate,
   onDelete,
+  disabled = false,
 }: PopupManagementTableProps) {
   return (
     <div className='overflow-x-auto rounded-lg border'>
@@ -69,7 +71,7 @@ export function PopupManagementTable({
                   </Badge>
                 </Table.Cell>
                 <Table.Cell className='text-center'>
-                  {popup.displayPriority}
+                  {popup.displayOrder}
                 </Table.Cell>
                 <Table.Cell className='max-w-[280px]'>
                   <div className='truncate font-medium'>
@@ -92,6 +94,7 @@ export function PopupManagementTable({
                       type='button'
                       variant='ghost'
                       size='sm'
+                      disabled={disabled}
                       onClick={() => onUpdate(popup)}
                     >
                       <Pencil aria-hidden='true' />
@@ -101,6 +104,7 @@ export function PopupManagementTable({
                       type='button'
                       variant='destructive-outline'
                       size='sm'
+                      disabled={disabled}
                       onClick={() => onDelete(popup.id)}
                     >
                       <Trash2 aria-hidden='true' />
