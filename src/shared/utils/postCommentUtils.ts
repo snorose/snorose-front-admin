@@ -3,7 +3,7 @@ import type { StatusBadgeTone } from '@/shared/components';
 export const BOARD_NAMES: Record<number, string> = {
   11: 'about 스노로즈',
   12: '공지사항',
-  13: '문의게시판/신고게시판',
+  13: '문의/신고',
   14: '이벤트',
   20: '베숙트',
   21: '첫눈온방',
@@ -172,15 +172,7 @@ export function getPostStatusBadges(post: {
     });
   }
 
-  // 2. 징계 여부
-  if (statuses.includes('SANCTIONED')) {
-    badges.push({
-      label: '징계',
-      tone: 'accent',
-    });
-  }
-
-  // 3. 삭제 여부
+  // 2. 삭제 여부
   if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     badges.push({
       label: '어드민 삭제',
