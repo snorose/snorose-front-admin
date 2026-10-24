@@ -1,4 +1,4 @@
-import { CircleHelpIcon, Pencil, Trash2 } from 'lucide-react';
+import { CircleHelpIcon } from 'lucide-react';
 
 import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
 
@@ -87,26 +87,24 @@ export function PopupManagementTable({
                 </Table.Cell>
                 <Table.Cell>{popup.createdAt || '-'}</Table.Cell>
                 <Table.Cell>{popup.updatedAt || '-'}</Table.Cell>
-                <Table.Cell className='text-right'>
-                  <div className='flex justify-center gap-1'>
+                <Table.Cell className='text-center'>
+                  <div className='flex items-center justify-center gap-2'>
                     <Button
                       type='button'
-                      variant='ghost'
-                      size='sm'
+                      variant='outline'
+                      size='xs'
                       disabled={disabled}
                       onClick={() => onUpdate(popup)}
                     >
-                      <Pencil aria-hidden='true' />
                       수정
                     </Button>
                     <Button
                       type='button'
                       variant='destructive-outline'
-                      size='sm'
+                      size='xs'
                       disabled={disabled}
                       onClick={() => onDelete(popup.id)}
                     >
-                      <Trash2 aria-hidden='true' />
                       삭제
                     </Button>
                   </div>
