@@ -409,7 +409,7 @@ export default function PushNotificationPage() {
                       htmlFor={`${inputId}-marketing-false`}
                       className='cursor-pointer font-normal'
                     >
-                      정보성 (전체 공지, 댓글, 관리자 삭제/비공개 통보 등)
+                      정보성 (전체 공지, 댓글, 어드민 삭제/비공개 통보 등)
                     </Label>
                   </div>
                 </RadioGroup>

@@ -446,7 +446,7 @@ test.describe('포인트 출처 ID 이동 — 실제 dev API와 관리 화면', 
     await destination.close();
   });
 
-  test('관리자 삭제 로그도 관리자 ID가 아닌 시험후기 ID로 검색한다', async ({
+  test('어드민 삭제 로그도 관리자 ID가 아닌 시험후기 ID로 검색한다', async ({
     context,
     page,
   }, testInfo) => {
@@ -562,8 +562,7 @@ test.describe('포인트 팝업 댓글 바로가기 — 실제 dev API', () => {
       { sortTypes: ['COMMENT_COUNT'], sortDirection: 'DESC' }
     );
     let fixture:
-      | { comment: Comment; first: Comments; next: Comments }
-      | undefined;
+      { comment: Comment; first: Comments; next: Comments } | undefined;
     for (const post of posts.data) {
       const search = {
         searchQuery: String(post.postId),

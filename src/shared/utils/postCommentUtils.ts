@@ -183,7 +183,7 @@ export function getPostStatusBadges(post: {
   // 3. 삭제 여부
   if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     badges.push({
-      label: '리자 삭제',
+      label: '어드민 삭제',
       tone: 'danger',
     });
   } else if (statuses.includes('USER_DELETED')) {
