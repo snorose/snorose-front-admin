@@ -8,7 +8,7 @@ export const STATUS_HISTORY_LABELS: Record<
   USER_DELETED: '사용자 삭제',
   DELETE_RESTORED: '삭제 복구',
   ADMIN_DELETED: '어드민 삭제',
-  ADMIN_HIDDEN: '관리자 비공개',
+  ADMIN_HIDDEN: '어드민 비공개',
   VISIBILITY_RESTORED: '공개 복구',
   SANCTIONED: '징계 처리',
   SANCTION_RELEASED: '징계 해제',

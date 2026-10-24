@@ -167,7 +167,7 @@ export function getPostStatusBadges(post: {
     });
   } else if (post.isVisible === false && statuses.includes('ADMIN_HIDDEN')) {
     badges.push({
-      label: '리자 비공개',
+      label: '어드민 비공개',
       tone: 'warning',
     });
   }
