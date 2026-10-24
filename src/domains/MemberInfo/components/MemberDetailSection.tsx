@@ -68,9 +68,9 @@ export default function MemberDetailSection({
   const roleLabel = roleBadge.label;
 
   return (
-    <article className='flex w-full flex-col gap-6'>
+    <article className='flex w-full min-w-0 flex-col gap-6'>
       <div className='flex flex-wrap items-start justify-between gap-4'>
-        <div className='flex items-start gap-3'>
+        <div className='flex min-w-0 items-start gap-3'>
           <Button
             type='button'
             variant='outline'
@@ -82,9 +82,9 @@ export default function MemberDetailSection({
             <ArrowLeft className='h-4 w-4' />
           </Button>
 
-          <div className='space-y-1'>
+          <div className='min-w-0 space-y-1'>
             <div className='flex flex-wrap items-center gap-3'>
-              <h2 className='text-3xl font-bold tracking-tight text-slate-950'>
+              <h2 className='min-w-0 text-3xl font-bold tracking-tight wrap-break-word text-slate-950'>
                 {member.userName} ({formatDisplayValue(member.studentNumber)})
               </h2>
               <StatusBadge tone={roleBadge.tone}>{roleLabel}</StatusBadge>
