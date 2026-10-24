@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Loader2, Pencil, UserRound } from 'lucide-react';
 
-import { StatusBadge } from '@/shared/components';
+import { SectionTitle, StatusBadge } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import type {
   BlacklistHistoryItem,
@@ -70,26 +70,24 @@ export default function MemberDetailSection({
   return (
     <article className='flex w-full min-w-0 flex-col gap-6'>
       <div className='flex flex-wrap items-start justify-between gap-4'>
-        <div className='flex min-w-0 items-start gap-3'>
+        <div className='flex min-w-0 items-center gap-3'>
           <Button
             type='button'
             variant='outline'
             size='icon'
             onClick={onBack}
-            className='mt-1'
             aria-label='회원 목록으로 돌아가기'
           >
             <ArrowLeft className='h-4 w-4' />
           </Button>
 
-          <div className='min-w-0 space-y-1'>
-            <div className='flex flex-wrap items-center gap-3'>
-              <h2 className='min-w-0 text-3xl font-bold tracking-tight wrap-break-word text-slate-950'>
-                {member.userName} ({formatDisplayValue(member.studentNumber)})
-              </h2>
+          <div className='flex min-w-0 items-center gap-2'>
+            <SectionTitle className='min-w-0 text-2xl wrap-break-word'>
+              {member.userName} ({formatDisplayValue(member.studentNumber)})
+            </SectionTitle>
+            <span className='inline-flex shrink-0 items-center self-center'>
               <StatusBadge tone={roleBadge.tone}>{roleLabel}</StatusBadge>
-            </div>
-            <p className='text-sm text-slate-500'>회원 상세 정보</p>
+            </span>
           </div>
         </div>
 
