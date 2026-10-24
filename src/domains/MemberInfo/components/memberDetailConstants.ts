@@ -47,10 +47,3 @@ export const DETAIL_SHORTCUTS: DetailShortcut[] = [
     icon: BookOpen,
   },
 ];
-
-export const WITHDRAWAL_WARNINGS = [
-  '모든 회원 데이터가 영구 삭제됩니다.',
-  '게시글·댓글·시험후기도 삭제될 수 있습니다.',
-  '보유 포인트가 모두 소멸됩니다.',
-  '탈퇴 후에는 복구할 수 없습니다.',
-];
