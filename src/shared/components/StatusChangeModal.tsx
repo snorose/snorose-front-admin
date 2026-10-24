@@ -6,16 +6,19 @@ interface StatusChangeModalProps {
   target: 'POST' | 'COMMENT';
   onClose: () => void;
   modalType: 'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE';
-  onConfirmAction: (reason: string) => void;
+  onConfirmAction: (reason: string, deleteCommentsAlso: boolean) => void;
+  isPending?: boolean;
 }
 export default function StatusChangeModal({
   target,
   modalType,
   onClose,
   onConfirmAction,
+  isPending = false,
 }: StatusChangeModalProps) {
   const reasonId = useId();
   const [reason, setReason] = useState('');
+  const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
   return (
     <div
       className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'
@@ -49,16 +52,33 @@ export default function StatusChangeModal({
             onChange={(e) => setReason(e.target.value)}
           />
 
+          {target === 'POST' && modalType === 'DELETE' && (
+            <label className='flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700'>
+              <input
+                type='checkbox'
+                checked={deleteCommentsAlso}
+                disabled={isPending}
+                onChange={(e) => setDeleteCommentsAlso(e.target.checked)}
+              />
+              게시글에 달린 댓글도 함께 전부 삭제 처리
+            </label>
+          )}
           <div className='mt-2 flex justify-end gap-2'>
-            <Button type='button' variant='outline' size='sm' onClick={onClose}>
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={onClose}
+              disabled={isPending}
+            >
               취소
             </Button>
             <Button
               type='button'
               variant={modalType === 'DELETE' ? 'destructive' : 'default'}
               size='sm'
-              onClick={() => onConfirmAction(reason)}
-              disabled={!reason.trim()}
+              onClick={() => onConfirmAction(reason, deleteCommentsAlso)}
+              disabled={isPending || !reason.trim()}
             >
               확인
             </Button>
