@@ -17,7 +17,7 @@ export default function MemberActivitySection({
 }) {
   return (
     <SectionCard icon={BookOpen} title='회원 활동 내역'>
-      <ul className='grid gap-2 sm:grid-cols-2'>
+      <ul className='grid gap-2'>
         {DETAIL_SHORTCUTS.map((shortcut) => (
           <li key={shortcut.title} className='min-w-0'>
             <ActivityShortcut

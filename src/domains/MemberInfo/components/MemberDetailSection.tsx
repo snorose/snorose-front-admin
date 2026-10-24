@@ -148,21 +148,20 @@ export default function MemberDetailSection({
           )}
         </SectionCard>
 
-        <MemberPenaltySummaryCard
-          hasNextPenaltyHistory={hasNextPenaltyHistory}
-          isPenaltyHistoryLoading={isPenaltyHistoryLoading}
-          member={member}
-          onChangedPenaltyHistory={onChangedPenaltyHistory}
-          onLoadMorePenaltyHistory={onLoadMorePenaltyHistory}
-          onOpenPenaltyHistory={onOpenPenaltyHistory}
-          penaltyHistory={penaltyHistory}
-          penaltyHistoryTotalCount={penaltyHistoryTotalCount}
-        />
-      </div>
-
-      <div className='grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]'>
-        <MemberActivitySection studentNumber={member.studentNumber} />
-        <MemberWithdrawalSection />
+        <div className='flex min-w-0 flex-col gap-6'>
+          <MemberPenaltySummaryCard
+            hasNextPenaltyHistory={hasNextPenaltyHistory}
+            isPenaltyHistoryLoading={isPenaltyHistoryLoading}
+            member={member}
+            onChangedPenaltyHistory={onChangedPenaltyHistory}
+            onLoadMorePenaltyHistory={onLoadMorePenaltyHistory}
+            onOpenPenaltyHistory={onOpenPenaltyHistory}
+            penaltyHistory={penaltyHistory}
+            penaltyHistoryTotalCount={penaltyHistoryTotalCount}
+          />
+          <MemberActivitySection studentNumber={member.studentNumber} />
+          <MemberWithdrawalSection />
+        </div>
       </div>
 
       <MemberPointAdjustmentDialog
