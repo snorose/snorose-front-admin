@@ -4,19 +4,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import StatusChangeModal from '@/shared/components/StatusChangeModal';
 import { Button } from '@/shared/components/ui';
 
-import {
-  bulkDeleteComments,
-  deletePost,
-  restorePost,
-  searchComments,
-  updatePostVisibility,
-} from '@/apis';
+import { deletePost, restorePost, updatePostVisibility } from '@/apis';
 
 import type { AdminGetPostResponse } from '../../types';
+import { deletePostComments } from '../../utils/deletePostComments';
 import { getRestoreWarnings } from '../../utils/restoreResult';
-import PostDetailActionModal from './PostDetailActionModal';
 
 interface PostDetailManageCardProps {
   post: AdminGetPostResponse;
@@ -37,52 +32,37 @@ export default function PostDetailManageCard({
 
   // 게시물 삭제 Mutation
   const deleteMutation = useMutation({
-    mutationFn: async (memo: string) => {
-      if (deleteCommentsAlso) {
-        const commentIds: number[] = [];
-        let page = 1;
-        let totalPage = 1;
-
-        do {
-          const result = await searchComments(page, {
-            searchQuery: String(post.postId),
-            searchScope: 'POST_ID',
-            sortTypes: ['CREATED_AT'],
-            sortDirection: 'ASC',
-          });
-          const aliveCommentIds = result.data
-            .filter(
-              (comment) =>
-                comment.deletedAt == null &&
-                !comment.adminCommonStatuses?.includes('ADMIN_DELETED') &&
-                !comment.adminCommonStatuses?.includes('USER_DELETED')
-            )
-            .map((comment) => comment.commentId);
-          commentIds.push(...aliveCommentIds);
-          totalPage = result.totalPage ?? 1;
-          page += 1;
-        } while (page <= totalPage);
-
-        if (commentIds.length > 0) {
-          const bulkResult = await bulkDeleteComments(commentIds, memo);
-          if (bulkResult.failedCount > 0) {
-            throw new Error('댓글 일부 삭제에 실패했습니다.');
-          }
-        }
-      }
+    mutationFn: async ({
+      memo,
+      deleteCommentsAlso,
+    }: {
+      memo: string;
+      deleteCommentsAlso: boolean;
+    }) => {
+      if (deleteCommentsAlso) await deletePostComments(post.postId, memo);
 
       return deletePost(post.postId, memo);
     },
     onSuccess: (deletedPost) => {
       toast.success('게시글이 삭제되었습니다.');
       setIsModalOpen(false);
-      setReason('');
-      setDeleteCommentsAlso(false);
       void queryClient.invalidateQueries({ queryKey: ['posts'] });
       void queryClient.invalidateQueries({
         queryKey: ['postComments', post.postId],
       });
       queryClient.setQueryData(['post', post.postId], deletedPost);
+    },
+    onSettled: () => {
+      for (const key of [
+        'posts',
+        'post',
+        'comments',
+        'postComments',
+        'postStatusHistories',
+        'commentStatusHistories',
+      ]) {
+        void queryClient.invalidateQueries({ queryKey: [key] });
+      }
     },
     onError: (error) => {
       console.error('게시글 삭제 중 오류 발생:', error);
@@ -105,8 +85,6 @@ export default function PostDetailManageCard({
         queryKey: ['postStatusHistories', post.postId],
       });
       setIsModalOpen(false);
-      setReason('');
-      setDeleteCommentsAlso(false);
       void queryClient.invalidateQueries({ queryKey: ['posts'] });
       void queryClient.invalidateQueries({ queryKey: ['post', post.postId] });
     },
@@ -127,7 +105,6 @@ export default function PostDetailManageCard({
 
       toast.success('게시글 공개 상태가 변경되었습니다.');
       setIsModalOpen(false);
-      setReason('');
 
       void queryClient.invalidateQueries({ queryKey: ['posts'] });
       void queryClient.invalidateQueries({
@@ -148,13 +125,11 @@ export default function PostDetailManageCard({
   const [modalType, setModalType] = useState<
     'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE'
   >('HIDE');
-  const [reason, setReason] = useState('');
-  const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
   // 모달 확인 클릭
-  const handleConfirmAction = () => {
+  const handleConfirmAction = (reason: string, deleteCommentsAlso: boolean) => {
     if (modalType === 'DELETE') {
       if (!reason.trim()) return;
-      deleteMutation.mutate(reason);
+      deleteMutation.mutate({ memo: reason, deleteCommentsAlso });
     } else if (modalType === 'RESTORE') {
       if (!reason.trim() || restoreMutation.isPending) return;
       restoreMutation.mutate(reason);
@@ -229,20 +204,19 @@ export default function PostDetailManageCard({
         )}
       </div>
       {/* 상태 변경 사유 모달 */}
-      <PostDetailActionModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setReason('');
-          setDeleteCommentsAlso(false);
-        }}
-        modalType={modalType}
-        reason={reason}
-        onReasonChange={setReason}
-        deleteCommentsAlso={deleteCommentsAlso}
-        onDeleteCommentsAlsoChange={setDeleteCommentsAlso}
-        onConfirm={handleConfirmAction}
-      />
+      {isModalOpen && (
+        <StatusChangeModal
+          target='POST'
+          onClose={() => setIsModalOpen(false)}
+          modalType={modalType}
+          isPending={
+            deleteMutation.isPending ||
+            restoreMutation.isPending ||
+            visibilityMutation.isPending
+          }
+          onConfirmAction={handleConfirmAction}
+        />
+      )}
     </div>
   );
 }
