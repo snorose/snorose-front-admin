@@ -4,15 +4,10 @@ import type { MemberPointHistory } from '@/shared/types';
 import { buildCommentDetailUrl } from '@/domains/Comments/utils/commentUrls';
 
 type PointSourceKind =
-  | 'post'
-  | 'comment'
-  | 'exam'
-  | 'lecture'
-  | 'admin'
-  | 'other';
+  'post' | 'comment' | 'exam' | 'lecture' | 'admin' | 'other';
 
 function getPointSourceKind(category: string, source: string): PointSourceKind {
-  // 관리자 삭제의 sourceId는 관리자가 아닌 삭제 대상의 ID다.
+  // 어드민 삭제의 sourceId는 관리자가 아닌 삭제 대상의 ID다.
   if (/^(ADMIN_)?EXAM_REVIEW_/.test(category)) return 'exam';
   if (/^(ADMIN_)?LECTURE_REVIEW_/.test(category)) return 'lecture';
   if (/^(ADMIN_)?COMMENT_/.test(category)) return 'comment';

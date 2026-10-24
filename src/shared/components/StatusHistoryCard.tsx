@@ -2,7 +2,10 @@ import { useEffect } from 'react';
 
 import { Loader2 } from 'lucide-react';
 
-import { STATUS_HISTORY_LABELS } from '@/shared/constants/status-history';
+import {
+  STATUS_HISTORY_META,
+  UNKNOWN_STATUS_HISTORY_META,
+} from '@/shared/constants/status-history';
 import { useStableTotalPage } from '@/shared/hooks';
 import type { AdminStatusHistory } from '@/shared/types/status-history';
 import { clampOneBasedPage, formatDateTimeWithAmPm } from '@/shared/utils';
@@ -56,41 +59,47 @@ export function StatusHistoryCard({
         </div>
       ) : (
         <div className='flex flex-col gap-3 text-xs leading-relaxed'>
-          {statusLogs.map((log, index) => (
-            <div
-              key={`${log.changedAt}-${log.changedStatus}-${index}`}
-              className='flex flex-col gap-1.5 border-b border-gray-50 pb-3 last:border-none last:pb-0'
-            >
-              <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2'>
-                <span className='font-medium text-gray-700'>변경 상태</span>
-                <div>
-                  <div className='flex flex-wrap gap-1'>
-                    <StatusBadge tone='accent'>
-                      {STATUS_HISTORY_LABELS[log.changedStatus]}
-                    </StatusBadge>
+          {statusLogs.map((log, index) => {
+            const status =
+              STATUS_HISTORY_META[log.changedStatus] ??
+              UNKNOWN_STATUS_HISTORY_META;
+
+            return (
+              <div
+                key={`${log.changedAt}-${log.changedStatus}-${index}`}
+                className='flex flex-col gap-1.5 border-b border-gray-50 pb-3 last:border-none last:pb-0'
+              >
+                <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-2'>
+                  <span className='font-medium text-gray-700'>변경 상태</span>
+                  <div>
+                    <div className='flex flex-wrap gap-1'>
+                      <StatusBadge tone={status.tone}>
+                        {status.label}
+                      </StatusBadge>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-700'>처리자</span>
-                <span className='font-semibold text-gray-700'>
-                  {log.actorNickname ?? '시스템'}
-                </span>
-              </div>
-              <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                <span className='font-medium text-gray-700'>변경 날짜</span>
-                <span className='font-mono text-gray-600'>
-                  {formatDateTimeWithAmPm(log.changedAt)}
-                </span>
-              </div>
-              {log.memo && (
                 <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                  <span className='font-medium text-gray-700'>메모</span>
-                  <span className='text-gray-600'>{log.memo}</span>
+                  <span className='font-medium text-gray-700'>처리자</span>
+                  <span className='font-semibold text-gray-700'>
+                    {log.actorNickname ?? '시스템'}
+                  </span>
                 </div>
-              )}
-            </div>
-          ))}
+                <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
+                  <span className='font-medium text-gray-700'>변경 날짜</span>
+                  <span className='font-mono text-gray-600'>
+                    {formatDateTimeWithAmPm(log.changedAt)}
+                  </span>
+                </div>
+                {log.memo && (
+                  <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
+                    <span className='font-medium text-gray-700'>메모</span>
+                    <span className='text-gray-600'>{log.memo}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
       {!isLoading && !isError && totalPage > 1 && (

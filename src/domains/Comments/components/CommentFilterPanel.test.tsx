@@ -40,14 +40,16 @@ describe('CommentFilterPanel', () => {
     const status = screen.getByRole('button', { name: '관리 상태' });
     await user.click(status);
     await user.click(screen.getByRole('menuitemcheckbox', { name: '노출' }));
-    await user.click(screen.getByRole('menuitemcheckbox', { name: '징계' }));
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: '어드민 비공개' })
+    );
     expect(onFilterChange).not.toHaveBeenCalled();
     await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onFilterChange).toHaveBeenLastCalledWith({
       searchScope: 'CONTENT',
       boardIds: [BOARD_OPTIONS[0].value, BOARD_OPTIONS[1].value],
-      adminCommonStatuses: ['VISIBLE', 'SANCTIONED'],
+      adminCommonStatuses: ['VISIBLE', 'ADMIN_HIDDEN'],
     });
     await user.click(board);
     expect(

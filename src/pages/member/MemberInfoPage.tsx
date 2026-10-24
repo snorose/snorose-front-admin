@@ -55,7 +55,7 @@ export default function MemberInfoPage() {
   } = useMemberInfoPageState();
 
   return (
-    <div className='flex w-full flex-col gap-6'>
+    <div className='flex w-full min-w-0 flex-col gap-6'>
       <PageHeader
         title='회원 관리'
         description='회원 정보를 조회 및 관리할 수 있어요.'

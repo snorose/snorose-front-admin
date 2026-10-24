@@ -70,14 +70,19 @@ describe('OriginalPostButton', () => {
   test('주입한 주소를 새 탭으로 여는 링크와 안내를 제공한다', () => {
     const href = '/board/large-snow/post/123';
     render(
-      <OriginalPostButton href={href} label='게시글 원문' isUserSnorose />
+      <OriginalPostButton
+        href={href}
+        label='스노로즈에서 보기'
+        title='스노로즈에서 보기'
+        isUserSnorose
+      />
     );
 
     const link = screen.getByRole('link', {
-      name: /^게시글 원문\s*\(새 탭에서 열림\)$/,
+      name: /^스노로즈에서 보기\s*\(새 탭에서 열림\)$/,
     });
     expect(link).toHaveAttribute('href', `http://localhost:5174${href}`);
-    expect(link).toHaveAttribute('title', '게시글 원문 바로가기');
+    expect(link).toHaveAttribute('title', '스노로즈에서 보기');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -87,7 +92,11 @@ describe('OriginalPostButton', () => {
     '주소가 %s이면 링크를 표시하지 않는다',
     (href) => {
       const { container } = render(
-        <OriginalPostButton href={href} label='게시글 원문' isUserSnorose />
+        <OriginalPostButton
+          href={href}
+          label='스노로즈에서 보기'
+          isUserSnorose
+        />
       );
 
       expect(container).toBeEmptyDOMElement();

@@ -73,9 +73,7 @@ describe('회원 정보의 공통 복사 UI', () => {
       );
     }
     expect(screen.getByLabelText('이름')).toHaveValue(member.userName);
-    fireEvent.click(
-      screen.getByRole('button', { name: '포인트 증감 히스토리 열기' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: '포인트 이력 열기' }));
     expect(onHistory).toHaveBeenCalledTimes(1);
   });
 

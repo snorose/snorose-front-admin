@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-
-import { useBulkDelete } from '@/shared/hooks';
 
 import { bulkDeletePosts } from '@/apis';
 
 import type { PostSearchParams } from '../types/post';
+import { deletePostComments } from '../utils/deletePostComments';
 import { getRestoreWarnings } from '../utils/restoreResult';
 import { useDeletePost } from './useDeletePost';
 import { usePostList } from './usePostList';
@@ -82,9 +82,35 @@ export function usePostTableState({
 
   const posts = rawPosts ?? [];
 
-  const { mutate: bulkDelete, isPending: isDeletePending } = useBulkDelete({
-    deleteFn: bulkDeletePosts,
-    queryKey: ['posts'],
+  const queryClient = useQueryClient();
+  const { mutate: bulkDelete, isPending: isDeletePending } = useMutation({
+    mutationFn: async ({
+      ids,
+      memo,
+      deleteCommentsAlso,
+    }: {
+      ids: number[];
+      memo: string;
+      deleteCommentsAlso: boolean;
+    }) => {
+      if (deleteCommentsAlso) {
+        for (const postId of ids) await deletePostComments(postId, memo);
+      }
+      return bulkDeletePosts(ids, memo);
+    },
+    onSettled: () => {
+      for (const key of [
+        'posts',
+        'post',
+        'comments',
+        'postComments',
+        'comment',
+        'postStatusHistories',
+        'commentStatusHistories',
+      ]) {
+        void queryClient.invalidateQueries({ queryKey: [key] });
+      }
+    },
   });
   const { mutate: singleDelete } = useDeletePost();
   const { mutate: restorePost, isPending: isRestorePending } = useRestorePost();
@@ -96,15 +122,24 @@ export function usePostTableState({
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmBulkDelete = (memo: string) => {
-    if (selectedIds.length === 0) return;
+  const handleConfirmBulkDelete = (
+    memo: string,
+    deleteCommentsAlso = false
+  ) => {
+    if (selectedIds.length === 0 || !memo.trim() || isDeletePending) return;
     bulkDelete(
-      { ids: selectedIds, memo },
+      { ids: selectedIds, memo, deleteCommentsAlso },
       {
         onSuccess: (res) => {
           const deletedCount = res?.deletedCount ?? selectedIds.length;
-          toast.success(`${deletedCount}개의 게시글이 삭제되었습니다.`);
-          setSelectedIds([]);
+          if (res.notDeletedPosts.length > 0)
+            toast.warning(
+              `${deletedCount}개 삭제 완료, ${res.notDeletedPosts.length}개 실패했습니다.`
+            );
+          else toast.success(`${deletedCount}개의 게시글이 삭제되었습니다.`);
+          setSelectedIds((prev) =>
+            prev.filter((id) => !res.deletedPostIds.includes(id))
+          );
           setIsDeleteModalOpen(false);
         },
         onError: () => toast.error('게시글 일괄 삭제 중 오류가 발생했습니다.'),

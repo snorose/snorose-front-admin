@@ -200,6 +200,7 @@ export default function PostTable({
         <StatusChangeModal
           target='POST'
           modalType='DELETE'
+          isPending={isDeletePending}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirmAction={handleConfirmBulkDelete}
         />

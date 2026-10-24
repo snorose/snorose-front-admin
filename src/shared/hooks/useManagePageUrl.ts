@@ -8,13 +8,16 @@ import {
 } from '@/shared/utils';
 
 export function useManagePageUrl<T extends object>(
-  schema: Record<string, ParamType>
+  schema: Record<string, ParamType>,
+  normalizeParams: (params: T) => T = (params) => params
 ) {
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
 
   const rawPage = searchParamsFromUrl.get('page');
   const currentPage = parseOneBasedPage(rawPage);
-  const searchParams = parseUrlParams<T>(searchParamsFromUrl, schema);
+  const searchParams = normalizeParams(
+    parseUrlParams<T>(searchParamsFromUrl, schema)
+  );
 
   useEffect(() => {
     if (rawPage === null || rawPage === String(currentPage)) return;
