@@ -12,6 +12,7 @@ import {
   PopupEditorDialog,
   PopupManagementTable,
 } from '@/domains/Operation/components';
+import { isPopupMockEnabled } from '@/domains/Operation/mocks/config';
 import type { PopupContent } from '@/domains/Operation/types';
 import type {
   CreatePopupRequest,
@@ -200,6 +201,14 @@ export default function PopupManagementPage() {
         title='팝업창 관리'
         description='사용자 홈 화면에 노출되는 공지 팝업 콘텐츠와 노출 기간을 관리할 수 있어요.'
       />
+      {isPopupMockEnabled() && (
+        <Alert>
+          <Alert.Title>목 데이터로 팝업 기능을 확인하고 있습니다.</Alert.Title>
+          <Alert.Description>
+            등록·수정·삭제는 이 화면에만 반영되며, 새로고침하면 초기화됩니다.
+          </Alert.Description>
+        </Alert>
+      )}
       <NoticePanel
         items={[
           <>

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { axiosInstance } from '@/shared/axios/instance';
 
@@ -33,6 +33,7 @@ async function readRequest(form: FormData) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubEnv('VITE_POPUP_MOCK', 'false');
   for (const method of [
     axiosInstance.get,
     axiosInstance.post,
@@ -45,7 +46,18 @@ beforeEach(() => {
   }
 });
 
+afterEach(() => vi.unstubAllEnvs());
+
 describe('팝업 API 계약', () => {
+  test('기본 목 모드에서는 서버 요청 없이 목록·상세를 조회한다', async () => {
+    vi.stubEnv('VITE_POPUP_MOCK', undefined);
+    const list = await getPopups(0);
+    expect(list.totalCount).toBe(12);
+    expect(list.currentCount).toBe(10);
+    expect((await getPopupDetail(list.data[0].id)).id).toBe(list.data[0].id);
+    expect(axiosInstance.get).not.toHaveBeenCalled();
+  });
+
   test('목록은 0 기반 페이지로 조회한다', async () => {
     await getPopups(2);
     expect(axiosInstance.get).toHaveBeenCalledWith('/v1/admin/popups', {

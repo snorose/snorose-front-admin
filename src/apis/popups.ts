@@ -1,6 +1,7 @@
 import { axiosInstance } from '@/shared/axios/instance';
 import type { BaseResponse } from '@/shared/types';
 
+import { isPopupMockEnabled } from '@/domains/Operation/mocks/config';
 import type {
   CreatePopupRequest,
   PopupDetail,
@@ -27,6 +28,11 @@ function createPopupFormData(
 }
 
 export async function getPopups(page: number): Promise<PopupListResult> {
+  if (isPopupMockEnabled()) {
+    const { mockPopupAPI } =
+      await import('@/domains/Operation/mocks/popup-api');
+    return getResult(await mockPopupAPI.list(page));
+  }
   const response = await axiosInstance.get<BaseResponse<PopupListResult>>(
     '/v1/admin/popups',
     { params: { page } }
@@ -35,6 +41,11 @@ export async function getPopups(page: number): Promise<PopupListResult> {
 }
 
 export async function getPopupDetail(id: number): Promise<PopupDetail> {
+  if (isPopupMockEnabled()) {
+    const { mockPopupAPI } =
+      await import('@/domains/Operation/mocks/popup-api');
+    return getResult(await mockPopupAPI.detail(id));
+  }
   const response = await axiosInstance.get<BaseResponse<PopupDetail>>(
     `/v1/admin/popups/${id}`
   );
@@ -42,6 +53,11 @@ export async function getPopupDetail(id: number): Promise<PopupDetail> {
 }
 
 export async function createPopup(request: CreatePopupRequest, image?: File) {
+  if (isPopupMockEnabled()) {
+    const { mockPopupAPI } =
+      await import('@/domains/Operation/mocks/popup-api');
+    return getResult(await mockPopupAPI.create(request, image));
+  }
   const response = await axiosInstance.post<BaseResponse<{ id: number }>>(
     '/v1/admin/popups',
     createPopupFormData(request, image),
@@ -55,6 +71,11 @@ export async function updatePopup(
   request: UpdatePopupRequest,
   image?: File
 ) {
+  if (isPopupMockEnabled()) {
+    const { mockPopupAPI } =
+      await import('@/domains/Operation/mocks/popup-api');
+    return getResult(await mockPopupAPI.update(id, request, image));
+  }
   const response = await axiosInstance.patch<BaseResponse<{ id: number }>>(
     `/v1/admin/popups/${id}`,
     createPopupFormData(request, image),
@@ -64,6 +85,11 @@ export async function updatePopup(
 }
 
 export async function deletePopup(id: number) {
+  if (isPopupMockEnabled()) {
+    const { mockPopupAPI } =
+      await import('@/domains/Operation/mocks/popup-api');
+    return getResult(await mockPopupAPI.delete(id));
+  }
   const response = await axiosInstance.delete<BaseResponse<{ id: number }>>(
     `/v1/admin/popups/${id}`
   );
