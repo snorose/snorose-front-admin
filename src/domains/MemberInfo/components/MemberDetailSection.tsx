@@ -99,7 +99,7 @@ export default function MemberDetailSection({
         )}
       </div>
 
-      <div className='grid gap-6 xl:grid-cols-[minmax(0,1.9fr)_320px]'>
+      <div className='grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]'>
         <SectionCard
           icon={UserRound}
           title='회원 정보'
@@ -160,8 +160,10 @@ export default function MemberDetailSection({
         />
       </div>
 
-      <MemberActivitySection studentNumber={member.studentNumber} />
-      <MemberWithdrawalSection />
+      <div className='grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]'>
+        <MemberActivitySection studentNumber={member.studentNumber} />
+        <MemberWithdrawalSection />
+      </div>
 
       <MemberPointAdjustmentDialog
         member={member}
