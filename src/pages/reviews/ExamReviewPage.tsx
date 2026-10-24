@@ -305,7 +305,7 @@ export default function ExamReviewPage() {
           classNumber,
           questionDetail: updatedDetail.questionDetail,
           uploadTime,
-          userDisplay: updatedDetail.userDisplay,
+          userDisplay: selectedExamReview.userDisplay,
           isDiscussed: updatedDetail.isDiscussed,
           isReported: selectedExamReview.isReported,
           reportCount: selectedExamReview.reportCount,

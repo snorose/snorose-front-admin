@@ -127,7 +127,7 @@ const selectedExamReview: ExamReview = {
 
 const selectedExamReviewDetail: ExamReviewDetailResult = {
   encryptedUserId: 'encrypted-user-id',
-  userDisplay: '익명',
+  userNickname: '익명',
   postId: 101,
   title: '운영체제 중간고사',
   commentCount: 0,
