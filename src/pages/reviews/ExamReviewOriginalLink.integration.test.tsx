@@ -45,7 +45,7 @@ const review = (id: number): ExamReview => ({
 
 const detail = (postId: number): ExamReviewDetailResult => ({
   encryptedUserId: 'mock-user',
-  userDisplay: '익명',
+  userNickname: '익명',
   postId,
   title: `시험후기 ${postId}`,
   commentCount: 0,
