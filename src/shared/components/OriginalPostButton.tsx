@@ -7,12 +7,14 @@ import { Button } from './ui/button';
 export type OriginalPostButtonProps = {
   href: string | null | undefined;
   label: string;
+  title?: string;
   isUserSnorose: boolean;
 };
 
 export function OriginalPostButton({
   href,
   label,
+  title = `${label} 바로가기`,
   isUserSnorose,
 }: OriginalPostButtonProps) {
   if (!href?.trim()) return null;
@@ -25,7 +27,7 @@ export function OriginalPostButton({
     <Button asChild variant='outline' size='sm'>
       <a
         href={targetUrl}
-        title={`${label} 바로가기`}
+        title={title}
         target='_blank'
         rel='noopener noreferrer'
       >

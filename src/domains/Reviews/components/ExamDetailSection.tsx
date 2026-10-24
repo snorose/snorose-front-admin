@@ -674,7 +674,8 @@ export function ExamDetailSection({
             <div className='flex shrink-0 flex-wrap items-center gap-2'>
               <OriginalPostButton
                 href={originalPostUrl}
-                label='스노로즈에서 확인'
+                label='스노로즈에서 보기'
+                title='스노로즈에서 보기'
                 isUserSnorose
               />
               {isDeleted ? (

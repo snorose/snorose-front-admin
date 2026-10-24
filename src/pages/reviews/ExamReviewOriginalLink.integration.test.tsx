@@ -108,7 +108,7 @@ function renderPage() {
   return client;
 }
 
-const link = () => screen.queryByRole('link', { name: /^스노로즈에서 확인/ });
+const link = () => screen.queryByRole('link', { name: /^스노로즈에서 보기/ });
 
 describe('시험후기 원본 링크 주입', () => {
   beforeEach(() => {
@@ -168,7 +168,7 @@ describe('시험후기 원본 링크 주입', () => {
     await waitFor(() => expect(link()).toBeInTheDocument());
     expect(link()).toHaveAttribute('target', '_blank');
     expect(link()).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(link()).toHaveAttribute('title', '스노로즈에서 확인 바로가기');
+    expect(link()).toHaveAttribute('title', '스노로즈에서 보기');
     client.clear();
   });
 

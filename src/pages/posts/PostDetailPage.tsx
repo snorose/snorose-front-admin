@@ -89,7 +89,8 @@ export default function PostDetailPage() {
 
           <OriginalPostButton
             href={originalPostUrl}
-            label='게시글 원문'
+            label='스노로즈에서 보기'
+            title='스노로즈에서 보기'
             isUserSnorose
           />
         </div>
