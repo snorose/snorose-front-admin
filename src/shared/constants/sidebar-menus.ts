@@ -117,10 +117,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         title: '서버 점검 일정 관리',
         url: PATHS.SERVER_MAINTENANCE,
       },
-      // {
-      //   title: '팝업창 관리',
-      //   url: PATHS.POPUPS,
-      // },
+      {
+        title: '팝업창 관리',
+        url: PATHS.POPUPS,
+      },
     ],
   },
 ];
