@@ -1,16 +1,13 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { History, ShieldAlert } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
-import { Button } from '@/shared/components/ui';
+import { Button, Separator } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import {
-  InfoBlock,
-  SectionCard,
-} from '@/domains/MemberInfo/components/MemberDetailCard';
+import { SectionCard } from '@/domains/MemberInfo/components/MemberDetailCard';
 import MemberPenaltyHistoryDialog from '@/domains/MemberInfo/components/MemberPenaltyHistoryDialog';
 import {
   isOngoingPenalty,
@@ -32,6 +29,9 @@ type MemberPenaltySummaryCardProps = {
   onLoadMorePenaltyHistory: () => void | Promise<void>;
   onOpenPenaltyHistory?: () => void | Promise<void>;
 };
+
+const SUMMARY_ROW_CLASS_NAME =
+  'grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-3';
 
 export default function MemberPenaltySummaryCard({
   hasNextPenaltyHistory,
@@ -63,6 +63,35 @@ export default function MemberPenaltySummaryCard({
     ? ongoingDemotion?.blacklistDeadline
     : member.blacklistEndDate;
   const remainingPenaltyLabel = getRemainingPenaltyLabel(demotionEndDate);
+  const details = [
+    { label: '경고 사유', value: isWarning ? member.blacklistReason : null },
+    {
+      label: '마지막 경고일',
+      value:
+        isWarning && member.blacklistStartDate
+          ? formatDateTimeToMinutes(member.blacklistStartDate)
+          : null,
+    },
+    { label: '강등 사유', value: isDemotion ? demotionReason : null },
+    {
+      label: '강등 시작일',
+      value:
+        isDemotion && demotionStartDate
+          ? formatDateTimeToMinutes(demotionStartDate)
+          : null,
+    },
+    {
+      label: '강등 종료일',
+      value:
+        isDemotion && demotionEndDate
+          ? formatDateTimeToMinutes(demotionEndDate)
+          : null,
+    },
+    {
+      label: '남은 기간',
+      value: isDemotion && demotionEndDate ? remainingPenaltyLabel : null,
+    },
+  ].filter(({ value }) => Boolean(value));
 
   return (
     <>
@@ -72,99 +101,75 @@ export default function MemberPenaltySummaryCard({
         action={
           <Button
             type='button'
-            variant='ghost'
-            size='icon'
+            variant='outline'
+            size='sm'
             onClick={() => {
               void onOpenPenaltyHistory?.();
               setIsHistoryOpen(true);
             }}
-            className='text-slate-600'
-            aria-label='강등/경고 히스토리 열기'
+            className='h-9'
+            aria-label='제재 이력 열기'
           >
-            <History className='h-5 w-5' />
+            <History aria-hidden='true' />
+            제재 이력
           </Button>
         }
       >
-        <div className='space-y-6'>
-          <div className='space-y-3'>
-            <p className='text-sm font-medium text-gray-700'>현재 상태</p>
-            <div className='flex flex-wrap items-center gap-2'>
-              <StatusBadge tone={penaltyStatus.tone}>
-                {penaltyStatus.label}
-              </StatusBadge>
-              {penaltyStatus.warningBadge ? (
-                <StatusBadge tone={penaltyStatus.warningBadge.tone}>
-                  {penaltyStatus.warningBadge.label}
+        <div className='space-y-3'>
+          <div className='text-sm leading-6'>
+            <dl className={SUMMARY_ROW_CLASS_NAME}>
+              <dt className='text-muted-foreground'>현재 상태</dt>
+              <dd className='flex min-h-6 min-w-0 flex-wrap items-center gap-1.5'>
+                <StatusBadge tone={penaltyStatus.tone}>
+                  {penaltyStatus.label}
                 </StatusBadge>
-              ) : null}
-            </div>
+                {penaltyStatus.warningBadge ? (
+                  <StatusBadge tone={penaltyStatus.warningBadge.tone}>
+                    {penaltyStatus.warningBadge.label}
+                  </StatusBadge>
+                ) : null}
+              </dd>
+            </dl>
+            <Separator className='my-2' />
+            <dl className={SUMMARY_ROW_CLASS_NAME}>
+              <dt className='text-muted-foreground'>누적 경고 수</dt>
+              <dd
+                className={`font-medium tabular-nums ${
+                  member.totalWarningCount > 0
+                    ? 'text-destructive'
+                    : 'text-foreground'
+                }`}
+              >
+                {member.totalWarningCount}
+                <span className='text-muted-foreground ml-1 font-normal'>
+                  회
+                </span>
+              </dd>
+            </dl>
+            {details.map(({ label, value }) => (
+              <Fragment key={label}>
+                <Separator className='my-3' />
+                <dl className={SUMMARY_ROW_CLASS_NAME}>
+                  <dt className='text-muted-foreground'>{label}</dt>
+                  <dd className='text-foreground min-w-0 wrap-break-word'>
+                    {value}
+                  </dd>
+                </dl>
+              </Fragment>
+            ))}
           </div>
 
-          {isWarning && member.blacklistReason ? (
-            <InfoBlock
-              label='경고 사유'
-              value={member.blacklistReason}
-              tone='muted'
-            />
-          ) : null}
-
-          {isWarning && member.blacklistStartDate ? (
-            <InfoBlock
-              label='마지막 경고일'
-              value={formatDateTimeToMinutes(member.blacklistStartDate)}
-            />
-          ) : null}
-
-          {isDemotion && demotionReason ? (
-            <InfoBlock label='강등 사유' value={demotionReason} tone='muted' />
-          ) : null}
-
-          {isDemotion && demotionStartDate ? (
-            <InfoBlock
-              label='강등 시작일'
-              value={formatDateTimeToMinutes(demotionStartDate)}
-              valueClassName='text-rose-600'
-            />
-          ) : null}
-
-          {isDemotion && demotionEndDate ? (
-            <InfoBlock
-              label='강등 종료일'
-              value={formatDateTimeToMinutes(demotionEndDate)}
-            />
-          ) : null}
-
-          {isDemotion && demotionEndDate ? (
-            <InfoBlock label='남은 기간' value={remainingPenaltyLabel} />
-          ) : null}
-
           {isDemotion && latestPayloadIsWarning && !ongoingDemotion ? (
-            <p className='rounded-lg bg-slate-50 px-4 py-3 text-sm font-medium text-slate-600'>
+            <p className='text-muted-foreground text-sm leading-6'>
               강등 상세 정보는 제재 이력에서 확인할 수 있습니다.
             </p>
           ) : null}
 
-          <div className='space-y-2'>
-            <p className='text-sm font-medium text-gray-700'>누적 경고 수</p>
-            <p
-              className={`text-3xl font-bold ${
-                member.totalWarningCount > 0
-                  ? 'text-rose-600'
-                  : 'text-slate-950'
-              }`}
-            >
-              {member.totalWarningCount}
-              <span className='ml-1 text-lg font-semibold text-slate-500'>
-                회
-              </span>
-            </p>
-          </div>
-
-          <div
-            className={`rounded-lg px-4 py-5 text-sm font-medium ${penaltyStatus.summaryTone}`}
+          <p
+            className={`rounded-md px-3 py-3 text-sm leading-6 font-medium ${penaltyStatus.summaryTone}`}
           >
             {penaltyStatus.summary}
-          </div>
+          </p>
         </div>
       </SectionCard>
 
