@@ -4,45 +4,12 @@ import type { LucideIcon } from 'lucide-react';
 
 import { SectionTitle } from '@/shared/components';
 
-type InfoBlockProps = {
-  label: string;
-  tone?: 'default' | 'muted';
-  value: ReactNode;
-  valueClassName?: string;
-};
-
 type SectionCardProps = {
   action?: ReactNode;
   children: ReactNode;
   icon: LucideIcon;
   title: string;
 };
-
-export function InfoBlock({
-  label,
-  tone,
-  value,
-  valueClassName,
-}: InfoBlockProps) {
-  return (
-    <div className='space-y-2'>
-      <p className='text-sm font-medium text-gray-700'>{label}</p>
-      <div
-        className={
-          tone === 'muted'
-            ? 'rounded-lg bg-slate-100 px-4 py-3 text-sm font-medium text-slate-900'
-            : undefined
-        }
-      >
-        <p
-          className={`text-sm font-semibold text-slate-900 ${valueClassName ?? ''}`}
-        >
-          {value}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 export function SectionCard({
   action,
