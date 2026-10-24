@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { ExamReviewPostInfoSection } from '@/domains/Reviews/components';
 import type {
   ExamReview,
   ExamReviewDetailResult,
@@ -92,7 +93,12 @@ vi.mock('@/domains/Reviews/components', () => ({
     </div>
   ),
   ExamReviewLogSection: () => <div>관리 이력 내용</div>,
-  ExamReviewPostInfoSection: () => <div>게시글 및 작성자 정보 내용</div>,
+  ExamReviewPostInfoSection: vi.fn(({ author }: { author: string }) => (
+    <div>
+      게시글 및 작성자 정보 내용
+      <output aria-label='작성자 닉네임'>{author}</output>
+    </div>
+  )),
   ExamReviewUpdateConfirmModal: ({
     isOpen,
     onConfirm,
@@ -127,7 +133,7 @@ const selectedExamReview: ExamReview = {
 
 const selectedExamReviewDetail: ExamReviewDetailResult = {
   encryptedUserId: 'encrypted-user-id',
-  userDisplay: '익명',
+  userNickname: '익명',
   postId: 101,
   title: '운영체제 중간고사',
   commentCount: 0,
@@ -161,6 +167,53 @@ const selectedExamReviewDetailWithMemo: ExamReviewDetailResult = {
 describe('ExamDetailSection', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+  });
+
+  test('상세 닉네임을 헤더와 작성자 정보에 표시한다', async () => {
+    const user = userEvent.setup();
+    const userNickname = '상세 닉네임';
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetail,
+          userNickname,
+        }}
+      />
+    );
+
+    expect(screen.getByText(`(작성자: ${userNickname})`)).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('tab', { name: '게시글 및 작성자 정보' })
+    );
+    expect(screen.getByLabelText('작성자 닉네임')).toHaveTextContent(
+      userNickname
+    );
+    expect(vi.mocked(ExamReviewPostInfoSection).mock.lastCall?.[0].author).toBe(
+      userNickname
+    );
+  });
+
+  test('닉네임이 null이면 헤더의 작성자를 숨기고 작성자 정보에 빈 문자열을 전달한다', async () => {
+    const user = userEvent.setup();
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={{
+          ...selectedExamReviewDetail,
+          userNickname: null,
+        }}
+      />
+    );
+
+    expect(screen.queryByText(/\(작성자:/)).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole('tab', { name: '게시글 및 작성자 정보' })
+    );
+    expect(screen.getByLabelText('작성자 닉네임')).toBeEmptyDOMElement();
+    expect(vi.mocked(ExamReviewPostInfoSection).mock.lastCall?.[0].author).toBe(
+      ''
+    );
   });
 
   test.each(['USER_DELETED', 'ADMIN_DELETED'] as const)(

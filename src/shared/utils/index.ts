@@ -27,6 +27,7 @@ export {
   getBoardKey,
   getBoardKeyByName,
   getPostStatusBadges,
+  removeObsoleteAdminStatuses,
   STATUS_OPTIONS,
   stripHtmlTags,
 } from './postCommentUtils';

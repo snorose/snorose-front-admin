@@ -121,7 +121,7 @@ export interface ExamReviewDetailLog {
 
 export interface ExamReviewDetailResult {
   encryptedUserId: string;
-  userDisplay: string;
+  userNickname: string | null;
   postId: number;
   title?: string;
   commentCount: number;

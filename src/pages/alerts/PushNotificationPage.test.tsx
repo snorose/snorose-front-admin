@@ -202,7 +202,7 @@ describe('PushNotificationPage', () => {
     render(<PushNotificationPage />);
 
     const marketingFalseRadio = screen.getByLabelText(
-      /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+      /정보성 \(전체 공지, 댓글, 어드민 삭제\/비공개 통보 등\)/
     );
     await user.click(marketingFalseRadio);
 
@@ -443,7 +443,7 @@ describe('PushNotificationPage', () => {
 
     // 광고성 알림 여부를 정보성으로 변경
     const marketingFalseRadio = screen.getByLabelText(
-      /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+      /정보성 \(전체 공지, 댓글, 어드민 삭제\/비공개 통보 등\)/
     );
     await user.click(marketingFalseRadio);
 
@@ -491,7 +491,7 @@ describe('PushNotificationPage', () => {
 
     await user.click(
       screen.getByLabelText(
-        /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+        /정보성 \(전체 공지, 댓글, 어드민 삭제\/비공개 통보 등\)/
       )
     );
     await user.click(
@@ -700,7 +700,7 @@ describe('PushNotificationPage', () => {
       render(<PushNotificationPage />);
 
       const marketingFalseRadio = screen.getByLabelText(
-        /정보성 \(전체 공지, 댓글, 관리자 삭제\/비공개 통보 등\)/
+        /정보성 \(전체 공지, 댓글, 어드민 삭제\/비공개 통보 등\)/
       );
       await user.click(marketingFalseRadio);
 

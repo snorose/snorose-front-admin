@@ -2,6 +2,7 @@ import { useId } from 'react';
 
 import { PageHeader } from '@/shared/components';
 import { useManagePageUrl } from '@/shared/hooks';
+import { removeObsoleteAdminStatuses } from '@/shared/utils';
 
 import { PostFilterPanel } from '@/domains/Posts/components/PostFilterPanel';
 import PostTable from '@/domains/Posts/components/PostTable';
@@ -26,7 +27,10 @@ const POST_SCHEMA = {
 export default function PostManagePage() {
   const titleId = useId();
   const { searchParams, currentPage, handleSearchChange, handlePageChange } =
-    useManagePageUrl<PostSearchParams>(POST_SCHEMA);
+    useManagePageUrl<PostSearchParams>(
+      POST_SCHEMA,
+      removeObsoleteAdminStatuses
+    );
 
   return (
     <div className='flex w-full min-w-0 flex-col gap-6'>

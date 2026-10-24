@@ -38,7 +38,7 @@ describe('getPostStatusBadges', () => {
         isVisible: false,
         adminCommonStatuses: ['ADMIN_HIDDEN'],
       },
-      [{ label: '리자 비공개', tone: 'warning' }],
+      [{ label: '어드민 비공개', tone: 'warning' }],
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['SANCTIONED'] },
@@ -46,7 +46,7 @@ describe('getPostStatusBadges', () => {
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['ADMIN_DELETED'] },
-      [{ label: '리자 삭제', tone: 'danger' }],
+      [{ label: '어드민 삭제', tone: 'danger' }],
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['USER_DELETED'] },

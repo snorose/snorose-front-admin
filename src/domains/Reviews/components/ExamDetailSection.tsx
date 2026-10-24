@@ -247,7 +247,7 @@ export function ExamDetailSection({
         examType: examTypeStr,
         fileName: selectedExamReviewDetail.fileName,
         examTypeAndQuestions: selectedExamReviewDetail.questionDetail,
-        author: selectedExamReviewDetail.userDisplay,
+        author: selectedExamReviewDetail.userNickname ?? '',
         initialValues: {
           isConfirmed: selectedExamReviewDetail.isConfirmed,
           isDiscussed: selectedExamReviewDetail.isDiscussed,
@@ -664,9 +664,9 @@ export function ExamDetailSection({
             <p className='min-w-0 font-semibold wrap-break-word'>
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
-            {selectedExamReviewDetail?.userDisplay && (
+            {selectedExamReviewDetail?.userNickname && (
               <span className='min-w-0 wrap-break-word'>
-                (작성자: {selectedExamReviewDetail.userDisplay})
+                (작성자: {selectedExamReviewDetail.userNickname})
               </span>
             )}
           </div>
@@ -674,7 +674,8 @@ export function ExamDetailSection({
             <div className='flex shrink-0 flex-wrap items-center gap-2'>
               <OriginalPostButton
                 href={originalPostUrl}
-                label='스노로즈에서 확인'
+                label='스노로즈에서 보기'
+                title='스노로즈에서 보기'
                 isUserSnorose
               />
               {isDeleted ? (

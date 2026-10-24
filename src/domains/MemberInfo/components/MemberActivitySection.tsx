@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ChevronRight } from 'lucide-react';
+
+import { StatusBadge } from '@/shared/components';
 
 import { SectionCard } from './MemberDetailCard';
 import { DETAIL_SHORTCUTS, type DetailShortcut } from './memberDetailConstants';
 
 const SHORTCUT_CLASS_NAME =
-  'flex min-h-36 flex-col items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-6 text-center transition';
+  'border-border flex min-h-12 w-full min-w-0 items-center gap-3 rounded-md border px-3 py-2.5 text-left text-sm transition-colors';
 
 export default function MemberActivitySection({
   studentNumber,
@@ -15,15 +17,16 @@ export default function MemberActivitySection({
 }) {
   return (
     <SectionCard icon={BookOpen} title='회원 활동 내역'>
-      <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+      <ul className='grid gap-2'>
         {DETAIL_SHORTCUTS.map((shortcut) => (
-          <ActivityShortcut
-            key={shortcut.title}
-            shortcut={shortcut}
-            studentNumber={studentNumber}
-          />
+          <li key={shortcut.title} className='min-w-0'>
+            <ActivityShortcut
+              shortcut={shortcut}
+              studentNumber={studentNumber}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     </SectionCard>
   );
 }
@@ -40,11 +43,10 @@ function ActivityShortcut({
     : undefined;
   const content = (
     <>
-      <shortcut.icon className='h-8 w-8 text-slate-800' />
-      <div className='space-y-1'>
-        <p className='font-semibold text-slate-900'>{shortcut.title}</p>
-        <p className='text-sm text-slate-500'>{shortcut.description}</p>
-      </div>
+      <shortcut.icon className='size-4 shrink-0' aria-hidden='true' />
+      <span className='min-w-0 flex-1 font-medium wrap-break-word'>
+        {shortcut.title}
+      </span>
     </>
   );
 
@@ -52,9 +54,14 @@ function ActivityShortcut({
     return (
       <Link
         to={href}
-        className={`${SHORTCUT_CLASS_NAME} hover:border-slate-400 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:outline-none`}
+        title={shortcut.description}
+        className={`${SHORTCUT_CLASS_NAME} text-foreground hover:bg-muted focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none`}
       >
         {content}
+        <ChevronRight
+          className='text-muted-foreground size-4 shrink-0'
+          aria-hidden='true'
+        />
       </Link>
     );
   }
@@ -63,9 +70,10 @@ function ActivityShortcut({
     <button
       type='button'
       disabled
-      className={`${SHORTCUT_CLASS_NAME} cursor-not-allowed opacity-60`}
+      className={`${SHORTCUT_CLASS_NAME} bg-muted/30 text-muted-foreground cursor-not-allowed`}
     >
       {content}
+      <StatusBadge tone='neutral'>준비 중</StatusBadge>
     </button>
   );
 }

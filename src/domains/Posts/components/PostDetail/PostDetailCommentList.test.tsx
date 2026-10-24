@@ -89,6 +89,6 @@ describe('PostDetailCommentList', () => {
     expect(screen.getAllByText('댓글 10 제재 내역')).toHaveLength(2);
     expect(await screen.findAllByText('운영 정책 위반')).toHaveLength(2);
     expect(screen.getAllByText('시스템')).toHaveLength(2);
-    expect(screen.getAllByText('관리자 비공개')).toHaveLength(2);
+    expect(screen.getAllByText('어드민 비공개')).toHaveLength(2);
   });
 });

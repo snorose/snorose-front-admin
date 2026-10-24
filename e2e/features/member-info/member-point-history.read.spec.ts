@@ -41,7 +41,7 @@ const isHistoryResponse = (url: string, page: number) => {
 async function openMember(page: Page, member: MemberInfo) {
   await page.goto(`/member/info/${encodeURIComponent(member.encryptedUserId)}`);
   await expect(
-    page.getByRole('button', { name: '포인트 증감 히스토리 열기' })
+    page.getByRole('button', { name: '포인트 이력 열기' })
   ).toBeVisible();
 }
 
@@ -73,9 +73,7 @@ test.describe('회원 포인트 증감 히스토리 — 실제 dev API 조회', 
     const firstResponse = page.waitForResponse((response) =>
       isHistoryResponse(response.url(), 0)
     );
-    await page
-      .getByRole('button', { name: '포인트 증감 히스토리 열기' })
-      .click();
+    await page.getByRole('button', { name: '포인트 이력 열기' }).click();
     const response = await firstResponse;
     expect(response.status()).toBe(200);
     const body =
@@ -182,9 +180,7 @@ test.describe('회원 포인트 증감 히스토리 — 실제 dev API 조회', 
     try {
       // API 응답을 조작하지 않고 브라우저를 실제 오프라인으로 전환합니다.
       await context.setOffline(true);
-      await page
-        .getByRole('button', { name: '포인트 증감 히스토리 열기' })
-        .click();
+      await page.getByRole('button', { name: '포인트 이력 열기' }).click();
       const dialog = page.getByRole('dialog', { name: '포인트 증감 히스토리' });
       await expect(dialog.getByRole('status')).toContainText(
         '네트워크 연결을 기다리고 있습니다.'
@@ -236,9 +232,7 @@ test.describe('회원 포인트 증감 히스토리 — 실제 dev API 조회', 
     );
     if (!emptyMember) return;
     await openMember(page, admin);
-    await page
-      .getByRole('button', { name: '포인트 증감 히스토리 열기' })
-      .click();
+    await page.getByRole('button', { name: '포인트 이력 열기' }).click();
     const dialog = page.getByRole('dialog', { name: '포인트 증감 히스토리' });
     await expect(dialog.getByLabel('포인트 증감 내역')).toHaveAttribute(
       'aria-busy',
@@ -246,9 +240,7 @@ test.describe('회원 포인트 증감 히스토리 — 실제 dev API 조회', 
     );
     await dialog.getByRole('button', { name: '창 닫기' }).click();
     await openMember(page, emptyMember);
-    await page
-      .getByRole('button', { name: '포인트 증감 히스토리 열기' })
-      .click();
+    await page.getByRole('button', { name: '포인트 이력 열기' }).click();
     await expect(dialog).toContainText(
       `${emptyMember.userName}(${emptyMember.studentNumber})`
     );
@@ -288,7 +280,7 @@ async function openSourceLog(
   );
   if (!found) return;
   await openMember(page, member);
-  await page.getByRole('button', { name: '포인트 증감 히스토리 열기' }).click();
+  await page.getByRole('button', { name: '포인트 이력 열기' }).click();
   const dialog = page.getByRole('dialog', { name: '포인트 증감 히스토리' });
   await expect(dialog.getByRole('listitem').first()).toBeVisible();
   const card = dialog.getByRole('listitem', {
@@ -446,7 +438,7 @@ test.describe('포인트 출처 ID 이동 — 실제 dev API와 관리 화면', 
     await destination.close();
   });
 
-  test('관리자 삭제 로그도 관리자 ID가 아닌 시험후기 ID로 검색한다', async ({
+  test('어드민 삭제 로그도 관리자 ID가 아닌 시험후기 ID로 검색한다', async ({
     context,
     page,
   }, testInfo) => {
@@ -562,8 +554,7 @@ test.describe('포인트 팝업 댓글 바로가기 — 실제 dev API', () => {
       { sortTypes: ['COMMENT_COUNT'], sortDirection: 'DESC' }
     );
     let fixture:
-      | { comment: Comment; first: Comments; next: Comments }
-      | undefined;
+      { comment: Comment; first: Comments; next: Comments } | undefined;
     for (const post of posts.data) {
       const search = {
         searchQuery: String(post.postId),
@@ -764,7 +755,7 @@ test('포인트 팝업을 바로 다시 열면 읽은 페이지의 캐시를 사
       requests.push(request.url());
   });
   await openMember(page, member);
-  const open = page.getByRole('button', { name: '포인트 증감 히스토리 열기' });
+  const open = page.getByRole('button', { name: '포인트 이력 열기' });
   await open.click();
   const dialog = page.getByRole('dialog', { name: '포인트 증감 히스토리' });
   const list = dialog.getByLabel('포인트 증감 내역');

@@ -214,9 +214,10 @@ export default function MemberDirectorySection({
             totalCount={totalCount}
             status={isListLoading ? 'loading' : isListError ? 'error' : 'ready'}
           />
-          <MemberDirectoryActionBar />
-
-          <div className='overflow-hidden rounded-lg border border-slate-200'>
+          <div className='border-border bg-background min-w-0 overflow-hidden rounded-lg border'>
+            <div className='border-border border-b p-4'>
+              <MemberDirectoryActionBar />
+            </div>
             <Table className='min-w-230'>
               <Table.Header>
                 <Table.Row className='border-b border-slate-200'>

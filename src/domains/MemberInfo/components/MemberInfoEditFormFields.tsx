@@ -2,6 +2,7 @@ import { type ReactNode, useId } from 'react';
 
 import { CopyableValue, DatePicker, StatusBadge } from '@/shared/components';
 import { Field, Input, Select } from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
 
 import { USER_ROLES } from '@/domains/MemberInfo/constants/memberInfo';
 import { getRoleBadgeMeta } from '@/domains/MemberInfo/utils/memberDirectory';
@@ -141,11 +142,13 @@ export function EditableRoleField({
 
 export function ReadonlyField({
   action,
+  className,
   copyValue,
   label,
   value,
 }: {
   action?: ReactNode;
+  className?: string;
   copyValue?: string;
   label: string;
   value: string;
@@ -153,7 +156,7 @@ export function ReadonlyField({
   const inputId = useId();
 
   return (
-    <Field className='min-w-0 gap-0'>
+    <Field className={cn('min-w-0 gap-0', className)}>
       <Field.Label htmlFor={inputId}>{label}</Field.Label>
       <Field.Content className='min-w-0'>
         <div className='flex min-w-0 items-center gap-2'>
