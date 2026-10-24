@@ -121,7 +121,8 @@ function renderPage(url = `/posts/manage/${post.postId}`) {
   return client;
 }
 
-const originalLink = () => screen.queryByRole('link', { name: /^게시글 원문/ });
+const originalLink = () =>
+  screen.queryByRole('link', { name: /^스노로즈에서 보기/ });
 
 describe('게시글·댓글에서 문의·신고 원문 열기', () => {
   beforeEach(() => {
@@ -160,6 +161,7 @@ describe('게시글·댓글에서 문의·신고 원문 열기', () => {
       );
       expect(getAdminInquiryDetailAPI).toHaveBeenCalledWith(post.postId);
       expect(originalLink()).toHaveAttribute('target', '_blank');
+      expect(originalLink()).toHaveAttribute('title', '스노로즈에서 보기');
       if (viaComment) {
         expect(screen.getByLabelText('현재 경로')).toHaveTextContent(
           `/posts/manage/${post.postId}?commentId=123`
