@@ -172,15 +172,7 @@ export function getPostStatusBadges(post: {
     });
   }
 
-  // 2. 징계 여부
-  if (statuses.includes('SANCTIONED')) {
-    badges.push({
-      label: '징계',
-      tone: 'accent',
-    });
-  }
-
-  // 3. 삭제 여부
+  // 2. 삭제 여부
   if (statuses.includes('ADMIN_DELETED') || post.deletedAt != null) {
     badges.push({
       label: '어드민 삭제',
