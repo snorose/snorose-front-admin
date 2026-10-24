@@ -36,7 +36,7 @@ describe('buildOriginalPostUrl', () => {
   it('문의·신고의 구분 없이 일반 게시판 경로를 만들지 않는다', () => {
     expect(
       buildOriginalPostUrl({
-        boardName: '문의게시판/신고게시판',
+        boardName: '문의/신고',
         isNotice: false,
         postId: 1725805,
       })

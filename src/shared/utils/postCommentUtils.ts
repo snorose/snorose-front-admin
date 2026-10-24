@@ -3,7 +3,7 @@ import type { StatusBadgeTone } from '@/shared/components';
 export const BOARD_NAMES: Record<number, string> = {
   11: 'about 스노로즈',
   12: '공지사항',
-  13: '문의게시판/신고게시판',
+  13: '문의/신고',
   14: '이벤트',
   20: '베숙트',
   21: '첫눈온방',
