@@ -61,26 +61,24 @@ export default function MemberDetailInfoGrid({
         label='보유 포인트'
         value={formatPoint(member.pointBalance)}
         action={
-          <div className='flex shrink-0 items-center gap-1'>
+          <div className='flex shrink-0 items-center gap-1.5'>
             <Button
               type='button'
-              variant='ghost'
-              size='icon'
+              variant='outline'
               onClick={onPointHistoryOpen}
-              aria-label='포인트 증감 히스토리 열기'
-              title='포인트 증감 히스토리'
+              aria-label='포인트 이력 열기'
             >
               <History aria-hidden='true' />
+              포인트 이력
             </Button>
             <Button
               type='button'
-              variant='ghost'
-              size='icon'
+              variant='outline'
               onClick={onPointAdjustmentOpen}
-              aria-label='포인트 지급/차감'
-              title='포인트 지급/차감'
+              aria-label='포인트 지급·차감'
             >
               <Coins aria-hidden='true' />
+              지급·차감
             </Button>
           </div>
         }

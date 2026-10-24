@@ -72,16 +72,17 @@ export default function MemberPenaltySummaryCard({
         action={
           <Button
             type='button'
-            variant='ghost'
-            size='icon'
+            variant='outline'
+            size='sm'
             onClick={() => {
               void onOpenPenaltyHistory?.();
               setIsHistoryOpen(true);
             }}
-            className='text-slate-600'
-            aria-label='강등/경고 히스토리 열기'
+            className='h-9'
+            aria-label='제재 이력 열기'
           >
-            <History className='h-5 w-5' />
+            <History aria-hidden='true' />
+            제재 이력
           </Button>
         }
       >
