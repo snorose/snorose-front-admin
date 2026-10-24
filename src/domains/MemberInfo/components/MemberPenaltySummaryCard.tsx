@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { History, ShieldAlert } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
-import { Button } from '@/shared/components/ui';
+import { Button, Separator } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -31,7 +31,7 @@ type MemberPenaltySummaryCardProps = {
 };
 
 const SUMMARY_ROW_CLASS_NAME =
-  'grid min-h-12 grid-cols-[5rem_minmax(0,1fr)] items-start gap-3 py-3';
+  'grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-3';
 
 export default function MemberPenaltySummaryCard({
   hasNextPenaltyHistory,
@@ -116,8 +116,8 @@ export default function MemberPenaltySummaryCard({
         }
       >
         <div className='space-y-3'>
-          <dl className='divide-border/60 divide-y text-sm leading-6'>
-            <div className={SUMMARY_ROW_CLASS_NAME}>
+          <div className='text-sm leading-6'>
+            <dl className={SUMMARY_ROW_CLASS_NAME}>
               <dt className='text-muted-foreground'>현재 상태</dt>
               <dd className='flex min-h-6 min-w-0 flex-wrap items-center gap-1.5'>
                 <StatusBadge tone={penaltyStatus.tone}>
@@ -129,8 +129,9 @@ export default function MemberPenaltySummaryCard({
                   </StatusBadge>
                 ) : null}
               </dd>
-            </div>
-            <div className={SUMMARY_ROW_CLASS_NAME}>
+            </dl>
+            <Separator className='my-2' />
+            <dl className={SUMMARY_ROW_CLASS_NAME}>
               <dt className='text-muted-foreground'>누적 경고 수</dt>
               <dd
                 className={`font-medium tabular-nums ${
@@ -144,16 +145,19 @@ export default function MemberPenaltySummaryCard({
                   회
                 </span>
               </dd>
-            </div>
+            </dl>
             {details.map(({ label, value }) => (
-              <div key={label} className={SUMMARY_ROW_CLASS_NAME}>
-                <dt className='text-muted-foreground'>{label}</dt>
-                <dd className='text-foreground min-w-0 wrap-break-word'>
-                  {value}
-                </dd>
-              </div>
+              <Fragment key={label}>
+                <Separator className='my-3' />
+                <dl className={SUMMARY_ROW_CLASS_NAME}>
+                  <dt className='text-muted-foreground'>{label}</dt>
+                  <dd className='text-foreground min-w-0 wrap-break-word'>
+                    {value}
+                  </dd>
+                </dl>
+              </Fragment>
             ))}
-          </dl>
+          </div>
 
           {isDemotion && latestPayloadIsWarning && !ongoingDemotion ? (
             <p className='text-muted-foreground text-sm leading-6'>
