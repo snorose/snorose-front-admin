@@ -46,7 +46,7 @@ describe('getPostStatusBadges', () => {
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['ADMIN_DELETED'] },
-      [{ label: '리자 삭제', tone: 'danger' }],
+      [{ label: '어드민 삭제', tone: 'danger' }],
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['USER_DELETED'] },
