@@ -3,7 +3,8 @@ import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
 import { DateTimePicker } from '@/shared/components';
-import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Button, Input, Label, Textarea } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
@@ -73,17 +74,14 @@ export function PopupEditorDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='max-h-[90vh] overflow-x-hidden overflow-y-auto sm:max-w-[760px]'>
-        <Dialog.Header>
-          <Dialog.Title>
-            {mode === 'create' ? '새 팝업 등록' : '팝업 수정'}
-          </Dialog.Title>
-          <Dialog.Description>
-            사용자 홈 화면에 노출할 팝업 콘텐츠와 게시 기간을 입력해 주세요.
-          </Dialog.Description>
-        </Dialog.Header>
-
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title={mode === 'create' ? '새 팝업 등록' : '팝업 수정'}
+      subtitle='사용자 홈 화면에 노출할 팝업 콘텐츠와 게시 기간을 입력해 주세요.'
+      className='sm:max-w-[760px]'
+    >
+      <div className='min-h-0 space-y-4 overflow-x-hidden overflow-y-auto px-6 pb-6'>
         <div className='flex min-w-0 flex-col gap-5'>
           <div className='grid gap-4 md:grid-cols-2'>
             <DateTimePicker
@@ -146,7 +144,7 @@ export function PopupEditorDialog({
                 id='popup-image-file'
                 type='file'
                 accept='image/*'
-                className='sr-only'
+                className='hidden'
                 tabIndex={-1}
                 aria-hidden='true'
                 onChange={(event) => {
@@ -269,7 +267,7 @@ export function PopupEditorDialog({
           </div>
         </div>
 
-        <Dialog.Footer>
+        <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
           <Button
             type='button'
             variant='outline'
@@ -280,8 +278,8 @@ export function PopupEditorDialog({
           <Button type='button' onClick={onSave}>
             저장 후 반영
           </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+        </div>
+      </div>
+    </Modal>
   );
 }

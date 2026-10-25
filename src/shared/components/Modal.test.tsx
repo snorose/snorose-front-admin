@@ -37,6 +37,7 @@ describe('Modal', () => {
         subtitle='회원 상세 안내'
       >
         회원 정보 본문
+        <button type='button'>상세 페이지로 이동</button>
       </Modal>
     );
 

@@ -3,14 +3,8 @@ import { type ReactNode, useId, useState } from 'react';
 import { CheckCircle, Coins, TrendingDown, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 
-import {
-  Button,
-  Dialog,
-  Input,
-  Label,
-  Select,
-  Textarea,
-} from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Button, Input, Label, Select, Textarea } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import type { MemberInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
@@ -120,6 +114,7 @@ export default function MemberPointAdjustmentDialog({
   };
 
   const handleApply = () => {
+    if (isSubmitting) return;
     if (!validateForm()) {
       return;
     }
@@ -172,19 +167,24 @@ export default function MemberPointAdjustmentDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <Dialog.Content className='rounded-2xl sm:max-w-xl'>
-          <Dialog.Header>
-            <Dialog.Title className='flex items-center gap-2 text-2xl'>
-              <Coins className='h-6 w-6' />
-              포인트 지급/차감
-            </Dialog.Title>
-            <Dialog.Description className='text-base'>
-              양수를 입력하면 지급, 음수를 입력하면 차감됩니다.
-            </Dialog.Description>
-          </Dialog.Header>
-
-          <div className='space-y-5 py-2'>
+      <Modal
+        open={open}
+        onOpenChange={handleOpenChange}
+        title={
+          <span className='flex items-center gap-2'>
+            <Coins className='size-4 shrink-0' aria-hidden='true' />
+            포인트 지급/차감
+          </span>
+        }
+        subtitle='양수를 입력하면 지급, 음수를 입력하면 차감됩니다.'
+        className='sm:max-w-xl'
+        closeDisabled={isSubmitting}
+      >
+        <fieldset
+          disabled={isSubmitting}
+          className='min-h-0 min-w-0 space-y-4 overflow-y-auto px-6 pb-6'
+        >
+          <div className='space-y-5'>
             {/* <div className='rounded-xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700'>
               현재 보유 포인트: {member.pointBalance.toLocaleString()}P
             </div> */}
@@ -270,7 +270,7 @@ export default function MemberPointAdjustmentDialog({
             </Field>
           </div>
 
-          <Dialog.Footer>
+          <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
             <Button
               type='button'
               variant='outline'
@@ -281,9 +281,9 @@ export default function MemberPointAdjustmentDialog({
             <Button type='button' onClick={handleApply} disabled={isSubmitting}>
               지급
             </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog>
+          </div>
+        </fieldset>
+      </Modal>
 
       {/* <MemberPointAdjustmentConfirmDialog
         category={displayCategory}

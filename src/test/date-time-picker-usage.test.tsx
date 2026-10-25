@@ -141,7 +141,7 @@ describe('DateTimePicker 일정 사용처', () => {
         endAt: `2026-10-17${separator}23:59:00`,
       };
       expect(mutate).toHaveBeenCalledExactlyOnceWith(
-        isFreeze ? request : [request]
+        isFreeze ? request : [{ ...request, type: 'WRITE' }]
       );
       await waitFor(() =>
         expect(
@@ -219,7 +219,10 @@ describe('DateTimePicker 일정 사용처', () => {
           data: request,
         });
       else
-        expect(mocks.updatePeriod).toHaveBeenCalledExactlyOnceWith(2, request);
+        expect(mocks.updatePeriod).toHaveBeenCalledExactlyOnceWith(2, {
+          ...request,
+          type: 'WRITE',
+        });
       await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
       if (!isFreeze) expect(onSuccess).toHaveBeenCalledOnce();
     }

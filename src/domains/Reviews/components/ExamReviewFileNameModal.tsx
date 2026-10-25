@@ -3,7 +3,8 @@ import { type RefObject, useId, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { Loader2 } from 'lucide-react';
 
-import { Button, Dialog, InputGroup, Label } from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Button, InputGroup, Label } from '@/shared/components/ui';
 
 import type { RenameExamReviewFileResult } from '@/domains/Reviews/types';
 
@@ -103,77 +104,78 @@ export function ExamReviewFileNameModal({
   };
 
   return (
-    <Dialog open onOpenChange={(open) => !open && !isSaving && onClose()}>
-      <Dialog.Content
-        className='sm:max-w-md'
-        showCloseButton={!isSaving}
-        onCloseAutoFocus={(event) => {
+    <Modal
+      open
+      onOpenChange={(open) => !open && !isSaving && onClose()}
+      title='파일명 변경'
+      subtitle='파일명은 다른 정보와 별도로 변경 즉시 저장됩니다.'
+      className='sm:max-w-md'
+      closeDisabled={isSaving}
+      contentProps={{
+        onCloseAutoFocus: (event) => {
           event.preventDefault();
           returnFocusRef.current?.focus();
-        }}
+        },
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className='min-h-0 space-y-4 overflow-y-auto px-6 pb-6'
       >
-        <Dialog.Header>
-          <Dialog.Title>파일명 변경</Dialog.Title>
-          <Dialog.Description>
-            파일명은 다른 정보와 별도로 변경 즉시 저장됩니다.
-          </Dialog.Description>
-        </Dialog.Header>
-        <form onSubmit={handleSubmit} className='space-y-4'>
-          <div className='space-y-1.5'>
-            <p className='text-sm font-medium'>현재 파일명</p>
-            <p className='rounded-md border bg-gray-50 px-3 py-2 text-sm break-all text-gray-700'>
-              {currentFileName}
-            </p>
-          </div>
-          <div className='space-y-1.5'>
-            <Label htmlFor={inputId}>새 파일명</Label>
-            <InputGroup data-disabled={isSaving}>
-              <InputGroup.Input
-                id={inputId}
-                value={newFileName}
-                onChange={(event) => {
-                  setNewFileName(event.target.value);
-                  setErrorMessage('');
-                }}
-                aria-invalid={Boolean(visibleErrorMessage)}
-                aria-describedby={
-                  visibleErrorMessage ? `${helpId} ${errorId}` : helpId
-                }
-                autoFocus
-                disabled={isSaving}
-              />
-              {extension && (
-                <InputGroup.Addon align='inline-end' className='shrink-0'>
-                  <InputGroup.Text>{extension}</InputGroup.Text>
-                </InputGroup.Addon>
-              )}
-            </InputGroup>
-            <p id={helpId} className='text-sm text-gray-500'>
-              {extension && `확장자(${extension})는 변경할 수 없습니다. `}
-              {INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.
-            </p>
-            {visibleErrorMessage ? (
-              <p id={errorId} role='alert' className='text-sm text-red-600'>
-                {visibleErrorMessage}
-              </p>
-            ) : null}
-          </div>
-          <Dialog.Footer>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={onClose}
+        <div className='space-y-1.5'>
+          <p className='text-sm font-medium'>현재 파일명</p>
+          <p className='rounded-md border bg-gray-50 px-3 py-2 text-sm break-all text-gray-700'>
+            {currentFileName}
+          </p>
+        </div>
+        <div className='space-y-1.5'>
+          <Label htmlFor={inputId}>새 파일명</Label>
+          <InputGroup data-disabled={isSaving}>
+            <InputGroup.Input
+              id={inputId}
+              value={newFileName}
+              onChange={(event) => {
+                setNewFileName(event.target.value);
+                setErrorMessage('');
+              }}
+              aria-invalid={Boolean(visibleErrorMessage)}
+              aria-describedby={
+                visibleErrorMessage ? `${helpId} ${errorId}` : helpId
+              }
+              autoFocus
               disabled={isSaving}
-            >
-              취소
-            </Button>
-            <Button type='submit' disabled={!canSubmit}>
-              {isSaving && <Loader2 className='animate-spin' />}
-              {isSaving ? '변경 중' : '파일명 변경'}
-            </Button>
-          </Dialog.Footer>
-        </form>
-      </Dialog.Content>
-    </Dialog>
+            />
+            {extension && (
+              <InputGroup.Addon align='inline-end' className='shrink-0'>
+                <InputGroup.Text>{extension}</InputGroup.Text>
+              </InputGroup.Addon>
+            )}
+          </InputGroup>
+          <p id={helpId} className='text-sm text-gray-500'>
+            {extension && `확장자(${extension})는 변경할 수 없습니다. `}
+            {INVALID_FILE_NAME_CHARACTERS_TEXT}는 사용할 수 없습니다.
+          </p>
+          {visibleErrorMessage ? (
+            <p id={errorId} role='alert' className='text-sm text-red-600'>
+              {visibleErrorMessage}
+            </p>
+          ) : null}
+        </div>
+        <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={onClose}
+            disabled={isSaving}
+          >
+            취소
+          </Button>
+          <Button type='submit' disabled={!canSubmit}>
+            {isSaving && <Loader2 className='animate-spin' />}
+            {isSaving ? '변경 중' : '파일명 변경'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

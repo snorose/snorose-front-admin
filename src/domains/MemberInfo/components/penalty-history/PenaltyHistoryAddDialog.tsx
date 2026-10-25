@@ -3,7 +3,8 @@ import { useId, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button, Dialog, Textarea } from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Button, Textarea } from '@/shared/components/ui';
 import type { AdminBlacklistReq, MemberInfo } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -99,6 +100,7 @@ export default function PenaltyHistoryAddDialog({
   };
 
   const closeDialog = () => {
+    if (isSubmitting) return;
     resetForm();
     onOpenChange(false);
   };
@@ -253,118 +255,119 @@ export default function PenaltyHistoryAddDialog({
   };
 
   return (
-    <Dialog
+    <Modal
       open={isOpen}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) closeDialog();
       }}
+      title={
+        <span className='flex items-center gap-2'>
+          <AlertTriangle className='size-4 shrink-0' aria-hidden='true' />
+          {title}
+        </span>
+      }
+      subtitle={`회원에게 ${isWarningMode ? '경고' : '강등'}을 추가합니다.`}
+      className='sm:max-w-xl'
+      closeDisabled={isSubmitting}
+      contentProps={{ ref: contentRef }}
     >
-      <Dialog.Content ref={contentRef} className='rounded-2xl p-0 sm:max-w-xl'>
-        <div className='space-y-8 px-8 py-8'>
-          <Dialog.Header className='gap-3'>
-            <Dialog.Title className='flex items-center gap-3 text-2xl font-bold text-slate-950'>
-              <AlertTriangle className='h-6 w-6' />
-              {title}
-            </Dialog.Title>
-            <Dialog.Description className='text-base font-medium text-slate-500'>
-              회원에게 {isWarningMode ? '경고' : '강등'}을 추가합니다.
-            </Dialog.Description>
-          </Dialog.Header>
+      <fieldset
+        disabled={isSubmitting}
+        className='min-h-0 min-w-0 space-y-5 overflow-y-auto px-6 pb-6'
+      >
+        {isPenaltyBlocked ? (
+          <p
+            role='alert'
+            className='rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600'
+          >
+            {PENALTY_ADD_BLOCKED_MESSAGE}
+          </p>
+        ) : (
+          <div className='space-y-5'>
+            {isWarningMode ? (
+              <WarningFields
+                customReason={customReason}
+                invalidFieldName={invalidFieldName}
+                needsCustomReason={needsCustomReason}
+                onCustomReasonChange={(value) => {
+                  setCustomReason(value);
+                  setInvalidFieldName(undefined);
+                }}
+                onReasonChange={handleChangeWarningReason}
+                onWarningCountChange={(value) => {
+                  setWarningCount(value);
+                  setInvalidFieldName(undefined);
+                }}
+                reason={warningReason}
+                warningCount={warningCount}
+              />
+            ) : (
+              <DemotionFields
+                customReason={customReason}
+                demotionReason={demotionReason}
+                demotionReasonOptions={demotionReasonOptions}
+                demotionType={demotionType}
+                invalidFieldName={invalidFieldName}
+                needsCustomReason={needsCustomReason}
+                onCustomReasonChange={(value) => {
+                  setCustomReason(value);
+                  setInvalidFieldName(undefined);
+                }}
+                onDemotionReasonChange={handleChangeDemotionReason}
+                onDemotionTypeChange={handleChangeDemotionType}
+                onRelegationMonthChange={(value) => {
+                  setRelegationMonth(value);
+                  setInvalidFieldName(undefined);
+                }}
+                relegationEndDateTime={relegationEndDateTime}
+                relegationMonth={relegationMonth}
+              />
+            )}
 
-          {isPenaltyBlocked ? (
-            <p
-              role='alert'
-              className='rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600'
-            >
-              {PENALTY_ADD_BLOCKED_MESSAGE}
-            </p>
-          ) : (
-            <div className='space-y-5'>
-              {isWarningMode ? (
-                <WarningFields
-                  customReason={customReason}
-                  invalidFieldName={invalidFieldName}
-                  needsCustomReason={needsCustomReason}
-                  onCustomReasonChange={(value) => {
-                    setCustomReason(value);
-                    setInvalidFieldName(undefined);
-                  }}
-                  onReasonChange={handleChangeWarningReason}
-                  onWarningCountChange={(value) => {
-                    setWarningCount(value);
-                    setInvalidFieldName(undefined);
-                  }}
-                  reason={warningReason}
-                  warningCount={warningCount}
-                />
-              ) : (
-                <DemotionFields
-                  customReason={customReason}
-                  demotionReason={demotionReason}
-                  demotionReasonOptions={demotionReasonOptions}
-                  demotionType={demotionType}
-                  invalidFieldName={invalidFieldName}
-                  needsCustomReason={needsCustomReason}
-                  onCustomReasonChange={(value) => {
-                    setCustomReason(value);
-                    setInvalidFieldName(undefined);
-                  }}
-                  onDemotionReasonChange={handleChangeDemotionReason}
-                  onDemotionTypeChange={handleChangeDemotionType}
-                  onRelegationMonthChange={(value) => {
-                    setRelegationMonth(value);
-                    setInvalidFieldName(undefined);
-                  }}
-                  relegationEndDateTime={relegationEndDateTime}
-                  relegationMonth={relegationMonth}
-                />
-              )}
+            <Field label='메모' htmlFor={memoId}>
+              <Textarea
+                id={memoId}
+                aria-describedby={memoDescriptionId}
+                value={memo}
+                onChange={(event) => setMemo(event.target.value)}
+                placeholder='관리자명: 내용'
+                maxLength={MEMO_MAX_LENGTH}
+                className='min-h-32 resize-none'
+              />
+              <p
+                id={memoDescriptionId}
+                className='text-right text-sm font-medium text-slate-400'
+              >
+                {memo.length}/{MEMO_MAX_LENGTH}
+              </p>
+            </Field>
+          </div>
+        )}
 
-              <Field label='메모' htmlFor={memoId}>
-                <Textarea
-                  id={memoId}
-                  aria-describedby={memoDescriptionId}
-                  value={memo}
-                  onChange={(event) => setMemo(event.target.value)}
-                  placeholder='관리자명: 내용'
-                  maxLength={MEMO_MAX_LENGTH}
-                  className='min-h-32 resize-none'
-                />
-                <p
-                  id={memoDescriptionId}
-                  className='text-right text-sm font-medium text-slate-400'
-                >
-                  {memo.length}/{MEMO_MAX_LENGTH}
-                </p>
-              </Field>
-            </div>
-          )}
-
-          <Dialog.Footer className='gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              size='default'
-              onClick={closeDialog}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              type='button'
-              variant='destructive-outline'
-              size='default'
-              onClick={handleRequestSubmit}
-              disabled={isSubmitting || isPenaltyBlocked}
-            >
-              {isSubmitting ? (
-                <Loader2 aria-hidden='true' className='animate-spin' />
-              ) : null}
-              {submitLabel}
-            </Button>
-          </Dialog.Footer>
+        <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+          <Button
+            type='button'
+            variant='outline'
+            size='default'
+            onClick={closeDialog}
+            disabled={isSubmitting}
+          >
+            취소
+          </Button>
+          <Button
+            type='button'
+            variant='destructive-outline'
+            size='default'
+            onClick={handleRequestSubmit}
+            disabled={isSubmitting || isPenaltyBlocked}
+          >
+            {isSubmitting ? (
+              <Loader2 aria-hidden='true' className='animate-spin' />
+            ) : null}
+            {submitLabel}
+          </Button>
         </div>
-      </Dialog.Content>
+      </fieldset>
 
       <PenaltyHistoryAddConfirmDialog
         demotionType={demotionType}
@@ -378,7 +381,7 @@ export default function PenaltyHistoryAddDialog({
         relegationMonth={relegationMonth}
         warningCount={warningCount}
       />
-    </Dialog>
+    </Modal>
   );
 }
 
