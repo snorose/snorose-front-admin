@@ -108,12 +108,12 @@ export function toBlacklistHistoryItem(
     type: history.type,
     reasonType: history.reasonType,
     warningCount: history.warningCount,
+    relegationMonth: history.relegationMonth,
     blackReason: history.blackReason,
     createdAt: history.createdAt,
     blacklistStartDate: isWarning
       ? null
       : (history.blacklistStartDate ?? history.createdAt),
-    blacklistDeadline: history.blacklistDeadline,
     adminName: history.adminName ?? '',
     operatorMemo: history.memo ?? '',
     deletedAt: history.deletedAt,
@@ -265,6 +265,8 @@ export function createMemberDiffPayload(
   const diff: Partial<EditMemberInfo> = {};
 
   EDIT_KEYS.forEach((key) => {
+    if (key === 'studentNumber' && original.userRoleId === 6) return;
+
     const oldValue = original[key];
     const newValue = updated[key];
 

@@ -115,17 +115,23 @@ export default function MemberInfoEditForm({
         setFieldErrors((prev) => ({ ...prev, nickname: undefined }));
       },
     },
-    {
-      type: 'editable',
-      fieldName: 'studentNumber',
-
-      label: '학번',
-      value: studentNumber,
-      onChange: (value) => {
-        setStudentNumber(value);
-        setFieldErrors((prev) => ({ ...prev, studentNumber: undefined }));
-      },
-    },
+    member.userRoleId === 6
+      ? {
+          type: 'readonly',
+          label: '학번',
+          value: formatDisplayValue(member.studentNumber),
+          copyValue: member.studentNumber ?? '',
+        }
+      : {
+          type: 'editable',
+          fieldName: 'studentNumber',
+          label: '학번',
+          value: studentNumber,
+          onChange: (value) => {
+            setStudentNumber(value);
+            setFieldErrors((prev) => ({ ...prev, studentNumber: undefined }));
+          },
+        },
     {
       type: 'editable',
       fieldName: 'birthday',
