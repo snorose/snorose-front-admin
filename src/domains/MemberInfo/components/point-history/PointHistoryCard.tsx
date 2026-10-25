@@ -67,7 +67,7 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
           </time>
         </div>
 
-        <dl className='mt-4 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2'>
+        <dl className='mt-3 grid grid-cols-2 gap-x-4 gap-y-2'>
           <Info label='포인트 유형'>{categoryLabel}</Info>
           <Info label='출처'>{sourceLabel}</Info>
           <Info label='로그 ID'>
@@ -103,7 +103,7 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
             )}
           </Info>
 
-          <div className='space-y-1 sm:col-span-2'>
+          <div className='col-span-2 min-w-0 space-y-1'>
             <dt className='text-muted-foreground text-xs font-medium'>
               {detailLabel}
             </dt>
@@ -119,9 +119,13 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
 
 function Info({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className='min-w-0 space-y-1'>
-      <dt className='text-muted-foreground text-xs font-medium'>{label}</dt>
-      <dd className='text-foreground text-sm break-words'>{children}</dd>
+    <div className='flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5'>
+      <dt className='text-muted-foreground shrink-0 text-xs font-medium'>
+        {label}
+      </dt>
+      <dd className='text-foreground min-w-0 text-sm wrap-anywhere'>
+        {children}
+      </dd>
     </div>
   );
 }
