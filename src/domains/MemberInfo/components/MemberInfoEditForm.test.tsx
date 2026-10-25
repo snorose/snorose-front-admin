@@ -57,6 +57,30 @@ describe('MemberInfoEditForm', () => {
     ).toHaveAttribute('type', 'button');
     expect(screen.getByLabelText(/^아이디/)).toHaveValue(MEMBER.loginId);
     expect(screen.getByLabelText(/^학번/)).toHaveValue(MEMBER.studentNumber);
+    expect(screen.getByLabelText(/^학번/)).not.toHaveAttribute('readonly');
+  });
+
+  test('강등자의 학번은 읽기 전용이며 다른 정보는 수정할 수 있다', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(
+      <MemberInfoEditForm
+        member={{ ...MEMBER, userRoleId: 6 }}
+        onSubmit={onSubmit}
+      />
+    );
+
+    const studentNumber = screen.getByRole('textbox', { name: '학번' });
+    expect(studentNumber).toHaveAttribute('readonly');
+    await user.type(studentNumber, '8');
+    expect(studentNumber).toHaveValue(MEMBER.studentNumber);
+
+    const nickname = screen.getByLabelText(/^닉네임/);
+    await user.clear(nickname);
+    await user.type(nickname, '새닉네임');
+    fireEvent.submit(nickname.closest('form') as HTMLFormElement);
+
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith({ nickname: '새닉네임' });
   });
 
   test('유효하지 않은 첫 번째 변경 필드로 이동하고 포커스한다', async () => {

@@ -1,34 +1,32 @@
-import { useId } from 'react';
+import { TriangleAlert, UserRoundMinus } from 'lucide-react';
 
-import { TriangleAlert } from 'lucide-react';
+import { StatusBadge } from '@/shared/components';
 
-import { SectionTitle } from '@/shared/components';
-import { Button } from '@/shared/components/ui';
+import { SectionCard } from './MemberDetailCard';
 
 export default function MemberWithdrawalSection() {
-  const titleId = useId();
-
   return (
-    <section aria-labelledby={titleId} className='flex min-w-0 flex-col gap-1'>
-      <SectionTitle
-        id={titleId}
-        className='flex min-h-9 items-center gap-2 text-rose-600'
-      >
-        <TriangleAlert className='h-5 w-5 shrink-0' aria-hidden='true' />
-        회원 탈퇴
-      </SectionTitle>
-
-      <div className='border-border bg-background min-w-0 rounded-lg border p-4'>
-        <Button
-          type='button'
-          variant='destructive-outline'
-          className='w-full'
-          title='준비 중인 기능입니다.'
-          disabled
-        >
-          회원 탈퇴 (준비중)
-        </Button>
-      </div>
-    </section>
+    <SectionCard
+      icon={UserRoundMinus}
+      className='border-0 p-0'
+      title='회원 탈퇴'
+      titleClassName='text-rose-600'
+    >
+      <ul className='grid gap-2'>
+        <li className='min-w-0'>
+          <button
+            type='button'
+            disabled
+            className='border-destructive bg-background text-destructive flex min-h-12 w-full min-w-0 cursor-not-allowed items-center gap-3 rounded-md border px-3 py-2.5 text-left text-sm opacity-50 transition-colors'
+          >
+            <TriangleAlert className='size-4 shrink-0' aria-hidden='true' />
+            <span className='min-w-0 flex-1 font-medium wrap-break-word'>
+              회원 탈퇴
+            </span>
+            <StatusBadge tone='neutral'>준비 중</StatusBadge>
+          </button>
+        </li>
+      </ul>
+    </SectionCard>
   );
 }

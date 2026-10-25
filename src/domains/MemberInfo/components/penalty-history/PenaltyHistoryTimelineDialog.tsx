@@ -14,7 +14,7 @@ import {
 import {
   getPenaltyBadgeMeta,
   getPenaltyProgressBadgeMeta,
-  isOngoingPenalty,
+  getWarningCountFromHistory,
   isPermanentDemotionType,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 
@@ -68,24 +68,24 @@ export default function PenaltyHistoryTimelineDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='max-h-[calc(100vh-4rem)] overflow-hidden rounded-2xl p-0 sm:max-w-2xl'>
-        <div className='flex max-h-[calc(100vh-4rem)] flex-col'>
-          <Dialog.Header className='gap-3 px-8 pt-8'>
-            <Dialog.Title className='flex items-center gap-3 text-2xl font-bold text-slate-950'>
-              <History className='h-6 w-6' />
+      <Dialog.Content className='max-h-[calc(100dvh-4rem)] gap-0 overflow-hidden p-0 sm:max-w-xl'>
+        <div className='flex max-h-[calc(100dvh-4rem)] min-h-0 flex-col'>
+          <Dialog.Header className='shrink-0 gap-2 px-6 pt-5 text-left'>
+            <Dialog.Title className='flex items-center gap-2 pr-6'>
+              <History className='size-4 shrink-0' aria-hidden='true' />
               제재 이력 타임라인
             </Dialog.Title>
-            <Dialog.Description className='text-base text-slate-500'>
+            <Dialog.Description>
               {member.userName}({member.studentNumber})님의 전체 제재 이력을
               확인할 수 있습니다.
             </Dialog.Description>
           </Dialog.Header>
 
-          <div className='grid grid-cols-2 gap-3 px-8 py-5'>
+          <div className='grid shrink-0 grid-cols-2 gap-2 px-6 py-4'>
             <Button
               type='button'
               variant='destructive-outline'
-              size='default'
+              size='sm'
               onClick={onAddWarning}
               disabled={isPenaltyBlocked || !canAddWarning}
               title={warningBlockedMessage}
@@ -96,7 +96,7 @@ export default function PenaltyHistoryTimelineDialog({
             <Button
               type='button'
               variant='destructive-outline'
-              size='default'
+              size='sm'
               onClick={onAddDemotion}
               disabled={isPenaltyBlocked}
               title={isPenaltyBlocked ? PENALTY_ADD_BLOCKED_MESSAGE : undefined}
@@ -109,31 +109,33 @@ export default function PenaltyHistoryTimelineDialog({
           {isPenaltyBlocked ? (
             <p
               role='alert'
-              className='px-8 pb-5 text-sm font-medium text-rose-600'
+              className='shrink-0 px-6 pb-4 text-sm text-rose-600'
             >
               {PENALTY_ADD_BLOCKED_MESSAGE}
             </p>
           ) : !canAddWarning ? (
-            <p className='px-8 pb-5 text-sm font-medium text-rose-600'>
+            <p className='shrink-0 px-6 pb-4 text-sm text-rose-600'>
               {warningBlockedMessage}
             </p>
           ) : null}
 
-          <div className='border-t border-slate-200' />
+          <div className='shrink-0 border-t' />
 
-          <div className='px-8 pt-5'>
-            <p className='rounded-xl bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-500'>
+          <div className='shrink-0 px-6 pt-4'>
+            <p className='text-muted-foreground text-xs'>
               전체 제재 이력 {totalCount.toLocaleString()}건
             </p>
           </div>
 
           <div
-            className='min-h-0 flex-1 overflow-y-auto px-8 pt-5 pb-7'
+            className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-3 pb-5'
+            aria-label='제재 이력'
+            aria-busy={isLoading}
             onScroll={handleScroll}
           >
             {histories.length > 0 ? (
               <>
-                <ol className='relative space-y-7 border-l-2 border-slate-200 pl-7'>
+                <ol className='border-border relative ml-1.5 space-y-4 border-l pl-4'>
                   {histories.map((history, index) => (
                     <PenaltyHistoryCard
                       key={`${history.createdAt}-${history.type}-${index}`}
@@ -143,14 +145,23 @@ export default function PenaltyHistoryTimelineDialog({
                   ))}
                 </ol>
                 {isLoading ? (
-                  <div className='mt-6 flex items-center justify-center gap-2 text-sm font-semibold text-slate-500'>
-                    <Loader2 className='h-4 w-4 animate-spin' />
+                  <div
+                    role='status'
+                    className='text-muted-foreground mt-4 flex items-center justify-center gap-2 text-sm'
+                  >
+                    <Loader2
+                      className='size-4 animate-spin'
+                      aria-hidden='true'
+                    />
                     제재 이력을 불러오는 중입니다.
                   </div>
                 ) : null}
               </>
             ) : (
-              <div className='rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-10 text-center text-sm font-semibold text-emerald-700'>
+              <div
+                role='status'
+                className='bg-muted text-muted-foreground rounded-md px-4 py-10 text-center text-sm'
+              >
                 {isLoading
                   ? '제재 이력을 불러오는 중입니다.'
                   : '제재 이력이 없습니다.'}
@@ -170,26 +181,20 @@ function PenaltyHistoryCard({
   history: BlacklistHistoryItem;
   onDelete: (history: BlacklistHistoryItem) => void;
 }) {
-  const isOngoing = isOngoingPenalty(history);
   const isPermanentDemotion = isPermanentDemotionType(history.type);
   const penaltyBadge = getPenaltyBadgeMeta(history);
   const progressBadge = getPenaltyProgressBadgeMeta(history);
-  // 경고 항목에는 강등 시작일/종료일이 없으므로(항상 '-') 해당 필드를 숨긴다.
+  // 경고 항목에는 강등 시작일/기간을 표시하지 않는다.
   const isWarning = history.type === '경고' || history.type === 'WARNING';
 
   return (
     <li className='relative'>
       <span
-        className={`absolute top-3 -left-[2.4375rem] h-5 w-5 rounded-full border-4 border-white shadow-sm ${
-          isOngoing && !isPermanentDemotion ? 'bg-rose-600' : 'bg-slate-950'
-        }`}
+        aria-hidden='true'
+        className='bg-background border-foreground absolute top-4 -left-[1.4375rem] size-3 rounded-full border-2'
       />
-      <article
-        className={`rounded-2xl border bg-white p-5 shadow-sm ${
-          isOngoing ? 'border-rose-200 shadow-rose-100' : 'border-slate-200'
-        }`}
-      >
-        <div className='flex flex-wrap items-start justify-between gap-3'>
+      <article className='bg-background border-border rounded-md border p-4 pt-3'>
+        <div className='flex flex-wrap items-center justify-between gap-2'>
           <div className='flex flex-wrap items-center gap-2'>
             <StatusBadge tone={penaltyBadge.tone}>
               {penaltyBadge.label}
@@ -200,14 +205,14 @@ function PenaltyHistoryCard({
               </StatusBadge>
             ) : null}
           </div>
-          <div className='flex items-center gap-2'>
-            <span
-              className={`text-sm font-semibold ${
-                isOngoing ? 'text-rose-600' : 'text-slate-400'
-              }`}
+          <div className='flex items-center gap-1'>
+            <time
+              dateTime={history.createdAt}
+              title={history.createdAt.replace('T', ' ')}
+              className='text-muted-foreground text-xs font-normal whitespace-nowrap tabular-nums'
             >
               {formatDateTimeToMinutes(history.createdAt)}
-            </span>
+            </time>
             <Button
               type='button'
               variant='ghost'
@@ -218,57 +223,96 @@ function PenaltyHistoryCard({
               title='제재 삭제는 담당자 요청이 필요합니다.'
               disabled={Boolean(history.deletedAt)}
             >
-              <Trash2 className='h-4 w-4' />
+              <Trash2 className='size-4' aria-hidden='true' />
             </Button>
           </div>
         </div>
 
-        <div className='mt-5 grid gap-4 sm:grid-cols-2'>
+        <dl className='mt-3 grid grid-cols-2 gap-x-4 gap-y-2'>
           <Info label='제재 사유' value={history.blackReason} />
           <Info label='관리자명' value={history.adminName} />
+          {isWarning ? (
+            <Info
+              label='경고 횟수'
+              value={`${getWarningCountFromHistory(history)}회`}
+            />
+          ) : null}
           {!isWarning ? (
             <>
               <Info label='강등 시작일' value={history.blacklistStartDate} />
-              <Info label='강등 종료일' value={history.blacklistDeadline} />
+              <Info
+                label='강등 기간'
+                value={
+                  isPermanentDemotion
+                    ? '영구'
+                    : history.relegationMonth != null
+                      ? `${history.relegationMonth}개월`
+                      : null
+                }
+              />
             </>
           ) : null}
-        </div>
-
-        <div className='mt-5 space-y-2'>
-          <p className='text-sm font-semibold text-gray-700'>운영자 메모</p>
-          <p className='rounded-xl bg-slate-100 px-4 py-3 text-sm font-medium text-slate-700'>
-            {history.operatorMemo || '-'}
-          </p>
-        </div>
+          {hasDetail(history.operatorMemo) ? (
+            <Info label='운영자 메모' value={history.operatorMemo} fullWidth />
+          ) : null}
+        </dl>
 
         {history.deletedAt ? (
-          <div className='mt-5 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700'>
-            <p className='font-bold'>취소 정보</p>
-            <p className='mt-2 font-medium'>
-              취소 사유: {history.deletedReason || '-'}
-            </p>
-            <p className='mt-1 text-rose-400'>
-              취소 날짜: {formatDateTimeToMinutes(history.deletedAt)} | 취소자:{' '}
-              {history.deletedBy || '-'}
-            </p>
-          </div>
+          <section className='mt-3 border-t pt-3' aria-label='취소 정보'>
+            <h3 className='text-muted-foreground mb-2 text-xs font-medium'>
+              취소 정보
+            </h3>
+            <dl className='grid grid-cols-2 gap-x-4 gap-y-2'>
+              <Info label='취소 날짜' value={history.deletedAt} />
+              <Info label='취소자' value={history.deletedBy} />
+              {hasDetail(history.deletedReason) ? (
+                <Info
+                  label='취소 사유'
+                  value={history.deletedReason}
+                  fullWidth
+                />
+              ) : null}
+            </dl>
+          </section>
         ) : null}
       </article>
     </li>
   );
 }
 
-function Info({ label, value }: { label: string; value?: string | null }) {
-  const displayValue = label.includes('일')
-    ? formatDateTimeToMinutes(value)
-    : value;
+function hasDetail(value?: string | null) {
+  const detail = value?.trim();
+  return Boolean(detail && detail !== '-');
+}
+
+function Info({
+  label,
+  value,
+  fullWidth = false,
+}: {
+  label: string;
+  value?: string | null;
+  fullWidth?: boolean;
+}) {
+  const displayValue =
+    label.includes('일') || label === '취소 날짜'
+      ? formatDateTimeToMinutes(value)
+      : value;
 
   return (
-    <div className='space-y-2'>
-      <p className='text-sm font-semibold text-gray-700'>{label}</p>
-      <p className='text-sm font-semibold text-slate-800'>
+    <div
+      className={
+        fullWidth
+          ? 'col-span-2 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2'
+          : 'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5'
+      }
+    >
+      <dt className='text-muted-foreground shrink-0 text-xs font-medium'>
+        {label}
+      </dt>
+      <dd className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
         {displayValue || '-'}
-      </p>
+      </dd>
     </div>
   );
 }

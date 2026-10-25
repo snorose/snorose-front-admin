@@ -52,7 +52,7 @@ vi.mock('@/domains/Posts/components/PostDetail/PostDetailCommentList', () => ({
 const post: AdminGetPostResponse = {
   postId: 1725805,
   encryptedUserId: 'mock',
-  boardName: '문의게시판/신고게시판',
+  boardName: '문의/신고',
   title: '문의 및 신고',
   content: '내용',
   commentCount: 1,

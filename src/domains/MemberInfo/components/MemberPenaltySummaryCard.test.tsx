@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 
@@ -22,28 +22,27 @@ const MEMBER: MemberInfo = {
   totalWarningCount: 1,
   isBlacklist: true,
   blacklistType: 'WARNING',
-  blacklistReason: '최신 경고 사유',
+  blacklistReasons: ['진행 중 강등 사유', '추가 경고 사유'],
   blacklistStartDate: '2026-08-20T00:00:00',
   blacklistEndDate: null,
 };
 
-const ONGOING_DEMOTION: BlacklistHistoryItem = {
+const DEMOTION_HISTORY: BlacklistHistoryItem = {
   encryptedUserId: MEMBER.encryptedUserId,
   studentNumber: MEMBER.studentNumber,
   type: 'RELEGATION',
   blackReason: '진행 중 강등 사유',
-  createdAt: '2026-01-01 00:00:00',
-  blacklistStartDate: '2026-01-01 00:00:00',
-  blacklistDeadline: '2099-01-01 00:00:00',
+  createdAt: '2026-10-18 01:20:21',
+  relegationMonth: 12,
   adminName: '관리자',
 };
 
-function renderCard(penaltyHistory: BlacklistHistoryItem[]) {
+function renderCard(penaltyHistory: BlacklistHistoryItem[], member = MEMBER) {
   render(
     <MemberPenaltySummaryCard
       hasNextPenaltyHistory={false}
       isPenaltyHistoryLoading={false}
-      member={MEMBER}
+      member={member}
       onLoadMorePenaltyHistory={vi.fn()}
       penaltyHistory={penaltyHistory}
       penaltyHistoryTotalCount={penaltyHistory.length}
@@ -52,22 +51,56 @@ function renderCard(penaltyHistory: BlacklistHistoryItem[]) {
 }
 
 describe('MemberPenaltySummaryCard', () => {
-  test('강등 중 최신 경고 정보를 강등 사유로 표시하지 않는다', () => {
+  afterEach(() => vi.useRealTimers());
+
+  test('경고와 강등이 함께 있으면 모든 사유를 제재 사유로 표시한다', () => {
     renderCard([]);
 
     expect(screen.getByText('일반 강등')).toBeInTheDocument();
     expect(screen.getByText('경고 1회')).toBeInTheDocument();
-    expect(screen.queryByText('최신 경고 사유')).not.toBeInTheDocument();
+    expect(screen.getByText('제재 사유')).toBeInTheDocument();
     expect(
-      screen.getByText('강등 상세 정보는 제재 이력에서 확인할 수 있습니다.')
+      screen.getByText('진행 중 강등 사유 추가 경고 사유')
+    ).toBeInTheDocument();
+    expect(screen.queryByText('강등 사유')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('강등 기간은 제재 이력에서 확인할 수 있습니다.')
     ).toBeInTheDocument();
   });
 
-  test('조회된 진행 중 강등 이력으로 강등 상세 정보를 표시한다', () => {
-    renderCard([ONGOING_DEMOTION]);
+  test('이력의 개월 수로 종료일과 남은 기간을 만들어 표시하지 않는다', () => {
+    renderCard([DEMOTION_HISTORY]);
 
-    expect(screen.getByText('강등 사유')).toBeInTheDocument();
-    expect(screen.getByText('진행 중 강등 사유')).toBeInTheDocument();
-    expect(screen.queryByText('최신 경고 사유')).not.toBeInTheDocument();
+    expect(screen.queryByText('강등 종료일')).not.toBeInTheDocument();
+    expect(screen.queryByText('남은 기간')).not.toBeInTheDocument();
+    expect(screen.queryByText('강등 시작일')).not.toBeInTheDocument();
+  });
+
+  test('서버 종료 시각이 생성 시각과 달라도 서버 값으로 종료 상태를 표시한다', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2027-10-18T00:30:00'));
+    renderCard([DEMOTION_HISTORY], {
+      ...MEMBER,
+      blacklistEndDate: '2027-10-18T00:00:00',
+    });
+
+    expect(screen.getByText('강등 종료일')).toBeInTheDocument();
+    expect(screen.getByText('2027-10-18 00:00')).toBeInTheDocument();
+    expect(screen.getByText('종료됨')).toBeInTheDocument();
+    expect(screen.queryByText('2027-10-18 01:20')).not.toBeInTheDocument();
+  });
+
+  test('이력을 조회하지 않아도 회원 상세의 강등 일자를 그대로 표시한다', () => {
+    renderCard([], {
+      ...MEMBER,
+      blacklistType: 'RELEGATION',
+      blacklistStartDate: '2026-10-18T00:00:00',
+      blacklistEndDate: '2027-10-18T00:00:00',
+    });
+
+    expect(screen.getByText('강등 시작일')).toBeInTheDocument();
+    expect(screen.getByText('2026-10-18 00:00')).toBeInTheDocument();
+    expect(screen.getByText('강등 종료일')).toBeInTheDocument();
+    expect(screen.getByText('2027-10-18 00:00')).toBeInTheDocument();
   });
 });

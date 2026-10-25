@@ -16,7 +16,11 @@ export default function MemberActivitySection({
   studentNumber: string;
 }) {
   return (
-    <SectionCard icon={BookOpen} title='회원 활동 내역'>
+    <SectionCard
+      icon={BookOpen}
+      className='border-0 p-0'
+      title='회원 활동 내역'
+    >
       <ul className='grid gap-2'>
         {DETAIL_SHORTCUTS.map((shortcut) => (
           <li key={shortcut.title} className='min-w-0'>

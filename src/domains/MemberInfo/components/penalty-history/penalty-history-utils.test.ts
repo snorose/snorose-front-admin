@@ -1,5 +1,6 @@
-import { describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
+import { getRelegationEndDateTimeLabel } from './penalty-history-add-utils';
 import {
   getPenaltyBadgeMeta,
   getPenaltyProgressBadgeMeta,
@@ -41,7 +42,7 @@ describe('getPenaltyBadgeMeta', () => {
         blackReason: '족보 무단 배포',
         createdAt: '2026-01-01 00:00:00',
         blacklistStartDate: '2026-01-01 00:00:00',
-        blacklistDeadline: null,
+        relegationMonth: null,
         adminName: '관리자',
       })
     ).toEqual({ label: '영구 강등', tone: 'danger' });
@@ -56,44 +57,64 @@ describe('getPenaltyBadgeMeta', () => {
         blackReason: '운영 정책 위반',
         createdAt: '2026-01-01 00:00:00',
         blacklistStartDate: null,
-        blacklistDeadline: null,
+        relegationMonth: null,
         adminName: '관리자',
       })
     ).toEqual({ label: '경고', tone: 'warning' });
   });
 });
 
-describe('getPenaltyProgressBadgeMeta', () => {
-  const demotion = {
+describe('제재 이력 상태 표시', () => {
+  const history = {
     encryptedUserId: 'encrypted-user-id',
     studentNumber: '1234567',
     type: 'RELEGATION',
     blackReason: '운영 정책 위반',
-    createdAt: '2026-01-01 00:00:00',
-    blacklistStartDate: '2026-01-01 00:00:00',
-    blacklistDeadline: '2099-01-01 00:00:00',
+    createdAt: '2026-10-18 01:20:21',
+    relegationMonth: 12,
     adminName: '관리자',
   };
 
-  test('진행 중인 강등은 danger tone으로 표시한다', () => {
-    expect(getPenaltyProgressBadgeMeta(demotion)).toEqual({
-      label: '진행중',
-      tone: 'danger',
-    });
-  });
+  test.each([
+    '2000-01-01 00:00:00',
+    '2026-10-18 01:20:21',
+    '2099-01-01 00:00:00',
+  ])(
+    '%s 생성 이력의 개월 수로 진행 중·종료 상태를 추정하지 않는다',
+    (createdAt) => {
+      expect(getPenaltyProgressBadgeMeta({ ...history, createdAt })).toBeNull();
+    }
+  );
 
-  test('종료된 강등과 취소된 제재는 neutral tone으로 표시한다', () => {
+  test.each(['WARNING', 'BLACKLIST', '영구 강등'])(
+    '%s 이력도 진행 상태를 추정하지 않는다',
+    (type) => {
+      expect(getPenaltyProgressBadgeMeta({ ...history, type })).toBeNull();
+    }
+  );
+
+  test('서버가 취소 일시를 제공한 제재는 취소 상태를 표시한다', () => {
     expect(
       getPenaltyProgressBadgeMeta({
-        ...demotion,
-        blacklistDeadline: '2026-01-02 00:00:00',
-      })
-    ).toEqual({ label: '종료', tone: 'neutral' });
-    expect(
-      getPenaltyProgressBadgeMeta({
-        ...demotion,
-        deletedAt: '2026-01-02 00:00:00',
+        ...history,
+        deletedAt: '2026-10-19 00:00:00',
       })
     ).toEqual({ label: '취소', tone: 'neutral' });
+    expect(
+      getPenaltyBadgeMeta({ ...history, deletedAt: '2026-10-19 00:00:00' })
+    ).toEqual({ label: '일반 강등', tone: 'neutral' });
+  });
+});
+
+describe('강등 부여 전 예상 종료일', () => {
+  afterEach(() => vi.useRealTimers());
+
+  test.each([
+    ['2026-01-31T12:34:00', '2026-02-28 12:34'],
+    ['2024-01-31T12:34:00', '2024-02-29 12:34'],
+  ])('현재 시각 %s에서 한 달 뒤 예상 날짜를 유지한다', (now, expected) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(now));
+    expect(getRelegationEndDateTimeLabel(1)).toBe(expected);
   });
 });

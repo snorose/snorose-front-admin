@@ -42,7 +42,7 @@ describe('getPostStatusBadges', () => {
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['SANCTIONED'] },
-      [{ label: '징계', tone: 'accent' }],
+      [{ label: '노출', tone: 'success' }],
     ],
     [
       { reportCount: 0, adminCommonStatuses: ['ADMIN_DELETED'] },
@@ -51,6 +51,17 @@ describe('getPostStatusBadges', () => {
     [
       { reportCount: 0, adminCommonStatuses: ['USER_DELETED'] },
       [{ label: '유저 삭제', tone: 'danger' }],
+    ],
+    [
+      { reportCount: 0, adminCommonStatuses: ['DESANCTIONED'] },
+      [{ label: '노출', tone: 'success' }],
+    ],
+    [
+      { reportCount: 5, adminCommonStatuses: ['SANCTIONED', 'ADMIN_DELETED'] },
+      [
+        { label: '신고 다수', tone: 'warning' },
+        { label: '어드민 삭제', tone: 'danger' },
+      ],
     ],
     [{ reportCount: 0 }, [{ label: '노출', tone: 'success' }]],
   ])('상태에 맞는 label과 tone을 반환한다', (post, expected) => {

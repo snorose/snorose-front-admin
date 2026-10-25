@@ -24,23 +24,25 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
   const sourceLabel = getPointSourceLabel(history.source);
   const detailLabel = getPointDetailLabel(history.category, history.source);
   const sourceTarget = getPointSourceTarget(history);
+  const sourceDetail = history.sourceDetail?.trim();
+  const hasSourceDetail = Boolean(sourceDetail && sourceDetail !== '-');
 
   return (
     <li className='relative' aria-label={`포인트 로그 ${history.id}`}>
       <span
         aria-hidden='true'
-        className={`absolute top-0 -left-[2.125rem] size-5 rounded-full border-[3px] bg-white sm:-left-[2.375rem] ${
-          isDeduction ? 'border-rose-600' : 'border-zinc-950'
+        className={`bg-background absolute top-4 -left-[1.4375rem] size-3 rounded-full border-2 ${
+          isDeduction ? 'border-rose-600' : 'border-foreground'
         }`}
       />
-      <article className='rounded-lg border border-zinc-200 bg-white p-5'>
-        <div className='flex flex-wrap items-center justify-between gap-3'>
-          <div className='flex items-center gap-3'>
+      <article className='border-border bg-background rounded-md border p-4'>
+        <div className='flex flex-wrap items-center justify-between gap-2'>
+          <div className='flex items-center gap-2'>
             <span
-              className={`rounded-lg border px-3 py-1 text-sm font-medium ${
+              className={`rounded-sm border px-2 py-0.5 text-xs font-medium ${
                 isDeduction
                   ? 'border-rose-600 bg-rose-600 text-white'
-                  : 'border-zinc-200 text-zinc-950'
+                  : 'border-border text-foreground'
               }`}
             >
               {isDeduction
@@ -50,8 +52,8 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
                   : '지급'}
             </span>
             <p
-              className={`text-xl font-bold sm:text-2xl ${
-                isDeduction ? 'text-rose-600' : 'text-zinc-950'
+              className={`text-lg font-semibold tabular-nums ${
+                isDeduction ? 'text-rose-600' : 'text-foreground'
               }`}
             >
               {history.difference > 0 ? '+' : ''}
@@ -61,13 +63,13 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
           <time
             dateTime={history.createdAt}
             title={history.createdAt.replace('T', ' ')}
-            className='text-sm font-medium text-zinc-500'
+            className='text-muted-foreground text-xs font-normal whitespace-nowrap tabular-nums'
           >
             {formatDateTimeToMinutes(history.createdAt)}
           </time>
         </div>
 
-        <dl className='mt-5 grid grid-cols-2 gap-x-6 gap-y-5'>
+        <dl className='mt-3 grid grid-cols-2 gap-x-4 gap-y-2'>
           <Info label='포인트 유형'>{categoryLabel}</Info>
           <Info label='출처'>{sourceLabel}</Info>
           <Info label='로그 ID'>
@@ -80,7 +82,7 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
                   to={sourceTarget.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='inline-flex items-center gap-1 rounded-sm hover:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:outline-none'
+                  className='hover:text-muted-foreground focus-visible:ring-ring inline-flex items-center gap-1 rounded-sm focus-visible:ring-2 focus-visible:outline-none'
                   aria-label={`${sourceTarget.idLabel} ${history.sourceId}로 이동 (새 탭)`}
                   title={`${sourceTarget.actionLabel} (새 탭)`}
                 >
@@ -99,16 +101,20 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
                 />
               )
             ) : (
-              <span className='text-zinc-500'>-</span>
+              <span className='text-muted-foreground'>-</span>
             )}
           </Info>
 
-          <div className='col-span-2 space-y-2'>
-            <dt className='text-sm font-medium text-gray-700'>{detailLabel}</dt>
-            <dd className='rounded-lg bg-[#ecebf0] px-4 py-3 text-base break-words whitespace-pre-wrap text-zinc-950'>
-              {history.sourceDetail ?? '-'}
-            </dd>
-          </div>
+          {hasSourceDetail ? (
+            <div className='col-span-2 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2'>
+              <dt className='text-muted-foreground text-xs font-medium'>
+                {detailLabel}
+              </dt>
+              <dd className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
+                {history.sourceDetail}
+              </dd>
+            </div>
+          ) : null}
         </dl>
       </article>
     </li>
@@ -117,9 +123,11 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
 
 function Info({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className='min-w-0 space-y-2'>
-      <dt className='text-sm font-medium text-gray-700'>{label}</dt>
-      <dd className='text-base font-medium break-words text-zinc-950'>
+    <div className='flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5'>
+      <dt className='text-muted-foreground shrink-0 text-xs font-medium'>
+        {label}
+      </dt>
+      <dd className='text-foreground min-w-0 text-sm wrap-anywhere'>
         {children}
       </dd>
     </div>
