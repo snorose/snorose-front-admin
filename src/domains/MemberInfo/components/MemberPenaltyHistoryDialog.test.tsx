@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import type { MemberInfo } from '@/shared/types';
+import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 
 import { warnPenaltyAPI } from '@/apis';
 
@@ -38,7 +39,7 @@ const MEMBER: MemberInfo = {
   blacklistEndDate: null,
 };
 
-const BLOCKED_MEMBERS: [string, MemberInfo][] = [
+const EXISTING_PENALTY_MEMBERS: [string, MemberInfo][] = [
   [
     '현재 경고 1회',
     { ...MEMBER, currentWarningCount: 1, totalWarningCount: 1 },
@@ -49,49 +50,93 @@ const BLOCKED_MEMBERS: [string, MemberInfo][] = [
   ],
   ['활성 경고', { ...MEMBER, isBlacklist: true, blacklistType: 'WARNING' }],
   ['일반 강등', { ...MEMBER, isBlacklist: true, blacklistType: 'RELEGATION' }],
-  ['영구 강등', { ...MEMBER, isBlacklist: true, blacklistType: 'BLACKLIST' }],
   ['강등자 등급', { ...MEMBER, userRoleId: 6 }],
 ];
 
 const MODES: AddPenaltyMode[] = ['WARNING', 'DEMOTION'];
+const PERMANENTLY_DEMOTED_MEMBER: MemberInfo = {
+  ...MEMBER,
+  isBlacklist: true,
+  blacklistType: 'BLACKLIST',
+  userRoleId: 6,
+};
+const ADDABLE_MEMBERS: [string, MemberInfo][] = [
+  ['제재 없음', MEMBER],
+  ...EXISTING_PENALTY_MEMBERS,
+];
+const ADD_CASES = ADDABLE_MEMBERS.flatMap(([label, member]) =>
+  MODES.map((mode) => ({ label, member, mode }))
+);
+ADD_CASES.push({
+  label: '영구 강등',
+  member: PERMANENTLY_DEMOTED_MEMBER,
+  mode: 'DEMOTION',
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(warnPenaltyAPI).mockResolvedValue(undefined);
 });
 
-function renderHistory(member: MemberInfo) {
+function renderHistory(
+  member: MemberInfo,
+  histories: BlacklistHistoryItem[] = []
+) {
   return render(
     <MemberPenaltyHistoryDialog
       hasNext={false}
-      histories={[]}
+      histories={histories}
       isLoading={false}
       member={member}
       onLoadMore={vi.fn()}
       onOpenChange={vi.fn()}
       open
-      totalCount={0}
+      totalCount={histories.length}
     />
   );
 }
 
-describe('회원 페이지 제재 추가 제한', () => {
-  test.each(BLOCKED_MEMBERS)(
-    '%s 회원은 두 종류의 추가를 모두 막는다',
-    async (_label, member) => {
-      const user = userEvent.setup();
+describe('회원 페이지 제재 추가', () => {
+  test('새 응답 필드로 경고 횟수와 강등 개월 수를 표시한다', () => {
+    const baseHistory = {
+      encryptedUserId: MEMBER.encryptedUserId,
+      studentNumber: MEMBER.studentNumber,
+      blackReason: '제재 사유',
+      adminName: '관리자',
+    };
+    renderHistory(MEMBER, [
+      {
+        ...baseHistory,
+        type: 'WARNING',
+        createdAt: '2026-01-02 00:00:00',
+        warningCount: 2,
+      },
+      {
+        ...baseHistory,
+        type: 'RELEGATION',
+        createdAt: '2026-01-01 00:00:00',
+        relegationMonth: 12,
+      },
+    ]);
+
+    expect(screen.getByText('경고 횟수')).toBeInTheDocument();
+    expect(screen.getByText('2회')).toBeInTheDocument();
+    expect(screen.getByText('강등 기간')).toBeInTheDocument();
+    expect(screen.getByText('12개월')).toBeInTheDocument();
+    expect(screen.queryByText('강등 종료일')).not.toBeInTheDocument();
+    expect(screen.queryByText('진행중')).not.toBeInTheDocument();
+    expect(screen.queryByText('종료', { exact: true })).not.toBeInTheDocument();
+  });
+
+  test.each(EXISTING_PENALTY_MEMBERS)(
+    '%s 회원에게 경고와 강등을 추가할 수 있다',
+    (_label, member) => {
       renderHistory(member);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        PENALTY_ADD_BLOCKED_MESSAGE
-      );
       for (const name of ['경고 추가', '강등 추가']) {
-        const button = screen.getByRole('button', { name });
-        expect(button).toBeDisabled();
-        await user.click(button);
+        expect(screen.getByRole('button', { name })).toBeEnabled();
       }
-      expect(screen.queryByLabelText('메모')).not.toBeInTheDocument();
-      expect(warnPenaltyAPI).not.toHaveBeenCalled();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     }
   );
 
@@ -107,15 +152,15 @@ describe('회원 페이지 제재 추가 제한', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  test.each(MODES)(
-    '제재가 0회인 회원의 %s 최초 부여는 가능하다',
-    async (mode) => {
+  test.each(ADD_CASES)(
+    '$label 회원의 $mode 추가 요청을 전송한다',
+    async ({ member, mode }) => {
       const user = userEvent.setup();
       const onApplied = vi.fn();
       const onOpenChange = vi.fn();
       render(
         <PenaltyHistoryAddDialog
-          member={MEMBER}
+          member={member}
           mode={mode}
           onApplied={onApplied}
           onOpenChange={onOpenChange}
@@ -140,32 +185,21 @@ describe('회원 페이지 제재 추가 제한', () => {
     }
   );
 
-  test.each(MODES)(
-    '제재가 남은 회원의 %s 입력 팝업이 열려도 부여할 수 없다',
-    (mode) => {
-      render(
-        <PenaltyHistoryAddDialog
-          member={{ ...MEMBER, currentWarningCount: 1 }}
-          mode={mode}
-          onOpenChange={vi.fn()}
-        />
-      );
+  test('영구강등 회원은 경고 추가 제한을 유지하고 강등은 추가할 수 있다', () => {
+    renderHistory(PERMANENTLY_DEMOTED_MEMBER);
 
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        PENALTY_ADD_BLOCKED_MESSAGE
-      );
-      expect(
-        screen.getByRole('button', {
-          name: mode === 'WARNING' ? '경고 추가' : '강등 추가',
-        })
-      ).toBeDisabled();
-      expect(screen.queryByLabelText('메모')).not.toBeInTheDocument();
-      expect(warnPenaltyAPI).not.toHaveBeenCalled();
-    }
-  );
+    expect(screen.getByRole('button', { name: '경고 추가' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '강등 추가' })).toBeEnabled();
+    expect(
+      screen.getByText('영구강등 회원에게는 경고를 추가할 수 없습니다.')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(PENALTY_ADD_BLOCKED_MESSAGE)
+    ).not.toBeInTheDocument();
+  });
 
   test.each(MODES)(
-    '%s 최종 확인 중 현재 제재가 갱신되면 부여를 막는다',
+    '%s 최종 확인 중 일반강등 상태로 갱신되어도 추가할 수 있다',
     async (mode) => {
       const user = userEvent.setup();
       const onOpenChange = vi.fn();
@@ -191,13 +225,29 @@ describe('회원 페이지 제재 추가 제한', () => {
         />
       );
 
-      expect(
-        screen.queryByRole('button', { name: '확인' })
-      ).not.toBeInTheDocument();
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        PENALTY_ADD_BLOCKED_MESSAGE
-      );
-      expect(warnPenaltyAPI).not.toHaveBeenCalled();
+      await user.click(screen.getByRole('button', { name: '확인' }));
+      await waitFor(() => expect(warnPenaltyAPI).toHaveBeenCalledOnce());
     }
   );
+
+  test('영구강등 회원의 경고 입력 팝업이 열려도 요청을 전송하지 않는다', async () => {
+    const user = userEvent.setup();
+    render(
+      <PenaltyHistoryAddDialog
+        member={PERMANENTLY_DEMOTED_MEMBER}
+        mode='WARNING'
+        onOpenChange={vi.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: '경고 추가' }));
+
+    expect(toast.error).toHaveBeenCalledWith(
+      '영구강등 회원에게는 경고를 추가할 수 없습니다.'
+    );
+    expect(
+      screen.queryByRole('button', { name: '확인' })
+    ).not.toBeInTheDocument();
+    expect(warnPenaltyAPI).not.toHaveBeenCalled();
+  });
 });

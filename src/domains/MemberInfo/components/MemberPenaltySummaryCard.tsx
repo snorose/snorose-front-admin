@@ -9,10 +9,7 @@ import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { SectionCard } from '@/domains/MemberInfo/components/MemberDetailCard';
 import MemberPenaltyHistoryDialog from '@/domains/MemberInfo/components/MemberPenaltyHistoryDialog';
-import {
-  isOngoingPenalty,
-  isWarningType,
-} from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
+import { isWarningType } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import {
   getPenaltyStatus,
   getRemainingPenaltyLabel,
@@ -49,22 +46,16 @@ export default function MemberPenaltySummaryCard({
   const isWarning = isWarningPenalty(member);
   const isDemotion = hasActivePenalty && !isWarning;
   const latestPayloadIsWarning = isWarningType(member.blacklistType ?? '');
-  const ongoingDemotion = penaltyHistory.find(isOngoingPenalty);
-  // 강등 중 새 경고가 추가되면 users API의 제재 상세 필드가 최신 경고를
-  // 가리킬 수 있다. 이때 경고 정보를 강등 정보로 오표시하지 않고,
-  // 조회된 이력의 진행 중 강등 정보를 사용한다.
-  const demotionReason = latestPayloadIsWarning
-    ? ongoingDemotion?.blackReason
-    : member.blacklistReason;
+  const blacklistReasons = member.blacklistReasons?.join('\n');
+  // 최신 경고의 시작일을 강등 시작일로 표시하지 않는다.
+  // 종료일은 서버가 제공하는 값만 사용하고 이력의 개월 수로 추정하지 않는다.
   const demotionStartDate = latestPayloadIsWarning
-    ? (ongoingDemotion?.blacklistStartDate ?? ongoingDemotion?.createdAt)
+    ? null
     : member.blacklistStartDate;
-  const demotionEndDate = latestPayloadIsWarning
-    ? ongoingDemotion?.blacklistDeadline
-    : member.blacklistEndDate;
+  const demotionEndDate = member.blacklistEndDate;
   const remainingPenaltyLabel = getRemainingPenaltyLabel(demotionEndDate);
   const details = [
-    { label: '경고 사유', value: isWarning ? member.blacklistReason : null },
+    { label: '제재 사유', value: hasActivePenalty ? blacklistReasons : null },
     {
       label: '마지막 경고일',
       value:
@@ -72,7 +63,6 @@ export default function MemberPenaltySummaryCard({
           ? formatDateTimeToMinutes(member.blacklistStartDate)
           : null,
     },
-    { label: '강등 사유', value: isDemotion ? demotionReason : null },
     {
       label: '강등 시작일',
       value:
@@ -151,7 +141,7 @@ export default function MemberPenaltySummaryCard({
                 <Separator className='my-3' />
                 <dl className={SUMMARY_ROW_CLASS_NAME}>
                   <dt className='text-muted-foreground'>{label}</dt>
-                  <dd className='text-foreground min-w-0 wrap-break-word'>
+                  <dd className='text-foreground min-w-0 wrap-break-word whitespace-pre-line'>
                     {value}
                   </dd>
                 </dl>
@@ -159,9 +149,9 @@ export default function MemberPenaltySummaryCard({
             ))}
           </div>
 
-          {isDemotion && latestPayloadIsWarning && !ongoingDemotion ? (
+          {isDemotion && latestPayloadIsWarning && !demotionEndDate ? (
             <p className='text-muted-foreground text-sm leading-6'>
-              강등 상세 정보는 제재 이력에서 확인할 수 있습니다.
+              강등 기간은 제재 이력에서 확인할 수 있습니다.
             </p>
           ) : null}
 

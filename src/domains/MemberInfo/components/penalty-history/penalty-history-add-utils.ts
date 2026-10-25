@@ -13,9 +13,9 @@ import {
 export type AddPenaltyMode = 'WARNING' | 'DEMOTION';
 export type DemotionType = 'RELEGATION' | 'BLACKLIST';
 
-// API의 기존 제재 추가 버그가 수정되면 false로 변경해 임시 제한을 해제한다.
+// 기존 제재 회원의 추가 부여를 다시 허용한다. 임시 제한이 필요하면 true로 변경한다.
 // 영구강등 회원의 경고 제한 등 기존 정책은 각 팝업에서 계속 적용한다.
-export const PENALTY_ADD_RESTRICTION_ENABLED = true;
+export const PENALTY_ADD_RESTRICTION_ENABLED = false;
 
 export const PENALTY_ADD_BLOCKED_MESSAGE =
   '현재 경고 또는 강등이 남아 있는 회원은 이 페이지에서 경고/강등을 추가할 수 없습니다. 추가 부여가 필요한 경우 담당자에게 문의해주세요.';
