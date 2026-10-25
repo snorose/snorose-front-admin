@@ -52,17 +52,17 @@ export default function MemberPointHistoryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='flex max-h-[calc(100dvh-4rem)] max-w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-2xl'>
-        <Dialog.Header className='gap-3 px-5 pt-7 pb-7 text-left sm:px-8 sm:pt-8'>
-          <Dialog.Title className='flex items-center gap-3 pr-6 text-xl font-bold text-zinc-950 sm:text-2xl'>
-            <History className='size-6 shrink-0' aria-hidden='true' />
+      <Dialog.Content className='flex max-h-[calc(100dvh-4rem)] max-w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-xl'>
+        <Dialog.Header className='gap-2 border-b px-6 py-5 text-left'>
+          <Dialog.Title className='flex items-center gap-2 pr-6'>
+            <History className='size-4 shrink-0' aria-hidden='true' />
             포인트 증감 히스토리
           </Dialog.Title>
-          <Dialog.Description className='text-sm text-zinc-500 sm:text-base'>
+          <Dialog.Description className='pr-6'>
             {member.userName}({member.studentNumber})의 전체 포인트 증감 내역을
             확인할 수 있습니다.
           </Dialog.Description>
-          <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-500'>
+          <div className='text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs'>
             <span className='inline-flex items-center gap-1'>
               <ArrowUpRight className='size-3.5' aria-hidden='true' />
               관련 화면을 새 탭으로 열기
@@ -75,7 +75,7 @@ export default function MemberPointHistoryDialog({
         </Dialog.Header>
 
         <div
-          className='min-h-0 flex-1 overflow-y-auto px-5 pt-1 pb-7 sm:px-8'
+          className='min-h-0 flex-1 overflow-y-auto px-6 py-5'
           onScroll={handleScroll}
           aria-label='포인트 증감 내역'
           aria-busy={isFetching || isPending}
@@ -83,7 +83,7 @@ export default function MemberPointHistoryDialog({
           {isPaused ? (
             <div
               role='status'
-              className='mb-5 flex items-center justify-center gap-2 rounded-xl bg-slate-50 px-4 py-8 text-sm text-slate-500'
+              className='bg-muted text-muted-foreground mb-4 flex items-center justify-center gap-2 rounded-md px-4 py-6 text-sm'
             >
               <WifiOff className='size-4 shrink-0' aria-hidden='true' />
               네트워크 연결을 기다리고 있습니다.
@@ -92,19 +92,19 @@ export default function MemberPointHistoryDialog({
           {isPending && !isPaused ? (
             <div
               role='status'
-              className='flex items-center justify-center gap-2 py-16 text-sm text-slate-500'
+              className='text-muted-foreground flex items-center justify-center gap-2 py-10 text-sm'
             >
               <Loader2 className='size-4 animate-spin' aria-hidden='true' />
               포인트 내역을 불러오는 중입니다.
             </div>
           ) : histories.length > 0 ? (
-            <ol className='ml-2 space-y-7 border-l-2 border-[#ecebf0] pl-6 sm:ml-3 sm:pl-7'>
+            <ol className='border-border ml-1.5 space-y-4 border-l pl-4'>
               {histories.map((history) => (
                 <PointHistoryCard key={history.id} history={history} />
               ))}
             </ol>
           ) : !isError && !isPending ? (
-            <p className='rounded-2xl bg-slate-50 px-5 py-16 text-center text-sm text-slate-500'>
+            <p className='bg-muted text-muted-foreground rounded-md px-4 py-10 text-center text-sm'>
               포인트 증감 내역이 없습니다.
             </p>
           ) : null}
@@ -112,7 +112,7 @@ export default function MemberPointHistoryDialog({
           {isError ? (
             <div
               role='alert'
-              className='mt-5 space-y-3 rounded-xl bg-rose-50 p-5 text-center text-sm text-rose-700'
+              className='mt-4 space-y-3 rounded-md bg-rose-50 p-4 text-center text-sm text-rose-700'
             >
               <p>포인트 내역을 불러오지 못했습니다. 다시 시도해주세요.</p>
               <Button
@@ -130,10 +130,11 @@ export default function MemberPointHistoryDialog({
               </Button>
             </div>
           ) : hasNextPage ? (
-            <div className='mt-6 text-center'>
+            <div className='mt-4 text-center'>
               <Button
                 type='button'
                 variant='outline'
+                size='sm'
                 disabled={isFetching || isPaused}
                 onClick={() => void fetchNextPage({ cancelRefetch: false })}
               >
@@ -145,7 +146,7 @@ export default function MemberPointHistoryDialog({
             </div>
           ) : null}
           {data && histories.length > 0 ? (
-            <p className='mt-4 text-center text-xs text-slate-500'>
+            <p className='text-muted-foreground mt-4 text-center text-xs'>
               전체 {totalCount.toLocaleString()}건 중{' '}
               {histories.length.toLocaleString()}건
             </p>
