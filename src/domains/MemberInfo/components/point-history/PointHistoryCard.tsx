@@ -63,7 +63,7 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
           <time
             dateTime={history.createdAt}
             title={history.createdAt.replace('T', ' ')}
-            className='text-muted-foreground text-xs'
+            className='text-muted-foreground text-xs font-normal whitespace-nowrap tabular-nums'
           >
             {formatDateTimeToMinutes(history.createdAt)}
           </time>
