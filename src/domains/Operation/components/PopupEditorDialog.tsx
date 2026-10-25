@@ -1,10 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { X } from 'lucide-react';
 
-import { DateTimePicker } from '@/shared/components';
+import { DatePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
-import { useDateTimeField } from '@/shared/hooks';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
@@ -16,6 +15,8 @@ type PopupEditorDialogProps = {
   mode: PopupEditorMode;
   popup: PopupContent;
   imagePreviewUrl: string;
+  maxDisplayOrder?: number;
+  disabled?: boolean;
   onOpenChange: (open: boolean) => void;
   onPopupChange: (
     field: keyof PopupContent,
@@ -31,6 +32,8 @@ export function PopupEditorDialog({
   mode,
   popup,
   imagePreviewUrl,
+  maxDisplayOrder,
+  disabled = false,
   onOpenChange,
   onPopupChange,
   onImageAttach,
@@ -38,32 +41,6 @@ export function PopupEditorDialog({
   onSave,
 }: PopupEditorDialogProps) {
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const {
-    date: startDate,
-    time: startTime,
-    onDateSelect: onStartDateSelect,
-    onTimeChange: onStartTimeChange,
-    setDateTime: setStartDateTime,
-  } = useDateTimeField({
-    initialDateTime: popup.startDate,
-    onDateTimeChange: (dateTime) => onPopupChange('startDate', dateTime),
-  });
-  const {
-    date: endDate,
-    time: endTime,
-    onDateSelect: onEndDateSelect,
-    onTimeChange: onEndTimeChange,
-    setDateTime: setEndDateTime,
-  } = useDateTimeField({
-    initialDateTime: popup.endDate,
-    onDateTimeChange: (dateTime) => onPopupChange('endDate', dateTime),
-  });
-
-  useEffect(() => {
-    setStartDateTime(popup.startDate);
-    setEndDateTime(popup.endDate);
-  }, [popup.startDate, popup.endDate, setStartDateTime, setEndDateTime]);
-
   const handleImageRemove = () => {
     onImageRemove();
 
@@ -84,27 +61,35 @@ export function PopupEditorDialog({
           </Dialog.Description>
         </Dialog.Header>
 
-        <div className='flex min-w-0 flex-col gap-5'>
+        <fieldset disabled={disabled} className='flex min-w-0 flex-col gap-5'>
           <div className='grid gap-4 md:grid-cols-2'>
-            <DateTimePicker
-              className='min-w-0'
-              label='게시 시작일시'
-              date={startDate}
-              time={startTime}
-              onDateSelect={onStartDateSelect}
-              onTimeChange={onStartTimeChange}
-              required
-            />
-
-            <DateTimePicker
-              className='min-w-0'
-              label='게시 종료일시'
-              date={endDate}
-              time={endTime}
-              onDateSelect={onEndDateSelect}
-              onTimeChange={onEndTimeChange}
-              required
-            />
+            <div className='flex min-w-0 flex-col gap-1'>
+              <Label htmlFor='popup-start-date' required>
+                게시 시작일
+              </Label>
+              <DatePicker
+                id='popup-start-date'
+                aria-label='게시 시작일'
+                value={popup.startDate}
+                onValueChange={(value) =>
+                  onPopupChange('startDate', value ?? '')
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className='flex min-w-0 flex-col gap-1'>
+              <Label htmlFor='popup-end-date' required>
+                게시 종료일
+              </Label>
+              <DatePicker
+                id='popup-end-date'
+                aria-label='게시 종료일'
+                value={popup.endDate}
+                minDate={popup.startDate || undefined}
+                onValueChange={(value) => onPopupChange('endDate', value ?? '')}
+                disabled={disabled}
+              />
+            </div>
 
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor='popup-display-priority' required>
@@ -113,7 +98,8 @@ export function PopupEditorDialog({
               <Input
                 id='popup-display-priority'
                 type='number'
-                min={1}
+                min={0}
+                max={maxDisplayOrder}
                 step={1}
                 value={
                   Number.isNaN(popup.displayPriority)
@@ -134,8 +120,9 @@ export function PopupEditorDialog({
                 id='popup-display-priority-description'
                 className='text-xs leading-5 text-gray-500'
               >
-                작은 숫자부터 상단에 표시되며, 같은 숫자는 먼저 등록한 팝업부터
-                표시됩니다.
+                0부터 {maxDisplayOrder ?? 0}까지 입력할 수 있습니다. 작은
+                숫자부터 표시되며, 해당 위치로 이동하면 다른 팝업의 순서도
+                조정됩니다.
               </p>
             </div>
 
@@ -145,7 +132,7 @@ export function PopupEditorDialog({
                 ref={imageInputRef}
                 id='popup-image-file'
                 type='file'
-                accept='image/*'
+                accept='image/png,image/jpeg,image/webp'
                 className='sr-only'
                 tabIndex={-1}
                 aria-hidden='true'
@@ -192,7 +179,7 @@ export function PopupEditorDialog({
                 id='popup-image-file-description'
                 className='text-xs leading-5 text-gray-500'
               >
-                첨부한 이미지는 본문 가장 아래에 표시됩니다.
+                PNG·JPEG·WebP 파일을 최대 10MB까지 첨부할 수 있습니다.
               </p>
             </div>
           </div>
@@ -267,7 +254,7 @@ export function PopupEditorDialog({
               </div>
             </div>
           </div>
-        </div>
+        </fieldset>
 
         <Dialog.Footer>
           <Button
@@ -277,7 +264,7 @@ export function PopupEditorDialog({
           >
             취소
           </Button>
-          <Button type='button' onClick={onSave}>
+          <Button type='button' disabled={disabled} onClick={onSave}>
             저장 후 반영
           </Button>
         </Dialog.Footer>

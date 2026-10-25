@@ -137,6 +137,7 @@ describe('DateTimePicker 일정 사용처', () => {
       const separator = isFreeze ? ' ' : 'T';
       const request = {
         title: '달력 일정',
+        ...(!isFreeze && { type: 'WRITE' }),
         startAt: `2026-10-09${separator}00:00:00`,
         endAt: `2026-10-17${separator}23:59:00`,
       };
@@ -210,6 +211,7 @@ describe('DateTimePicker 일정 사용처', () => {
       const separator = isFreeze ? ' ' : 'T';
       const request = {
         title: '다음 일정',
+        ...(!isFreeze && { type: 'WRITE' }),
         startAt: `2026-10-15${separator}23:59:00`,
         endAt: `2026-10-17${separator}23:59:00`,
       };
@@ -225,7 +227,7 @@ describe('DateTimePicker 일정 사용처', () => {
     }
   );
 
-  test('팝업 날짜·시간 변경과 해제 콜백, 외부 초기값 갱신을 유지한다', async () => {
+  test('팝업은 API에 맞춰 날짜만 변경하고 해제 및 초기값 갱신을 유지한다', async () => {
     const user = userEvent.setup();
     const popup: PopupContent = {
       id: 1,
@@ -233,8 +235,8 @@ describe('DateTimePicker 일정 사용처', () => {
       bodyMarkdown: '',
       imageFileName: '',
       displayPriority: 1,
-      startDate: '2026-10-09T08:30',
-      endDate: '2026-10-17T23:59',
+      startDate: '2026-10-09',
+      endDate: '2026-10-17',
       createdAt: '',
       updatedAt: '',
     };
@@ -250,34 +252,26 @@ describe('DateTimePicker 일정 사용처', () => {
     };
     const { rerender } = render(<PopupEditorDialog {...props} popup={popup} />);
     expect(props.onPopupChange).not.toHaveBeenCalled();
-    await chooseDate(user, '게시 시작일시', 15);
+    await chooseDate(user, '게시 시작일', 15);
     expect(props.onPopupChange).toHaveBeenLastCalledWith(
       'startDate',
-      '2026-10-15T08:30'
+      '2026-10-15'
     );
-    await chooseTime(user, '게시 시작일시');
-    expect(props.onPopupChange).toHaveBeenLastCalledWith(
-      'startDate',
-      '2026-10-15T23:59'
-    );
-    await user.click(screen.getByRole('button', { name: '게시 시작일시' }));
+    await user.click(screen.getByRole('button', { name: '게시 시작일' }));
     await user.click(screen.getByRole('button', { name: '날짜 선택 해제' }));
     expect(props.onPopupChange).toHaveBeenLastCalledWith('startDate', '');
-    expect(
-      screen.getByRole('combobox', { name: '게시 시작일시 시' })
-    ).toHaveTextContent('23시');
     rerender(
       <PopupEditorDialog
         {...props}
-        popup={{ ...popup, startDate: '2024-02-29T12:34' }}
+        popup={{ ...popup, startDate: '2024-02-29' }}
       />
     );
     expect(
-      screen.getByRole('button', { name: '게시 시작일시' })
+      screen.getByRole('button', { name: '게시 시작일' })
     ).toHaveTextContent('2024-02-29');
     expect(
-      screen.getByRole('combobox', { name: '게시 시작일시 분' })
-    ).toHaveTextContent('34분');
+      screen.queryByRole('combobox', { name: /게시 시작일/ })
+    ).not.toBeInTheDocument();
     expect(props.onSave).not.toHaveBeenCalled();
   });
 });
