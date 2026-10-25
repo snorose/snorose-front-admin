@@ -24,6 +24,8 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
   const sourceLabel = getPointSourceLabel(history.source);
   const detailLabel = getPointDetailLabel(history.category, history.source);
   const sourceTarget = getPointSourceTarget(history);
+  const sourceDetail = history.sourceDetail?.trim();
+  const hasSourceDetail = Boolean(sourceDetail && sourceDetail !== '-');
 
   return (
     <li className='relative' aria-label={`포인트 로그 ${history.id}`}>
@@ -103,14 +105,16 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
             )}
           </Info>
 
-          <div className='col-span-2 min-w-0 space-y-1'>
-            <dt className='text-muted-foreground text-xs font-medium'>
-              {detailLabel}
-            </dt>
-            <dd className='bg-muted text-foreground rounded-md px-3 py-2 text-sm break-words whitespace-pre-wrap'>
-              {history.sourceDetail ?? '-'}
-            </dd>
-          </div>
+          {hasSourceDetail ? (
+            <div className='col-span-2 grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2'>
+              <dt className='text-muted-foreground text-xs font-medium'>
+                {detailLabel}
+              </dt>
+              <dd className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
+                {history.sourceDetail}
+              </dd>
+            </div>
+          ) : null}
         </dl>
       </article>
     </li>
