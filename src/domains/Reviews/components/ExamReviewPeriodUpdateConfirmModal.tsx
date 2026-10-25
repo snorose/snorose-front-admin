@@ -1,9 +1,10 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { DateTimePicker } from '@/shared/components';
-import { Button, Dialog, Input, Label } from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { PeriodFields } from '@/shared/components/PeriodFields';
+import { Button } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
@@ -25,8 +26,8 @@ export function ExamReviewPeriodUpdateConfirmModal({
   onClose,
   onSuccess,
 }: ExamReviewPeriodUpdateConfirmModalProps) {
-  const titleId = useId();
   const [title, setTitle] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
   const startDateTime = useDateTimeField();
   const endDateTime = useDateTimeField();
@@ -43,12 +44,8 @@ export function ExamReviewPeriodUpdateConfirmModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem, isUpdateModalOpen]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
-
   const handleUpdateConfirm = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem || isPending) return;
 
     if (
       title === '' ||
@@ -59,6 +56,7 @@ export function ExamReviewPeriodUpdateConfirmModal({
       return;
     }
 
+    setIsPending(true);
     try {
       await patchExamReviewPeriodAPI(
         selectedItem.id,
@@ -75,54 +73,43 @@ export function ExamReviewPeriodUpdateConfirmModal({
       toast.error(
         getErrorMessage(error, '시험 후기 작성 기간 수정에 실패했습니다.')
       );
+    } finally {
+      setIsPending(false);
     }
   };
 
   return (
-    <Dialog open={isUpdateModalOpen} onOpenChange={onClose}>
-      <Dialog.Content className='max-w-xs sm:max-w-sm'>
-        <Dialog.Header>
-          <Dialog.Title>작성 기간 수정</Dialog.Title>
-          <Dialog.Description>
-            시험 후기 작성 기간을 수정하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='flex flex-col gap-1'>
-          <Label htmlFor={titleId} className='text-sm font-semibold'>
-            기간 제목:
-          </Label>
-          <Input
-            type='text'
-            id={titleId}
-            value={title}
-            onChange={handleInputChange}
-          />
-        </div>
-        <DateTimePicker
-          label='시작 일시'
-          date={startDateTime.date}
-          time={startDateTime.time}
-          onDateSelect={startDateTime.onDateSelect}
-          onTimeChange={startDateTime.onTimeChange}
-          datePlaceholder='시작 날짜 선택'
+    <Modal
+      open={isUpdateModalOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+      title='작성 기간 수정'
+      subtitle='시험 후기 작성 기간을 수정하시겠습니까?'
+      size='sm'
+      closeDisabled={isPending}
+    >
+      <fieldset
+        disabled={isPending}
+        className='min-h-0 min-w-0 space-y-4 overflow-y-auto px-6 pb-6'
+      >
+        <PeriodFields
+          title={title}
+          titleLabel='기간 제목'
+          onTitleChange={setTitle}
+          start={startDateTime}
+          end={endDateTime}
+          disabled={isPending}
         />
-        <DateTimePicker
-          label='종료 일시'
-          date={endDateTime.date}
-          time={endDateTime.time}
-          onDateSelect={endDateTime.onDateSelect}
-          onTimeChange={endDateTime.onTimeChange}
-          datePlaceholder='종료 날짜 선택'
-        />
-        <Dialog.Footer>
+        <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
           <Button type='button' variant='outline' onClick={onClose}>
             취소
           </Button>
           <Button type='button' onClick={handleUpdateConfirm}>
-            수정
+            {isPending ? '수정 중' : '수정'}
           </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+        </div>
+      </fieldset>
+    </Modal>
   );
 }

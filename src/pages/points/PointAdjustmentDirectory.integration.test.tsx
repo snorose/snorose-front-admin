@@ -141,6 +141,43 @@ async function submitAdjustment(
   return page;
 }
 
+test.each(['단일건', '전체'] as const)(
+  '%s 포인트 요청 중 재실행과 닫기를 막고 완료 후 닫는다',
+  async (target) => {
+    const { client, wrapper } = createWrapper();
+    let finish!: () => void;
+    const pending = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    vi.mocked(postSinglePointAPI).mockImplementationOnce(async () => {
+      await pending;
+    });
+    vi.mocked(postAllMemberPointAPI).mockImplementationOnce(async () => {
+      await pending;
+    });
+    const page = await submitAdjustment(target, 20, wrapper);
+    const user = userEvent.setup();
+    const confirm = screen.getByRole('button', { name: '적용 중' });
+    expect(confirm).toBeDisabled();
+    expect(screen.getByRole('button', { name: '취소' })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: '창 닫기' })
+    ).not.toBeInTheDocument();
+    await user.click(confirm);
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(
+      target === '단일건' ? postSinglePointAPI : postAllMemberPointAPI
+    ).toHaveBeenCalledOnce();
+    await act(async () => finish());
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    page.unmount();
+    client.clear();
+  }
+);
+
 test.each([
   ['단일건', 20],
   ['단일건', -20],

@@ -11,17 +11,14 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import {
-  MemberInfoPopover,
-  StatusBadge,
-  StatusChangeModal,
-} from '@/shared/components';
+import { StatusBadge, StatusChangeModal } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 
 import type { AdminCommentResult } from '@/domains/Comments/types';
 import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
+import { MemberInfoPopover } from '@/domains/MemberInfo/components/MemberInfoPopover';
 
 import { deleteComment, restoreComment, updateCommentVisibility } from '@/apis';
 
@@ -112,6 +109,7 @@ export default function PostDetailCommentItem({
   const handleConfirmAction = (memo: string) => {
     if (
       !memo.trim() ||
+      deleteMutation.isPending ||
       restoreMutation.isPending ||
       visibilityMutation.isPending
     )
@@ -264,6 +262,11 @@ export default function PostDetailCommentItem({
         <StatusChangeModal
           target='COMMENT'
           modalType={modalType}
+          isPending={
+            deleteMutation.isPending ||
+            restoreMutation.isPending ||
+            visibilityMutation.isPending
+          }
           onClose={() => {
             setIsModalOpen(false);
           }}

@@ -3,13 +3,8 @@ import { useEffect, useState } from 'react';
 import { LoaderCircleIcon } from 'lucide-react';
 
 import { DateTimePicker } from '@/shared/components';
-import {
-  Button,
-  ConfirmModal,
-  Dialog,
-  Input,
-  Label,
-} from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Button, ConfirmModal, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { formatDateTimeWithT, getErrorMessage } from '@/shared/utils';
 
@@ -213,27 +208,24 @@ export function ExamReviewAdminStatusPeriodFormModal({
   };
 
   return (
-    <Dialog
+    <Modal
       open={open}
       onOpenChange={(nextOpen) => {
         if (nextOpen) onOpenChange(true);
         else requestClose();
       }}
-    >
-      <Dialog.Content
-        className='max-h-[85vh] overflow-y-auto sm:max-w-2xl'
-        showCloseButton={!isSubmitting}
-        onCloseAutoFocus={(event) => {
+      title={period ? '기간 수정' : '기간 추가'}
+      subtitle='기간 이름과 시작·종료 일시를 설정해주세요.'
+      size='lg'
+      closeDisabled={isSubmitting}
+      contentProps={{
+        onCloseAutoFocus: (event) => {
           event.preventDefault();
           onAfterClose();
-        }}
-      >
-        <Dialog.Header>
-          <Dialog.Title>{period ? '기간 수정' : '기간 추가'}</Dialog.Title>
-          <Dialog.Description>
-            기간 이름과 시작·종료 일시를 설정해주세요.
-          </Dialog.Description>
-        </Dialog.Header>
+        },
+      }}
+    >
+      <div className='min-h-0 overflow-y-auto px-6 pb-6'>
         {open && (
           <PeriodForm
             key={period?.id ?? 'new'}
@@ -245,18 +237,18 @@ export function ExamReviewAdminStatusPeriodFormModal({
             onDirtyChange={setIsFormDirty}
           />
         )}
-        {isDiscardConfirmOpen && (
-          <ConfirmModal
-            isOpen
-            title='저장하지 않은 변경사항이 있습니다.'
-            description='입력한 내용을 저장하지 않고 닫으시겠습니까?'
-            confirmText='변경사항 버리기'
-            confirmVariant='destructive'
-            onConfirm={closeModal}
-            onClose={() => setIsDiscardConfirmOpen(false)}
-          />
-        )}
-      </Dialog.Content>
-    </Dialog>
+      </div>
+      {isDiscardConfirmOpen && (
+        <ConfirmModal
+          isOpen
+          title='저장하지 않은 변경사항이 있습니다.'
+          description='입력한 내용을 저장하지 않고 닫으시겠습니까?'
+          confirmText='변경사항 버리기'
+          confirmVariant='destructive'
+          onConfirm={closeModal}
+          onClose={() => setIsDiscardConfirmOpen(false)}
+        />
+      )}
+    </Modal>
   );
 }

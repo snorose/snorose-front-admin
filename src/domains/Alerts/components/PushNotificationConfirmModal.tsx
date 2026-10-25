@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
-import { Button, Dialog } from '@/shared/components/ui';
+import { DetailList } from '@/shared/components/DetailList';
+import { ConfirmModal } from '@/shared/components/ui';
 import type { PushNotification } from '@/shared/types';
 
 interface PushNotificationConfirmModalProps {
@@ -43,54 +44,17 @@ export function PushNotificationConfirmModal({
   );
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open && !isLoading) {
-          onClose();
-        }
-      }}
+    <ConfirmModal
+      isOpen={isOpen}
+      title='푸시 알림 전송 확인'
+      description='아래 내용으로 푸시 알림을 전송하시겠습니까?'
+      onConfirm={onConfirm}
+      onClose={onClose}
+      isPending={isLoading}
+      confirmText='즉시 발송'
+      pendingText='발송 중...'
     >
-      <Dialog.Content showCloseButton={!isLoading}>
-        <Dialog.Header>
-          <Dialog.Title>푸시 알림 전송 확인</Dialog.Title>
-          <Dialog.Description>
-            아래 내용으로 푸시 알림을 전송하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='flex flex-col gap-3 py-4'>
-          {CONFIRMATION_DATA.map((data) => (
-            <div className='flex items-start gap-2' key={data.label}>
-              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-                {data.label}:
-              </span>
-              <span className='text-sm break-keep'>{data.value}</span>
-            </div>
-          ))}
-        </div>
-
-        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2 sm:justify-normal'>
-          <Button
-            type='button'
-            variant='outline'
-            size='default'
-            disabled={isLoading}
-            onClick={onClose}
-            className='w-full'
-          >
-            취소
-          </Button>
-          <Button
-            type='button'
-            size='default'
-            disabled={isLoading}
-            onClick={onConfirm}
-            className='w-full'
-          >
-            {isLoading ? '발송 중...' : '즉시 발송'}
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+      <DetailList items={CONFIRMATION_DATA} />
+    </ConfirmModal>
   );
 }

@@ -550,6 +550,7 @@ export function ExamDetailSection({
       );
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
+      setIsSaveModalOpen(false);
       setSelectedFile(null);
       setIsEditMode(false);
       setInitialValues({
@@ -862,9 +863,9 @@ export function ExamDetailSection({
       <ExamReviewUpdateConfirmModal
         isOpen={isSaveModalOpen}
         changes={updateChanges}
+        isSaving={isSaving}
         onClose={() => setIsSaveModalOpen(false)}
         onConfirm={() => {
-          setIsSaveModalOpen(false);
           void handleSave();
         }}
       />

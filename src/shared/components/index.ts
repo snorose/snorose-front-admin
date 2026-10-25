@@ -4,10 +4,10 @@ export { BulkActionBar } from './BulkActionBar';
 export { CopyableValue, type CopyableValueProps } from './CopyableValue';
 export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
+export { DetailList, type DetailListItem } from './DetailList';
 export { FilterMultiSelect } from './FilterMultiSelect';
 export { Header } from './Header';
-export { default as MemberInfoModal } from './MemberInfoModal';
-export { MemberInfoPopover } from './MemberInfoPopover';
+export { Modal, type ModalProps } from './Modal';
 export { NavUser } from './NavUser';
 export { NoticePanel } from './NoticePanel';
 export {
@@ -16,10 +16,10 @@ export {
 } from './OriginalPostButton';
 export { PageHeader } from './PageHeader';
 export { PaginationBar } from './PaginationBar';
+export { PeriodFields } from './PeriodFields';
 export { PeriodStatusBadge } from './PeriodStatusBadge';
 export { ProtectedRoute } from './ProtectedRoute';
 export { ResultCount, type ResultCountProps } from './ResultCount';
-export { default as SanctionModal } from './SanctionModal';
 export { SearchableSelect } from './SearchableSelect';
 export { SectionTitle } from './SectionTitle';
 export {

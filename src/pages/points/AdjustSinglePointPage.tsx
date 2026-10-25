@@ -33,6 +33,7 @@ export default function AdjustSinglePointPage() {
   const [difference, setDifference] = useState<string>('');
   const [memo, setMemo] = useState<string>('');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSearchButtonClick = async () => {
     if (!searchQuery.trim()) {
@@ -73,10 +74,12 @@ export default function AdjustSinglePointPage() {
   };
 
   const handleConfirmModalButtonClick = async () => {
+    if (isSubmitting) return;
     if (!searchedMember) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const numDifference = Number(difference);
 
@@ -96,6 +99,7 @@ export default function AdjustSinglePointPage() {
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '포인트 지급/차감에 실패했어요.'));
     } finally {
+      setIsSubmitting(false);
       setIsConfirmModalOpen(false);
     }
   };
@@ -168,6 +172,7 @@ export default function AdjustSinglePointPage() {
       {searchedMember && (
         <PointAdjustmentConfirmModal
           isOpen={isConfirmModalOpen}
+          isPending={isSubmitting}
           onClose={() => setIsConfirmModalOpen(false)}
           onConfirm={handleConfirmModalButtonClick}
           searchedMember={searchedMember}
