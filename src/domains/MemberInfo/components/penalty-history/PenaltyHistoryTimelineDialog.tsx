@@ -3,7 +3,8 @@ import type { UIEvent } from 'react';
 import { History, Loader2, Plus, Trash2 } from 'lucide-react';
 
 import { StatusBadge } from '@/shared/components';
-import { Button, Dialog } from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Button } from '@/shared/components/ui';
 import type { BlacklistHistoryItem, MemberInfo } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -67,110 +68,100 @@ export default function PenaltyHistoryTimelineDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='max-h-[calc(100dvh-4rem)] gap-0 overflow-hidden p-0 sm:max-w-xl'>
-        <div className='flex max-h-[calc(100dvh-4rem)] min-h-0 flex-col'>
-          <Dialog.Header className='shrink-0 gap-2 px-6 pt-5 text-left'>
-            <Dialog.Title className='flex items-center gap-2 pr-6'>
-              <History className='size-4 shrink-0' aria-hidden='true' />
-              제재 이력 타임라인
-            </Dialog.Title>
-            <Dialog.Description>
-              {member.userName}({member.studentNumber})님의 전체 제재 이력을
-              확인할 수 있습니다.
-            </Dialog.Description>
-          </Dialog.Header>
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title={
+        <span className='flex items-center gap-2'>
+          <History className='size-4 shrink-0' aria-hidden='true' />
+          제재 이력 타임라인
+        </span>
+      }
+      subtitle={`${member.userName}(${member.studentNumber})님의 전체 제재 이력을 확인할 수 있습니다.`}
+      className='max-h-[calc(100dvh-4rem)] sm:max-w-xl'
+    >
+      <div className='grid shrink-0 grid-cols-2 gap-2 px-6 py-4'>
+        <Button
+          type='button'
+          variant='destructive-outline'
+          size='sm'
+          onClick={onAddWarning}
+          disabled={isPenaltyBlocked || !canAddWarning}
+          title={warningBlockedMessage}
+        >
+          <Plus aria-hidden='true' />
+          경고 추가
+        </Button>
+        <Button
+          type='button'
+          variant='destructive-outline'
+          size='sm'
+          onClick={onAddDemotion}
+          disabled={isPenaltyBlocked}
+          title={isPenaltyBlocked ? PENALTY_ADD_BLOCKED_MESSAGE : undefined}
+        >
+          <Plus aria-hidden='true' />
+          강등 추가
+        </Button>
+      </div>
 
-          <div className='grid shrink-0 grid-cols-2 gap-2 px-6 py-4'>
-            <Button
-              type='button'
-              variant='destructive-outline'
-              size='sm'
-              onClick={onAddWarning}
-              disabled={isPenaltyBlocked || !canAddWarning}
-              title={warningBlockedMessage}
-            >
-              <Plus aria-hidden='true' />
-              경고 추가
-            </Button>
-            <Button
-              type='button'
-              variant='destructive-outline'
-              size='sm'
-              onClick={onAddDemotion}
-              disabled={isPenaltyBlocked}
-              title={isPenaltyBlocked ? PENALTY_ADD_BLOCKED_MESSAGE : undefined}
-            >
-              <Plus aria-hidden='true' />
-              강등 추가
-            </Button>
-          </div>
+      {isPenaltyBlocked ? (
+        <p role='alert' className='shrink-0 px-6 pb-4 text-sm text-rose-600'>
+          {PENALTY_ADD_BLOCKED_MESSAGE}
+        </p>
+      ) : !canAddWarning ? (
+        <p className='shrink-0 px-6 pb-4 text-sm text-rose-600'>
+          {warningBlockedMessage}
+        </p>
+      ) : null}
 
-          {isPenaltyBlocked ? (
-            <p
-              role='alert'
-              className='shrink-0 px-6 pb-4 text-sm text-rose-600'
-            >
-              {PENALTY_ADD_BLOCKED_MESSAGE}
-            </p>
-          ) : !canAddWarning ? (
-            <p className='shrink-0 px-6 pb-4 text-sm text-rose-600'>
-              {warningBlockedMessage}
-            </p>
-          ) : null}
+      <div className='shrink-0 border-t' />
 
-          <div className='shrink-0 border-t' />
+      <div className='shrink-0 px-6 pt-4'>
+        <p className='text-muted-foreground text-xs'>
+          전체 제재 이력 {totalCount.toLocaleString()}건
+        </p>
+      </div>
 
-          <div className='shrink-0 px-6 pt-4'>
-            <p className='text-muted-foreground text-xs'>
-              전체 제재 이력 {totalCount.toLocaleString()}건
-            </p>
-          </div>
-
-          <div
-            className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-3 pb-5'
-            aria-label='제재 이력'
-            aria-busy={isLoading}
-            onScroll={handleScroll}
-          >
-            {histories.length > 0 ? (
-              <>
-                <ol className='border-border relative ml-1.5 space-y-4 border-l pl-4'>
-                  {histories.map((history, index) => (
-                    <PenaltyHistoryCard
-                      key={`${history.createdAt}-${history.type}-${index}`}
-                      history={history}
-                      onDelete={onDelete}
-                    />
-                  ))}
-                </ol>
-                {isLoading ? (
-                  <div
-                    role='status'
-                    className='text-muted-foreground mt-4 flex items-center justify-center gap-2 text-sm'
-                  >
-                    <Loader2
-                      className='size-4 animate-spin'
-                      aria-hidden='true'
-                    />
-                    제재 이력을 불러오는 중입니다.
-                  </div>
-                ) : null}
-              </>
-            ) : (
+      <div
+        className='min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-3 pb-5'
+        aria-label='제재 이력'
+        aria-busy={isLoading}
+        onScroll={handleScroll}
+      >
+        {histories.length > 0 ? (
+          <>
+            <ol className='border-border relative ml-1.5 space-y-4 border-l pl-4'>
+              {histories.map((history, index) => (
+                <PenaltyHistoryCard
+                  key={`${history.createdAt}-${history.type}-${index}`}
+                  history={history}
+                  onDelete={onDelete}
+                />
+              ))}
+            </ol>
+            {isLoading ? (
               <div
                 role='status'
-                className='bg-muted text-muted-foreground rounded-md px-4 py-10 text-center text-sm'
+                className='text-muted-foreground mt-4 flex items-center justify-center gap-2 text-sm'
               >
-                {isLoading
-                  ? '제재 이력을 불러오는 중입니다.'
-                  : '제재 이력이 없습니다.'}
+                <Loader2 className='size-4 animate-spin' aria-hidden='true' />
+                제재 이력을 불러오는 중입니다.
               </div>
-            )}
+            ) : null}
+          </>
+        ) : (
+          <div
+            role='status'
+            className='bg-muted text-muted-foreground rounded-md px-4 py-10 text-center text-sm'
+          >
+            {isLoading
+              ? '제재 이력을 불러오는 중입니다.'
+              : '제재 이력이 없습니다.'}
           </div>
-        </div>
-      </Dialog.Content>
-    </Dialog>
+        )}
+      </div>
+    </Modal>
   );
 }
 

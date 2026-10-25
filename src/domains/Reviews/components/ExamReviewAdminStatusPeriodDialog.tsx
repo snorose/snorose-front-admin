@@ -2,13 +2,8 @@ import { useMemo, useState } from 'react';
 
 import { BarChart3Icon, TriangleAlertIcon } from 'lucide-react';
 
-import {
-  Alert,
-  Button,
-  ConfirmModal,
-  Dialog,
-  Skeleton,
-} from '@/shared/components/ui';
+import { Modal } from '@/shared/components/Modal';
+import { Alert, Button, ConfirmModal, Skeleton } from '@/shared/components/ui';
 
 import { useExamReviewAdminStatusPeriods } from '@/domains/Reviews/hooks';
 import { sortAdminStatusPeriods } from '@/domains/Reviews/utils';
@@ -59,7 +54,7 @@ export function ExamReviewAdminStatusPeriodDialog({
   };
 
   return (
-    <Dialog
+    <Modal
       open={open}
       onOpenChange={(nextOpen) => {
         if (nextOpen) {
@@ -69,31 +64,26 @@ export function ExamReviewAdminStatusPeriodDialog({
 
         requestClose();
       }}
+      title='기간 편집'
+      subtitle='관리자 편집 가능 기간과 현황 조회 기간을 함께 관리합니다.'
+      className='sm:max-w-3xl'
+      closeDisabled={isMutating}
+      headerExtra={
+        <div>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            onClick={requestClose}
+            disabled={isMutating}
+          >
+            <BarChart3Icon />
+            현황 보기
+          </Button>
+        </div>
+      }
     >
-      <Dialog.Content className='max-h-[85vh] overflow-y-auto sm:max-w-3xl'>
-        <Dialog.Header className='pr-8'>
-          <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
-            <div className='flex flex-col gap-2'>
-              <div className='flex flex-wrap items-center gap-2'>
-                <Dialog.Title>기간 편집</Dialog.Title>
-              </div>
-              <Dialog.Description>
-                관리자 편집 가능 기간과 현황 조회 기간을 함께 관리합니다.
-              </Dialog.Description>
-            </div>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              onClick={requestClose}
-              disabled={isMutating}
-            >
-              <BarChart3Icon />
-              현황 보기
-            </Button>
-          </div>
-        </Dialog.Header>
-
+      <div className='min-h-0 min-w-0 overflow-y-auto px-6 pb-6'>
         {periodsQuery.isPending ? (
           <div className='flex flex-col gap-3'>
             {[0, 1, 2].map((item) => (
@@ -141,19 +131,18 @@ export function ExamReviewAdminStatusPeriodDialog({
             onDirtyChange={setIsEditorDirty}
           />
         )}
-
-        {isDiscardConfirmOpen && (
-          <ConfirmModal
-            isOpen
-            title='저장하지 않은 변경사항이 있습니다.'
-            description='변경 내용을 저장하지 않고 현황으로 돌아가시겠습니까?'
-            confirmText='변경사항 버리기'
-            confirmVariant='destructive'
-            onConfirm={closeDialog}
-            onClose={() => setIsDiscardConfirmOpen(false)}
-          />
-        )}
-      </Dialog.Content>
-    </Dialog>
+      </div>
+      {isDiscardConfirmOpen && (
+        <ConfirmModal
+          isOpen
+          title='저장하지 않은 변경사항이 있습니다.'
+          description='변경 내용을 저장하지 않고 현황으로 돌아가시겠습니까?'
+          confirmText='변경사항 버리기'
+          confirmVariant='destructive'
+          onConfirm={closeDialog}
+          onClose={() => setIsDiscardConfirmOpen(false)}
+        />
+      )}
+    </Modal>
   );
 }
