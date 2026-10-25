@@ -14,7 +14,7 @@ import {
 import {
   getPenaltyBadgeMeta,
   getPenaltyProgressBadgeMeta,
-  isOngoingPenalty,
+  getWarningCountFromHistory,
   isPermanentDemotionType,
 } from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 
@@ -181,28 +181,19 @@ function PenaltyHistoryCard({
   history: BlacklistHistoryItem;
   onDelete: (history: BlacklistHistoryItem) => void;
 }) {
-  const isOngoing = isOngoingPenalty(history);
   const isPermanentDemotion = isPermanentDemotionType(history.type);
   const penaltyBadge = getPenaltyBadgeMeta(history);
   const progressBadge = getPenaltyProgressBadgeMeta(history);
-  // 경고 항목에는 강등 시작일/종료일이 없으므로(항상 '-') 해당 필드를 숨긴다.
+  // 경고 항목에는 강등 시작일/기간을 표시하지 않는다.
   const isWarning = history.type === '경고' || history.type === 'WARNING';
 
   return (
     <li className='relative'>
       <span
         aria-hidden='true'
-        className={`bg-background absolute top-4 -left-[1.4375rem] size-3 rounded-full border-2 ${
-          isOngoing && !isPermanentDemotion
-            ? 'border-rose-600'
-            : 'border-foreground'
-        }`}
+        className='bg-background border-foreground absolute top-4 -left-[1.4375rem] size-3 rounded-full border-2'
       />
-      <article
-        className={`bg-background rounded-md border p-4 pt-3 ${
-          isOngoing ? 'border-rose-200' : 'border-border'
-        }`}
-      >
+      <article className='bg-background border-border rounded-md border p-4 pt-3'>
         <div className='flex flex-wrap items-center justify-between gap-2'>
           <div className='flex flex-wrap items-center gap-2'>
             <StatusBadge tone={penaltyBadge.tone}>
@@ -240,10 +231,25 @@ function PenaltyHistoryCard({
         <dl className='mt-3 grid grid-cols-2 gap-x-4 gap-y-2'>
           <Info label='제재 사유' value={history.blackReason} />
           <Info label='관리자명' value={history.adminName} />
+          {isWarning ? (
+            <Info
+              label='경고 횟수'
+              value={`${getWarningCountFromHistory(history)}회`}
+            />
+          ) : null}
           {!isWarning ? (
             <>
               <Info label='강등 시작일' value={history.blacklistStartDate} />
-              <Info label='강등 종료일' value={history.blacklistDeadline} />
+              <Info
+                label='강등 기간'
+                value={
+                  isPermanentDemotion
+                    ? '영구'
+                    : history.relegationMonth != null
+                      ? `${history.relegationMonth}개월`
+                      : null
+                }
+              />
             </>
           ) : null}
           {hasDetail(history.operatorMemo) ? (

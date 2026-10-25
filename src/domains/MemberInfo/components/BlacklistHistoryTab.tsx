@@ -7,6 +7,11 @@ import { Table } from '@/shared/components/ui';
 import type { BlacklistHistoryItem } from '@/shared/types';
 import { getErrorMessage } from '@/shared/utils';
 
+import {
+  getWarningCountFromHistory,
+  isPermanentDemotionType,
+  isWarningType,
+} from '@/domains/MemberInfo/components/penalty-history/penalty-history-utils';
 import { toBlacklistHistoryItem } from '@/domains/MemberInfo/utils/memberDirectory';
 
 import { blacklistHistoryAPI } from '@/apis';
@@ -88,7 +93,9 @@ export default function BlacklistHistoryTab({
             <Table.Head className='text-center'>유형</Table.Head>
             <Table.Head className='text-center'>사유</Table.Head>
             <Table.Head className='text-center'>생성일</Table.Head>
-            <Table.Head className='text-center'>해제일</Table.Head>
+            <Table.Head className='text-center'>
+              경고 횟수 / 강등 기간
+            </Table.Head>
           </Table.Row>
         </Table.Header>
 
@@ -128,12 +135,14 @@ export default function BlacklistHistoryTab({
                   <Table.Cell className='text-center'>
                     {history.createdAt}
                   </Table.Cell>
-                  <Table.Cell
-                    className={`text-center ${
-                      history.blacklistDeadline === null ? 'bg-gray-50' : ''
-                    }`}
-                  >
-                    {history.blacklistDeadline}
+                  <Table.Cell className='text-center'>
+                    {isWarningType(history.type)
+                      ? `${getWarningCountFromHistory(history)}회`
+                      : isPermanentDemotionType(history.type)
+                        ? '영구'
+                        : history.relegationMonth != null
+                          ? `${history.relegationMonth}개월`
+                          : '-'}
                   </Table.Cell>
                 </Table.Row>
               ))}

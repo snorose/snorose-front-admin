@@ -2,7 +2,7 @@ export interface AdminSanctionResponse {
   type: string;
   createdAt: string;
   startAt: string;
-  endAt?: string;
+  relegationMonth?: number | null;
   reason: string;
   encryptedAdminId: string;
   memo?: string;

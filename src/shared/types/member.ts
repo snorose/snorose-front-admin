@@ -19,7 +19,7 @@ export type MemberInfo = {
   totalWarningCount: number;
   isBlacklist: boolean | null;
   blacklistType?: string | null;
-  blacklistReason?: string | null;
+  blacklistReasons?: string[] | null;
   blacklistStartDate: string | null; // YYYY-MM-DDTHH:MM:SS
   blacklistEndDate: string | null; // YYYY-MM-DDTHH:MM:SS
 };
@@ -48,12 +48,12 @@ export type UserBlacklistHistory = {
   studentNumber?: string;
   type: string;
   reasonType?: string;
-  warningCount?: number;
+  warningCount?: number | null;
+  relegationMonth?: number | null;
   blackReason: string;
   memo?: string | null;
   createdAt: string; // YYYY-MM-DD HH:MM:SS
   blacklistStartDate?: string | null;
-  blacklistDeadline: string | null; // YYYY-MM-DD HH:MM:SS
   adminName?: string | null;
   deletedAt?: string | null;
   deletedReason?: string | null;
@@ -134,11 +134,11 @@ export interface BlacklistHistoryItem {
   studentNumber: string;
   type: string;
   reasonType?: string;
-  warningCount?: number;
+  warningCount?: number | null;
+  relegationMonth?: number | null;
   blackReason: string;
   createdAt: string;
   blacklistStartDate?: string | null;
-  blacklistDeadline: string | null;
   adminName: string;
   operatorMemo?: string;
   deletedAt?: string | null;

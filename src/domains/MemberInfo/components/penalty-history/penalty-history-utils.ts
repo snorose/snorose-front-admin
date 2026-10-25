@@ -16,12 +16,6 @@ type PenaltyBadgeMeta = {
   tone: StatusBadgeTone;
 };
 
-const PENALTY_PROGRESS_BADGE_META = {
-  ONGOING: { label: '진행중', tone: 'danger' },
-  ENDED: { label: '종료', tone: 'neutral' },
-  CANCELLED: { label: '취소', tone: 'neutral' },
-} satisfies Record<string, PenaltyBadgeMeta>;
-
 export function isWarningType(type: string) {
   return WARNING_TYPES.some((warningType) => type.includes(warningType));
 }
@@ -92,18 +86,6 @@ export function toDate(value?: string | null) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function isOngoingPenalty(history: BlacklistHistoryItem) {
-  if (history.deletedAt || isWarningType(history.type)) return false;
-
-  const now = new Date();
-  const startDate = toDate(history.blacklistStartDate ?? history.createdAt);
-  const endDate = toDate(history.blacklistDeadline);
-
-  if (!startDate) return false;
-  if (startDate.getTime() > now.getTime()) return false;
-  return !endDate || endDate.getTime() >= now.getTime();
-}
-
 export function getPenaltyBadgeMeta(
   history: BlacklistHistoryItem
 ): PenaltyBadgeMeta {
@@ -111,22 +93,14 @@ export function getPenaltyBadgeMeta(
 
   if (history.deletedAt) return { label, tone: 'neutral' };
   if (isWarningType(history.type)) return { label, tone: 'warning' };
-  if (isPermanentDemotionType(history.type) || isOngoingPenalty(history)) {
-    return { label, tone: 'danger' };
-  }
-
-  return { label, tone: 'neutral' };
+  return { label, tone: 'danger' };
 }
 
 export function getPenaltyProgressBadgeMeta(
   history: BlacklistHistoryItem
 ): PenaltyBadgeMeta | null {
-  if (history.deletedAt) return PENALTY_PROGRESS_BADGE_META.CANCELLED;
-  if (isWarningType(history.type)) return null;
-
-  return isOngoingPenalty(history)
-    ? PENALTY_PROGRESS_BADGE_META.ONGOING
-    : PENALTY_PROGRESS_BADGE_META.ENDED;
+  // 개월 수만으로 정확한 종료 시각을 알 수 없으므로 진행 상태는 추정하지 않는다.
+  return history.deletedAt ? { label: '취소', tone: 'neutral' } : null;
 }
 
 export function getDaysBetween(start?: string | null, end?: string | null) {

@@ -9,6 +9,7 @@ import {
   getRoleBadgeMeta,
   isPermanentDemotionPenalty,
   isWarningPenalty,
+  toBlacklistHistoryItem,
 } from './memberDirectory';
 
 const MEMBER: MemberInfo = {
@@ -60,6 +61,42 @@ describe('createMemberDiffPayload', () => {
     const updated = { ...MEMBER, birthday: '' };
 
     expect(createMemberDiffPayload(MEMBER, updated)).toEqual({ birthday: '' });
+  });
+
+  test('일반 회원은 학번을 변경할 수 있다', () => {
+    expect(
+      createMemberDiffPayload(MEMBER, { ...MEMBER, studentNumber: '7654321' })
+    ).toEqual({ studentNumber: '7654321' });
+  });
+
+  test('강등자는 등급을 함께 바꿔도 학번 변경을 요청에 포함하지 않는다', () => {
+    const original = { ...MEMBER, userRoleId: 6 };
+    expect(
+      createMemberDiffPayload(original, {
+        ...original,
+        studentNumber: '7654321',
+        userRoleId: 2,
+        nickname: '새닉네임',
+      })
+    ).toEqual({ userRoleId: 2, nickname: '새닉네임' });
+  });
+});
+
+describe('블랙리스트 이력 응답 변환', () => {
+  test('기존 종료일 없이 강등 개월 수와 경고 횟수를 전달한다', () => {
+    expect(
+      toBlacklistHistoryItem({
+        type: 'RELEGATION',
+        blackReason: '제재 사유',
+        createdAt: '2026-01-31 12:00:00',
+        relegationMonth: 12,
+        warningCount: 2,
+      })
+    ).toMatchObject({
+      blacklistStartDate: '2026-01-31 12:00:00',
+      relegationMonth: 12,
+      warningCount: 2,
+    });
   });
 });
 

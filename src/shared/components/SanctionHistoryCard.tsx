@@ -88,10 +88,18 @@ export function SanctionHistoryCard({
 
               {item.startAt && (
                 <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
-                  <span className='font-medium text-gray-700'>징계 기간</span>
+                  <span className='font-medium text-gray-700'>징계 시작일</span>
                   <span className='font-mono text-gray-600'>
-                    {item.startAt.substring(0, 10)} ~{' '}
-                    {item.endAt?.substring(0, 10) ?? '종료일 없음'}
+                    {item.startAt.substring(0, 10)}
+                  </span>
+                </div>
+              )}
+
+              {item.relegationMonth != null && (
+                <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
+                  <span className='font-medium text-gray-700'>강등 기간</span>
+                  <span className='font-mono text-gray-600'>
+                    {item.relegationMonth}개월
                   </span>
                 </div>
               )}
