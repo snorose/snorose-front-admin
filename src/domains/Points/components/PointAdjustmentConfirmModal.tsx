@@ -1,3 +1,4 @@
+import { DetailList } from '@/shared/components/DetailList';
 import { ConfirmModal } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
@@ -53,40 +54,25 @@ export function PointAdjustmentConfirmModal({
       isPending={isPending}
       pendingText='적용 중'
     >
-      <div className='flex min-w-0 flex-col gap-3 wrap-anywhere'>
-        {CONFIRMATION_DATA.map((data) => (
-          <div className='flex min-w-0 items-start gap-2' key={data.label}>
-            <span className='shrink-0 text-sm font-semibold text-gray-700'>
-              {data.label}:
-            </span>
-            <span className='text-sm'>{data.value}</span>
-          </div>
-        ))}
-        <div className='flex min-w-0 items-start gap-2'>
-          <span className='shrink-0 text-sm font-semibold text-gray-700'>
-            포인트 지급/차감량:
-          </span>
-          <span
-            className={cn(
-              'text-sm',
-              isPositiveDifference ? 'text-blue-600' : 'text-red-600'
-            )}
-          >
-            {isPositiveDifference ? '+' : ''}
-            {difference}
-          </span>
-        </div>
-        {memo && (
-          <div className='flex items-start gap-2'>
-            <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-              메모:
-            </span>
-            <span className='min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
-              {memo}
-            </span>
-          </div>
-        )}
-      </div>
+      <DetailList
+        items={[
+          ...CONFIRMATION_DATA,
+          {
+            label: '포인트 지급/차감량',
+            value: (
+              <span
+                className={cn(
+                  isPositiveDifference ? 'text-blue-600' : 'text-red-600'
+                )}
+              >
+                {isPositiveDifference ? '+' : ''}
+                {difference}
+              </span>
+            ),
+          },
+          ...(memo ? [{ label: '메모', value: memo }] : []),
+        ]}
+      />
     </ConfirmModal>
   );
 }

@@ -1,3 +1,4 @@
+import { DetailList } from '@/shared/components/DetailList';
 import { ConfirmModal } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
@@ -35,44 +36,32 @@ export function AllMemberPointAdjustmentConfirmModal({
       isPending={isPending}
       pendingText='적용 중'
     >
-      <div className='flex min-w-0 flex-col gap-3 wrap-anywhere'>
-        <div className='flex min-w-0 items-start gap-2'>
-          <span className='shrink-0 text-sm font-semibold text-gray-700'>
-            포인트 유형:
-          </span>
-          <span className='text-sm'>
-            {selectedCategory
+      <DetailList
+        items={[
+          {
+            label: '포인트 유형',
+            value: selectedCategory
               ? (POINT_CATEGORY_OPTIONS.find(
                   (option) => option.value === selectedCategory
                 )?.label ?? '')
-              : ''}
-          </span>
-        </div>
-        <div className='flex min-w-0 items-start gap-2'>
-          <span className='shrink-0 text-sm font-semibold text-gray-700'>
-            포인트 지급/차감량:
-          </span>
-          <span
-            className={cn(
-              'text-sm',
-              isPositiveDifference ? 'text-blue-600' : 'text-red-600'
-            )}
-          >
-            {isPositiveDifference ? '+' : ''}
-            {difference}
-          </span>
-        </div>
-        {memo && (
-          <div className='flex items-start gap-2'>
-            <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-              메모:
-            </span>
-            <span className='min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
-              {memo}
-            </span>
-          </div>
-        )}
-      </div>
+              : '',
+          },
+          {
+            label: '포인트 지급/차감량',
+            value: (
+              <span
+                className={cn(
+                  isPositiveDifference ? 'text-blue-600' : 'text-red-600'
+                )}
+              >
+                {isPositiveDifference ? '+' : ''}
+                {difference}
+              </span>
+            ),
+          },
+          ...(memo ? [{ label: '메모', value: memo }] : []),
+        ]}
+      />
     </ConfirmModal>
   );
 }

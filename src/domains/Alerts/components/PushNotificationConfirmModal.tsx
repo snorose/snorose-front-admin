@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { DetailList } from '@/shared/components/DetailList';
 import { ConfirmModal } from '@/shared/components/ui';
 import type { PushNotification } from '@/shared/types';
 
@@ -53,18 +54,7 @@ export function PushNotificationConfirmModal({
       confirmText='즉시 발송'
       pendingText='발송 중...'
     >
-      <div className='flex flex-col gap-3'>
-        {CONFIRMATION_DATA.map((data) => (
-          <div className='flex items-start gap-2' key={data.label}>
-            <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-              {data.label}:
-            </span>
-            <span className='min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
-              {data.value}
-            </span>
-          </div>
-        ))}
-      </div>
+      <DetailList items={CONFIRMATION_DATA} />
     </ConfirmModal>
   );
 }

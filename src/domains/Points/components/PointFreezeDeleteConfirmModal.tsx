@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 
+import { DetailList } from '@/shared/components/DetailList';
 import { ConfirmModal } from '@/shared/components/ui';
 import type { PointFreeze } from '@/shared/types';
 import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
@@ -42,32 +43,19 @@ export function PointFreezeDeleteConfirmModal({
       pendingText='삭제 중'
       confirmVariant='destructive'
     >
-      <div className='flex min-w-0 flex-col gap-3 wrap-anywhere'>
-        <ul className='ml-4 flex list-outside list-disc flex-col gap-1'>
-          <li>
-            <span className='shrink-0 text-sm font-semibold text-gray-700'>
-              일정 제목:{' '}
-            </span>
-            <span className='text-sm'>{selectedItem.title}</span>
-          </li>
-          <li>
-            <span className='shrink-0 text-sm font-semibold text-gray-700'>
-              시작 일시:{' '}
-            </span>
-            <span className='text-sm'>
-              {formatDateTimeToMinutes(selectedItem.startAt)}
-            </span>
-          </li>
-          <li>
-            <span className='shrink-0 text-sm font-semibold text-gray-700'>
-              종료 일시:{' '}
-            </span>
-            <span className='text-sm'>
-              {formatDateTimeToMinutes(selectedItem.endAt)}
-            </span>
-          </li>
-        </ul>
-      </div>
+      <DetailList
+        items={[
+          { label: '일정 제목', value: selectedItem.title },
+          {
+            label: '시작 일시',
+            value: formatDateTimeToMinutes(selectedItem.startAt),
+          },
+          {
+            label: '종료 일시',
+            value: formatDateTimeToMinutes(selectedItem.endAt),
+          },
+        ]}
+      />
     </ConfirmModal>
   );
 }

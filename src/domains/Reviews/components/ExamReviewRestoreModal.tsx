@@ -1,4 +1,6 @@
-import { ConfirmModal, Textarea } from '@/shared/components/ui';
+import { ConfirmModal } from '@/shared/components/ui';
+
+import { ExamReviewReasonFields } from './ExamReviewReasonFields';
 
 interface ExamReviewRestoreModalProps {
   isOpen: boolean;
@@ -39,52 +41,14 @@ export function ExamReviewRestoreModal({
             신중하게 확인한 후 복구해주세요.
           </p>
         </div>
-        <div className='flex flex-col gap-2'>
-          <label
-            htmlFor='exam-review-restore-existing-memo'
-            className='text-sm font-medium text-gray-700'
-          >
-            기존 메모
-          </label>
-          <Textarea
-            id='exam-review-restore-existing-memo'
-            value={existingMemo ?? ''}
-            placeholder='기존 메모가 없습니다.'
-            className='bg-muted min-h-[96px] resize-none'
-            readOnly
-          />
-        </div>
-        <div className='flex flex-col gap-2'>
-          <label
-            htmlFor='exam-review-restore-reason'
-            className='text-sm font-medium text-gray-700'
-          >
-            복구 사유
-          </label>
-          <Textarea
-            id='exam-review-restore-reason'
-            value={restoreReason}
-            onChange={(event) => onReasonChange(event.target.value)}
-            onKeyDown={(event) => {
-              if (
-                event.key === 'Enter' &&
-                !event.nativeEvent.isComposing &&
-                (event.metaKey || event.ctrlKey) &&
-                restoreReason.trim() &&
-                !isRestoring
-              ) {
-                event.preventDefault();
-                onConfirm();
-              }
-            }}
-            placeholder='복구 사유를 입력해주세요.'
-            className='min-h-[120px] resize-none'
-            disabled={isRestoring}
-          />
-          <p className='text-sm text-gray-500'>
-            기존 메모 아래에 [복구 사유]로 저장됩니다.
-          </p>
-        </div>
+        <ExamReviewReasonFields
+          action='복구'
+          existingMemo={existingMemo}
+          reason={restoreReason}
+          disabled={isRestoring}
+          onReasonChange={onReasonChange}
+          onConfirm={onConfirm}
+        />
       </div>
     </ConfirmModal>
   );

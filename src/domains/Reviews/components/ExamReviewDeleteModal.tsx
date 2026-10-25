@@ -1,4 +1,6 @@
-import { ConfirmModal, Textarea } from '@/shared/components/ui';
+import { ConfirmModal } from '@/shared/components/ui';
+
+import { ExamReviewReasonFields } from './ExamReviewReasonFields';
 
 interface ExamReviewDeleteModalProps {
   isOpen: boolean;
@@ -41,52 +43,14 @@ export function ExamReviewDeleteModal({
             신중하게 확인한 후 삭제해주세요.
           </p>
         </div>
-        <div className='flex flex-col gap-2'>
-          <label
-            htmlFor='exam-review-existing-memo'
-            className='text-sm font-medium text-gray-700'
-          >
-            기존 메모
-          </label>
-          <Textarea
-            id='exam-review-existing-memo'
-            value={existingMemo ?? ''}
-            placeholder='기존 메모가 없습니다.'
-            className='bg-muted min-h-[96px] resize-none'
-            readOnly
-          />
-        </div>
-        <div className='flex flex-col gap-2'>
-          <label
-            htmlFor='exam-review-delete-reason'
-            className='text-sm font-medium text-gray-700'
-          >
-            삭제 사유
-          </label>
-          <Textarea
-            id='exam-review-delete-reason'
-            value={deleteReason}
-            onChange={(event) => onReasonChange(event.target.value)}
-            onKeyDown={(event) => {
-              if (
-                event.key === 'Enter' &&
-                !event.nativeEvent.isComposing &&
-                (event.metaKey || event.ctrlKey) &&
-                deleteReason.trim() &&
-                !isDeleting
-              ) {
-                event.preventDefault();
-                onConfirm();
-              }
-            }}
-            placeholder='삭제 사유를 입력해주세요.'
-            className='min-h-[120px] resize-none'
-            disabled={isDeleting}
-          />
-          <p className='text-sm text-gray-500'>
-            기존 메모 아래에 [삭제 사유]로 저장됩니다.
-          </p>
-        </div>
+        <ExamReviewReasonFields
+          action='삭제'
+          existingMemo={existingMemo}
+          reason={deleteReason}
+          disabled={isDeleting}
+          onReasonChange={onReasonChange}
+          onConfirm={onConfirm}
+        />
       </div>
     </ConfirmModal>
   );
