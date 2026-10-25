@@ -3,10 +3,12 @@ import { type ReactNode, useId } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 import { SectionTitle } from '@/shared/components';
+import { cn } from '@/shared/lib';
 
 type SectionCardProps = {
   action?: ReactNode;
   children: ReactNode;
+  className?: string;
   icon: LucideIcon;
   title: string;
 };
@@ -14,6 +16,7 @@ type SectionCardProps = {
 export function SectionCard({
   action,
   children,
+  className,
   icon: Icon,
   title,
 }: SectionCardProps) {
@@ -28,7 +31,12 @@ export function SectionCard({
         </SectionTitle>
         {action}
       </div>
-      <div className='border-border bg-background min-w-0 rounded-lg border p-4'>
+      <div
+        className={cn(
+          'border-border bg-background min-w-0 rounded-lg border p-4',
+          className
+        )}
+      >
         {children}
       </div>
     </section>
