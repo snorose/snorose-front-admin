@@ -1,6 +1,6 @@
 # 모달 공통화 조사 및 전환 계획
 
-> 2026-10-25 소스 기준. 범용 `Modal` 추가까지 완료했으며, 기존 모달 전환은 아직 진행하지 않았다. 아래 사용처는 테스트와 주석 처리된 호출을 제외한 소스 연결 기준이며, 화면 동작 검증은 전환 단계에서 진행한다.
+> 2026-10-25 소스 기준. 0단계 범용 `Modal` 추가와 1단계 `ConfirmModal` 전환·기존 사용처 상태 연결을 완료했다. 직접 Dialog를 사용하는 모달의 전환은 2단계부터 남아 있다. 아래 사용처는 테스트와 주석 처리된 호출을 제외한 소스 연결 기준이며, 화면 동작 검증은 전환 단계에서 진행한다.
 
 ## 목표와 범위
 
@@ -68,19 +68,19 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 
 아래 모달들은 공통 `ConfirmModal`의 내부 교체로 외곽 틀이 함께 변경된다. 요청 중 상태 연결 등 필요한 호출부만 수정한다.
 
-| 사용 파일                                                     | 화면·기능                           | 현재 상태                                             | 변경 계획                                                             | 단계 |
-| ------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------- | ---- |
-| `Reviews/components/ExamReviewDeleteModal.tsx`                | 시험후기 상세 삭제                  | 사유·기존 메모, 삭제 중 확인 비활성화                 | `isDeleting`을 공통 처리 중 상태에 연결. 포인트 차감 안내·단축키 유지 | 1    |
-| `Reviews/components/ExamReviewRestoreModal.tsx`               | 시험후기 상세 복구                  | 사유·기존 메모, 복구 중 확인 비활성화                 | `isRestoring` 연결. 포인트 복구 안내·단축키 유지                      | 1    |
-| `Reviews/components/ExamReviewUpdateConfirmModal.tsx`         | 시험후기 상세 저장 확인             | `max-w-3xl`, 수정 전후 비교표                         | 너비 예외·비교표 유지. 상세 저장 요청 중 상태를 호출부에서 전달       | 1    |
-| `Reviews/components/ExamReviewAdminStatusPeriodList.tsx`      | 현황 집계 기간 삭제                 | 기간 요약, `isSubmitting`으로 확인 비활성화           | 처리 중 상태에 연결해 취소·닫기도 제한                                | 1    |
-| `Reviews/components/ExamReviewAdminStatusPeriodFormModal.tsx` | 기간 폼 미저장 변경 폐기            | 중첩 ConfirmModal                                     | 공통 틀만 간접 적용. 버리기·계속 편집과 포커스 복귀 유지              | 1    |
-| `Reviews/components/ExamReviewAdminStatusPeriodDialog.tsx`    | 기간 편집 종료 전 변경 폐기         | 중첩 ConfirmModal                                     | 공통 틀만 간접 적용. 현황 복귀와 편집 유지 분기 보존                  | 1    |
-| `MemberInfo/components/WarnPenaltyTab.tsx`                    | 경고 관리 탭 적용 확인              | 회원명·경고 수 표시, 처리 중 확인 비활성화            | `isSubmitting` 연결, 기존 경고 증가 안내 유지                         | 1    |
-| `MemberInfo/components/DemotionPenaltyTab.tsx`                | 강등 관리 탭 적용 확인              | 기간·종료일 표시, 처리 중 확인 비활성화               | `isSubmitting` 연결, 기간 계산·확정 문구 유지                         | 1    |
-| `InquiryReport/components/InquiryStatusSelect.tsx`            | 문의·신고 상태 변경                 | 처리 중 onClose 방어, 확인 버튼의 처리 중 상태 미연결 | `isStatusUpdating` 연결, 상태 변경 함수의 중복 요청 방지도 점검       | 1    |
-| `src/pages/operation/PopupManagementPage.tsx`                 | 팝업 등록·수정 확인 / 삭제 확인 2곳 | 제목·설명·버튼만 전달                                 | 공통 틀 간접 적용. 비동기 저장·삭제 흐름은 각 요청 상태 연결          | 1    |
-| `src/pages/operation/ServerMaintenancePage.tsx`               | 서버 점검 일정 삭제                 | 로컬 상태에서 즉시 삭제                               | 공통 틀만 간접 적용. 동기 동작에 불필요한 로딩 상태 추가하지 않음     | 1    |
+| 사용 파일                                                     | 화면·기능                           | 현재 상태                                             | 변경 계획                                                                    | 단계 |
+| ------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------- | ---- |
+| `Reviews/components/ExamReviewDeleteModal.tsx`                | 시험후기 상세 삭제                  | 사유·기존 메모, 삭제 중 확인 비활성화                 | `isDeleting`을 공통 처리 중 상태에 연결. 포인트 차감 안내·단축키 유지        | 1    |
+| `Reviews/components/ExamReviewRestoreModal.tsx`               | 시험후기 상세 복구                  | 사유·기존 메모, 복구 중 확인 비활성화                 | `isRestoring` 연결. 포인트 복구 안내·단축키 유지                             | 1    |
+| `Reviews/components/ExamReviewUpdateConfirmModal.tsx`         | 시험후기 상세 저장 확인             | `max-w-3xl`, 수정 전후 비교표                         | 너비 예외·비교표 유지. 상세 저장 요청 중 상태를 호출부에서 전달              | 1    |
+| `Reviews/components/ExamReviewAdminStatusPeriodList.tsx`      | 현황 집계 기간 삭제                 | 기간 요약, `isSubmitting`으로 확인 비활성화           | 처리 중 상태에 연결해 취소·닫기도 제한                                       | 1    |
+| `Reviews/components/ExamReviewAdminStatusPeriodFormModal.tsx` | 기간 폼 미저장 변경 폐기            | 중첩 ConfirmModal                                     | 공통 틀만 간접 적용. 버리기·계속 편집과 포커스 복귀 유지                     | 1    |
+| `Reviews/components/ExamReviewAdminStatusPeriodDialog.tsx`    | 기간 편집 종료 전 변경 폐기         | 중첩 ConfirmModal                                     | 공통 틀만 간접 적용. 현황 복귀와 편집 유지 분기 보존                         | 1    |
+| `MemberInfo/components/WarnPenaltyTab.tsx`                    | 경고 관리 탭 적용 확인              | 회원명·경고 수 표시, 처리 중 확인 비활성화            | `isSubmitting` 연결, 기존 경고 증가 안내 유지                                | 1    |
+| `MemberInfo/components/DemotionPenaltyTab.tsx`                | 강등 관리 탭 적용 확인              | 기간·종료일 표시, 처리 중 확인 비활성화               | `isSubmitting` 연결, 기간 계산·확정 문구 유지                                | 1    |
+| `InquiryReport/components/InquiryStatusSelect.tsx`            | 문의·신고 상태 변경                 | 처리 중 onClose 방어, 확인 버튼의 처리 중 상태 미연결 | `isStatusUpdating` 연결, 상태 변경 함수의 중복 요청 방지도 점검              | 1    |
+| `src/pages/operation/PopupManagementPage.tsx`                 | 팝업 등록·수정 확인 / 삭제 확인 2곳 | 제목·설명·버튼만 전달                                 | 공통 틀 간접 적용. 현재 로컬 상태의 동기 저장·삭제이므로 로딩 상태 추가 없음 | 1    |
+| `src/pages/operation/ServerMaintenancePage.tsx`               | 서버 점검 일정 삭제                 | 로컬 상태에서 즉시 삭제                               | 공통 틀만 간접 적용. 동기 동작에 불필요한 로딩 상태 추가하지 않음            | 1    |
 
 ## 현재 사용하지 않는 모달
 
@@ -112,7 +112,7 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 
 - [x] 범용 `Modal` 추가
 - [x] 소스 사용처 조사 및 전환 계획 작성
-- [ ] ConfirmModal 기반 교체와 기존 사용처 처리 중 상태 연결
+- [x] ConfirmModal 기반 교체와 기존 사용처 처리 중 상태 연결
 - [ ] 직접 Dialog 사용 모달과 자체 오버레이 전환
 - [ ] 폼·중첩 모달·조회 모달 동작 검증
 - [ ] 반복 본문 추출 여부 재평가
@@ -129,3 +129,19 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 | 자동 검사   | 변경 모달과 관련 도메인 테스트, ESLint, `npm run build`. 공통 동작 변경은 회귀 테스트로 확인                |
 
 이 문서는 소스 조사에 기반한 작업 계획이다. 기존 화면 전체를 브라우저에서 확인했거나 모달 전환을 완료했다는 의미는 아니다.
+
+## 1단계 적용 결과
+
+위 조사 표의 현재 구조는 전환 전 상태를 설명한다. 1단계의 실제 적용 결과는 다음과 같다.
+
+| 적용 대상                                     | 변경 결과                                                                                                 |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| ConfirmModal                                  | Modal + Body + Footer로 교체. 기존 경로·props 유지, ReactNode 제목·설명과 size·isPending·pendingText 추가 |
+| 요청 중 공통 동작                             | 확인·취소 비활성화, 로딩 아이콘·문구, X 숨김 및 ESC·바깥 클릭 닫기 차단                                   |
+| 시험후기 삭제·복구, 기간 삭제, 경고·강등 적용 | 기존 비동기 상태를 isPending에 연결                                                                       |
+| 문의·신고 상태 변경                           | isStatusUpdating 연결 및 처리 함수의 재진입 방어 추가                                                     |
+| 시험후기 수정 확인                            | isSaving 전달. 요청 전에 확인창을 닫던 흐름을 성공 후 닫기로 변경. 실패 시 확인창과 변경 내용 유지        |
+| 팝업 등록·수정·삭제, 서버 점검 삭제           | 현재 동기 처리이므로 공통 외곽만 간접 적용                                                                |
+| 미저장 변경 폐기                              | 기존 dirty 판정·닫기 분기 유지, 공통 외곽만 간접 적용                                                     |
+
+자동 검사와 실제 브라우저 검증은 구분한다. 관련 컴포넌트 테스트, ESLint 및 빌드로 검증하며 화면별 시각·중첩 포커스 동작 확인은 후속 전환 단계의 검증 항목으로 남긴다.

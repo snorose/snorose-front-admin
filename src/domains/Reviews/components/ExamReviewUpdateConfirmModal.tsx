@@ -9,6 +9,7 @@ export type ExamReviewUpdateChange = {
 interface ExamReviewUpdateConfirmModalProps {
   isOpen: boolean;
   changes: ExamReviewUpdateChange[];
+  isSaving?: boolean;
   onClose: () => void;
   onConfirm: () => void;
 }
@@ -16,6 +17,7 @@ interface ExamReviewUpdateConfirmModalProps {
 export function ExamReviewUpdateConfirmModal({
   isOpen,
   changes,
+  isSaving = false,
   onClose,
   onConfirm,
 }: ExamReviewUpdateConfirmModalProps) {
@@ -26,6 +28,8 @@ export function ExamReviewUpdateConfirmModal({
       title='시험 후기 수정'
       description='아래 항목이 수정됩니다. 저장하시겠습니까?'
       confirmText='저장'
+      isPending={isSaving}
+      pendingText='저장 중'
       closeText='취소'
       onClose={onClose}
       onConfirm={onConfirm}

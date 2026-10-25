@@ -210,7 +210,7 @@ export default function WarnPenaltyTab({
       <ConfirmModal
         isOpen={openModal}
         confirmVariant='destructive'
-        confirmDisabled={isSubmitting}
+        isPending={isSubmitting}
         onClose={() => setOpenModal(false)}
         onConfirm={handleConfirm}
         confirmText='예, 진행합니다'

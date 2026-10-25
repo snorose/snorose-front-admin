@@ -22,7 +22,9 @@ export function ExamReviewDeleteModal({
   return (
     <ConfirmModal
       isOpen={isOpen}
-      confirmText={isDeleting ? '삭제 중' : '삭제'}
+      confirmText='삭제'
+      isPending={isDeleting}
+      pendingText='삭제 중'
       confirmVariant='destructive'
       confirmDisabled={!deleteReason.trim() || isDeleting}
       closeText='취소'

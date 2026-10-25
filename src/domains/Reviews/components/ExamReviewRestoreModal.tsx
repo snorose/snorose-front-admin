@@ -24,7 +24,9 @@ export function ExamReviewRestoreModal({
       isOpen={isOpen}
       title='시험 후기 복구'
       description='삭제된 시험후기를 복구하시겠습니까?'
-      confirmText={isRestoring ? '복구 중' : '복구'}
+      confirmText='복구'
+      isPending={isRestoring}
+      pendingText='복구 중'
       confirmDisabled={!restoreReason.trim() || isRestoring}
       onClose={onClose}
       onConfirm={onConfirm}

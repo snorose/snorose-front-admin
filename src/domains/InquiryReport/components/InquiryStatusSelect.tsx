@@ -43,7 +43,7 @@ export default function InquiryStatusSelect({
   const statusBadge = getInquiryStatusBadgeMeta(status);
 
   const handleConfirmStatusChange = async () => {
-    if (!pendingStatus) return;
+    if (!pendingStatus || isStatusUpdating) return;
 
     try {
       setIsStatusUpdating(true);
@@ -109,7 +109,9 @@ export default function InquiryStatusSelect({
             ? `"${title}" 상태를 ${getInquiryStatusBadgeMeta(pendingStatus).label}(으)로 변경할까요?`
             : undefined
         }
-        confirmText={isStatusUpdating ? '변경 중...' : '변경'}
+        confirmText='변경'
+        isPending={isStatusUpdating}
+        pendingText='변경 중...'
         closeText='취소'
         onClose={() => {
           if (!isStatusUpdating) setPendingStatus(null);

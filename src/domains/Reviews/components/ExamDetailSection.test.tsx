@@ -101,13 +101,15 @@ vi.mock('@/domains/Reviews/components', () => ({
   )),
   ExamReviewUpdateConfirmModal: ({
     isOpen,
+    isSaving,
     onConfirm,
   }: {
     isOpen: boolean;
+    isSaving?: boolean;
     onConfirm: () => void;
   }) =>
     isOpen ? (
-      <button type='button' onClick={onConfirm}>
+      <button type='button' onClick={onConfirm} disabled={isSaving}>
         수정 확인
       </button>
     ) : null,
@@ -478,6 +480,37 @@ describe('ExamDetailSection', () => {
       });
     });
     expect(deleteExamReview).toHaveBeenCalledWith(101);
+  });
+
+  test('저장 실패 시 확인창과 변경 내용을 유지하고 재시도 성공 후 닫는다', async () => {
+    const user = userEvent.setup();
+    vi.mocked(updateExamReview).mockRejectedValueOnce(new Error('저장 실패'));
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
+    await user.click(screen.getByRole('button', { name: '저장' }));
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: '수정 확인' })).toBeEnabled();
+    vi.mocked(updateExamReview).mockResolvedValueOnce({
+      ...selectedExamReviewDetail,
+      isConfirmed: true,
+    });
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: '수정 확인' })
+      ).not.toBeInTheDocument()
+    );
+    expect(updateExamReview).toHaveBeenCalledTimes(2);
+    expect(updateExamReview).toHaveBeenLastCalledWith(101, {
+      post: { isConfirmed: true },
+    });
   });
 
   test('확인여부 변경을 시험후기 수정 API payload에 포함한다', async () => {
