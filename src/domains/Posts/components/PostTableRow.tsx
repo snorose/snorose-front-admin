@@ -9,7 +9,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-import { MemberInfoPopover, StatusBadge } from '@/shared/components';
+import { StatusBadge } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import {
@@ -18,6 +18,8 @@ import {
   getPostStatusBadges,
   stripHtmlTags,
 } from '@/shared/utils';
+
+import { MemberInfoPopover } from '@/domains/MemberInfo/components/MemberInfoPopover';
 
 import type { AdminGetPostResponse } from '../types/post';
 

@@ -4,18 +4,18 @@
 
 ## 목표와 범위
 
-[`Modal`](../../src/shared/components/Modal.tsx)을 모달의 기본 틀로 사용한다. 제목·선택 설명·X 버튼·기본 여백·크기를 통일하고 본문과 하단 버튼은 화면에서 구성한다. 확인·취소 형태는 기존 `ConfirmModal`을 `Modal` 기반으로 전환해 재사용한다.
+[`Modal`](../../src/shared/components/Modal.tsx)을 모달의 기본 틀로 사용한다. 제목·선택 설명·X 버튼·기본 여백·크기·본문 스크롤을 통일한다. 본문과 그 외 화면별 동작은 children으로 구성한다. 표준 확인·취소 버튼은 ConfirmModal이 제공한다. 확인·취소 형태는 기존 `ConfirmModal`을 `Modal` 기반으로 전환해 재사용한다.
 
 API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항 폐기 확인은 도메인 컴포넌트에 유지한다. 전역 모달 저장소 도입과 전체 모달의 단일 크기 강제는 범위에 포함하지 않는다.
 
 ## 공통 기반의 현재 상태와 변경 계획
 
-| 파일                                         | 현재 상태                                                                                                               | 변경 계획                                                                                                                 | 상태                  |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `src/shared/components/ui/dialog.tsx`        | Radix 기반 shadcn Dialog. X 버튼 기본 제공, 헤더·제목·설명·하단을 호출부에서 조합                                       | 접근성·포털·포커스 등 기본 동작을 담당하는 하위 컴포넌트로 유지                                                           | 유지                  |
-| `src/shared/components/Modal.tsx`            | `title`, 선택 `subtitle`, `headerExtra`, `size`, `closeDisabled`, `contentProps` 제공. `Modal.Body`·`Modal.Footer` 제공 | 기존 모달의 공통 외곽 틀로 적용                                                                                           | 추가 완료 / 전환 대기 |
-| `src/shared/components/index.ts`             | `Modal`과 `ModalProps` export 제공                                                                                      | 화면은 `@/shared/components`에서 가져오기                                                                                 | 완료                  |
-| `src/shared/components/ui/confirm-modal.tsx` | Dialog 직접 조합. 제목·설명은 문자열. 확인 버튼 비활성화만 지원하며 취소·X·ESC·외부 클릭은 별도 처리 필요               | `Modal`을 조합하도록 변경. `description`을 `subtitle`에 연결. 처리 중 상태와 크기 옵션 추가, 제목·설명은 `ReactNode` 허용 | 예정                  |
+| 파일                                         | 현재 상태                                                                                                              | 변경 계획                                                       | 상태                     |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------ |
+| `src/shared/components/ui/dialog.tsx`        | Radix 기반 shadcn Dialog. X 버튼 기본 제공, 헤더·제목·설명·하단을 호출부에서 조합                                      | 접근성·포털·포커스 등 기본 동작을 담당하는 하위 컴포넌트로 유지 | 유지                     |
+| `src/shared/components/Modal.tsx`            | `title`, 선택 `subtitle`, `headerExtra`, `size`, `closeDisabled`, `contentProps` 제공. children 전달 및 공통 외곽 제공 | 기존 모달의 공통 외곽 틀로 적용                                 | 추가 완료 / 0~2단계 적용 |
+| `src/shared/components/index.ts`             | `Modal`과 `ModalProps` export 제공                                                                                     | 화면은 `@/shared/components`에서 가져오기                       | 완료                     |
+| `src/shared/components/ui/confirm-modal.tsx` | Modal을 감싸는 확인창. 확인·취소 버튼·로딩·비활성화·닫기 제한 제공                                                     | Modal을 감싸고 공통 확인·취소 버튼과 처리 상태 제공             | 완료                     |
 
 `ConfirmModal`의 기존 경로와 props는 호환성을 유지한다. 내부에서는 `Modal`을 `@/shared/components/Modal`에서 직접 import해 공유·UI 배럴 간 순환 참조를 피한다. 이번 계획에서 파일 이동은 하지 않는다.
 
@@ -27,11 +27,11 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 | X 버튼 주변  | 일부 화면만 오른쪽 패딩을 확보                        | 공통 헤더에서 X 영역 확보. `subtitle`은 선택이며 없을 때 설명 참조 제거                                                                 |
 | 너비         | `xs`·`sm`·`md`·`xl`·임의 픽셀 혼용                    | 기본 `md`, 작은 확인은 `sm`, 큰 폼은 `lg`, 넓은 조회는 `xl`. 필수 너비는 `className` 예외로 유지                                        |
 | 여백·모서리  | `p-6`, 내부 `px-8 py-8`, `rounded-2xl` 등 반복        | 공통 여백과 기본 모서리 사용. 중복 패딩 제거                                                                                            |
-| 긴 내용      | 전체 스크롤과 본문 스크롤 혼용                        | 기본은 헤더·하단 유지, `Modal.Body` 내부 스크롤. `onScroll`, `aria-busy` 등 본문 속성 유지                                              |
-| 하단 버튼    | 화면마다 Footer·일반 div로 정렬                       | 자유형은 `Modal.Footer`, 확인형은 `ConfirmModal` 사용. 기본 강조·취소·삭제 버튼 역할 유지                                               |
+| 긴 내용      | 전체 스크롤과 본문 스크롤 혼용                        | ConfirmModal 본문은 내부에서 스크롤. Modal을 직접 쓰는 화면은 children에서 필요한 스크롤을 구성                                         |
+| 하단 버튼    | 화면마다 Footer·일반 div로 정렬                       | 표준 확인·취소는 `ConfirmModal`, 그 외 화면별 동작은 `Modal` children 안에서 구성. 기본 강조·취소·삭제 버튼 역할 유지                   |
 | 처리 중 닫기 | 닫기 제한 유무·방법이 다름                            | 변경 요청 중 `closeDisabled` 적용. 커스텀 취소 버튼도 화면에서 비활성화해야 함                                                          |
 | 처리 중 실행 | 로딩 문구·아이콘·비활성화가 제각각                    | `ConfirmModal`에 `isPending`·선택 처리 문구를 추가해 확인·취소 비활성화, 로딩 표시, 닫기 제한을 연결. 실행 함수의 중복 요청 방지도 유지 |
-| 폼 제출      | 실제 form 제출과 onClick 제출 혼용                    | 기존 제출 의미 유지. form으로 Body·Footer를 감싸면 `flex min-h-0 flex-col` 및 필요 시 `flex-1` 적용                                     |
+| 폼 제출      | 실제 form 제출과 onClick 제출 혼용                    | 기존 제출 의미 유지. 본문 form과 제출 버튼을 함께 구성                                                                                  |
 | 미저장 변경  | 기간 편집에서 폐기 확인을 별도 구현                   | `onOpenChange`의 기존 닫기 요청 함수를 유지. `closeDisabled`로 폐기 확인을 대체하지 않음                                                |
 | 포커스       | 파일명·기간 폼에서 복귀 대상을 직접 지정              | `contentProps.onCloseAutoFocus`와 `contentProps.ref`로 기존 동작 유지                                                                   |
 
@@ -39,28 +39,28 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 
 파일 경로의 `shared/…`는 `src/shared/…`, 나머지 `도메인/components/…`는 `src/domains/도메인/components/…`를 의미한다. 단계 번호는 아래 실행 순서에 대응한다.
 
-| 모달 파일                                                                  | 사용 화면·호출부                                                             | 현재 구조                                                                   | 변경 계획                                                                                                         | 단계 |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---- |
-| `shared/components/MemberInfoModal.tsx`                                    | 회원 팝오버 `MemberInfoPopover`                                              | Dialog, 제목만 표시, 회원 정보 그리드, 닫기·상세 이동                       | `Modal` + Body + Footer. 설명 생략, 회원 정보·이동 로직 유지. 기존 `max-w-md`는 너비 예외 적용                    | 2    |
-| `shared/components/SanctionModal.tsx`                                      | `MemberInfoPopover`의 제재 선택                                              | 작은 Dialog, 경고·강등 선택 후 추가 모달 열기                               | 작은 `Modal`과 Body로 전환. 선택 버튼은 본문에 유지, 선택 → 닫기 → 추가 모달 흐름 유지                            | 2    |
-| `shared/components/StatusChangeModal.tsx`                                  | `PostTable`, `CommentTable`, `PostDetailManageCard`, `PostDetailCommentItem` | 직접 만든 fixed 오버레이, 제목·설명·사유·댓글 동시 삭제 옵션. Dialog/X 없음 | `ConfirmModal` 기반으로 전환. 사유·옵션은 본문에 유지. `isPending` 연결, 새 X·ESC·바깥 클릭 및 포커스 동작 검증   | 2    |
-| `Points/components/PointAdjustmentConfirmModal.tsx`                        | `AdjustSinglePointPage`                                                      | Dialog에 회원·포인트·메모 요약, 취소·확인 직접 구현                         | `ConfirmModal`로 전환. 요약은 children 유지, 요청 중 상태를 페이지에서 전달                                       | 2    |
-| `Points/components/AllMemberPointAdjustmentConfirmModal.tsx`               | `AdjustAllMemberPointPage`                                                   | Dialog에 전체 지급 요약, 취소·확인 직접 구현                                | `ConfirmModal`로 전환. 지급 대상·수량·메모 보존, 요청 중 상태 전달                                                | 2    |
-| `Alerts/components/PushNotificationConfirmModal.tsx`                       | `PushNotificationPage`                                                       | Dialog, 전송 요약, 가로 2열 버튼. 발송 중 X 숨김·닫기 제한                  | `ConfirmModal`로 전환. 기존 발송 중 제한 유지, 버튼은 공통 Footer 정렬로 통일                                     | 2    |
-| `Points/components/PointFreezeDeleteConfirmModal.tsx`                      | `PointFreezePage` → `PointFreezeListSection`                                 | 작은 Dialog, 일정 요약, 삭제 요청의 `isPending`은 확인 버튼에만 적용        | `ConfirmModal size='sm'`로 전환. 요약 유지, 처리 중 닫기·취소도 제한                                              | 2    |
-| `Reviews/components/ExamReviewPeriodDeleteConfirmModal.tsx`                | `ExamReviewPeriodPage` → `ExamReviewPeriodListSection`                       | 작은 Dialog, 기간 요약, 별도 요청 중 상태 없음                              | `ConfirmModal size='sm'`로 전환. 요청 중 상태·중복 실행 방지 추가, 성공 콜백 유지                                 | 2    |
-| `MemberInfo/components/penalty-history/PenaltyHistoryAddConfirmDialog.tsx` | `PenaltyHistoryAddDialog`                                                    | 큰 여백·강조 제목, 취소·확인. 처리 중에도 Dialog 닫기 가능                  | `ReactNode` 제목을 지원하는 `ConfirmModal`로 전환. 강조 문구 유지, `isSubmitting` 연결                            | 2    |
-| `Points/components/PointFreezeUpdateConfirmModal.tsx`                      | `PointFreezePage` → `PointFreezeListSection`                                 | 이름은 Confirm이지만 제목·시작·종료를 입력하는 수정 폼. 작은 Dialog         | 자유형 `Modal size='sm'` + Body + Footer로 전환. `isPending` 연결, 날짜 상태·검증·저장 로직 유지                  | 3    |
-| `Reviews/components/ExamReviewPeriodUpdateConfirmModal.tsx`                | `ExamReviewPeriodPage` → `ExamReviewPeriodListSection`                       | 기간 제목·시작·종료 입력 Dialog, 별도 요청 중 상태 없음                     | 자유형 `Modal size='sm'`로 전환. 요청 중 상태 추가, 성공·새로고침 흐름 유지                                       | 3    |
-| `MemberInfo/components/MemberPointAdjustmentDialog.tsx`                    | 회원 상세 `MemberDetailSection`                                              | `rounded-2xl`, 큰 제목·설명, 포인트 폼, 자체 초기화                         | `Modal` + Body + Footer. 기존 약 36rem 너비 예외 유지, `isSubmitting`으로 닫기 제한, 직접 지급 흐름 유지          | 3    |
-| `MemberInfo/components/penalty-history/PenaltyHistoryAddDialog.tsx`        | `SanctionModal`, `MemberPenaltyHistoryDialog`                                | 큰 제목·여백, content ref로 포커스 처리, 추가 확인 모달 중첩                | `Modal`로 전환하고 중복 패딩 제거. `contentProps.ref` 전달, 제재 제한·검증·확인 후 제출 유지                      | 3    |
-| `Reviews/components/ExamReviewFileNameModal.tsx`                           | 시험후기 상세 `ExamDetailSection`                                            | 실제 form 제출, 저장 중 닫기 차단, 닫힌 뒤 트리거로 포커스 복귀             | `Modal` + form 안 Body·Footer. `closeDisabled`, `contentProps.onCloseAutoFocus` 연결. 확장자·검증·Enter 제출 유지 | 3    |
-| `Reviews/components/ExamReviewAdminStatusPeriodFormModal.tsx`              | `ExamReviewAdminStatusPeriodList`                                            | Dialog 전체 스크롤, 저장 중 닫기 차단, 미저장 폐기 확인 중첩                | `Modal size='lg'`로 전환. Body 내부 스크롤, 기존 `requestClose`·`onAfterClose`·폐기 확인 유지                     | 3    |
-| `Operation/components/PopupEditorDialog.tsx`                               | `PopupManagementPage`                                                        | 약 760px Dialog 전체 스크롤, 입력·이미지·미리보기·저장 버튼                 | `Modal` + Body + Footer. 760px 너비 예외 유지, 본문만 스크롤. 저장 확인으로 이어지는 흐름 유지                    | 3    |
-| `MemberInfo/components/MemberPointHistoryDialog.tsx`                       | 회원 상세 `MemberDetailSection`                                              | 헤더 구분선·도움말, 본문 스크롤 기반 무한 조회                              | `Modal` + Body. 도움말은 `headerExtra`, 필요 구분선은 본문 경계에 유지. scroll handler·오류·재조회·더 보기 유지   | 4    |
-| `MemberInfo/components/penalty-history/PenaltyHistoryTimelineDialog.tsx`   | `MemberPenaltySummaryCard` → `MemberPenaltyHistoryDialog`                    | 헤더·추가 버튼·건수 고정, 타임라인만 스크롤                                 | `Modal`로 전환. 상단 액션·건수는 Body 밖 고정 영역, 타임라인은 Body. 기존 무한 조회·제재 제한 유지                | 4    |
-| `Reviews/components/ExamReviewAdminStatusDialog.tsx`                       | `ExamReviewPage`                                                             | 960px 상한, 컨테이너 쿼리, 지정 높이, 본문 스크롤                           | `Modal size='xl'` + Body. 960px·반응형 높이·`@container`는 예외 유지. 차트·탭·기간 편집 이동 유지                 | 4    |
-| `Reviews/components/ExamReviewAdminStatusPeriodDialog.tsx`                 | `ExamReviewPage`                                                             | 큰 Dialog 전체 스크롤, 헤더 내 현황 보기, 기간 목록·폐기 확인               | `Modal`로 전환. 48rem 너비 예외 유지, 현황 보기는 `headerExtra`, 목록은 Body. 미저장 변경 확인 유지               | 4    |
+| 모달 파일                                                                  | 사용 화면·호출부                                                             | 현재 구조                                                                   | 변경 계획                                                                                                                                               | 단계 |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| `domains/MemberInfo/components/MemberInfoPopover.tsx`                      | 회원 팝오버 `MemberInfoPopover`                                              | Dialog, 제목만 표시, 회원 정보 그리드, 닫기·상세 이동                       | `Modal` + children. 설명 생략, 회원 정보·이동 로직 유지. 기존 `max-w-md`는 너비 예외 적용. 닫기·상세 이동 버튼은 children 안에 배치                     | 2    |
+| `domains/MemberInfo/components/MemberInfoPopover.tsx`                      | `MemberInfoPopover`의 제재 선택                                              | 작은 Dialog, 경고·강등 선택 후 추가 모달 열기                               | 작은 `Modal`의 children에 선택 버튼 배치, 선택 → 닫기 → 추가 모달 흐름 유지                                                                             | 2    |
+| `shared/components/StatusChangeModal.tsx`                                  | `PostTable`, `CommentTable`, `PostDetailManageCard`, `PostDetailCommentItem` | 직접 만든 fixed 오버레이, 제목·설명·사유·댓글 동시 삭제 옵션. Dialog/X 없음 | `ConfirmModal` 기반으로 전환. 사유·옵션은 본문에 유지. `isPending` 연결, 새 X·ESC·바깥 클릭 및 포커스 동작 검증                                         | 2    |
+| `Points/components/PointAdjustmentConfirmModal.tsx`                        | `AdjustSinglePointPage`                                                      | Dialog에 회원·포인트·메모 요약, 취소·확인 직접 구현                         | `ConfirmModal`로 전환. 요약은 children 유지, 요청 중 상태를 페이지에서 전달                                                                             | 2    |
+| `Points/components/AllMemberPointAdjustmentConfirmModal.tsx`               | `AdjustAllMemberPointPage`                                                   | Dialog에 전체 지급 요약, 취소·확인 직접 구현                                | `ConfirmModal`로 전환. 지급 대상·수량·메모 보존, 요청 중 상태 전달                                                                                      | 2    |
+| `Alerts/components/PushNotificationConfirmModal.tsx`                       | `PushNotificationPage`                                                       | Dialog, 전송 요약, 가로 2열 버튼. 발송 중 X 숨김·닫기 제한                  | `ConfirmModal`로 전환. 기존 발송 중 제한 유지, 버튼은 공통 버튼 정렬로 통일                                                                             | 2    |
+| `Points/components/PointFreezeDeleteConfirmModal.tsx`                      | `PointFreezePage` → `PointFreezeListSection`                                 | 작은 Dialog, 일정 요약, 삭제 요청의 `isPending`은 확인 버튼에만 적용        | `ConfirmModal size='sm'`로 전환. 요약 유지, 처리 중 닫기·취소도 제한                                                                                    | 2    |
+| `Reviews/components/ExamReviewPeriodDeleteConfirmModal.tsx`                | `ExamReviewPeriodPage` → `ExamReviewPeriodListSection`                       | 작은 Dialog, 기간 요약, 별도 요청 중 상태 없음                              | `ConfirmModal size='sm'`로 전환. 요청 중 상태·중복 실행 방지 추가, 성공 콜백 유지                                                                       | 2    |
+| `MemberInfo/components/penalty-history/PenaltyHistoryAddConfirmDialog.tsx` | `PenaltyHistoryAddDialog`                                                    | 큰 여백·강조 제목, 취소·확인. 처리 중에도 Dialog 닫기 가능                  | `ReactNode` 제목을 지원하는 `ConfirmModal`로 전환. 강조 문구 유지, `isSubmitting` 연결                                                                  | 2    |
+| `Points/components/PointFreezeUpdateConfirmModal.tsx`                      | `PointFreezePage` → `PointFreezeListSection`                                 | 이름은 Confirm이지만 제목·시작·종료를 입력하는 수정 폼. 작은 Dialog         | 폼과 제출 버튼을 `Modal` children 안에 배치. `isPending` 연결, 날짜 상태·검증·저장 로직 유지                                                            | 3    |
+| `Reviews/components/ExamReviewPeriodUpdateConfirmModal.tsx`                | `ExamReviewPeriodPage` → `ExamReviewPeriodListSection`                       | 기간 제목·시작·종료 입력 Dialog, 별도 요청 중 상태 없음                     | 자유형 `Modal size='sm'`로 전환. 요청 중 상태 추가, 성공·새로고침 흐름 유지                                                                             | 3    |
+| `MemberInfo/components/MemberPointAdjustmentDialog.tsx`                    | 회원 상세 `MemberDetailSection`                                              | `rounded-2xl`, 큰 제목·설명, 포인트 폼, 자체 초기화                         | `Modal` + children. 기존 약 36rem 너비 예외 유지, `isSubmitting`으로 닫기 제한, 직접 지급 흐름 유지                                                     | 3    |
+| `MemberInfo/components/penalty-history/PenaltyHistoryAddDialog.tsx`        | `SanctionModal`, `MemberPenaltyHistoryDialog`                                | 큰 제목·여백, content ref로 포커스 처리, 추가 확인 모달 중첩                | `Modal`로 전환하고 중복 패딩 제거. `contentProps.ref` 전달, 제재 제한·검증·확인 후 제출 유지                                                            | 3    |
+| `Reviews/components/ExamReviewFileNameModal.tsx`                           | 시험후기 상세 `ExamDetailSection`                                            | 실제 form 제출, 저장 중 닫기 차단, 닫힌 뒤 트리거로 포커스 복귀             | `Modal` children 안에 form과 제출 버튼 구성. `closeDisabled`, `contentProps.onCloseAutoFocus` 연결. 확장자·검증·Enter 제출 유지                         | 3    |
+| `Reviews/components/ExamReviewAdminStatusPeriodFormModal.tsx`              | `ExamReviewAdminStatusPeriodList`                                            | Dialog 전체 스크롤, 저장 중 닫기 차단, 미저장 폐기 확인 중첩                | `Modal size='lg'`로 전환. 공통 본문 내부 스크롤, 기존 `requestClose`·`onAfterClose`·폐기 확인 유지                                                      | 3    |
+| `Operation/components/PopupEditorDialog.tsx`                               | `PopupManagementPage`                                                        | 약 760px Dialog 전체 스크롤, 입력·이미지·미리보기·저장 버튼                 | `Modal` + children. 760px 너비 예외 유지, 본문만 스크롤. 저장 확인으로 이어지는 흐름 유지                                                               | 3    |
+| `MemberInfo/components/MemberPointHistoryDialog.tsx`                       | 회원 상세 `MemberDetailSection`                                              | 헤더 구분선·도움말, 본문 스크롤 기반 무한 조회                              | `Modal` + children. 도움말은 `headerExtra`, 필요 구분선은 본문 경계에 유지. scroll handler·오류·재조회·더 보기 유지                                     | 4    |
+| `MemberInfo/components/penalty-history/PenaltyHistoryTimelineDialog.tsx`   | `MemberPenaltySummaryCard` → `MemberPenaltyHistoryDialog`                    | 헤더·추가 버튼·건수 고정, 타임라인만 스크롤                                 | `Modal`로 전환. 상단 액션·건수는 고정 영역, 타임라인은 스크롤 본문으로 구성. 고정 영역·본문 속성 전달 API는 전환 시 조정. 기존 무한 조회·제재 제한 유지 | 4    |
+| `Reviews/components/ExamReviewAdminStatusDialog.tsx`                       | `ExamReviewPage`                                                             | 960px 상한, 컨테이너 쿼리, 지정 높이, 본문 스크롤                           | `Modal size='xl'` + children. 960px·반응형 높이·`@container`는 예외 유지. 차트·탭·기간 편집 이동 유지                                                   | 4    |
+| `Reviews/components/ExamReviewAdminStatusPeriodDialog.tsx`                 | `ExamReviewPage`                                                             | 큰 Dialog 전체 스크롤, 헤더 내 현황 보기, 기간 목록·폐기 확인               | `Modal`로 전환. 48rem 너비 예외 유지, 현황 보기는 `headerExtra`, 목록은 children. 미저장 변경 확인 유지                                                 | 4    |
 
 `MemberPenaltyHistoryDialog`는 직접 Dialog를 렌더링하지 않는 조정 컴포넌트다. 타임라인·제재 추가 모달에 대한 상태와 데이터 전달은 유지한다.
 
@@ -135,15 +135,15 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 
 위 조사 표의 현재 구조는 전환 전 상태를 설명한다. 1단계의 실제 적용 결과는 다음과 같다.
 
-| 적용 대상                                     | 변경 결과                                                                                                 |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| ConfirmModal                                  | Modal + Body + Footer로 교체. 기존 경로·props 유지, ReactNode 제목·설명과 size·isPending·pendingText 추가 |
-| 요청 중 공통 동작                             | 확인·취소 비활성화, 로딩 아이콘·문구, X 숨김 및 ESC·바깥 클릭 닫기 차단                                   |
-| 시험후기 삭제·복구, 기간 삭제, 경고·강등 적용 | 기존 비동기 상태를 isPending에 연결                                                                       |
-| 문의·신고 상태 변경                           | isStatusUpdating 연결 및 처리 함수의 재진입 방어 추가                                                     |
-| 시험후기 수정 확인                            | isSaving 전달. 요청 전에 확인창을 닫던 흐름을 성공 후 닫기로 변경. 실패 시 확인창과 변경 내용 유지        |
-| 팝업 등록·수정·삭제, 서버 점검 삭제           | 현재 동기 처리이므로 공통 외곽만 간접 적용                                                                |
-| 미저장 변경 폐기                              | 기존 dirty 판정·닫기 분기 유지, 공통 외곽만 간접 적용                                                     |
+| 적용 대상                                     | 변경 결과                                                                                                                               |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| ConfirmModal                                  | 기존 Modal 위에 확인·취소 영역을 구성하고 처리 상태를 제공. 기존 경로·props 유지, ReactNode 제목·설명과 size·isPending·pendingText 추가 |
+| 요청 중 공통 동작                             | 확인·취소 비활성화, 로딩 아이콘·문구, X 숨김 및 ESC·바깥 클릭 닫기 차단                                                                 |
+| 시험후기 삭제·복구, 기간 삭제, 경고·강등 적용 | 기존 비동기 상태를 isPending에 연결                                                                                                     |
+| 문의·신고 상태 변경                           | isStatusUpdating 연결 및 처리 함수의 재진입 방어 추가                                                                                   |
+| 시험후기 수정 확인                            | isSaving 전달. 요청 전에 확인창을 닫던 흐름을 성공 후 닫기로 변경. 실패 시 확인창과 변경 내용 유지                                      |
+| 팝업 등록·수정·삭제, 서버 점검 삭제           | 현재 동기 처리이므로 공통 외곽만 간접 적용                                                                                              |
+| 미저장 변경 폐기                              | 기존 dirty 판정·닫기 분기 유지, 공통 외곽만 간접 적용                                                                                   |
 
 자동 검사와 실제 브라우저 검증은 구분한다. 관련 컴포넌트 테스트, ESLint 및 빌드로 검증하며 화면별 시각·중첩 포커스 동작 확인은 후속 전환 단계의 검증 항목으로 남긴다.
 
@@ -153,11 +153,11 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 
 | 대상                    | 적용 결과                                                                                                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MemberInfoModal         | Modal + Body + Footer로 전환. 기존 너비·회원 정보·상세 페이지 이동 유지, 긴 값 줄바꿈 적용                                                                    |
-| SanctionModal           | 작은 Modal + Body로 전환. 경고·강등 선택 후 추가 폼을 여는 흐름 유지                                                                                          |
+| MemberInfoModal         | Modal children에 회원 정보와 화면 전용 버튼 배치. 기존 너비·회원 정보·상세 페이지 이동 유지, 긴 값 줄바꿈 적용                                                |
+| SanctionModal           | 작은 Modal + children으로 전환. 경고·강등 선택 후 추가 폼을 여는 흐름 유지                                                                                    |
 | StatusChangeModal       | 자체 fixed 오버레이를 ConfirmModal로 전환. 사유·댓글 동시 삭제 옵션·문구 유지. 부모 클릭 전파 방지, 처리 중 사유 입력도 비활성화                              |
 | 개별·전체 포인트 확인   | ConfirmModal로 전환. 페이지에 isSubmitting과 재진입 방어 추가, 요청 중 상태 연결. 기존 성공·실패 후 확인창을 닫는 흐름 유지                                   |
-| 푸시 전송 확인          | ConfirmModal로 전환. 발송 중 닫기 제한 유지, 버튼은 공통 Footer 배치 적용. 긴 내용·URL 줄바꿈 보완                                                            |
+| 푸시 전송 확인          | ConfirmModal로 전환. 발송 중 닫기 제한 유지, 공통 확인·취소 버튼 배치 적용. 긴 내용·URL 줄바꿈 보완                                                           |
 | 포인트 미지급 일정 삭제 | 작은 ConfirmModal로 전환, 기존 mutation의 isPending 연결                                                                                                      |
 | 시험후기 작성 기간 삭제 | 작은 ConfirmModal로 전환, isPending·중복 실행 방어 추가. 실패 후 재시도 및 성공 시 닫기·목록 갱신 유지                                                        |
 | 경고·강등 최종 확인     | ConfirmModal로 전환. 강조 제목·기존 너비 유지, isSubmitting으로 취소·닫기·재실행 제한                                                                         |
@@ -175,3 +175,23 @@ API 요청, 입력 검증, 성공·실패 처리, 입력 초기화, 변경사항
 | 후속 검증      | 전체 화면별 시각 검증과 제재 선택→추가→최종 확인의 브라우저 포커스 흐름은 후속 폼 전환 단계에서 확인                                                                               |
 
 다음 작업은 3단계 폼 모달 전환이다. 현재 사용하지 않는 MemberPointAdjustmentConfirmDialog는 계획대로 유지했다.
+
+## 공통 구조 확정: Modal과 ConfirmModal 유지
+
+확인창을 모두 Modal 직접 호출로 바꾸는 중간 변경은 정리했다. 이전 1·2단계 적용분과 기존 확인창 사용처는 아래 기준을 따른다. 3·4단계 폼·복잡한 조회 모달 전환 범위는 유지한다.
+
+| 구분         | 역할                                                     | 사용 방법                                                                                                           |
+| ------------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Modal        | 공통 헤더·X·크기·포커스·본문 스크롤·화면별 children 구성 | 자유로운 본문을 children으로 전달. 확인·취소 버튼이 필요하면 ConfirmModal 사용. 화면 전용 동작은 children 안에 구성 |
+| ConfirmModal | Modal을 조합해 확인·취소 버튼과 처리 중 상태 제공        | title·description·onConfirm·onClose·isPending 등 전달. 버튼 JSX와 처리 중 동작을 각 사용처에 반복하지 않음          |
+| 화면별 모달  | 도메인 내용·검증·요청·상태 연결                          | 회원 정보·제재 선택은 Modal 사용. 삭제·지급·전송·최종 확인·변경사항 폐기는 ConfirmModal 사용                        |
+
+Modal에는 footer prop이 없다. ConfirmModal이 Modal 위에 확인·취소 버튼 영역을 구성하고 본문 스크롤을 관리한다. Modal을 직접 쓰는 화면은 자체 children 안에 화면별 내용을 구성한다. 기존 ConfirmModal 경로와 props는 유지한다. 처리 중 닫기 제한과 비활성화, 포커스 복귀도 유지한다.
+
+검증 갱신: 구조 확정 후 관련 13개 파일 134개 테스트와 전체 ESLint·빌드 통과. 전체 포인트 확인 모달의 데스크톱·모바일 배치 및 ESC·포커스 복귀도 재확인했다.
+
+## 회원 팝오버 소유 위치 변경
+
+회원 정보·제재 선택 모달은 shared에 개별 컴포넌트로 두지 않는다. 두 모달은 회원 팝오버에서만 사용하고 제재 추가 폼은 MemberInfo 도메인에 의존하므로, 팝오버와 함께 `domains/MemberInfo/components/MemberInfoPopover.tsx`에서 관리한다. 정보 보기와 제재 선택은 `Modal`을 직접 사용하며 화면 전용 버튼은 children 안에서 구성한다.
+
+`src/shared/components/MemberInfoModal.tsx`, `SanctionModal.tsx`, `MemberInfoPopover.tsx`와 해당 shared export를 제거했다. 게시글 목록·상세 및 댓글 목록의 네 사용처는 `domains/MemberInfo/components/MemberInfoPopover`를 직접 import한다.

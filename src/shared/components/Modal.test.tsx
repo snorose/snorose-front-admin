@@ -14,9 +14,7 @@ describe('Modal', () => {
         <>
           <button onClick={() => setOpen(true)}>열기</button>
           <Modal open={open} onOpenChange={setOpen} title='안내'>
-            <Modal.Body>
-              <button>본문 버튼</button>
-            </Modal.Body>
+            <button>본문 버튼</button>
           </Modal>
         </>
       );
@@ -38,10 +36,7 @@ describe('Modal', () => {
         title='회원 정보'
         subtitle='회원 상세 안내'
       >
-        <Modal.Body>회원 정보 본문</Modal.Body>
-        <Modal.Footer>
-          <button type='button'>상세 페이지로 이동</button>
-        </Modal.Footer>
+        회원 정보 본문
       </Modal>
     );
 

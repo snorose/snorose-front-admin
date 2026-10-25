@@ -30,9 +30,8 @@ export type ModalProps = {
 };
 
 /**
- * 제목·설명·닫기 버튼과 모달 레이아웃을 통일한다.
- * 본문과 하단 버튼은 Modal.Body, Modal.Footer로 자유롭게 구성한다.
- * form으로 감쌀 때는 min-h-0 flex flex-col을 적용해 본문 스크롤을 유지한다.
+ * 제목·설명·닫기 버튼과 모달 외곽 레이아웃을 통일한다.
+ * 본문과 사용자 정의 행동은 children으로 구성한다.
  */
 export function Modal({
   open,
@@ -111,27 +110,3 @@ export function Modal({
     </Dialog>
   );
 }
-
-Modal.Body = function ModalBody({
-  className,
-  ...props
-}: ComponentProps<'div'>) {
-  return (
-    <div
-      className={cn(
-        'min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6',
-        className
-      )}
-      {...props}
-    />
-  );
-};
-
-Modal.Footer = function ModalFooter({
-  className,
-  ...props
-}: ComponentProps<typeof Dialog.Footer>) {
-  return (
-    <Dialog.Footer className={cn('shrink-0 px-6 pb-6', className)} {...props} />
-  );
-};

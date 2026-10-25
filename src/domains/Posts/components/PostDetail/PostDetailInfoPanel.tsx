@@ -2,10 +2,12 @@ import DOMPurify from 'dompurify';
 import { Bookmark, Heart, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { MemberInfoPopover, StatusBadge } from '@/shared/components';
+import { StatusBadge } from '@/shared/components';
 import { Switch } from '@/shared/components/ui';
 import { formatDateTimeWithAmPm } from '@/shared/utils';
 import { getPostStatusBadges } from '@/shared/utils';
+
+import { MemberInfoPopover } from '@/domains/MemberInfo/components/MemberInfoPopover';
 
 import { useUpdatePostNotice } from '../../hooks/useUpdatePostNotice';
 import type { AdminGetPostResponse } from '../../types/post';

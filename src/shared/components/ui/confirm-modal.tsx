@@ -4,6 +4,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 
 import { Modal, type ModalProps } from '@/shared/components/Modal';
+import { Dialog } from '@/shared/components/ui/dialog';
 
 import { Button, buttonVariants } from './button';
 
@@ -52,9 +53,12 @@ export function ConfirmModal({
       className={className}
       closeDisabled={isPending}
     >
-      {children != null && <Modal.Body>{children}</Modal.Body>}
-
-      <Modal.Footer>
+      {children != null && (
+        <div className='min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-6 pb-6'>
+          {children}
+        </div>
+      )}
+      <Dialog.Footer className='shrink-0 px-6 pb-6'>
         <Button
           type='button'
           variant='outline'
@@ -73,7 +77,7 @@ export function ConfirmModal({
           {isPending && <Loader2 aria-hidden='true' className='animate-spin' />}
           {isPending ? (pendingText ?? confirmText) : confirmText}
         </Button>
-      </Modal.Footer>
+      </Dialog.Footer>
     </Modal>
   );
 }
