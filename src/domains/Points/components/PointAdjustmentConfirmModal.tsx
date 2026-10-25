@@ -1,4 +1,4 @@
-import { Button, Dialog } from '@/shared/components/ui';
+import { ConfirmModal } from '@/shared/components/ui';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 import type { AdminUserListItem } from '@/shared/types';
@@ -7,6 +7,7 @@ type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
 interface PointAdjustmentConfirmModalProps {
   isOpen: boolean;
+  isPending?: boolean;
   onClose: () => void;
   onConfirm: () => void;
   searchedMember: AdminUserListItem;
@@ -17,6 +18,7 @@ interface PointAdjustmentConfirmModalProps {
 
 export function PointAdjustmentConfirmModal({
   isOpen,
+  isPending = false,
   onClose,
   onConfirm,
   searchedMember,
@@ -42,55 +44,49 @@ export function PointAdjustmentConfirmModal({
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <Dialog.Content>
-        <Dialog.Header>
-          <Dialog.Title>포인트 지급/차감 확인</Dialog.Title>
-          <Dialog.Description>
-            아래 내용으로 포인트를 적용하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='flex flex-col gap-3 py-4'>
-          {CONFIRMATION_DATA.map((data) => (
-            <div className='flex items-center gap-2' key={data.label}>
-              <span className='text-sm font-semibold text-gray-700'>
-                {data.label}:
-              </span>
-              <span className='text-sm'>{data.value}</span>
-            </div>
-          ))}
-          <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold text-gray-700'>
-              포인트 지급/차감량:
+    <ConfirmModal
+      isOpen={isOpen}
+      title='포인트 지급/차감 확인'
+      description='아래 내용으로 포인트를 적용하시겠습니까?'
+      onConfirm={onConfirm}
+      onClose={onClose}
+      isPending={isPending}
+      pendingText='적용 중'
+    >
+      <div className='flex min-w-0 flex-col gap-3 wrap-anywhere'>
+        {CONFIRMATION_DATA.map((data) => (
+          <div className='flex min-w-0 items-start gap-2' key={data.label}>
+            <span className='shrink-0 text-sm font-semibold text-gray-700'>
+              {data.label}:
             </span>
-            <span
-              className={cn(
-                'text-sm',
-                isPositiveDifference ? 'text-blue-600' : 'text-red-600'
-              )}
-            >
-              {isPositiveDifference ? '+' : ''}
-              {difference}
+            <span className='text-sm'>{data.value}</span>
+          </div>
+        ))}
+        <div className='flex min-w-0 items-start gap-2'>
+          <span className='shrink-0 text-sm font-semibold text-gray-700'>
+            포인트 지급/차감량:
+          </span>
+          <span
+            className={cn(
+              'text-sm',
+              isPositiveDifference ? 'text-blue-600' : 'text-red-600'
+            )}
+          >
+            {isPositiveDifference ? '+' : ''}
+            {difference}
+          </span>
+        </div>
+        {memo && (
+          <div className='flex items-start gap-2'>
+            <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
+              메모:
+            </span>
+            <span className='min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
+              {memo}
             </span>
           </div>
-          {memo && (
-            <div className='flex items-start gap-2'>
-              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-                메모:
-              </span>
-              <span className='text-sm break-keep'>{memo}</span>
-            </div>
-          )}
-        </div>
-        <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={onClose}>
-            취소
-          </Button>
-          <Button type='button' onClick={onConfirm}>
-            확인
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+        )}
+      </div>
+    </ConfirmModal>
   );
 }

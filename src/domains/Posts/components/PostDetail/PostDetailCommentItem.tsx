@@ -112,6 +112,7 @@ export default function PostDetailCommentItem({
   const handleConfirmAction = (memo: string) => {
     if (
       !memo.trim() ||
+      deleteMutation.isPending ||
       restoreMutation.isPending ||
       visibilityMutation.isPending
     )
@@ -264,6 +265,11 @@ export default function PostDetailCommentItem({
         <StatusChangeModal
           target='COMMENT'
           modalType={modalType}
+          isPending={
+            deleteMutation.isPending ||
+            restoreMutation.isPending ||
+            visibilityMutation.isPending
+          }
           onClose={() => {
             setIsModalOpen(false);
           }}

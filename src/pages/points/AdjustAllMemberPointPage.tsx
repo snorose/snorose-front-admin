@@ -32,6 +32,7 @@ export default function AdjustAllMemberPointPage() {
   };
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleApplyButtonClick = async () => {
     if (!selectedCategory || !difference || !memo) {
@@ -50,6 +51,8 @@ export default function AdjustAllMemberPointPage() {
   };
 
   const handleConfirmModalButtonClick = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       await postAllMemberPointAPI({
         category: selectedCategory as PointCategoryValue,
@@ -65,6 +68,7 @@ export default function AdjustAllMemberPointPage() {
     } catch (error: unknown) {
       toast.error(getErrorMessage(error, '포인트 지급/차감에 실패했습니다.'));
     } finally {
+      setIsSubmitting(false);
       setIsConfirmModalOpen(false);
     }
   };
@@ -115,6 +119,7 @@ export default function AdjustAllMemberPointPage() {
 
       <AllMemberPointAdjustmentConfirmModal
         isOpen={isConfirmModalOpen}
+        isPending={isSubmitting}
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleConfirmModalButtonClick}
         selectedCategory={selectedCategory}

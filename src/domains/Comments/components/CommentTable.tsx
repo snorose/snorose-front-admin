@@ -202,6 +202,7 @@ export default function CommentTable({
         <StatusChangeModal
           target='COMMENT'
           modalType='RESTORE'
+          isPending={isVisibilityPending}
           onClose={() => setIsRestoreModalOpen(false)}
           onConfirmAction={handleConfirmBulkRestore}
         />
@@ -211,6 +212,7 @@ export default function CommentTable({
         <StatusChangeModal
           target='COMMENT'
           modalType='DELETE'
+          isPending={isDeletePending}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirmAction={handleConfirmBulkDelete}
         />

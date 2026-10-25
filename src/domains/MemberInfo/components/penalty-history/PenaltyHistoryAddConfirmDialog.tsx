@@ -1,6 +1,4 @@
-import { Loader2 } from 'lucide-react';
-
-import { Button, Dialog } from '@/shared/components/ui';
+import { ConfirmModal } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
 import type { DemotionType } from '@/domains/MemberInfo/components/penalty-history/penalty-history-add-utils';
@@ -31,48 +29,24 @@ export default function PenaltyHistoryAddConfirmDialog({
   warningCount,
 }: PenaltyHistoryAddConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content className='rounded-2xl p-0 sm:max-w-xl'>
-        <div className='space-y-7 px-8 py-8'>
-          <Dialog.Header>
-            <Dialog.Title className='text-xl leading-8 font-bold text-slate-950'>
-              <ConfirmTitle
-                demotionType={demotionType}
-                isWarningMode={isWarningMode}
-                member={member}
-                relegationEndDateTime={relegationEndDateTime}
-                relegationMonth={relegationMonth}
-                warningCount={warningCount}
-              />
-            </Dialog.Title>
-          </Dialog.Header>
-
-          <Dialog.Footer className='gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              size='default'
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              type='button'
-              variant='destructive'
-              size='default'
-              onClick={onConfirm}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <Loader2 aria-hidden='true' className='animate-spin' />
-              ) : null}
-              확인
-            </Button>
-          </Dialog.Footer>
-        </div>
-      </Dialog.Content>
-    </Dialog>
+    <ConfirmModal
+      isOpen={open}
+      className='sm:max-w-xl'
+      isPending={isSubmitting}
+      confirmVariant='destructive'
+      onConfirm={onConfirm}
+      onClose={() => onOpenChange(false)}
+      title={
+        <ConfirmTitle
+          demotionType={demotionType}
+          isWarningMode={isWarningMode}
+          member={member}
+          relegationEndDateTime={relegationEndDateTime}
+          relegationMonth={relegationMonth}
+          warningCount={warningCount}
+        />
+      }
+    />
   );
 }
 

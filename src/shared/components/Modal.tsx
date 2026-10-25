@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react';
+import { type ComponentProps, type ReactNode, useRef } from 'react';
 
 import { Dialog } from '@/shared/components/ui/dialog';
 import { cn } from '@/shared/lib';
@@ -47,6 +47,7 @@ export function Modal({
   closeDisabled = false,
   contentProps,
 }: ModalProps) {
+  const openerRef = useRef<HTMLElement | null>(null);
   const hasSubtitle = subtitle != null && subtitle !== false && subtitle !== '';
 
   return (
@@ -66,6 +67,20 @@ export function Modal({
           modalSizes[size],
           className
         )}
+        onOpenAutoFocus={(event) => {
+          openerRef.current =
+            document.activeElement instanceof HTMLElement
+              ? document.activeElement
+              : null;
+          contentProps?.onOpenAutoFocus?.(event);
+        }}
+        onCloseAutoFocus={(event) => {
+          contentProps?.onCloseAutoFocus?.(event);
+          if (!event.defaultPrevented && openerRef.current?.isConnected) {
+            event.preventDefault();
+            openerRef.current.focus();
+          }
+        }}
         onEscapeKeyDown={(event) => {
           contentProps?.onEscapeKeyDown?.(event);
           if (closeDisabled) event.preventDefault();

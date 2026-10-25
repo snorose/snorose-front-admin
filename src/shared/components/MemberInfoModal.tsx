@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Dialog } from '@/shared/components/ui';
+import { Button } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
+
+import { Modal } from './Modal';
 
 interface MemberInfoModalProps {
   isOpen: boolean;
@@ -20,18 +22,17 @@ export default function MemberInfoModal({
   if (!memberInfo) return null;
 
   return (
-    <Dialog
+    <Modal
+      title='회원 정보'
+      className='sm:max-w-md'
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
     >
-      <Dialog.Content className='sm:max-w-md'>
-        <Dialog.Header>
-          <Dialog.Title>회원 정보</Dialog.Title>
-        </Dialog.Header>
+      <Modal.Body>
         {memberInfo && (
-          <div className='grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 py-2 text-sm'>
+          <div className='grid grid-cols-[auto_minmax(0,1fr)] gap-x-6 gap-y-2.5 text-sm wrap-anywhere'>
             <span className='text-gray-700'>이름</span>
             <span className='font-medium text-gray-900'>
               {memberInfo.userName}
@@ -64,20 +65,20 @@ export default function MemberInfoModal({
             </span>
           </div>
         )}
-        <Dialog.Footer>
-          <Button variant='outline' onClick={onClose}>
-            닫기
-          </Button>
-          <Button
-            onClick={() => {
-              onClose();
-              navigate(`/member/info/${encryptedUserId}`);
-            }}
-          >
-            유저 상세 페이지로 이동
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant='outline' onClick={onClose}>
+          닫기
+        </Button>
+        <Button
+          onClick={() => {
+            onClose();
+            navigate(`/member/info/${encryptedUserId}`);
+          }}
+        >
+          유저 상세 페이지로 이동
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }

@@ -1,10 +1,35 @@
-import { render, screen } from '@testing-library/react';
+import { useState } from 'react';
+
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Modal } from './Modal';
 
 describe('Modal', () => {
+  test('Trigger 없이 연 모달을 닫으면 열기 버튼으로 포커스가 복귀한다', async () => {
+    function Example() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button onClick={() => setOpen(true)}>열기</button>
+          <Modal open={open} onOpenChange={setOpen} title='안내'>
+            <Modal.Body>
+              <button>본문 버튼</button>
+            </Modal.Body>
+          </Modal>
+        </>
+      );
+    }
+    const user = userEvent.setup();
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: '열기' }));
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: '열기' })).toHaveFocus()
+    );
+  });
+
   test('제목과 설명을 접근 가능한 이름으로 연결하고 자유로운 내용을 표시한다', () => {
     render(
       <Modal

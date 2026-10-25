@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { Button, Textarea } from '@/shared/components/ui';
+import { ConfirmModal, Textarea } from '@/shared/components/ui';
 
 interface StatusChangeModalProps {
   target: 'POST' | 'COMMENT';
@@ -20,26 +20,27 @@ export default function StatusChangeModal({
   const [reason, setReason] = useState('');
   const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
   return (
-    <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className='animate-in fade-in zoom-in-95 w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-lg duration-150'>
-        <h3 className='mb-2 text-base font-bold text-gray-900'>
-          {target === 'POST' ? '게시글' : '댓글'}{' '}
-          {modalType === 'HIDE'
+    <div className='contents' onClick={(event) => event.stopPropagation()}>
+      <ConfirmModal
+        isOpen
+        title={`${target === 'POST' ? '게시글' : '댓글'} ${
+          modalType === 'HIDE'
             ? '비공개'
             : modalType === 'SHOW'
               ? '공개'
               : modalType === 'RESTORE'
                 ? '복구'
-                : '삭제'}{' '}
-          처리
-        </h3>
-        <p className='mb-4 text-xs text-gray-500'>
-          상태를 변경하는 사유를 작성해 주세요.
-        </p>
-
+                : '삭제'
+        } 처리`}
+        description='상태를 변경하는 사유를 작성해 주세요.'
+        className='sm:max-w-md'
+        onClose={onClose}
+        onConfirm={() => onConfirmAction(reason, deleteCommentsAlso)}
+        confirmVariant={modalType === 'DELETE' ? 'destructive' : 'default'}
+        confirmDisabled={!reason.trim()}
+        isPending={isPending}
+        pendingText='처리 중'
+      >
         <div className='flex flex-col gap-4'>
           <label htmlFor={reasonId} className='sr-only'>
             상태 변경 사유
@@ -49,42 +50,24 @@ export default function StatusChangeModal({
             className='min-h-[100px]'
             placeholder='사유를 입력하세요...'
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            disabled={isPending}
+            onChange={(event) => setReason(event.target.value)}
           />
-
           {target === 'POST' && modalType === 'DELETE' && (
             <label className='flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700'>
               <input
                 type='checkbox'
                 checked={deleteCommentsAlso}
                 disabled={isPending}
-                onChange={(e) => setDeleteCommentsAlso(e.target.checked)}
+                onChange={(event) =>
+                  setDeleteCommentsAlso(event.target.checked)
+                }
               />
               게시글에 달린 댓글도 함께 전부 삭제 처리
             </label>
           )}
-          <div className='mt-2 flex justify-end gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              onClick={onClose}
-              disabled={isPending}
-            >
-              취소
-            </Button>
-            <Button
-              type='button'
-              variant={modalType === 'DELETE' ? 'destructive' : 'default'}
-              size='sm'
-              onClick={() => onConfirmAction(reason, deleteCommentsAlso)}
-              disabled={isPending || !reason.trim()}
-            >
-              확인
-            </Button>
-          </div>
         </div>
-      </div>
+      </ConfirmModal>
     </div>
   );
 }

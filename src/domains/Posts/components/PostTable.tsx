@@ -192,6 +192,7 @@ export default function PostTable({
         <StatusChangeModal
           target='POST'
           modalType='RESTORE'
+          isPending={isVisibilityPending}
           onClose={() => setIsRestoreModalOpen(false)}
           onConfirmAction={handleConfirmBulkRestore}
         />
@@ -209,6 +210,7 @@ export default function PostTable({
         <StatusChangeModal
           target='POST'
           modalType={visibilityModalType}
+          isPending={isVisibilityPending}
           onClose={() => setVisibilityModalType(null)}
           onConfirmAction={handleConfirmBulkVisibility}
         />
