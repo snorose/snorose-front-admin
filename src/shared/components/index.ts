@@ -8,6 +8,7 @@ export { FilterMultiSelect } from './FilterMultiSelect';
 export { Header } from './Header';
 export { default as MemberInfoModal } from './MemberInfoModal';
 export { MemberInfoPopover } from './MemberInfoPopover';
+export { Modal, type ModalProps } from './Modal';
 export { NavUser } from './NavUser';
 export { NoticePanel } from './NoticePanel';
 export {
