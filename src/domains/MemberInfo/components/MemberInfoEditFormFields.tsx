@@ -13,6 +13,7 @@ export type EditableFieldItem = {
   fieldName: keyof MemberEditFormValues;
   inputType?: string;
   label: string;
+  labelAction?: ReactNode;
   onChange: (value: string) => void;
   placeholder?: string;
   value: string;
@@ -36,6 +37,7 @@ export function EditableField({
   error,
   fieldName,
   label,
+  labelAction,
   onChange,
   placeholder,
   type = 'text',
@@ -44,6 +46,7 @@ export function EditableField({
   error?: string;
   fieldName: keyof MemberEditFormValues;
   label: string;
+  labelAction?: ReactNode;
   onChange: (value: string) => void;
   placeholder?: string;
   type?: string;
@@ -55,13 +58,16 @@ export function EditableField({
 
   return (
     <Field className='gap-0' data-invalid={Boolean(error)}>
-      <Field.Label
-        htmlFor={inputId}
-        required
-        className={error ? 'text-destructive' : undefined}
-      >
-        {label}
-      </Field.Label>
+      <div className='flex items-center gap-1'>
+        <Field.Label
+          htmlFor={inputId}
+          required
+          className={error ? 'text-destructive' : undefined}
+        >
+          {label}
+        </Field.Label>
+        {labelAction}
+      </div>
       <Field.Content>
         {type === 'date' ? (
           <DatePicker
@@ -145,19 +151,24 @@ export function ReadonlyField({
   className,
   copyValue,
   label,
+  labelAction,
   value,
 }: {
   action?: ReactNode;
   className?: string;
   copyValue?: string;
   label: string;
+  labelAction?: ReactNode;
   value: string;
 }) {
   const inputId = useId();
 
   return (
     <Field className={cn('min-w-0 gap-0', className)}>
-      <Field.Label htmlFor={inputId}>{label}</Field.Label>
+      <div className='flex items-center gap-1'>
+        <Field.Label htmlFor={inputId}>{label}</Field.Label>
+        {labelAction}
+      </div>
       <Field.Content className='min-w-0'>
         <div className='flex min-w-0 items-center gap-2'>
           {copyValue !== undefined ? (
