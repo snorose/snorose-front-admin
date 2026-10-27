@@ -5,6 +5,7 @@ import { Button, Field } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
+import { MemberEmailInfoTooltip } from '@/domains/MemberInfo/components/MemberEmailInfoTooltip';
 import { ReadonlyField } from '@/domains/MemberInfo/components/MemberInfoEditFormFields';
 import {
   formatDisplayValue,
@@ -99,7 +100,11 @@ export default function MemberDetailInfoGrid({
           </div>
         </Field.Content>
       </Field>
-      <ReadonlyField label='이메일' value={formatDisplayValue(member.email)} />
+      <ReadonlyField
+        label='이메일'
+        labelAction={<MemberEmailInfoTooltip />}
+        value={formatDisplayValue(member.email)}
+      />
     </div>
   );
 }
