@@ -142,11 +142,6 @@ export default function MemberDetailSection({
           ) : (
             <MemberInfoEditForm member={member} onSubmit={onSaveEdit} />
           )}
-          <MemberPointSection
-            pointBalance={member.pointBalance}
-            onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
-            onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
-          />
         </SectionCard>
 
         <div className='flex min-w-0 flex-col gap-6'>
@@ -159,6 +154,11 @@ export default function MemberDetailSection({
             onOpenPenaltyHistory={onOpenPenaltyHistory}
             penaltyHistory={penaltyHistory}
             penaltyHistoryTotalCount={penaltyHistoryTotalCount}
+          />
+          <MemberPointSection
+            pointBalance={member.pointBalance}
+            onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
+            onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
           />
           <MemberActivitySection studentNumber={member.studentNumber} />
           <MemberWithdrawalSection />
