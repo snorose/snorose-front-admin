@@ -1,7 +1,5 @@
-import { Coins, History } from 'lucide-react';
-
 import { StatusBadge } from '@/shared/components';
-import { Button, Field } from '@/shared/components/ui';
+import { Field } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
@@ -9,25 +7,20 @@ import { MemberEmailInfoTooltip } from '@/domains/MemberInfo/components/MemberEm
 import { ReadonlyField } from '@/domains/MemberInfo/components/MemberInfoEditFormFields';
 import {
   formatDisplayValue,
-  formatPoint,
   getRoleBadgeMeta,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 
 type MemberDetailInfoGridProps = {
   member: MemberInfo;
-  onPointAdjustmentOpen: () => void;
-  onPointHistoryOpen: () => void;
   roleLabel: string;
 };
 
 export default function MemberDetailInfoGrid({
   member,
-  onPointAdjustmentOpen,
-  onPointHistoryOpen,
   roleLabel,
 }: MemberDetailInfoGridProps) {
   return (
-    <div className='@container grid grid-cols-1 gap-4 md:grid-cols-2'>
+    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
       <ReadonlyField label='이름' value={formatDisplayValue(member.userName)} />
       <ReadonlyField
         label='아이디'
@@ -57,33 +50,6 @@ export default function MemberDetailInfoGrid({
       <ReadonlyField
         label='정보 수정일'
         value={formatDateTimeToMinutes(member.updatedAt)}
-      />
-      <ReadonlyField
-        label='보유 포인트'
-        className='md:col-span-2 @3xl:col-span-1'
-        value={formatPoint(member.pointBalance)}
-        action={
-          <div className='flex shrink-0 items-center gap-1.5'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={onPointHistoryOpen}
-              aria-label='포인트 이력 열기'
-            >
-              <History aria-hidden='true' />
-              포인트 이력
-            </Button>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={onPointAdjustmentOpen}
-              aria-label='포인트 지급·차감'
-            >
-              <Coins aria-hidden='true' />
-              지급·차감
-            </Button>
-          </div>
-        }
       />
       <ReadonlyField
         label='회원 ID (암호화)'

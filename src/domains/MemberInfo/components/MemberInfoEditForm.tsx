@@ -16,7 +16,6 @@ import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberI
 import {
   createMemberDiffPayload,
   formatDisplayValue,
-  formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 import {
@@ -180,12 +179,6 @@ export default function MemberInfoEditForm({
 
       label: '정보 수정일',
       value: formatDateTimeToMinutes(member.updatedAt),
-    },
-    {
-      type: 'readonly',
-
-      label: '보유 포인트',
-      value: formatPoint(member.pointBalance),
     },
     {
       type: 'readonly',
