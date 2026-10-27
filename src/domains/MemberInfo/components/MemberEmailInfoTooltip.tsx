@@ -16,7 +16,7 @@ export function MemberEmailInfoTooltip() {
             variant='ghost'
             size='icon-sm'
             aria-label='이메일 변경 안내'
-            className='text-muted-foreground relative size-6 after:absolute after:-inset-2.5 sm:after:-inset-1'
+            className='text-muted-foreground size-11 sm:size-8'
             onClick={(event) => {
               event.preventDefault();
               setOpen(true);
