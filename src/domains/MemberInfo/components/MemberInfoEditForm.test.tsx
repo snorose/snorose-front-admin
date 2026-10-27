@@ -60,6 +60,29 @@ describe('MemberInfoEditForm', () => {
     expect(screen.getByLabelText(/^학번/)).not.toHaveAttribute('readonly');
   });
 
+  test('이메일 안내 버튼을 클릭해도 변경한 회원 정보가 제출되지 않는다', async () => {
+    const user = userEvent.setup({ skipHover: true });
+    const onSubmit = vi.fn();
+    render(<MemberInfoEditForm member={MEMBER} onSubmit={onSubmit} />);
+    const nickname = screen.getByRole('textbox', { name: /^닉네임/ });
+    await user.clear(nickname);
+    await user.type(nickname, '새닉네임');
+
+    await user.click(screen.getByRole('button', { name: '이메일 변경 안내' }));
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      '이메일은 숙명인 메일로만 변경할 수 있습니다.'
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(nickname).toHaveValue('새닉네임');
+
+    await user.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    );
+    fireEvent.submit(nickname.closest('form') as HTMLFormElement);
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith({ nickname: '새닉네임' });
+  });
+
   test('강등자의 학번은 읽기 전용이며 다른 정보는 수정할 수 있다', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -148,7 +171,10 @@ describe('MemberInfoEditForm', () => {
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith({
       birthday: '1980-02-29',
     });
-    expect(screen.getByLabelText(/^이메일/)).toHaveAttribute('type', 'email');
+    expect(screen.getByRole('textbox', { name: /^이메일/ })).toHaveAttribute(
+      'type',
+      'email'
+    );
   });
 
   test('생년월일 해제 후 저장하면 날짜 버튼에 오류·포커스를 연결하고 재선택으로 복구한다', async () => {

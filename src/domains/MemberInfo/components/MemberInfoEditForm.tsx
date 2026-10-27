@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import type { EditMemberInfo, MemberInfo } from '@/shared/types';
 import { formatDateOnly, formatDateTimeToMinutes } from '@/shared/utils';
 
+import { MemberEmailInfoTooltip } from '@/domains/MemberInfo/components/MemberEmailInfoTooltip';
 import {
   EditableField,
   EditableRoleField,
@@ -15,7 +16,6 @@ import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberI
 import {
   createMemberDiffPayload,
   formatDisplayValue,
-  formatPoint,
 } from '@/domains/MemberInfo/utils/memberDirectory';
 import { convertUserRoleIdToEnum } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 import {
@@ -183,12 +183,6 @@ export default function MemberInfoEditForm({
     {
       type: 'readonly',
 
-      label: '보유 포인트',
-      value: formatPoint(member.pointBalance),
-    },
-    {
-      type: 'readonly',
-
       label: '회원 ID (암호화)',
       value: formatDisplayValue(member.encryptedUserId),
       copyValue: member.encryptedUserId ?? '',
@@ -202,6 +196,7 @@ export default function MemberInfoEditForm({
       fieldName: 'email',
 
       label: '이메일',
+      labelAction: <MemberEmailInfoTooltip />,
       value: email,
       onChange: (value) => {
         setEmail(value);
@@ -226,6 +221,7 @@ export default function MemberInfoEditForm({
                 key={field.label}
                 fieldName={field.fieldName}
                 label={field.label}
+                labelAction={field.labelAction}
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={field.placeholder}
