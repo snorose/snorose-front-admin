@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import type { MemberInfo, MemberPointHistory } from '@/shared/types';
 
 import MemberDetailInfoGrid from './MemberDetailInfoGrid';
+import MemberPointSection from './MemberPointSection';
 import PenaltyUserInfoView from './PenaltyUserInfoView';
 import PointHistoryCard from './point-history/PointHistoryCard';
 
@@ -52,12 +53,14 @@ describe('회원 정보의 공통 복사 UI', () => {
   test('회원 상세의 복사 항목은 읽기 전용 입력으로 표시하고 원문을 복사한다', async () => {
     const onHistory = vi.fn();
     render(
-      <MemberDetailInfoGrid
-        member={member}
-        roleLabel='정회원'
-        onPointAdjustmentOpen={vi.fn()}
-        onPointHistoryOpen={onHistory}
-      />
+      <>
+        <MemberDetailInfoGrid member={member} roleLabel='정회원' />
+        <MemberPointSection
+          pointBalance={member.pointBalance}
+          onPointAdjustmentOpen={vi.fn()}
+          onPointHistoryOpen={onHistory}
+        />
+      </>
     );
     for (const [label, value] of [
       ['아이디', member.loginId],

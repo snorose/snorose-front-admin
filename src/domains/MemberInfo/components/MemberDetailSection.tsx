@@ -18,6 +18,7 @@ import MemberInfoEditForm from '@/domains/MemberInfo/components/MemberInfoEditFo
 import MemberPenaltySummaryCard from '@/domains/MemberInfo/components/MemberPenaltySummaryCard';
 import MemberPointAdjustmentDialog from '@/domains/MemberInfo/components/MemberPointAdjustmentDialog';
 import MemberPointHistoryDialog from '@/domains/MemberInfo/components/MemberPointHistoryDialog';
+import MemberPointSection from '@/domains/MemberInfo/components/MemberPointSection';
 import MemberWithdrawalSection from '@/domains/MemberInfo/components/MemberWithdrawalSection';
 import { MEMBER_INFO_EDIT_FORM_ID } from '@/domains/MemberInfo/constants/memberInfo';
 import { memberPointHistoryQueryKey } from '@/domains/MemberInfo/hooks/useMemberPointHistory';
@@ -137,12 +138,7 @@ export default function MemberDetailSection({
           }
         >
           {!isEdit ? (
-            <MemberDetailInfoGrid
-              member={member}
-              onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
-              onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
-              roleLabel={roleLabel}
-            />
+            <MemberDetailInfoGrid member={member} roleLabel={roleLabel} />
           ) : (
             <MemberInfoEditForm member={member} onSubmit={onSaveEdit} />
           )}
@@ -158,6 +154,11 @@ export default function MemberDetailSection({
             onOpenPenaltyHistory={onOpenPenaltyHistory}
             penaltyHistory={penaltyHistory}
             penaltyHistoryTotalCount={penaltyHistoryTotalCount}
+          />
+          <MemberPointSection
+            pointBalance={member.pointBalance}
+            onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
+            onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
           />
           <MemberActivitySection studentNumber={member.studentNumber} />
           <MemberWithdrawalSection />
