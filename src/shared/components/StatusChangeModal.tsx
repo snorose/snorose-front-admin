@@ -6,7 +6,7 @@ interface StatusChangeModalProps {
   target: 'POST' | 'COMMENT';
   onClose: () => void;
   modalType: 'HIDE' | 'SHOW' | 'DELETE' | 'RESTORE';
-  onConfirmAction: (reason: string, deleteCommentsAlso: boolean) => void;
+  onConfirmAction: (reason: string, includeComments: boolean) => void;
   isPending?: boolean;
 }
 export default function StatusChangeModal({
@@ -19,6 +19,7 @@ export default function StatusChangeModal({
   const reasonId = useId();
   const [reason, setReason] = useState('');
   const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
+  const [restoreCommentsAlso, setRestoreCommentsAlso] = useState(false);
   return (
     <div
       className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'
@@ -64,6 +65,17 @@ export default function StatusChangeModal({
               게시글에 달린 댓글도 함께 전부 삭제 처리
             </label>
           )}
+          {target === 'POST' && modalType === 'RESTORE' && (
+            <label className='flex cursor-pointer items-center gap-2 text-xs font-semibold text-gray-700'>
+              <input
+                type='checkbox'
+                checked={restoreCommentsAlso}
+                disabled={isPending}
+                onChange={(e) => setRestoreCommentsAlso(e.target.checked)}
+              />
+              게시글에 달린 삭제된 하위 댓글도 전부 복구 처리
+            </label>
+          )}
           <div className='mt-2 flex justify-end gap-2'>
             <Button
               type='button'
@@ -78,7 +90,14 @@ export default function StatusChangeModal({
               type='button'
               variant={modalType === 'DELETE' ? 'destructive' : 'default'}
               size='sm'
-              onClick={() => onConfirmAction(reason, deleteCommentsAlso)}
+              onClick={() =>
+                onConfirmAction(
+                  reason,
+                  modalType === 'RESTORE'
+                    ? restoreCommentsAlso
+                    : deleteCommentsAlso
+                )
+              }
               disabled={isPending || !reason.trim()}
             >
               확인
