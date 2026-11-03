@@ -32,7 +32,7 @@ export default function StatusChangeModal({
             : modalType === 'SHOW'
               ? '공개'
               : modalType === 'RESTORE'
-                ? '복구'
+                ? '삭제 복구'
                 : '삭제'}{' '}
           처리
         </h3>
