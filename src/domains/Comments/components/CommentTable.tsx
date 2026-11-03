@@ -52,6 +52,7 @@ export default function CommentTable({
     handleConfirmBulkRestore,
     isRestoreModalOpen,
     setIsRestoreModalOpen,
+    isRestorePending,
     isDeletePending,
     isVisibilityPending,
     totalPage,
@@ -86,6 +87,7 @@ export default function CommentTable({
         isVisibilityPending={isVisibilityPending}
         isDeletePending={isDeletePending}
         onBulkVisibility={handleBulkVisibility}
+        isRestoreDisabled={isRestorePending}
         onBulkRestore={handleBulkRestore}
         onBulkDelete={handleBulkDelete}
         label='댓글'
@@ -202,6 +204,7 @@ export default function CommentTable({
         <StatusChangeModal
           target='COMMENT'
           modalType='RESTORE'
+          isPending={isRestorePending}
           onClose={() => setIsRestoreModalOpen(false)}
           onConfirmAction={handleConfirmBulkRestore}
         />

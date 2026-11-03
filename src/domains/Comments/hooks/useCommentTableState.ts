@@ -265,6 +265,7 @@ export function useCommentTableState({
     isRestoreModalOpen,
     setIsRestoreModalOpen,
     isDeletePending,
+    isRestorePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
     totalPage,
     totalCount,

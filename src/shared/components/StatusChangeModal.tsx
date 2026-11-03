@@ -48,6 +48,7 @@ export default function StatusChangeModal({
             id={reasonId}
             className='min-h-[100px]'
             placeholder='사유를 입력하세요...'
+            disabled={isPending}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />

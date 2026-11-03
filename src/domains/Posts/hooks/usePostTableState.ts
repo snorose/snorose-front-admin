@@ -286,6 +286,7 @@ export function usePostTableState({
     setIsRestoreModalOpen,
     handleSingleDelete,
     isDeletePending,
+    isRestorePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
     totalPage,
     totalCount,
