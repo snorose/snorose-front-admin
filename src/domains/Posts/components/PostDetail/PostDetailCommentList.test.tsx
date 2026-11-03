@@ -61,6 +61,7 @@ const COMMENT: AdminCommentResult = {
 
 describe('PostDetailCommentList', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.mocked(searchComments).mockResolvedValue({
       hasNext: false,
       totalPage: 1,
@@ -85,10 +86,19 @@ describe('PostDetailCommentList', () => {
 
     await user.click(await screen.findByText('선택할 댓글'));
 
+    expect(screen.queryByRole('checkbox')).toBeNull();
+    expect(screen.queryByRole('button', { name: '선택 댓글 삭제' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '선택 댓글 복구' })).toBeNull();
+
     expect(screen.getAllByText('댓글 10 신고 내역')).toHaveLength(2);
     expect(screen.getAllByText('댓글 10 제재 내역')).toHaveLength(2);
-    expect(await screen.findAllByText('운영 정책 위반')).toHaveLength(2);
-    expect(screen.getAllByText('시스템')).toHaveLength(2);
-    expect(screen.getAllByText('어드민 비공개')).toHaveLength(2);
+    await user.click(
+      screen.getAllByRole('button', {
+        name: '댓글 상태 변경 내역 전체 보기',
+      })[0]
+    );
+    expect(await screen.findByText('운영 정책 위반')).toBeInTheDocument();
+    expect(screen.getByText('시스템')).toBeInTheDocument();
+    expect(screen.getByText('전체 상태 변경 내역 1건')).toBeInTheDocument();
   });
 });
