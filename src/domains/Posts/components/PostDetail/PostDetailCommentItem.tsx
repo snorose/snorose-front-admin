@@ -84,6 +84,7 @@ export default function PostDetailCommentItem({
         queryKey: ['commentStatusHistories', comment.commentId],
       });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
       setIsModalOpen(false);
     },
@@ -102,6 +103,7 @@ export default function PostDetailCommentItem({
         queryKey: ['commentStatusHistories', comment.commentId],
       });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
     },
     onError: () => {

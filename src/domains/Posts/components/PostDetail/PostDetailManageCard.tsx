@@ -82,6 +82,9 @@ export default function PostDetailManageCard({
       void queryClient.invalidateQueries({ queryKey: ['postComments'] });
       void queryClient.invalidateQueries({ queryKey: ['comments'] });
       void queryClient.invalidateQueries({
+        queryKey: ['commentStatusHistories'],
+      });
+      void queryClient.invalidateQueries({
         queryKey: ['postStatusHistories', post.postId],
       });
       setIsModalOpen(false);
