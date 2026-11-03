@@ -162,18 +162,14 @@ export function useCommentTableState({
       {
         onSuccess: ({ restored, restoredIds, failedIds }) => {
           setIsRestoreModalOpen(false);
-          if (failedIds.length > 0) {
-            toast.warning(
-              `${restored.length}개의 댓글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
-            );
-          } else {
-            toast.success(`${restored.length}개의 댓글이 복구되었습니다.`);
-          }
+          if (restored.length > 0) toast.success('댓글이 복구되었습니다.');
+          if (failedIds.length > 0)
+            toast.error(`${failedIds.length}개의 댓글 복구에 실패했습니다.`);
 
           const restoredIdSet = new Set(restoredIds);
           setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
         },
-        onError: () => toast.error('댓글 복구 중 오류가 발생했습니다.'),
+        onError: () => toast.error('댓글 복구에 실패했습니다.'),
       }
     );
   };

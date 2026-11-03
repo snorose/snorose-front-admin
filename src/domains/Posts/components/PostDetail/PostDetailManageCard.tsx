@@ -74,11 +74,8 @@ export default function PostDetailManageCard({
     mutationFn: (memo: string) => restorePost(post.postId, memo),
     onSuccess: (result) => {
       const warnings = getRestoreWarnings(result);
-      if (warnings.length > 0)
-        toast.warning('게시글은 복구되었지만 일부 복구에 실패했습니다.', {
-          description: warnings.join(' / '),
-        });
-      else toast.success('게시글이 복구되었습니다.');
+      toast.success('게시글이 복구되었습니다.');
+      warnings.forEach((message) => toast.error(message));
       void queryClient.invalidateQueries({ queryKey: ['postComments'] });
       void queryClient.invalidateQueries({ queryKey: ['comments'] });
       void queryClient.invalidateQueries({
