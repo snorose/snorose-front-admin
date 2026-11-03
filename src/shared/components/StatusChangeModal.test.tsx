@@ -6,6 +6,29 @@ import StatusChangeModal from './StatusChangeModal';
 
 afterEach(cleanup);
 
+it('게시글 복구 옵션은 기본 미선택이며 사용자가 선택한 값을 전달한다', async () => {
+  const onConfirmAction = vi.fn();
+  const user = userEvent.setup();
+  render(
+    <StatusChangeModal
+      target='POST'
+      modalType='RESTORE'
+      onClose={vi.fn()}
+      onConfirmAction={onConfirmAction}
+    />
+  );
+  const checkbox = screen.getByRole('checkbox');
+  expect(checkbox).not.toBeChecked();
+  expect(checkbox).toBeEnabled();
+  expect(screen.queryByText('현재는 하위 댓글도 함께 복구됩니다.')).toBeNull();
+  await user.type(screen.getByRole('textbox'), '오삭제 복구');
+  await user.click(screen.getByRole('button', { name: '확인' }));
+  expect(onConfirmAction).toHaveBeenLastCalledWith('오삭제 복구', false);
+  await user.click(checkbox);
+  await user.click(screen.getByRole('button', { name: '확인' }));
+  expect(onConfirmAction).toHaveBeenLastCalledWith('오삭제 복구', true);
+});
+
 it('게시글 삭제 확인 시 사유와 댓글 삭제 선택을 전달한다', async () => {
   const onConfirmAction = vi.fn();
   const user = userEvent.setup();

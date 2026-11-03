@@ -84,6 +84,7 @@ export default function PostDetailCommentItem({
         queryKey: ['commentStatusHistories', comment.commentId],
       });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
       setIsModalOpen(false);
     },
@@ -102,6 +103,7 @@ export default function PostDetailCommentItem({
         queryKey: ['commentStatusHistories', comment.commentId],
       });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
     },
     onError: () => {
@@ -112,6 +114,7 @@ export default function PostDetailCommentItem({
   const handleConfirmAction = (memo: string) => {
     if (
       !memo.trim() ||
+      deleteMutation.isPending ||
       restoreMutation.isPending ||
       visibilityMutation.isPending
     )
@@ -263,6 +266,11 @@ export default function PostDetailCommentItem({
       {isModalOpen && comment && (
         <StatusChangeModal
           target='COMMENT'
+          isPending={
+            deleteMutation.isPending ||
+            restoreMutation.isPending ||
+            visibilityMutation.isPending
+          }
           modalType={modalType}
           onClose={() => {
             setIsModalOpen(false);

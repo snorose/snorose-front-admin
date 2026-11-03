@@ -50,6 +50,7 @@ export const useRestoreComment = () => {
       });
       void queryClient.invalidateQueries({ queryKey: ['comments'] });
       void queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      void queryClient.invalidateQueries({ queryKey: ['post'] });
     },
     onError: (error) => {
       console.error('댓글 복구 중 오류 발생:', error);

@@ -203,25 +203,23 @@ export function usePostTableState({
       {
         onSuccess: ({ restored, restoredIds, failedIds }) => {
           setIsRestoreModalOpen(false);
-          restored.forEach((result) => {
-            const warnings = getRestoreWarnings(result);
-            if (warnings.length > 0)
-              toast.warning(`게시글 ${result.post.postId} 복구 후 일부 실패`, {
-                description: warnings.join(' / '),
-              });
-          });
-          if (failedIds.length > 0) {
-            toast.warning(
-              `${restored.length}개의 게시글이 복구되었고, ${failedIds.length}개는 실패했습니다.`
-            );
-          } else {
-            toast.success(`${restored.length}개의 게시글이 복구되었습니다.`);
-          }
+          toast.success('게시글이 복구되었습니다.');
+          const attachmentFailed = restored.some((result) =>
+            getRestoreWarnings(result).includes('첨부파일 복구에 실패했습니다.')
+          );
+          if (attachmentFailed) toast.error('첨부파일 복구에 실패했습니다.');
+          const failedCommentCount = restored.reduce(
+            (count, result) => count + result.failedComments.length,
+            0
+          );
+          if (failedCommentCount > 0)
+            toast.error(`${failedCommentCount}개의 댓글 복구에 실패했습니다.`);
+          if (failedIds.length > 0) toast.error('게시글 복구에 실패했습니다.');
 
           const restoredIdSet = new Set(restoredIds);
           setSelectedIds((prev) => prev.filter((id) => !restoredIdSet.has(id)));
         },
-        onError: () => toast.error('게시글 복구 중 오류가 발생했습니다.'),
+        onError: () => toast.error('게시글 복구에 실패했습니다.'),
       }
     );
   };
@@ -286,6 +284,7 @@ export function usePostTableState({
     setIsRestoreModalOpen,
     handleSingleDelete,
     isDeletePending,
+    isRestorePending,
     isVisibilityPending: isVisibilityPending || isRestorePending,
     totalPage,
     totalCount,

@@ -52,6 +52,7 @@ export default function PostTable({
     handleConfirmBulkRestore,
     isRestoreModalOpen,
     setIsRestoreModalOpen,
+    isRestorePending,
     isDeletePending,
     isVisibilityPending,
     totalPage,
@@ -85,6 +86,7 @@ export default function PostTable({
         isVisibilityPending={isVisibilityPending}
         isDeletePending={isDeletePending}
         onBulkVisibility={handleBulkVisibility}
+        isRestoreDisabled={isRestorePending}
         onBulkRestore={handleBulkRestore}
         onBulkDelete={handleBulkDelete}
         label='게시글'
@@ -192,6 +194,7 @@ export default function PostTable({
         <StatusChangeModal
           target='POST'
           modalType='RESTORE'
+          isPending={isRestorePending}
           onClose={() => setIsRestoreModalOpen(false)}
           onConfirmAction={handleConfirmBulkRestore}
         />

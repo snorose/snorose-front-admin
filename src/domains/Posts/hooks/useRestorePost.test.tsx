@@ -84,15 +84,31 @@ describe('게시글 일괄 복구', () => {
     const hook = setup();
     await act(async () => {
       await expect(
-        hook.result.current.mutateAsync({ postIds: [10], memo: '복구' })
+        hook.result.current.mutateAsync({
+          postIds: [10],
+          memo: '복구',
+        })
       ).rejects.toThrow('게시글 복구에 실패했습니다.');
     });
   });
-  it('첨부파일 구성 요소·썸네일·댓글 실패 사유를 안내한다', () => {
-    expect(getRestoreWarnings(result).join(' ')).toContain('7 (ORIGINAL)');
-    expect(getRestoreWarnings(result).join(' ')).toContain('썸네일');
-    expect(getRestoreWarnings(result).join(' ')).toContain(
-      '8 (USER_NOT_FOUND)'
-    );
+  it('부분 실패를 피그마 문구로 안내한다', () => {
+    expect(getRestoreWarnings(result)).toEqual([
+      '첨부파일 복구에 실패했습니다.',
+      '1개의 댓글 복구에 실패했습니다.',
+    ]);
+  });
+  it('첨부파일과 댓글이 모두 복구되면 경고가 없다', () => {
+    expect(
+      getRestoreWarnings({
+        ...result,
+        attachmentRestore: {
+          status: 'SUCCESS',
+          restoredAttachmentIds: [7],
+          failedAttachments: [],
+          thumbnailFailed: false,
+        },
+        failedComments: [],
+      })
+    ).toEqual([]);
   });
 });
