@@ -1,87 +1,58 @@
-import type { PopupContent } from '@/domains/Operation/types';
+import type { PopupDetail, PopupStatus } from '@/domains/Operation/types/popup';
 
-export const MOCK_POPUP_CONTENTS: PopupContent[] = [
-  {
-    id: 1,
-    title: '[EVENT] 스노로즈 X 웰라쥬 체험단 이벤트',
-    bodyMarkdown: `무너진 피부에 #속수분텐션업할 시간!
+import { snoroseLogo } from '@/assets';
 
-  - 모집 인원: 스노로즈 가입자 중 숙명여대 재학생, 휴학생, 졸업생 포함 총 50인
-  - 체험 제품: 웰라쥬 리얼 히알루로닉 수딩 크림 본품(80ml)
-  - 모집 기간: 4월 27일(월) ~ 5월 4일(월)
+export function getKstDateTime(now = new Date()) {
+  return new Date(now.getTime() + 9 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 19);
+}
 
-  [이벤트 관련 링크](/board/notice/post/1895414)`,
-    imageFileName: 'event.png',
-    startDate: '2026-04-28T00:00',
-    endDate: '2026-05-04T23:59',
-    displayPriority: 10,
-    createdAt: '2026-04-28 14:00',
-    updatedAt: '2026-04-28 14:12',
-  },
-  {
-    id: 2,
-    title: '[캘린더] 5월 스노로즈 일정',
-    bodyMarkdown: '',
-    imageFileName: 'calendar.png',
-    startDate: '2026-04-28T00:00',
-    endDate: '2026-05-30T23:59',
-    displayPriority: 20,
-    createdAt: '2026-04-28 14:00',
-    updatedAt: '2026-04-28 14:05',
-  },
-  {
-    id: 3,
-    title: '[공지] 8월 스노로즈 운영 안내',
-    bodyMarkdown: '8월 커뮤니티 운영 일정과 주요 안내 사항을 확인해 주세요.',
-    imageFileName: '',
-    startDate: '2026-08-01T09:00',
-    endDate: '2026-08-31T23:59',
-    displayPriority: 30,
-    createdAt: '2026-07-25 10:00',
-    updatedAt: '2026-07-25 10:00',
-  },
-  {
-    id: 4,
-    title: '[학사] 2학기 주요 일정 안내',
-    bodyMarkdown: '개강과 수강 정정 등 2학기 주요 학사 일정을 안내합니다.',
-    imageFileName: 'fall-semester.png',
-    startDate: '2026-08-05T09:00',
-    endDate: '2026-09-30T23:59',
-    displayPriority: 40,
-    createdAt: '2026-07-28 11:00',
-    updatedAt: '2026-08-03 15:30',
-  },
-  {
-    id: 5,
-    title: '[이벤트] 가을맞이 커뮤니티 이벤트',
-    bodyMarkdown: '10월까지 진행되는 가을맞이 이벤트에 참여해 보세요.',
-    imageFileName: 'autumn-event.webp',
-    startDate: '2026-08-10T12:00',
-    endDate: '2026-10-31T18:00',
-    displayPriority: 50,
-    createdAt: '2026-08-08 09:30',
-    updatedAt: '2026-08-10 10:00',
-  },
-  {
-    id: 6,
-    title: '[예정] 11월 서비스 점검 안내',
-    bodyMarkdown: '11월 서비스 점검 일정은 추후 상세 안내할 예정입니다.',
-    imageFileName: '',
-    startDate: '2026-11-01T09:00',
-    endDate: '2026-11-30T23:59',
-    displayPriority: 60,
-    createdAt: '2026-08-11 14:00',
-    updatedAt: '2026-08-11 14:00',
-  },
-  {
-    id: 7,
-    title: '[예정] 12월 연말 이벤트',
-    bodyMarkdown: '12월에 진행될 연말 이벤트를 기대해 주세요.',
-    imageFileName: 'year-end-event.jpg',
-    startDate: '2026-12-01T00:00',
-    endDate: '2026-12-31T23:59',
-    displayPriority: 70,
-    createdAt: '2026-08-12 16:00',
-    updatedAt: '2026-08-12 16:00',
-  },
-];
+export function getMockPopupStatus(
+  startDate: string,
+  endDate: string
+): PopupStatus {
+  const today = getKstDateTime().slice(0, 10);
+  return today < startDate ? 'SCHEDULED' : today > endDate ? 'ENDED' : 'ACTIVE';
+}
+
+export function createMockPopupDetails(): PopupDetail[] {
+  const today = getKstDateTime().slice(0, 10);
+  const date = (offset: number) =>
+    new Date(Date.parse(`${today}T00:00:00Z`) + offset * 86400000)
+      .toISOString()
+      .slice(0, 10);
+  const titles = [
+    '[공지] 서비스 점검 안내',
+    '[캘린더] 이번 달 주요 일정',
+    '[이벤트] 스노로즈 체험단 모집',
+    '[공지] 커뮤니티 이용 안내',
+    '[학사] 수강 신청 일정 안내',
+    '[이벤트] 커뮤니티 설문조사',
+    '[공지] 개인정보 처리방침 변경',
+    '[캘린더] 다음 달 학사 일정',
+    '[이벤트] 신규 회원 환영 이벤트',
+    '[공지] 시험 기간 운영 안내',
+    '[학사] 장학금 신청 안내',
+    '[이벤트] 스노로즈와 함께하는 캠퍼스 생활 후기 모집 및 참여 혜택 안내',
+  ];
+  return titles.map((title, index) => {
+    const startDate = date(index % 3 === 0 ? -2 : index % 3 === 1 ? 2 : -7);
+    const endDate = date(index % 3 === 0 ? 2 : index % 3 === 1 ? 7 : -1);
+    return {
+      id: index + 1,
+      title,
+      displayOrder: index,
+      description:
+        index % 4 === 1 || index % 4 === 3
+          ? null
+          : '**스노로즈 안내**\n\n- 자세한 일정을 확인해 주세요.\n- 게시 기간에만 표시되는 팝업입니다.\n\n[공지 확인하기](/board/notice/post/123)',
+      imageUrl: index % 4 < 2 ? snoroseLogo : null,
+      startDate,
+      endDate,
+      status: getMockPopupStatus(startDate, endDate),
+      createdAt: `${date(index - 14)}T10:00:00`,
+      updatedAt: index % 4 === 0 ? `${date(index - 13)}T15:30:00` : null,
+    };
+  });
+}

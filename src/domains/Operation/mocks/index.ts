@@ -1,1 +1,2 @@
-export { MOCK_POPUP_CONTENTS } from './popups';
+export { isPopupMockEnabled } from './config';
+export { createMockPopupDetails } from './popups';
