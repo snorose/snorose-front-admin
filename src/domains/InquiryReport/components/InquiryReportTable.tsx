@@ -365,6 +365,7 @@ export default function InquiryReportTable({
                         <CopyableValue
                           value={inquiry.postId}
                           label='게시글 ID'
+                          className='text-xs tabular-nums'
                         />
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
