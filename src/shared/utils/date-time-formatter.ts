@@ -78,23 +78,43 @@ export function formatDateTimeToMinutes(
   if (!dateTimeString) return '-';
 
   const match = dateTimeString.match(
-    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/
+    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?(?:Z|[+-](\d{2}):(\d{2}))?$/
   );
   if (!match) return '-';
 
-  const [, year, month, day, hour, minute] = match;
+  const [, year, month, day, hour, minute, second, offsetHour, offsetMinute] =
+    match;
   const parsedYear = Number(year);
   const parsedMonth = Number(month);
   const parsedDay = Number(day);
-  const daysInMonth = new Date(parsedYear, parsedMonth, 0).getDate();
+  const isLeapYear =
+    parsedYear % 4 === 0 && (parsedYear % 100 !== 0 || parsedYear % 400 === 0);
+  const daysInMonth = [
+    31,
+    isLeapYear ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ][parsedMonth - 1];
 
   if (
     parsedMonth < 1 ||
     parsedMonth > 12 ||
     parsedDay < 1 ||
+    !daysInMonth ||
     parsedDay > daysInMonth ||
     Number(hour) > 23 ||
-    Number(minute) > 59
+    Number(minute) > 59 ||
+    (second !== undefined && Number(second) > 59) ||
+    (offsetHour !== undefined && Number(offsetHour) > 23) ||
+    (offsetMinute !== undefined && Number(offsetMinute) > 59)
   ) {
     return '-';
   }
