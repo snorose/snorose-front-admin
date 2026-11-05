@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { MemberInfo } from '@/shared/types';
@@ -20,7 +20,7 @@ export function MemberInfoPopover({
   encryptedUserId,
   displayName,
 }: MemberInfoPopoverProps) {
-  const triggerRef = useRef<HTMLSpanElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
   const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
@@ -66,14 +66,20 @@ export function MemberInfoPopover({
 
   return (
     <div className='min-w-0'>
-      <span
+      <button
+        type='button'
         ref={triggerRef}
         onClick={handleTriggerClick}
         title={displayName}
-        className='block cursor-pointer truncate transition-colors hover:text-blue-700 hover:underline'
+        aria-expanded={isPopoverOpen}
+        className='group hover:bg-accent focus-visible:ring-ring flex max-w-full min-w-0 cursor-pointer items-center gap-1 rounded-sm text-left transition-colors focus-visible:ring-2 focus-visible:outline-none'
       >
-        {displayName}
-      </span>
+        <span className='truncate'>{displayName}</span>
+        <ChevronDown
+          className='text-muted-foreground size-3.5 shrink-0 transition-transform duration-200 group-aria-expanded:rotate-180 motion-reduce:transition-none'
+          aria-hidden='true'
+        />
+      </button>
 
       {isFetching && (
         <Loader2 className='ml-1 inline h-3 w-3 animate-spin text-gray-400' />
