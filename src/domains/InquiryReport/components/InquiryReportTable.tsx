@@ -289,7 +289,7 @@ export default function InquiryReportTable({
               <Table.Row>
                 <Table.Head
                   style={{ width: '128px' }}
-                  className='px-3 text-center'
+                  className='px-3 text-left'
                 >
                   postId
                 </Table.Head>
@@ -303,7 +303,7 @@ export default function InquiryReportTable({
                   카테고리
                 </Table.Head>
                 <Table.Head style={{ width: '124px' }} className='px-3'>
-                  아이디
+                  작성자 아이디
                 </Table.Head>
                 <Table.Head
                   style={{ width: '120px' }}
@@ -361,7 +361,7 @@ export default function InquiryReportTable({
                           : 'bg-white hover:bg-gray-50'
                       }`}
                     >
-                      <Table.Cell className='px-3 text-center font-mono text-gray-600'>
+                      <Table.Cell className='px-3 text-left font-mono text-gray-600'>
                         <CopyableValue
                           value={inquiry.postId}
                           label='게시글 ID'
