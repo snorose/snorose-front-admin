@@ -2,6 +2,7 @@ import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { PeriodStatusBadge, SectionTitle } from '@/shared/components';
 import { Button, DropdownMenu, Table } from '@/shared/components/ui';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { ServerMaintenance } from '../types/maintenance';
 
@@ -65,16 +66,16 @@ export function MaintenanceListSection({ items, onEdit, onDelete }: Props) {
                       {item.title}
                     </Table.Cell>
                     <Table.Cell className='text-center whitespace-nowrap'>
-                      {item.startAt.replace('T', ' ')}
+                      {formatDateTimeToMinutes(item.startAt)}
                     </Table.Cell>
                     <Table.Cell className='text-center whitespace-nowrap'>
-                      {item.endAt.replace('T', ' ')}
+                      {formatDateTimeToMinutes(item.endAt)}
                     </Table.Cell>
                     <Table.Cell className='text-center whitespace-nowrap'>
-                      {item.createdAt.replace('T', ' ')}
+                      {formatDateTimeToMinutes(item.createdAt)}
                     </Table.Cell>
                     <Table.Cell className='text-center whitespace-nowrap'>
-                      {item.updatedAt.replace('T', ' ')}
+                      {formatDateTimeToMinutes(item.updatedAt)}
                     </Table.Cell>
                     <Table.Cell className='text-center'>
                       <DropdownMenu>

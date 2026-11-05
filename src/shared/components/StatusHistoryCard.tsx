@@ -195,7 +195,7 @@ export function StatusHistoryCard({
                                 <time
                                   dateTime={log.changedAt}
                                   title={log.changedAt.replace('T', ' ')}
-                                  className='text-sm font-semibold whitespace-nowrap text-gray-700 tabular-nums'
+                                  className='text-sm font-semibold whitespace-nowrap text-gray-700'
                                 >
                                   {formatDateTimeToMinutes(log.changedAt)}
                                 </time>

@@ -117,7 +117,14 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
     width: '120px',
     render: renderProcessStatusBadge,
   },
-  { key: 'uploadTime', label: '작성일', width: '150px' },
+  {
+    key: 'uploadTime',
+    label: '작성일',
+    width: '150px',
+    render: (review: ExamReview) => (
+      <span className='text-sm text-gray-600'>{review.uploadTime}</span>
+    ),
+  },
 ];
 
 interface ExamTableProps {

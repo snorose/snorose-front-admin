@@ -283,7 +283,7 @@ export default function InquiryReportTable({
       <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
-            className={`w-full ${isDetailOpen ? 'min-w-[624px]' : 'min-w-[1104px]'} table-fixed text-[13px]`}
+            className={`w-full ${isDetailOpen ? 'min-w-[624px]' : 'min-w-[1104px]'} table-fixed text-sm`}
           >
             <Table.Header className='h-[42px] border-b border-gray-200'>
               <Table.Row>
@@ -361,11 +361,11 @@ export default function InquiryReportTable({
                           : 'bg-white hover:bg-gray-50'
                       }`}
                     >
-                      <Table.Cell className='px-3 text-left font-mono text-gray-600'>
+                      <Table.Cell className='px-3 text-left text-sm text-gray-600'>
                         <CopyableValue
                           value={inquiry.postId}
                           label='게시글 ID'
-                          className='gap-1 text-xs tabular-nums [&_svg]:size-3'
+                          className='gap-1 text-sm [&_svg]:size-3'
                         />
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
@@ -400,14 +400,14 @@ export default function InquiryReportTable({
                       </Table.Cell>
                       {!isDetailOpen && (
                         <Table.Cell
-                          className='truncate px-3 font-bold text-gray-900'
+                          className='truncate px-3 font-semibold text-gray-900'
                           title={inquiry.title}
                         >
                           {inquiry.title}
                         </Table.Cell>
                       )}
                       {!isDetailOpen && (
-                        <Table.Cell className='px-3 font-mono text-gray-600'>
+                        <Table.Cell className='px-3 text-sm text-gray-600'>
                           {formatDateTimeToMinutes(inquiry.createdAt)}
                         </Table.Cell>
                       )}

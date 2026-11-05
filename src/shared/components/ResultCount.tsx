@@ -17,7 +17,7 @@ export function ResultCount({ totalCount, status }: ResultCountProps) {
       ) : (
         <>
           총{' '}
-          <span className='text-foreground font-semibold tabular-nums'>
+          <span className='text-foreground font-semibold'>
             {totalCount === undefined
               ? '-'
               : totalCount.toLocaleString('ko-KR')}

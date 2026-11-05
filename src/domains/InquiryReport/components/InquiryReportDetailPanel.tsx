@@ -239,7 +239,7 @@ export default function InquiryReportDetailPanel({
       </div>
 
       {/* 메타 정보 */}
-      <div className='grid grid-cols-1 gap-x-8 gap-y-2 border-b border-gray-100 px-4 py-3 text-[13px] sm:grid-cols-2'>
+      <div className='grid grid-cols-1 gap-x-8 gap-y-2 border-b border-gray-100 px-4 py-3 text-sm sm:grid-cols-2'>
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-h-6 min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3'>
             <span className='text-muted-foreground shrink-0'>유형</span>
@@ -305,7 +305,7 @@ export default function InquiryReportDetailPanel({
 
           <div className='grid min-h-6 min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3'>
             <span className='text-muted-foreground shrink-0'>작성일</span>
-            <span className='min-w-0 break-words text-gray-800'>
+            <span className='min-w-0 text-sm break-words text-gray-800'>
               {formatDateTimeToMinutes(detail.createdAt)}
             </span>
           </div>
@@ -313,7 +313,7 @@ export default function InquiryReportDetailPanel({
           {detail.updatedAt && (
             <div className='grid min-h-6 min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3'>
               <span className='text-muted-foreground shrink-0'>수정일</span>
-              <span className='min-w-0 break-words text-gray-800'>
+              <span className='min-w-0 text-sm break-words text-gray-800'>
                 {formatDateTimeToMinutes(detail.updatedAt)}
               </span>
             </div>
@@ -354,7 +354,7 @@ export default function InquiryReportDetailPanel({
         </div>
 
         {isCommentsLoading ? (
-          <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
+          <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-400'>
             댓글을 불러오는 중입니다...
           </div>
         ) : visibleComments.length > 0 ? (
@@ -377,7 +377,7 @@ export default function InquiryReportDetailPanel({
             ))}
           </ul>
         ) : (
-          <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-[13px] text-gray-400'>
+          <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-400'>
             등록된 댓글이 없습니다.
           </div>
         )}
@@ -387,7 +387,7 @@ export default function InquiryReportDetailPanel({
           onSubmit={handleCommentSubmit}
         >
           {replyParentComment && (
-            <div className='flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] text-slate-600'>
+            <div className='flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600'>
               <span className='min-w-0 truncate'>
                 {getCommentAuthorDisplay(replyParentComment)} 댓글에 대댓글 작성
               </span>

@@ -81,7 +81,7 @@
 | 헤더               | `flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-1` |
 | 목록 제목          | 기존 `h2`, `text-lg font-bold` 유지                                   |
 | 개수               | `text-sm text-muted-foreground whitespace-nowrap`                     |
-| 숫자               | `font-semibold text-foreground tabular-nums`                          |
+| 숫자               | `font-semibold text-foreground`                                       |
 | 숫자 구분          | `toLocaleString('ko-KR')`                                             |
 | 간격               | 헤더·작업 영역·테이블을 `gap-3`으로 배치                              |
 | 좁은 화면          | 한 줄이 부족하면 개수를 다음 줄에 배치하고 왼쪽 정렬                  |

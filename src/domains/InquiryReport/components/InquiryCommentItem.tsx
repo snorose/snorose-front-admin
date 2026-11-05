@@ -68,7 +68,7 @@ export default function InquiryCommentItem({
             {comment.isWriterWithdrawn ? (
               <WithdrawnUserBadge />
             ) : (
-              <span className='truncate text-[12px] font-semibold text-gray-800'>
+              <span className='truncate text-sm font-semibold text-gray-800'>
                 {comment.userDisplay}
               </span>
             )}
@@ -100,7 +100,7 @@ export default function InquiryCommentItem({
             )}
           </div>
           <div className='flex items-center gap-1'>
-            <span className='font-mono text-[11px] text-gray-400'>
+            <span className='text-sm text-gray-500'>
               {formatDateTimeToMinutes(comment.createdAt)}
             </span>
             {isManageable && (
@@ -173,7 +173,7 @@ export default function InquiryCommentItem({
           </div>
         ) : (
           <p
-            className={`text-[13px] leading-relaxed whitespace-pre-wrap ${
+            className={`text-sm leading-relaxed whitespace-pre-wrap ${
               comment.isVisible && !comment.isDeleted
                 ? 'text-gray-700'
                 : 'text-gray-400'

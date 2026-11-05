@@ -5,7 +5,7 @@ import { AlertTriangle, Eye, Heart, MessageSquare } from 'lucide-react';
 import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Button, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-import { formatDateTimeWithAmPm } from '@/shared/utils';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminCommentResult } from '../types/comment';
 import {
@@ -163,8 +163,8 @@ export default function CommentTableRow({
       </Table.Cell>
 
       {/* 9. 작성일 */}
-      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {formatDateTimeWithAmPm(comment.createdAt)}
+      <Table.Cell className='px-3 text-xs text-gray-600'>
+        {formatDateTimeToMinutes(comment.createdAt)}
       </Table.Cell>
 
       {/* 10. 카테고리 */}

@@ -19,7 +19,7 @@ export default function MemberPointSection({
   return (
     <SectionCard icon={Coins} title='보유 포인트'>
       <div className='flex min-w-0 flex-wrap items-center justify-between gap-3'>
-        <p className='text-primary min-w-0 text-xl font-semibold wrap-break-word tabular-nums'>
+        <p className='text-primary min-w-0 text-xl font-semibold wrap-break-word'>
           {formatPoint(pointBalance)}
         </p>
         <div className='ml-auto flex shrink-0 items-center gap-1.5'>

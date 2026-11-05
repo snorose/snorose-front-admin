@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { PaginationBar } from '@/shared/components';
 import { Button, Table } from '@/shared/components/ui';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { convertCategoryEnumToString } from '@/domains/MemberInfo/utils/memberInfoFormatters';
 
@@ -111,7 +112,7 @@ export default function PointHistoryTab({
                 </Table.Cell>
 
                 <Table.Cell className='text-center'>
-                  {history.createAt.replace('T', ' ')}
+                  {formatDateTimeToMinutes(history.createAt)}
                 </Table.Cell>
 
                 <Table.Cell

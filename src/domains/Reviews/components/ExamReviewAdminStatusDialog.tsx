@@ -183,7 +183,7 @@ export function ExamReviewAdminStatusDialog({
                     조회 기간
                   </h3>
                   {selectedPeriod && (
-                    <p className='text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs leading-5 tabular-nums'>
+                    <p className='text-muted-foreground flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-5'>
                       <time
                         className='whitespace-nowrap'
                         dateTime={selectedPeriod.startAt}

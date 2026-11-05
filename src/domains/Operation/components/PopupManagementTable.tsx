@@ -1,6 +1,7 @@
 import { CircleHelpIcon, Pencil, Trash2 } from 'lucide-react';
 
 import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { PopupContent } from '@/domains/Operation/types';
 
@@ -11,10 +12,6 @@ type PopupManagementTableProps = {
   onUpdate: (popup: PopupContent) => void;
   onDelete: (id: number) => void;
 };
-
-function formatPopupDateTime(dateTime: string) {
-  return dateTime ? dateTime.replace('T', ' ') : '-';
-}
 
 export function PopupManagementTable({
   popups,
@@ -80,11 +77,15 @@ export function PopupManagementTable({
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  {formatPopupDateTime(popup.startDate)} ~{' '}
-                  {formatPopupDateTime(popup.endDate)}
+                  {formatDateTimeToMinutes(popup.startDate)} ~{' '}
+                  {formatDateTimeToMinutes(popup.endDate)}
                 </Table.Cell>
-                <Table.Cell>{popup.createdAt || '-'}</Table.Cell>
-                <Table.Cell>{popup.updatedAt || '-'}</Table.Cell>
+                <Table.Cell>
+                  {formatDateTimeToMinutes(popup.createdAt)}
+                </Table.Cell>
+                <Table.Cell>
+                  {formatDateTimeToMinutes(popup.updatedAt)}
+                </Table.Cell>
                 <Table.Cell className='text-right'>
                   <div className='flex justify-center gap-1'>
                     <Button
