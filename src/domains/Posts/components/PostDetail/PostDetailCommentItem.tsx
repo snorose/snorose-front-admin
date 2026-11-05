@@ -18,7 +18,7 @@ import {
 } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-import { formatDateTimeWithAmPm } from '@/shared/utils';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminCommentResult } from '@/domains/Comments/types';
 import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
@@ -153,8 +153,8 @@ export default function PostDetailCommentItem({
               encryptedUserId={comment.encryptedUserId}
               displayName={comment.nickname}
             />
-            <span className='font-mono text-xs text-gray-400'>
-              {formatDateTimeWithAmPm(comment.createdAt)}
+            <span className='text-xs text-gray-600 tabular-nums'>
+              {formatDateTimeToMinutes(comment.createdAt)}
             </span>
             {comment.category && (
               <StatusBadge tone='outline'>{comment.category}</StatusBadge>
