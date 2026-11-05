@@ -122,9 +122,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
     label: '작성일',
     width: '150px',
     render: (review: ExamReview) => (
-      <span className='text-sm text-gray-600 tabular-nums'>
-        {review.uploadTime}
-      </span>
+      <span className='text-sm text-gray-600'>{review.uploadTime}</span>
     ),
   },
 ];

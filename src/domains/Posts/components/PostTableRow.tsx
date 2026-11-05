@@ -119,7 +119,7 @@ export default function PostTableRow({
       </Table.Cell>
 
       {/* 6. 작성일 */}
-      <Table.Cell className='px-3 text-xs text-gray-600 tabular-nums'>
+      <Table.Cell className='px-3 text-xs text-gray-600'>
         {formatDateTimeToMinutes(post.createdAt)}
       </Table.Cell>
 

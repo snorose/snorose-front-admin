@@ -365,7 +365,7 @@ export default function InquiryReportTable({
                         <CopyableValue
                           value={inquiry.postId}
                           label='게시글 ID'
-                          className='gap-1 text-sm tabular-nums [&_svg]:size-3'
+                          className='gap-1 text-sm [&_svg]:size-3'
                         />
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
@@ -407,7 +407,7 @@ export default function InquiryReportTable({
                         </Table.Cell>
                       )}
                       {!isDetailOpen && (
-                        <Table.Cell className='px-3 text-sm text-gray-600 tabular-nums'>
+                        <Table.Cell className='px-3 text-sm text-gray-600'>
                           {formatDateTimeToMinutes(inquiry.createdAt)}
                         </Table.Cell>
                       )}

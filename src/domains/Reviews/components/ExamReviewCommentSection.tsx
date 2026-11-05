@@ -71,7 +71,7 @@ export function ExamReviewCommentSection({
             <span className='text-sm font-medium text-gray-900'>
               {comment.userDisplay}
             </span>
-            <span className='text-sm text-gray-500 tabular-nums'>
+            <span className='text-sm text-gray-500'>
               {formatDateTimeToMinutes(comment.createdAt)}
             </span>
           </div>

@@ -67,7 +67,7 @@ export function ExamReviewLogSection({ logs }: ExamReviewLogSectionProps) {
         <Table.Body>
           {safeLogs.map((log, index) => (
             <Table.Row key={`${log.createdAt}-${index}`}>
-              <Table.Cell className='text-sm text-gray-600 tabular-nums'>
+              <Table.Cell className='text-sm text-gray-600'>
                 {formatDateTimeToMinutes(log.createdAt)}
               </Table.Cell>
               <Table.Cell>{log.adminName || '-'}</Table.Cell>

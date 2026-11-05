@@ -103,11 +103,11 @@ export function ExamReviewAdminStatusPeriodList({
               className='grid gap-2 px-4 py-3 md:grid-cols-[minmax(0,1fr)_9rem_9rem_5rem] md:items-center md:gap-3'
             >
               <strong className='truncate text-sm'>{period.title}</strong>
-              <div className='text-muted-foreground text-sm tabular-nums'>
+              <div className='text-muted-foreground text-sm'>
                 <span className='mr-2 font-medium md:hidden'>시작</span>
                 {formatDateTimeToMinutes(period.startAt)}
               </div>
-              <div className='text-muted-foreground text-sm tabular-nums'>
+              <div className='text-muted-foreground text-sm'>
                 <span className='mr-2 font-medium md:hidden'>종료</span>
                 {formatDateTimeToMinutes(period.endAt)}
               </div>

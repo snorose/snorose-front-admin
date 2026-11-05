@@ -56,7 +56,7 @@ export function ReportHistoryCard({
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
                 <span className='font-medium text-gray-700'>날짜</span>
-                <span className='text-gray-600 tabular-nums'>
+                <span className='text-gray-600'>
                   {formatDateTimeToMinutes(item.reportedAt)}
                 </span>
               </div>

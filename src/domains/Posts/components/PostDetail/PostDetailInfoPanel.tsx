@@ -65,7 +65,7 @@ export default function PostDetailInfoPanel({
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-1'>
             <span className='font-medium text-gray-700'>게시일자</span>
-            <div className='flex flex-col text-xs leading-tight text-gray-600 tabular-nums'>
+            <div className='flex flex-col text-xs leading-tight text-gray-600'>
               <span>{formatDateTimeToMinutes(post.createdAt)}</span>
             </div>
           </div>

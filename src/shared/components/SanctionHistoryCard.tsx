@@ -74,7 +74,7 @@ export function SanctionHistoryCard({
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
                 <span className='font-medium text-gray-700'>부여 일자</span>
-                <span className='text-gray-600 tabular-nums'>
+                <span className='text-gray-600'>
                   {formatDateTimeToMinutes(item.createdAt)}
                 </span>
               </div>
@@ -89,7 +89,7 @@ export function SanctionHistoryCard({
               {item.startAt && (
                 <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
                   <span className='font-medium text-gray-700'>징계 시작일</span>
-                  <span className='text-gray-600 tabular-nums'>
+                  <span className='text-gray-600'>
                     {item.startAt.substring(0, 10)}
                   </span>
                 </div>

@@ -124,7 +124,7 @@ export default function MemberPenaltySummaryCard({
             <dl className={SUMMARY_ROW_CLASS_NAME}>
               <dt className='text-muted-foreground'>누적 경고 수</dt>
               <dd
-                className={`font-medium tabular-nums ${
+                className={`font-medium ${
                   member.totalWarningCount > 0
                     ? 'text-destructive'
                     : 'text-foreground'

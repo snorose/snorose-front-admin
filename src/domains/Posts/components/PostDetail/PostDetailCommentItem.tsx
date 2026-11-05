@@ -153,7 +153,7 @@ export default function PostDetailCommentItem({
               encryptedUserId={comment.encryptedUserId}
               displayName={comment.nickname}
             />
-            <span className='text-xs text-gray-600 tabular-nums'>
+            <span className='text-xs text-gray-600'>
               {formatDateTimeToMinutes(comment.createdAt)}
             </span>
             {comment.category && (

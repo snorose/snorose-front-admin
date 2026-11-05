@@ -163,7 +163,7 @@ export default function CommentTableRow({
       </Table.Cell>
 
       {/* 9. 작성일 */}
-      <Table.Cell className='px-3 text-xs text-gray-600 tabular-nums'>
+      <Table.Cell className='px-3 text-xs text-gray-600'>
         {formatDateTimeToMinutes(comment.createdAt)}
       </Table.Cell>
 

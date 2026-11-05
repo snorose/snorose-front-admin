@@ -305,7 +305,7 @@ export default function InquiryReportDetailPanel({
 
           <div className='grid min-h-6 min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3'>
             <span className='text-muted-foreground shrink-0'>작성일</span>
-            <span className='min-w-0 text-sm break-words text-gray-800 tabular-nums'>
+            <span className='min-w-0 text-sm break-words text-gray-800'>
               {formatDateTimeToMinutes(detail.createdAt)}
             </span>
           </div>
@@ -313,7 +313,7 @@ export default function InquiryReportDetailPanel({
           {detail.updatedAt && (
             <div className='grid min-h-6 min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3'>
               <span className='text-muted-foreground shrink-0'>수정일</span>
-              <span className='min-w-0 text-sm break-words text-gray-800 tabular-nums'>
+              <span className='min-w-0 text-sm break-words text-gray-800'>
                 {formatDateTimeToMinutes(detail.updatedAt)}
               </span>
             </div>
