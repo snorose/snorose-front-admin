@@ -1,4 +1,7 @@
+import { MemoryRouter } from 'react-router-dom';
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { InquiryDetail, InquiryListItem } from '@/shared/types';
@@ -87,18 +90,27 @@ describe('문의·신고 공통 복사 UI', () => {
     expect(onRowSelect).toHaveBeenCalledWith(123);
   });
 
-  test('상세의 일반 작성자 아이디를 복사한다', async () => {
+  test('상세의 작성자 아이디를 누르면 회원 메뉴를 표시한다', async () => {
+    const user = userEvent.setup();
     render(
-      <InquiryReportDetailPanel
-        postId={123}
-        onClose={vi.fn()}
-        onStatusChange={vi.fn()}
-      />
+      <MemoryRouter>
+        <InquiryReportDetailPanel
+          postId={123}
+          onClose={vi.fn()}
+          onStatusChange={vi.fn()}
+        />
+      </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: '작성자 아이디 복사' }));
-    await waitFor(() =>
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('snowrose')
-    );
+    await user.click(screen.getByRole('button', { name: 'snowrose' }));
+    expect(
+      screen.getByRole('menuitem', { name: '회원 정보' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('menuitem', { name: '제재하기' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: '작성자 아이디 복사' })
+    ).not.toBeInTheDocument();
   });
 
   test('탈퇴 작성자의 아이디와 복사 버튼은 표시하지 않는다', () => {
@@ -107,11 +119,13 @@ describe('문의·신고 공통 복사 UI', () => {
       isLoading: false,
     } as ReturnType<typeof useInquiryDetail>);
     render(
-      <InquiryReportDetailPanel
-        postId={123}
-        onClose={vi.fn()}
-        onStatusChange={vi.fn()}
-      />
+      <MemoryRouter>
+        <InquiryReportDetailPanel
+          postId={123}
+          onClose={vi.fn()}
+          onStatusChange={vi.fn()}
+        />
+      </MemoryRouter>
     );
     expect(screen.getByText('탈퇴')).toBeInTheDocument();
     expect(screen.queryByText('snowrose')).not.toBeInTheDocument();

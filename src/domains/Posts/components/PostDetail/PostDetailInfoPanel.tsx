@@ -107,6 +107,7 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-700'>작성자</span>
             <div>
               <MemberInfoPopover
+                key={post.encryptedUserId}
                 encryptedUserId={post.encryptedUserId}
                 displayName={post.nickName ?? '정보 없음'}
               />

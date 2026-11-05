@@ -125,6 +125,7 @@ export default function CommentTableRow({
       {/* 6. 작성자(닉네임) */}
       <Table.Cell className='relative cursor-pointer px-3 font-bold text-gray-900 select-none'>
         <MemberInfoPopover
+          key={comment.encryptedUserId}
           encryptedUserId={comment.encryptedUserId}
           displayName={comment.nickname ?? '정보 없음'}
         />

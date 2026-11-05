@@ -3,7 +3,7 @@ import { type FormEvent, useEffect, useId, useState } from 'react';
 import { X } from 'lucide-react';
 
 import {
-  CopyableValue,
+  MemberInfoPopover,
   OriginalPostButton,
   StatusBadge,
 } from '@/shared/components';
@@ -241,23 +241,23 @@ export default function InquiryReportDetailPanel({
       {/* 메타 정보 */}
       <div className='grid grid-cols-1 gap-x-8 gap-y-2 border-b border-gray-100 px-4 py-3 text-[13px] sm:grid-cols-2'>
         <div className='flex min-w-0 flex-col gap-2'>
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-700'>분류</span>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+            <span className='text-muted-foreground shrink-0'>분류</span>
             <span className='flex min-w-0 items-center'>
               <InquiryGroupBadge group={detail.group} />
             </span>
           </div>
 
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-700'>중분류</span>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+            <span className='text-muted-foreground shrink-0'>중분류</span>
             <span className='flex min-w-0 items-center'>
               <InquirySubGroupBadge subGroup={detail.subGroup} />
             </span>
           </div>
 
           {detail.reportCause && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-700'>신고 사유</span>
+            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+              <span className='text-muted-foreground shrink-0'>신고 사유</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {INQUIRY_REPORT_CAUSE_LABELS[detail.reportCause] ??
                   detail.reportCause}
@@ -266,8 +266,8 @@ export default function InquiryReportDetailPanel({
           )}
 
           {detail.target && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-700'>신고 대상</span>
+            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+              <span className='text-muted-foreground shrink-0'>신고 대상</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {detail.target}
               </span>
@@ -276,15 +276,18 @@ export default function InquiryReportDetailPanel({
         </div>
 
         <div className='flex min-w-0 flex-col gap-2'>
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-700'>작성자</span>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+            <span className='text-muted-foreground shrink-0 whitespace-nowrap'>
+              작성자 아이디
+            </span>
             <span className='flex min-w-0 items-center text-gray-800'>
               {isWriterWithdrawn ? (
                 <WithdrawnUserBadge />
               ) : detail.userLoginId ? (
-                <CopyableValue
-                  value={detail.userLoginId}
-                  label='작성자 아이디'
+                <MemberInfoPopover
+                  key={detail.encryptedUserId}
+                  displayName={detail.userLoginId}
+                  encryptedUserId={detail.encryptedUserId}
                 />
               ) : (
                 <span>-</span>
@@ -292,24 +295,24 @@ export default function InquiryReportDetailPanel({
             </span>
           </div>
 
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-700'>작성일</span>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+            <span className='text-muted-foreground shrink-0'>작성일</span>
             <span className='min-w-0 break-words text-gray-800'>
               {formatDateTimeToMinutes(detail.createdAt)}
             </span>
           </div>
 
           {detail.updatedAt && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-              <span className='shrink-0 text-gray-700'>수정일</span>
+            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+              <span className='text-muted-foreground shrink-0'>수정일</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {formatDateTimeToMinutes(detail.updatedAt)}
               </span>
             </div>
           )}
 
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-700'>답변</span>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+            <span className='text-muted-foreground shrink-0'>댓글</span>
             <span className='min-w-0 break-words text-gray-800'>
               {commentCount}건
             </span>
@@ -318,17 +321,32 @@ export default function InquiryReportDetailPanel({
       </div>
 
       {/* 내용 */}
-      <div className='flex flex-col gap-2 border-b border-gray-100 px-4 py-3'>
-        <p className='text-[13px] font-medium text-gray-700'>내용</p>
-        <div className='rounded border border-gray-200 bg-gray-50 px-3 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap text-gray-800'>
+      <div className='flex flex-col gap-3 border-b border-gray-100 px-4 py-5'>
+        <p className='text-foreground text-sm font-semibold'>내용</p>
+        <div className='text-foreground text-sm leading-7 break-words whitespace-pre-wrap'>
           {detail.content}
         </div>
       </div>
 
+      {/* 첨부파일 */}
+      {detail.attachments.length > 0 && (
+        <div className='flex flex-col gap-3 border-b border-gray-100 px-4 py-4'>
+          <p className='text-foreground text-sm font-semibold'>첨부파일</p>
+          <ul className='flex flex-col gap-2'>
+            {detail.attachments.map((attachment) => (
+              <InquiryReportAttachmentItem
+                key={attachment.id}
+                attachment={attachment}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* 댓글 */}
       <div className='flex flex-col gap-3 border-b border-gray-100 px-4 py-3'>
         <div className='flex items-center justify-between gap-2'>
-          <p className='text-[13px] font-medium text-gray-700'>댓글</p>
+          <p className='text-foreground text-sm font-semibold'>댓글</p>
           <span className='text-[12px] text-gray-400'>{commentCount}건</span>
         </div>
 
@@ -362,7 +380,7 @@ export default function InquiryReportDetailPanel({
         )}
 
         <form
-          className='flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3'
+          className='bg-muted/50 flex flex-col gap-2 rounded-lg p-3'
           onSubmit={handleCommentSubmit}
         >
           {replyParentComment && (
@@ -408,21 +426,6 @@ export default function InquiryReportDetailPanel({
           </div>
         </form>
       </div>
-
-      {/* 첨부파일 */}
-      {detail.attachments.length > 0 && (
-        <div className='flex flex-col gap-2 px-4 py-3'>
-          <p className='text-[13px] font-medium text-gray-700'>첨부파일</p>
-          <ul className='flex flex-col gap-2'>
-            {detail.attachments.map((attachment) => (
-              <InquiryReportAttachmentItem
-                key={attachment.id}
-                attachment={attachment}
-              />
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

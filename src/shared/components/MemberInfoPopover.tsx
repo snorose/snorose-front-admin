@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useState } from 'react';
 
-import { Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2, ShieldAlert, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { DropdownMenu } from '@/shared/components/ui';
 import type { MemberInfo } from '@/shared/types';
 
 import { getUserDetailAPI } from '@/apis';
@@ -20,21 +20,11 @@ export function MemberInfoPopover({
   encryptedUserId,
   displayName,
 }: MemberInfoPopoverProps) {
-  const triggerRef = useRef<HTMLSpanElement>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [popoverPos, setPopoverPos] = useState({ top: 0, left: 0 });
   const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isSanctionModalOpen, setIsSanctionModalOpen] = useState(false);
-
-  const handleTriggerClick = () => {
-    if (!isPopoverOpen && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setPopoverPos({ top: rect.bottom + 4, left: rect.left });
-    }
-    setIsPopoverOpen((prev) => !prev);
-  };
 
   const fetchMemberInfo = async (): Promise<MemberInfo | null> => {
     if (memberInfo) return memberInfo;
@@ -66,54 +56,52 @@ export function MemberInfoPopover({
 
   return (
     <div className='min-w-0'>
-      <span
-        ref={triggerRef}
-        onClick={handleTriggerClick}
-        title={displayName}
-        className='block cursor-pointer truncate transition-colors hover:text-blue-700 hover:underline'
-      >
-        {displayName}
-      </span>
-
-      {isFetching && (
-        <Loader2 className='ml-1 inline h-3 w-3 animate-spin text-gray-400' />
-      )}
-
-      {isPopoverOpen &&
-        createPortal(
-          <>
-            <div
-              className='fixed inset-0 z-40'
-              onClick={() => setIsPopoverOpen(false)}
-            />
-            <div
-              className='fixed z-50 w-48 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg'
-              style={{ top: popoverPos.top, left: popoverPos.left }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className='w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50'
-                onClick={handleInfoClick}
-              >
-                회원 정보
-              </button>
-              <button className='w-full cursor-not-allowed px-3 py-2 text-left text-sm text-gray-400'>
-                작성한 게시글
-              </button>
-              <button className='w-full cursor-not-allowed px-3 py-2 text-left text-sm text-gray-400'>
-                작성한 댓글
-              </button>
-              <div className='border-t border-gray-100' />
-              <button
-                className='w-full px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50'
-                onClick={handleSanctionClick}
-              >
-                제재하기
-              </button>
-            </div>
-          </>,
-          document.body
-        )}
+      <DropdownMenu open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <DropdownMenu.Trigger asChild>
+          <button
+            type='button'
+            title={displayName}
+            disabled={isFetching}
+            aria-busy={isFetching}
+            className='group hover:bg-accent focus-visible:ring-ring flex max-w-full min-w-0 cursor-pointer items-center gap-1 rounded-sm text-left transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-wait'
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className='truncate'>{displayName}</span>
+            {isFetching ? (
+              <Loader2
+                className='text-muted-foreground size-3.5 shrink-0 animate-spin'
+                aria-hidden='true'
+              />
+            ) : (
+              <ChevronDown
+                className='text-muted-foreground size-3.5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180 motion-reduce:transition-none'
+                aria-hidden='true'
+              />
+            )}
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          align='start'
+          sideOffset={4}
+          className='w-44 rounded-lg shadow-md'
+          onClick={(event) => event.stopPropagation()}
+        >
+          <DropdownMenu.Item onSelect={() => void handleInfoClick()}>
+            <UserRound aria-hidden='true' />
+            회원 정보
+          </DropdownMenu.Item>
+          {/* <DropdownMenu.Item disabled>작성한 게시글</DropdownMenu.Item>
+          <DropdownMenu.Item disabled>작성한 댓글</DropdownMenu.Item> */}
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item
+            variant='destructive'
+            onSelect={() => void handleSanctionClick()}
+          >
+            <ShieldAlert aria-hidden='true' />
+            제재하기
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu>
 
       <MemberInfoModal
         isOpen={isInfoModalOpen}
