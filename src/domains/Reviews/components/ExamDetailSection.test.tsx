@@ -217,7 +217,7 @@ describe('ExamDetailSection', () => {
       />
     );
 
-    expect(screen.queryByText(/\(작성자:/)).not.toBeInTheDocument();
+    expect(screen.queryByText('작성자:')).not.toBeInTheDocument();
     await user.click(
       screen.getByRole('tab', { name: '게시글 및 작성자 정보' })
     );
