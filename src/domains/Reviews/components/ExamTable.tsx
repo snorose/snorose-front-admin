@@ -87,7 +87,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
       />
     ),
   },
-  { key: 'reviewTitle', label: '시험후기명', width: '260px' },
+  { key: 'reviewTitle', label: '시험후기명', width: '300px' },
   {
     key: 'userDisplay',
     label: '작성자',
@@ -114,7 +114,7 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
   {
     key: 'processStatuses',
     label: '관리 상태',
-    width: '200px',
+    width: '120px',
     render: renderProcessStatusBadge,
   },
   { key: 'uploadTime', label: '작성일', width: '150px' },
@@ -252,6 +252,7 @@ export default function ExamTable({
                   key={column.key}
                   className={cn(
                     'relative cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap',
+                    column.key === 'isDiscussed' && 'pl-6',
                     (column.key === 'id' || column.key === 'status') &&
                       'text-center'
                   )}
@@ -302,10 +303,11 @@ export default function ExamTable({
                             column.key !== 'id' &&
                               column.key !== 'processStatuses' &&
                               'overflow-hidden text-ellipsis',
+                            column.key === 'isDiscussed' && 'pl-6',
                             (column.key === 'id' || column.key === 'status') &&
                               'text-center',
                             column.key === 'processStatuses' &&
-                              'min-w-[200px] overflow-visible whitespace-normal'
+                              'min-w-[120px] overflow-visible whitespace-normal'
                           )}
                         >
                           {column.render
