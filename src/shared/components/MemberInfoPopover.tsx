@@ -55,7 +55,7 @@ export function MemberInfoPopover({
   };
 
   return (
-    <div className='min-w-0'>
+    <div className='w-full min-w-0'>
       <DropdownMenu open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <DropdownMenu.Trigger asChild>
           <button
@@ -63,7 +63,7 @@ export function MemberInfoPopover({
             title={displayName}
             disabled={isFetching}
             aria-busy={isFetching}
-            className='group hover:bg-accent focus-visible:ring-ring flex max-w-full min-w-0 cursor-pointer items-center gap-1 rounded-sm text-left transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-wait'
+            className='group hover:bg-accent focus-visible:ring-ring -mx-1 flex max-w-[calc(100%+0.5rem)] min-w-0 cursor-pointer items-center gap-1 rounded-sm px-1 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-wait'
             onClick={(event) => event.stopPropagation()}
           >
             <span className='truncate'>{displayName}</span>
