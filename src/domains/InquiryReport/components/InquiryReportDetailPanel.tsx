@@ -241,14 +241,14 @@ export default function InquiryReportDetailPanel({
       {/* 메타 정보 */}
       <div className='grid grid-cols-1 gap-x-8 gap-y-2 border-b border-gray-100 px-4 py-3 text-[13px] sm:grid-cols-2'>
         <div className='flex min-w-0 flex-col gap-2'>
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-700'>분류</span>
             <span className='flex min-w-0 items-center'>
               <InquiryGroupBadge group={detail.group} />
             </span>
           </div>
 
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-700'>중분류</span>
             <span className='flex min-w-0 items-center'>
               <InquirySubGroupBadge subGroup={detail.subGroup} />
@@ -256,7 +256,7 @@ export default function InquiryReportDetailPanel({
           </div>
 
           {detail.reportCause && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
               <span className='shrink-0 text-gray-700'>신고 사유</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {INQUIRY_REPORT_CAUSE_LABELS[detail.reportCause] ??
@@ -266,7 +266,7 @@ export default function InquiryReportDetailPanel({
           )}
 
           {detail.target && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
               <span className='shrink-0 text-gray-700'>신고 대상</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {detail.target}
@@ -276,8 +276,10 @@ export default function InquiryReportDetailPanel({
         </div>
 
         <div className='flex min-w-0 flex-col gap-2'>
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
-            <span className='shrink-0 text-gray-700'>작성자</span>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+            <span className='shrink-0 whitespace-nowrap text-gray-700'>
+              작성자 아이디
+            </span>
             <span className='flex min-w-0 items-center text-gray-800'>
               {isWriterWithdrawn ? (
                 <WithdrawnUserBadge />
@@ -292,7 +294,7 @@ export default function InquiryReportDetailPanel({
             </span>
           </div>
 
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-700'>작성일</span>
             <span className='min-w-0 break-words text-gray-800'>
               {formatDateTimeToMinutes(detail.createdAt)}
@@ -300,7 +302,7 @@ export default function InquiryReportDetailPanel({
           </div>
 
           {detail.updatedAt && (
-            <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
               <span className='shrink-0 text-gray-700'>수정일</span>
               <span className='min-w-0 break-words text-gray-800'>
                 {formatDateTimeToMinutes(detail.updatedAt)}
@@ -308,7 +310,7 @@ export default function InquiryReportDetailPanel({
             </div>
           )}
 
-          <div className='grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-3'>
+          <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
             <span className='shrink-0 text-gray-700'>답변</span>
             <span className='min-w-0 break-words text-gray-800'>
               {commentCount}건
