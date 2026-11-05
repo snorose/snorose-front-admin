@@ -293,6 +293,7 @@ export default function InquiryReportDetailPanel({
               ) : detail.userLoginId ? (
                 <MemberInfoPopover
                   key={detail.encryptedUserId}
+                  className='w-full'
                   displayName={detail.userLoginId}
                   encryptedUserId={detail.encryptedUserId}
                 />

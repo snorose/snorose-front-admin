@@ -4,6 +4,7 @@ import { ChevronDown, Loader2, ShieldAlert, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DropdownMenu } from '@/shared/components/ui';
+import { cn } from '@/shared/lib';
 import type { MemberInfo } from '@/shared/types';
 
 import { getUserDetailAPI } from '@/apis';
@@ -14,11 +15,13 @@ import SanctionModal from './SanctionModal';
 interface MemberInfoPopoverProps {
   encryptedUserId: string;
   displayName: string;
+  className?: string;
 }
 
 export function MemberInfoPopover({
   encryptedUserId,
   displayName,
+  className,
 }: MemberInfoPopoverProps) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
@@ -55,7 +58,7 @@ export function MemberInfoPopover({
   };
 
   return (
-    <div className='w-full min-w-0'>
+    <div className={cn('max-w-full min-w-0', className)}>
       <DropdownMenu open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <DropdownMenu.Trigger asChild>
           <button
