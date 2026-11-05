@@ -15,6 +15,7 @@ import { INQUIRY_COMMENT_MAX_LENGTH } from '@/domains/InquiryReport/constants/in
 import {
   INQUIRY_AUXILIARY_BADGE_META,
   INQUIRY_REPORT_CAUSE_LABELS,
+  getInquirySubGroupBadgeMeta,
 } from '@/domains/InquiryReport/constants/inquiryReportLabels';
 import {
   useCreateInquiryComment,
@@ -36,10 +37,7 @@ import {
   buildOriginalInquiryPostUrl,
   buildReportTargetUrl,
 } from '../utils/inquiryReportUrls';
-import {
-  InquiryGroupBadge,
-  InquirySubGroupBadge,
-} from './InquiryClassificationBadge';
+import { InquiryGroupBadge } from './InquiryClassificationBadge';
 import InquiryCommentItem from './InquiryCommentItem';
 import InquiryReportAttachmentItem from './InquiryReportAttachmentItem';
 import InquiryStatusSelect from './InquiryStatusSelect';
@@ -242,36 +240,43 @@ export default function InquiryReportDetailPanel({
       <div className='grid grid-cols-1 gap-x-8 gap-y-2 border-b border-gray-100 px-4 py-3 text-[13px] sm:grid-cols-2'>
         <div className='flex min-w-0 flex-col gap-2'>
           <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
-            <span className='text-muted-foreground shrink-0'>분류</span>
+            <span className='text-muted-foreground shrink-0'>유형</span>
             <span className='flex min-w-0 items-center'>
               <InquiryGroupBadge group={detail.group} />
             </span>
           </div>
 
           <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
-            <span className='text-muted-foreground shrink-0'>중분류</span>
+            <span className='text-muted-foreground shrink-0'>카테고리</span>
             <span className='flex min-w-0 items-center'>
-              <InquirySubGroupBadge subGroup={detail.subGroup} />
+              {getInquirySubGroupBadgeMeta(detail.subGroup).label}
             </span>
           </div>
+          {detail.group === 'REPORT' && (
+            <>
+              {detail.reportCause && (
+                <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+                  <span className='text-muted-foreground shrink-0'>
+                    신고 사유
+                  </span>
+                  <span className='min-w-0 break-words text-gray-800'>
+                    {INQUIRY_REPORT_CAUSE_LABELS[detail.reportCause] ??
+                      detail.reportCause}
+                  </span>
+                </div>
+              )}
 
-          {detail.reportCause && (
-            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
-              <span className='text-muted-foreground shrink-0'>신고 사유</span>
-              <span className='min-w-0 break-words text-gray-800'>
-                {INQUIRY_REPORT_CAUSE_LABELS[detail.reportCause] ??
-                  detail.reportCause}
-              </span>
-            </div>
-          )}
-
-          {detail.target && (
-            <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
-              <span className='text-muted-foreground shrink-0'>신고 대상</span>
-              <span className='min-w-0 break-words text-gray-800'>
-                {detail.target}
-              </span>
-            </div>
+              {detail.target && (
+                <div className='grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] gap-3'>
+                  <span className='text-muted-foreground shrink-0'>
+                    신고 대상
+                  </span>
+                  <span className='min-w-0 break-words text-gray-800'>
+                    {detail.target}
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </div>
 
