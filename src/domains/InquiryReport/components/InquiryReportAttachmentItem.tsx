@@ -25,7 +25,7 @@ export default function InquiryReportAttachmentItem({
           />
         </a>
         {attachment.fileComment && (
-          <span className='text-[12px] text-gray-500'>
+          <span className='text-sm text-gray-500'>
             {attachment.fileComment}
           </span>
         )}
@@ -34,7 +34,7 @@ export default function InquiryReportAttachmentItem({
   }
 
   return (
-    <li className='flex items-center gap-1.5 text-[13px] text-gray-700'>
+    <li className='flex items-center gap-1.5 text-sm text-gray-700'>
       <Paperclip className='h-3.5 w-3.5 shrink-0 text-gray-400' />
       <a
         href={attachment.url}
