@@ -3,7 +3,7 @@ import { type FormEvent, useEffect, useId, useState } from 'react';
 import { X } from 'lucide-react';
 
 import {
-  CopyableValue,
+  MemberInfoPopover,
   OriginalPostButton,
   StatusBadge,
 } from '@/shared/components';
@@ -282,9 +282,9 @@ export default function InquiryReportDetailPanel({
               {isWriterWithdrawn ? (
                 <WithdrawnUserBadge />
               ) : detail.userLoginId ? (
-                <CopyableValue
-                  value={detail.userLoginId}
-                  label='작성자 아이디'
+                <MemberInfoPopover
+                  displayName={detail.userLoginId}
+                  encryptedUserId={detail.encryptedUserId}
                 />
               ) : (
                 <span>-</span>
