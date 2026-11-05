@@ -317,13 +317,6 @@ export default function InquiryReportDetailPanel({
               </span>
             </div>
           )}
-
-          <div className='grid min-h-6 min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-center gap-3'>
-            <span className='text-muted-foreground shrink-0'>댓글</span>
-            <span className='min-w-0 break-words text-gray-800'>
-              {commentCount}건
-            </span>
-          </div>
         </div>
       </div>
 
@@ -352,9 +345,11 @@ export default function InquiryReportDetailPanel({
 
       {/* 댓글 */}
       <div className='flex flex-col gap-3 border-b border-gray-100 px-4 py-3'>
-        <div className='flex items-center justify-between gap-2'>
+        <div className='flex items-center gap-1.5'>
           <p className='text-foreground text-sm font-semibold'>댓글</p>
-          <span className='text-[12px] text-gray-400'>{commentCount}건</span>
+          <span className='text-muted-foreground text-xs'>
+            ({commentCount}건)
+          </span>
         </div>
 
         {isCommentsLoading ? (
