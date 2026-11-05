@@ -285,6 +285,7 @@ export default function InquiryReportDetailPanel({
                 <WithdrawnUserBadge />
               ) : detail.userLoginId ? (
                 <MemberInfoPopover
+                  key={detail.encryptedUserId}
                   displayName={detail.userLoginId}
                   encryptedUserId={detail.encryptedUserId}
                 />

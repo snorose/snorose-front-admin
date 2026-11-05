@@ -149,6 +149,7 @@ export default function PostDetailCommentItem({
         <div className='flex items-start justify-between gap-4'>
           <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
             <MemberInfoPopover
+              key={comment.encryptedUserId}
               encryptedUserId={comment.encryptedUserId}
               displayName={comment.nickname}
             />

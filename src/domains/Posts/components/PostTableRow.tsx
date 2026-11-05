@@ -94,6 +94,7 @@ export default function PostTableRow({
       {/* 3. 작성자(닉네임) */}
       <Table.Cell className='relative cursor-pointer px-3 font-bold text-gray-900'>
         <MemberInfoPopover
+          key={post.encryptedUserId}
           encryptedUserId={post.encryptedUserId}
           displayName={post.nickName ?? '정보 없음'}
         />
