@@ -76,7 +76,30 @@ export function formatDateTimeToMinutes(
   dateTimeString: string | null | undefined
 ): string {
   if (!dateTimeString) return '-';
-  return dateTimeString.slice(0, 16).replace('T', ' ');
+
+  const match = dateTimeString.match(
+    /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/
+  );
+  if (!match) return '-';
+
+  const [, year, month, day, hour, minute] = match;
+  const parsedYear = Number(year);
+  const parsedMonth = Number(month);
+  const parsedDay = Number(day);
+  const daysInMonth = new Date(parsedYear, parsedMonth, 0).getDate();
+
+  if (
+    parsedMonth < 1 ||
+    parsedMonth > 12 ||
+    parsedDay < 1 ||
+    parsedDay > daysInMonth ||
+    Number(hour) > 23 ||
+    Number(minute) > 59
+  ) {
+    return '-';
+  }
+
+  return `${year}-${month}-${day} ${hour}:${minute}`;
 }
 
 /**
