@@ -407,7 +407,7 @@ export default function InquiryReportTable({
                         </Table.Cell>
                       )}
                       {!isDetailOpen && (
-                        <Table.Cell className='px-3 font-mono text-gray-600'>
+                        <Table.Cell className='px-3 text-xs text-gray-600 tabular-nums'>
                           {formatDateTimeToMinutes(inquiry.createdAt)}
                         </Table.Cell>
                       )}

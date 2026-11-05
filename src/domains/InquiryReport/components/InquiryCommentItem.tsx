@@ -100,7 +100,7 @@ export default function InquiryCommentItem({
             )}
           </div>
           <div className='flex items-center gap-1'>
-            <span className='font-mono text-[11px] text-gray-400'>
+            <span className='text-[11px] text-gray-500 tabular-nums'>
               {formatDateTimeToMinutes(comment.createdAt)}
             </span>
             {isManageable && (
