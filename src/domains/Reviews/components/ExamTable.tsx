@@ -8,6 +8,7 @@ import {
 } from 'react';
 
 import {
+  MemberInfoPopover,
   PaginationBar,
   SectionTitleWithCount,
   StatusBadge,
@@ -87,7 +88,21 @@ const EXAM_REVIEW_TABLE_COLUMNS: ExamReviewTableColumn[] = [
     ),
   },
   { key: 'reviewTitle', label: '시험후기명', width: '260px' },
-  { key: 'userDisplay', label: '작성자', width: '120px' },
+  {
+    key: 'userDisplay',
+    label: '작성자',
+    width: '120px',
+    render: (review) =>
+      review.encryptedUserId && review.userDisplay ? (
+        <MemberInfoPopover
+          key={review.encryptedUserId}
+          encryptedUserId={review.encryptedUserId}
+          displayName={review.userDisplay}
+        />
+      ) : (
+        review.userDisplay
+      ),
+  },
   {
     key: 'isDiscussed',
     label: '논의 여부',

@@ -59,6 +59,7 @@ const transformApiResponseToExamReview = (apiData: ExamReviews): ExamReview => {
     questionDetail: '',
     uploadTime,
     userDisplay,
+    encryptedUserId: apiData.encryptedUserId,
     isDiscussed: apiData.isDiscussed ?? false,
     isReported: reportCount > 0,
     reportCount,
