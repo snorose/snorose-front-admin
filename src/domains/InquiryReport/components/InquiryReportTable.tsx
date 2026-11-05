@@ -400,14 +400,14 @@ export default function InquiryReportTable({
                       </Table.Cell>
                       {!isDetailOpen && (
                         <Table.Cell
-                          className='truncate px-3 font-bold text-gray-900'
+                          className='truncate px-3 font-semibold text-gray-900'
                           title={inquiry.title}
                         >
                           {inquiry.title}
                         </Table.Cell>
                       )}
                       {!isDetailOpen && (
-                        <Table.Cell className='px-3 text-xs text-gray-600 tabular-nums'>
+                        <Table.Cell className='px-3 text-sm text-gray-600 tabular-nums'>
                           {formatDateTimeToMinutes(inquiry.createdAt)}
                         </Table.Cell>
                       )}
