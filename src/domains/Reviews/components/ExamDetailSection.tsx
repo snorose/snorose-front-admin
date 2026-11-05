@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { MemberInfoPopover, OriginalPostButton } from '@/shared/components';
 import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   ExamReviewCommentSection,
@@ -212,8 +213,9 @@ export function ExamDetailSection({
 
   const formInitialValues = useMemo(() => {
     if (selectedExamReviewDetail) {
-      const date = new Date(selectedExamReviewDetail.createdAt);
-      const uploadTimeStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+      const uploadTimeStr = formatDateTimeToMinutes(
+        selectedExamReviewDetail.createdAt
+      );
       const semesterStr = convertSemesterEnumToString(
         selectedExamReviewDetail.semester,
         selectedExamReviewDetail.lectureYear

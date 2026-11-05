@@ -110,16 +110,16 @@ export function ExamReviewPeriodListSection({
                         <PeriodStatusBadge startAt={startAt} endAt={endAt} />
                       </Table.Cell>
                       <Table.Cell className='text-center'>{title}</Table.Cell>
-                      <Table.Cell className='text-center'>
+                      <Table.Cell className='text-center text-sm text-gray-600 tabular-nums'>
                         {formatDateTimeToMinutes(startAt)}
                       </Table.Cell>
-                      <Table.Cell className='text-center'>
+                      <Table.Cell className='text-center text-sm text-gray-600 tabular-nums'>
                         {formatDateTimeToMinutes(endAt)}
                       </Table.Cell>
-                      <Table.Cell className='text-center'>
+                      <Table.Cell className='text-center text-sm text-gray-600 tabular-nums'>
                         {formatDateTimeToMinutes(createdAt)}
                       </Table.Cell>
-                      <Table.Cell className='text-center'>
+                      <Table.Cell className='text-center text-sm text-gray-600 tabular-nums'>
                         {formatDateTimeToMinutes(updatedAt)}
                       </Table.Cell>
                       <Table.Cell className='text-center'>
