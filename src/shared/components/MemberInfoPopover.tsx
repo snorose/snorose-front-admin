@@ -1,6 +1,12 @@
 import { useState } from 'react';
 
-import { ChevronDown, Loader2, ShieldAlert, UserRound } from 'lucide-react';
+import {
+  ChevronDown,
+  FileText,
+  Loader2,
+  ShieldAlert,
+  UserRound,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DropdownMenu } from '@/shared/components/ui';
@@ -16,12 +22,18 @@ interface MemberInfoPopoverProps {
   encryptedUserId: string;
   displayName: string;
   className?: string;
+  showSanctionAction?: boolean;
+  onViewNotices?: () => void;
+  onViewMemberInfo?: () => void;
 }
 
 export function MemberInfoPopover({
   encryptedUserId,
   displayName,
   className,
+  showSanctionAction = true,
+  onViewNotices,
+  onViewMemberInfo,
 }: MemberInfoPopoverProps) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
@@ -47,6 +59,10 @@ export function MemberInfoPopover({
 
   const handleInfoClick = async () => {
     setIsPopoverOpen(false);
+    if (onViewMemberInfo) {
+      onViewMemberInfo();
+      return;
+    }
     const member = await fetchMemberInfo();
     if (member) setIsInfoModalOpen(true);
   };
@@ -93,16 +109,24 @@ export function MemberInfoPopover({
             <UserRound aria-hidden='true' />
             회원 정보
           </DropdownMenu.Item>
-          {/* <DropdownMenu.Item disabled>작성한 게시글</DropdownMenu.Item>
-          <DropdownMenu.Item disabled>작성한 댓글</DropdownMenu.Item> */}
-          <DropdownMenu.Separator />
-          <DropdownMenu.Item
-            variant='destructive'
-            onSelect={() => void handleSanctionClick()}
-          >
-            <ShieldAlert aria-hidden='true' />
-            제재하기
-          </DropdownMenu.Item>
+          {onViewNotices && (
+            <DropdownMenu.Item onSelect={onViewNotices}>
+              <FileText aria-hidden='true' />
+              작성한 공지글
+            </DropdownMenu.Item>
+          )}
+          {showSanctionAction && (
+            <>
+              <DropdownMenu.Separator />
+              <DropdownMenu.Item
+                variant='destructive'
+                onSelect={() => void handleSanctionClick()}
+              >
+                <ShieldAlert aria-hidden='true' />
+                제재하기
+              </DropdownMenu.Item>
+            </>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
 
@@ -113,11 +137,13 @@ export function MemberInfoPopover({
         encryptedUserId={encryptedUserId}
       />
 
-      <SanctionModal
-        isOpen={isSanctionModalOpen}
-        onClose={() => setIsSanctionModalOpen(false)}
-        memberInfo={memberInfo}
-      />
+      {showSanctionAction && (
+        <SanctionModal
+          isOpen={isSanctionModalOpen}
+          onClose={() => setIsSanctionModalOpen(false)}
+          memberInfo={memberInfo}
+        />
+      )}
     </div>
   );
 }
