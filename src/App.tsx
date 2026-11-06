@@ -1,4 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import {
+  Navigate,
+  Route,
+  RouterProvider,
+  Routes,
+  createBrowserRouter,
+} from 'react-router-dom';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -6,6 +12,11 @@ import { AppSidebar, ProtectedRoute } from '@/shared/components';
 import { Sidebar, Toaster } from '@/shared/components/ui';
 import { PATHS } from '@/shared/constants';
 import { AuthProvider } from '@/shared/contexts';
+
+import { NoticesProvider } from '@/domains/Notices';
+
+import GeneralNoticePage from '@/pages/notices/GeneralNoticePage';
+import NoticeEditorPage from '@/pages/notices/NoticeEditorPage';
 
 import {
   AdjustAllMemberPointPage,
@@ -41,115 +52,139 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+function AppContent() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Toaster theme='light' richColors position='top-right' />
-          <Routes>
-            <Route path='/' element={<LogInPage />} />
-            <Route
-              path='/*'
-              element={
-                <ProtectedRoute>
-                  <div className='flex min-h-screen'>
-                    <Sidebar.Provider>
-                      <AppSidebar />
-                      <main className='flex flex-1 flex-col overflow-hidden px-6 py-5'>
-                        <section className='flex w-full flex-1 overflow-auto'>
-                          <Routes>
+    <AuthProvider>
+      <Toaster theme='light' richColors position='top-right' />
+      <Routes>
+        <Route path='/' element={<LogInPage />} />
+        <Route
+          path='/*'
+          element={
+            <ProtectedRoute>
+              <div className='flex min-h-screen'>
+                <Sidebar.Provider>
+                  <AppSidebar />
+                  <main className='flex flex-1 flex-col overflow-hidden px-6 py-5'>
+                    <section className='flex w-full flex-1 overflow-auto'>
+                      <NoticesProvider>
+                        <Routes>
+                          <Route path='/notices'>
                             <Route
-                              path={PATHS.MEMBER_INFO}
-                              element={<MemberInfoPage />}
-                            />
-                            <Route
-                              path={`${PATHS.MEMBER_INFO}/:memberKey`}
-                              element={<MemberInfoPage />}
-                            />
-                            <Route
-                              path={PATHS.MEMBER_PENALTY}
-                              element={<MemberPenaltyManagementPage />}
-                            />
-                            <Route
-                              path={PATHS.REVIEW_EXAM}
-                              element={<ExamReviewPage />}
-                            />
-                            <Route
-                              path={PATHS.REVIEW_EXAM_PERIOD}
-                              element={<ExamReviewPeriodPage />}
-                            />
-                            <Route
-                              path={PATHS.POINT_SINGLE}
-                              element={<AdjustSinglePointPage />}
-                            />
-                            <Route
-                              path={PATHS.POINT_ALL}
-                              element={<AdjustAllMemberPointPage />}
-                            />
-                            <Route
-                              path={PATHS.POINT_FREEZE}
-                              element={<PointFreezePage />}
-                            />
-                            <Route
-                              path={PATHS.POINT_UPLOAD_EXCEL}
-                              element={<ExcelPointUploadPage />}
-                            />
-                            <Route
-                              path={PATHS.POST_COMMENTS}
-                              element={<PostCommentPage />}
-                            />
-                            <Route
-                              path={PATHS.POST_COMMENT_DETAIL}
-                              element={<PostCommentDetailPage />}
-                            />
-                            <Route
-                              path={PATHS.POST_DETAIL}
-                              element={<PostDetailPage />}
-                            />
-                            <Route
-                              path={PATHS.POST_MANAGE}
-                              element={<PostManagePage />}
-                            />
-                            <Route
-                              path={PATHS.INQUIRY_REPORT}
-                              element={<InquiryReportPage />}
-                            />
-                            <Route
-                              path={PATHS.PUSH_NOTIFICATIONS}
-                              element={<PushNotificationPage />}
-                            />
-                            <Route
-                              path='/alerts'
+                              index
                               element={
-                                <Navigate
-                                  to={PATHS.PUSH_NOTIFICATIONS}
-                                  replace
-                                />
+                                <Navigate to={PATHS.NOTICE_GENERAL} replace />
                               }
                             />
                             <Route
-                              path={PATHS.POPUPS}
-                              element={<PopupManagementPage />}
+                              path='general'
+                              element={<GeneralNoticePage />}
                             />
                             <Route
-                              path={PATHS.SERVER_MAINTENANCE}
-                              element={<ServerMaintenancePage />}
+                              path='general/new'
+                              element={<NoticeEditorPage />}
                             />
-                            <Route path='*' element={<NotFoundPage />} />
-                          </Routes>
-                        </section>
-                      </main>
-                    </Sidebar.Provider>
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+                            <Route
+                              path='general/:noticeId/edit'
+                              element={<NoticeEditorPage />}
+                            />
+                          </Route>
+                          <Route
+                            path={PATHS.MEMBER_INFO}
+                            element={<MemberInfoPage />}
+                          />
+                          <Route
+                            path={`${PATHS.MEMBER_INFO}/:memberKey`}
+                            element={<MemberInfoPage />}
+                          />
+                          <Route
+                            path={PATHS.MEMBER_PENALTY}
+                            element={<MemberPenaltyManagementPage />}
+                          />
+                          <Route
+                            path={PATHS.REVIEW_EXAM}
+                            element={<ExamReviewPage />}
+                          />
+                          <Route
+                            path={PATHS.REVIEW_EXAM_PERIOD}
+                            element={<ExamReviewPeriodPage />}
+                          />
+                          <Route
+                            path={PATHS.POINT_SINGLE}
+                            element={<AdjustSinglePointPage />}
+                          />
+                          <Route
+                            path={PATHS.POINT_ALL}
+                            element={<AdjustAllMemberPointPage />}
+                          />
+                          <Route
+                            path={PATHS.POINT_FREEZE}
+                            element={<PointFreezePage />}
+                          />
+                          <Route
+                            path={PATHS.POINT_UPLOAD_EXCEL}
+                            element={<ExcelPointUploadPage />}
+                          />
+                          <Route
+                            path={PATHS.POST_COMMENTS}
+                            element={<PostCommentPage />}
+                          />
+                          <Route
+                            path={PATHS.POST_COMMENT_DETAIL}
+                            element={<PostCommentDetailPage />}
+                          />
+                          <Route
+                            path={PATHS.POST_DETAIL}
+                            element={<PostDetailPage />}
+                          />
+                          <Route
+                            path={PATHS.POST_MANAGE}
+                            element={<PostManagePage />}
+                          />
+                          <Route
+                            path={PATHS.INQUIRY_REPORT}
+                            element={<InquiryReportPage />}
+                          />
+                          <Route
+                            path={PATHS.PUSH_NOTIFICATIONS}
+                            element={<PushNotificationPage />}
+                          />
+                          <Route
+                            path='/alerts'
+                            element={
+                              <Navigate to={PATHS.PUSH_NOTIFICATIONS} replace />
+                            }
+                          />
+                          <Route
+                            path={PATHS.POPUPS}
+                            element={<PopupManagementPage />}
+                          />
+                          <Route
+                            path={PATHS.SERVER_MAINTENANCE}
+                            element={<ServerMaintenancePage />}
+                          />
+                          <Route path='*' element={<NotFoundPage />} />
+                        </Routes>
+                      </NoticesProvider>
+                    </section>
+                  </main>
+                </Sidebar.Provider>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   );
 }
 
-export default App;
+// React Router의 이탈 차단이 뒤로/앞으로 가기에도 적용되도록 data router를 사용합니다.
+const router = createBrowserRouter([{ path: '*', element: <AppContent /> }]);
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
+}
