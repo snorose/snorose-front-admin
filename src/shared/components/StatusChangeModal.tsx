@@ -1,6 +1,13 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { Button, Textarea } from '@/shared/components/ui';
+
+const DELETE_REASON_PRESETS = [
+  '포인트/출첵 관련 게시글 및 댓글',
+  '무성의/초성 관련 게시글 및 댓글',
+  '불법촬영물 게시 및 유통',
+  '상업적 광고 및 판매글',
+] as const;
 
 interface StatusChangeModalProps {
   target: 'POST' | 'COMMENT';
@@ -17,6 +24,7 @@ export default function StatusChangeModal({
   isPending = false,
 }: StatusChangeModalProps) {
   const reasonId = useId();
+  const reasonInputRef = useRef<HTMLTextAreaElement>(null);
   const [reason, setReason] = useState('');
   const [deleteCommentsAlso, setDeleteCommentsAlso] = useState(false);
   const [restoreCommentsAlso, setRestoreCommentsAlso] = useState(false);
@@ -42,10 +50,36 @@ export default function StatusChangeModal({
         </p>
 
         <div className='flex flex-col gap-4'>
+          {modalType === 'DELETE' && (
+            <div className='flex flex-col gap-2'>
+              <span className='text-xs font-medium text-gray-700'>
+                자주 쓰는 삭제 사유
+              </span>
+              <div className='flex flex-wrap gap-2'>
+                {DELETE_REASON_PRESETS.map((preset) => (
+                  <Button
+                    key={preset}
+                    type='button'
+                    variant='outline'
+                    size='xs'
+                    className='h-auto py-1.5 text-left whitespace-normal'
+                    disabled={isPending}
+                    onClick={() => {
+                      setReason(preset);
+                      reasonInputRef.current?.focus();
+                    }}
+                  >
+                    {preset}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
           <label htmlFor={reasonId} className='sr-only'>
             상태 변경 사유
           </label>
           <Textarea
+            ref={reasonInputRef}
             id={reasonId}
             className='min-h-[100px]'
             placeholder='사유를 입력하세요...'
