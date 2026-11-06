@@ -171,7 +171,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
         4,
         expect.objectContaining({
           boardIds: [board.value, BOARD_OPTIONS[1].value],
-          sortTypes: ['VIEW_COUNT'],
+          sortTypes: 'VIEW_COUNT',
         })
       )
     );
@@ -195,7 +195,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
           encryptedUserId: 'user-id',
           isVisible: false,
           isKeywordExist: false,
-          sortTypes: ['VIEW_COUNT'],
+          sortTypes: 'VIEW_COUNT',
           startDate: '2026-10-01',
           keywordPost: '검색어',
         })
