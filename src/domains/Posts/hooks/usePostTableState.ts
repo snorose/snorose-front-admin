@@ -35,7 +35,7 @@ export function usePostTableState({
     setSelectedIds([]);
   }, [
     searchParams.encryptedUserId,
-    searchParams.boardId,
+    searchParams.boardIds,
     searchParams.isNotice,
     searchParams.isVisible,
     searchParams.isKeywordExist,
@@ -61,7 +61,7 @@ export function usePostTableState({
     page: currentPage,
     body: {
       encryptedUserId: searchParams.encryptedUserId,
-      boardId: searchParams.boardId,
+      boardIds: searchParams.boardIds,
       isVisible: searchParams.isVisible,
       isKeywordExist: searchParams.isKeywordExist,
       startDate: searchParams.startDate || undefined,

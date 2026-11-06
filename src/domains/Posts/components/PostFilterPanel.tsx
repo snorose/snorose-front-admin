@@ -5,7 +5,6 @@ import { Search } from 'lucide-react';
 import {
   DatePicker,
   FilterMultiSelect,
-  SearchableSelect,
   SectionTitle,
   StatusBadge,
 } from '@/shared/components';
@@ -20,11 +19,6 @@ import {
 import { BOARD_OPTIONS, STATUS_OPTIONS } from '@/shared/utils';
 
 import type { PostSearchParams } from '../types';
-
-const boardOptions = BOARD_OPTIONS.map((option) => ({
-  ...option,
-  value: String(option.value),
-}));
 
 interface PostFilterPanelProps {
   onFilterChange: (filters: PostSearchParams) => void;
@@ -218,19 +212,15 @@ export const PostFilterPanel = ({
               </Select>
             </div>
             <div className='min-w-0'>
-              <SearchableSelect
+              <FilterMultiSelect
                 label='게시판'
-                placeholder='전체'
-                options={boardOptions}
-                value={
-                  filters.boardId === undefined
-                    ? 'ALL'
-                    : String(filters.boardId)
-                }
-                onValueChange={(value) =>
+                showSelectedNames
+                options={BOARD_OPTIONS}
+                value={filters.boardIds ?? []}
+                onValueChange={(boardIds) =>
                   setFilters((prev) => ({
                     ...prev,
-                    boardId: value === 'ALL' ? undefined : Number(value),
+                    boardIds: boardIds.length ? boardIds : undefined,
                   }))
                 }
               />

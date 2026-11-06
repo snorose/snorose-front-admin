@@ -10,7 +10,7 @@ import type { PostSearchParams } from '@/domains/Posts/types';
 
 const POST_SCHEMA = {
   encryptedUserId: 'string',
-  boardId: 'number',
+  boardIds: 'number-array',
   isVisible: 'boolean',
   isKeywordExist: 'boolean',
   startDate: 'string',
