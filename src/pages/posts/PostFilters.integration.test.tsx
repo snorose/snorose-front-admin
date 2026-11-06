@@ -155,7 +155,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
       `/posts/manage?boardIds=${board.value},${BOARD_OPTIONS[1].value}&adminCommonStatuses=VISIBLE,ADMIN_HIDDEN&encryptedUserId=user-id&isVisible=false&isKeywordExist=false&sortTypes=VIEW_COUNT&sortDirection=DESC&startDate=2026-10-01&page=4`,
     ]);
     expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
-      '게시판 2개'
+      `${board.label}외 1개`
     );
     expect(screen.getByRole('button', { name: '관리 상태' })).toHaveTextContent(
       '관리 상태 2개'

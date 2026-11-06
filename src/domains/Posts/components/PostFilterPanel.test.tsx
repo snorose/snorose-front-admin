@@ -52,7 +52,11 @@ describe('PostFilterPanel', () => {
     await user.click(
       screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[1].label })
     );
-    expect(board).toHaveTextContent('게시판 2개');
+    expect(board).toHaveTextContent(`${BOARD_OPTIONS[0].label}외 1개`);
+    expect(board).toHaveAttribute(
+      'title',
+      `${BOARD_OPTIONS[0].label}, ${BOARD_OPTIONS[1].label}`
+    );
     expect(onFilterChange).not.toHaveBeenCalled();
     await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));

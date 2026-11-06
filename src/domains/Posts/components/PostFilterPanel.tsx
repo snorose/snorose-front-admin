@@ -214,6 +214,7 @@ export const PostFilterPanel = ({
             <div className='min-w-0'>
               <FilterMultiSelect
                 label='게시판'
+                showSelectedNames
                 options={BOARD_OPTIONS}
                 value={filters.boardIds ?? []}
                 onValueChange={(boardIds) =>

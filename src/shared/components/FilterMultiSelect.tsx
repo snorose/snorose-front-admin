@@ -15,6 +15,7 @@ interface FilterMultiSelectProps<T extends string | number> {
   }) => ReactNode;
   onValueChange: (value: T[]) => void;
   disabled?: boolean;
+  showSelectedNames?: boolean;
 }
 
 export function FilterMultiSelect<T extends string | number>({
@@ -24,6 +25,7 @@ export function FilterMultiSelect<T extends string | number>({
   renderOption,
   onValueChange,
   disabled = false,
+  showSelectedNames = false,
 }: FilterMultiSelectProps<T>) {
   const id = useId();
   const isDisabled = disabled || options.length === 0;
@@ -31,12 +33,19 @@ export function FilterMultiSelect<T extends string | number>({
     value.length === 1
       ? options.find((option) => option.value === value[0])
       : undefined;
+  const selectedLabels = value.map(
+    (selected) =>
+      options.find((option) => option.value === selected)?.label ??
+      String(selected)
+  );
   const summary =
     value.length === 0
       ? '전체'
       : value.length === 1
         ? (selectedOption?.content ?? selectedOption?.label ?? String(value[0]))
-        : `${label} ${value.length}개`;
+        : showSelectedNames
+          ? `${selectedLabels[0]} 외 ${value.length - 1}개`
+          : `${label} ${value.length}개`;
 
   return (
     <div className='flex min-w-0 flex-col gap-1'>
@@ -52,12 +61,24 @@ export function FilterMultiSelect<T extends string | number>({
             aria-labelledby={`${id}-label`}
             aria-describedby={`${id}-summary`}
             disabled={isDisabled}
+            title={
+              showSelectedNames && value.length
+                ? selectedLabels.join(', ')
+                : undefined
+            }
             className='border-input h-9 w-full justify-between bg-transparent px-3 font-normal shadow-none'
           >
             <span id={`${id}-summary`} className='min-w-0 truncate'>
-              {selectedOption && renderOption
-                ? renderOption(selectedOption)
-                : summary}
+              {selectedOption && renderOption ? (
+                renderOption(selectedOption)
+              ) : showSelectedNames && value.length > 1 ? (
+                <span className='flex min-w-0 gap-1'>
+                  <span className='truncate'>{selectedLabels[0]}</span>
+                  <span className='shrink-0'>외 {value.length - 1}개</span>
+                </span>
+              ) : (
+                summary
+              )}
             </span>
             <ChevronDown
               aria-hidden='true'
