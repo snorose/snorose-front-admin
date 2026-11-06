@@ -57,3 +57,84 @@ it('댓글 삭제 모달에는 댓글 동시 삭제 옵션이 없다', () => {
   );
   expect(screen.queryByRole('checkbox')).toBeNull();
 });
+
+it.each([
+  '포인트/출첵 관련 게시글 및 댓글',
+  '무성의/초성 관련 게시글 및 댓글',
+  '불법촬영물 게시 및 유통',
+  '상업적 광고 및 판매글',
+])(
+  '삭제 사유 버튼 "%s"를 누르면 입력만 채우고 확인 시 전달한다',
+  async (preset) => {
+    const user = userEvent.setup();
+    const onConfirmAction = vi.fn();
+    render(
+      <StatusChangeModal
+        target='POST'
+        modalType='DELETE'
+        onClose={vi.fn()}
+        onConfirmAction={onConfirmAction}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: preset }));
+    expect(screen.getByRole('textbox')).toHaveValue(preset);
+    expect(screen.getByRole('textbox')).toHaveFocus();
+    expect(onConfirmAction).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '확인' }));
+    expect(onConfirmAction).toHaveBeenCalledWith(preset, false);
+  }
+);
+
+it('댓글 삭제에서도 자동 입력한 문구를 수정하고 사유를 직접 입력할 수 있다', async () => {
+  const user = userEvent.setup();
+  const onConfirmAction = vi.fn();
+  render(
+    <StatusChangeModal
+      target='COMMENT'
+      modalType='DELETE'
+      onClose={vi.fn()}
+      onConfirmAction={onConfirmAction}
+    />
+  );
+  await user.click(
+    screen.getByRole('button', { name: '불법촬영물 게시 및 유통' })
+  );
+  const input = screen.getByRole('textbox');
+  await user.type(input, ' 확인 후 삭제');
+  expect(input).toHaveFocus();
+  expect(input).toHaveValue('불법촬영물 게시 및 유통 확인 후 삭제');
+  await user.clear(input);
+  await user.type(input, '중복 게시물');
+  await user.click(screen.getByRole('button', { name: '확인' }));
+  expect(onConfirmAction).toHaveBeenCalledWith('중복 게시물', false);
+});
+
+it('처리 중에는 자동 입력 버튼과 직접 입력을 비활성화한다', () => {
+  render(
+    <StatusChangeModal
+      target='POST'
+      modalType='DELETE'
+      isPending
+      onClose={vi.fn()}
+      onConfirmAction={vi.fn()}
+    />
+  );
+  expect(screen.getByRole('textbox')).toBeDisabled();
+  for (const button of screen.getAllByRole('button'))
+    expect(button).toBeDisabled();
+});
+
+it.each(['HIDE', 'SHOW', 'RESTORE'] as const)(
+  '%s 모달에는 삭제 사유 자동 입력 버튼이 없다',
+  (modalType) => {
+    render(
+      <StatusChangeModal
+        target='POST'
+        modalType={modalType}
+        onClose={vi.fn()}
+        onConfirmAction={vi.fn()}
+      />
+    );
+    expect(screen.queryByText('자주 쓰는 삭제 사유')).not.toBeInTheDocument();
+  }
+);
