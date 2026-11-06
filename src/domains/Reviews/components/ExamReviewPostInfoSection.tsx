@@ -1,3 +1,4 @@
+import { MemberInfoPopover } from '@/shared/components';
 import { Field } from '@/shared/components/ui';
 
 interface ExamReviewPostInfoSectionProps {
@@ -32,7 +33,15 @@ export function ExamReviewPostInfoSection({
       <Field className='gap-0'>
         <Field.Label>작성자 닉네임</Field.Label>
         <div className='flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm text-gray-700'>
-          {author}
+          {author && encryptedUserId ? (
+            <MemberInfoPopover
+              key={encryptedUserId}
+              displayName={author}
+              encryptedUserId={encryptedUserId}
+            />
+          ) : (
+            author
+          )}
         </div>
       </Field>
 

@@ -57,7 +57,7 @@ export function ExamReviewAdminStatusList({
                 <span className='min-w-0 text-sm leading-5 font-medium [overflow-wrap:anywhere] break-words'>
                   {manager.nickname ?? '닉네임 없음'}
                 </span>
-                <span className='shrink-0 text-sm leading-5 font-medium tabular-nums'>
+                <span className='shrink-0 text-sm leading-5 font-medium'>
                   {manager.processedCount.toLocaleString('ko-KR')}건
                 </span>
               </li>

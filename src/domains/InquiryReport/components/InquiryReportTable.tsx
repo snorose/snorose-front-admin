@@ -39,14 +39,14 @@ interface InquiryReportTableProps {
 }
 
 const GROUP_OPTIONS = [
-  { label: '분류 전체', value: 'ALL' },
+  { label: '유형 전체', value: 'ALL' },
   { label: '문의', value: 'INQUIRY' },
   { label: '신고', value: 'REPORT' },
   { label: '기타', value: 'ETC' },
 ] as const;
 
 const INQUIRY_SUB_GROUP_OPTIONS = [
-  { label: '중분류', value: 'ALL' },
+  { label: '카테고리 전체', value: 'ALL' },
   { label: '족보 관련 문의', value: 'EXAM_REVIEW_INQUIRY' },
   { label: '이벤트 관련 문의', value: 'EVENT_INQUIRY' },
   { label: '공지 관련 문의', value: 'NOTICE_INQUIRY' },
@@ -54,7 +54,7 @@ const INQUIRY_SUB_GROUP_OPTIONS = [
 ] as const;
 
 const REPORT_SUB_GROUP_OPTIONS = [
-  { label: '중분류', value: 'ALL' },
+  { label: '카테고리 전체', value: 'ALL' },
   { label: '게시글 신고', value: 'POST_REPORT' },
   { label: '족보 신고', value: 'EXAM_REVIEW_REPORT' },
   { label: '이용자 신고', value: 'USER_REPORT' },
@@ -93,7 +93,7 @@ export default function InquiryReportTable({
     if (groupFilter === 'REPORT') return REPORT_SUB_GROUP_OPTIONS;
 
     return [
-      { label: '중분류', value: 'ALL' },
+      { label: '카테고리 전체', value: 'ALL' },
       ...INQUIRY_SUB_GROUP_OPTIONS.filter((option) => option.value !== 'ALL'),
       ...REPORT_SUB_GROUP_OPTIONS.filter((option) => option.value !== 'ALL'),
     ];
@@ -148,7 +148,7 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              aria-label='분류'
+              aria-label='유형'
               className='bg-background h-9 w-[112px]'
             >
               <Select.Value />
@@ -172,7 +172,7 @@ export default function InquiryReportTable({
           {groupFilter !== 'ALL' && (
             <button
               type='button'
-              aria-label='분류 필터 초기화'
+              aria-label='유형 필터 초기화'
               onClick={(e) => {
                 e.stopPropagation();
                 setGroupFilter('ALL');
@@ -196,7 +196,7 @@ export default function InquiryReportTable({
             }}
           >
             <Select.Trigger
-              aria-label='중분류'
+              aria-label='카테고리'
               className={`h-9 w-[160px] ${groupFilter === 'ALL' || groupFilter === 'ETC' ? 'bg-muted' : 'bg-background'}`}
             >
               <Select.Value />
@@ -216,7 +216,7 @@ export default function InquiryReportTable({
           {subGroupFilter !== 'ALL' && (
             <button
               type='button'
-              aria-label='중분류 필터 초기화'
+              aria-label='카테고리 필터 초기화'
               onClick={(e) => {
                 e.stopPropagation();
                 setSubGroupFilter('ALL');
@@ -283,13 +283,13 @@ export default function InquiryReportTable({
       <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
         <div className='w-full overflow-x-auto'>
           <Table
-            className={`w-full ${isDetailOpen ? 'min-w-[624px]' : 'min-w-[1104px]'} table-fixed text-[13px]`}
+            className={`w-full ${isDetailOpen ? 'min-w-[624px]' : 'min-w-[1104px]'} table-fixed text-sm`}
           >
             <Table.Header className='h-[42px] border-b border-gray-200'>
               <Table.Row>
                 <Table.Head
                   style={{ width: '128px' }}
-                  className='px-3 text-center'
+                  className='px-3 text-left'
                 >
                   postId
                 </Table.Head>
@@ -297,13 +297,13 @@ export default function InquiryReportTable({
                   style={{ width: '88px' }}
                   className='px-3 text-center'
                 >
-                  분류
+                  유형
                 </Table.Head>
                 <Table.Head style={{ width: '160px' }} className='px-3'>
-                  중분류
+                  카테고리
                 </Table.Head>
                 <Table.Head style={{ width: '124px' }} className='px-3'>
-                  아이디
+                  작성자 아이디
                 </Table.Head>
                 <Table.Head
                   style={{ width: '120px' }}
@@ -361,10 +361,11 @@ export default function InquiryReportTable({
                           : 'bg-white hover:bg-gray-50'
                       }`}
                     >
-                      <Table.Cell className='px-3 text-center font-mono text-gray-600'>
+                      <Table.Cell className='px-3 text-left text-sm text-gray-600'>
                         <CopyableValue
                           value={inquiry.postId}
                           label='게시글 ID'
+                          className='gap-1 text-sm [&_svg]:size-3'
                         />
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
@@ -399,14 +400,14 @@ export default function InquiryReportTable({
                       </Table.Cell>
                       {!isDetailOpen && (
                         <Table.Cell
-                          className='truncate px-3 font-bold text-gray-900'
+                          className='truncate px-3 font-semibold text-gray-900'
                           title={inquiry.title}
                         >
                           {inquiry.title}
                         </Table.Cell>
                       )}
                       {!isDetailOpen && (
-                        <Table.Cell className='px-3 font-mono text-gray-600'>
+                        <Table.Cell className='px-3 text-sm text-gray-600'>
                           {formatDateTimeToMinutes(inquiry.createdAt)}
                         </Table.Cell>
                       )}

@@ -4,8 +4,9 @@ import { isAxiosError } from 'axios';
 import { Loader2, Pencil, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { OriginalPostButton } from '@/shared/components';
+import { MemberInfoPopover, OriginalPostButton } from '@/shared/components';
 import { Button, Card, Skeleton, Tabs } from '@/shared/components/ui';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import {
   ExamReviewCommentSection,
@@ -212,8 +213,9 @@ export function ExamDetailSection({
 
   const formInitialValues = useMemo(() => {
     if (selectedExamReviewDetail) {
-      const date = new Date(selectedExamReviewDetail.createdAt);
-      const uploadTimeStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+      const uploadTimeStr = formatDateTimeToMinutes(
+        selectedExamReviewDetail.createdAt
+      );
       const semesterStr = convertSemesterEnumToString(
         selectedExamReviewDetail.semester,
         selectedExamReviewDetail.lectureYear
@@ -665,9 +667,18 @@ export function ExamDetailSection({
               {selectedExamReview?.reviewTitle || '시험후기'}
             </p>
             {selectedExamReviewDetail?.userNickname && (
-              <span className='min-w-0 wrap-break-word'>
-                (작성자: {selectedExamReviewDetail.userNickname})
-              </span>
+              <div className='flex min-w-0 items-center gap-1'>
+                <span className='shrink-0'>작성자:</span>
+                {selectedExamReviewDetail.encryptedUserId ? (
+                  <MemberInfoPopover
+                    key={selectedExamReviewDetail.encryptedUserId}
+                    displayName={selectedExamReviewDetail.userNickname}
+                    encryptedUserId={selectedExamReviewDetail.encryptedUserId}
+                  />
+                ) : (
+                  <span>{selectedExamReviewDetail.userNickname}</span>
+                )}
+              </div>
             )}
           </div>
           {selectedExamReview && (

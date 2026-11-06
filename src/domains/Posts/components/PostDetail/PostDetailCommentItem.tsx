@@ -18,7 +18,7 @@ import {
 } from '@/shared/components';
 import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-import { formatDateTimeWithAmPm } from '@/shared/utils';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { AdminCommentResult } from '@/domains/Comments/types';
 import { getPostStatusBadges } from '@/domains/Comments/utils/commentUtils';
@@ -84,6 +84,7 @@ export default function PostDetailCommentItem({
         queryKey: ['commentStatusHistories', comment.commentId],
       });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
       setIsModalOpen(false);
     },
@@ -102,6 +103,7 @@ export default function PostDetailCommentItem({
         queryKey: ['commentStatusHistories', comment.commentId],
       });
       queryClient.invalidateQueries({ queryKey: ['postComments'] });
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
       queryClient.invalidateQueries({ queryKey: ['post', comment.postId] });
     },
     onError: () => {
@@ -112,6 +114,7 @@ export default function PostDetailCommentItem({
   const handleConfirmAction = (memo: string) => {
     if (
       !memo.trim() ||
+      deleteMutation.isPending ||
       restoreMutation.isPending ||
       visibilityMutation.isPending
     )
@@ -146,11 +149,12 @@ export default function PostDetailCommentItem({
         <div className='flex items-start justify-between gap-4'>
           <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5'>
             <MemberInfoPopover
+              key={comment.encryptedUserId}
               encryptedUserId={comment.encryptedUserId}
               displayName={comment.nickname}
             />
-            <span className='font-mono text-xs text-gray-400'>
-              {formatDateTimeWithAmPm(comment.createdAt)}
+            <span className='text-xs text-gray-600'>
+              {formatDateTimeToMinutes(comment.createdAt)}
             </span>
             {comment.category && (
               <StatusBadge tone='outline'>{comment.category}</StatusBadge>
@@ -263,6 +267,11 @@ export default function PostDetailCommentItem({
       {isModalOpen && comment && (
         <StatusChangeModal
           target='COMMENT'
+          isPending={
+            deleteMutation.isPending ||
+            restoreMutation.isPending ||
+            visibilityMutation.isPending
+          }
           modalType={modalType}
           onClose={() => {
             setIsModalOpen(false);

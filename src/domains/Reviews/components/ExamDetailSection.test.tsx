@@ -1,4 +1,11 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+
+import {
+  render as renderWithContext,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
@@ -182,7 +189,11 @@ describe('ExamDetailSection', () => {
       />
     );
 
-    expect(screen.getByText(`(작성자: ${userNickname})`)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: userNickname }));
+    expect(
+      screen.getByRole('menuitem', { name: '회원 정보' })
+    ).toBeInTheDocument();
+    await user.keyboard('{Escape}');
     await user.click(
       screen.getByRole('tab', { name: '게시글 및 작성자 정보' })
     );
@@ -206,7 +217,7 @@ describe('ExamDetailSection', () => {
       />
     );
 
-    expect(screen.queryByText(/\(작성자:/)).not.toBeInTheDocument();
+    expect(screen.queryByText('작성자:')).not.toBeInTheDocument();
     await user.click(
       screen.getByRole('tab', { name: '게시글 및 작성자 정보' })
     );
@@ -610,3 +621,7 @@ describe('ExamDetailSection', () => {
     expect(updateExamReview).not.toHaveBeenCalled();
   });
 });
+
+function render(ui: Parameters<typeof renderWithContext>[0]) {
+  return renderWithContext(ui, { wrapper: MemoryRouter });
+}

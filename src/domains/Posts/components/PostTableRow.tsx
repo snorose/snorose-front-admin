@@ -13,7 +13,7 @@ import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import {
-  formatDateTimeWithAmPm,
+  formatDateTimeToMinutes,
   formatPostId,
   getPostStatusBadges,
   stripHtmlTags,
@@ -94,6 +94,7 @@ export default function PostTableRow({
       {/* 3. 작성자(닉네임) */}
       <Table.Cell className='relative cursor-pointer px-3 font-bold text-gray-900'>
         <MemberInfoPopover
+          key={post.encryptedUserId}
           encryptedUserId={post.encryptedUserId}
           displayName={post.nickName ?? '정보 없음'}
         />
@@ -118,8 +119,8 @@ export default function PostTableRow({
       </Table.Cell>
 
       {/* 6. 작성일 */}
-      <Table.Cell className='px-3 font-mono text-xs text-gray-600'>
-        {formatDateTimeWithAmPm(post.createdAt)}
+      <Table.Cell className='px-3 text-xs text-gray-600'>
+        {formatDateTimeToMinutes(post.createdAt)}
       </Table.Cell>
 
       {/* 7. 카테고리 */}

@@ -119,39 +119,43 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
     const user = userEvent.setup();
     const posts = renderPage(PostManagePage, ['/posts/manage']);
     await user.click(screen.getByRole('button', { name: '게시판' }));
-    await user.click(screen.getByRole('button', { name: '주거' }));
+    await user.click(screen.getByRole('menuitemcheckbox', { name: '주거' }));
+    await user.click(
+      screen.getByRole('menuitemcheckbox', { name: '교환학생·어학연수' })
+    );
+    await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));
     await waitFor(() =>
-      expect(searchPosts).toHaveBeenLastCalledWith(1, { boardId: 41 })
+      expect(searchPosts).toHaveBeenLastCalledWith(1, { boardIds: [41, 71] })
     );
-    expect(urlParams().get('boardId')).toBe('41');
+    expect(urlParams().get('boardIds')).toBe('41,71');
     posts.unmount();
 
     renderPage(PostCommentPage, ['/posts/comments']);
     await user.click(screen.getByRole('button', { name: '게시판' }));
     await user.click(screen.getByRole('checkbox', { name: '주거' }));
     await user.click(
-      screen.getByRole('checkbox', { name: '교환학생/어학연수' })
+      screen.getByRole('checkbox', { name: '교환학생·어학연수' })
     );
     await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));
     await waitFor(() =>
       expect(searchComments).toHaveBeenLastCalledWith(1, {
         searchScope: 'CONTENT',
-        boardIds: [41, 70],
+        boardIds: [41, 71],
       })
     );
-    expect(urlParams().get('boardIds')).toBe('41,70');
+    expect(urlParams().get('boardIds')).toBe('41,71');
   });
 
   test('게시글 URL의 선택을 복원하고 숨은 조건·false를 보존해 1페이지에서 검색한다', async () => {
     const user = userEvent.setup();
     const board = BOARD_OPTIONS[0];
     renderPage(PostManagePage, [
-      `/posts/manage?boardId=${board.value}&adminCommonStatuses=VISIBLE,ADMIN_HIDDEN&encryptedUserId=user-id&isVisible=false&isKeywordExist=false&sortTypes=VIEW_COUNT&sortDirection=DESC&startDate=2026-10-01&page=4`,
+      `/posts/manage?boardIds=${board.value},${BOARD_OPTIONS[1].value}&adminCommonStatuses=VISIBLE,ADMIN_HIDDEN&encryptedUserId=user-id&isVisible=false&isKeywordExist=false&sortTypes=VIEW_COUNT&sortDirection=DESC&startDate=2026-10-01&page=4`,
     ]);
     expect(screen.getByRole('button', { name: '게시판' })).toHaveTextContent(
-      board.label
+      `${board.label}외 1개`
     );
     expect(screen.getByRole('button', { name: '관리 상태' })).toHaveTextContent(
       '관리 상태 2개'
@@ -166,7 +170,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
       expect(searchPosts).toHaveBeenCalledWith(
         4,
         expect.objectContaining({
-          boardId: board.value,
+          boardIds: [board.value, BOARD_OPTIONS[1].value],
           sortTypes: ['VIEW_COUNT'],
         })
       )
@@ -186,7 +190,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
       expect(searchPosts).toHaveBeenLastCalledWith(
         1,
         expect.objectContaining({
-          boardId: board.value,
+          boardIds: [board.value, BOARD_OPTIONS[1].value],
           adminCommonStatuses: ['VISIBLE'],
           encryptedUserId: 'user-id',
           isVisible: false,
@@ -214,7 +218,7 @@ describe('게시글·댓글 필터 URL와 요청 연결', () => {
       expect(searchPosts).toHaveBeenLastCalledWith(
         1,
         expect.objectContaining({
-          boardId: undefined,
+          boardIds: undefined,
           encryptedUserId: undefined,
           isVisible: undefined,
           keywordPost: undefined,

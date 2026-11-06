@@ -511,7 +511,7 @@ export default function ExcelPointUploadPage() {
                           <Table.Cell className='px-3 py-3 text-center text-sm'>
                             {row.studentNumber || '—'}
                           </Table.Cell>
-                          <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
+                          <Table.Cell className='px-3 py-3 text-center text-sm'>
                             {row.difference || '—'}
                           </Table.Cell>
                           <Table.Cell className='px-3 py-3 text-center text-sm'>
@@ -634,7 +634,7 @@ export default function ExcelPointUploadPage() {
                   <span>·</span>
                   <span className='shrink-0'>
                     업로드한 회원{' '}
-                    <span className='font-semibold text-blue-600 tabular-nums'>
+                    <span className='font-semibold text-blue-600'>
                       {uploadResult.requestedCount}
                     </span>
                     명
@@ -642,7 +642,7 @@ export default function ExcelPointUploadPage() {
                   <span>·</span>
                   <span className='shrink-0'>
                     지급 성공{' '}
-                    <span className='font-semibold text-green-600 tabular-nums'>
+                    <span className='font-semibold text-green-600'>
                       {uploadResult.successCount}
                     </span>
                     명
@@ -650,7 +650,7 @@ export default function ExcelPointUploadPage() {
                   <span>·</span>
                   <span className='shrink-0'>
                     실패{' '}
-                    <span className='font-semibold text-red-600 tabular-nums'>
+                    <span className='font-semibold text-red-600'>
                       {uploadResult.failedCount}
                     </span>
                     명
@@ -681,7 +681,7 @@ export default function ExcelPointUploadPage() {
                                 className='text-sm font-semibold text-amber-950'
                               >
                                 처리되지 않음
-                                <span className='ml-1.5 font-normal text-amber-900/90 tabular-nums'>
+                                <span className='ml-1.5 font-normal text-amber-900/90'>
                                   ({uploadResult.failedCount}명)
                                 </span>
                               </h3>
@@ -747,7 +747,7 @@ export default function ExcelPointUploadPage() {
                                     <Table.Cell className='px-3 py-3 text-center text-sm'>
                                       {row.studentNumber || '—'}
                                     </Table.Cell>
-                                    <Table.Cell className='px-3 py-3 text-center text-sm tabular-nums'>
+                                    <Table.Cell className='px-3 py-3 text-center text-sm'>
                                       {row.difference}
                                     </Table.Cell>
                                     <Table.Cell className='px-3 py-3 text-center text-sm'>
@@ -797,7 +797,7 @@ export default function ExcelPointUploadPage() {
                             className='text-sm font-semibold text-emerald-950'
                           >
                             지급 성공
-                            <span className='ml-1.5 font-normal text-emerald-900/90 tabular-nums'>
+                            <span className='ml-1.5 font-normal text-emerald-900/90'>
                               ({uploadResult.successCount}명)
                             </span>
                           </h3>
@@ -840,7 +840,7 @@ export default function ExcelPointUploadPage() {
                                   <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
                                     {row.studentNumber}
                                   </Table.Cell>
-                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900 tabular-nums'>
+                                  <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>
                                     {row.difference}
                                   </Table.Cell>
                                   <Table.Cell className='px-4 py-3 text-center text-sm text-gray-900'>

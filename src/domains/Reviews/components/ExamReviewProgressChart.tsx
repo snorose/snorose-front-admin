@@ -41,7 +41,7 @@ export function ExamReviewProgressChart({
                 {label}
               </dt>
               <dd
-                className={`flex items-baseline gap-0.5 text-lg font-semibold tracking-tight whitespace-nowrap tabular-nums sm:text-xl ${index === 1 ? 'text-primary' : ''}`}
+                className={`flex items-baseline gap-0.5 text-lg font-semibold tracking-tight whitespace-nowrap sm:text-xl ${index === 1 ? 'text-primary' : ''}`}
               >
                 <span>{value.toLocaleString('ko-KR')}</span>
                 <span className='text-muted-foreground text-xs font-normal tracking-normal sm:text-sm'>
@@ -86,7 +86,7 @@ export function ExamReviewProgressChart({
               />
             </svg>
             <div className='absolute inset-0 flex flex-col items-center justify-center gap-1'>
-              <span className='text-2xl font-semibold tracking-tight tabular-nums'>
+              <span className='text-2xl font-semibold tracking-tight'>
                 {summary.confirmedRate}%
               </span>
               <span className='text-muted-foreground text-xs'>확인 완료율</span>

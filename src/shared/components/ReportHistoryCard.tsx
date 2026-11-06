@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
 import type { AdminReportHistory } from '@/shared/types/report-history';
-import { formatDateTimeWithAmPm } from '@/shared/utils';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import { StatusBadge } from './StatusBadge';
 
@@ -56,8 +56,8 @@ export function ReportHistoryCard({
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>
                 <span className='font-medium text-gray-700'>날짜</span>
-                <span className='font-mono text-gray-600'>
-                  {formatDateTimeWithAmPm(item.reportedAt)}
+                <span className='text-gray-600'>
+                  {formatDateTimeToMinutes(item.reportedAt)}
                 </span>
               </div>
               <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2'>

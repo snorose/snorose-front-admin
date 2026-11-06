@@ -34,43 +34,41 @@ describe('PostFilterPanel', () => {
     expect(onFilterChange).toHaveBeenLastCalledWith({ isNotice: undefined });
   });
 
-  test('게시판을 숫자 단일 값으로 전달하고 전체 선택으로 조건을 해제한다', async () => {
+  test('게시판을 여러 개 선택해 숫자 배열로 전달하고 선택 해제로 조건을 지운다', async () => {
     const user = userEvent.setup();
     const onFilterChange = vi.fn();
     render(
       <PostFilterPanel
-        initialFilters={{ boardId: BOARD_OPTIONS[0].value }}
+        initialFilters={{ boardIds: [BOARD_OPTIONS[0].value] }}
         onFilterChange={onFilterChange}
       />
     );
     const board = screen.getByRole('button', { name: '게시판' });
     expect(board).toHaveTextContent(BOARD_OPTIONS[0].label);
     await user.click(board);
-    await user.type(
-      screen.getByRole('textbox', { name: '게시판 목록 검색' }),
-      BOARD_OPTIONS[1].label
-    );
     expect(
-      screen.queryByRole('button', { name: BOARD_OPTIONS[0].label })
-    ).not.toBeInTheDocument();
+      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[0].label })
+    ).toBeChecked();
     await user.click(
-      screen.getByRole('button', { name: BOARD_OPTIONS[1].label })
+      screen.getByRole('menuitemcheckbox', { name: BOARD_OPTIONS[1].label })
+    );
+    expect(board).toHaveTextContent(`${BOARD_OPTIONS[0].label}외 1개`);
+    expect(board).toHaveAttribute(
+      'title',
+      `${BOARD_OPTIONS[0].label}, ${BOARD_OPTIONS[1].label}`
     );
     expect(onFilterChange).not.toHaveBeenCalled();
+    await user.keyboard('{Escape}');
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(onFilterChange).toHaveBeenLastCalledWith({
-      boardId: BOARD_OPTIONS[1].value,
+      boardIds: [BOARD_OPTIONS[0].value, BOARD_OPTIONS[1].value],
     });
     await user.click(board);
-    expect(
-      screen.getByRole('textbox', { name: '게시판 목록 검색' })
-    ).toHaveValue('');
-    expect(
-      screen.queryByRole('button', { name: '선택 해제' })
-    ).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '전체' }));
+    await user.click(screen.getByRole('menuitem', { name: '선택 해제' }));
+    await user.keyboard('{Escape}');
+    expect(board).toHaveTextContent('전체');
     await user.click(screen.getByRole('button', { name: '검색' }));
-    expect(onFilterChange).toHaveBeenLastCalledWith({ boardId: undefined });
+    expect(onFilterChange).toHaveBeenLastCalledWith({ boardIds: undefined });
   });
 
   test('관리 상태를 복수 선택하고 마지막 해제 시 조건을 생략한다', async () => {

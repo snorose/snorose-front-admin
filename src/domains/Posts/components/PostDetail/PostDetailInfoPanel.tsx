@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Switch } from '@/shared/components/ui';
-import { formatDateTimeWithAmPm } from '@/shared/utils';
+import { formatDateTimeToMinutes } from '@/shared/utils';
 import { getPostStatusBadges } from '@/shared/utils';
 
 import { useUpdatePostNotice } from '../../hooks/useUpdatePostNotice';
@@ -65,8 +65,8 @@ export default function PostDetailInfoPanel({
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col gap-1'>
             <span className='font-medium text-gray-700'>게시일자</span>
-            <div className='flex flex-col font-mono text-[12px] leading-tight text-gray-800'>
-              <span>{formatDateTimeWithAmPm(post.createdAt)}</span>
+            <div className='flex flex-col text-xs leading-tight text-gray-600'>
+              <span>{formatDateTimeToMinutes(post.createdAt)}</span>
             </div>
           </div>
 
@@ -107,6 +107,7 @@ export default function PostDetailInfoPanel({
             <span className='font-medium text-gray-700'>작성자</span>
             <div>
               <MemberInfoPopover
+                key={post.encryptedUserId}
                 encryptedUserId={post.encryptedUserId}
                 displayName={post.nickName ?? '정보 없음'}
               />

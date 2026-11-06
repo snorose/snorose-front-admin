@@ -24,6 +24,7 @@ export default function PostDetailStatusLogCard({
     <StatusHistoryCard
       title='게시글 상태 변경 내역'
       statusLogs={data?.data ?? []}
+      totalCount={data?.totalCount}
       isLoading={isLoading}
       isError={isError}
       currentPage={currentPage}

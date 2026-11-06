@@ -48,6 +48,7 @@ export interface ExamReviewSearchParams {
 }
 
 export interface ExamReview {
+  encryptedUserId?: string | null;
   id: number;
   status: string;
   reviewTitle: string;
@@ -165,7 +166,8 @@ export interface ExamReviewAdminStatusPeriodInput {
   endAt: string;
 }
 
-export interface ExamReviewAdminStatusPeriod extends ExamReviewAdminStatusPeriodInput {
+export interface ExamReviewAdminStatusPeriod
+  extends ExamReviewAdminStatusPeriodInput {
   id: number;
   createdAt: string;
   updatedAt: string;

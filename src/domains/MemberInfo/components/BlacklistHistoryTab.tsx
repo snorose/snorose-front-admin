@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { PaginationBar } from '@/shared/components';
 import { Table } from '@/shared/components/ui';
 import type { BlacklistHistoryItem } from '@/shared/types';
-import { getErrorMessage } from '@/shared/utils';
+import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
 
 import {
   getWarningCountFromHistory,
@@ -133,7 +133,7 @@ export default function BlacklistHistoryTab({
                     {history.blackReason}
                   </Table.Cell>
                   <Table.Cell className='text-center'>
-                    {history.createdAt}
+                    {formatDateTimeToMinutes(history.createdAt)}
                   </Table.Cell>
                   <Table.Cell className='text-center'>
                     {isWarningType(history.type)

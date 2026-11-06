@@ -52,7 +52,7 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
                   : '지급'}
             </span>
             <p
-              className={`text-lg font-semibold tabular-nums ${
+              className={`text-lg font-semibold ${
                 isDeduction ? 'text-rose-600' : 'text-foreground'
               }`}
             >
@@ -63,7 +63,7 @@ export default function PointHistoryCard({ history }: PointHistoryCardProps) {
           <time
             dateTime={history.createdAt}
             title={history.createdAt.replace('T', ' ')}
-            className='text-muted-foreground text-xs font-normal whitespace-nowrap tabular-nums'
+            className='text-muted-foreground text-xs font-normal whitespace-nowrap'
           >
             {formatDateTimeToMinutes(history.createdAt)}
           </time>
