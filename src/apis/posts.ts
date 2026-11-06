@@ -18,7 +18,7 @@ export const searchPosts = async (
   body: AdminPostSearchRequest
 ): Promise<AdminPostListResult> => {
   const response = await axiosInstance.post<BaseResponse<AdminPostListResult>>(
-    '/v1/admin/posts/search',
+    '/v2/admin/posts/search',
     body,
     {
       params: { page: page - 1 },

@@ -48,7 +48,7 @@ export interface AdminPostStatusHistoryListResult {
 
 export interface AdminPostSearchRequest {
   encryptedUserId?: string;
-  boardId?: number;
+  boardIds?: number[];
   isNotice?: boolean;
   isVisible?: boolean;
   isKeywordExist?: boolean;
@@ -85,7 +85,7 @@ export interface AdminPostBulkDeleteResult {
 
 export interface PostSearchParams {
   encryptedUserId?: string;
-  boardId?: number;
+  boardIds?: number[];
   isNotice?: boolean;
   isVisible?: boolean;
   isKeywordExist?: boolean;
