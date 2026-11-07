@@ -101,6 +101,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         title: '문의 및 신고',
         url: PATHS.INQUIRY_REPORT,
       },
+      {
+        title: 'FAQ 관리',
+        url: PATHS.FAQ,
+      },
     ],
   },
   {
