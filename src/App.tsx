@@ -15,6 +15,7 @@ import { AuthProvider } from '@/shared/contexts';
 
 import { NoticesProvider } from '@/domains/Notices';
 
+import FaqManagementPage from '@/pages/faqs/FaqManagementPage';
 import GeneralNoticePage from '@/pages/notices/GeneralNoticePage';
 import NoticeEditorPage from '@/pages/notices/NoticeEditorPage';
 
@@ -144,6 +145,10 @@ function AppContent() {
                           <Route
                             path={PATHS.INQUIRY_REPORT}
                             element={<InquiryReportPage />}
+                          />
+                          <Route
+                            path={PATHS.FAQ}
+                            element={<FaqManagementPage />}
                           />
                           <Route
                             path={PATHS.PUSH_NOTIFICATIONS}
