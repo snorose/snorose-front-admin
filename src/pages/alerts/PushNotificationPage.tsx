@@ -2,7 +2,7 @@ import { useId, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { PageHeader, SectionTitle } from '@/shared/components';
+import { DateTimePicker, PageHeader, SectionTitle } from '@/shared/components';
 import {
   Button,
   Input,
@@ -11,7 +11,7 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import type { PushNotification } from '@/shared/types';
-import { getErrorMessage } from '@/shared/utils';
+import { formatDateValue, getErrorMessage } from '@/shared/utils';
 
 import { PushNotificationConfirmModal } from '@/domains/Alerts/components';
 
@@ -95,6 +95,11 @@ export default function PushNotificationPage() {
   const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
   const [isLoading, setIsLoading] = useState(false);
   const [urlInputType, setUrlInputType] = useState<UrlInputType>('internal');
+  const [sendTiming, setSendTiming] = useState<'immediate' | 'scheduled'>(
+    'immediate'
+  );
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
+  const [scheduledTime, setScheduledTime] = useState('00:00');
   const isSubmittingRef = useRef(false);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,6 +118,9 @@ export default function PushNotificationPage() {
 
   const handleResetButtonClick = () => {
     setFormData(INITIAL_FORM_DATA);
+    setSendTiming('immediate');
+    setScheduledDate(undefined);
+    setScheduledTime('00:00');
     setUrlInputType('internal');
   };
 
@@ -136,6 +144,12 @@ export default function PushNotificationPage() {
   };
 
   const handleApplyButtonClick = () => {
+    if (sendTiming === 'scheduled') {
+      toast.info(
+        '예약 발송은 준비 중입니다. 날짜와 시간 입력만 확인할 수 있습니다.'
+      );
+      return;
+    }
     if (
       !formData.name.trim() ||
       !formData.title.trim() ||
@@ -206,6 +220,7 @@ export default function PushNotificationPage() {
   };
 
   const handleConfirmModalButtonClick = async () => {
+    if (sendTiming === 'scheduled') return;
     if (isSubmittingRef.current) {
       return;
     }
@@ -372,6 +387,60 @@ export default function PushNotificationPage() {
         <article className='flex w-full flex-col gap-1'>
           <SectionTitle>발송 옵션</SectionTitle>
           <div className='flex flex-col gap-2'>
+            <div className='flex items-center justify-between rounded-lg border bg-blue-50 p-4'>
+              <div className='flex min-w-0 flex-1 flex-col gap-2'>
+                <Label id={`${inputId}-send-time-label`} required>
+                  발송 시점
+                </Label>
+                <RadioGroup
+                  aria-labelledby={`${inputId}-send-time-label`}
+                  value={sendTiming}
+                  onValueChange={(value) =>
+                    setSendTiming(value as 'immediate' | 'scheduled')
+                  }
+                  className='flex flex-col gap-1'
+                >
+                  <div className='flex items-center gap-3'>
+                    <RadioGroup.Item
+                      value='immediate'
+                      id={`${inputId}-send-immediate`}
+                    />
+                    <Label
+                      htmlFor={`${inputId}-send-immediate`}
+                      className='cursor-pointer font-normal'
+                    >
+                      즉시 발송
+                    </Label>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    <RadioGroup.Item
+                      value='scheduled'
+                      id={`${inputId}-send-scheduled`}
+                      disabled
+                    />
+                    <Label
+                      htmlFor={`${inputId}-send-scheduled`}
+                      className='text-muted-foreground cursor-not-allowed font-normal'
+                    >
+                      예약 발송 (준비 중)
+                    </Label>
+                  </div>
+                </RadioGroup>
+                <DateTimePicker
+                  label='예약 발송 일시'
+                  hideLabel
+                  layout='horizontal'
+                  className='w-full max-w-lg'
+                  date={scheduledDate}
+                  time={scheduledTime}
+                  onDateSelect={setScheduledDate}
+                  onTimeChange={setScheduledTime}
+                  datePlaceholder='발송 날짜 선택'
+                  minDate={formatDateValue(new Date())}
+                  disabled
+                />
+              </div>
+            </div>
             <div className='flex items-center justify-between rounded-lg border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
                 <Label id={`${inputId}-isMarketing-label`} required>

@@ -11,19 +11,20 @@ const MINUTES = Array.from({ length: 60 }, (_, i) =>
   String(i).padStart(2, '0')
 );
 
-interface DateTimePickerProps extends Pick<
-  AriaAttributes,
-  'aria-describedby' | 'aria-invalid'
-> {
+interface DateTimePickerProps
+  extends Pick<AriaAttributes, 'aria-describedby' | 'aria-invalid'> {
   label: string;
   date: Date | undefined;
   time: string;
   onDateSelect: (date: Date | undefined) => void;
   onTimeChange: (time: string) => void;
   datePlaceholder?: string;
+  minDate?: string;
   required?: boolean;
   className?: string;
   disabled?: boolean;
+  hideLabel?: boolean;
+  layout?: 'responsive' | 'horizontal';
 }
 
 export function DateTimePicker({
@@ -33,9 +34,12 @@ export function DateTimePicker({
   onDateSelect,
   onTimeChange,
   datePlaceholder = '날짜 선택',
+  minDate,
   required = false,
   className = '',
   disabled = false,
+  hideLabel = false,
+  layout = 'responsive',
   ...accessibilityProps
 }: DateTimePickerProps) {
   const id = useId();
@@ -44,15 +48,27 @@ export function DateTimePicker({
 
   return (
     <div className={cn('@container flex min-w-0 flex-col gap-1', className)}>
-      <Label htmlFor={dateId} required={required}>
+      <Label
+        htmlFor={dateId}
+        required={required}
+        className={hideLabel ? 'sr-only' : undefined}
+      >
         {label}
       </Label>
-      <div className='grid grid-cols-1 gap-2 @min-[24rem]:grid-cols-2'>
+      <div
+        className={cn(
+          'grid gap-2',
+          layout === 'horizontal'
+            ? 'grid-cols-2'
+            : 'grid-cols-1 @min-[24rem]:grid-cols-2'
+        )}
+      >
         <DatePicker
           id={dateId}
           value={formatDateValue(date)}
           onValueChange={(value) => onDateSelect(parseDateValue(value))}
           placeholder={datePlaceholder}
+          minDate={minDate}
           aria-label={label}
           disabled={disabled}
           {...accessibilityProps}
@@ -69,7 +85,7 @@ export function DateTimePicker({
               type='button'
               aria-label={`${label} 시`}
               {...accessibilityProps}
-              className='min-w-0 flex-1'
+              className='bg-background min-w-0 flex-1'
               size='default'
             >
               <Select.Value placeholder='시' />
@@ -92,7 +108,7 @@ export function DateTimePicker({
               type='button'
               aria-label={`${label} 분`}
               {...accessibilityProps}
-              className='min-w-0 flex-1'
+              className='bg-background min-w-0 flex-1'
               size='default'
             >
               <Select.Value placeholder='분' />
