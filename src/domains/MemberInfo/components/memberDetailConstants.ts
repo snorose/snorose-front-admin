@@ -11,7 +11,7 @@ import { PATHS } from '@/shared/constants';
 
 export type DetailShortcut = {
   description: string;
-  getHref?: (studentNumber: string) => string;
+  getHref?: (nickname: string) => string;
   icon: LucideIcon;
   title: string;
 };
@@ -21,15 +21,15 @@ export const DETAIL_SHORTCUTS: DetailShortcut[] = [
     title: '작성한 게시글 조회',
     description: '해당 회원이 작성한 게시글을 조회합니다.',
     icon: FileText,
-    getHref: (studentNumber) =>
-      `${PATHS.POST_MANAGE}?keywordAuthor=${encodeURIComponent(studentNumber)}&page=1`,
+    getHref: (nickname) =>
+      `${PATHS.POST_MANAGE}?keywordAuthor=${encodeURIComponent(nickname)}&page=1`,
   },
   {
     title: '작성한 댓글 조회',
     description: '해당 회원이 작성한 댓글을 조회합니다.',
     icon: MessageSquare,
-    getHref: (studentNumber) =>
-      `${PATHS.POST_COMMENTS}?searchScope=CONTENT&keywordAuthor=${encodeURIComponent(studentNumber)}&page=1`,
+    getHref: (nickname) =>
+      `${PATHS.POST_COMMENTS}?searchScope=CONTENT&keywordAuthor=${encodeURIComponent(nickname)}&page=1`,
   },
   {
     title: '다운로드 받은 시험후기',
