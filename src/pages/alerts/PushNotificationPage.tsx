@@ -11,7 +11,7 @@ import {
   Textarea,
 } from '@/shared/components/ui';
 import type { PushNotification } from '@/shared/types';
-import { getErrorMessage } from '@/shared/utils';
+import { formatDateValue, getErrorMessage } from '@/shared/utils';
 
 import { PushNotificationConfirmModal } from '@/domains/Alerts/components';
 
@@ -436,6 +436,7 @@ export default function PushNotificationPage() {
                   onDateSelect={setScheduledDate}
                   onTimeChange={setScheduledTime}
                   datePlaceholder='발송 날짜 선택'
+                  minDate={formatDateValue(new Date())}
                   disabled={sendTiming !== 'scheduled'}
                 />
               </div>

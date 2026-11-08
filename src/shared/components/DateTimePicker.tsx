@@ -19,6 +19,7 @@ interface DateTimePickerProps
   onDateSelect: (date: Date | undefined) => void;
   onTimeChange: (time: string) => void;
   datePlaceholder?: string;
+  minDate?: string;
   required?: boolean;
   className?: string;
   disabled?: boolean;
@@ -33,6 +34,7 @@ export function DateTimePicker({
   onDateSelect,
   onTimeChange,
   datePlaceholder = '날짜 선택',
+  minDate,
   required = false,
   className = '',
   disabled = false,
@@ -66,6 +68,7 @@ export function DateTimePicker({
           value={formatDateValue(date)}
           onValueChange={(value) => onDateSelect(parseDateValue(value))}
           placeholder={datePlaceholder}
+          minDate={minDate}
           aria-label={label}
           disabled={disabled}
           {...accessibilityProps}
