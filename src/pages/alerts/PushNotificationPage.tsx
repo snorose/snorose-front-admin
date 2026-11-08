@@ -95,7 +95,6 @@ export default function PushNotificationPage() {
   const [formData, setFormData] = useState<PushNotification>(INITIAL_FORM_DATA);
   const [isLoading, setIsLoading] = useState(false);
   const [urlInputType, setUrlInputType] = useState<UrlInputType>('internal');
-  // PR 생성 전 예약 선택을 다시 비활성화한다.
   const [sendTiming, setSendTiming] = useState<'immediate' | 'scheduled'>(
     'immediate'
   );
@@ -417,12 +416,13 @@ export default function PushNotificationPage() {
                     <RadioGroup.Item
                       value='scheduled'
                       id={`${inputId}-send-scheduled`}
+                      disabled
                     />
                     <Label
                       htmlFor={`${inputId}-send-scheduled`}
-                      className='cursor-pointer font-normal'
+                      className='text-muted-foreground cursor-not-allowed font-normal'
                     >
-                      예약 발송
+                      예약 발송 (준비 중)
                     </Label>
                   </div>
                 </RadioGroup>
@@ -437,7 +437,7 @@ export default function PushNotificationPage() {
                   onTimeChange={setScheduledTime}
                   datePlaceholder='발송 날짜 선택'
                   minDate={formatDateValue(new Date())}
-                  disabled={sendTiming !== 'scheduled'}
+                  disabled
                 />
               </div>
             </div>
