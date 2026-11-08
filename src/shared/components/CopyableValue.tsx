@@ -1,22 +1,9 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { Copy } from 'lucide-react';
-import { toast } from 'sonner';
+import { Check, Copy } from 'lucide-react';
 
 import { Button, InputGroup } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-
-/** 항목명 끝 글자의 받침에 따라 조사 '이/가'를 고른다. */
-function getSubjectParticle(label: string) {
-  const lastCharacter = label
-    .trim()
-    .replace(/[)\]]+$/, '')
-    .slice(-1);
-  const code = lastCharacter.charCodeAt(0);
-  const hasFinalConsonant =
-    code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
-  return hasFinalConsonant ? '이' : '가';
-}
 
 export type CopyableValueProps = {
   value: string | number | null | undefined;
@@ -30,7 +17,7 @@ export type CopyableValueProps = {
 };
 
 /**
- * 값 표시와 복사 버튼, 복사 결과 토스트를 제공한다.
+ * 값 표시와 복사 버튼, 복사 완료 상태를 제공한다.
  *
  * - inline(기본): 텍스트 옆에 복사 버튼
  * - input: 실제 읽기 전용 입력과 오른쪽 복사 버튼
@@ -45,7 +32,16 @@ export function CopyableValue({
 }: CopyableValueProps) {
   const [isCopying, setIsCopying] = useState(false);
   const isCopyingRef = useRef(false);
+  const [copiedValue, setCopiedValue] = useState<string | null>(null);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    },
+    []
+  );
   const copyValue = value == null ? '' : String(value);
+  const isCopied = copiedValue === copyValue;
   const hasValue = copyValue.trim().length > 0;
 
   const handleCopy = async () => {
@@ -53,14 +49,17 @@ export function CopyableValue({
 
     isCopyingRef.current = true;
     setIsCopying(true);
+    setCopiedValue(null);
     try {
       if (!navigator.clipboard?.writeText) {
         throw new Error('Clipboard unavailable');
       }
       await navigator.clipboard.writeText(copyValue);
-      toast.success(`${label}${getSubjectParticle(label)} 복사되었습니다.`);
+      setCopiedValue(copyValue);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setCopiedValue(null), 2000);
     } catch {
-      toast.error(`${label} 복사에 실패했습니다.`);
+      setCopiedValue(null);
     } finally {
       isCopyingRef.current = false;
       setIsCopying(false);
@@ -72,16 +71,21 @@ export function CopyableValue({
       type='button'
       variant='ghost'
       size='icon-sm'
+      className='relative size-5 shrink-0 p-0'
       disabled={!hasValue || isCopying}
       aria-label={`${label} 복사`}
-      title={`${label} 복사`}
+      title={isCopied ? '복사됨' : `${label} 복사`}
       aria-busy={isCopying}
       onClick={(event) => {
         event.stopPropagation();
         void handleCopy();
       }}
     >
-      <Copy className='size-3.5' aria-hidden='true' />
+      {isCopied ? (
+        <Check className='size-3 text-green-600' aria-hidden='true' />
+      ) : (
+        <Copy className='size-3' aria-hidden='true' />
+      )}
     </Button>
   );
 
@@ -103,7 +107,7 @@ export function CopyableValue({
   return (
     <span
       className={cn(
-        'inline-flex max-w-full min-w-0 items-center gap-2 align-middle text-sm',
+        'inline-flex max-w-full min-w-0 items-center gap-1 align-middle text-sm',
         className
       )}
     >

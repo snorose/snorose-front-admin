@@ -365,7 +365,6 @@ export default function InquiryReportTable({
                         <CopyableValue
                           value={inquiry.postId}
                           label='게시글 ID'
-                          className='gap-1 text-sm [&_svg]:size-3'
                         />
                       </Table.Cell>
                       <Table.Cell className='px-3 text-center'>
