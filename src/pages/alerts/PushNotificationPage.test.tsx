@@ -21,7 +21,8 @@ vi.mock('sonner', () => ({
   },
 }));
 
-vi.mock('@/shared/utils', () => ({
+vi.mock('@/shared/utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/shared/utils')>()),
   getErrorMessage: vi.fn((_error, defaultMessage) => defaultMessage),
 }));
 
