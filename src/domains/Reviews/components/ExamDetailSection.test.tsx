@@ -522,7 +522,7 @@ describe('ExamDetailSection', () => {
     expect(onSaveSuccess).toHaveBeenCalledWith(updatedDetail);
   });
 
-  test('편집 모드에 들어가지 않고 파일명을 변경한다', async () => {
+  test('편집 모드가 아니면 파일명 변경을 차단한다', async () => {
     const user = userEvent.setup();
     const onFileNameChangeSuccess = vi.fn();
     render(
@@ -533,15 +533,13 @@ describe('ExamDetailSection', () => {
       />
     );
 
-    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
-    expect(screen.getByText('수정 대상 파일명: exam.pdf')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '파일명 저장' }));
-
-    expect(onFileNameChangeSuccess).toHaveBeenCalledWith(101, {
-      postId: 101,
-      fileName: 'renamed.pdf',
-      logs: [],
-    });
+    const renameButton = screen.getByRole('button', { name: '파일명 변경' });
+    expect(renameButton).toBeDisabled();
+    await user.click(renameButton);
+    expect(
+      screen.queryByText('수정 대상 파일명: exam.pdf')
+    ).not.toBeInTheDocument();
+    expect(onFileNameChangeSuccess).not.toHaveBeenCalled();
     expect(updateExamReview).not.toHaveBeenCalled();
     expect(
       screen.queryByRole('button', { name: '저장' })
@@ -566,7 +564,7 @@ describe('ExamDetailSection', () => {
     );
 
     const renameButton = screen.getByRole('button', { name: '파일명 변경' });
-    expect(renameButton).toBeEnabled();
+    expect(renameButton).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: '편집 모드' }));
     await user.click(screen.getByRole('button', { name: '확인 상태로 변경' }));
