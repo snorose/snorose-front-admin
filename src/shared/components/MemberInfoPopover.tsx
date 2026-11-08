@@ -83,7 +83,7 @@ export function MemberInfoPopover({
     if (!member) return;
 
     const params = new URLSearchParams({
-      keywordAuthor: member.loginId,
+      keywordAuthor: member.nickname,
       page: '1',
     });
     navigate(`${PATHS.POST_COMMENTS}?${params.toString()}`);
