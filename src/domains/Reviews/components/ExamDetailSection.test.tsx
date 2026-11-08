@@ -36,6 +36,7 @@ vi.mock('@/apis/reviews', () => ({
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
+    info: vi.fn(),
     error: vi.fn(),
   },
 }));
@@ -586,6 +587,62 @@ describe('ExamDetailSection', () => {
       });
     });
   });
+
+  test.each(['재시도', '취소'])(
+    '파일명 실패 후 %s해도 저장된 상세를 유지한다',
+    async (action) => {
+      const user = userEvent.setup();
+      const savedDetail = {
+        ...selectedExamReviewDetail,
+        isConfirmed: true,
+        memo: '저장된 메모',
+      };
+      const onSaveSuccess = vi.fn();
+      vi.mocked(updateExamReview).mockResolvedValue(savedDetail);
+      vi.mocked(renameExamReviewFile).mockRejectedValueOnce(
+        new Error('파일명 실패')
+      );
+      render(
+        <ExamDetailSection
+          selectedExamReview={selectedExamReview}
+          selectedExamReviewDetail={selectedExamReviewDetail}
+          onSaveSuccess={onSaveSuccess}
+        />
+      );
+      await user.click(screen.getByRole('button', { name: '편집 모드' }));
+      await user.click(
+        screen.getByRole('button', { name: '확인 상태로 변경' })
+      );
+      await user.click(screen.getByRole('button', { name: '파일명 변경' }));
+      await user.click(screen.getByRole('button', { name: '파일명 저장' }));
+      await user.click(screen.getByRole('button', { name: '저장' }));
+      await user.click(screen.getByRole('button', { name: '수정 확인' }));
+      await waitFor(() => expect(toast.info).toHaveBeenCalled());
+      expect(onSaveSuccess).toHaveBeenCalledWith(savedDetail);
+      if (action === '재시도') {
+        vi.mocked(renameExamReviewFile).mockResolvedValue({
+          postId: 101,
+          fileName: 'renamed.pdf',
+          logs: [],
+        });
+        await user.click(screen.getByRole('button', { name: '저장' }));
+        await user.click(screen.getByRole('button', { name: '수정 확인' }));
+        await waitFor(() =>
+          expect(onSaveSuccess).toHaveBeenLastCalledWith({
+            ...savedDetail,
+            fileName: 'renamed.pdf',
+            logs: [],
+          })
+        );
+      } else {
+        await user.click(screen.getByRole('button', { name: '취소' }));
+        expect(screen.getByText('현재 파일명: exam.pdf')).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: '편집 모드' }));
+        expect(screen.getByRole('button', { name: '저장' })).toBeDisabled();
+      }
+      expect(updateExamReview).toHaveBeenCalledTimes(1);
+    }
+  );
 
   test('필수값이 비어 있으면 시험후기 수정 API를 호출하지 않는다', async () => {
     const user = userEvent.setup();

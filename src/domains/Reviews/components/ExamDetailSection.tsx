@@ -169,7 +169,7 @@ const getRequiredFieldErrorMessage = (formData: FormData): string | null => {
 
 export function ExamDetailSection({
   selectedExamReview,
-  selectedExamReviewDetail,
+  selectedExamReviewDetail: detailFromProps,
   isLoadingDetail,
   originalPostUrl,
   onSaveSuccess,
@@ -177,6 +177,16 @@ export function ExamDetailSection({
   onDeleteSuccess,
   onRestoreSuccess,
 }: ExamDetailSectionProps = {}) {
+  const [savedSnapshot, setSavedSnapshot] = useState<{
+    source: ExamReviewDetailResult | null | undefined;
+    detail: ExamReviewDetailResult;
+  } | null>(null);
+  const selectedExamReviewDetail =
+    savedSnapshot &&
+    savedSnapshot.source === detailFromProps &&
+    savedSnapshot?.detail.postId === selectedExamReview?.id
+      ? savedSnapshot.detail
+      : detailFromProps;
   const [activeTab, setActiveTab] = useState<
     'review' | 'post' | 'comments' | 'logs'
   >('review');
@@ -544,6 +554,8 @@ export function ExamDetailSection({
           fileName: savedDetail.fileName,
         });
         setSelectedFile(null);
+        setSavedSnapshot({ source: detailFromProps, detail: savedDetail });
+        onSaveSuccess?.(savedDetail);
       }
       let updatedDetail = savedDetail;
       if (!selectedFile && formData.fileName !== initialValues.fileName) {
@@ -585,7 +597,10 @@ export function ExamDetailSection({
         questionDetail: formData.examTypeAndQuestions,
         fileName: updatedDetail.fileName,
       });
-      onSaveSuccess?.(updatedDetail);
+      setSavedSnapshot({ source: detailFromProps, detail: updatedDetail });
+      if (!hasDetailUpdate || updatedDetail !== savedDetail) {
+        onSaveSuccess?.(updatedDetail);
+      }
     } catch (error: unknown) {
       const errorMessage =
         (isAxiosError(error) && error.response?.data?.message) ||
