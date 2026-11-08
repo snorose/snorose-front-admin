@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
+  BookOpen,
   ChevronDown,
   FileText,
   Loader2,
@@ -78,7 +79,10 @@ export function MemberInfoPopover({
   };
 
   const handleActivityClick = async (
-    path: typeof PATHS.POST_MANAGE | typeof PATHS.POST_COMMENTS
+    path:
+      | typeof PATHS.POST_MANAGE
+      | typeof PATHS.POST_COMMENTS
+      | typeof PATHS.REVIEW_EXAM
   ) => {
     setIsPopoverOpen(false);
     const member = await fetchMemberInfo();
@@ -138,6 +142,12 @@ export function MemberInfoPopover({
           >
             <MessageSquare aria-hidden='true' />
             작성 댓글
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => void handleActivityClick(PATHS.REVIEW_EXAM)}
+          >
+            <BookOpen aria-hidden='true' />
+            작성 시험후기
           </DropdownMenu.Item>
           {onViewNotices && (
             <DropdownMenu.Item onSelect={onViewNotices}>
