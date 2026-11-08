@@ -77,7 +77,9 @@ export function MemberInfoPopover({
     if (member) setIsSanctionModalOpen(true);
   };
 
-  const handleCommentsClick = async () => {
+  const handleActivityClick = async (
+    path: typeof PATHS.POST_MANAGE | typeof PATHS.POST_COMMENTS
+  ) => {
     setIsPopoverOpen(false);
     const member = await fetchMemberInfo();
     if (!member) return;
@@ -86,7 +88,7 @@ export function MemberInfoPopover({
       keywordAuthor: member.nickname,
       page: '1',
     });
-    navigate(`${PATHS.POST_COMMENTS}?${params.toString()}`);
+    navigate(`${path}?${params.toString()}`);
   };
 
   return (
@@ -125,7 +127,15 @@ export function MemberInfoPopover({
             <UserRound aria-hidden='true' />
             회원 정보
           </DropdownMenu.Item>
-          <DropdownMenu.Item onSelect={() => void handleCommentsClick()}>
+          <DropdownMenu.Item
+            onSelect={() => void handleActivityClick(PATHS.POST_MANAGE)}
+          >
+            <FileText aria-hidden='true' />
+            작성 게시글
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => void handleActivityClick(PATHS.POST_COMMENTS)}
+          >
             <MessageSquare aria-hidden='true' />
             작성 댓글
           </DropdownMenu.Item>
