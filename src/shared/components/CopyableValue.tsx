@@ -72,7 +72,7 @@ export function CopyableValue({
       type='button'
       variant='ghost'
       size='icon-sm'
-      className={variant === 'inline' ? 'size-6 shrink-0 p-0' : undefined}
+      className='size-5 shrink-0 p-0'
       disabled={!hasValue || isCopying}
       aria-label={`${label} 복사`}
       title={`${label} 복사`}
@@ -82,7 +82,7 @@ export function CopyableValue({
         void handleCopy();
       }}
     >
-      <Copy className='size-3.5' aria-hidden='true' />
+      <Copy className='size-3' aria-hidden='true' />
     </Button>
   );
 
