@@ -73,7 +73,7 @@ export default function PenaltyUserInfo({
               </Label>
 
               {isCopy ? (
-                <div className='w-60'>
+                <div className='w-60 min-w-0'>
                   <CopyableValue
                     id={`${inputId}-${key}`}
                     variant='input'
