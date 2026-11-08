@@ -16,13 +16,13 @@ export function MemberEmailInfoTooltip() {
             variant='ghost'
             size='icon-sm'
             aria-label='이메일 변경 안내'
-            className='text-muted-foreground size-11 sm:size-8'
+            className='relative size-5 shrink-0 p-0 text-inherit hover:text-inherit'
             onClick={(event) => {
               event.preventDefault();
               setOpen(true);
             }}
           >
-            <InfoIcon className='size-4' aria-hidden='true' />
+            <InfoIcon className='size-3.5' aria-hidden='true' />
           </Button>
         </Tooltip.Trigger>
         <Tooltip.Content
