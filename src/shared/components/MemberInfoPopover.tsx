@@ -1,15 +1,18 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   ChevronDown,
   FileText,
   Loader2,
+  MessageSquare,
   ShieldAlert,
   UserRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { DropdownMenu } from '@/shared/components/ui';
+import { PATHS } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 import type { MemberInfo } from '@/shared/types';
 
@@ -35,6 +38,7 @@ export function MemberInfoPopover({
   onViewNotices,
   onViewMemberInfo,
 }: MemberInfoPopoverProps) {
+  const navigate = useNavigate();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [memberInfo, setMemberInfo] = useState<MemberInfo | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -73,6 +77,20 @@ export function MemberInfoPopover({
     if (member) setIsSanctionModalOpen(true);
   };
 
+  const handleActivityClick = async (
+    path: typeof PATHS.POST_MANAGE | typeof PATHS.POST_COMMENTS
+  ) => {
+    setIsPopoverOpen(false);
+    const member = await fetchMemberInfo();
+    if (!member) return;
+
+    const params = new URLSearchParams({
+      keywordAuthor: member.nickname,
+      page: '1',
+    });
+    navigate(`${path}?${params.toString()}`);
+  };
+
   return (
     <div className={cn('max-w-full min-w-0', className)}>
       <DropdownMenu open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -108,6 +126,18 @@ export function MemberInfoPopover({
           <DropdownMenu.Item onSelect={() => void handleInfoClick()}>
             <UserRound aria-hidden='true' />
             회원 정보
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => void handleActivityClick(PATHS.POST_MANAGE)}
+          >
+            <FileText aria-hidden='true' />
+            작성 게시글
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => void handleActivityClick(PATHS.POST_COMMENTS)}
+          >
+            <MessageSquare aria-hidden='true' />
+            작성 댓글
           </DropdownMenu.Item>
           {onViewNotices && (
             <DropdownMenu.Item onSelect={onViewNotices}>
