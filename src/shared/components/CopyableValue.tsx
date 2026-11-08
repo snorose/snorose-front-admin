@@ -72,6 +72,7 @@ export function CopyableValue({
       type='button'
       variant='ghost'
       size='icon-sm'
+      className={variant === 'inline' ? 'size-6 shrink-0 p-0' : undefined}
       disabled={!hasValue || isCopying}
       aria-label={`${label} 복사`}
       title={`${label} 복사`}
@@ -103,7 +104,7 @@ export function CopyableValue({
   return (
     <span
       className={cn(
-        'inline-flex max-w-full min-w-0 items-center gap-2 align-middle text-sm',
+        'inline-flex max-w-full min-w-0 items-center gap-1 align-middle text-sm',
         className
       )}
     >
