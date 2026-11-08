@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { Copy } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button, InputGroup } from '@/shared/components/ui';
@@ -45,7 +45,16 @@ export function CopyableValue({
 }: CopyableValueProps) {
   const [isCopying, setIsCopying] = useState(false);
   const isCopyingRef = useRef(false);
+  const [copiedValue, setCopiedValue] = useState<string | null>(null);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    },
+    []
+  );
   const copyValue = value == null ? '' : String(value);
+  const isCopied = copiedValue === copyValue;
   const hasValue = copyValue.trim().length > 0;
 
   const handleCopy = async () => {
@@ -53,11 +62,15 @@ export function CopyableValue({
 
     isCopyingRef.current = true;
     setIsCopying(true);
+    setCopiedValue(null);
     try {
       if (!navigator.clipboard?.writeText) {
         throw new Error('Clipboard unavailable');
       }
       await navigator.clipboard.writeText(copyValue);
+      setCopiedValue(copyValue);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setCopiedValue(null), 2000);
       toast.success(`${label}${getSubjectParticle(label)} 복사되었습니다.`);
     } catch {
       toast.error(`${label} 복사에 실패했습니다.`);
@@ -72,17 +85,21 @@ export function CopyableValue({
       type='button'
       variant='ghost'
       size='icon-sm'
-      className='size-5 shrink-0 p-0'
+      className='relative size-5 shrink-0 p-0'
       disabled={!hasValue || isCopying}
       aria-label={`${label} 복사`}
-      title={`${label} 복사`}
+      title={isCopied ? '복사됨' : `${label} 복사`}
       aria-busy={isCopying}
       onClick={(event) => {
         event.stopPropagation();
         void handleCopy();
       }}
     >
-      <Copy className='size-3' aria-hidden='true' />
+      {isCopied ? (
+        <Check className='size-3 text-green-600' aria-hidden='true' />
+      ) : (
+        <Copy className='size-3' aria-hidden='true' />
+      )}
     </Button>
   );
 

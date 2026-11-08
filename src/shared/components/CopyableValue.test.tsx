@@ -157,6 +157,30 @@ describe('CopyableValue', () => {
     }
   );
 
+  test('성공하면 복사됨과 체크를 표시하고 2초 후 복원한다', async () => {
+    vi.useFakeTimers();
+    try {
+      render(<CopyableValue value='snowrose' label='아이디' />);
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button'));
+      });
+      expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨');
+      expect(screen.getByRole('button').querySelector('svg')).toHaveClass(
+        'text-green-600'
+      );
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(screen.getByRole('button')).toHaveAttribute(
+        'title',
+        '아이디 복사'
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   test('복사 완료 전 중복 실행과 성공 안내를 막는다', async () => {
     let resolveCopy!: () => void;
     writeText.mockReturnValueOnce(
