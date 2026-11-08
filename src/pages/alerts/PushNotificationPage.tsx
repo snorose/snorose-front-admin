@@ -374,6 +374,44 @@ export default function PushNotificationPage() {
           <div className='flex flex-col gap-2'>
             <div className='flex items-center justify-between rounded-lg border bg-blue-50 p-4'>
               <div className='flex flex-col gap-2'>
+                <Label id={`${inputId}-send-time-label`} required>
+                  발송 시점
+                </Label>
+                <RadioGroup
+                  aria-labelledby={`${inputId}-send-time-label`}
+                  value='immediate'
+                  className='flex flex-col gap-1'
+                >
+                  <div className='flex items-center gap-3'>
+                    <RadioGroup.Item
+                      value='immediate'
+                      id={`${inputId}-send-immediate`}
+                    />
+                    <Label
+                      htmlFor={`${inputId}-send-immediate`}
+                      className='cursor-pointer font-normal'
+                    >
+                      즉시 발송
+                    </Label>
+                  </div>
+                  <div className='flex items-center gap-3'>
+                    <RadioGroup.Item
+                      value='scheduled'
+                      id={`${inputId}-send-scheduled`}
+                      disabled
+                    />
+                    <Label
+                      htmlFor={`${inputId}-send-scheduled`}
+                      className='text-muted-foreground cursor-not-allowed font-normal'
+                    >
+                      예약 발송 (준비 중)
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+            <div className='flex items-center justify-between rounded-lg border bg-blue-50 p-4'>
+              <div className='flex flex-col gap-2'>
                 <Label id={`${inputId}-isMarketing-label`} required>
                   메시지 유형
                 </Label>
