@@ -73,13 +73,14 @@ export default function PenaltyUserInfo({
               </Label>
 
               {isCopy ? (
-                <CopyableValue
-                  id={`${inputId}-${key}`}
-                  variant='input'
-                  className='w-60'
-                  value={rawValue == null ? undefined : String(rawValue)}
-                  label={label}
-                />
+                <div className='w-60'>
+                  <CopyableValue
+                    id={`${inputId}-${key}`}
+                    variant='input'
+                    value={rawValue == null ? undefined : String(rawValue)}
+                    label={label}
+                  />
+                </div>
               ) : (
                 <Input
                   id={`${inputId}-${key}`}
