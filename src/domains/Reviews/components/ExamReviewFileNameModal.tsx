@@ -1,20 +1,12 @@
 import { type RefObject, useId, useState } from 'react';
 
-import { isAxiosError } from 'axios';
-import { Loader2 } from 'lucide-react';
-
 import { Button, Dialog, InputGroup, Label } from '@/shared/components/ui';
 
-import type { RenameExamReviewFileResult } from '@/domains/Reviews/types';
-
-import { renameExamReviewFile } from '@/apis/reviews';
-
 interface ExamReviewFileNameModalProps {
-  postId: number;
   currentFileName: string;
   returnFocusRef: RefObject<HTMLButtonElement | null>;
   onClose: () => void;
-  onSuccess: (postId: number, result: RenameExamReviewFileResult) => void;
+  onApply: (fileName: string) => void;
 }
 
 const INVALID_FILE_NAME_CHARACTERS = [
@@ -39,11 +31,10 @@ const getExtension = (fileName: string) => {
 };
 
 export function ExamReviewFileNameModal({
-  postId,
   currentFileName,
   returnFocusRef,
   onClose,
-  onSuccess,
+  onApply,
 }: ExamReviewFileNameModalProps) {
   const inputId = useId();
   const helpId = `${inputId}-help`;
@@ -53,7 +44,6 @@ export function ExamReviewFileNameModal({
     extension ? currentFileName.slice(0, -extension.length) : currentFileName
   );
   const [errorMessage, setErrorMessage] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
   const trimmedFileName = newFileName.trim();
   const fullFileName = `${trimmedFileName}${extension}`;
   const hasInvalidCharacters = INVALID_FILE_NAME_CHARACTERS.some((character) =>
@@ -64,14 +54,12 @@ export function ExamReviewFileNameModal({
     : '';
   const visibleErrorMessage = invalidCharacterErrorMessage || errorMessage;
   const canSubmit =
-    !isSaving &&
     Boolean(trimmedFileName) &&
     fullFileName !== currentFileName &&
     !hasInvalidCharacters;
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSaving) return;
 
     if (!trimmedFileName) {
       setErrorMessage('파일명을 입력해주세요.');
@@ -85,28 +73,14 @@ export function ExamReviewFileNameModal({
       setErrorMessage(invalidCharacterErrorMessage);
       return;
     }
-    setIsSaving(true);
-    setErrorMessage('');
-    try {
-      const result = await renameExamReviewFile(postId, fullFileName);
-      onSuccess(postId, result);
-      onClose();
-    } catch (error: unknown) {
-      setErrorMessage(
-        (isAxiosError<{ message?: string }>(error) &&
-          error.response?.data?.message) ||
-          '파일명 변경에 실패했습니다. 다시 시도해주세요.'
-      );
-    } finally {
-      setIsSaving(false);
-    }
+    onApply(fullFileName);
+    onClose();
   };
 
   return (
-    <Dialog open onOpenChange={(open) => !open && !isSaving && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Content
         className='sm:max-w-md'
-        showCloseButton={!isSaving}
         onCloseAutoFocus={(event) => {
           event.preventDefault();
           returnFocusRef.current?.focus();
@@ -115,7 +89,7 @@ export function ExamReviewFileNameModal({
         <Dialog.Header>
           <Dialog.Title>파일명 변경</Dialog.Title>
           <Dialog.Description>
-            파일명은 다른 정보와 별도로 변경 즉시 저장됩니다.
+            적용한 파일명은 편집 모드에서 저장을 눌러야 반영됩니다.
           </Dialog.Description>
         </Dialog.Header>
         <form onSubmit={handleSubmit} className='space-y-4'>
@@ -127,7 +101,7 @@ export function ExamReviewFileNameModal({
           </div>
           <div className='space-y-1.5'>
             <Label htmlFor={inputId}>새 파일명</Label>
-            <InputGroup data-disabled={isSaving}>
+            <InputGroup>
               <InputGroup.Input
                 id={inputId}
                 value={newFileName}
@@ -140,7 +114,6 @@ export function ExamReviewFileNameModal({
                   visibleErrorMessage ? `${helpId} ${errorId}` : helpId
                 }
                 autoFocus
-                disabled={isSaving}
               />
               {extension && (
                 <InputGroup.Addon align='inline-end' className='shrink-0'>
@@ -159,17 +132,11 @@ export function ExamReviewFileNameModal({
             ) : null}
           </div>
           <Dialog.Footer>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={onClose}
-              disabled={isSaving}
-            >
+            <Button type='button' variant='outline' onClick={onClose}>
               취소
             </Button>
             <Button type='submit' disabled={!canSubmit}>
-              {isSaving && <Loader2 className='animate-spin' />}
-              {isSaving ? '변경 중' : '파일명 변경'}
+              적용
             </Button>
           </Dialog.Footer>
         </form>
