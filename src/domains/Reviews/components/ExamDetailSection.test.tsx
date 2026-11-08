@@ -546,10 +546,23 @@ describe('ExamDetailSection', () => {
   test('편집 중 파일명을 수정해도 작성 중인 변경사항을 유지한다', async () => {
     const user = userEvent.setup();
     const onFileNameChangeSuccess = vi.fn();
+    const onSaveSuccess = vi.fn();
+    const result = {
+      postId: 101,
+      fileName: 'renamed.pdf',
+      logs: [
+        {
+          encryptedAdminId: 'admin',
+          adminName: '관리자',
+          createdAt: '2026-11-08T00:00:00',
+          changes: { newFileName: 'renamed.pdf' },
+        },
+      ],
+    };
     vi.mocked(updateExamReview).mockResolvedValue({
       ...selectedExamReviewDetail,
       isConfirmed: true,
-      fileName: 'renamed.pdf',
+      fileName: 'exam.pdf',
     });
 
     render(
@@ -557,6 +570,7 @@ describe('ExamDetailSection', () => {
         selectedExamReview={selectedExamReview}
         selectedExamReviewDetail={selectedExamReviewDetail}
         onFileNameChangeSuccess={onFileNameChangeSuccess}
+        onSaveSuccess={onSaveSuccess}
       />
     );
 
@@ -572,11 +586,7 @@ describe('ExamDetailSection', () => {
     await user.click(screen.getByRole('button', { name: '파일명 저장' }));
     expect(onFileNameChangeSuccess).not.toHaveBeenCalled();
     expect(renameExamReviewFile).not.toHaveBeenCalled();
-    vi.mocked(renameExamReviewFile).mockResolvedValue({
-      postId: 101,
-      fileName: 'renamed.pdf',
-      logs: [],
-    });
+    vi.mocked(renameExamReviewFile).mockResolvedValue(result);
 
     expect(screen.getByText('현재 파일명: renamed.pdf')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '저장' }));
@@ -586,6 +596,65 @@ describe('ExamDetailSection', () => {
         post: { isConfirmed: true },
       });
     });
+    await waitFor(() => {
+      expect(renameExamReviewFile).toHaveBeenCalledExactlyOnceWith(
+        101,
+        'renamed.pdf'
+      );
+      expect(onFileNameChangeSuccess).toHaveBeenCalledExactlyOnceWith(
+        101,
+        result
+      );
+      expect(onSaveSuccess).toHaveBeenLastCalledWith({
+        ...selectedExamReviewDetail,
+        isConfirmed: true,
+        fileName: result.fileName,
+        logs: result.logs,
+      });
+    });
+  });
+
+  test('파일명만 변경하면 상세 수정 없이 파일명을 저장한다', async () => {
+    const user = userEvent.setup();
+    const onSaveSuccess = vi.fn();
+    const result = {
+      postId: 101,
+      fileName: 'renamed.pdf',
+      logs: [
+        {
+          encryptedAdminId: null,
+          adminName: '관리자',
+          createdAt: '2026-11-08T00:00:00',
+          changes: { newFileName: 'renamed.pdf' },
+        },
+      ],
+    };
+    vi.mocked(renameExamReviewFile).mockResolvedValue(result);
+    render(
+      <ExamDetailSection
+        selectedExamReview={selectedExamReview}
+        selectedExamReviewDetail={selectedExamReviewDetail}
+        onSaveSuccess={onSaveSuccess}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: '편집 모드' }));
+    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
+    await user.click(screen.getByRole('button', { name: '파일명 저장' }));
+    expect(renameExamReviewFile).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '저장' }));
+    await user.click(screen.getByRole('button', { name: '수정 확인' }));
+    await waitFor(() =>
+      expect(onSaveSuccess).toHaveBeenCalledExactlyOnceWith({
+        ...selectedExamReviewDetail,
+        fileName: result.fileName,
+        logs: result.logs,
+      })
+    );
+    expect(renameExamReviewFile).toHaveBeenCalledExactlyOnceWith(
+      101,
+      'renamed.pdf'
+    );
+    expect(updateExamReview).not.toHaveBeenCalled();
   });
 
   test.each(['재시도', '취소'])(
