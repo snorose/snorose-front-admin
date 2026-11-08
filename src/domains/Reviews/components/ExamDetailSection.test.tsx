@@ -18,6 +18,7 @@ import type {
 
 import {
   deleteExamReview,
+  renameExamReviewFile,
   restoreExamReview,
   updateExamReview,
 } from '@/apis/reviews';
@@ -28,6 +29,7 @@ vi.mock('@/apis/reviews', () => ({
   deleteExamReview: vi.fn(),
   downloadExamReviewFile: vi.fn(),
   restoreExamReview: vi.fn(),
+  renameExamReviewFile: vi.fn(),
   updateExamReview: vi.fn(),
 }));
 
@@ -73,25 +75,19 @@ vi.mock('@/domains/Reviews/components', () => ({
     </div>
   ),
   ExamReviewFileNameModal: ({
-    postId,
     currentFileName,
+    onApply,
     onClose,
-    onSuccess,
   }: {
-    postId: number;
     currentFileName: string;
+    onApply: (name: string) => void;
     onClose: () => void;
-    onSuccess: (
-      postId: number,
-      result: { postId: number; fileName: string; logs: [] }
-    ) => void;
   }) => (
     <div>
       <div>수정 대상 파일명: {currentFileName}</div>
       <button
-        type='button'
         onClick={() => {
-          onSuccess(postId, { postId, fileName: 'renamed.pdf', logs: [] });
+          onApply('renamed.pdf');
           onClose();
         }}
       >
@@ -555,7 +551,7 @@ describe('ExamDetailSection', () => {
       fileName: 'renamed.pdf',
     });
 
-    const { rerender } = render(
+    render(
       <ExamDetailSection
         selectedExamReview={selectedExamReview}
         selectedExamReviewDetail={selectedExamReviewDetail}
@@ -573,22 +569,13 @@ describe('ExamDetailSection', () => {
     await user.click(renameButton);
     expect(screen.getByText('수정 대상 파일명: exam.pdf')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '파일명 저장' }));
-    expect(onFileNameChangeSuccess).toHaveBeenCalledWith(101, {
+    expect(onFileNameChangeSuccess).not.toHaveBeenCalled();
+    expect(renameExamReviewFile).not.toHaveBeenCalled();
+    vi.mocked(renameExamReviewFile).mockResolvedValue({
       postId: 101,
       fileName: 'renamed.pdf',
       logs: [],
     });
-
-    rerender(
-      <ExamDetailSection
-        selectedExamReview={selectedExamReview}
-        selectedExamReviewDetail={{
-          ...selectedExamReviewDetail,
-          fileName: 'renamed.pdf',
-        }}
-        onFileNameChangeSuccess={onFileNameChangeSuccess}
-      />
-    );
 
     expect(screen.getByText('현재 파일명: renamed.pdf')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '저장' }));

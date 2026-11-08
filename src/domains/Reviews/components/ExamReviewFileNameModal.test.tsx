@@ -11,16 +11,15 @@ vi.mock('@/apis/reviews', () => ({
 }));
 
 const onClose = vi.fn();
-const onSuccess = vi.fn();
+const onApply = vi.fn();
 
 const renderModal = (currentFileName = '기존파일.pdf') =>
   render(
     <ExamReviewFileNameModal
-      postId={101}
       currentFileName={currentFileName}
       returnFocusRef={{ current: null }}
       onClose={onClose}
-      onSuccess={onSuccess}
+      onApply={onApply}
     />
   );
 
@@ -40,11 +39,11 @@ describe('ExamReviewFileNameModal', () => {
     expect(screen.getByText('.pdf')).toBeInTheDocument();
     await user.clear(input);
     await user.type(input, '새파일');
-    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
+    await user.click(screen.getByRole('button', { name: '적용' }));
 
     await waitFor(() => {
-      expect(renameExamReviewFile).toHaveBeenCalledWith(101, '새파일.pdf');
-      expect(onSuccess).toHaveBeenCalledWith(101, result);
+      expect(renameExamReviewFile).not.toHaveBeenCalled();
+      expect(onApply).toHaveBeenCalledWith('새파일.pdf');
       expect(onClose).toHaveBeenCalledOnce();
     });
   });
@@ -54,7 +53,7 @@ describe('ExamReviewFileNameModal', () => {
     renderModal();
 
     const input = screen.getByRole('textbox', { name: '새 파일명' });
-    const submitButton = screen.getByRole('button', { name: '파일명 변경' });
+    const submitButton = screen.getByRole('button', { name: '적용' });
     expect(submitButton).toBeDisabled();
     await user.clear(input);
     expect(submitButton).toBeDisabled();
@@ -90,34 +89,18 @@ describe('ExamReviewFileNameModal', () => {
       const input = screen.getByRole('textbox', { name: '새 파일명' });
       await user.clear(input);
       await user.type(input, newFileName);
-      await user.click(screen.getByRole('button', { name: '파일명 변경' }));
+      await user.click(screen.getByRole('button', { name: '적용' }));
 
       await waitFor(() => {
-        expect(renameExamReviewFile).toHaveBeenCalledWith(
-          101,
-          expectedFileName
-        );
+        expect(onApply).toHaveBeenCalledWith(expectedFileName);
       });
     }
   );
 
-  test('서버 오류가 나면 입력한 이름을 유지하고 오류를 보여준다', async () => {
-    const user = userEvent.setup();
-    vi.mocked(renameExamReviewFile).mockRejectedValue({
-      isAxiosError: true,
-      response: { data: { message: '이미 사용 중인 파일명입니다.' } },
-    });
+  test('취소하면 임시 파일명을 적용하지 않는다', async () => {
     renderModal();
-
-    const input = screen.getByRole('textbox', { name: '새 파일명' });
-    await user.clear(input);
-    await user.type(input, '새파일');
-    await user.click(screen.getByRole('button', { name: '파일명 변경' }));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      '이미 사용 중인 파일명입니다.'
-    );
-    expect(input).toHaveValue('새파일');
-    expect(onClose).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('button', { name: '취소' }));
+    expect(onApply).not.toHaveBeenCalled();
+    expect(renameExamReviewFile).not.toHaveBeenCalled();
   });
 });

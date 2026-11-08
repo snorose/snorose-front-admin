@@ -36,6 +36,7 @@ import {
 import {
   deleteExamReview,
   downloadExamReviewFile,
+  renameExamReviewFile,
   restoreExamReview,
   updateExamReview,
 } from '@/apis/reviews';
@@ -283,17 +284,7 @@ export function ExamDetailSection({
         isEditMode &&
         initializedPostIdRef.current === formInitialValues.postId
       ) {
-        setFormData((current) => ({
-          ...current,
-          fileName: selectedFile
-            ? current.fileName
-            : formInitialValues.fileName,
-        }));
-        setInitialValues((current) =>
-          current
-            ? { ...current, fileName: formInitialValues.fileName }
-            : formInitialValues.initialValues
-        );
+        // 편집 중인 임시 변경사항은 상세 재조회에도 유지한다.
       } else {
         setFormData({
           encryptedUserId: formInitialValues.encryptedUserId,
@@ -344,6 +335,7 @@ export function ExamDetailSection({
       formData.isOnline !== initialValues.isOnline ||
       formData.examType !== initialValues.examType ||
       formData.examTypeAndQuestions !== initialValues.questionDetail ||
+      formData.fileName !== initialValues.fileName ||
       selectedFile !== null
     );
   }, [formData, initialValues, selectedFile]);
@@ -390,6 +382,8 @@ export function ExamDetailSection({
       formData.examTypeAndQuestions
     );
     add('메모', initialValues.memo ?? '', formData.memo ?? '');
+
+    if (!selectedFile) add('파일명', initialValues.fileName, formData.fileName);
 
     if (selectedFile) {
       add('업로드 파일', initialValues.fileName || '', selectedFile.name);
@@ -537,19 +531,41 @@ export function ExamDetailSection({
       const hasDetailUpdate =
         Object.keys(post).length > 0 || Boolean(selectedFile);
 
-      if (!hasDetailUpdate) {
-        return;
+      let savedDetail = selectedExamReviewDetail;
+      if (hasDetailUpdate) {
+        savedDetail = await updateExamReview(selectedExamReview.id, {
+          ...(selectedFile ? { file: selectedFile } : {}),
+          post,
+        });
+        // 상세 저장 성공분을 보존하여 파일명 저장 실패 시 중복 전송하지 않는다.
+        setInitialValues({
+          ...formData,
+          questionDetail: formData.examTypeAndQuestions,
+          fileName: savedDetail.fileName,
+        });
+        setSelectedFile(null);
       }
-
-      const updateData: UpdateExamReviewRequest = {
-        ...(selectedFile ? { file: selectedFile } : {}),
-        post,
-      };
-
-      const updatedDetail = await updateExamReview(
-        selectedExamReview.id,
-        updateData
-      );
+      let updatedDetail = savedDetail;
+      if (!selectedFile && formData.fileName !== initialValues.fileName) {
+        try {
+          const result = await renameExamReviewFile(
+            selectedExamReview.id,
+            formData.fileName
+          );
+          updatedDetail = {
+            ...savedDetail,
+            fileName: result.fileName,
+            logs: result.logs,
+          };
+          onFileNameChangeSuccess?.(selectedExamReview.id, result);
+        } catch (error) {
+          if (hasDetailUpdate)
+            toast.info(
+              '다른 정보는 저장되었습니다. 파일명은 다시 저장해주세요.'
+            );
+          throw error;
+        }
+      }
 
       toast.success('시험 후기가 성공적으로 수정되었습니다.');
       setSelectedFile(null);
@@ -817,6 +833,7 @@ export function ExamDetailSection({
                       onFileDownload={handleFileDownload}
                       onFileNameRename={() => setIsFileNameModalOpen(true)}
                       canRenameFileName={
+                        !selectedFile &&
                         isEditMode &&
                         !isDisabled &&
                         !isSaving &&
@@ -887,14 +904,12 @@ export function ExamDetailSection({
         selectedExamReviewDetail?.fileName && (
           <ExamReviewFileNameModal
             key={selectedExamReview.id}
-            postId={selectedExamReview.id}
-            currentFileName={selectedExamReviewDetail.fileName}
+            currentFileName={formData.fileName}
             returnFocusRef={renameButtonRef}
             onClose={() => setIsFileNameModalOpen(false)}
-            onSuccess={(postId, result) => {
-              toast.success('파일명이 변경되었습니다.');
-              onFileNameChangeSuccess?.(postId, result);
-            }}
+            onApply={(fileName) =>
+              setFormData((current) => ({ ...current, fileName }))
+            }
           />
         )}
 
