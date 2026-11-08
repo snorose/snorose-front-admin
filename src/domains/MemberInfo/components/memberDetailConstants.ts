@@ -32,6 +32,13 @@ export const DETAIL_SHORTCUTS: DetailShortcut[] = [
       `${PATHS.POST_COMMENTS}?searchScope=CONTENT&keywordAuthor=${encodeURIComponent(nickname)}&page=1`,
   },
   {
+    title: '작성한 시험후기 조회',
+    description: '해당 회원이 작성한 시험후기를 조회합니다.',
+    icon: BookOpen,
+    getHref: (nickname) =>
+      `${PATHS.REVIEW_EXAM}?keywordAuthor=${encodeURIComponent(nickname)}&page=1`,
+  },
+  {
     title: '다운로드 받은 시험후기',
     description: '다운로드 이력 API 연동 후 제공됩니다.',
     icon: Download,

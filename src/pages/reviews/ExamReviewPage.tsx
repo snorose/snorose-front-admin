@@ -45,6 +45,9 @@ export default function ExamReviewPage() {
   const titleId = useId();
   const queryClient = useQueryClient();
   const [searchParamsFromUrl, setSearchParamsFromUrl] = useSearchParams();
+  const searchFormParams = new URLSearchParams(searchParamsFromUrl);
+  searchFormParams.delete('page');
+  searchFormParams.sort();
   const [selectedExamReview, setSelectedExamReview] =
     useState<ExamReview | null>(null);
   const {
@@ -411,6 +414,7 @@ export default function ExamReviewPage() {
 
       <div className='flex min-w-0 flex-col gap-6'>
         <ExamSearch
+          key={searchFormParams.toString()}
           onSearchChange={handleSearchChange}
           initialEndDate={searchParamsFromUrl.get('endDate') || ''}
           initialKeywordAuthor={searchParamsFromUrl.get('keywordAuthor') || ''}
