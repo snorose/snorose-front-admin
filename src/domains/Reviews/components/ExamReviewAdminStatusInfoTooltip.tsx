@@ -24,7 +24,7 @@ export function ExamReviewAdminStatusInfoTooltip({
             variant='ghost'
             size='icon-sm'
             aria-label={label}
-            className='text-muted-foreground relative size-5 shrink-0 p-0 after:absolute after:-inset-2.5 sm:after:-inset-1'
+            className='relative size-5 shrink-0 p-0 text-inherit after:absolute after:-inset-2.5 hover:text-inherit sm:after:-inset-1'
             onClick={(event) => {
               // Radix의 기본 클릭 닫기를 막아 터치로도 설명을 열 수 있게 한다.
               event.preventDefault();

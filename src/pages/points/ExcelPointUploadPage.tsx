@@ -243,7 +243,7 @@ function RowNumberColumnHead() {
               variant='ghost'
               size='icon-sm'
               aria-label='행 번호 안내'
-              className='relative size-5 shrink-0 p-0'
+              className='relative size-5 shrink-0 p-0 text-inherit hover:text-inherit'
             >
               <Info className='size-3.5' aria-hidden />
             </Button>

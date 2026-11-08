@@ -16,7 +16,7 @@ export function MemberEmailInfoTooltip() {
             variant='ghost'
             size='icon-sm'
             aria-label='이메일 변경 안내'
-            className='text-muted-foreground relative size-5 shrink-0 p-0'
+            className='relative size-5 shrink-0 p-0 text-inherit hover:text-inherit'
             onClick={(event) => {
               event.preventDefault();
               setOpen(true);
