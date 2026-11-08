@@ -124,9 +124,6 @@ export default function ExamSearch({
   initialStatuses,
 }: ExamSearchProps) {
   const dateId = useId();
-  // key prop을 사용하여 prop 변경 시 컴포넌트 재초기화 (useEffect 대신)
-  const searchKey = `${initialStartDate}-${initialEndDate}-${initialKeywordAuthor}-${initialKeywordPost}-${initialSort}-${initialSemester}-${initialExamType}-${initialIsConfirmed}-${initialIsDiscussed}-${initialIsReported}-${initialStatuses}`;
-
   // 내부 상태는 사용자 입력용으로만 사용
   const [startDate, setStartDate] = useState<string>(initialStartDate);
   const [endDate, setEndDate] = useState<string>(initialEndDate);
@@ -342,7 +339,6 @@ export default function ExamSearch({
 
   return (
     <section
-      key={searchKey}
       aria-labelledby={`${dateId}-heading`}
       className='flex w-full min-w-0 flex-col gap-1'
     >
