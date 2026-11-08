@@ -1,22 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Check, Copy } from 'lucide-react';
-import { toast } from 'sonner';
 
 import { Button, InputGroup } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
-
-/** 항목명 끝 글자의 받침에 따라 조사 '이/가'를 고른다. */
-function getSubjectParticle(label: string) {
-  const lastCharacter = label
-    .trim()
-    .replace(/[)\]]+$/, '')
-    .slice(-1);
-  const code = lastCharacter.charCodeAt(0);
-  const hasFinalConsonant =
-    code >= 0xac00 && code <= 0xd7a3 && (code - 0xac00) % 28 !== 0;
-  return hasFinalConsonant ? '이' : '가';
-}
 
 export type CopyableValueProps = {
   value: string | number | null | undefined;
@@ -30,7 +17,7 @@ export type CopyableValueProps = {
 };
 
 /**
- * 값 표시와 복사 버튼, 복사 결과 토스트를 제공한다.
+ * 값 표시와 복사 버튼, 복사 완료 상태를 제공한다.
  *
  * - inline(기본): 텍스트 옆에 복사 버튼
  * - input: 실제 읽기 전용 입력과 오른쪽 복사 버튼
@@ -71,9 +58,8 @@ export function CopyableValue({
       setCopiedValue(copyValue);
       if (resetTimer.current) clearTimeout(resetTimer.current);
       resetTimer.current = setTimeout(() => setCopiedValue(null), 2000);
-      toast.success(`${label}${getSubjectParticle(label)} 복사되었습니다.`);
     } catch {
-      toast.error(`${label} 복사에 실패했습니다.`);
+      setCopiedValue(null);
     } finally {
       isCopyingRef.current = false;
       setIsCopying(false);

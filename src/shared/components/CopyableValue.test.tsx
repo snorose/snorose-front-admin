@@ -37,21 +37,15 @@ afterEach(() => {
 });
 
 describe('CopyableValue', () => {
-  test.each([
-    ['아이디', '아이디가 복사되었습니다.'],
-    ['학번', '학번이 복사되었습니다.'],
-    ['게시글 ID', '게시글 ID가 복사되었습니다.'],
-    ['회원 ID (암호화)', '회원 ID (암호화)가 복사되었습니다.'],
-  ])(
-    '복사 성공 시 %s 항목명에 맞는 조사를 안내한다',
-    async (label, message) => {
-      render(<CopyableValue value='original' label={label} />);
-      fireEvent.click(screen.getByRole('button', { name: `${label} 복사` }));
-      await waitFor(() =>
-        expect(toast.success).toHaveBeenCalledExactlyOnceWith(message)
-      );
-    }
-  );
+  test('복사 성공 시 토스트 없이 완료 상태를 표시한다', async () => {
+    render(<CopyableValue value='original' label='아이디' />);
+    fireEvent.click(screen.getByRole('button'));
+    await waitFor(() =>
+      expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨')
+    );
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
 
   test('입력형은 읽기 전용 input에 라벨을 연결하고 키보드로 원문을 복사한다', async () => {
     const user = userEvent.setup();
@@ -81,7 +75,9 @@ describe('CopyableValue', () => {
     expect(screen.getByRole('button', { name: '회원 ID 복사' })).toHaveFocus();
     await user.keyboard('{Enter}');
     expect(clipboardSpy).toHaveBeenCalledWith('encrypted-original');
-    await waitFor(() => expect(toast.success).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨')
+    );
     clipboardSpy.mockRestore();
   });
 
@@ -98,9 +94,7 @@ describe('CopyableValue', () => {
       fireEvent.click(screen.getByRole('button', { name: '아이디 복사' }));
       expect(writeText).toHaveBeenCalledExactlyOnceWith(String(value));
       await waitFor(() =>
-        expect(toast.success).toHaveBeenCalledExactlyOnceWith(
-          '아이디가 복사되었습니다.'
-        )
+        expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨')
       );
     }
   );
@@ -130,7 +124,9 @@ describe('CopyableValue', () => {
       'encrypted-original'
     );
     fireEvent.click(screen.getByRole('button'));
-    await waitFor(() => expect(toast.success).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨')
+    );
     expect(writeText).toHaveBeenCalledWith('encrypted-original');
   });
 
@@ -147,11 +143,8 @@ describe('CopyableValue', () => {
       }
       render(<CopyableValue value='snowrose' label='아이디' />);
       fireEvent.click(screen.getByRole('button'));
-      await waitFor(() =>
-        expect(toast.error).toHaveBeenCalledExactlyOnceWith(
-          '아이디 복사에 실패했습니다.'
-        )
-      );
+      await waitFor(() => expect(screen.getByRole('button')).toBeEnabled());
+      expect(toast.error).not.toHaveBeenCalled();
       expect(toast.success).not.toHaveBeenCalled();
       expect(screen.getByRole('button')).toBeEnabled();
     }
@@ -198,7 +191,7 @@ describe('CopyableValue', () => {
     expect(toast.success).not.toHaveBeenCalled();
     await act(async () => resolveCopy());
     expect(button).toBeEnabled();
-    expect(toast.success).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨');
   });
 
   test('값 클릭은 복사하지 않고 아이콘 클릭은 부모 클릭·폼 제출을 막는다', async () => {
@@ -213,7 +206,9 @@ describe('CopyableValue', () => {
     expect(writeText).not.toHaveBeenCalled();
     onClick.mockClear();
     fireEvent.click(screen.getByRole('button'));
-    await waitFor(() => expect(toast.success).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(screen.getByRole('button')).toHaveAttribute('title', '복사됨')
+    );
     expect(onClick).not.toHaveBeenCalled();
     expect(onSubmit).not.toHaveBeenCalled();
   });
