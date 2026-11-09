@@ -187,6 +187,55 @@ afterEach(() => {
 });
 
 describe('실제 목록 조회 경로', () => {
+  test('하위 게시판은 대분류에 따라 활성화하고 대분류 변경 시 이전 선택을 지운다', async () => {
+    const user = userEvent.setup();
+    const router = renderPage('/notices/general?status=published&sort=views');
+    await screen.findByText('서버 공지 11', { exact: true });
+    const group = () => screen.getByRole('combobox', { name: '게시판' });
+    const subBoard = () =>
+      screen.getByRole('combobox', { name: '하위 게시판' });
+    const params = () => new URLSearchParams(router.state.location.search);
+    expect(subBoard()).toBeDisabled();
+    await user.type(screen.getByLabelText('게시글 검색'), '미적용 검색어');
+    await user.click(group());
+    await user.click(screen.getByRole('option', { name: '커뮤니티' }));
+    expect(subBoard()).toBeEnabled();
+    expect(subBoard()).toHaveTextContent('전체');
+    await user.click(subBoard());
+    await user.click(screen.getByRole('option', { name: '첫눈온방' }));
+    expect(params().get('board')).toBe('첫눈온방');
+    expect(screen.getAllByRole('row')).toHaveLength(11);
+    await user.click(group());
+    await user.click(screen.getByRole('option', { name: '공식 게시판' }));
+    expect(subBoard()).toHaveTextContent('전체');
+    expect(params().get('board')).toBeNull();
+    await user.click(subBoard());
+    expect(
+      screen.queryByRole('option', { name: '첫눈온방' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: '총학생회' }));
+    await user.click(group());
+    await user.click(screen.getByRole('option', { name: '공지사항' }));
+    expect(subBoard()).toBeDisabled();
+    expect(subBoard()).toHaveTextContent('해당 없음');
+    expect(params().get('board')).toBe('공지사항');
+    await user.click(group());
+    await user.click(screen.getByRole('option', { name: '커뮤니티' }));
+    expect(subBoard()).toBeEnabled();
+    expect(subBoard()).toHaveTextContent('전체');
+    expect(params().get('board')).toBeNull();
+    await user.click(group());
+    await user.click(screen.getByRole('option', { name: '전체' }));
+    expect(subBoard()).toBeDisabled();
+    expect(params().get('group')).toBeNull();
+    expect(params().get('board')).toBeNull();
+    expect(params().get('status')).toBe('published');
+    expect(params().get('sort')).toBe('views');
+    expect(params().get('keyword')).toBeNull();
+    expect(screen.getByLabelText('게시글 검색')).toHaveValue('미적용 검색어');
+    expect(axiosInstance.get).toHaveBeenCalledTimes(3);
+  });
+
   test('같은 작성자의 공지를 다시 선택해도 미적용 검색어를 지우고 닉네임을 다시 표시한다', async () => {
     const user = userEvent.setup();
     const router = renderPage('/notices/general?keywordAuthor=운영리자&page=1');
@@ -220,8 +269,10 @@ describe('실제 목록 조회 경로', () => {
       )
     ).not.toBeInTheDocument();
     await user.type(screen.getByLabelText('게시글 검색'), '서버 공지 1');
-    await user.click(screen.getByRole('button', { name: '커뮤니티' }));
-    await user.click(screen.getByRole('button', { name: '게시' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '커뮤니티' }));
+    await user.click(screen.getByRole('combobox', { name: '상태' }));
+    await user.click(screen.getByRole('option', { name: '게시' }));
     await user.click(screen.getByRole('combobox', { name: '정렬' }));
     await user.click(screen.getByRole('option', { name: '조회수순' }));
     expect(
@@ -248,6 +299,22 @@ describe('실제 목록 조회 경로', () => {
     });
     expect(screen.getAllByRole('row')).toHaveLength(6);
     expect(axiosInstance.get).toHaveBeenCalledTimes(3);
+    await user.click(screen.getByRole('combobox', { name: '상태' }));
+    await user.click(screen.getByRole('option', { name: '전체' }));
+    expect(
+      new URLSearchParams(router.state.location.search).get('status')
+    ).toBeNull();
+    await user.click(screen.getByRole('combobox', { name: '구분' }));
+    await user.click(screen.getByRole('option', { name: '일반' }));
+    expect(new URLSearchParams(router.state.location.search).get('kind')).toBe(
+      'normal'
+    );
+    await user.click(screen.getByRole('combobox', { name: '구분' }));
+    await user.click(screen.getByRole('option', { name: '전체' }));
+    const cleared = new URLSearchParams(router.state.location.search);
+    expect(cleared.get('kind')).toBeNull();
+    expect(cleared.get('sort')).toBe('views');
+    expect(cleared.get('keyword')).toBe('서버 공지 1');
   });
 
   test('시작·종료일과 정렬을 바꾸면 검색 버튼 없이 조합하고 날짜 해제 시에도 정렬을 유지한다', async () => {
@@ -437,7 +504,8 @@ describe('실제 목록 조회 경로', () => {
     const router = renderPage();
     await screen.findByText('서버 공지 1', { exact: true });
     expect(screen.getAllByText('NEW', { selector: 'span' })).toHaveLength(10);
-    await user.click(screen.getByRole('button', { name: 'NEW' }));
+    await user.click(screen.getByRole('combobox', { name: '구분' }));
+    await user.click(screen.getByRole('option', { name: 'NEW' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getByText('11', { selector: 'span' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));

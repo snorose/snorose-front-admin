@@ -17,7 +17,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 
 import { AuthContext } from '@/shared/contexts';
 import type { AuthContextType } from '@/shared/types';
@@ -91,6 +91,13 @@ function renderNotices(
   );
   return { ...render(<RouterProvider router={router} />), router };
 }
+
+beforeAll(() => {
+  HTMLElement.prototype.hasPointerCapture = () => false;
+  HTMLElement.prototype.setPointerCapture = () => undefined;
+  HTMLElement.prototype.releasePointerCapture = () => undefined;
+  HTMLElement.prototype.scrollIntoView = () => undefined;
+});
 
 afterEach(() => {
   cleanup();
@@ -377,10 +384,12 @@ describe('공지 조회와 작성 흐름', () => {
     expect(screen.getAllByRole('row')).toHaveLength(11);
     await user.click(screen.getByRole('link', { name: '2' }));
     expect(screen.getAllByRole('row')).toHaveLength(11);
-    await user.click(screen.getByRole('button', { name: '커뮤니티' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '커뮤니티' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getAllByRole('row')).toHaveLength(4);
-    await user.click(screen.getByRole('button', { name: '함박눈방' }));
+    await user.click(screen.getByRole('combobox', { name: '하위 게시판' }));
+    await user.click(screen.getByRole('option', { name: '함박눈방' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getAllByRole('row')).toHaveLength(2);
     await user.type(screen.getByLabelText('게시글 검색'), '없는 검색어');
@@ -393,10 +402,12 @@ describe('공지 조회와 작성 흐름', () => {
     expect(
       screen.queryByRole('button', { name: '스노로즈' })
     ).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '공지사항' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '공지사항' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getByRole('status')).toHaveTextContent('2');
-    await user.click(screen.getByRole('button', { name: '이벤트' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '이벤트' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getAllByRole('row')).toHaveLength(3);
     expect(

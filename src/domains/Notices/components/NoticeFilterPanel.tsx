@@ -1,8 +1,8 @@
 import { type KeyboardEvent, useId, useState } from 'react';
 
-import { Search } from 'lucide-react';
+import { Pin, Search } from 'lucide-react';
 
-import { DatePicker, SectionTitle } from '@/shared/components';
+import { DatePicker, SectionTitle, StatusBadge } from '@/shared/components';
 import {
   Button,
   Input,
@@ -11,9 +11,12 @@ import {
   Select,
 } from '@/shared/components/ui';
 
-import { NOTICE_STATUS_LABELS } from '../constants';
+import {
+  NOTICE_BOARD_GROUPS,
+  NOTICE_STATUS_LABELS,
+  NOTICE_STATUS_TONES,
+} from '../constants';
 import type { NoticeFilters, NoticeStatus } from '../types';
-import NoticeBoardSelect from './NoticeBoardSelect';
 
 interface NoticeFilterPanelProps {
   initialFilters: NoticeFilters;
@@ -33,6 +36,10 @@ export default function NoticeFilterPanel({
     author: initialFilters.author,
   }));
   const filters = { ...initialFilters, ...searchFields };
+  const selectedGroup = NOTICE_BOARD_GROUPS.find(
+    (group) => group.label === filters.group
+  );
+  const hasSubBoards = !!selectedGroup && selectedGroup.boards.length > 1;
   // 선택형 조건은 즉시 적용하되 아직 검색하지 않은 텍스트까지 적용하지 않습니다.
   const updateFilters = (updates: NoticeFilters) =>
     onFilterChange({ ...initialFilters, ...updates });
@@ -148,13 +155,71 @@ export default function NoticeFilterPanel({
             </div>
           </fieldset>
         </div>
-        <NoticeBoardSelect
-          allowAll
-          group={filters.group ?? ''}
-          board={filters.board ?? ''}
-          onChange={(group, board) => updateFilters({ group, board })}
-        />
-        <div className='grid min-w-0 grid-cols-1 gap-4 @md:grid-cols-2 @5xl:grid-cols-3'>
+        <div className='grid min-w-0 grid-cols-1 items-end gap-4 @md:grid-cols-2 @3xl:grid-cols-5'>
+          <div className='flex min-w-0 flex-col gap-1'>
+            <Label htmlFor='notice-board-group'>게시판</Label>
+            <Select
+              value={filters.group || 'all'}
+              onValueChange={(value) => {
+                const group = NOTICE_BOARD_GROUPS.find(
+                  (item) => item.label === value
+                );
+                updateFilters({
+                  group: group?.label ?? '',
+                  board: group?.boards.length === 1 ? group.boards[0] : '',
+                });
+              }}
+            >
+              <Select.Trigger
+                type='button'
+                id='notice-board-group'
+                className='h-9 w-full min-w-0 shadow-none'
+              >
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content align='start'>
+                <Select.Item value='all'>전체</Select.Item>
+                {NOTICE_BOARD_GROUPS.map((group) => (
+                  <Select.Item
+                    key={group.label}
+                    value={group.label}
+                    textValue={group.label}
+                  >
+                    <StatusBadge tone='outline'>{group.label}</StatusBadge>
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+          </div>
+          <div className='flex min-w-0 flex-col gap-1'>
+            <Label htmlFor='notice-sub-board'>하위 게시판</Label>
+            <Select
+              disabled={!hasSubBoards}
+              value={hasSubBoards ? filters.board || 'all' : ''}
+              onValueChange={(board) =>
+                updateFilters({ board: board === 'all' ? '' : board })
+              }
+            >
+              <Select.Trigger
+                type='button'
+                id='notice-sub-board'
+                className='h-9 w-full min-w-0 shadow-none'
+              >
+                <Select.Value
+                  placeholder={selectedGroup ? '해당 없음' : '게시판 선택'}
+                />
+              </Select.Trigger>
+              <Select.Content align='start'>
+                <Select.Item value='all'>전체</Select.Item>
+                {hasSubBoards &&
+                  selectedGroup.boards.map((board) => (
+                    <Select.Item key={board} value={board} textValue={board}>
+                      <StatusBadge tone='outline'>{board}</StatusBadge>
+                    </Select.Item>
+                  ))}
+              </Select.Content>
+            </Select>
+          </div>
           <div className='flex min-w-0 flex-col gap-1'>
             <Label htmlFor='notice-sort'>정렬</Label>
             <Select
@@ -183,62 +248,91 @@ export default function NoticeFilterPanel({
               </Select.Content>
             </Select>
           </div>
-          <fieldset className='min-w-0'>
-            <legend className='mb-1 py-1 text-sm leading-none font-semibold text-gray-700'>
-              상태
-            </legend>
-            <div className='flex flex-wrap gap-2'>
-              <Button
+          <div className='flex min-w-0 flex-col gap-1'>
+            <Label htmlFor='notice-status'>상태</Label>
+            <Select
+              value={filters.status || 'all'}
+              onValueChange={(status) =>
+                updateFilters({ status: status === 'all' ? '' : status })
+              }
+            >
+              <Select.Trigger
                 type='button'
-                size='sm'
-                variant={!filters.status ? 'default' : 'outline'}
-                aria-pressed={!filters.status}
-                onClick={() => updateFilters({ status: '' })}
+                id='notice-status'
+                className='h-9 w-full min-w-0 shadow-none'
               >
-                전체
-              </Button>
-              {(Object.keys(NOTICE_STATUS_LABELS) as NoticeStatus[]).map(
-                (status) => (
-                  <Button
-                    key={status}
-                    type='button'
-                    size='sm'
-                    variant={filters.status === status ? 'default' : 'outline'}
-                    aria-pressed={filters.status === status}
-                    onClick={() => updateFilters({ status })}
-                  >
-                    {NOTICE_STATUS_LABELS[status]}
-                  </Button>
-                )
-              )}
-            </div>
-          </fieldset>
-          <fieldset className='min-w-0'>
-            <legend className='mb-1 py-1 text-sm leading-none font-semibold text-gray-700'>
-              구분
-            </legend>
-            <div className='flex flex-wrap gap-2'>
-              {[
-                ['', '전체'],
-                ['new', 'NEW'],
-                ['pinned', '핀 고정'],
-                ['normal', '일반'],
-              ].map(([kind, label]) => (
-                <Button
-                  key={kind}
-                  type='button'
-                  size='sm'
-                  variant={
-                    (filters.kind || '') === kind ? 'default' : 'outline'
-                  }
-                  aria-pressed={(filters.kind || '') === kind}
-                  onClick={() => updateFilters({ kind })}
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-          </fieldset>
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content align='start'>
+                <Select.Item value='all'>전체</Select.Item>
+                {(Object.keys(NOTICE_STATUS_LABELS) as NoticeStatus[]).map(
+                  (status) => (
+                    <Select.Item
+                      key={status}
+                      value={status}
+                      textValue={NOTICE_STATUS_LABELS[status]}
+                    >
+                      {status === 'private' ? (
+                        <span className='rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-red-600'>
+                          {NOTICE_STATUS_LABELS[status]}
+                        </span>
+                      ) : (
+                        <StatusBadge tone={NOTICE_STATUS_TONES[status]}>
+                          {NOTICE_STATUS_LABELS[status]}
+                        </StatusBadge>
+                      )}
+                    </Select.Item>
+                  )
+                )}
+              </Select.Content>
+            </Select>
+          </div>
+          <div className='flex min-w-0 flex-col gap-1 @md:col-span-2 @3xl:col-span-1'>
+            <Label htmlFor='notice-kind'>구분</Label>
+            <Select
+              value={filters.kind || 'all'}
+              onValueChange={(kind) =>
+                updateFilters({ kind: kind === 'all' ? '' : kind })
+              }
+            >
+              <Select.Trigger
+                type='button'
+                id='notice-kind'
+                className='h-9 w-full min-w-0 shadow-none'
+              >
+                <Select.Value />
+              </Select.Trigger>
+              <Select.Content align='start'>
+                {[
+                  ['all', '전체'],
+                  ['new', 'NEW'],
+                  ['pinned', '핀 고정'],
+                  ['normal', '일반'],
+                ].map(([kind, label]) => (
+                  <Select.Item key={kind} value={kind} textValue={label}>
+                    {kind === 'all' ? (
+                      label
+                    ) : (
+                      <StatusBadge
+                        tone={
+                          kind === 'new'
+                            ? 'danger'
+                            : kind === 'pinned'
+                              ? 'accent'
+                              : 'neutral'
+                        }
+                      >
+                        {kind === 'pinned' && (
+                          <Pin className='size-3' aria-hidden='true' />
+                        )}
+                        {label}
+                      </StatusBadge>
+                    )}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+          </div>
         </div>
         <div className='flex flex-col gap-3 @md:flex-row @md:items-center'>
           <div className='flex gap-2 @md:ml-auto'>
