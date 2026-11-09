@@ -20,6 +20,7 @@ E2E_SLOW_MO=500 npm run test:e2e:headed -- e2e/features/points/points.read.spec.
 
 ## 기능별 문서
 
+- [공지](./features/notices/README.md): 목록·검색·이미지 임시저장·즉시 게시·예약 자동 공개·실제 동영상 업로드와 QA 데이터 기록
 - [FAQ](./features/faqs/README.md): 목록·페이지 이동·입력 검증·취소·실제 작성·수정·삭제와 생성 데이터 정리
 - [포인트](./features/points/README.md): 단일건 지급·차감, 미지급 일정 관리, 엑셀 업로드 테스트와 QA 설정·데이터 정리·TC 목록
 - [문의·신고 QA TC](../docs/inquiry-report-admin-test-cases.md): 기존 상세 TC와 실행 결과

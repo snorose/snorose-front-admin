@@ -5,7 +5,8 @@
 어드민 E2E는 mock 없이 실제 화면, dev API, dev DB를 연결해 검증합니다.
 
 - 브라우저: Chromium
-- 어드민 주소: `http://localhost:5173`
+- E2E 서버 주소: `http://localhost:3000`
+- 일반 개발 서버: `npm run dev`의 기존 5173 포트 유지
 - API: `https://dev.snorose.com`
 - 실행 순서: 실제 로그인 → 인증 상태 저장 → read/write TC 실행
 - 실행 방식: 충돌 방지를 위해 worker 1개로 순차 실행
@@ -195,12 +196,12 @@ Playwright 설정이 `features/**/*.read.spec.ts`와 `features/**/*.write.spec.t
 
 ### 로그인 단계에서 CORS 오류가 발생하는 경우
 
-Playwright는 `5173` 포트에서 실행하도록 설정되어 있습니다. 브라우저 콘솔에 CORS 오류가 표시되더라도 dev API의 OPTIONS 요청이 `503` 등으로 실패한 것은 아닌지 먼저 확인합니다.
+Playwright는 일반 개발 서버와 별도로 `3000` 포트에서 실행하도록 설정되어 있습니다. 브라우저 콘솔에 CORS 오류가 표시되더라도 dev API의 OPTIONS 요청이 `503` 등으로 실패한 것은 아닌지 먼저 확인합니다.
 
 이 경우 테스트 포트를 임의로 변경하기보다 다음을 확인합니다.
 
 - `https://dev.snorose.com` 서버 상태
-- `http://localhost:5173` Origin 허용 여부
+- `http://localhost:3000` Origin 허용 여부(API 및 첨부 업로드 저장소)
 - `.env`의 `VITE_API_BASE_URL`
 
 ### 고정 QA ID를 찾을 수 없는 경우
