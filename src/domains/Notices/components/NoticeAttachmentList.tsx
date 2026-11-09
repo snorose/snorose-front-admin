@@ -22,11 +22,13 @@ import {
 interface NoticeAttachmentListProps {
   attachments: NoticeAttachment[];
   onChange: (attachments: NoticeAttachment[]) => void;
+  disabled?: boolean;
 }
 
 export default function NoticeAttachmentList({
   attachments,
   onChange,
+  disabled = false,
 }: NoticeAttachmentListProps) {
   const hintId = useId();
   const cards = useRef(new Map<string, HTMLLIElement>());
@@ -43,6 +45,13 @@ export default function NoticeAttachmentList({
   const deleting = attachments.find((attachment) => attachment.id === deleteId);
   const thumbnailId = getNoticeThumbnailId(attachments);
   useLayoutEffect(() => {
+    if (disabled) {
+      pendingFocusId.current = null;
+      setDraggedId(null);
+      setOverId(null);
+      setDeleteId(null);
+      return;
+    }
     const id = pendingFocusId.current;
     if (!id) return;
     pendingFocusId.current = null;
@@ -53,12 +62,14 @@ export default function NoticeAttachmentList({
       inline: 'nearest',
       behavior: 'smooth',
     });
-  }, [attachments]);
+  }, [attachments, disabled]);
   const select = (id: string) => {
+    if (disabled) return;
     setSelectedId(id);
     cards.current.get(id)?.focus({ preventScroll: true });
   };
   const move = (id: string, to: number) => {
+    if (disabled) return;
     const next = moveNoticeAttachment(attachments, id, to);
     if (next === attachments) return;
     setSelectedId(id);
@@ -73,8 +84,9 @@ export default function NoticeAttachmentList({
     <div className='min-w-0 space-y-3'>
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs leading-5 text-gray-500'>
         <p id={hintId}>
-          첫 번째 이미지가 썸네일로 사용됩니다. 좌우로 스크롤해 확인하고, 항목을
-          선택한 뒤 ←/→ 키나 버튼·드래그로 순서를 바꿀 수 있습니다.
+          {disabled
+            ? '저장 중이거나 첨부 처리 대기 중에는 첨부를 변경할 수 없습니다.'
+            : '첫 번째 첨부가 썸네일로 사용됩니다. 좌우로 스크롤해 확인하고, 항목을 선택한 뒤 ←/→ 키나 버튼·드래그로 순서를 바꿀 수 있습니다.'}
         </p>
         <span className='shrink-0'>
           이미지 {photoCount}/{NOTICE_ATTACHMENT_LIMITS.image.quantity} · 동영상{' '}
@@ -105,12 +117,13 @@ export default function NoticeAttachmentList({
                 aria-current={selectedId === attachment.id ? 'true' : undefined}
                 aria-describedby={hintId}
                 aria-keyshortcuts='ArrowLeft ArrowRight'
-                tabIndex={0}
+                aria-disabled={disabled || undefined}
+                tabIndex={disabled ? -1 : 0}
                 ref={(element) => {
                   if (element) cards.current.set(attachment.id, element);
                   else cards.current.delete(attachment.id);
                 }}
-                draggable
+                draggable={!disabled}
                 className={`relative flex w-44 shrink-0 flex-col overflow-hidden rounded-lg border bg-white outline-none ${overId === attachment.id || selectedId === attachment.id ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-200'} ${draggedId === attachment.id ? 'opacity-60' : ''}`}
                 onClick={(event) => {
                   if (
@@ -121,11 +134,12 @@ export default function NoticeAttachmentList({
                   select(attachment.id);
                 }}
                 onFocus={(event) => {
-                  if (event.target === event.currentTarget)
+                  if (!disabled && event.target === event.currentTarget)
                     setSelectedId(attachment.id);
                 }}
                 onKeyDown={(event) => {
                   if (
+                    disabled ||
                     event.target !== event.currentTarget ||
                     event.altKey ||
                     event.ctrlKey ||
@@ -144,6 +158,10 @@ export default function NoticeAttachmentList({
                   );
                 }}
                 onDragStart={(event) => {
+                  if (disabled) {
+                    event.preventDefault();
+                    return;
+                  }
                   event.dataTransfer.setData(
                     'application/x-notice-attachment',
                     attachment.id
@@ -157,17 +175,18 @@ export default function NoticeAttachmentList({
                   setOverId(null);
                 }}
                 onDragOver={(event) => {
-                  if (!draggedId) return;
+                  if (disabled || !draggedId) return;
                   event.preventDefault();
                   event.dataTransfer.dropEffect = 'move';
                   setOverId(attachment.id);
                 }}
                 onDrop={(event) => {
                   event.preventDefault();
+                  if (disabled || !draggedId) return;
                   const id = event.dataTransfer.getData(
                     'application/x-notice-attachment'
                   );
-                  if (id) move(id, index);
+                  if (id === draggedId) move(id, index);
                   setDraggedId(null);
                   setOverId(null);
                 }}
@@ -192,6 +211,7 @@ export default function NoticeAttachmentList({
                     className='absolute top-1 right-1 size-7 rounded-full shadow-sm'
                     aria-label={`${attachment.name} 삭제`}
                     title='첨부 삭제'
+                    disabled={disabled}
                     onClick={() => setDeleteId(attachment.id)}
                   >
                     <X className='size-3.5' aria-hidden='true' />
@@ -221,7 +241,7 @@ export default function NoticeAttachmentList({
                     variant='ghost'
                     size='icon'
                     className='size-10 rounded-none'
-                    disabled={index === 0}
+                    disabled={disabled || index === 0}
                     aria-label={`${attachment.name} 앞으로 이동`}
                     title='앞으로 이동'
                     onClick={() => move(attachment.id, index - 1)}
@@ -232,7 +252,8 @@ export default function NoticeAttachmentList({
                     type='button'
                     variant='ghost'
                     size='sm'
-                    draggable
+                    draggable={!disabled}
+                    disabled={disabled}
                     className='cursor-grab gap-1 text-gray-500 active:cursor-grabbing'
                     aria-label={`${attachment.name} 순서 끌어서 이동`}
                     title='선택 후 ←/→ 키 또는 드래그로 순서 변경'
@@ -246,7 +267,7 @@ export default function NoticeAttachmentList({
                     variant='ghost'
                     size='icon'
                     className='size-10 rounded-none'
-                    disabled={index === attachments.length - 1}
+                    disabled={disabled || index === attachments.length - 1}
                     aria-label={`${attachment.name} 뒤로 이동`}
                     title='뒤로 이동'
                     onClick={() => move(attachment.id, index + 1)}
@@ -263,7 +284,7 @@ export default function NoticeAttachmentList({
         이미지는 개당 7MB, 동영상은 50MB까지 첨부할 수 있습니다.
       </p>
       <ConfirmModal
-        isOpen={!!deleting}
+        isOpen={!disabled && !!deleting}
         title='첨부 파일을 삭제할까요?'
         description={
           deleting
@@ -272,7 +293,9 @@ export default function NoticeAttachmentList({
         }
         confirmText='삭제'
         confirmVariant='destructive'
+        confirmDisabled={disabled}
         onConfirm={() => {
+          if (disabled) return;
           onChange(
             attachments.filter((attachment) => attachment.id !== deleteId)
           );
