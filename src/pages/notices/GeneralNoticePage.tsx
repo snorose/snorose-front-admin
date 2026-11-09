@@ -1,10 +1,4 @@
-import { Link } from 'react-router-dom';
-
-import { Plus } from 'lucide-react';
-
 import { PageHeader } from '@/shared/components';
-import { Button } from '@/shared/components/ui';
-import { PATHS } from '@/shared/constants';
 
 import NoticeFilterPanel from '@/domains/Notices/components/NoticeFilterPanel';
 import NoticeTable from '@/domains/Notices/components/NoticeTable';
@@ -14,29 +8,26 @@ export default function GeneralNoticePage() {
   const {
     filters,
     authorSearch,
-    totalCount,
+    authorSelectionVersion,
     updateFilters,
     resetFilters,
     ...tableProps
   } = useNoticeListState();
+  const initialFilters = { ...filters, keywordAuthor: authorSearch };
   return (
     <div className='flex w-full min-w-0 flex-col gap-6'>
-      <div className='flex flex-wrap items-start justify-between gap-4'>
-        <PageHeader
-          title='일반 공지 관리'
-          description='전체 게시판의 공지사항을 관리할 수 있습니다.'
-        />
-        <Button asChild className='!text-white'>
-          <Link to={PATHS.NOTICE_CREATE}>
-            <Plus className='size-4' aria-hidden='true' />
-            공지사항 작성하기
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title='일반 공지 관리'
+        description='전체 게시판의 공지사항을 관리할 수 있습니다.'
+      />
       <NoticeFilterPanel
-        filters={filters}
-        authorSearch={authorSearch}
-        totalCount={totalCount}
+        key={JSON.stringify([
+          filters.keyword ?? '',
+          authorSearch,
+          filters.author ?? '',
+          authorSelectionVersion,
+        ])}
+        initialFilters={initialFilters}
         onFilterChange={updateFilters}
         onReset={resetFilters}
       />

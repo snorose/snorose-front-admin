@@ -1,19 +1,25 @@
+import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { useAuth } from '@/shared/hooks';
 
-import { getNoticeBoard, getNoticeCategories } from '../constants/boards';
 import {
-  createMockNoticeCreateResponse,
-  createSampleNotices,
-} from '../mocks/notices';
-import type { Notice, NoticeForm, NoticeStatus } from '../types';
-import { toCreateNoticeRequest } from '../utils/api.mapper';
-import { getNoticeFileType } from '../utils/attachments';
-import { toNoticeHtml } from '../utils/content';
-import { publishScheduledNotices, validateNotice } from '../utils/notice';
+  getNoticeBoard,
+  getNoticeCategories,
+} from '@/domains/Notices/constants/boards';
+import { NoticesContext } from '@/domains/Notices/contexts/NoticesContext';
+import type { Notice, NoticeForm, NoticeStatus } from '@/domains/Notices/types';
+import { toCreateNoticeRequest } from '@/domains/Notices/utils/api.mapper';
+import { getNoticeFileType } from '@/domains/Notices/utils/attachments';
+import { toNoticeHtml } from '@/domains/Notices/utils/content';
+import {
+  publishScheduledNotices,
+  validateNotice,
+} from '@/domains/Notices/utils/notice';
 
-export function useNoticeMockState() {
+import { createMockNoticeCreateResponse, createSampleNotices } from './notices';
+
+function useNoticeTestState() {
   const { user } = useAuth();
   const [notices, setNotices] = useState<Notice[]>(createSampleNotices);
   const attachmentUrls = useRef(new Set<string>());
@@ -111,5 +117,23 @@ export function useNoticeMockState() {
     return null;
   };
 
-  return { notices, saveNotice, createAttachments };
+  return {
+    notices,
+    saveNotice,
+    createAttachments,
+    // 저장 후 다시 여는 편집 테스트에서도 미리보기를 유지합니다.
+    releaseAttachments: () => {},
+    isLoading: false,
+    isError: false,
+    retry: () => {},
+    canSave: true,
+    canEdit: true,
+  };
+}
+
+export function NoticeTestProvider({ children }: { children: ReactNode }) {
+  const value = useNoticeTestState();
+  return (
+    <NoticesContext.Provider value={value}>{children}</NoticesContext.Provider>
+  );
 }

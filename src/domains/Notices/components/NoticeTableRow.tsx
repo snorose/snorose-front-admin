@@ -16,21 +16,22 @@ import { formatNoticeDate } from '../utils/notice';
 
 interface NoticeTableRowProps {
   notice: Notice;
-  latestId?: number;
+  canEdit: boolean;
   onViewMemberInfo: (authorId: string) => void;
   onViewNotices: () => void;
 }
 
 export default function NoticeTableRow({
   notice,
-  latestId,
+  canEdit,
   onViewMemberInfo,
   onViewNotices,
 }: NoticeTableRowProps) {
+  const isNew = notice.status === 'published' && notice.isNew;
   return (
     <Table.Row
       className={
-        notice.id === latestId
+        isNew
           ? 'bg-blue-50/50'
           : notice.status === 'published' && notice.pinned
             ? 'bg-violet-50/30'
@@ -44,7 +45,7 @@ export default function NoticeTableRow({
         <StatusBadge tone='outline'>{notice.board}</StatusBadge>
       </Table.Cell>
       <Table.Cell className='px-3 text-center'>
-        {notice.id === latestId ? (
+        {isNew ? (
           <StatusBadge tone='danger'>NEW</StatusBadge>
         ) : notice.status === 'published' && notice.pinned ? (
           <StatusBadge tone='accent'>
@@ -55,7 +56,7 @@ export default function NoticeTableRow({
           <StatusBadge tone='neutral'>일반</StatusBadge>
         )}
       </Table.Cell>
-      <Table.Cell className='px-3 py-4'>
+      <Table.Cell className='px-3 py-2'>
         <p className='truncate font-bold text-gray-900' title={notice.title}>
           {notice.title}
         </p>
@@ -63,38 +64,55 @@ export default function NoticeTableRow({
           {noticeContentToText(notice.content) || '작성된 본문이 없습니다.'}
         </p>
       </Table.Cell>
-      <Table.Cell className='px-3 font-semibold text-blue-600'>
-        <MemberInfoPopover
-          key={notice.authorId}
-          encryptedUserId={notice.authorId}
-          displayName={notice.author}
-          showSanctionAction={false}
-          onViewMemberInfo={() => onViewMemberInfo(notice.authorId)}
-          onViewNotices={onViewNotices}
-        />
+      <Table.Cell className='relative px-3 font-bold text-gray-900'>
+        {notice.author ? (
+          <MemberInfoPopover
+            key={notice.authorId}
+            encryptedUserId={notice.authorId}
+            displayName={notice.author}
+            showSanctionAction={false}
+            onViewMemberInfo={
+              notice.authorId
+                ? () => onViewMemberInfo(notice.authorId)
+                : undefined
+            }
+            onViewNotices={onViewNotices}
+          />
+        ) : (
+          <span>정보 없음</span>
+        )}
       </Table.Cell>
-      <Table.Cell className='px-3'>
-        <div className='flex flex-col gap-1 font-mono text-[11px] text-gray-500'>
+      <Table.Cell className='px-3 py-1.5 text-center'>
+        <div className='mx-auto grid max-w-[110px] grid-cols-3 justify-items-start gap-x-2 gap-y-1 pl-1 font-mono text-[11px] text-gray-500'>
           <span
-            className='flex items-center gap-1'
+            className='flex items-center gap-0.5'
+            title='조회수'
             aria-label={`조회수 ${notice.views}`}
           >
-            <Eye className='size-3.5' aria-hidden='true' />
+            <Eye className='size-3.5 text-gray-400' aria-hidden='true' />
             {notice.views.toLocaleString()}
           </span>
           <span
-            className='flex items-center gap-1'
+            className='flex items-center gap-0.5'
+            title='공감수'
             aria-label={`공감수 ${notice.likes}`}
           >
-            <Heart className='size-3.5' aria-hidden='true' />
-            {notice.likes}
+            <Heart
+              className='size-3.5 fill-rose-50 text-rose-400'
+              aria-hidden='true'
+            />
+            {notice.likes.toLocaleString()}
           </span>
           <span
-            className='flex items-center gap-1'
+            className='flex items-center gap-0.5'
+            title='스크랩수'
             aria-label={`스크랩수 ${notice.scraps}`}
           >
-            <Bookmark className='size-3.5' aria-hidden='true' />
-            {notice.scraps}
+            <Bookmark
+              className='size-3.5 fill-amber-50 text-amber-400'
+              aria-hidden='true'
+            />
+            {notice.scraps.toLocaleString()}
           </span>
         </div>
       </Table.Cell>
@@ -113,14 +131,26 @@ export default function NoticeTableRow({
         {formatNoticeDate(notice.updatedAt)}
       </Table.Cell>
       <Table.Cell className='px-3 text-center'>
-        <Button variant='ghost' size='icon-sm' asChild>
-          <Link
-            to={`/notices/general/${notice.id}/edit`}
+        {canEdit ? (
+          <Button variant='ghost' size='icon-sm' asChild>
+            <Link
+              to={`/notices/general/${notice.id}/edit`}
+              aria-label={`${notice.title} 수정`}
+            >
+              <Pencil className='size-4 text-gray-500' />
+            </Link>
+          </Button>
+        ) : (
+          <Button
+            variant='ghost'
+            size='icon-sm'
+            disabled
             aria-label={`${notice.title} 수정`}
+            title='수정 기능은 준비 중입니다.'
           >
             <Pencil className='size-4 text-gray-500' />
-          </Link>
-        </Button>
+          </Button>
+        )}
       </Table.Cell>
     </Table.Row>
   );

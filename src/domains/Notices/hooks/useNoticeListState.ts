@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { PATHS } from '@/shared/constants';
@@ -5,15 +6,14 @@ import { useManagePageUrl } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
 
 import { NOTICE_SCHEMA } from '../constants';
-import { createMockNoticeListResponse } from '../mocks';
 import type { Notice, NoticeFilters } from '../types';
-import { fromAdminNotice } from '../utils/api.mapper';
-import { filterNotices, getLatestNoticeId, sortNotices } from '../utils/notice';
+import { filterNotices, sortNotices } from '../utils/notice';
 import { useNotices } from './useNotices';
 
 export function useNoticeListState() {
-  const { notices } = useNotices();
+  const { notices, isLoading, isError, retry, canEdit } = useNotices();
   const navigate = useNavigate();
+  const [authorSelectionVersion, setAuthorSelectionVersion] = useState(0);
   const {
     searchParams: filters,
     currentPage: requestedPage,
@@ -24,18 +24,10 @@ export function useNoticeListState() {
     (notice) => notice.authorId === filters.author
   );
   const authorSearch = filters.keywordAuthor || selectedAuthor?.author || '';
-  const latestId = getLatestNoticeId(notices);
   const sorted = filterNotices(sortNotices(notices, filters.sort), filters);
   const totalPage = Math.max(1, Math.ceil(sorted.length / 10));
   const currentPage = clampOneBasedPage(requestedPage, totalPage);
-  // 화면의 1-based 페이지를 API의 0-based page로 변환합니다.
-  const pageResult = createMockNoticeListResponse(
-    currentPage - 1,
-    sorted
-  ).result;
-  const visible = pageResult.data.map((item) =>
-    fromAdminNotice(item, sorted.find((notice) => notice.id === item.postId)!)
-  );
+  const visible = sorted.slice((currentPage - 1) * 10, currentPage * 10);
   const updateFilters = (updates: NoticeFilters) =>
     handleSearchChange({ ...filters, ...updates });
 
@@ -44,11 +36,20 @@ export function useNoticeListState() {
   return {
     filters,
     authorSearch,
-    totalCount: pageResult.totalCount,
+    authorSelectionVersion,
+    totalCount: isLoading || isError ? undefined : sorted.length,
+    countStatus: isLoading
+      ? ('loading' as const)
+      : isError
+        ? ('error' as const)
+        : ('ready' as const),
     updateFilters,
     resetFilters: () => handleSearchChange({}),
     notices: visible,
-    latestId,
+    isLoading,
+    isError,
+    onRetry: retry,
+    canEdit,
     currentPage,
     totalPage,
     onPageChange: handlePageChange,
@@ -57,7 +58,10 @@ export function useNoticeListState() {
       : undefined,
     onClearAuthor: () => updateFilters({ author: '', keywordAuthor: '' }),
     onViewMemberInfo: handleViewMemberInfo,
-    onViewAuthorNotices: (notice: Notice) =>
-      updateFilters({ author: notice.authorId, keywordAuthor: notice.author }),
+    onViewAuthorNotices: (notice: Notice) => {
+      // 같은 작성자를 다시 선택한 경우에도 미적용 텍스트를 실제 조회 조건으로 되돌립니다.
+      setAuthorSelectionVersion((version) => version + 1);
+      updateFilters({ author: notice.authorId, keywordAuthor: notice.author });
+    },
   };
 }

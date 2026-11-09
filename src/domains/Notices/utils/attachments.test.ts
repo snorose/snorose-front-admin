@@ -134,15 +134,16 @@ describe('공지 첨부 순서', () => {
     ]);
   });
 
-  test('동영상이 앞에 있거나 썸네일을 삭제해도 첫 이미지가 썸네일이다', () => {
+  test('서버와 동일하게 동영상을 포함한 첫 첨부가 썸네일이다', () => {
     const moved = moveNoticeAttachment(attachments, 'video', 0);
-    expect(getNoticeThumbnailId(moved)).toBe('one');
+    expect(getNoticeThumbnailId(moved)).toBe('video');
     expect(
       getNoticeThumbnailId(
         moved.filter((attachment) => attachment.id !== 'one')
       )
-    ).toBe('two');
-    expect(getNoticeThumbnailId([attachments[1]])).toBeUndefined();
+    ).toBe('video');
+    expect(getNoticeThumbnailId([attachments[1]])).toBe('video');
+    expect(getNoticeThumbnailId([])).toBeUndefined();
   });
 
   test('없는 첨부나 범위 밖 이동으로 항목을 삭제하지 않는다', () => {

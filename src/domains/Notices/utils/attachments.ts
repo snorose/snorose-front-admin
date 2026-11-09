@@ -111,6 +111,5 @@ export function moveNoticeAttachment(
 }
 
 export function getNoticeThumbnailId(attachments: NoticeAttachment[]) {
-  return attachments.find((attachment) => attachment.type.startsWith('image/'))
-    ?.id;
+  return attachments[0]?.id;
 }
