@@ -47,12 +47,18 @@ export type NoticeEditorDetails = Pick<
   | 'authorId'
 >;
 
-// 목록 API에서 제공하지 않는 작성/예약 이력·첨부는 목 편집 데이터로 보완합니다.
+// 목록에 없는 작성자 ID·작성/예약 이력·카테고리·첨부는 알 수 없는 값으로 남깁니다.
 export function fromAdminNotice(
   item: AdminNoticeListItem,
-  details: NoticeEditorDetails
+  details?: NoticeEditorDetails
 ): Notice {
   return {
+    createdAt: '',
+    publishedAt: null,
+    scheduledAt: '',
+    category: '',
+    attachments: [],
+    authorId: '',
     ...details,
     id: item.postId,
     boardId: item.boardId,
@@ -63,7 +69,9 @@ export function fromAdminNotice(
     status: UI_STATUS[item.status],
     isNew: item.isNew,
     pinned: item.isPinned,
-    updatedAt: `${item.updatedAt}+09:00`,
+    updatedAt: /(?:Z|[+-]\d{2}:\d{2})$/i.test(item.updatedAt)
+      ? item.updatedAt
+      : `${item.updatedAt}+09:00`,
     views: item.viewCount,
     likes: item.likeCount,
     scraps: item.scrapCount,

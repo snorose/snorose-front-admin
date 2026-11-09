@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { createSampleNotices } from '../mocks/notices';
+import { createSampleNotices } from '@/test/fixtures/notices';
+
 import type { NoticeForm } from '../types';
 import {
   filterNotices,
@@ -79,7 +80,7 @@ describe('공지 목록 정책', () => {
     );
   });
 
-  test('작성 기간의 마지막 날은 한국 시간 자정까지 포함한다', () => {
+  test('마지막 수정일 기간의 마지막 날은 한국 시간 자정까지 포함한다', () => {
     const notices = samples();
     expect(
       filterNotices(notices, {
@@ -87,6 +88,41 @@ describe('공지 목록 정책', () => {
         endDate: '2026-11-04',
       }).map((item) => item.id)
     ).toEqual([1082]);
+  });
+
+  test('게시판별 NEW를 모두 유지하고 작성일이 없는 목록은 서버 순서를 보존한다', () => {
+    const notices = samples()
+      .slice(0, 3)
+      .map((notice, index) => ({
+        ...notice,
+        id: [10, 99, 12][index],
+        isNew: true,
+        createdAt: '',
+        publishedAt: null,
+      }));
+    expect(sortNotices(notices).map((notice) => notice.id)).toEqual([
+      10, 99, 12,
+    ]);
+    expect(sortNotices(notices, 'oldest').map((notice) => notice.id)).toEqual([
+      12, 99, 10,
+    ]);
+    expect(filterNotices(notices, { kind: 'new' })).toHaveLength(3);
+    expect(filterNotices(notices, { kind: 'normal' })).toHaveLength(0);
+    expect(filterNotices(notices, { kind: 'pinned' })).toHaveLength(0);
+  });
+
+  test('작성일 대신 실제 응답의 수정일로 기간을 검색한다', () => {
+    const notices = [
+      {
+        ...samples()[0],
+        createdAt: '',
+        updatedAt: '2026-11-06T00:00:00+09:00',
+      },
+    ];
+    expect(
+      filterNotices(notices, { startDate: '2026-11-06', endDate: '2026-11-06' })
+    ).toHaveLength(1);
+    expect(filterNotices(notices, { endDate: '2026-11-05' })).toHaveLength(0);
   });
 });
 
