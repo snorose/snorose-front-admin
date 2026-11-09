@@ -25,7 +25,7 @@ setup('실제 어드민 계정으로 로그인한다', async ({ page }) => {
   const loginResponse = await loginRequest.response();
   if (!loginResponse) {
     throw new Error(
-      '로그인 API 네트워크 실패: dev API 상태와 localhost:5173 CORS 허용 여부를 확인해주세요.'
+      `로그인 API 네트워크 실패: dev API 상태와 ${new URL(page.url()).origin} CORS 허용 여부를 확인해주세요.`
     );
   }
   const responseBody = (await loginResponse.json().catch(() => null)) as {

@@ -49,3 +49,12 @@ export interface AdminCreateNoticeResult {
   isScheduled: boolean;
   scheduledAt: string | null;
 }
+
+/** 한 작성 화면의 재시도 상태. 생성 성공·결과 불명일 때 POST를 반복하지 않습니다. */
+export interface NoticeSaveProgress {
+  createOutcomeUnknown?: boolean;
+  result?: AdminCreateNoticeResult;
+  request?: AdminCreateNoticeRequest;
+  uploaded: Set<number>;
+  thumbnailReady: boolean;
+}

@@ -18,6 +18,7 @@ export interface NoticeContentEditorOptions {
   value: string;
   onChange: (html: string) => void;
   invalid?: boolean;
+  disabled?: boolean;
 }
 
 export function useNoticeContentEditor({
@@ -25,6 +26,7 @@ export function useNoticeContentEditor({
   value,
   onChange,
   invalid = false,
+  disabled = false,
 }: NoticeContentEditorOptions) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
@@ -91,6 +93,9 @@ export function useNoticeContentEditor({
   useEffect(() => {
     editor?.view.dom.setAttribute('aria-invalid', String(invalid));
   }, [editor, invalid]);
+  useEffect(() => {
+    editor?.setEditable(!disabled, false);
+  }, [editor, disabled]);
   useEffect(() => {
     if (!editor) return;
     const allowed = new Set([

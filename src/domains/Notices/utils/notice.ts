@@ -16,12 +16,14 @@ export function getLatestNoticeId(notices: Notice[]) {
 }
 
 export function sortNotices(notices: Notice[], sort = 'latest') {
-  const latestId = getLatestNoticeId(notices);
+  const serverOrder = new Map(
+    notices.map((notice, index) => [notice.id, index])
+  );
   const priority = (notice: Notice) => {
     if (notice.status === 'private') return 5;
     if (notice.status === 'draft') return 2;
     if (notice.status === 'scheduled') return 3;
-    if (notice.id === latestId) return 0;
+    if (notice.isNew) return 0;
     return notice.pinned ? 1 : 4;
   };
   const date = (notice: Notice) =>
@@ -29,13 +31,15 @@ export function sortNotices(notices: Notice[], sort = 'latest') {
       notice.status === 'draft'
         ? notice.updatedAt
         : (notice.publishedAt ?? notice.createdAt)
-    );
+    ) || 0;
+  const order = (a: Notice, b: Notice) =>
+    serverOrder.get(a.id)! - serverOrder.get(b.id)!;
 
   return [...notices].sort(
     (a, b) =>
       priority(a) - priority(b) ||
       (sort === 'oldest'
-        ? date(a) - date(b)
+        ? date(a) - date(b) || -order(a, b)
         : sort === 'views'
           ? b.views - a.views
           : sort === 'likes'
@@ -44,12 +48,11 @@ export function sortNotices(notices: Notice[], sort = 'latest') {
               ? b.scraps - a.scraps
               : date(b) - date(a)) ||
       date(b) - date(a) ||
-      b.id - a.id
+      order(a, b)
   );
 }
 
 export function filterNotices(notices: Notice[], filters: NoticeFilters) {
-  const latestId = getLatestNoticeId(notices);
   const group = NOTICE_BOARD_GROUPS.find(
     (item) => item.label === filters.group
   );
@@ -67,21 +70,20 @@ export function filterNotices(notices: Notice[], filters: NoticeFilters) {
     if (filters.status && notice.status !== filters.status) return false;
     if (group && !group.boards.includes(notice.board)) return false;
     if (filters.board && notice.board !== filters.board) return false;
-    if (filters.kind === 'new' && notice.id !== latestId) return false;
-    const isPinned =
-      notice.status === 'published' && notice.pinned && notice.id !== latestId;
+    const isNew = notice.status === 'published' && notice.isNew;
+    if (filters.kind === 'new' && !isNew) return false;
+    const isPinned = notice.status === 'published' && notice.pinned && !isNew;
     if (filters.kind === 'pinned' && !isPinned) return false;
-    if (filters.kind === 'normal' && (notice.id === latestId || isPinned))
-      return false;
-    const created = Date.parse(notice.createdAt);
+    if (filters.kind === 'normal' && (isNew || isPinned)) return false;
+    const updated = Date.parse(notice.updatedAt);
     if (
       filters.startDate &&
-      created < Date.parse(`${filters.startDate}T00:00:00+09:00`)
+      updated < Date.parse(`${filters.startDate}T00:00:00+09:00`)
     )
       return false;
     if (
       filters.endDate &&
-      created >= Date.parse(`${filters.endDate}T00:00:00+09:00`) + 86_400_000
+      updated >= Date.parse(`${filters.endDate}T00:00:00+09:00`) + 86_400_000
     )
       return false;
     const content = noticeContentToText(notice.content);
@@ -171,6 +173,7 @@ export function publishScheduledNotices(notices: Notice[], now = Date.now()) {
 }
 
 export function formatNoticeDate(value: string) {
+  if (!Number.isFinite(Date.parse(value))) return '-';
   return new Intl.DateTimeFormat('ko-KR', {
     timeZone: 'Asia/Seoul',
     year: 'numeric',

@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { NOTICE_BOARD_CATALOG, getNoticeCategories } from '../constants/boards';
 import {
   createMockNoticeCreateResponse,
   createMockNoticeListResponse,
   createSampleNotices,
-} from '../mocks/notices';
+} from '@/test/fixtures/notices';
+
+import { NOTICE_BOARD_CATALOG, getNoticeCategories } from '../constants/boards';
 import type { NoticeForm } from '../types';
 import { fromAdminNotice, toCreateNoticeRequest } from './api.mapper';
 import { validateNotice } from './notice';
@@ -117,6 +118,31 @@ describe('공개 게시판과 API 계약', () => {
     );
     expect(mapped.isNew).toBe(false);
     expect(mapped.updatedAt).toBe('2026-11-05T09:00:00+09:00');
+  });
+
+  test('목록에 없는 작성자 ID·작성일·예약·카테고리·첨부는 샘플로 보완하지 않는다', () => {
+    const item = createMockNoticeListResponse().result.data[0];
+    const mapped = fromAdminNotice({
+      ...item,
+      updatedAt: '2026-09-29T00:13:45.312433',
+    });
+    expect(mapped).toMatchObject({
+      authorId: '',
+      createdAt: '',
+      publishedAt: null,
+      scheduledAt: '',
+      category: '',
+      attachments: [],
+      updatedAt: '2026-09-29T00:13:45.312433+09:00',
+    });
+    expect(Number.isFinite(Date.parse(mapped.updatedAt))).toBe(true);
+    expect(
+      fromAdminNotice({ ...item, updatedAt: '2026-09-29T00:13:45Z' }).updatedAt
+    ).toBe('2026-09-29T00:13:45Z');
+    expect(
+      fromAdminNotice({ ...item, updatedAt: '2026-09-29T00:13:45+09:00' })
+        .updatedAt
+    ).toBe('2026-09-29T00:13:45+09:00');
   });
 
   test('즉시 게시와 임시저장 요청에 예약 시각이나 UI 전용 필드를 보내지 않는다', () => {

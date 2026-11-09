@@ -17,13 +17,13 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 
 import { AuthContext } from '@/shared/contexts';
 import type { AuthContextType } from '@/shared/types';
 
-import { NoticesProvider } from '@/domains/Notices';
-import { createSampleNotices } from '@/domains/Notices/mocks/notices';
+import { NoticeTestProvider } from '@/test/fixtures/notice-provider';
+import { createSampleNotices } from '@/test/fixtures/notices';
 
 import GeneralNoticePage from './GeneralNoticePage';
 import NoticeEditorPage from './NoticeEditorPage';
@@ -56,11 +56,11 @@ function LocationProbe() {
 function NoticeTestRoot() {
   return (
     <AuthContext.Provider value={auth}>
-      <NoticesProvider>
+      <NoticeTestProvider>
         <LocationProbe />
         <Link to='/elsewhere'>다른 어드민 화면</Link>
         <Outlet />
-      </NoticesProvider>
+      </NoticeTestProvider>
     </AuthContext.Provider>
   );
 }
@@ -91,6 +91,13 @@ function renderNotices(
   );
   return { ...render(<RouterProvider router={router} />), router };
 }
+
+beforeAll(() => {
+  HTMLElement.prototype.hasPointerCapture = () => false;
+  HTMLElement.prototype.setPointerCapture = () => undefined;
+  HTMLElement.prototype.releasePointerCapture = () => undefined;
+  HTMLElement.prototype.scrollIntoView = () => undefined;
+});
 
 afterEach(() => {
   cleanup();
@@ -137,9 +144,12 @@ describe('공지 조회와 작성 흐름', () => {
       })
     );
     await user.click(
-      within(screen.getByText('꾸민 공지').closest('tr')!).getByRole('link', {
-        name: /수정/,
-      })
+      within((await screen.findByText('꾸민 공지')).closest('tr')!).getByRole(
+        'link',
+        {
+          name: /수정/,
+        }
+      )
     );
     assertFormatting();
   });
@@ -374,22 +384,31 @@ describe('공지 조회와 작성 흐름', () => {
     expect(screen.getAllByRole('row')).toHaveLength(11);
     await user.click(screen.getByRole('link', { name: '2' }));
     expect(screen.getAllByRole('row')).toHaveLength(11);
-    await user.click(screen.getByRole('button', { name: '커뮤니티' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '커뮤니티' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getAllByRole('row')).toHaveLength(4);
-    await user.click(screen.getByRole('button', { name: '함박눈방' }));
+    await user.click(screen.getByRole('combobox', { name: '하위 게시판' }));
+    await user.click(screen.getByRole('option', { name: '함박눈방' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getAllByRole('row')).toHaveLength(2);
     await user.type(screen.getByLabelText('게시글 검색'), '없는 검색어');
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(
       screen.getByText('조건에 맞는 공지사항이 없습니다.')
     ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '필터 초기화' }));
+    await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
     expect(screen.getAllByRole('row')).toHaveLength(11);
     expect(
       screen.queryByRole('button', { name: '스노로즈' })
     ).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: '공지사항' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '공지사항' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getByRole('status')).toHaveTextContent('2');
-    await user.click(screen.getByRole('button', { name: '이벤트' }));
+    await user.click(screen.getByRole('combobox', { name: '게시판' }));
+    await user.click(screen.getByRole('option', { name: '이벤트' }));
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getAllByRole('row')).toHaveLength(3);
     expect(
       screen.getByText('11월 스노로즈 이벤트 안내 (작성 중)')
@@ -500,6 +519,9 @@ describe('공지 조회와 작성 흐름', () => {
       );
     await openAuthor();
     expect(
+      screen.getAllByRole('menuitem').map((item) => item.textContent)
+    ).toEqual(['회원 정보', '작성한 공지글']);
+    expect(
       screen.queryByRole('menuitem', { name: '제재하기' })
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: '회원 정보' }));
@@ -512,7 +534,7 @@ describe('공지 조회와 작성 흐름', () => {
     );
     await openAuthor();
     await user.click(screen.getByRole('menuitem', { name: '작성한 공지글' }));
-    expect(screen.getByLabelText('작성자 검색 (아이디/닉네임)')).toHaveValue(
+    expect(screen.getByLabelText('작성자 검색 (닉네임)')).toHaveValue(
       '운영리자'
     );
     expect(screen.getByTestId('current-url')).toHaveTextContent(
@@ -526,11 +548,9 @@ describe('공지 조회와 작성 흐름', () => {
         ).length
       ) + 1
     );
-    await user.clear(screen.getByLabelText('작성자 검색 (아이디/닉네임)'));
-    await user.type(
-      screen.getByLabelText('작성자 검색 (아이디/닉네임)'),
-      '개발리자'
-    );
+    await user.clear(screen.getByLabelText('작성자 검색 (닉네임)'));
+    await user.type(screen.getByLabelText('작성자 검색 (닉네임)'), '개발리자');
+    await user.click(screen.getByRole('button', { name: '검색' }));
     expect(screen.getByTestId('current-url')).not.toHaveTextContent(
       'author=sample-admin-0'
     );
@@ -542,7 +562,7 @@ describe('공지 조회와 작성 흐름', () => {
 
   test('작성자 ID가 있는 공유 URL도 작성자 검색에 닉네임을 표시한다', () => {
     renderNotices('/notices/general?author=sample-admin-1');
-    expect(screen.getByLabelText('작성자 검색 (아이디/닉네임)')).toHaveValue(
+    expect(screen.getByLabelText('작성자 검색 (닉네임)')).toHaveValue(
       '소통리자'
     );
   });
@@ -636,10 +656,9 @@ describe('공지 조회와 작성 흐름', () => {
       })
     );
     await user.click(
-      within(screen.getByText('키보드 첨부 공지').closest('tr')!).getByRole(
-        'link',
-        { name: /수정/ }
-      )
+      within(
+        (await screen.findByText('키보드 첨부 공지')).closest('tr')!
+      ).getByRole('link', { name: /수정/ })
     );
     expect(order()).toEqual(savedOrder);
     expect(within(list()).getAllByRole('listitem')[0]).toHaveTextContent(
@@ -674,7 +693,7 @@ describe('공지 조회와 작성 흐름', () => {
       within(screen.getByRole('list', { name: '첨부 순서' })).getAllByRole(
         'listitem'
       );
-    expect(within(rows()[1]).getByText('썸네일')).toBeInTheDocument();
+    expect(within(rows()[0]).getByText('썸네일')).toBeInTheDocument();
     await user.click(
       screen.getByRole('button', { name: '둘째사진.png 앞으로 이동' })
     );

@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 import { E2E_AUTH_FILE } from './e2e/shared/e2e-env';
 
-const appUrl = 'http://localhost:5173';
+const appUrl = 'http://localhost:3000';
 const slowMo = Number(process.env.E2E_SLOW_MO ?? 0);
 
 export default defineConfig({
@@ -48,7 +48,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- --host localhost --port 5173',
+    command: 'npm run dev -- --host localhost --port 3000 --strictPort',
     url: appUrl,
     reuseExistingServer: !process.env.CI,
     stdout: 'ignore',

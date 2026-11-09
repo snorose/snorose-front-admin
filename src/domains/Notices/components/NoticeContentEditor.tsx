@@ -22,6 +22,7 @@ export default function NoticeContentEditor({
   value,
   onChange,
   invalid = false,
+  disabled = false,
   ref,
 }: NoticeContentEditorProps) {
   const {
@@ -40,7 +41,7 @@ export default function NoticeContentEditor({
     embedLink,
     keepLink,
     convertLinkToEmbed,
-  } = useNoticeContentEditor({ id, value, onChange, invalid });
+  } = useNoticeContentEditor({ id, value, onChange, invalid, disabled });
   useImperativeHandle(
     ref,
     () => ({

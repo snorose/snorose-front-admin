@@ -45,8 +45,12 @@ export function MemberInfoPopover({
   const [isFetching, setIsFetching] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isSanctionModalOpen, setIsSanctionModalOpen] = useState(false);
+  const hasMemberIdentity = Boolean(encryptedUserId);
+  const canViewMemberInfo = hasMemberIdentity || Boolean(onViewMemberInfo);
+  const canSanction = hasMemberIdentity && showSanctionAction;
 
   const fetchMemberInfo = async (): Promise<MemberInfo | null> => {
+    if (!hasMemberIdentity) return null;
     if (memberInfo) return memberInfo;
     if (isFetching) return null;
     setIsFetching(true);
@@ -95,6 +99,9 @@ export function MemberInfoPopover({
     navigate(`${path}?${params.toString()}`);
   };
 
+  if (!canViewMemberInfo && !onViewNotices)
+    return <span className={className}>{displayName}</span>;
+
   return (
     <div className={cn('max-w-full min-w-0', className)}>
       <DropdownMenu open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -127,35 +134,46 @@ export function MemberInfoPopover({
           className='w-44 rounded-lg shadow-md'
           onClick={(event) => event.stopPropagation()}
         >
-          <DropdownMenu.Item onSelect={() => void handleInfoClick()}>
-            <UserRound aria-hidden='true' />
-            회원 정보
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => void handleActivityClick(PATHS.POST_MANAGE)}
-          >
-            <FileText aria-hidden='true' />
-            작성 게시글
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => void handleActivityClick(PATHS.POST_COMMENTS)}
-          >
-            <MessageSquare aria-hidden='true' />
-            작성 댓글
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => void handleActivityClick(PATHS.REVIEW_EXAM)}
-          >
-            <BookOpen aria-hidden='true' />
-            작성 시험후기
-          </DropdownMenu.Item>
+          {canViewMemberInfo && (
+            <DropdownMenu.Item onSelect={() => void handleInfoClick()}>
+              <UserRound aria-hidden='true' />
+              회원 정보
+            </DropdownMenu.Item>
+          )}
+          {hasMemberIdentity && !onViewNotices && (
+            <>
+              <DropdownMenu.Item
+                onSelect={() => void handleActivityClick(PATHS.POST_MANAGE)}
+              >
+                <FileText aria-hidden='true' />
+                작성 게시글
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => void handleActivityClick(PATHS.POST_COMMENTS)}
+              >
+                <MessageSquare aria-hidden='true' />
+                작성 댓글
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={() => void handleActivityClick(PATHS.REVIEW_EXAM)}
+              >
+                <BookOpen aria-hidden='true' />
+                작성 시험후기
+              </DropdownMenu.Item>
+            </>
+          )}
           {onViewNotices && (
-            <DropdownMenu.Item onSelect={onViewNotices}>
+            <DropdownMenu.Item
+              onSelect={() => {
+                setIsPopoverOpen(false);
+                onViewNotices();
+              }}
+            >
               <FileText aria-hidden='true' />
               작성한 공지글
             </DropdownMenu.Item>
           )}
-          {showSanctionAction && (
+          {canSanction && (
             <>
               <DropdownMenu.Separator />
               <DropdownMenu.Item
@@ -177,7 +195,7 @@ export function MemberInfoPopover({
         encryptedUserId={encryptedUserId}
       />
 
-      {showSanctionAction && (
+      {canSanction && (
         <SanctionModal
           isOpen={isSanctionModalOpen}
           onClose={() => setIsSanctionModalOpen(false)}

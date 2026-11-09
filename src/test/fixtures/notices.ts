@@ -4,21 +4,25 @@ import {
   NOTICE_BOARD_CATALOG,
   getNoticeBoard,
   getNoticeCategories,
-} from '../constants/boards';
+} from '@/domains/Notices/constants/boards';
 import type {
   AdminCreateNoticeRequest,
   AdminCreateNoticeResult,
   AdminNoticeListItem,
   AdminNoticeListResult,
-} from '../types';
-import type { Notice, NoticeBoard, NoticeStatus } from '../types';
+} from '@/domains/Notices/types';
+import type {
+  Notice,
+  NoticeBoard,
+  NoticeStatus,
+} from '@/domains/Notices/types';
 import {
   fromAdminNotice,
   toAdminNotice,
   toNoticeLocalDateTime,
-} from '../utils/api.mapper';
-import { toNoticeHtml } from '../utils/content';
-import { sortNotices } from '../utils/notice';
+} from '@/domains/Notices/utils/api.mapper';
+import { toNoticeHtml } from '@/domains/Notices/utils/content';
+import { sortNotices } from '@/domains/Notices/utils/notice';
 
 const rows: [string, NoticeBoard, NoticeStatus, boolean, string][] = [
   [
