@@ -44,7 +44,9 @@ export function ConfirmModal({
           )}
         </Dialog.Header>
 
-        {children && <div className='min-h-0 overflow-y-auto'>{children}</div>}
+        {children && (
+          <div className='-m-1 min-h-0 overflow-y-auto p-1'>{children}</div>
+        )}
 
         <Dialog.Footer className='shrink-0'>
           <Button type='button' variant='outline' onClick={onClose}>
