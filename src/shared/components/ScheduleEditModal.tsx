@@ -74,7 +74,7 @@ export function ScheduleEditModal({
             datePlaceholder='종료 날짜 선택'
           />
         </div>
-        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2 sm:justify-normal'>
+        <Dialog.Footer className='mt-2 grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2 sm:justify-normal'>
           <Button
             type='button'
             variant='outline'
