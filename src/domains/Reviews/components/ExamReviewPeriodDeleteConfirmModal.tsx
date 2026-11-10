@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 
-import { Button, Dialog } from '@/shared/components/ui';
+import { DescriptionListModal } from '@/shared/components';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
 
@@ -33,58 +33,29 @@ export function ExamReviewPeriodDeleteConfirmModal({
     }
   };
 
-  const handleDeleteCancel = () => {
-    onClose();
-  };
-
   return (
-    <Dialog open={isDeleteModalOpen} onOpenChange={handleDeleteCancel}>
-      <Dialog.Content className='max-w-xs sm:max-w-sm'>
-        <Dialog.Header>
-          <Dialog.Title>작성 기간 삭제</Dialog.Title>
-          <Dialog.Description>
-            시험 후기 작성 기간을 삭제하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='flex flex-col gap-3'>
-          <ul className='ml-4 flex list-outside list-disc flex-col gap-1'>
-            <li>
-              <span className='text-sm font-semibold text-gray-700'>
-                기간 제목:{' '}
-              </span>
-              <span className='text-sm'>{selectedItem.title}</span>
-            </li>
-            <li>
-              <span className='text-sm font-semibold text-gray-700'>
-                시작 일시:{' '}
-              </span>
-              <span className='text-sm'>
-                {formatDateTimeToMinutes(selectedItem.startAt)}
-              </span>
-            </li>
-            <li>
-              <span className='text-sm font-semibold text-gray-700'>
-                종료 일시:{' '}
-              </span>
-              <span className='text-sm'>
-                {formatDateTimeToMinutes(selectedItem.endAt)}
-              </span>
-            </li>
-          </ul>
-        </div>
-        <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={handleDeleteCancel}>
-            취소
-          </Button>
-          <Button
-            type='button'
-            variant='destructive'
-            onClick={handleDeleteConfirm}
-          >
-            삭제
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+    <DescriptionListModal
+      open={isDeleteModalOpen}
+      onClose={onClose}
+      title='작성 기간 삭제'
+      description='시험 후기 작성 기간을 삭제하시겠습니까?'
+      className='max-w-xs sm:max-w-sm'
+      items={[
+        { label: '기간 제목', value: selectedItem.title },
+        {
+          label: '시작 일시',
+          value: formatDateTimeToMinutes(selectedItem.startAt),
+        },
+        {
+          label: '종료 일시',
+          value: formatDateTimeToMinutes(selectedItem.endAt),
+        },
+      ]}
+      action={{
+        label: '삭제',
+        variant: 'destructive',
+        onClick: handleDeleteConfirm,
+      }}
+    />
   );
 }

@@ -42,7 +42,7 @@ export default function AdjustAllMemberPointPage() {
     const numDifference = Number(difference);
 
     if (isNaN(numDifference) || numDifference === 0) {
-      toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
+      toast.info('유효한 포인트 증감량을 입력해주세요.');
       return;
     }
 
@@ -78,7 +78,7 @@ export default function AdjustAllMemberPointPage() {
 
       <NoticePanel
         items={[
-          '포인트 카테고리, 메모, 지급/차감량을 설정할 수 있어요.',
+          '포인트 카테고리, 메모, 포인트 증감량을 설정할 수 있어요.',
           '포인트 지급/차감은 즉시 적용되므로 신중히 진행해 주세요.',
         ]}
       />
