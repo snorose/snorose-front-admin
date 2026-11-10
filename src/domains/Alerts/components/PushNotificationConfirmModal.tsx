@@ -58,13 +58,15 @@ export function PushNotificationConfirmModal({
             아래 내용으로 푸시 알림을 전송하시겠습니까?
           </Dialog.Description>
         </Dialog.Header>
-        <div className='flex flex-col gap-3 py-4'>
+        <div className='grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2.5 py-2 text-sm'>
           {CONFIRMATION_DATA.map((data) => (
-            <div className='flex items-start gap-2' key={data.label}>
-              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-                {data.label}:
+            <div className='contents' key={data.label}>
+              <span className='text-muted-foreground shrink-0 text-xs font-medium'>
+                {data.label}
               </span>
-              <span className='text-sm break-keep'>{data.value}</span>
+              <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
+                {data.value}
+              </span>
             </div>
           ))}
         </div>
