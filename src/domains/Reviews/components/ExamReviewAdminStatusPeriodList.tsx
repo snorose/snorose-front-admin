@@ -180,7 +180,7 @@ export function ExamReviewAdminStatusPeriodList({
           description='이 기간 설정만 삭제되며 시험후기 원본과 확인 이력은 유지됩니다.'
           confirmText='삭제'
           confirmVariant='destructive'
-          confirmDisabled={isSubmitting}
+          isPending={isSubmitting}
           onConfirm={handleDelete}
           onClose={() => setDeleteTarget(null)}
         >

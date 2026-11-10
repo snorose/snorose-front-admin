@@ -144,7 +144,7 @@ export default function FaqManagementPage() {
         description='삭제한 FAQ는 복구할 수 없습니다.'
         confirmText={deleteMutation.isPending ? '삭제 중…' : '삭제'}
         confirmVariant='destructive'
-        confirmDisabled={deleteMutation.isPending}
+        isPending={deleteMutation.isPending}
         onClose={() => {
           if (!deleteMutation.isPending) setDeleteTarget(null);
         }}

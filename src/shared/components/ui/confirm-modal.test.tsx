@@ -4,37 +4,47 @@ import { describe, expect, test, vi } from 'vitest';
 import { ConfirmModal } from './confirm-modal';
 
 describe('ConfirmModal', () => {
-  test('삭제 확인은 파괴적 변형을 사용하고 비활성 상태에서는 실행되지 않는다', () => {
+  test('확인과 취소를 각각 실행한다', () => {
     const onConfirm = vi.fn();
-    const { rerender } = render(
+    const onClose = vi.fn();
+    render(
       <ConfirmModal
         isOpen
-        title='일정 삭제'
-        confirmText='삭제'
-        confirmVariant='destructive'
-        confirmDisabled
+        title='확인 요청'
         onConfirm={onConfirm}
-        onClose={vi.fn()}
+        onClose={onClose}
       />
     );
-
-    const confirmButton = screen.getByRole('button', { name: '삭제' });
-    expect(confirmButton).toHaveAttribute('data-variant', 'destructive');
-    expect(confirmButton).toBeDisabled();
-    fireEvent.click(confirmButton);
-    expect(onConfirm).not.toHaveBeenCalled();
-
-    rerender(
-      <ConfirmModal
-        isOpen
-        title='일정 삭제'
-        confirmText='삭제'
-        confirmVariant='destructive'
-        onConfirm={onConfirm}
-        onClose={vi.fn()}
-      />
-    );
-    fireEvent.click(screen.getByRole('button', { name: '삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '확인', exact: true }));
     expect(onConfirm).toHaveBeenCalledOnce();
+    expect(onClose).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: '취소' }));
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  test('처리 중에는 버튼과 Escape로 실행하거나 닫을 수 없다', () => {
+    const onConfirm = vi.fn();
+    const onClose = vi.fn();
+    render(
+      <ConfirmModal
+        isOpen
+        isPending
+        title='처리 중'
+        onConfirm={onConfirm}
+        onClose={onClose}
+      />
+    );
+    const confirm = screen.getByRole('button', { name: '확인', exact: true });
+    const cancel = screen.getByRole('button', { name: '취소' });
+    expect(confirm).toBeDisabled();
+    expect(cancel).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: '창 닫기' })
+    ).not.toBeInTheDocument();
+    fireEvent.click(confirm);
+    fireEvent.click(cancel);
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 });
