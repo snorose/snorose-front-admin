@@ -49,7 +49,7 @@ export function ExamReviewReasonModal({
     >
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-2 border-b pb-4 text-sm'>
-          <p className='leading-relaxed break-keep text-red-600'>
+          <p className='text-xs leading-relaxed break-keep text-red-600'>
             {isDelete
               ? '삭제 시 포인트 100포인트가 차감되고 인앱 알림이 발송됩니다.'
               : '시험후기를 복구하면 사용자에게 100포인트가 다시 지급됩니다.'}
