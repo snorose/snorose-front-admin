@@ -48,7 +48,7 @@ export function ScheduleEditModal({
           <Dialog.Title>{title}</Dialog.Title>
           <Dialog.Description>{description}</Dialog.Description>
         </Dialog.Header>
-        <div className='flex flex-col gap-4 [&_[data-slot=label]]:font-medium'>
+        <div className='flex flex-col gap-4 [&_[data-slot=label]]:pb-0 [&_[data-slot=label]]:font-medium'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor={titleId}>{titleLabel}</Label>
             <Input
