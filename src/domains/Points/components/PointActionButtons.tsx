@@ -55,7 +55,7 @@ export function PointActionButtons({
         className='w-32'
         onClick={handleApplyClick}
       >
-        내용 확인
+        적용
       </Button>
     </div>
   );

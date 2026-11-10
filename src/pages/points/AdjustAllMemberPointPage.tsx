@@ -109,7 +109,7 @@ export default function AdjustAllMemberPointPage() {
           onClick={handleApplyButtonClick}
           className='w-32'
         >
-          내용 확인
+          적용
         </Button>
       </div>
 
