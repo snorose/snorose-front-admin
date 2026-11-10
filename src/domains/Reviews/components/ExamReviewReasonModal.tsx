@@ -97,7 +97,7 @@ export function ExamReviewReasonModal({
             className='min-h-[120px] resize-none'
             disabled={isPending}
           />
-          <p className='text-sm text-gray-500'>
+          <p className='text-xs text-gray-500'>
             기존 메모 아래에 [{reasonLabel}]로 저장됩니다.
           </p>
         </div>
