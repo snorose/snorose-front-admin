@@ -42,9 +42,9 @@ export default function MemberPointAdjustmentConfirmDialog({
           <ConfirmRow label='학과' value={member.major} />
           <ConfirmRow label='학번' value={member.studentNumber} />
           <ConfirmRow label='포인트 유형' value={category} />
-          <div className='flex items-center gap-2'>
-            <span className='font-semibold text-gray-700'>
-              포인트 지급/차감량:
+          <div className='flex min-w-0 items-baseline gap-2'>
+            <span className='text-muted-foreground shrink-0 text-xs font-medium'>
+              포인트 지급/차감량
             </span>
             <span
               className={
@@ -78,9 +78,13 @@ export default function MemberPointAdjustmentConfirmDialog({
 
 function ConfirmRow({ label, value }: { label: string; value?: ReactNode }) {
   return (
-    <div className='flex items-center gap-2'>
-      <span className='font-semibold text-gray-700'>{label}:</span>
-      <span>{value}</span>
+    <div className='flex min-w-0 items-baseline gap-2'>
+      <span className='text-muted-foreground shrink-0 text-xs font-medium'>
+        {label}
+      </span>
+      <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
+        {value}
+      </span>
     </div>
   );
 }
