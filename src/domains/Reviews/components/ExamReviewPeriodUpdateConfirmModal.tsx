@@ -1,9 +1,8 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { DateTimePicker } from '@/shared/components';
-import { Button, Dialog, Input, Label } from '@/shared/components/ui';
+import { ScheduleEditModal } from '@/shared/components';
 import { useDateTimeField } from '@/shared/hooks';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
@@ -25,7 +24,6 @@ export function ExamReviewPeriodUpdateConfirmModal({
   onClose,
   onSuccess,
 }: ExamReviewPeriodUpdateConfirmModalProps) {
-  const titleId = useId();
   const [title, setTitle] = useState('');
 
   const startDateTime = useDateTimeField();
@@ -42,10 +40,6 @@ export function ExamReviewPeriodUpdateConfirmModal({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem, isUpdateModalOpen]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
 
   const handleUpdateConfirm = async () => {
     if (!selectedItem) return;
@@ -79,50 +73,17 @@ export function ExamReviewPeriodUpdateConfirmModal({
   };
 
   return (
-    <Dialog open={isUpdateModalOpen} onOpenChange={onClose}>
-      <Dialog.Content className='max-w-xs sm:max-w-sm'>
-        <Dialog.Header>
-          <Dialog.Title>작성 기간 수정</Dialog.Title>
-          <Dialog.Description>
-            시험 후기 작성 기간을 수정하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='flex flex-col gap-1'>
-          <Label htmlFor={titleId} className='text-sm font-semibold'>
-            기간 제목:
-          </Label>
-          <Input
-            type='text'
-            id={titleId}
-            value={title}
-            onChange={handleInputChange}
-          />
-        </div>
-        <DateTimePicker
-          label='시작 일시'
-          date={startDateTime.date}
-          time={startDateTime.time}
-          onDateSelect={startDateTime.onDateSelect}
-          onTimeChange={startDateTime.onTimeChange}
-          datePlaceholder='시작 날짜 선택'
-        />
-        <DateTimePicker
-          label='종료 일시'
-          date={endDateTime.date}
-          time={endDateTime.time}
-          onDateSelect={endDateTime.onDateSelect}
-          onTimeChange={endDateTime.onTimeChange}
-          datePlaceholder='종료 날짜 선택'
-        />
-        <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={onClose}>
-            취소
-          </Button>
-          <Button type='button' onClick={handleUpdateConfirm}>
-            수정
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+    <ScheduleEditModal
+      open={isUpdateModalOpen}
+      onClose={onClose}
+      onSubmit={handleUpdateConfirm}
+      title='작성 기간 수정'
+      description='시험 후기 작성 기간을 수정하시겠습니까?'
+      titleLabel='기간 제목'
+      value={title}
+      onTitleChange={setTitle}
+      startDateTime={startDateTime}
+      endDateTime={endDateTime}
+    />
   );
 }

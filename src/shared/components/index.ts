@@ -25,6 +25,7 @@ export { PeriodStatusBadge } from './PeriodStatusBadge';
 export { ProtectedRoute } from './ProtectedRoute';
 export { ResultCount, type ResultCountProps } from './ResultCount';
 export { default as SanctionModal } from './SanctionModal';
+export { ScheduleEditModal } from './ScheduleEditModal';
 export { SearchableSelect } from './SearchableSelect';
 export { SectionTitle } from './SectionTitle';
 export {
