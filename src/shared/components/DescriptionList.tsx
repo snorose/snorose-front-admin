@@ -17,7 +17,7 @@ export function DescriptionList({ items, className }: DescriptionListProps) {
     >
       {items.map(({ label, value }) => (
         <Fragment key={label}>
-          <dt className='text-muted-foreground shrink-0 text-xs font-medium'>
+          <dt className='shrink-0 text-sm font-medium text-gray-700'>
             {label}
           </dt>
           <dd className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
