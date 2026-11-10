@@ -131,7 +131,7 @@ async function submitAdjustment(
   await user.click(screen.getByRole('option', { name: '기타' }));
   await user.type(screen.getByLabelText(/포인트 증감량/), String(difference));
   await user.type(screen.getByLabelText(/메모/), '포인트 조정');
-  await user.click(screen.getByRole('button', { name: '적용' }));
+  await user.click(screen.getByRole('button', { name: '내용 확인' }));
   await user.click(
     within(screen.getByRole('dialog')).getByRole('button', { name: '확인' })
   );
