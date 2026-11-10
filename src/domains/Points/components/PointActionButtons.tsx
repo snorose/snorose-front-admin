@@ -30,7 +30,7 @@ export function PointActionButtons({
 
     const numDifference = Number(difference);
     if (isNaN(numDifference) || numDifference === 0) {
-      toast.info('유효한 포인트 지급/차감량을 입력해주세요.');
+      toast.info('유효한 포인트 증감량을 입력해주세요.');
       return;
     }
 
