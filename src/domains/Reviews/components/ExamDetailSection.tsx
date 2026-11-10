@@ -722,9 +722,9 @@ export function ExamDetailSection({
               {isDeleted ? (
                 <Button
                   type='button'
-                  variant='outline'
+                  variant='destructive-outline'
                   size='sm'
-                  className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                  className='hover:bg-red-50 hover:text-red-700'
                   onClick={() => setIsRestoreModalOpen(true)}
                   disabled={
                     isDisabled ||
@@ -741,6 +741,7 @@ export function ExamDetailSection({
                   type='button'
                   variant='destructive-outline'
                   size='sm'
+                  className='hover:bg-red-50 hover:text-red-700'
                   aria-label='시험 후기 삭제'
                   onClick={openDeleteModal}
                   disabled={isDisabled}
