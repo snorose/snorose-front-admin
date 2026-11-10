@@ -41,8 +41,7 @@ import {
   updateExamReview,
 } from '@/apis/reviews';
 
-import { ExamReviewDeleteModal } from './ExamReviewDeleteModal';
-import { ExamReviewRestoreModal } from './ExamReviewRestoreModal';
+import { ExamReviewReasonModal } from './ExamReviewReasonModal';
 import type { ExamReviewUpdateChange } from './ExamReviewUpdateConfirmModal';
 
 interface ExamDetailSectionProps {
@@ -723,9 +722,9 @@ export function ExamDetailSection({
               {isDeleted ? (
                 <Button
                   type='button'
-                  variant='outline'
+                  variant='destructive-outline'
                   size='sm'
-                  className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700'
+                  className='hover:bg-red-50 hover:text-red-700'
                   onClick={() => setIsRestoreModalOpen(true)}
                   disabled={
                     isDisabled ||
@@ -742,6 +741,7 @@ export function ExamDetailSection({
                   type='button'
                   variant='destructive-outline'
                   size='sm'
+                  className='hover:bg-red-50 hover:text-red-700'
                   aria-label='시험 후기 삭제'
                   onClick={openDeleteModal}
                   disabled={isDisabled}
@@ -928,11 +928,12 @@ export function ExamDetailSection({
           />
         )}
 
-      <ExamReviewRestoreModal
+      <ExamReviewReasonModal
+        action='restore'
         isOpen={isRestoreModalOpen}
         existingMemo={selectedExamReviewDetail?.memo ?? null}
-        restoreReason={restoreReason}
-        isRestoring={isRestoring}
+        reason={restoreReason}
+        isPending={isRestoring}
         onReasonChange={setRestoreReason}
         onClose={() => {
           if (!isRestoring) {
@@ -943,11 +944,12 @@ export function ExamDetailSection({
         onConfirm={() => void handleRestore()}
       />
 
-      <ExamReviewDeleteModal
+      <ExamReviewReasonModal
+        action='delete'
         isOpen={isDeleteModalOpen}
         existingMemo={selectedExamReviewDetail?.memo ?? null}
-        deleteReason={deleteReason}
-        isDeleting={isDeleting}
+        reason={deleteReason}
+        isPending={isDeleting}
         onReasonChange={setDeleteReason}
         onClose={closeDeleteModal}
         onConfirm={() => void handleDeleteClick()}

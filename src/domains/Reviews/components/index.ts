@@ -8,7 +8,6 @@ export { ExamReviewAdminStatusPeriodDialog } from './ExamReviewAdminStatusPeriod
 export { ExamReviewAdminStatusPeriodFormModal } from './ExamReviewAdminStatusPeriodFormModal';
 export { ExamReviewAdminStatusPeriodList } from './ExamReviewAdminStatusPeriodList';
 export { ExamReviewCommentSection } from './ExamReviewCommentSection';
-export { ExamReviewDeleteModal } from './ExamReviewDeleteModal';
 export { ExamReviewDetailInfoSection } from './ExamReviewDetailInfoSection';
 export { ExamReviewFileNameModal } from './ExamReviewFileNameModal';
 export { ExamReviewLogSection } from './ExamReviewLogSection';
@@ -19,7 +18,7 @@ export { ExamReviewPeriodUpdateConfirmModal } from './ExamReviewPeriodUpdateConf
 export { ExamReviewPostInfoSection } from './ExamReviewPostInfoSection';
 export { ExamReviewProcessStatusBadge } from './ExamReviewProcessStatusBadge';
 export { ExamReviewProgressChart } from './ExamReviewProgressChart';
-export { ExamReviewRestoreModal } from './ExamReviewRestoreModal';
+export { ExamReviewReasonModal } from './ExamReviewReasonModal';
 export { ExamReviewUpdateConfirmModal } from './ExamReviewUpdateConfirmModal';
 export { default as ExamSearch } from './ExamSearch';
 export { default as ExamTable } from './ExamTable';

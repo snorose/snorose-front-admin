@@ -16,6 +16,7 @@ interface ConfirmModalProps {
   confirmDisabled?: boolean;
   closeText?: string;
   className?: string;
+  footerClassName?: string;
   children?: React.ReactNode;
 }
 
@@ -30,6 +31,7 @@ export function ConfirmModal({
   confirmDisabled = false,
   closeText = '취소',
   className,
+  footerClassName,
   children,
 }: ConfirmModalProps) {
   return (
@@ -44,9 +46,11 @@ export function ConfirmModal({
           )}
         </Dialog.Header>
 
-        {children && <div className='min-h-0 overflow-y-auto'>{children}</div>}
+        {children && (
+          <div className='-m-1 min-h-0 overflow-y-auto p-1'>{children}</div>
+        )}
 
-        <Dialog.Footer className='shrink-0'>
+        <Dialog.Footer className={cn('shrink-0', footerClassName)}>
           <Button type='button' variant='outline' onClick={onClose}>
             {closeText}
           </Button>
