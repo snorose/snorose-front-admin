@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { Button, Dialog } from '@/shared/components/ui';
+import { DescriptionListModal } from '@/shared/components/DescriptionListModal';
 import type { PushNotification } from '@/shared/types';
 
 interface PushNotificationConfirmModalProps {
@@ -43,56 +43,18 @@ export function PushNotificationConfirmModal({
   );
 
   return (
-    <Dialog
+    <DescriptionListModal
       open={isOpen}
-      onOpenChange={(open) => {
-        if (!open && !isLoading) {
-          onClose();
-        }
+      onClose={onClose}
+      title='푸시 알림 전송 확인'
+      description='아래 내용으로 푸시 알림을 전송하시겠습니까?'
+      items={CONFIRMATION_DATA}
+      isPending={isLoading}
+      action={{
+        label: '즉시 발송',
+        onClick: onConfirm,
+        pendingLabel: '발송 중...',
       }}
-    >
-      <Dialog.Content showCloseButton={!isLoading}>
-        <Dialog.Header>
-          <Dialog.Title>푸시 알림 전송 확인</Dialog.Title>
-          <Dialog.Description>
-            아래 내용으로 푸시 알림을 전송하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2.5 py-2 text-sm'>
-          {CONFIRMATION_DATA.map((data) => (
-            <div className='contents' key={data.label}>
-              <span className='text-muted-foreground shrink-0 text-xs font-medium'>
-                {data.label}
-              </span>
-              <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
-                {data.value}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2 sm:justify-normal'>
-          <Button
-            type='button'
-            variant='outline'
-            size='default'
-            disabled={isLoading}
-            onClick={onClose}
-            className='w-full'
-          >
-            취소
-          </Button>
-          <Button
-            type='button'
-            size='default'
-            disabled={isLoading}
-            onClick={onConfirm}
-            className='w-full'
-          >
-            {isLoading ? '발송 중...' : '즉시 발송'}
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+    />
   );
 }

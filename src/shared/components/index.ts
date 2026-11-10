@@ -4,6 +4,11 @@ export { BulkActionBar } from './BulkActionBar';
 export { CopyableValue, type CopyableValueProps } from './CopyableValue';
 export { DatePicker } from './DatePicker';
 export { DateTimePicker } from './DateTimePicker';
+export { DescriptionList, type DescriptionListProps } from './DescriptionList';
+export {
+  DescriptionListModal,
+  type DescriptionListModalProps,
+} from './DescriptionListModal';
 export { FilterMultiSelect } from './FilterMultiSelect';
 export { Header } from './Header';
 export { default as MemberInfoModal } from './MemberInfoModal';
