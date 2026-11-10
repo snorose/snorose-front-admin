@@ -4,6 +4,33 @@ import { describe, expect, test, vi } from 'vitest';
 import { ConfirmModal } from './confirm-modal';
 
 describe('ConfirmModal', () => {
+  test('입력 검증으로 확인을 차단하고 해제하면 위험 작업을 실행한다', () => {
+    const onConfirm = vi.fn();
+    const onClose = vi.fn();
+    const props = {
+      isOpen: true,
+      title: '일정 삭제',
+      confirmText: '삭제',
+      confirmVariant: 'destructive' as const,
+      onConfirm,
+      onClose,
+    };
+    const { rerender } = render(<ConfirmModal {...props} confirmDisabled />);
+    const confirm = screen.getByRole('button', { name: '삭제' });
+    expect(confirm).toBeDisabled();
+    expect(confirm).toHaveAttribute('data-variant', 'destructive');
+    expect(screen.getByRole('button', { name: '취소' })).toBeEnabled();
+    fireEvent.click(confirm);
+    expect(onConfirm).not.toHaveBeenCalled();
+
+    rerender(<ConfirmModal {...props} confirmDisabled={false} />);
+    expect(confirm).toBeEnabled();
+    expect(confirm).toHaveAttribute('data-variant', 'destructive');
+    fireEvent.click(confirm);
+    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   test('확인과 취소를 각각 실행한다', () => {
     const onConfirm = vi.fn();
     const onClose = vi.fn();
