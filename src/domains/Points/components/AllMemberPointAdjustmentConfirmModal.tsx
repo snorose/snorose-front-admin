@@ -1,6 +1,5 @@
-import { Button, Dialog } from '@/shared/components/ui';
+import { DescriptionListModal } from '@/shared/components';
 import { POINT_CATEGORY_OPTIONS } from '@/shared/constants';
-import { cn } from '@/shared/lib';
 
 type PointCategoryValue = (typeof POINT_CATEGORY_OPTIONS)[number]['value'];
 
@@ -24,62 +23,39 @@ export function AllMemberPointAdjustmentConfirmModal({
   const isPositiveDifference = Number(difference) > 0;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <Dialog.Content>
-        <Dialog.Header>
-          <Dialog.Title>정회원 전체 포인트 지급/차감 확인</Dialog.Title>
-          <Dialog.Description>
-            아래 내용으로 포인트를 적용하시겠습니까?
-          </Dialog.Description>
-        </Dialog.Header>
-        <div className='grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2.5 py-2 text-sm'>
-          <div className='contents'>
-            <span className='text-muted-foreground shrink-0 text-xs font-medium'>
-              포인트 유형
-            </span>
-            <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
-              {selectedCategory
-                ? (POINT_CATEGORY_OPTIONS.find(
-                    (option) => option.value === selectedCategory
-                  )?.label ?? '')
-                : ''}
-            </span>
-          </div>
-          <div className='contents'>
-            <span className='text-muted-foreground shrink-0 text-xs font-medium'>
-              포인트 증감량
-            </span>
+    <DescriptionListModal
+      open={isOpen}
+      onClose={onClose}
+      title='정회원 전체 포인트 지급/차감 확인'
+      description='아래 내용으로 포인트를 적용하시겠습니까?'
+      items={[
+        {
+          label: '포인트 유형',
+          value: selectedCategory
+            ? (POINT_CATEGORY_OPTIONS.find(
+                (option) => option.value === selectedCategory
+              )?.label ?? '')
+            : '',
+        },
+        {
+          label: '포인트 증감량',
+          value: (
             <span
-              className={cn(
-                'text-sm',
+              className={
                 isPositiveDifference ? 'text-blue-600' : 'text-red-600'
-              )}
+              }
             >
               {isPositiveDifference ? '+' : ''}
               {difference}
             </span>
-          </div>
-          {memo && (
-            <div className='contents'>
-              <span className='text-muted-foreground shrink-0 text-xs font-medium'>
-                메모
-              </span>
-              <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
-                {memo}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <Dialog.Footer>
-          <Button type='button' variant='outline' onClick={onClose}>
-            취소
-          </Button>
-          <Button type='button' onClick={onConfirm}>
-            확인
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Content>
-    </Dialog>
+          ),
+        },
+        ...(memo ? [{ label: '메모', value: memo }] : []),
+      ]}
+      action={{
+        label: isPositiveDifference ? '지급하기' : '차감하기',
+        onClick: onConfirm,
+      }}
+    />
   );
 }
