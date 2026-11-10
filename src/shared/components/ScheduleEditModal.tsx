@@ -43,7 +43,7 @@ export function ScheduleEditModal({
         if (!nextOpen) onClose();
       }}
     >
-      <Dialog.Content className='max-w-xs sm:max-w-sm'>
+      <Dialog.Content className='sm:max-w-lg'>
         <Dialog.Header>
           <Dialog.Title>{title}</Dialog.Title>
           <Dialog.Description>{description}</Dialog.Description>
