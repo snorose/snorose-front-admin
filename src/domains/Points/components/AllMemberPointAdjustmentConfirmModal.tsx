@@ -54,6 +54,7 @@ export function AllMemberPointAdjustmentConfirmModal({
       ]}
       action={{
         label: isPositiveDifference ? '지급하기' : '차감하기',
+        variant: isPositiveDifference ? 'default' : 'destructive',
         onClick: onConfirm,
       }}
     />
