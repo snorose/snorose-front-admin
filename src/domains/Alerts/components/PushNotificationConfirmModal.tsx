@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { DescriptionListModal } from '@/shared/components/DescriptionListModal';
+import { DescriptionListModal } from '@/shared/components';
 import type { PushNotification } from '@/shared/types';
 
 interface PushNotificationConfirmModalProps {

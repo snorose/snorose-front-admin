@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 
-import { DescriptionListModal } from '@/shared/components/DescriptionListModal';
+import { DescriptionListModal } from '@/shared/components';
 import type { ExamReviewPeriod } from '@/shared/types';
 import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
 
