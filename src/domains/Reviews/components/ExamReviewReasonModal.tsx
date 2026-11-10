@@ -57,7 +57,7 @@ export function ExamReviewReasonModal({
             신중하게 확인한 후 {actionLabel}해주세요.
           </p>
         </div>
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-1'>
           <label htmlFor={memoId} className='text-sm font-medium text-gray-700'>
             기존 메모
           </label>
@@ -69,7 +69,7 @@ export function ExamReviewReasonModal({
             readOnly
           />
         </div>
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-1'>
           <label
             htmlFor={reasonId}
             className='text-sm font-medium text-gray-700'
