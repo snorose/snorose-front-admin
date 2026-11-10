@@ -42,7 +42,8 @@ export function ExamReviewReasonModal({
       }
       confirmText={isPending ? `${actionLabel} 중` : actionLabel}
       confirmVariant={isDelete ? 'destructive' : 'default'}
-      confirmDisabled={!reason.trim() || isPending}
+      confirmDisabled={!reason.trim()}
+      isPending={isPending}
       closeText='취소'
       footerClassName='mt-3 grid grid-cols-2 gap-4 sm:grid sm:grid-cols-2 sm:justify-normal [&>button]:w-full'
       onClose={onClose}

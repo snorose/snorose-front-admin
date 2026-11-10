@@ -226,7 +226,7 @@ export function FaqEditorDialog({
         description='저장하지 않은 내용은 사라집니다.'
         confirmText='작성 취소'
         closeText='계속 작성'
-        confirmDisabled={isSaving || submitting.current}
+        isPending={isSaving || submitting.current}
         onConfirm={() => {
           if (isSaving || submitting.current) return;
           navigationAllowed.current = true;
