@@ -15,7 +15,7 @@ describe('ConfirmModal', () => {
         onClose={onClose}
       />
     );
-    fireEvent.click(screen.getByRole('button', { name: '확인', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: '확인' }));
     expect(onConfirm).toHaveBeenCalledOnce();
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: '취소' }));
@@ -34,7 +34,7 @@ describe('ConfirmModal', () => {
         onClose={onClose}
       />
     );
-    const confirm = screen.getByRole('button', { name: '확인', exact: true });
+    const confirm = screen.getByRole('button', { name: '확인' });
     const cancel = screen.getByRole('button', { name: '취소' });
     expect(confirm).toBeDisabled();
     expect(cancel).toBeDisabled();
