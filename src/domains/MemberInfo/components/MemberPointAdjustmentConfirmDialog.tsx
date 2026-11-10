@@ -44,7 +44,7 @@ export default function MemberPointAdjustmentConfirmDialog({
           <ConfirmRow label='포인트 유형' value={category} />
           <div className='flex min-w-0 items-baseline gap-2'>
             <span className='text-muted-foreground shrink-0 text-xs font-medium'>
-              포인트 지급/차감량
+              포인트 증감량
             </span>
             <span
               className={

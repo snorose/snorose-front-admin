@@ -83,7 +83,7 @@ export function PointDetailSection({
 
         <div className='flex flex-col gap-1'>
           <Label htmlFor={`${inputId}-difference`} required>
-            포인트 지급/차감량
+            포인트 증감량
           </Label>
           <Input
             type='number'

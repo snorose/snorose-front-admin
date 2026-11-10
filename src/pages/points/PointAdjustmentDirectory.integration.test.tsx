@@ -129,10 +129,7 @@ async function submitAdjustment(
   }
   await user.click(screen.getByRole('combobox', { name: /포인트 유형/ }));
   await user.click(screen.getByRole('option', { name: '기타' }));
-  await user.type(
-    screen.getByLabelText(/포인트 지급\/차감량/),
-    String(difference)
-  );
+  await user.type(screen.getByLabelText(/포인트 증감량/), String(difference));
   await user.type(screen.getByLabelText(/메모/), '포인트 조정');
   await user.click(screen.getByRole('button', { name: '적용' }));
   await user.click(

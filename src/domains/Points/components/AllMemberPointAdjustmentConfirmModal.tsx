@@ -32,12 +32,12 @@ export function AllMemberPointAdjustmentConfirmModal({
             아래 내용으로 포인트를 적용하시겠습니까?
           </Dialog.Description>
         </Dialog.Header>
-        <div className='flex flex-col gap-3 py-4'>
-          <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold text-gray-700'>
-              포인트 유형:
+        <div className='grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-2.5 py-2 text-sm'>
+          <div className='contents'>
+            <span className='text-muted-foreground shrink-0 text-xs font-medium'>
+              포인트 유형
             </span>
-            <span className='text-sm'>
+            <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
               {selectedCategory
                 ? (POINT_CATEGORY_OPTIONS.find(
                     (option) => option.value === selectedCategory
@@ -45,9 +45,9 @@ export function AllMemberPointAdjustmentConfirmModal({
                 : ''}
             </span>
           </div>
-          <div className='flex items-center gap-2'>
-            <span className='text-sm font-semibold text-gray-700'>
-              포인트 지급/차감량:
+          <div className='contents'>
+            <span className='text-muted-foreground shrink-0 text-xs font-medium'>
+              포인트 증감량
             </span>
             <span
               className={cn(
@@ -60,11 +60,13 @@ export function AllMemberPointAdjustmentConfirmModal({
             </span>
           </div>
           {memo && (
-            <div className='flex items-start gap-2'>
-              <span className='flex-shrink-0 text-sm font-semibold text-gray-700'>
-                메모:
+            <div className='contents'>
+              <span className='text-muted-foreground shrink-0 text-xs font-medium'>
+                메모
               </span>
-              <span className='text-sm break-keep'>{memo}</span>
+              <span className='text-foreground min-w-0 text-sm wrap-anywhere whitespace-pre-wrap'>
+                {memo}
+              </span>
             </div>
           )}
         </div>
