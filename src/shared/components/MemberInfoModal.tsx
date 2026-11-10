@@ -44,6 +44,7 @@ export default function MemberInfoModal({
         },
       ]}
       cancelLabel='닫기'
+      compactCancel
       action={{
         label: '유저 상세 페이지로 이동',
         onClick: () => {
