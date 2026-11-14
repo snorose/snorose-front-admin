@@ -8,12 +8,12 @@
 - E2E 서버 주소: `http://localhost:3000`
 - 일반 개발 서버: `npm run dev`의 기존 5173 포트 유지
 - API: `https://dev.snorose.com`
-- 실행 순서: 실제 로그인 → 인증 상태 저장 → read/write TC 실행
+- 실행 순서: 로그인 준비 → read/write TC 실행
 - 실행 방식: 충돌 방지를 위해 worker 1개로 순차 실행
 - 기본 실행: headless
 - 데이터 변경: 전용 QA 데이터만 사용하고 테스트 종료 시 원상 복구
 
-문의·신고의 상세 TC와 최근 실행 결과는 [문의·신고 QA TC](./inquiry-report-admin-test-cases.md)에서 확인할 수 있습니다.
+문의·신고의 실행 범위와 QA 데이터·검증 상태는 [문의·신고 E2E README](../e2e/features/inquiry-report/README.md), 상세 TC와 현재 검증 결과는 [문의·신고 QA TC](./inquiry-report-admin-test-cases.md)에서 확인할 수 있습니다.
 
 ## 2. 최초 1회 준비
 
@@ -55,7 +55,7 @@ E2E_QA_REPORT_ID=
 npm run test:e2e
 ```
 
-`dev-auth` 로그인 후 모든 `*.read.spec.ts`, `*.write.spec.ts`를 실행합니다. 문의·신고 기준으로 인증 setup 1개와 TC 26개가 실행되므로 Playwright 출력에는 총 27개가 표시됩니다.
+`dev-auth` 로그인 후 모든 기능의 `*.read.spec.ts`, `*.write.spec.ts`를 실행합니다. 문의·신고 경로만 선택하면 로그인 준비 1개와 TC 29개(read 23개·write 6개), 총 30개를 수집합니다. 기존 문의·신고 TC에는 이전 UI 기준 단언이 남아 있으므로 최신 검증 범위는 기능별 README를 확인합니다.
 
 ### 조회 테스트만 실행
 
@@ -133,10 +133,12 @@ npm run test:e2e:report
 e2e/
 ├── features/
 │   └── inquiry-report/
+│       ├── README.md
 │       ├── inquiry-report.api.ts
 │       ├── inquiry-report.fixture.ts
 │       ├── inquiry-report.page.ts
 │       ├── inquiry-report.read.spec.ts
+│       ├── inquiry-report-authors.read.spec.ts
 │       └── inquiry-report.write.spec.ts
 ├── setup/
 │   └── auth.setup.ts
@@ -159,6 +161,7 @@ e2e/
 
 ```text
 e2e/features/member/
+├── README.md
 ├── member.api.ts
 ├── member.fixture.ts
 ├── member.page.ts
@@ -168,7 +171,7 @@ e2e/features/member/
 
 Playwright 설정이 `features/**/*.read.spec.ts`와 `features/**/*.write.spec.ts`를 자동으로 찾으므로 일반적으로 프로젝트 설정을 추가할 필요가 없습니다.
 
-기능별 실행 명령, QA 환경변수, TC 목록, 데이터 정리 방식은 각 기능 폴더의 `README.md`에 작성합니다. 공통 가이드에는 설치·인증·공통 실행 방법을 유지합니다. 기능별 문서는 [E2E 문서 안내](../e2e/README.md)에서 찾을 수 있습니다.
+기능별 실행 명령, QA 환경변수, TC 목록, 데이터 정리 방식은 각 기능 폴더의 `README.md`에 작성합니다. 공통 가이드에는 설치·로그인 설정·공통 실행 방법을 유지합니다. 기능별 문서는 [E2E 문서 안내](../e2e/README.md)에서 찾을 수 있습니다.
 
 작성 원칙은 다음과 같습니다.
 
@@ -178,19 +181,12 @@ Playwright 설정이 `features/**/*.read.spec.ts`와 `features/**/*.write.spec.t
 4. 테스트별 변경 추적과 `finally` 복구는 fixture가 담당합니다.
 5. write 테스트는 임의의 운영 데이터를 탐색하지 않고 전용 QA ID를 사용합니다.
 6. 생성 데이터에는 기능을 식별할 수 있는 E2E 접두사를 사용합니다.
-7. Authorization 토큰, 계정정보, 비밀번호는 로그와 에러 메시지에 출력하지 않습니다.
+7. 실제 계정정보는 문서나 로그에 기록하지 않습니다.
 8. 여러 TC에서 같은 locator나 동작이 반복될 때만 Page Object로 올립니다.
 
 ## 8. 문의·신고 데이터 정리 방식
 
-문의·신고 write fixture는 다음 데이터를 추적합니다.
-
-- 변경 전 문의 상태
-- UI에서 생성한 댓글과 대댓글 ID
-
-테스트가 성공하거나 중간에 실패해도 fixture 종료 단계에서 원래 상태로 복구하고 생성 댓글을 삭제 처리합니다. 시작 시에는 이전에 중단된 테스트가 남긴 공개 상태의 `[E2E:*]` 댓글도 정리합니다.
-
-변경 API는 `dev.snorose.com`에서만 허용됩니다. `.env`의 `VITE_API_BASE_URL`이 다른 서버를 가리키면 테스트를 즉시 중단합니다.
+문의·신고 변경 테스트는 전용 QA 글을 사용하며, 종료 후 변경한 상태를 복원하고 테스트 댓글을 정리합니다. 준비 데이터와 실행 범위는 [문의·신고 E2E README](../e2e/features/inquiry-report/README.md)를 참고합니다.
 
 ## 9. 자주 발생하는 문제
 
@@ -214,4 +210,4 @@ Playwright는 일반 개발 서버와 별도로 `3000` 포트에서 실행하도
 
 ### 테스트를 중간에 중지한 경우
 
-다음 write 실행 시작 시 공개 상태의 `[E2E:*]` 댓글을 우선 정리합니다. 그래도 데이터가 남아 있다면 해당 문의의 댓글과 상태를 확인한 뒤 다시 실행합니다.
+전용 QA 글의 상태와 남은 테스트 댓글을 확인한 뒤 다시 실행합니다.

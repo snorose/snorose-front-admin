@@ -67,8 +67,12 @@ export default function InquiryReportDetailPanel({
 
   const { data: detailData, isLoading: isDetailLoading } =
     useInquiryDetail(postId);
-  const { data: commentsData, isLoading: isCommentsLoading } =
-    useInquiryComments(postId);
+  const {
+    data: commentsData,
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+    refetch: refetchComments,
+  } = useInquiryComments(postId);
   const createComment = useCreateInquiryComment(postId);
   const updateComment = useUpdateInquiryComment(postId);
   const deleteComment = useDeleteInquiryComment(postId);
@@ -290,15 +294,15 @@ export default function InquiryReportDetailPanel({
             <span className='flex min-w-0 items-center text-gray-800'>
               {isWriterWithdrawn ? (
                 <WithdrawnUserBadge />
-              ) : detail.userLoginId ? (
+              ) : detail.encryptedUserId?.trim() ? (
                 <MemberInfoPopover
                   key={detail.encryptedUserId}
                   className='w-full'
-                  displayName={detail.userLoginId}
+                  displayName={detail.userLoginId || '-'}
                   encryptedUserId={detail.encryptedUserId}
                 />
               ) : (
-                <span>-</span>
+                <span>{detail.userLoginId || '-'}</span>
               )}
             </span>
           </div>
@@ -349,13 +353,28 @@ export default function InquiryReportDetailPanel({
         <div className='flex items-center gap-1.5'>
           <p className='text-foreground text-sm font-semibold'>댓글</p>
           <span className='text-muted-foreground text-xs'>
-            ({commentCount}건)
+            {isCommentsError ? '조회 실패' : `(${commentCount}건)`}
           </span>
         </div>
 
         {isCommentsLoading ? (
           <div className='rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-400'>
             댓글을 불러오는 중입니다...
+          </div>
+        ) : isCommentsError ? (
+          <div
+            role='alert'
+            className='flex items-center justify-between gap-2 rounded-lg border border-gray-200 px-3 py-4 text-sm text-gray-600'
+          >
+            댓글을 불러오지 못했습니다.
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={() => void refetchComments()}
+            >
+              다시 시도
+            </Button>
           </div>
         ) : visibleComments.length > 0 ? (
           <ul className='flex flex-col gap-2'>

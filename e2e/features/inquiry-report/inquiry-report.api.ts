@@ -113,12 +113,26 @@ export class InquiryReportApi {
     const cached = this.comments.get(postId);
     if (cached && !refresh) return cached;
 
-    const result = await this.request<AdminInquiryCommentListResult>(
-      'GET',
-      `/v1/posts/${postId}/comments?page=0`
-    );
-    this.comments.set(postId, result.data);
-    return result.data;
+    const comments: InquiryComment[] = [];
+    const seen = new Set<number>();
+    for (let page = 0; page < MAX_LIST_PAGES; page += 1) {
+      const result = await this.request<AdminInquiryCommentListResult>(
+        'GET',
+        `/v1/posts/${postId}/comments?page=${page}`
+      );
+      const fresh = result.data.filter((comment) => !seen.has(comment.id));
+      for (const comment of fresh) {
+        seen.add(comment.id);
+        comments.push(comment);
+      }
+      if (!result.hasNext) {
+        this.comments.set(postId, comments);
+        return comments;
+      }
+      if (!fresh.length)
+        throw new Error('댓글의 다음 페이지가 반복되거나 비어 있습니다.');
+    }
+    throw new Error('댓글 목록 조회가 최대 페이지 수를 초과했습니다.');
   }
 
   async updateStatus(postId: number, status: InquiryStatus) {

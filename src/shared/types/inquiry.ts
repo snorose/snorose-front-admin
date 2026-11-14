@@ -11,7 +11,7 @@ export type InquirySubGroup =
   | 'COMMENT_REPORT'
   | 'USER_REPORT';
 
-export type InquiryStatus = 'PENDING' | 'COMPLETED' | 'HOLD';
+export type InquiryStatus = 'PENDING' | 'COMPLETED' | 'HOLD' | 'WITHDRAWN';
 
 export type InquiryCategory =
   | 'EXAM_REVIEW_INQUIRY'
@@ -48,6 +48,8 @@ export type InquiryListItem = {
   title: string;
   encryptedUserId: string;
   userLoginId: string;
+  manager?: string | null;
+  encryptedAdminId?: string | null;
   createdAt: string;
   updatedAt: string | null;
   isEdited: boolean;

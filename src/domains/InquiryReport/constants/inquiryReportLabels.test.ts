@@ -40,6 +40,7 @@ describe('문의·신고 상태 배지 메타데이터', () => {
     ['PENDING', '답변 전', 'neutral'],
     ['COMPLETED', '답변 완료', 'success'],
     ['HOLD', '보류', 'warning'],
+    ['WITHDRAWN', '이용자 철회', 'neutral'],
   ] as const)('%s에 %s·%s tone을 반환한다', (status, label, tone) => {
     expect(getInquiryStatusBadgeMeta(status)).toEqual({ label, tone });
   });

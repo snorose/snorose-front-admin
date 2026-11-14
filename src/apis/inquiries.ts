@@ -18,6 +18,7 @@ import type {
 
 export type AdminInquiryListParams = {
   page?: number;
+  searchKey?: string;
   group?: InquiryGroup;
   subGroup?: InquirySubGroup;
   status?: InquiryStatus;
@@ -29,11 +30,12 @@ const normalizeGroup = (group: InquiryGroup): InquiryGroup =>
   (typeof group === 'string' ? group.toUpperCase() : group) as InquiryGroup;
 
 export const getAdminInquiriesAPI = async (
-  params: AdminInquiryListParams = { page: 0 }
+  params: AdminInquiryListParams = { page: 0 },
+  signal?: AbortSignal
 ): Promise<AdminInquiryListResult> => {
   const response = await axiosInstance.get<
     BaseResponse<AdminInquiryListResult>
-  >('/v1/admin/inquiries', { params });
+  >('/v1/admin/inquiries', { params, ...(signal ? { signal } : {}) });
   const result = response.data.result;
   return {
     ...result,
@@ -66,11 +68,12 @@ export const updateAdminInquiryStatusAPI = async (
 
 export const getAdminInquiryCommentsAPI = async (
   postId: number,
-  params: { page?: number } = { page: 0 }
+  params: { page?: number } = { page: 0 },
+  signal?: AbortSignal
 ): Promise<AdminInquiryCommentListResult> => {
   const response = await axiosInstance.get<
     BaseResponse<AdminInquiryCommentListResult>
-  >(`/v1/posts/${postId}/comments`, { params });
+  >(`/v1/posts/${postId}/comments`, { params, ...(signal ? { signal } : {}) });
   return response.data.result;
 };
 

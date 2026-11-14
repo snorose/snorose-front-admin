@@ -40,6 +40,7 @@ export const INQUIRY_STATUS_BADGE_META: Record<
   PENDING: { label: '답변 전', tone: 'neutral' },
   COMPLETED: { label: '답변 완료', tone: 'success' },
   HOLD: { label: '보류', tone: 'warning' },
+  WITHDRAWN: { label: '이용자 철회', tone: 'neutral' },
 };
 
 export const INQUIRY_AUXILIARY_BADGE_META = {

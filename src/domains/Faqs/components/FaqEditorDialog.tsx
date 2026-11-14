@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useBlocker } from 'react-router-dom';
 
+import { X } from 'lucide-react';
+
 import { StatusBadge } from '@/shared/components';
 import {
   Button,
@@ -18,6 +20,7 @@ import type { Faq, FaqInput } from '../types';
 
 interface FaqEditorDialogProps {
   faq: Faq | null;
+  availableCategories: readonly string[];
   isSaving: boolean;
   onSave: (input: FaqInput) => Promise<void>;
   onSaved: () => void;
@@ -26,6 +29,7 @@ interface FaqEditorDialogProps {
 
 export function FaqEditorDialog({
   faq,
+  availableCategories,
   isSaving,
   onSave,
   onSaved,
@@ -39,17 +43,27 @@ export function FaqEditorDialog({
   const [input, setInput] = useState(initialInput);
   const [error, setError] = useState('');
   const [discardOpen, setDiscardOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [categoryError, setCategoryError] = useState('');
+  const [addedCategories, setAddedCategories] = useState<string[]>([]);
+  const categoryTriggerRef = useRef<HTMLButtonElement>(null);
   const submitting = useRef(false);
   const navigationAllowed = useRef(false);
-  const categories: readonly string[] =
-    faq?.faqCategory &&
-    !FAQ_CATEGORIES.some((category) => category === faq.faqCategory)
-      ? [faq.faqCategory, ...FAQ_CATEGORIES]
-      : FAQ_CATEGORIES;
-  const dirty = Object.keys(initialInput).some(
-    (key) =>
-      input[key as keyof FaqInput] !== initialInput[key as keyof FaqInput]
-  );
+  const categories = [
+    ...new Set([
+      ...FAQ_CATEGORIES,
+      ...availableCategories,
+      ...(faq?.faqCategory ? [faq.faqCategory] : []),
+      ...addedCategories,
+    ]),
+  ];
+  const dirty =
+    (categoryOpen && !!newCategory.trim()) ||
+    Object.keys(initialInput).some(
+      (key) =>
+        input[key as keyof FaqInput] !== initialInput[key as keyof FaqInput]
+    );
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       !navigationAllowed.current &&
@@ -75,6 +89,23 @@ export function FaqEditorDialog({
     if (isSaving || submitting.current) return;
     if (dirty) setDiscardOpen(true);
     else onClose();
+  };
+
+  const addCategory = () => {
+    const category = newCategory.trim();
+    if (!category || category === '전체' || categories.includes(category)) {
+      setCategoryError(
+        !category
+          ? '카테고리 이름을 입력해 주세요.'
+          : category === '전체'
+            ? '전체는 조회용 이름이므로 사용할 수 없습니다.'
+            : '이미 있는 카테고리입니다. 목록에서 선택해 주세요.'
+      );
+      return;
+    }
+    setAddedCategories((previous) => [...previous, category]);
+    setInput((previous) => ({ ...previous, category }));
+    setCategoryOpen(false);
   };
 
   return (
@@ -141,13 +172,27 @@ export function FaqEditorDialog({
                   분류
                 </Label>
                 <Select
-                  value={input.category}
+                  value={input.category ? `category:${input.category}` : ''}
                   disabled={isSaving}
-                  onValueChange={(category) => setInput({ ...input, category })}
+                  onValueChange={(value) => {
+                    if (value === 'add-category') {
+                      setNewCategory('');
+                      setCategoryError('');
+                      setCategoryOpen(true);
+                      return;
+                    }
+                    // 새 옵션이 추가될 때 native select가 보내는 빈 변경은 무시합니다.
+                    if (value.startsWith('category:'))
+                      setInput((previous) => ({
+                        ...previous,
+                        category: value.slice('category:'.length),
+                      }));
+                  }}
                 >
                   <Select.Trigger
+                    ref={categoryTriggerRef}
                     id='faq-category'
-                    className='w-full'
+                    className='w-full min-w-0'
                     aria-required='true'
                   >
                     <Select.Value placeholder='분류를 선택해 주세요.' />
@@ -156,7 +201,7 @@ export function FaqEditorDialog({
                     {categories.map((category) => (
                       <Select.Item
                         key={category}
-                        value={category}
+                        value={`category:${category}`}
                         textValue={category}
                       >
                         <StatusBadge
@@ -166,8 +211,47 @@ export function FaqEditorDialog({
                         </StatusBadge>
                       </Select.Item>
                     ))}
+                    <Select.Separator />
+                    <Select.Item value='add-category'>
+                      신규 카테고리 추가
+                    </Select.Item>
                   </Select.Content>
                 </Select>
+                {addedCategories.includes(input.category) && (
+                  <div
+                    role='group'
+                    aria-label='새로 추가한 카테고리'
+                    className='flex min-w-0 flex-wrap gap-2'
+                  >
+                    <StatusBadge tone='neutral'>
+                      <span className='min-w-0 truncate' title={input.category}>
+                        {input.category}
+                      </span>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon-sm'
+                        className='size-5 shrink-0 rounded-full'
+                        disabled={isSaving}
+                        aria-label={`${input.category} 카테고리 삭제`}
+                        title='카테고리 삭제'
+                        onClick={() => {
+                          const category = input.category;
+                          setAddedCategories((previous) =>
+                            previous.filter((value) => value !== category)
+                          );
+                          setInput((previous) => ({
+                            ...previous,
+                            category: '',
+                          }));
+                          categoryTriggerRef.current?.focus();
+                        }}
+                      >
+                        <X aria-hidden='true' className='size-3' />
+                      </Button>
+                    </StatusBadge>
+                  </div>
+                )}
               </div>
               <div className='flex flex-col gap-1'>
                 <Label htmlFor='faq-question' required>
@@ -220,6 +304,48 @@ export function FaqEditorDialog({
           </form>
         </Dialog.Content>
       </Dialog>
+      <ConfirmModal
+        isOpen={categoryOpen}
+        title='신규 카테고리 추가'
+        description='확인하면 분류에 선택됩니다. FAQ를 저장하면 카테고리가 함께 저장됩니다.'
+        onClose={() => setCategoryOpen(false)}
+        onConfirm={addCategory}
+      >
+        <div className='flex flex-col gap-2'>
+          <Label htmlFor='faq-new-category' required>
+            카테고리 이름
+          </Label>
+          <Input
+            id='faq-new-category'
+            value={newCategory}
+            placeholder='카테고리 이름을 입력해 주세요.'
+            aria-invalid={!!categoryError}
+            aria-describedby={categoryError ? 'faq-category-error' : undefined}
+            onChange={(event) => {
+              setNewCategory(event.target.value);
+              setCategoryError('');
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter') return;
+              event.preventDefault();
+              if (
+                !event.nativeEvent.isComposing &&
+                event.nativeEvent.keyCode !== 229
+              )
+                addCategory();
+            }}
+          />
+          {categoryError && (
+            <p
+              id='faq-category-error'
+              role='alert'
+              className='text-sm text-red-600'
+            >
+              {categoryError}
+            </p>
+          )}
+        </div>
+      </ConfirmModal>
       <ConfirmModal
         isOpen={discardOpen || blocker.state === 'blocked'}
         title='작성을 취소하시겠습니까?'

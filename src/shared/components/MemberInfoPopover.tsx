@@ -103,7 +103,10 @@ export function MemberInfoPopover({
     return <span className={className}>{displayName}</span>;
 
   return (
-    <div className={cn('max-w-full min-w-0', className)}>
+    <div
+      className={cn('max-w-full min-w-0', className)}
+      onClick={(event) => event.stopPropagation()}
+    >
       <DropdownMenu open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <DropdownMenu.Trigger asChild>
           <button
