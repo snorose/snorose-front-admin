@@ -3,6 +3,92 @@ import type { Response } from '@playwright/test';
 import type { FaqInput, FaqResult } from '../../../src/domains/Faqs/types';
 import { expect, test } from './faqs.fixture';
 
+test('[TC-ADM-FAQ-015] 신규 카테고리를 팝업에서 추가하고 저장·필터·재선택한다', async ({
+  page,
+  faqPage,
+  faqApi,
+  faqQa,
+}) => {
+  await expectSuccess(await faqPage.goto());
+  await faqPage.openCreate();
+  await faqPage.editor.getByRole('combobox', { name: /^분류/ }).click();
+  const addOption = page.getByRole('option', {
+    name: '신규 카테고리 추가',
+    exact: true,
+  });
+  await expect(page.getByRole('option').last()).toHaveText(
+    '신규 카테고리 추가'
+  );
+  await expect(addOption.locator('[data-slot=badge]')).toHaveCount(0);
+  await addOption.click();
+  const popup = page.getByRole('dialog', {
+    name: '신규 카테고리 추가',
+    exact: true,
+  });
+  const category = `${faqQa.prefix} 분류`;
+  await popup.getByLabel('카테고리 이름', { exact: false }).fill(category);
+  await popup.getByRole('button', { name: '확인', exact: true }).click();
+  await expect(
+    faqPage.editor.getByRole('combobox', { name: /^분류/ })
+  ).toHaveText(category);
+  const chip = faqPage.editor.getByRole('group', {
+    name: '새로 추가한 카테고리',
+    exact: true,
+  });
+  await chip
+    .getByRole('button', { name: `${category} 카테고리 삭제`, exact: true })
+    .click();
+  await expect(
+    faqPage.editor.getByRole('combobox', { name: /^분류/ })
+  ).toHaveText('분류를 선택해 주세요.');
+  await faqPage.editor.getByRole('combobox', { name: /^분류/ }).click();
+  await expect(
+    page.getByRole('option', { name: category, exact: true })
+  ).toHaveCount(0);
+  await page.getByRole('option', { name: '가입 · 인증', exact: true }).click();
+  await expect(
+    faqPage.editor.getByRole('combobox', { name: /^분류/ })
+  ).toHaveText('가입 · 인증');
+  await faqPage.editor.getByRole('combobox', { name: /^분류/ }).click();
+  await page
+    .getByRole('option', { name: '신규 카테고리 추가', exact: true })
+    .click();
+  await popup.getByLabel('카테고리 이름', { exact: false }).fill(category);
+  await popup.getByRole('button', { name: '확인', exact: true }).click();
+  const input = {
+    category,
+    question: `${faqQa.prefix} 새 분류 제목`,
+    answer: '신규 카테고리 저장 확인',
+  };
+  await faqPage.fill(input);
+  const createdResponse = faqPage.response('POST');
+  await faqPage.editor
+    .getByRole('button', { name: 'FAQ 등록', exact: true })
+    .click();
+  const created = await expectSuccess(await createdResponse);
+  await expect(faqPage.editor).not.toBeVisible();
+  const located = await faqApi.find(created.faqId);
+  expect(located?.faq.faqCategory).toBe(category);
+  await expectSuccess(await faqPage.goto());
+  await page.getByRole('combobox', { name: '카테고리', exact: true }).click();
+  await page.getByRole('option', { name: category, exact: true }).click();
+  await expect(faqPage.rows).toHaveCount(1);
+  await expect(faqPage.rows.first()).toContainText(input.question);
+  await faqPage.openEdit(located!.faq);
+  await expect(
+    faqPage.editor.getByRole('combobox', { name: /^분류/ })
+  ).toHaveText(category);
+  await faqPage.editor
+    .getByRole('button', { name: '취소', exact: true })
+    .click();
+  await faqPage.openCreate();
+  await faqPage.editor.getByRole('combobox', { name: /^분류/ }).click();
+  await expect(
+    page.getByRole('option', { name: category, exact: true })
+  ).toBeVisible();
+  await page.getByRole('option', { name: category, exact: true }).click();
+});
+
 test('[TC-ADM-FAQ-009] 실제 작성·수정·삭제와 취소·재조회·줄바꿈·URL 보존을 확인한다', async ({
   page,
   faqPage,

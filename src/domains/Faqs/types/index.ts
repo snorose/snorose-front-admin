@@ -4,6 +4,7 @@ export interface Faq {
   question: string;
   answer: string;
   writer: string;
+  encryptedUserId?: string | null;
   createdAt: string;
   updatedAt: string | null;
 }

@@ -4,6 +4,54 @@ import { formatDateTimeToMinutes } from '../../../src/shared/utils/date-time-for
 import { expect, test } from './faqs.fixture';
 
 test.describe('FAQ 실제 API read QA', () => {
+  test('[TC-ADM-FAQ-016] 텍스트 검색은 비활성화하고 카테고리는 즉시 적용·복원·초기화한다', async ({
+    page,
+    faqPage,
+    faqApi,
+  }) => {
+    await expectSuccess(await faqPage.goto());
+    const all = (await faqApi.all()).map(({ faq }) => faq);
+    const first = all.find((faq) => faq.faqCategory);
+    test.skip(!first, '분류가 있는 FAQ가 1건 이상 필요합니다.');
+    const search = page.getByLabel('게시글 검색', { exact: true });
+    await expect(search).toBeDisabled();
+    await expect(
+      page.getByRole('combobox', { name: '게시글 검색 범위', exact: true })
+    ).toBeDisabled();
+    await expect(
+      page.getByRole('button', { name: '검색', exact: true })
+    ).toBeDisabled();
+    const category = page.getByRole('combobox', {
+      name: '카테고리',
+      exact: true,
+    });
+    await expect(category).toBeEnabled();
+    await category.click();
+    await page
+      .getByRole('option', { name: first!.faqCategory, exact: true })
+      .click();
+    const expected = all.filter(
+      (faq) => faq.faqCategory === first!.faqCategory
+    );
+    await expect(faqPage.rows).toHaveCount(Math.min(expected.length, 10));
+    await expect(page.getByRole('status')).toHaveText(
+      new RegExp(`총\\s*${expected.length}\\s*건`)
+    );
+    await page.goto(
+      `/report/faq?${new URLSearchParams({ keyword: '__ignored_keyword__', scope: 'title', category: first!.faqCategory })}`
+    );
+    await expect(faqPage.rows).toHaveCount(Math.min(expected.length, 10));
+    await expect(search).toHaveValue('');
+    await expect(category).toHaveText(first!.faqCategory);
+    await page.reload();
+    await expect(faqPage.rows).toHaveCount(Math.min(expected.length, 10));
+    await page
+      .getByRole('button', { name: '검색 조건 초기화', exact: true })
+      .click();
+    await expect(category).toHaveText('전체');
+    await expect(faqPage.rows).toHaveCount(Math.min(all.length, 10));
+  });
+
   test('[TC-ADM-FAQ-001] 공통 표의 제목·작성자·날짜와 전체 건수가 실제 API와 일치한다', async ({
     page,
     faqPage,
@@ -182,7 +230,7 @@ test.describe('FAQ 실제 API read QA', () => {
     );
   });
 
-  test('[TC-ADM-FAQ-010] 작성자는 회원 메뉴 없이 텍스트로 표시한다', async ({
+  test('[TC-ADM-FAQ-010] 작성자 ID가 있으면 공통 회원 메뉴를 표시하고 없으면 이름만 표시한다', async ({
     faqPage,
     faqApi,
   }) => {
@@ -193,7 +241,9 @@ test.describe('FAQ 실제 API read QA', () => {
       await expect(writerCell).toHaveText(
         faq.writer?.trim() ? faq.writer : '-'
       );
-      await expect(writerCell.getByRole('button')).toHaveCount(0);
+      await expect(writerCell.getByRole('button')).toHaveCount(
+        faq.encryptedUserId?.trim() ? 1 : 0
+      );
       await expect(writerCell.getByRole('link')).toHaveCount(0);
     }
   });

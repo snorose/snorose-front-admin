@@ -2,7 +2,11 @@ import { Fragment } from 'react';
 
 import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
 
-import { StatusBadge, TableStateRow } from '@/shared/components';
+import {
+  MemberInfoPopover,
+  StatusBadge,
+  TableStateRow,
+} from '@/shared/components';
 import { Button, Table } from '@/shared/components/ui';
 import { cn } from '@/shared/lib';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -16,6 +20,7 @@ interface FaqTableProps {
   isLoading: boolean;
   isError: boolean;
   disabled: boolean;
+  emptyMessage?: string;
   selectedId: number | null;
   onSelect: (faqId: number | null) => void;
   onEdit: (faq: Faq) => void;
@@ -27,6 +32,7 @@ export function FaqTable({
   isLoading,
   isError,
   disabled,
+  emptyMessage = '등록된 FAQ가 없습니다.',
   selectedId,
   onSelect,
   onEdit,
@@ -68,7 +74,7 @@ export function FaqTable({
             <TableStateRow
               state={state}
               colSpan={6}
-              message={state === 'empty' ? '등록된 FAQ가 없습니다.' : undefined}
+              message={state === 'empty' ? emptyMessage : undefined}
             />
           ) : (
             <>
@@ -133,7 +139,17 @@ export function FaqTable({
                         </button>
                       </Table.Cell>
                       <Table.Cell>
-                        {faq.writer?.trim() ? faq.writer : '-'}
+                        {faq.encryptedUserId?.trim() ? (
+                          <MemberInfoPopover
+                            key={faq.encryptedUserId}
+                            encryptedUserId={faq.encryptedUserId}
+                            displayName={faq.writer?.trim() ? faq.writer : '-'}
+                          />
+                        ) : faq.writer?.trim() ? (
+                          faq.writer
+                        ) : (
+                          '-'
+                        )}
                       </Table.Cell>
                       <Table.Cell className='text-gray-600'>
                         {formatDateTimeToMinutes(faq.createdAt)}
