@@ -4,6 +4,8 @@
  */
 import type { Locator, Page } from '@playwright/test';
 
+import type { InquiryStatus } from '../../../src/shared/types';
+
 export class InquiryReportPage {
   constructor(readonly page: Page) {}
 
@@ -12,7 +14,12 @@ export class InquiryReportPage {
   }
 
   get dataRows() {
-    return this.table.locator('tbody tr');
+    return this.table.locator('tbody tr').filter({
+      has: this.page.getByRole('button', {
+        name: '게시글 ID 복사',
+        exact: true,
+      }),
+    });
   }
 
   get filterTriggers() {
@@ -33,8 +40,9 @@ export class InquiryReportPage {
 
   async enterFromSidebar() {
     await this.page.goto('/member/info');
-    await this.page.getByRole('button', { name: '문의 및 신고' }).click();
-    await this.page.getByRole('link', { name: '문의 및 신고' }).click();
+    await this.page
+      .getByRole('link', { name: '문의 및 신고', exact: true })
+      .click();
   }
 
   rowAt(index: number) {
@@ -108,13 +116,14 @@ export class InquiryReportPage {
   }
 
   async openCommentMenu(article: Locator, item: '수정' | '삭제') {
-    await article.getByRole('button', { name: '댓글 더보기' }).click();
+    await article.getByRole('button', { name: /댓글 메뉴 열기$/ }).click();
     await this.page.getByRole('menuitem', { name: item }).click();
   }
 }
 
-export function inquiryStatusLabel(status: 'PENDING' | 'COMPLETED' | 'HOLD') {
+export function inquiryStatusLabel(status: InquiryStatus) {
   if (status === 'PENDING') return '답변 전';
   if (status === 'COMPLETED') return '답변 완료';
+  if (status === 'WITHDRAWN') return '이용자 철회';
   return '보류';
 }

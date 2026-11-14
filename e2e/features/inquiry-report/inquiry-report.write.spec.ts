@@ -23,6 +23,8 @@ import {
 test.describe('문의 및 신고 실제 API write QA', () => {
   test.beforeEach(async ({ realInquiry }) => {
     await realInquiry.cleanupStaleComments(realInquiry.qa.inquiryId);
+    const detail = await realInquiry.getDetail(realInquiry.qa.inquiryId);
+    realInquiry.trackStatus(realInquiry.qa.inquiryId, detail.status);
   });
 
   test('[TC-ADM-IR-018] 상태 변경 모달에서 취소한다', async ({
@@ -122,8 +124,8 @@ test.describe('문의 및 신고 실제 API write QA', () => {
     );
     await submit.click();
     const created = await responseResult<InquiryComment>(responsePromise);
-    await expectMutationSuccess(statusResponsePromise);
     realInquiry.trackCreatedComment(located.item.postId, created.id);
+    await expectMutationSuccess(statusResponsePromise);
 
     await expect(panel.getByText(content, { exact: true })).toBeVisible();
     await expect(input).toHaveValue('');
@@ -145,12 +147,12 @@ test.describe('문의 및 신고 실제 API write QA', () => {
     const panel = await openFixedDetail(inquiryReport, located);
     const parent = inquiryReport.commentArticle(panel, rootComment!.content);
 
-    await parent.getByRole('button', { name: '대댓글 작성' }).click();
+    await parent.getByRole('button', { name: /댓글에 대댓글 작성$/ }).click();
     await expect(parent).toHaveClass(/bg-slate-50/);
     await panel.getByRole('button', { name: '취소' }).click();
     await expect(panel.getByPlaceholder('댓글을 입력하세요.')).toBeVisible();
 
-    await parent.getByRole('button', { name: '대댓글 작성' }).click();
+    await parent.getByRole('button', { name: /댓글에 대댓글 작성$/ }).click();
     const content = marker('대댓글');
     await panel.getByPlaceholder('대댓글을 입력하세요.').fill(content);
     const responsePromise = mutationResponse(

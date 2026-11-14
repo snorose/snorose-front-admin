@@ -2,7 +2,7 @@ import { useId } from 'react';
 
 import { MessageSquare, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
-import { StatusBadge } from '@/shared/components';
+import { MemberInfoPopover, StatusBadge } from '@/shared/components';
 import { Button, DropdownMenu, Textarea } from '@/shared/components/ui';
 import type { InquiryComment } from '@/shared/types';
 import { formatDateTimeToMinutes } from '@/shared/utils';
@@ -67,9 +67,16 @@ export default function InquiryCommentItem({
           <div className='flex min-w-0 items-center gap-1.5'>
             {comment.isWriterWithdrawn ? (
               <WithdrawnUserBadge />
+            ) : comment.encryptedUserId?.trim() ? (
+              <MemberInfoPopover
+                key={comment.encryptedUserId}
+                encryptedUserId={comment.encryptedUserId}
+                displayName={comment.userDisplay || '-'}
+                className='text-sm font-semibold text-gray-800'
+              />
             ) : (
               <span className='truncate text-sm font-semibold text-gray-800'>
-                {comment.userDisplay}
+                {comment.userDisplay || '-'}
               </span>
             )}
             {isAdminComment && (

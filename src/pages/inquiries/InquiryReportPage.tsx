@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '@/shared/components';
+import { cn } from '@/shared/lib';
 import type { InquiryStatus } from '@/shared/types';
 import { parseOneBasedPage } from '@/shared/utils';
 
@@ -61,31 +62,39 @@ export default function InquiryReportPage() {
   };
 
   return (
-    <div className='flex w-full flex-col gap-6 pb-12'>
+    <div className='flex w-full min-w-0 flex-col gap-6 pb-12'>
       <PageHeader
         title='문의 및 신고'
         description='접수된 문의 및 신고 목록을 조회할 수 있습니다.'
       />
 
-      <div className='flex flex-col items-stretch gap-4 xl:flex-row xl:items-start'>
-        <div className='min-w-0 flex-1'>
-          <InquiryReportTable
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-            selectedPostId={selectedPostId}
-            onRowSelect={handleRowSelect}
-            onStatusChange={handleStatusChange}
-          />
-        </div>
-        {selectedPostId !== null && (
-          <div className='w-full min-w-0 xl:sticky xl:top-4 xl:mt-[48px] xl:flex-1 xl:basis-0'>
-            <InquiryReportDetailPanel
-              postId={selectedPostId}
-              onClose={() => handleRowSelect(null)}
+      <div className='@container min-w-0'>
+        <div
+          className={cn(
+            'grid min-w-0 grid-cols-1 items-start gap-4',
+            selectedPostId !== null &&
+              '@min-[1440px]:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)]'
+          )}
+        >
+          <div className='min-w-0'>
+            <InquiryReportTable
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              selectedPostId={selectedPostId}
+              onRowSelect={handleRowSelect}
               onStatusChange={handleStatusChange}
             />
           </div>
-        )}
+          {selectedPostId !== null && (
+            <div className='w-full min-w-0 @min-[1440px]:sticky @min-[1440px]:top-4 @min-[1440px]:mt-[48px]'>
+              <InquiryReportDetailPanel
+                postId={selectedPostId}
+                onClose={() => handleRowSelect(null)}
+                onStatusChange={handleStatusChange}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

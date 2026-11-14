@@ -20,14 +20,14 @@ import {
 import type { InquiryReportPage } from './inquiry-report.page';
 
 const REQUIRED_COLUMNS = [
-  '번호',
   'postId',
-  '분류',
-  '중분류',
-  '아이디',
+  '유형',
+  '카테고리',
+  '작성자 아이디',
   '답변여부',
   '제목',
   '작성일',
+  '담당자',
 ];
 
 const GROUP_LABEL = { INQUIRY: '문의', REPORT: '신고', ETC: '기타' } as const;
@@ -46,6 +46,7 @@ const STATUS_LABEL: Record<InquiryStatus, string> = {
   PENDING: '답변 전',
   COMPLETED: '답변 완료',
   HOLD: '보류',
+  WITHDRAWN: '이용자 철회',
 };
 const EXAM_REVIEW_BOARD_ID = 32;
 
@@ -86,29 +87,28 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       ).toBeVisible();
     }
     const row = inquiryReport.dataRows.first();
-    await expect(row.getByRole('cell').nth(1)).toHaveText(String(first.postId));
-    await expect(row).toContainText('1');
+    await expect(row.getByRole('cell').nth(0)).toHaveText(String(first.postId));
     await expect(row).toContainText(GROUP_LABEL[first.group]);
     await expect(row).toContainText(SUBGROUP_LABEL[first.subGroup]);
     await expect(row).toContainText(STATUS_LABEL[first.status]);
     await expect(row).toContainText(first.title);
     const listUrl = page.url();
-    await row
-      .getByRole('button', { name: '게시글 ID 복사', exact: true })
-      .click();
+    const copyButton = row.getByRole('button', {
+      name: '게시글 ID 복사',
+      exact: true,
+    });
+    await copyButton.click();
+    await expect(copyButton).toHaveAttribute('title', '복사됨');
     await expect
       .poll(() => page.evaluate(() => navigator.clipboard.readText()))
       .toBe(String(first.postId));
-    await expect(
-      page.getByText('게시글 ID가 복사되었습니다.', { exact: true })
-    ).toBeVisible();
     await expect(page).toHaveURL(listUrl);
     await expect(
       page.getByRole('button', { name: '문의·신고 상세 닫기', exact: true })
     ).toHaveCount(0);
   });
 
-  test('[TC-ADM-IR-003] 분류·중분류·탈퇴 사용자를 칩으로 표시한다', async ({
+  test('[TC-ADM-IR-003] 유형·카테고리·탈퇴 사용자를 공통 배지로 표시한다', async ({
     inquiryReport,
     realInquiry,
   }) => {
@@ -128,7 +128,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
 
     const inquiryRow = await rowForItem(inquiryReport, realInquiry, inquiry);
     await expect(inquiryRow.getByText('문의', { exact: true })).toHaveClass(
-      /bg-blue-100/
+      /bg-blue-50/
     );
     await expect(
       inquiryRow.getByText(SUBGROUP_LABEL[inquiry.subGroup], { exact: true })
@@ -136,11 +136,11 @@ test.describe('문의 및 신고 실제 API read QA', () => {
 
     const reportRow = await rowForItem(inquiryReport, realInquiry, report);
     await expect(reportRow.getByText('신고', { exact: true })).toHaveClass(
-      /bg-red-100/
+      /bg-rose-50/
     );
     await expect(
       reportRow.getByText(SUBGROUP_LABEL[report.subGroup], { exact: true })
-    ).toHaveClass(/bg-red-50/);
+    ).toHaveClass(/bg-rose-50/);
 
     const withdrawnRow = await rowForItem(
       inquiryReport,
@@ -148,7 +148,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       withdrawn
     );
     await expect(withdrawnRow.getByText('탈퇴', { exact: true })).toHaveClass(
-      /bg-gray-900/
+      /bg-slate-50/
     );
   });
 
@@ -234,7 +234,9 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     }
 
     await inquiryReport.selectFilter(0, '신고');
-    await expect(inquiryReport.filterTriggers.nth(1)).toContainText('중분류');
+    await expect(inquiryReport.filterTriggers.nth(1)).toContainText(
+      '카테고리 전체'
+    );
     await inquiryReport.selectFilter(1, SUBGROUP_LABEL[reportSubGroup]);
     await expect(inquiryReport.dataRows).toHaveCount(
       Math.min(
@@ -250,35 +252,49 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await inquiryReport.selectFilter(0, '문의');
     await inquiryReport.selectFilter(1, '이벤트 관련 문의');
     await inquiryReport.selectFilter(0, '신고');
-    await expect(inquiryReport.filterTriggers.nth(1)).toContainText('중분류');
+    await expect(inquiryReport.filterTriggers.nth(1)).toContainText(
+      '카테고리 전체'
+    );
 
     await inquiryReport.selectFilter(1, '게시글 신고');
     await inquiryReport.selectFilter(2, '답변 완료');
     await inquiryReport.clearFilter(2);
-    await expect(inquiryReport.filterTriggers.nth(2)).toContainText('답변여부');
+    await expect(inquiryReport.filterTriggers.nth(2)).toContainText(
+      '답변 전체'
+    );
     await inquiryReport.clearFilter(1);
-    await expect(inquiryReport.filterTriggers.nth(1)).toContainText('중분류');
+    await expect(inquiryReport.filterTriggers.nth(1)).toContainText(
+      '카테고리 전체'
+    );
     await inquiryReport.clearFilter(0);
-    await expect(inquiryReport.filterTriggers.nth(0)).toContainText('분류');
+    await expect(inquiryReport.filterTriggers.nth(0)).toContainText(
+      '유형 전체'
+    );
     await expect(inquiryReport.filterTriggers.nth(1)).toBeDisabled();
   });
 
-  test('[TC-ADM-IR-007] 답변 전·답변 완료 필터를 적용한다', async ({
+  test('[TC-ADM-IR-007] 답변 전·답변 완료·이용자 철회 필터를 즉시 적용한다', async ({
     inquiryReport,
     realInquiry,
   }) => {
     const inquiries = await realInquiry.getAllInquiries();
-    for (const status of ['PENDING', 'COMPLETED'] as const) {
+    for (const status of ['PENDING', 'COMPLETED', 'WITHDRAWN'] as const) {
       await inquiryReport.selectFilter(2, STATUS_LABEL[status]);
       await expect(inquiryReport.dataRows).toHaveCount(
         Math.min(10, inquiries.filter((item) => item.status === status).length)
       );
-      const otherStatus = status === 'PENDING' ? 'COMPLETED' : 'PENDING';
-      await expect(
-        inquiryReport.table.getByText(STATUS_LABEL[otherStatus], {
-          exact: true,
-        })
-      ).toHaveCount(0);
+      for (const otherStatus of [
+        'PENDING',
+        'COMPLETED',
+        'WITHDRAWN',
+      ] as const) {
+        if (otherStatus === status) continue;
+        await expect(
+          inquiryReport.table.getByText(STATUS_LABEL[otherStatus], {
+            exact: true,
+          })
+        ).toHaveCount(0);
+      }
     }
   });
 
@@ -288,21 +304,34 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     realInquiry,
   }) => {
     const inquiries = await realInquiry.getAllInquiries();
-    const filterCase = findEmptyAndFilledReportFilter(inquiries);
-    test.skip(
-      !filterCase,
-      '빈 결과와 정상 결과를 함께 만드는 신고 조합이 필요합니다.'
+    const report = requireValue(
+      inquiries.find(
+        (item) => item.group === 'REPORT' && item.status !== 'HOLD'
+      ),
+      '복합 필터를 확인할 신고 데이터가 필요합니다.'
     );
 
     await inquiryReport.selectFilter(0, '신고');
-    await inquiryReport.selectFilter(1, SUBGROUP_LABEL[filterCase!.subGroup]);
-    await inquiryReport.selectFilter(2, STATUS_LABEL[filterCase!.emptyStatus]);
+    await inquiryReport.selectFilter(1, SUBGROUP_LABEL[report.subGroup]);
+    await inquiryReport.selectFilter(2, STATUS_LABEL[report.status]);
+    await expect(inquiryReport.dataRows.first()).toContainText(
+      String(report.postId)
+    );
+
+    const form = page.getByRole('form', { name: '문의 및 신고 검색' });
+    const input = form.getByLabel('통합 검색');
+    await input.fill(`E2E-empty-result-${Date.now()}`);
+    await form.getByRole('button', { name: '검색', exact: true }).click();
     await expect(
       page.getByText('필터 조건에 해당하는 항목이 없습니다.')
     ).toBeVisible();
+    await expect(inquiryReport.dataRows).toHaveCount(0);
 
-    await inquiryReport.selectFilter(2, STATUS_LABEL[filterCase!.filledStatus]);
-    await expect(inquiryReport.dataRows.first()).toBeVisible();
+    await input.fill('');
+    await input.press('Enter');
+    await expect(inquiryReport.dataRows.first()).toContainText(
+      String(report.postId)
+    );
   });
 
   test('[TC-ADM-IR-009] 10건 단위 페이지네이션을 확인한다', async ({
@@ -333,11 +362,11 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     const panel = await openDetailCase(inquiryReport, detailCase);
     await expect(panel).toContainText(detailCase.detail.title);
     for (const label of [
-      '분류',
-      '중분류',
+      '유형',
+      '카테고리',
       '작성자',
       '작성일',
-      '답변',
+      '댓글',
       '내용',
     ]) {
       await expect(panel).toContainText(label);
@@ -410,7 +439,7 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     );
     const panel = await openDetailCase(inquiryReport, detailCase);
     await expect(panel.getByText('수정됨', { exact: true })).toHaveClass(
-      /bg-gray-100/
+      /bg-slate-50/
     );
     await expect(panel).toContainText('수정일');
   });
@@ -428,24 +457,30 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     await expect(panel).toContainText('신고 사유');
     await expect(panel).toContainText('신고 대상');
     await expect(panel.getByText('신고', { exact: true })).toHaveClass(
-      /bg-red-100/
+      /bg-rose-50/
     );
   });
 
-  test('[TC-ADM-IR-013] 작성자 복사와 탈퇴 작성자를 구분한다', async ({
+  test('[TC-ADM-IR-013] 작성자 회원 메뉴와 탈퇴 작성자를 구분한다', async ({
     page,
     inquiryReport,
     realInquiry,
   }) => {
     const normalCase = await findDetailCase(
       realInquiry,
-      (item, detail) => !isWithdrawnListItem(item) && !detail.isWriterWithdrawn
+      (item, detail) =>
+        !isWithdrawnListItem(item) &&
+        !detail.isWriterWithdrawn &&
+        !!detail.encryptedUserId?.trim()
     );
     let panel = await openDetailCase(inquiryReport, normalCase);
-    await panel.getByRole('button', { name: '작성자 아이디 복사' }).click();
-    await expect
-      .poll(() => page.evaluate(() => navigator.clipboard.readText()))
-      .toBe(normalCase.detail.userLoginId);
+    await panel
+      .getByRole('button', { name: normalCase.detail.userLoginId, exact: true })
+      .click();
+    await expect(
+      page.getByRole('menuitem', { name: '회원 정보' })
+    ).toBeVisible();
+    await page.keyboard.press('Escape');
 
     await inquiryReport.closeDetail();
     const withdrawnCase = await findDetailCase(realInquiry, (item) =>
@@ -453,10 +488,10 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     );
     panel = await openDetailCase(inquiryReport, withdrawnCase);
     await expect(panel.getByText('탈퇴', { exact: true })).toHaveClass(
-      /bg-gray-900/
+      /bg-slate-50/
     );
     await expect(
-      panel.getByRole('button', { name: '작성자 아이디 복사' })
+      panel.getByRole('button', { name: '탈퇴', exact: true })
     ).toHaveCount(0);
   });
 
@@ -651,8 +686,8 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     for (const comment of hidden)
       await expect(panel).not.toContainText(comment.content);
     await expect(
-      panel.getByText(`${visible.length}건`, { exact: true })
-    ).toHaveCount(2);
+      panel.getByText(`(${visible.length}건)`, { exact: true })
+    ).toBeVisible();
     await expect(panel).not.toContainText('삭제된 댓글입니다.');
   });
 
@@ -679,12 +714,12 @@ test.describe('문의 및 신고 실제 API read QA', () => {
     const normalArticle = inquiryReport.commentArticle(panel, normal.content);
 
     await expect(
-      adminArticle.getByRole('button', { name: '댓글 더보기' })
+      adminArticle.getByRole('button', { name: /댓글 메뉴 열기$/ })
     ).toBeVisible();
     await expect(
-      normalArticle.getByRole('button', { name: '댓글 더보기' })
+      normalArticle.getByRole('button', { name: /댓글 메뉴 열기$/ })
     ).toHaveCount(0);
-    await adminArticle.getByRole('button', { name: '댓글 더보기' }).click();
+    await adminArticle.getByRole('button', { name: /댓글 메뉴 열기$/ }).click();
     await expect(page.getByRole('menuitem', { name: '수정' })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: '삭제' })).toBeVisible();
     await page.keyboard.press('Escape');
@@ -700,31 +735,39 @@ test.describe('문의 및 신고 실제 API read QA', () => {
       inquiryReport
         .commentArticle(panel, withdrawn!.content)
         .getByText('탈퇴', { exact: true })
-    ).toHaveClass(/bg-gray-900/);
+    ).toHaveClass(/bg-slate-50/);
   });
 
-  test('[TC-ADM-IR-026] PC 1:1·소형 세로 배치와 스크롤을 확인한다', async ({
+  test('[TC-ADM-IR-026] 넓은 화면의 목록·상세 배치와 일반 화면의 세로 배치를 확인한다', async ({
     page,
     inquiryReport,
     realInquiry,
   }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize({ width: 1920, height: 1080 });
     const detailCase = await findDetailCase(realInquiry, () => true);
     await openDetailCase(inquiryReport, detailCase);
-    const layout = page
-      .locator('div.flex.flex-col.items-stretch.gap-4')
-      .first();
-    await expect(layout).toHaveCSS('flex-direction', 'row');
-    const widths = await layout
-      .locator(':scope > div')
-      .evaluateAll((nodes) =>
-        nodes.map((node) => node.getBoundingClientRect().width)
-      );
-    expect(widths).toHaveLength(2);
-    expect(Math.abs(widths[0] - widths[1])).toBeLessThan(4);
+    const bounds = async () => ({
+      table: (await inquiryReport.table.boundingBox())!,
+      panel: (await inquiryReport.detailPanel.boundingBox())!,
+    });
+    await expect
+      .poll(async () => {
+        const { table, panel } = await bounds();
+        return panel.x >= table.x + table.width;
+      })
+      .toBe(true);
+    const wide = await bounds();
+    expect(wide.table.width).toBeGreaterThan(wide.panel.width);
 
-    await page.setViewportSize({ width: 1000, height: 700 });
-    await expect(layout).toHaveCSS('flex-direction', 'column');
+    for (const width of [1440, 1000]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect
+        .poll(async () => {
+          const { table, panel } = await bounds();
+          return panel.y >= table.y + table.height;
+        })
+        .toBe(true);
+    }
     await expect(
       inquiryReport.detailPanel.getByRole('button', {
         name: '문의·신고 상세 닫기',
@@ -810,28 +853,6 @@ async function findCommentCase(
   }
   test.skip(true, '조건을 만족하는 댓글 데이터가 필요합니다.');
   throw new Error('댓글 데이터 조건 불충족');
-}
-
-function findEmptyAndFilledReportFilter(inquiries: InquiryListItem[]) {
-  const reportSubGroups = [
-    'POST_REPORT',
-    'EXAM_REVIEW_REPORT',
-    'COMMENT_REPORT',
-    'USER_REPORT',
-  ] as const;
-  for (const subGroup of reportSubGroups) {
-    const statuses = inquiries
-      .filter((item) => item.subGroup === subGroup)
-      .map((item) => item.status);
-    for (const emptyStatus of ['PENDING', 'COMPLETED'] as const) {
-      const filledStatus: 'PENDING' | 'COMPLETED' =
-        emptyStatus === 'PENDING' ? 'COMPLETED' : 'PENDING';
-      if (!statuses.includes(emptyStatus) && statuses.includes(filledStatus)) {
-        return { subGroup, emptyStatus, filledStatus };
-      }
-    }
-  }
-  return null;
 }
 
 function isWithdrawnListItem(item: InquiryListItem) {

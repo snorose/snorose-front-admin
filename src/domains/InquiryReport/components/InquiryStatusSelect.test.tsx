@@ -12,6 +12,29 @@ beforeAll(() => {
 });
 
 describe('InquiryStatusSelect', () => {
+  test('철회된 항목은 이용자 철회로 표시하고 관리자 변경 옵션에는 추가하지 않는다', async () => {
+    const user = userEvent.setup();
+    render(
+      <InquiryStatusSelect
+        inquiryId={1}
+        status='WITHDRAWN'
+        title='철회한 신고'
+        onStatusChange={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('이용자 철회')).toBeInTheDocument();
+    expect(screen.queryByText('알 수 없음')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('combobox', { name: '상태 변경' }));
+    expect(screen.getByRole('option', { name: '답변 전' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: '답변 완료' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('option', { name: '이용자 철회' })
+    ).not.toBeInTheDocument();
+  });
+
   test('현재 답변 상태를 tone 배지로 표시한다', () => {
     render(
       <InquiryStatusSelect
