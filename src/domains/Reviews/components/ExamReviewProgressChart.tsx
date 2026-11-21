@@ -43,7 +43,9 @@ export function ExamReviewProgressChart({
                   {index === 0 && (
                     <ExamReviewAdminStatusInfoTooltip
                       label='기간 내 업로드 건수 설명'
-                      description='삭제된 시험후기는 업로드 건수에서 제외'
+                      description={
+                        '기간 내 업로드된 시험후기 중 노출 중인 후기 수\n(삭제된 후기 제외)'
+                      }
                     />
                   )}
                 </span>
