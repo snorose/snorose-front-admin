@@ -26,7 +26,9 @@ export function ExamReviewProgressChart({
         </h3>
         <ExamReviewAdminStatusInfoTooltip
           label='시험후기 확인 현황 설명'
-          description='선택한 기간에 업로드된 시험후기의 확인 상태'
+          description={
+            '해당 기간에 업로드된 시험후기 중\n현재 노출 중인 후기의 확인 상태'
+          }
         />
       </div>
 
