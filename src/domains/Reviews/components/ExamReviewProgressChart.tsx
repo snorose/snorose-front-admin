@@ -24,10 +24,6 @@ export function ExamReviewProgressChart({
         <h3 id={titleId} className='text-base font-semibold'>
           시험후기 확인 현황
         </h3>
-        <ExamReviewAdminStatusInfoTooltip
-          label='시험후기 확인 현황 설명'
-          description='선택한 기간에 업로드된 시험후기의 확인 상태'
-        />
       </div>
 
       <div className='bg-muted/30 mt-2 rounded-lg border p-4'>
