@@ -186,7 +186,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     const names = screen
       .getAllByRole('listitem')
       .map((item) => item.textContent);
-    expect(names).toEqual(['눈송관리자4건', '로즈매니저1건']);
+    expect(names).toEqual(['눈송관리자4회', '로즈매니저1회']);
   });
 
   test('편집에서 돌아오면 선택을 유지하고 새로 열면 첫 기간을 선택한다', async () => {
@@ -525,7 +525,9 @@ describe('ExamReviewAdminStatusDialog', () => {
     renderDialog();
     expect(await screen.findByText('0%')).toBeInTheDocument();
     for (const label of ['기간 내 업로드', '확인 완료', '미확인']) {
-      expect(screen.getByText(label).parentElement).toHaveTextContent(/0\s*건/);
+      expect(
+        screen.getByText(label).closest('dt')?.nextElementSibling
+      ).toHaveTextContent(/0\s*건/);
     }
     expect(screen.getByText('처리 내역이 없습니다.')).toBeInTheDocument();
     expect(screen.queryByText('1인당 평균')).not.toBeInTheDocument();
@@ -545,7 +547,7 @@ describe('ExamReviewAdminStatusDialog', () => {
     });
     renderDialog();
     expect(await screen.findByText('닉네임 없음')).toBeInTheDocument();
-    expect(screen.getByText('9건')).toBeInTheDocument();
+    expect(screen.getByText('9회')).toBeInTheDocument();
     expect(screen.queryByText('1인당 평균')).not.toBeInTheDocument();
     expect(screen.queryByText('담당자 미상')).not.toBeInTheDocument();
   });
@@ -561,17 +563,17 @@ describe('ExamReviewAdminStatusDialog', () => {
       screen.getByRole('button', { name: '기간 추가' })
     ).toBeInTheDocument();
   });
-  test('집계 설명은 제목 옆 버튼의 툴팁에서 확인하고 Escape로 닫는다', async () => {
+  test('집계 설명은 각 설명 버튼의 툴팁에서 확인하고 Escape로 닫는다', async () => {
     const user = userEvent.setup();
     renderDialog();
     await screen.findByText('71.4%');
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
     await user.hover(
-      screen.getByRole('button', { name: '시험후기 확인 현황 설명' })
+      screen.getByRole('button', { name: '기간 내 업로드 건수 설명' })
     );
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
-      '선택한 기간에 업로드된 시험후기의 확인 상태'
+      '기간 내 업로드된 시험후기 중 노출 중인 후기 수 (삭제된 후기 제외)'
     );
     await user.keyboard('{Escape}');
     await waitFor(() =>

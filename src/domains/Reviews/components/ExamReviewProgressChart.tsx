@@ -24,10 +24,6 @@ export function ExamReviewProgressChart({
         <h3 id={titleId} className='text-base font-semibold'>
           시험후기 확인 현황
         </h3>
-        <ExamReviewAdminStatusInfoTooltip
-          label='시험후기 확인 현황 설명'
-          description='선택한 기간에 업로드된 시험후기의 확인 상태'
-        />
       </div>
 
       <div className='bg-muted/30 mt-2 rounded-lg border p-4'>
@@ -38,7 +34,17 @@ export function ExamReviewProgressChart({
               className='row-span-2 grid min-w-0 grid-rows-subgrid px-2 first:pl-0 last:pr-0 sm:px-3'
             >
               <dt className='text-muted-foreground text-xs leading-5 break-keep sm:text-sm'>
-                {label}
+                <span className='inline-flex items-center gap-1'>
+                  {label}
+                  {index === 0 && (
+                    <ExamReviewAdminStatusInfoTooltip
+                      label='기간 내 업로드 건수 설명'
+                      description={
+                        '기간 내 업로드된 시험후기 중 노출 중인 후기 수\n(삭제된 후기 제외)'
+                      }
+                    />
+                  )}
+                </span>
               </dt>
               <dd
                 className={`flex items-baseline gap-0.5 text-lg font-semibold tracking-tight whitespace-nowrap sm:text-xl ${index === 1 ? 'text-primary' : ''}`}

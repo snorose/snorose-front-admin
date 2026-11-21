@@ -27,7 +27,9 @@ export function ExamReviewAdminStatusList({
           </h3>
           <ExamReviewAdminStatusInfoTooltip
             label='관리자별 처리 현황 설명'
-            description='미확인 → 확인으로 변경한 횟수'
+            description={
+              '미확인 → 확인으로 변경한 횟수\n(삭제된 시험후기는 집계에서 제외)'
+            }
           />
         </div>
       </div>
@@ -43,7 +45,7 @@ export function ExamReviewAdminStatusList({
         <div className='mt-2 overflow-hidden rounded-lg border'>
           <div className='bg-muted/40 text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-2.5 text-sm'>
             <span>관리자 닉네임</span>
-            <span className='shrink-0'>처리 건수</span>
+            <span className='shrink-0'>확인 처리 횟수</span>
           </div>
           <ul
             aria-labelledby={titleId}
@@ -58,7 +60,7 @@ export function ExamReviewAdminStatusList({
                   {manager.nickname ?? '닉네임 없음'}
                 </span>
                 <span className='shrink-0 text-sm leading-5 font-medium'>
-                  {manager.processedCount.toLocaleString('ko-KR')}건
+                  {manager.processedCount.toLocaleString('ko-KR')}회
                 </span>
               </li>
             ))}
@@ -66,7 +68,10 @@ export function ExamReviewAdminStatusList({
         </div>
       )}
       <p className='text-muted-foreground mt-2 text-xs leading-relaxed break-keep'>
-        확인 처리 횟수는 현재 확인 완료 건수와 다를 수 있습니다.
+        같은 후기를 다시 확인하면 처리 횟수가 추가되므로, 현재 확인 완료 건수와
+        다를 수 있습니다.
+        <br />
+        예시) 미확인 → 확인 → 미확인 → 확인 시 처리 2회, 확인 완료 1건
       </p>
     </section>
   );
