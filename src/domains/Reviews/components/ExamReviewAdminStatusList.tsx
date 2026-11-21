@@ -45,7 +45,7 @@ export function ExamReviewAdminStatusList({
         <div className='mt-2 overflow-hidden rounded-lg border'>
           <div className='bg-muted/40 text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-2.5 text-sm'>
             <span>관리자 닉네임</span>
-            <span className='shrink-0'>처리 건수</span>
+            <span className='shrink-0'>확인 처리 횟수</span>
           </div>
           <ul
             aria-labelledby={titleId}
@@ -60,7 +60,7 @@ export function ExamReviewAdminStatusList({
                   {manager.nickname ?? '닉네임 없음'}
                 </span>
                 <span className='shrink-0 text-sm leading-5 font-medium'>
-                  {manager.processedCount.toLocaleString('ko-KR')}건
+                  {manager.processedCount.toLocaleString('ko-KR')}회
                 </span>
               </li>
             ))}
