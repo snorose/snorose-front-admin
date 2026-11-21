@@ -38,7 +38,7 @@ export function ExamReviewAdminStatusInfoTooltip({
           side='top'
           sideOffset={6}
           collisionPadding={12}
-          className='w-max max-w-64 text-left leading-5 text-wrap break-keep'
+          className='w-max max-w-64 text-center leading-5 break-keep whitespace-pre-line'
         >
           {description}
         </Tooltip.Content>

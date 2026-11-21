@@ -27,7 +27,9 @@ export function ExamReviewAdminStatusList({
           </h3>
           <ExamReviewAdminStatusInfoTooltip
             label='관리자별 처리 현황 설명'
-            description='미확인 → 확인으로 변경한 횟수'
+            description={
+              '미확인 → 확인으로 변경한 횟수\n(삭제된 시험후기는 집계에서 제외)'
+            }
           />
         </div>
       </div>
