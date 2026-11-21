@@ -68,7 +68,10 @@ export function ExamReviewAdminStatusList({
         </div>
       )}
       <p className='text-muted-foreground mt-2 text-xs leading-relaxed break-keep'>
-        확인 처리 횟수는 현재 확인 완료 건수와 다를 수 있습니다.
+        같은 후기를 다시 확인하면 처리 횟수가 추가되므로, 현재 확인 완료 건수와
+        다를 수 있습니다.
+        <br />
+        예시) 미확인 → 확인 → 미확인 → 확인 시 처리 2회, 확인 완료 1건
       </p>
     </section>
   );
