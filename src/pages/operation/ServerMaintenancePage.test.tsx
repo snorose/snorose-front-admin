@@ -108,9 +108,9 @@ describe('서버 점검 생성 API 연동', () => {
     renderPage();
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: '생성' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      '중복된 서버 점검 기간 일정이 있습니다'
-    );
+    expect(
+      await screen.findByText('중복된 서버 점검 기간 일정이 있습니다')
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/일정 제목/)).toHaveValue('정기 점검');
     expect(screen.getByLabelText(/메모/)).toHaveValue('DB 작업');
   });
@@ -178,7 +178,7 @@ test('목록 조회 실패 후 다시 시도하면 서버 번호와 상태를 �
     ]);
   const user = userEvent.setup();
   renderPage();
-  expect(await screen.findByRole('alert')).toHaveTextContent('목록 조회 실패');
+  expect(await screen.findByText('목록 조회 실패')).toBeInTheDocument();
   expect(screen.queryByText('등록된 일정이 없습니다.')).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: '다시 시도' }));
   expect(

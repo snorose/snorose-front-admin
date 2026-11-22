@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { PageHeader } from '@/shared/components';
+import { NoticePanel, PageHeader } from '@/shared/components';
 import { Alert, Button } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -101,6 +101,14 @@ export default function ServerMaintenancePage() {
       <PageHeader
         title='서버 점검 일정 관리'
         description='서버 점검 일정을 등록, 조회, 수정, 삭제할 수 있어요.'
+      />
+      <NoticePanel
+        items={[
+          '서버 점검 일정은 시작 일시에 자동 노출되고 종료 일시에 자동 해제됩니다.',
+          '진행 중 일정은 삭제할 수 없으며, 필요 시 종료 일시를 앞당겨 조기 종료할 수 있습니다.',
+          '종료 일시는 시작 일시보다 이후여야 하며, 현재 시각보다 이전으로 설정할 수 없습니다.',
+          '중복된 서버 점검 일정은 생성할 수 없습니다.',
+        ]}
       />
       {unknownOutcome ? (
         <Alert variant='destructive'>
