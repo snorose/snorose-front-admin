@@ -51,15 +51,19 @@ export class NoticeEditorPage {
       .fill('자동화 QA용 공지입니다. 실제 운영 안내가 아닙니다.');
   }
 
-  async image(name: string, color = '#2563eb') {
-    const base64 = await this.page.evaluate((color) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 32;
-      const ctx = canvas.getContext('2d')!;
-      ctx.fillStyle = color;
-      ctx.fillRect(0, 0, 32, 32);
-      return canvas.toDataURL('image/png').split(',')[1];
-    }, color);
+  async image(name: string, color = '#2563eb', width = 32, height = width) {
+    const base64 = await this.page.evaluate(
+      ({ color, width, height }) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, width, height);
+        return canvas.toDataURL('image/png').split(',')[1];
+      },
+      { color, width, height }
+    );
     return {
       name,
       mimeType: 'image/png',
@@ -67,7 +71,7 @@ export class NoticeEditorPage {
     };
   }
 
-  async schedule(target: Date) {
+  async schedule(target: Date, reschedule = false) {
     const [year, month, day, hour, minute] = new Intl.DateTimeFormat('sv-SE', {
       timeZone: 'Asia/Seoul',
       year: 'numeric',
@@ -79,7 +83,12 @@ export class NoticeEditorPage {
     })
       .format(target)
       .split(/\D/);
-    await this.page.getByRole('button', { name: '예약', exact: true }).click();
+    await this.page
+      .getByRole('button', {
+        name: reschedule ? '예약 시각 변경' : '예약',
+        exact: true,
+      })
+      .click();
     await this.page
       .getByRole('button', { name: '예약 게시 일시', exact: true })
       .click();
@@ -95,17 +104,27 @@ export class NoticeEditorPage {
       })
       .click();
     await this.page
+      .getByRole('combobox', { name: '예약 게시 일시 오전/오후', exact: true })
+      .click();
+    await this.page
+      .getByRole('option', {
+        name: Number(hour) >= 12 ? '오후' : '오전',
+        exact: true,
+      })
+      .click();
+    await this.page
       .getByRole('combobox', { name: '예약 게시 일시 시', exact: true })
       .click();
     await this.page
-      .getByRole('option', { name: `${hour}시`, exact: true })
+      .getByRole('option', {
+        name: `${Number(hour) % 12 || 12}시`,
+        exact: true,
+      })
       .click();
     await this.page
       .getByRole('combobox', { name: '예약 게시 일시 분', exact: true })
-      .click();
-    await this.page
-      .getByRole('option', { name: `${minute}분`, exact: true })
-      .click();
+      .fill(minute);
+    await this.page.keyboard.press('Tab');
     return `${year}-${month}-${day}T${hour}:${minute}:00`;
   }
 

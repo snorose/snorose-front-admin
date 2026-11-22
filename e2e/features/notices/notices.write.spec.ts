@@ -42,8 +42,8 @@ test('TC-ADM-NOTICE-004 첨부 순서를 바꾸고 임시저장·실제 S3 업�
     isDraft: true,
     isScheduled: false,
     images: [
-      { type: 'PHOTO', fileName: 'e2e-second.png' },
-      { type: 'PHOTO', fileName: 'e2e-first.png' },
+      { type: 'PHOTO', fileName: 'e2e-second.png', fileComment: '' },
+      { type: 'PHOTO', fileName: 'e2e-first.png', fileComment: '' },
     ],
   });
   await noticeEditor.persisted(noticeQa.title, result.postId, '임시저장');
