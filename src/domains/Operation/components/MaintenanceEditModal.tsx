@@ -17,6 +17,7 @@ import type {
   ServerMaintenanceListItem,
 } from '../types/maintenance';
 import { MaintenanceDetailLoader } from './MaintenanceDetailLoader';
+import { MaintenanceImageInput } from './MaintenanceImageInput';
 
 type ChangeMode = 'keep' | 'change' | 'remove';
 
@@ -240,11 +241,10 @@ function MaintenanceEditForm({
             {imageMode === 'change' && (
               <div className='flex flex-col gap-1'>
                 <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
-                <Input
+                <MaintenanceImageInput
                   id={`${id}-image`}
-                  type='file'
-                  accept='image/*'
-                  onChange={(event) => setImage(event.target.files?.[0])}
+                  file={image}
+                  onChange={setImage}
                 />
               </div>
             )}

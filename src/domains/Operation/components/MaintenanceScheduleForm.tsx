@@ -15,6 +15,7 @@ import { getErrorMessage } from '@/shared/utils';
 
 import { DEFAULT_MAINTENANCE_NOTICE } from '../constants/maintenance';
 import type { ServerMaintenance } from '../types/maintenance';
+import { MaintenanceImageInput } from './MaintenanceImageInput';
 
 export type MaintenanceDraft = Pick<
   ServerMaintenance,
@@ -239,12 +240,11 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
                       </Tooltip>
                     </Tooltip.Provider>
                   </div>
-                  <Input
-                    ref={imageInput}
+                  <MaintenanceImageInput
+                    inputRef={imageInput}
                     id={`${id}-image`}
-                    type='file'
-                    accept='image/*'
-                    onChange={(event) => setImage(event.target.files?.[0])}
+                    file={image}
+                    onChange={setImage}
                   />
                 </div>
                 <div className='flex flex-col gap-1'>
