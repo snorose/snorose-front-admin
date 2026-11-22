@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
-import { InfoIcon } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { PageHeader } from '@/shared/components';
 import { Alert, Button } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
+import { MaintenanceListSection } from '@/domains/Operation/components/MaintenanceListSection';
 import {
   type MaintenanceDraft,
   MaintenanceScheduleForm,
@@ -15,10 +16,18 @@ import {
 import {
   MaintenanceOutcomeUnknownError,
   createAdminMaintenance,
+  getAdminMaintenances,
   uploadMaintenanceImage,
 } from '@/apis/maintenance';
 
+const MAINTENANCE_QUERY_KEY = ['server-maintenances'];
+
 export default function ServerMaintenancePage() {
+  const queryClient = useQueryClient();
+  const list = useQuery({
+    queryKey: MAINTENANCE_QUERY_KEY,
+    queryFn: getAdminMaintenances,
+  });
   const [upload, setUpload] = useState<{
     id: number;
     url?: string;
@@ -58,6 +67,7 @@ export default function ServerMaintenancePage() {
       }
       throw error;
     }
+    void queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
     if (draft.image) {
       const pending = {
         id: result.id,
@@ -82,15 +92,8 @@ export default function ServerMaintenancePage() {
     <div className='flex w-full min-w-0 flex-col gap-6'>
       <PageHeader
         title='서버 점검 일정 관리'
-        description='서버 점검 일정을 등록할 수 있어요.'
+        description='서버 점검 일정을 등록하고 조회할 수 있어요.'
       />
-      <Alert role='status'>
-        <InfoIcon aria-hidden='true' />
-        <Alert.Title>일정 조회·수정·삭제는 준비 중입니다.</Alert.Title>
-        <Alert.Description>
-          현재 서버 점검 일정 등록 기능을 사용할 수 있습니다.
-        </Alert.Description>
-      </Alert>
       {unknownOutcome ? (
         <Alert variant='destructive'>
           <Alert.Title>등록 결과를 확인할 수 없습니다.</Alert.Title>
@@ -141,6 +144,19 @@ export default function ServerMaintenancePage() {
       ) : (
         <MaintenanceScheduleForm onSave={save} />
       )}
+      <MaintenanceListSection
+        items={list.data ?? []}
+        isLoading={list.isPending}
+        isFetching={list.isFetching}
+        errorMessage={
+          list.isError
+            ? getErrorMessage(list.error, '서버 점검 일정 조회에 실패했습니다.')
+            : undefined
+        }
+        onRetry={() => {
+          void list.refetch();
+        }}
+      />
     </div>
   );
 }

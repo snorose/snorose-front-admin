@@ -1,9 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
   createAdminMaintenance,
+  getAdminMaintenances,
   uploadMaintenanceImage,
 } from '@/apis/maintenance';
 
@@ -12,10 +14,12 @@ import ServerMaintenancePage from './ServerMaintenancePage';
 vi.mock('@/apis/maintenance', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/apis/maintenance')>()),
   createAdminMaintenance: vi.fn(),
+  getAdminMaintenances: vi.fn(),
   uploadMaintenanceImage: vi.fn(),
 }));
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(getAdminMaintenances).mockResolvedValue([]);
   vi.mocked(createAdminMaintenance).mockResolvedValue({
     id: 7,
     attachmentUrlList: [],
@@ -27,6 +31,17 @@ beforeAll(() => {
   HTMLElement.prototype.releasePointerCapture = () => undefined;
   HTMLElement.prototype.scrollIntoView = () => undefined;
 });
+
+function renderPage() {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  });
+  return render(
+    <QueryClientProvider client={client}>
+      <ServerMaintenancePage />
+    </QueryClientProvider>
+  );
+}
 
 async function chooseDate(
   user: ReturnType<typeof userEvent.setup>,
@@ -69,7 +84,7 @@ async function fillForm(user: ReturnType<typeof userEvent.setup>) {
 describe('서버 점검 생성 API 연동', () => {
   test('명세의 로컬 날짜 형식과 필수 메모를 전송하고 성공 후 초기화한다', async () => {
     const user = userEvent.setup();
-    render(<ServerMaintenancePage />);
+    renderPage();
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: '생성' }));
     await waitFor(() =>
@@ -82,14 +97,15 @@ describe('서버 점검 생성 API 연동', () => {
       memo: 'DB 작업',
       noticeMessage: '서비스 안정화를 위한 서버 점검이 진행 중입니다.',
     });
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    await waitFor(() => expect(getAdminMaintenances).toHaveBeenCalledTimes(2));
   });
   test('중복 기간 응답의 메시지를 표시하고 입력을 유지한다', async () => {
     vi.mocked(createAdminMaintenance).mockRejectedValue(
       new Error('중복된 서버 점검 기간 일정이 있습니다')
     );
     const user = userEvent.setup();
-    render(<ServerMaintenancePage />);
+    renderPage();
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: '생성' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -106,7 +122,7 @@ describe('서버 점검 생성 API 연동', () => {
       })
     );
     const user = userEvent.setup();
-    render(<ServerMaintenancePage />);
+    renderPage();
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: '생성' }));
     const saving = screen.getByRole('button', { name: '저장 중…' });
@@ -127,7 +143,7 @@ describe('서버 점검 생성 API 연동', () => {
       .mockRejectedValueOnce(new Error('이미지 업로드 실패'))
       .mockResolvedValueOnce(undefined);
     const user = userEvent.setup();
-    render(<ServerMaintenancePage />);
+    renderPage();
     await fillForm(user);
     const file = new File(['image'], 'notice.png', { type: 'image/png' });
     await user.upload(screen.getByLabelText(/안내 이미지/), file);
@@ -143,4 +159,49 @@ describe('서버 점검 생성 API 연동', () => {
       file
     );
   });
+});
+
+test('목록 조회 실패 후 다시 시도하면 서버 번호와 상태를 표시한다', async () => {
+  vi.mocked(getAdminMaintenances)
+    .mockRejectedValueOnce(new Error('목록 조회 실패'))
+    .mockResolvedValueOnce([
+      {
+        id: 12,
+        number: 9,
+        status: 'COMPLETED',
+        title: '완료 점검',
+        startAt: '2099-11-10 02:00:00',
+        endAt: '2099-11-10 04:00:00',
+        createdAt: '2026-11-08 18:00:00',
+        updatedAt: '2026-11-08 19:00:00',
+      },
+    ]);
+  const user = userEvent.setup();
+  renderPage();
+  expect(await screen.findByRole('alert')).toHaveTextContent('목록 조회 실패');
+  expect(screen.queryByText('등록된 일정이 없습니다.')).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '다시 시도' }));
+  expect(
+    await screen.findByRole('cell', { name: '완료 점검' })
+  ).toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: '9' })).toBeInTheDocument();
+  expect(screen.getByText('종료')).toBeInTheDocument();
+});
+
+test('목록 응답 대기 중 로딩 표시 후 빈 목록을 표시한다', async () => {
+  let finish!: (value: []) => void;
+  vi.mocked(getAdminMaintenances).mockReturnValue(
+    new Promise((resolve) => {
+      finish = resolve;
+    })
+  );
+  renderPage();
+  expect(screen.getByRole('status')).toHaveTextContent(
+    '서버 점검 일정을 불러오는 중입니다.'
+  );
+  expect(screen.queryByText('등록된 일정이 없습니다.')).not.toBeInTheDocument();
+  finish([]);
+  expect(
+    await screen.findByText('등록된 일정이 없습니다.')
+  ).toBeInTheDocument();
 });

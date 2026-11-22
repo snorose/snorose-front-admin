@@ -3,6 +3,8 @@ import { isAxiosError } from 'axios';
 import { axiosInstance } from '@/shared/axios/instance';
 import type { BaseResponse } from '@/shared/types';
 
+import type { ServerMaintenanceListItem } from '@/domains/Operation/types/maintenance';
+
 export interface CreateMaintenanceRequest {
   title: string;
   startAt: string;
@@ -59,4 +61,12 @@ export async function uploadMaintenanceImage(url: string, file: File) {
     signal: AbortSignal.timeout(120_000),
   });
   if (!response.ok) throw new Error('이미지 업로드에 실패했습니다.');
+}
+
+export async function getAdminMaintenances() {
+  const { data } = await axiosInstance.get<
+    BaseResponse<ServerMaintenanceListItem[]>
+  >('/v1/admin/server-maintenances');
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
 }

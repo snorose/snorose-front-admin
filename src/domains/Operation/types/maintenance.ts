@@ -6,3 +6,8 @@ export interface ServerMaintenance {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ServerMaintenanceListItem extends ServerMaintenance {
+  number: number;
+  status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED';
+}

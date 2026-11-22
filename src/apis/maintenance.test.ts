@@ -5,7 +5,7 @@ import { axiosInstance } from '@/shared/axios/instance';
 import { createAdminMaintenance, uploadMaintenanceImage } from './maintenance';
 
 vi.mock('@/shared/axios/instance', () => ({
-  axiosInstance: { post: vi.fn() },
+  axiosInstance: { post: vi.fn(), get: vi.fn() },
 }));
 beforeEach(() => {
   vi.clearAllMocks();
@@ -64,4 +64,20 @@ test('성공 여부나 생성 번호가 누락된 응답은 결과 불명으로 
       MaintenanceOutcomeUnknownError
     );
   }
+});
+
+test('목록은 인증 axios로 조회하고 배열을 그대로 반환한다', async () => {
+  const { getAdminMaintenances } = await import('./maintenance');
+  const result = [{ id: 12, number: 1, status: 'SCHEDULED' }];
+  vi.mocked(axiosInstance.get).mockResolvedValue({
+    data: { isSuccess: true, result },
+  });
+  expect(await getAdminMaintenances()).toEqual(result);
+  expect(axiosInstance.get).toHaveBeenCalledWith(
+    '/v1/admin/server-maintenances'
+  );
+  vi.mocked(axiosInstance.get).mockResolvedValue({
+    data: { isSuccess: false, message: '조회 실패' },
+  });
+  await expect(getAdminMaintenances()).rejects.toThrow('조회 실패');
 });
