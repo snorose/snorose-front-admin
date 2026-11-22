@@ -3,25 +3,18 @@ import { useState } from 'react';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
 import {
-  DescriptionList,
   DescriptionListModal,
   SectionTitleWithCount,
   TableStateRow,
 } from '@/shared/components';
-import {
-  Badge,
-  Button,
-  Dialog,
-  DropdownMenu,
-  Input,
-  Label,
-  Table,
-} from '@/shared/components/ui';
+import { Badge, Button, DropdownMenu, Table } from '@/shared/components/ui';
+
+import { PushNotificationEditModal } from './PushNotificationEditModal';
 
 type SendStatus = '예약' | '성공' | '일부 실패' | '예약 취소';
 type SendTarget = '전체 회원' | '관리자' | '일부 회원';
 
-interface NotificationHistory {
+export interface NotificationHistory {
   id: number;
   status: SendStatus;
   requestedAt: string;
@@ -30,6 +23,12 @@ interface NotificationHistory {
   category: '광고성' | '정보성';
   memberCount: number | null;
   admin: string;
+  title: string;
+  body: string;
+  url: string;
+  isExternal: boolean;
+  sendTiming: 'immediate' | 'scheduled';
+  scheduledAt: string;
 }
 
 // 목록 API 연동 전 화면 확인용 데이터입니다.
@@ -43,6 +42,12 @@ const MOCK_NOTIFICATIONS: NotificationHistory[] = [
     category: '광고성',
     memberCount: null,
     admin: 'admin_kim',
+    title: '광복절 기념 이벤트 안내',
+    body: '광복절 기념 이벤트에 참여해 주세요. 자세한 내용은 공지에서 확인하실 수 있습니다.',
+    url: '/board/notice/post/815',
+    isExternal: false,
+    sendTiming: 'scheduled',
+    scheduledAt: '2026-08-15T16:00',
   },
   {
     id: 4,
@@ -53,6 +58,12 @@ const MOCK_NOTIFICATIONS: NotificationHistory[] = [
     category: '정보성',
     memberCount: null,
     admin: 'snorose_admin',
+    title: '정기 모임 알림',
+    body: '정기 모임 일정을 확인해 주세요.',
+    url: '/board/notice/post/813',
+    isExternal: false,
+    sendTiming: 'scheduled',
+    scheduledAt: '2026-08-15T16:00',
   },
   {
     id: 3,
@@ -63,6 +74,12 @@ const MOCK_NOTIFICATIONS: NotificationHistory[] = [
     category: '정보성',
     memberCount: null,
     admin: 'snorose_admin',
+    title: '시스템 점검 안내',
+    body: '시스템 점검 안내 내용을 확인해 주세요.',
+    url: '/',
+    isExternal: false,
+    sendTiming: 'immediate',
+    scheduledAt: '',
   },
   {
     id: 2,
@@ -73,6 +90,12 @@ const MOCK_NOTIFICATIONS: NotificationHistory[] = [
     category: '정보성',
     memberCount: 1,
     admin: 'admin_park',
+    title: '테스트 알림',
+    body: '테스트 알림 내용을 확인해 주세요.',
+    url: '/',
+    isExternal: false,
+    sendTiming: 'immediate',
+    scheduledAt: '',
   },
   {
     id: 1,
@@ -83,6 +106,12 @@ const MOCK_NOTIFICATIONS: NotificationHistory[] = [
     category: '정보성',
     memberCount: 847,
     admin: 'admin_lee',
+    title: '컴퓨터공학과 회원 안내',
+    body: '컴퓨터공학과 회원 안내 내용을 확인해 주세요.',
+    url: '/',
+    isExternal: false,
+    sendTiming: 'immediate',
+    scheduledAt: '',
   },
 ];
 
@@ -124,6 +153,26 @@ function getNotificationDetails(notification: NotificationHistory) {
   return [
     { label: 'ID', value: notification.id },
     { label: '알림명', value: notification.name },
+    { label: '알림 제목', value: notification.title },
+    { label: '알림 내용', value: notification.body },
+    { label: '연결 주소', value: notification.url },
+    {
+      label: '주소 유형',
+      value: notification.isExternal ? '외부 URL' : '스노로즈 내부 URL',
+    },
+    {
+      label: '발송 시점',
+      value:
+        notification.sendTiming === 'scheduled' ? '예약 발송' : '즉시 발송',
+    },
+    ...(notification.sendTiming === 'scheduled'
+      ? [
+          {
+            label: '예약 발송 일시',
+            value: notification.scheduledAt.replace('T', ' '),
+          },
+        ]
+      : []),
     { label: '발송 상태', value: notification.status },
     { label: '발송 요청 일시', value: notification.requestedAt },
     { label: '발송 대상', value: notification.target },
@@ -268,76 +317,25 @@ export function PushNotificationList() {
           </Table.Body>
         </Table>
       </div>
-      <Dialog
-        open={editing !== null}
-        onOpenChange={(open) => {
-          if (!open) setEditing(null);
-        }}
-      >
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>알림 수정</Dialog.Title>
-            <Dialog.Description>
-              예약 알림 정보를 확인하고 알림명을 수정하시겠습니까?
-            </Dialog.Description>
-          </Dialog.Header>
-          <form
-            className='flex flex-col gap-4'
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (!editing?.name.trim()) return;
-              setNotifications((items) =>
-                items.map((item) =>
-                  item.id === editing.id
-                    ? { ...editing, name: editing.name.trim() }
-                    : item
-                )
-              );
-              setEditing(null);
-            }}
-          >
-            <div className='flex flex-col gap-1'>
-              <Label htmlFor='notification-edit-name'>알림명</Label>
-              <Input
-                id='notification-edit-name'
-                required
-                value={editing?.name ?? ''}
-                onChange={(event) =>
-                  setEditing((item) =>
-                    item ? { ...item, name: event.target.value } : null
-                  )
-                }
-              />
-            </div>
-            {editing && (
-              <DescriptionList
-                items={getNotificationDetails(editing).filter(
-                  (item) => item.label !== '알림명'
-                )}
-              />
-            )}
-            <Dialog.Footer className='mt-2 grid grid-cols-2 gap-4 sm:grid sm:grid-cols-2 sm:justify-normal'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => setEditing(null)}
-              >
-                취소
-              </Button>
-              <Button type='submit' disabled={!editing?.name.trim()}>
-                수정
-              </Button>
-            </Dialog.Footer>
-          </form>
-        </Dialog.Content>
-      </Dialog>
+      {editing && (
+        <PushNotificationEditModal
+          notification={editing}
+          onClose={() => setEditing(null)}
+          onSave={(updated) => {
+            setNotifications((items) =>
+              items.map((item) => (item.id === updated.id ? updated : item))
+            );
+            setEditing(null);
+          }}
+        />
+      )}
       {deleting && (
         <DescriptionListModal
           open
           onClose={() => setDeleting(null)}
           title='알림 삭제'
           description='알림 정보를 확인하고 삭제하시겠습니까?'
-          className='max-w-xs sm:max-w-sm'
+          className='max-h-[85dvh] overflow-y-auto sm:max-w-lg'
           items={getNotificationDetails(deleting)}
           action={{
             label: '삭제',
