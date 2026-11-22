@@ -3,7 +3,6 @@ import {
   FileText,
   HandCoins,
   type LucideIcon,
-  Megaphone,
   MessageSquareWarning,
   Settings,
   User,
@@ -24,11 +23,6 @@ export type SidebarSubMenu = {
 };
 
 export const SIDEBAR_MENUS: SidebarMenu[] = [
-  {
-    title: '공지',
-    icon: Megaphone,
-    items: [{ title: '일반 공지', url: PATHS.NOTICE_GENERAL }],
-  },
   {
     title: '회원',
     icon: User,
@@ -54,6 +48,10 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
       {
         title: '댓글 관리',
         url: PATHS.POST_COMMENTS,
+      },
+      {
+        title: '일반 공지',
+        url: PATHS.NOTICE_GENERAL,
       },
     ],
   },
