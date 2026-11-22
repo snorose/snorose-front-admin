@@ -1,10 +1,11 @@
 import { useId, useRef, useState } from 'react';
 
 import { DateTimePicker, SectionTitle } from '@/shared/components';
-import { Button, Input, Label } from '@/shared/components/ui';
+import { Button, Input, Label, Textarea } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { getErrorMessage } from '@/shared/utils';
 
+import { DEFAULT_MAINTENANCE_NOTICE } from '../constants/maintenance';
 import type { ServerMaintenance } from '../types/maintenance';
 
 export type MaintenanceDraft = Pick<
@@ -21,7 +22,9 @@ interface Props {
 export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
   const id = useId();
   const [memo, setMemo] = useState('');
-  const [noticeMessage, setNoticeMessage] = useState('');
+  const [noticeMessage, setNoticeMessage] = useState(
+    DEFAULT_MAINTENANCE_NOTICE
+  );
   const [image, setImage] = useState<File>();
   const imageInput = useRef<HTMLInputElement>(null);
   const saving = useRef(false);
@@ -45,7 +48,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
     end.setDateTime(initial?.endAt ?? '');
     setError('');
     setMemo('');
-    setNoticeMessage('');
+    setNoticeMessage(DEFAULT_MAINTENANCE_NOTICE);
     setImage(undefined);
     if (imageInput.current) imageInput.current.value = '';
   };
@@ -150,38 +153,41 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             />
           </div>
           {!initial && (
-            <>
-              <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-memo`} required>
-                  메모
-                </Label>
-                <Input
-                  id={`${id}-memo`}
-                  value={memo}
-                  onChange={(event) => setMemo(event.target.value)}
-                  required
-                />
-              </div>
-              <div className='flex flex-col gap-1'>
+            <div className='grid gap-4 sm:grid-cols-2'>
+              <div className='flex min-w-0 flex-col gap-1'>
                 <Label htmlFor={`${id}-notice`}>안내 문구 (선택)</Label>
-                <Input
+                <Textarea
                   id={`${id}-notice`}
+                  className='field-sizing-fixed h-28 min-h-28 resize-y'
                   value={noticeMessage}
                   onChange={(event) => setNoticeMessage(event.target.value)}
-                  placeholder='서비스 안정화를 위한 서버 점검이 진행 중입니다.'
+                  placeholder={DEFAULT_MAINTENANCE_NOTICE}
                 />
               </div>
-              <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-image`}>안내 이미지 (선택, 1개)</Label>
-                <Input
-                  ref={imageInput}
-                  id={`${id}-image`}
-                  type='file'
-                  accept='image/*'
-                  onChange={(event) => setImage(event.target.files?.[0])}
-                />
+              <div className='flex min-w-0 flex-col gap-4'>
+                <div className='flex flex-col gap-1'>
+                  <Label htmlFor={`${id}-image`}>안내 이미지 (선택, 1개)</Label>
+                  <Input
+                    ref={imageInput}
+                    id={`${id}-image`}
+                    type='file'
+                    accept='image/*'
+                    onChange={(event) => setImage(event.target.files?.[0])}
+                  />
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <Label htmlFor={`${id}-memo`} required>
+                    메모
+                  </Label>
+                  <Input
+                    id={`${id}-memo`}
+                    value={memo}
+                    onChange={(event) => setMemo(event.target.value)}
+                    required
+                  />
+                </div>
               </div>
-            </>
+            </div>
           )}
           {error && (
             <p id={errorId} role='alert' className='text-destructive text-sm'>

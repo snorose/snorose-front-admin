@@ -14,6 +14,7 @@ import {
   type MaintenanceDraft,
   MaintenanceScheduleForm,
 } from '@/domains/Operation/components/MaintenanceScheduleForm';
+import { DEFAULT_MAINTENANCE_NOTICE } from '@/domains/Operation/constants/maintenance';
 import type { ServerMaintenanceListItem } from '@/domains/Operation/types/maintenance';
 
 import {
@@ -53,9 +54,7 @@ export default function ServerMaintenancePage() {
         startAt: `${draft.startAt.replace('T', ' ')}:00`,
         endAt: `${draft.endAt.replace('T', ' ')}:00`,
         memo: draft.memo ?? '',
-        noticeMessage:
-          draft.noticeMessage ??
-          '서비스 안정화를 위한 서버 점검이 진행 중입니다.',
+        noticeMessage: draft.noticeMessage ?? DEFAULT_MAINTENANCE_NOTICE,
         ...(draft.image
           ? {
               attachments: [

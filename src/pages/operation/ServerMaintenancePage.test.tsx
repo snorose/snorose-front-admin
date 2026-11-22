@@ -95,7 +95,8 @@ describe('서버 점검 생성 API 연동', () => {
       startAt: '2026-10-01 02:00:00',
       endAt: '2026-10-01 03:00:00',
       memo: 'DB 작업',
-      noticeMessage: '서비스 안정화를 위한 서버 점검이 진행 중입니다.',
+      noticeMessage:
+        '안정적인 서비스 제공을 위한 서버 점검을 하고 있어요.\n이용에 불편을 드리게 된 점 양해 부탁드립니다.',
     });
     expect(screen.getByRole('table')).toBeInTheDocument();
     await waitFor(() => expect(getAdminMaintenances).toHaveBeenCalledTimes(2));
