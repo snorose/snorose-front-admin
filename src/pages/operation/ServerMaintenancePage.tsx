@@ -100,7 +100,7 @@ export default function ServerMaintenancePage() {
     <div className='flex w-full min-w-0 flex-col gap-6'>
       <PageHeader
         title='서버 점검 일정 관리'
-        description='서버 점검 일정을 등록, 조회, 수정, 삭제할 수 있어요.'
+        description='서버 점검 일정을 생성하고 조회·수정·삭제할 수 있어요.'
       />
       <NoticePanel
         items={[
