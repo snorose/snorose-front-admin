@@ -1,11 +1,17 @@
-import { MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
 
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+
+import { SectionTitleWithCount, TableStateRow } from '@/shared/components';
 import {
-  DescriptionList,
-  SectionTitleWithCount,
-  TableStateRow,
-} from '@/shared/components';
-import { Badge, Button, Dialog, Table } from '@/shared/components/ui';
+  Badge,
+  Button,
+  Dialog,
+  DropdownMenu,
+  Input,
+  Label,
+  Table,
+} from '@/shared/components/ui';
 
 type SendStatus = '예약' | '성공' | '일부 실패' | '예약 취소';
 type SendTarget = '전체 회원' | '관리자' | '일부 회원';
@@ -110,6 +116,9 @@ function formatMemberCount(count: number | null) {
 }
 
 export function PushNotificationList() {
+  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  const [editing, setEditing] = useState<NotificationHistory | null>(null);
+  const [deleting, setDeleting] = useState<NotificationHistory | null>(null);
   return (
     <section
       aria-labelledby='notification-history-title'
@@ -118,7 +127,7 @@ export function PushNotificationList() {
       <SectionTitleWithCount
         title='알림 발송 목록 조회'
         titleId='notification-history-title'
-        totalCount={MOCK_NOTIFICATIONS.length}
+        totalCount={notifications.length}
         status='ready'
       />
       <div className='overflow-x-auto rounded-lg border'>
@@ -155,14 +164,14 @@ export function PushNotificationList() {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {MOCK_NOTIFICATIONS.length === 0 ? (
+            {notifications.length === 0 ? (
               <TableStateRow
                 state='empty'
                 colSpan={9}
                 message='발송한 알림이 없습니다.'
               />
             ) : (
-              MOCK_NOTIFICATIONS.map((notification) => (
+              notifications.map((notification) => (
                 <Table.Row key={notification.id}>
                   <Table.Cell>{notification.id}</Table.Cell>
                   <Table.Cell>
@@ -202,8 +211,8 @@ export function PushNotificationList() {
                   <Table.Cell>{notification.admin}</Table.Cell>
                   <Table.Cell>
                     {notification.status === '예약' && (
-                      <Dialog>
-                        <Dialog.Trigger asChild>
+                      <DropdownMenu>
+                        <DropdownMenu.Trigger asChild>
                           <Button
                             type='button'
                             variant='ghost'
@@ -212,48 +221,24 @@ export function PushNotificationList() {
                           >
                             <MoreHorizontal aria-hidden='true' />
                           </Button>
-                        </Dialog.Trigger>
-                        <Dialog.Content>
-                          <Dialog.Header>
-                            <Dialog.Title>알림 발송 상세</Dialog.Title>
-                            <Dialog.Description>
-                              선택한 알림의 발송 요청 정보입니다.
-                            </Dialog.Description>
-                          </Dialog.Header>
-                          <DescriptionList
-                            items={[
-                              { label: 'ID', value: notification.id },
-                              {
-                                label: '발송 상태',
-                                value: notification.status,
-                              },
-                              {
-                                label: '발송 요청 일시',
-                                value: notification.requestedAt,
-                              },
-                              {
-                                label: '발송 대상',
-                                value: notification.target,
-                              },
-                              { label: '알림명', value: notification.name },
-                              {
-                                label: '알림 구분',
-                                value: notification.category,
-                              },
-                              {
-                                label: '발송 대상 회원 수',
-                                value: formatMemberCount(
-                                  notification.memberCount
-                                ),
-                              },
-                              {
-                                label: '요청 관리자',
-                                value: notification.admin,
-                              },
-                            ]}
-                          />
-                        </Dialog.Content>
-                      </Dialog>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Content align='end'>
+                          <DropdownMenu.Item
+                            onSelect={() => setEditing({ ...notification })}
+                          >
+                            <Pencil aria-hidden='true' />
+                            수정
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Separator />
+                          <DropdownMenu.Item
+                            variant='destructive'
+                            onSelect={() => setDeleting(notification)}
+                          >
+                            <Trash2 aria-hidden='true' />
+                            삭제
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu>
                     )}
                   </Table.Cell>
                 </Table.Row>
@@ -262,6 +247,98 @@ export function PushNotificationList() {
           </Table.Body>
         </Table>
       </div>
+      <Dialog
+        open={editing !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditing(null);
+        }}
+      >
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title>알림 수정</Dialog.Title>
+            <Dialog.Description>
+              예약 알림의 알림명을 수정합니다.
+            </Dialog.Description>
+          </Dialog.Header>
+          <form
+            className='flex flex-col gap-4'
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!editing?.name.trim()) return;
+              setNotifications((items) =>
+                items.map((item) =>
+                  item.id === editing.id
+                    ? { ...editing, name: editing.name.trim() }
+                    : item
+                )
+              );
+              setEditing(null);
+            }}
+          >
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor='notification-edit-name'>알림명</Label>
+              <Input
+                id='notification-edit-name'
+                required
+                value={editing?.name ?? ''}
+                onChange={(event) =>
+                  setEditing((item) =>
+                    item ? { ...item, name: event.target.value } : null
+                  )
+                }
+              />
+            </div>
+            <Dialog.Footer>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setEditing(null)}
+              >
+                취소
+              </Button>
+              <Button type='submit' disabled={!editing?.name.trim()}>
+                저장
+              </Button>
+            </Dialog.Footer>
+          </form>
+        </Dialog.Content>
+      </Dialog>
+      <Dialog
+        open={deleting !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleting(null);
+        }}
+      >
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title>알림 삭제</Dialog.Title>
+            <Dialog.Description className='break-words'>
+              ‘{deleting?.name}’ 알림을 삭제하시겠습니까?
+            </Dialog.Description>
+          </Dialog.Header>
+          <Dialog.Footer>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => setDeleting(null)}
+            >
+              취소
+            </Button>
+            <Button
+              type='button'
+              variant='destructive'
+              onClick={() => {
+                setNotifications((items) =>
+                  items.filter((item) => item.id !== deleting?.id)
+                );
+                setDeleting(null);
+              }}
+            >
+              삭제
+            </Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
     </section>
   );
 }
