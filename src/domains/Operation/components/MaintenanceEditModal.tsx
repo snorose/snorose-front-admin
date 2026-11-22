@@ -155,8 +155,8 @@ export function MaintenanceEditModal({
         <Dialog.Header>
           <Dialog.Title>서버 점검 일정 수정</Dialog.Title>
           <Dialog.Description>
-            일정 정보를 수정합니다. 관리자 메모·안내 문구·이미지는 변경을 선택한
-            경우에만 반영됩니다.
+            안내 문구와 이미지는 점검 중 사용자에게 표시됩니다. 관리자 메모·안내
+            문구·이미지는 변경을 선택한 경우에만 반영됩니다.
           </Dialog.Description>
         </Dialog.Header>
         <form
@@ -171,7 +171,7 @@ export function MaintenanceEditModal({
             className='flex min-w-0 flex-col gap-4 [&_[data-slot=label]]:py-0 [&_[data-slot=label]]:font-medium'
           >
             <div className='flex flex-col gap-1'>
-              <Label htmlFor={`${id}-title`}>일정 제목</Label>
+              <Label htmlFor={`${id}-title`}>관리용 일정 제목</Label>
               <Input
                 id={`${id}-title`}
                 value={title}
@@ -211,10 +211,10 @@ export function MaintenanceEditModal({
                 />
               </div>
             )}
-            {modeSelect('안내 문구 처리', noticeMode, setNoticeMode)}
+            {modeSelect('사용자 안내 문구 처리', noticeMode, setNoticeMode)}
             {noticeMode === 'change' && (
               <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-notice`}>새 안내 문구</Label>
+                <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
                 <Input
                   id={`${id}-notice`}
                   value={notice}
@@ -222,10 +222,10 @@ export function MaintenanceEditModal({
                 />
               </div>
             )}
-            {modeSelect('안내 이미지 처리', imageMode, setImageMode)}
+            {modeSelect('사용자 안내 이미지 처리', imageMode, setImageMode)}
             {imageMode === 'change' && (
               <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-image`}>새 안내 이미지 (1개)</Label>
+                <Label htmlFor={`${id}-image`}>사용자 안내 이미지 (1개)</Label>
                 <Input
                   id={`${id}-image`}
                   type='file'

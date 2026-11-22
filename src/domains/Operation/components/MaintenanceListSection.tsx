@@ -65,7 +65,7 @@ export function MaintenanceListSection({
               {[
                 '번호',
                 '상태',
-                '일정 제목',
+                '관리용 일정 제목',
                 '시작 일시',
                 '종료 일시',
                 '생성 일시',

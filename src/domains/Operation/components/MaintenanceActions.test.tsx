@@ -43,8 +43,8 @@ test('수정 기본값은 메모·문구·이미지를 보내지 않으며 성�
   render(
     <MaintenanceEditModal item={item} onChanged={onChanged} onClose={onClose} />
   );
-  await user.clear(screen.getByLabelText('일정 제목'));
-  await user.type(screen.getByLabelText('일정 제목'), '변경 점검');
+  await user.clear(screen.getByLabelText('관리용 일정 제목'));
+  await user.type(screen.getByLabelText('관리용 일정 제목'), '변경 점검');
   await user.click(screen.getByRole('button', { name: '수정' }));
   expect(updateAdminMaintenance).toHaveBeenCalledExactlyOnceWith(12, {
     title: '변경 점검',
@@ -61,8 +61,14 @@ test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오
   render(
     <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={onClose} />
   );
-  await user.selectOptions(screen.getByLabelText('안내 문구 처리'), 'remove');
-  await user.selectOptions(screen.getByLabelText('안내 이미지 처리'), 'remove');
+  await user.selectOptions(
+    screen.getByLabelText('사용자 안내 문구 처리'),
+    'remove'
+  );
+  await user.selectOptions(
+    screen.getByLabelText('사용자 안내 이미지 처리'),
+    'remove'
+  );
   await user.click(screen.getByRole('button', { name: '수정' }));
   expect(updateAdminMaintenance).toHaveBeenCalledWith(
     12,
@@ -84,9 +90,12 @@ test('이미지 재시도는 PATCH를 반복하지 않는다', async () => {
   render(
     <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={onClose} />
   );
-  await user.selectOptions(screen.getByLabelText('안내 이미지 처리'), 'change');
+  await user.selectOptions(
+    screen.getByLabelText('사용자 안내 이미지 처리'),
+    'change'
+  );
   await user.upload(
-    screen.getByLabelText('새 안내 이미지 (1개)'),
+    screen.getByLabelText('사용자 안내 이미지 (1개)'),
     new File(['image'], 'a.png', { type: 'image/png' })
   );
   await user.click(screen.getByRole('button', { name: '수정' }));

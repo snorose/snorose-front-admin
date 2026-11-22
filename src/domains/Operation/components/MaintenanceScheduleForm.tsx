@@ -117,7 +117,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
         <fieldset disabled={isSaving} className='flex min-w-0 flex-col gap-4'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor={titleId} required>
-              일정 제목
+              관리용 일정 제목
             </Label>
             <Input
               id={titleId}
@@ -155,7 +155,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
           {!initial && (
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='flex min-w-0 flex-col gap-1'>
-                <Label htmlFor={`${id}-notice`}>안내 문구 (선택)</Label>
+                <Label htmlFor={`${id}-notice`}>사용자 안내 문구 (선택)</Label>
                 <Textarea
                   id={`${id}-notice`}
                   className='field-sizing-fixed h-28 min-h-28 resize-y'
@@ -166,7 +166,9 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
               </div>
               <div className='flex min-w-0 flex-col gap-4'>
                 <div className='flex flex-col gap-1'>
-                  <Label htmlFor={`${id}-image`}>안내 이미지 (선택, 1개)</Label>
+                  <Label htmlFor={`${id}-image`}>
+                    사용자 안내 이미지 (선택, 1개)
+                  </Label>
                   <Input
                     ref={imageInput}
                     id={`${id}-image`}
