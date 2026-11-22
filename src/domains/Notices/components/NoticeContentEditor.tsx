@@ -53,8 +53,14 @@ export default function NoticeContentEditor({
   );
   return (
     <div className='notice-editor min-w-0'>
-      <NoticeEditorToolbar editor={editor} onOpenLink={openLink} />
-      {embedLink && (
+      {/* 잠금 전에 열린 포털 메뉴가 남지 않도록 툴바만 초기화합니다. */}
+      <NoticeEditorToolbar
+        key={String(disabled)}
+        editor={editor}
+        onOpenLink={openLink}
+        disabled={disabled}
+      />
+      {embedLink && !disabled && (
         <div
           role='group'
           aria-label='링크 첨부 방식'
@@ -82,11 +88,12 @@ export default function NoticeContentEditor({
         </div>
       )}
       <EditorContent editor={editor} />
-      <Dialog open={linkOpen} onOpenChange={setLinkOpen}>
+      <Dialog open={linkOpen && !disabled} onOpenChange={setLinkOpen}>
         <Dialog.Content
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            if (editor && !editor.isDestroyed) editor.commands.focus();
+            if (!disabled && editor && !editor.isDestroyed)
+              editor.commands.focus();
           }}
         >
           <Dialog.Header>
