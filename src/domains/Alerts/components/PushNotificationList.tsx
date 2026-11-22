@@ -2,7 +2,12 @@ import { useState } from 'react';
 
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
-import { SectionTitleWithCount, TableStateRow } from '@/shared/components';
+import {
+  DescriptionList,
+  DescriptionListModal,
+  SectionTitleWithCount,
+  TableStateRow,
+} from '@/shared/components';
 import {
   Badge,
   Button,
@@ -113,6 +118,22 @@ function HistoryBadge({
 
 function formatMemberCount(count: number | null) {
   return count === null ? '-' : `${count.toLocaleString('ko-KR')}명`;
+}
+
+function getNotificationDetails(notification: NotificationHistory) {
+  return [
+    { label: 'ID', value: notification.id },
+    { label: '알림명', value: notification.name },
+    { label: '발송 상태', value: notification.status },
+    { label: '발송 요청 일시', value: notification.requestedAt },
+    { label: '발송 대상', value: notification.target },
+    { label: '알림 구분', value: notification.category },
+    {
+      label: '발송 대상 회원 수',
+      value: formatMemberCount(notification.memberCount),
+    },
+    { label: '요청 관리자', value: notification.admin },
+  ];
 }
 
 export function PushNotificationList() {
@@ -257,7 +278,7 @@ export function PushNotificationList() {
           <Dialog.Header>
             <Dialog.Title>알림 수정</Dialog.Title>
             <Dialog.Description>
-              예약 알림의 알림명을 수정합니다.
+              예약 알림 정보를 확인하고 알림명을 수정하시겠습니까?
             </Dialog.Description>
           </Dialog.Header>
           <form
@@ -288,7 +309,14 @@ export function PushNotificationList() {
                 }
               />
             </div>
-            <Dialog.Footer>
+            {editing && (
+              <DescriptionList
+                items={getNotificationDetails(editing).filter(
+                  (item) => item.label !== '알림명'
+                )}
+              />
+            )}
+            <Dialog.Footer className='mt-2 grid grid-cols-2 gap-4 sm:grid sm:grid-cols-2 sm:justify-normal'>
               <Button
                 type='button'
                 variant='outline'
@@ -297,48 +325,32 @@ export function PushNotificationList() {
                 취소
               </Button>
               <Button type='submit' disabled={!editing?.name.trim()}>
-                저장
+                수정
               </Button>
             </Dialog.Footer>
           </form>
         </Dialog.Content>
       </Dialog>
-      <Dialog
-        open={deleting !== null}
-        onOpenChange={(open) => {
-          if (!open) setDeleting(null);
-        }}
-      >
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>알림 삭제</Dialog.Title>
-            <Dialog.Description className='break-words'>
-              ‘{deleting?.name}’ 알림을 삭제하시겠습니까?
-            </Dialog.Description>
-          </Dialog.Header>
-          <Dialog.Footer>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => setDeleting(null)}
-            >
-              취소
-            </Button>
-            <Button
-              type='button'
-              variant='destructive'
-              onClick={() => {
-                setNotifications((items) =>
-                  items.filter((item) => item.id !== deleting?.id)
-                );
-                setDeleting(null);
-              }}
-            >
-              삭제
-            </Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog>
+      {deleting && (
+        <DescriptionListModal
+          open
+          onClose={() => setDeleting(null)}
+          title='알림 삭제'
+          description='알림 정보를 확인하고 삭제하시겠습니까?'
+          className='max-w-xs sm:max-w-sm'
+          items={getNotificationDetails(deleting)}
+          action={{
+            label: '삭제',
+            variant: 'destructive',
+            onClick: () => {
+              setNotifications((items) =>
+                items.filter((item) => item.id !== deleting.id)
+              );
+              setDeleting(null);
+            },
+          }}
+        />
+      )}
     </section>
   );
 }
