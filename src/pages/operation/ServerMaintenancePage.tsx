@@ -14,7 +14,6 @@ import {
   type MaintenanceDraft,
   MaintenanceScheduleForm,
 } from '@/domains/Operation/components/MaintenanceScheduleForm';
-import { DEFAULT_MAINTENANCE_NOTICE } from '@/domains/Operation/constants/maintenance';
 import type { ServerMaintenanceListItem } from '@/domains/Operation/types/maintenance';
 
 import {
@@ -54,7 +53,7 @@ export default function ServerMaintenancePage() {
         startAt: `${draft.startAt.replace('T', ' ')}:00`,
         endAt: `${draft.endAt.replace('T', ' ')}:00`,
         memo: draft.memo ?? '',
-        noticeMessage: draft.noticeMessage ?? DEFAULT_MAINTENANCE_NOTICE,
+        noticeMessage: draft.noticeMessage ?? '',
         ...(draft.image
           ? {
               attachments: [

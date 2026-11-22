@@ -95,7 +95,7 @@ test('이미지 재시도는 PATCH를 반복하지 않는다', async () => {
     'change'
   );
   await user.upload(
-    screen.getByLabelText('사용자 안내 이미지 (1개)'),
+    screen.getByLabelText('사용자 안내 이미지'),
     new File(['image'], 'a.png', { type: 'image/png' })
   );
   await user.click(screen.getByRole('button', { name: '수정' }));

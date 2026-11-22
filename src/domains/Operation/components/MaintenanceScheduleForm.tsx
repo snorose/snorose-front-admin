@@ -1,7 +1,15 @@
 import { useId, useRef, useState } from 'react';
 
+import { InfoIcon } from 'lucide-react';
+
 import { DateTimePicker, SectionTitle } from '@/shared/components';
-import { Button, Input, Label, Textarea } from '@/shared/components/ui';
+import {
+  Button,
+  Input,
+  Label,
+  Textarea,
+  Tooltip,
+} from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -29,6 +37,8 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
   const imageInput = useRef<HTMLInputElement>(null);
   const saving = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [noticeTooltipOpen, setNoticeTooltipOpen] = useState(false);
+  const [imageTooltipOpen, setImageTooltipOpen] = useState(false);
   const titleId = `${id}-title`;
   const headingId = `${id}-heading`;
   const errorId = `${id}-error`;
@@ -96,9 +106,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
               ...(!initial
                 ? {
                     memo: memo.trim(),
-                    ...(noticeMessage.trim()
-                      ? { noticeMessage: noticeMessage.trim() }
-                      : {}),
+                    noticeMessage: noticeMessage.trim(),
                     ...(image ? { image } : {}),
                   }
                 : {}),
@@ -155,7 +163,39 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
           {!initial && (
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='flex min-w-0 flex-col gap-1'>
-                <Label htmlFor={`${id}-notice`}>사용자 안내 문구 (선택)</Label>
+                <div className='flex items-center gap-1'>
+                  <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
+                  <Tooltip.Provider delayDuration={150}>
+                    <Tooltip
+                      open={noticeTooltipOpen}
+                      onOpenChange={setNoticeTooltipOpen}
+                    >
+                      <Tooltip.Trigger asChild>
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon-sm'
+                          aria-label='사용자 안내 문구 입력 안내'
+                          className='relative size-5 shrink-0 p-0 text-inherit after:absolute after:-inset-2.5 hover:text-inherit sm:after:-inset-1'
+                          onClick={(event) => {
+                            event.preventDefault();
+                            setNoticeTooltipOpen(true);
+                          }}
+                        >
+                          <InfoIcon className='size-3.5' aria-hidden='true' />
+                        </Button>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        side='top'
+                        sideOffset={6}
+                        collisionPadding={12}
+                        className='max-w-64 text-center leading-5 break-keep'
+                      >
+                        입력한 경우에만 사용자에게 노출
+                      </Tooltip.Content>
+                    </Tooltip>
+                  </Tooltip.Provider>
+                </div>
                 <Textarea
                   id={`${id}-notice`}
                   className='field-sizing-fixed h-28 min-h-28 resize-y'
@@ -166,9 +206,39 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
               </div>
               <div className='flex min-w-0 flex-col gap-4'>
                 <div className='flex flex-col gap-1'>
-                  <Label htmlFor={`${id}-image`}>
-                    사용자 안내 이미지 (선택, 1개)
-                  </Label>
+                  <div className='flex items-center gap-1'>
+                    <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
+                    <Tooltip.Provider delayDuration={150}>
+                      <Tooltip
+                        open={imageTooltipOpen}
+                        onOpenChange={setImageTooltipOpen}
+                      >
+                        <Tooltip.Trigger asChild>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label='기본 안내 이미지 안내'
+                            className='relative size-5 shrink-0 p-0 text-inherit after:absolute after:-inset-2.5 hover:text-inherit sm:after:-inset-1'
+                            onClick={(event) => {
+                              event.preventDefault();
+                              setImageTooltipOpen(true);
+                            }}
+                          >
+                            <InfoIcon className='size-3.5' aria-hidden='true' />
+                          </Button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          side='top'
+                          sideOffset={6}
+                          collisionPadding={12}
+                          className='max-w-64 text-center leading-5 break-keep'
+                        >
+                          미첨부 시 기본 이미지 표시
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </Tooltip.Provider>
+                  </div>
                   <Input
                     ref={imageInput}
                     id={`${id}-image`}

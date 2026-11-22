@@ -147,7 +147,7 @@ describe('서버 점검 생성 API 연동', () => {
     renderPage();
     await fillForm(user);
     const file = new File(['image'], 'notice.png', { type: 'image/png' });
-    await user.upload(screen.getByLabelText(/안내 이미지/), file);
+    await user.upload(screen.getByLabelText('사용자 안내 이미지'), file);
     await user.click(screen.getByRole('button', { name: '생성' }));
     await user.click(
       await screen.findByRole('button', { name: '이미지 업로드 재시도' })
@@ -205,4 +205,17 @@ test('목록 응답 대기 중 로딩 표시 후 빈 목록을 표시한다', as
   expect(
     await screen.findByText('등록된 일정이 없습니다.')
   ).toBeInTheDocument();
+});
+
+test('사용자 안내 문구를 비우면 기본값으로 대체하지 않고 빈 문자열을 전송한다', async () => {
+  const user = userEvent.setup();
+  renderPage();
+  await fillForm(user);
+  await user.clear(screen.getByLabelText('사용자 안내 문구'));
+  await user.click(screen.getByRole('button', { name: '생성' }));
+  await waitFor(() =>
+    expect(createAdminMaintenance).toHaveBeenCalledWith(
+      expect.objectContaining({ noticeMessage: '' })
+    )
+  );
 });

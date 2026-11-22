@@ -225,7 +225,7 @@ export function MaintenanceEditModal({
             {modeSelect('사용자 안내 이미지 처리', imageMode, setImageMode)}
             {imageMode === 'change' && (
               <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-image`}>사용자 안내 이미지 (1개)</Label>
+                <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
                 <Input
                   id={`${id}-image`}
                   type='file'
