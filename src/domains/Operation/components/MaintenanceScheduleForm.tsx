@@ -59,7 +59,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
         {initial ? '서버 점검 일정 수정' : '서버 점검 일정 등록'}
       </SectionTitle>
       <form
-        className='flex flex-col gap-4 rounded-lg border p-4 pb-5'
+        className='@container flex flex-col gap-4 rounded-lg border p-4 pb-5'
         onSubmit={async (event) => {
           event.preventDefault();
           if (saving.current) return;
@@ -205,10 +205,20 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
                 취소
               </Button>
             )}
-            <Button type='button' size='sm' variant='outline' onClick={reset}>
+            <Button
+              type='button'
+              size='sm'
+              variant='outline'
+              className='h-9 min-w-24 flex-1 shadow-none @md:flex-none'
+              onClick={reset}
+            >
               입력 초기화
             </Button>
-            <Button type='submit' size='sm'>
+            <Button
+              type='submit'
+              size='sm'
+              className='h-9 min-w-24 flex-1 shadow-none @md:flex-none'
+            >
               {isSaving ? '저장 중…' : initial ? '수정' : '생성'}
             </Button>
           </div>
