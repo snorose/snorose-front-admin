@@ -26,6 +26,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     const onSave = vi.fn();
     render(<MaintenanceScheduleForm onSave={onSave} />);
     await user.type(screen.getByLabelText(/일정 제목/), '점검');
+    await user.type(screen.getByLabelText(/메모/), '작업');
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
     await user.click(screen.getByRole('option', { name: '09시' }));
     await user.click(screen.getByRole('button', { name: '생성' }));
@@ -126,6 +127,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     const user = userEvent.setup();
     render(<MaintenanceScheduleForm onSave={vi.fn()} />);
     await user.type(screen.getByLabelText(/일정 제목/), '점검');
+    await user.type(screen.getByLabelText(/메모/), '작업');
     await user.click(screen.getByRole('button', { name: '시작 일시' }));
     const day = screen
       .getAllByRole('button')

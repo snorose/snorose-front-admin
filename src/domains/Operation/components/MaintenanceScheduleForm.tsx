@@ -1,24 +1,31 @@
-import { useId, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import { DateTimePicker, SectionTitle } from '@/shared/components';
 import { Button, Input, Label } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
+import { getErrorMessage } from '@/shared/utils';
 
 import type { ServerMaintenance } from '../types/maintenance';
 
 export type MaintenanceDraft = Pick<
   ServerMaintenance,
   'title' | 'startAt' | 'endAt'
->;
+> & { memo?: string; noticeMessage?: string; image?: File };
 
 interface Props {
   initial?: ServerMaintenance;
-  onSave: (draft: MaintenanceDraft) => void;
+  onSave: (draft: MaintenanceDraft) => void | Promise<void>;
   onCancel?: () => void;
 }
 
 export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
   const id = useId();
+  const [memo, setMemo] = useState('');
+  const [noticeMessage, setNoticeMessage] = useState('');
+  const [image, setImage] = useState<File>();
+  const imageInput = useRef<HTMLInputElement>(null);
+  const saving = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
   const titleId = `${id}-title`;
   const headingId = `${id}-heading`;
   const errorId = `${id}-error`;
@@ -37,6 +44,10 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
     start.setDateTime(initial?.startAt ?? '');
     end.setDateTime(initial?.endAt ?? '');
     setError('');
+    setMemo('');
+    setNoticeMessage('');
+    setImage(undefined);
+    if (imageInput.current) imageInput.current.value = '';
   };
 
   return (
@@ -46,8 +57,9 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
       </SectionTitle>
       <form
         className='flex flex-col gap-4 rounded-lg border p-4 pb-5'
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
+          if (saving.current) return;
           if (!draft.title.trim() || !draft.startAt || !draft.endAt) {
             setError('모든 필수 항목을 입력해 주세요.');
             return;
@@ -60,70 +72,141 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             setError('종료 일시는 시작 일시보다 늦어야 합니다.');
             return;
           }
-          onSave({ ...draft, title: draft.title.trim() });
-          reset();
+          if (!initial && !memo.trim()) {
+            setError('메모를 입력해 주세요.');
+            return;
+          }
+          if (
+            image &&
+            (!image.type.startsWith('image/') || image.name.length > 218)
+          ) {
+            setError('파일명이 218자 이하인 이미지를 선택해 주세요.');
+            return;
+          }
+          saving.current = true;
+          setIsSaving(true);
+          setError('');
+          try {
+            await onSave({
+              ...draft,
+              title: draft.title.trim(),
+              ...(!initial
+                ? {
+                    memo: memo.trim(),
+                    ...(noticeMessage.trim()
+                      ? { noticeMessage: noticeMessage.trim() }
+                      : {}),
+                    ...(image ? { image } : {}),
+                  }
+                : {}),
+            });
+            reset();
+          } catch (error) {
+            setError(
+              getErrorMessage(error, '서버 점검 일정 등록에 실패했습니다.')
+            );
+          } finally {
+            saving.current = false;
+            setIsSaving(false);
+          }
         }}
       >
-        <div className='flex flex-col gap-1'>
-          <Label htmlFor={titleId} required>
-            일정 제목
-          </Label>
-          <Input
-            id={titleId}
-            placeholder='예: 정기 서버점검'
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={100}
-            required
-          />
-        </div>
-        <div className='grid gap-4 sm:grid-cols-2'>
-          <DateTimePicker
-            label='시작 일시'
-            date={start.date}
-            time={start.time}
-            onDateSelect={start.onDateSelect}
-            onTimeChange={start.onTimeChange}
-            datePlaceholder='시작 날짜 선택'
-            required
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? errorId : undefined}
-          />
-          <DateTimePicker
-            label='종료 일시'
-            date={end.date}
-            time={end.time}
-            onDateSelect={end.onDateSelect}
-            onTimeChange={end.onTimeChange}
-            datePlaceholder='종료 날짜 선택'
-            required
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? errorId : undefined}
-          />
-        </div>
-        {error && (
-          <p id={errorId} role='alert' className='text-destructive text-sm'>
-            {error}
-          </p>
-        )}
-        <div className='flex justify-end gap-2'>
-          {initial && (
-            <Button
-              type='button'
-              size='sm'
-              variant='outline'
-              onClick={onCancel}
-            >
-              취소
-            </Button>
+        <fieldset disabled={isSaving} className='flex min-w-0 flex-col gap-4'>
+          <div className='flex flex-col gap-1'>
+            <Label htmlFor={titleId} required>
+              일정 제목
+            </Label>
+            <Input
+              id={titleId}
+              placeholder='예: 정기 서버점검'
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              maxLength={100}
+              required
+            />
+          </div>
+          <div className='grid gap-4 sm:grid-cols-2'>
+            <DateTimePicker
+              label='시작 일시'
+              date={start.date}
+              time={start.time}
+              onDateSelect={start.onDateSelect}
+              onTimeChange={start.onTimeChange}
+              datePlaceholder='시작 날짜 선택'
+              required
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? errorId : undefined}
+            />
+            <DateTimePicker
+              label='종료 일시'
+              date={end.date}
+              time={end.time}
+              onDateSelect={end.onDateSelect}
+              onTimeChange={end.onTimeChange}
+              datePlaceholder='종료 날짜 선택'
+              required
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? errorId : undefined}
+            />
+          </div>
+          {!initial && (
+            <>
+              <div className='flex flex-col gap-1'>
+                <Label htmlFor={`${id}-memo`} required>
+                  메모
+                </Label>
+                <Input
+                  id={`${id}-memo`}
+                  value={memo}
+                  onChange={(event) => setMemo(event.target.value)}
+                  required
+                />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <Label htmlFor={`${id}-notice`}>안내 문구 (선택)</Label>
+                <Input
+                  id={`${id}-notice`}
+                  value={noticeMessage}
+                  onChange={(event) => setNoticeMessage(event.target.value)}
+                  placeholder='서비스 안정화를 위한 서버 점검이 진행 중입니다.'
+                />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <Label htmlFor={`${id}-image`}>안내 이미지 (선택, 1개)</Label>
+                <Input
+                  ref={imageInput}
+                  id={`${id}-image`}
+                  type='file'
+                  accept='image/*'
+                  onChange={(event) => setImage(event.target.files?.[0])}
+                />
+              </div>
+            </>
           )}
-          <Button type='button' size='sm' variant='outline' onClick={reset}>
-            입력 초기화
-          </Button>
-          <Button type='submit' size='sm'>
-            {initial ? '수정' : '생성'}
-          </Button>
-        </div>
+          {error && (
+            <p id={errorId} role='alert' className='text-destructive text-sm'>
+              {error}
+            </p>
+          )}
+          <div className='flex justify-end gap-2'>
+            {initial && (
+              <Button
+                type='button'
+                size='sm'
+                variant='outline'
+                onClick={onCancel}
+              >
+                취소
+              </Button>
+            )}
+            <Button type='button' size='sm' variant='outline' onClick={reset}>
+              입력 초기화
+            </Button>
+            <Button type='submit' size='sm'>
+              {isSaving ? '저장 중…' : initial ? '수정' : '생성'}
+            </Button>
+          </div>
+        </fieldset>
       </form>
     </section>
   );
