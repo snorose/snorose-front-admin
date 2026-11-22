@@ -20,6 +20,7 @@ import type {
   NoticeSaveProgress,
   NoticeStatus,
 } from '../types';
+import { fromAdminNoticeStatus } from '../utils/api.mapper';
 import { type NoticeMediaKind, selectNoticeFiles } from '../utils/attachments';
 import { hasNoticeContent, toNoticeHtml } from '../utils/content';
 import { validateNotice } from '../utils/notice';
@@ -36,34 +37,37 @@ export function useNoticeEditorState(notice?: Notice) {
     canEdit,
   } = useNotices();
   const saving = useRef(false);
-  const progress = useRef<NoticeSaveProgress>({
-    uploaded: new Set(),
-    thumbnailReady: false,
-  });
+  const progress = useRef<NoticeSaveProgress>({});
   const [isSaving, setIsSaving] = useState(false);
   const [createdPostId, setCreatedPostId] = useState<number>();
   const [createOutcomeUnknown, setCreateOutcomeUnknown] = useState(false);
-  const savedStatus = useRef<NoticeStatus | null>(null);
-  const writable = notice ? canEdit : canSave;
+  const isDeleted = !!notice?.deletionStatus;
+  const writable = !isDeleted && (notice ? canEdit : canSave);
   const isFormLocked = () =>
+    isDeleted ||
     saving.current ||
     progress.current.result !== undefined ||
-    !!progress.current.createOutcomeUnknown;
+    progress.current.updateResult !== undefined ||
+    !!progress.current.createOutcomeUnknown ||
+    !!progress.current.updateOutcomeUnknown;
   const [initialForm] = useState<NoticeForm>(() => ({
     title: notice?.title ?? '',
     content: toNoticeHtml(notice?.content ?? ''),
     board: notice?.board ?? '',
     pinned: notice?.pinned ?? false,
     scheduledAt: notice?.scheduledAt ?? '',
-    category: getNoticeCategories(notice?.board ?? '').includes(
-      notice?.category ?? ''
-    )
-      ? (notice?.category ?? '')
-      : '',
+    category: notice?.category ?? '',
     attachments: notice?.attachments ?? [],
   }));
   const [form, setForm] = useState(initialForm);
-  const categories = getNoticeCategories(form.board);
+  const boardCategories = getNoticeCategories(form.board);
+  const categories =
+    boardCategories.length > 0 &&
+    form.category &&
+    !boardCategories.includes(form.category)
+      ? [...boardCategories, form.category]
+      : boardCategories;
+  const attachmentsUnavailable = notice?.attachmentsKnown === false;
   const [group, setGroup] = useState(
     () =>
       NOTICE_BOARD_GROUPS.find((item) =>
@@ -78,6 +82,8 @@ export function useNoticeEditorState(notice?: Notice) {
         : 'published'
   );
   const [initialMode] = useState(mode);
+  const scheduleUnknown = notice?.status === 'scheduled' && !notice.scheduledAt;
+  const [rescheduleRequested, setRescheduleRequested] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmStatus, setConfirmStatus] = useState<NoticeStatus | null>(null);
   const [leaving, setLeaving] = useState(false);
@@ -86,16 +92,18 @@ export function useNoticeEditorState(notice?: Notice) {
   const errorRef = useRef<HTMLParagraphElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { date, time, onDateSelect, onTimeChange } = useDateTimeField({
-    initialDateTime: initialForm.scheduledAt,
-    onDateTimeChange: (scheduledAt) => {
-      if (isFormLocked()) return;
-      setForm((previous) => ({ ...previous, scheduledAt }));
-    },
-  });
+  const { date, time, onDateSelect, onTimeChange, setDateTime } =
+    useDateTimeField({
+      initialDateTime: initialForm.scheduledAt,
+      onDateTimeChange: (scheduledAt) => {
+        if (isFormLocked()) return;
+        setForm((previous) => ({ ...previous, scheduledAt }));
+      },
+    });
   const dirty =
     JSON.stringify(form) !== JSON.stringify(initialForm) ||
-    mode !== initialMode;
+    mode !== initialMode ||
+    rescheduleRequested;
   const navigationAllowed = useRef(false);
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
@@ -105,6 +113,14 @@ export function useNoticeEditorState(notice?: Notice) {
         currentLocation.search !== nextLocation.search)
   );
   const canSaveDraft = !notice || notice.status === 'draft';
+  const canSchedule =
+    !notice || notice.status === 'draft' || notice.status === 'scheduled';
+  const visibilityAction =
+    notice && notice.status !== 'draft'
+      ? notice.status === 'private'
+        ? ('public' as const)
+        : ('private' as const)
+      : undefined;
   const actionText =
     mode === 'scheduled'
       ? '예약 게시'
@@ -128,16 +144,38 @@ export function useNoticeEditorState(notice?: Notice) {
   }, [dirty]);
 
   const requestSave = (status: NoticeStatus) => {
-    if (saving.current || progress.current.createOutcomeUnknown) return;
+    if (isFormLocked()) return;
     if (!writable) {
       setError('공지 작성·수정 기능은 준비 중입니다.');
       return;
     }
-    if (progress.current.result) {
-      setConfirmStatus(savedStatus.current);
+    if (status === 'scheduled' && !canSchedule) {
+      setError(
+        '이미 게시되었거나 비공개인 공지는 예약 상태로 변경할 수 없습니다.'
+      );
       return;
     }
-    const message = validateNotice(form, status, notices, notice?.id);
+    if (notice && status === notice.status && !dirty) {
+      setError('변경사항이 없습니다.');
+      return;
+    }
+    if (
+      status === 'scheduled' &&
+      scheduleUnknown &&
+      rescheduleRequested &&
+      !form.scheduledAt
+    ) {
+      setError('예약 시각을 변경하려면 날짜와 시간을 선택해 주세요.');
+      return;
+    }
+    const message = validateNotice(
+      form,
+      status,
+      notices,
+      notice?.id,
+      Date.now(),
+      notice
+    );
     setError(message);
     if (message) {
       if (!form.board) requestAnimationFrame(() => errorRef.current?.focus());
@@ -150,14 +188,8 @@ export function useNoticeEditorState(notice?: Notice) {
     setConfirmStatus(status);
   };
   const confirmSave = async () => {
-    if (
-      !confirmStatus ||
-      saving.current ||
-      progress.current.createOutcomeUnknown
-    )
-      return;
+    if (!confirmStatus || isFormLocked()) return;
     const status = confirmStatus;
-    savedStatus.current = status;
     saving.current = true;
     setIsSaving(true);
     setConfirmStatus(null);
@@ -167,46 +199,60 @@ export function useNoticeEditorState(notice?: Notice) {
         form,
         status,
         notice?.id,
-        progress.current
+        progress.current,
+        notice
       );
       if (message) {
-        setError(
-          progress.current.result
+        const errorMessage = progress.current.updateResult
+          ? `공지 ${progress.current.updateResult.postId}번은 수정되었습니다. ${message}`
+          : progress.current.result
             ? `공지 ${progress.current.result.postId}번은 생성되었습니다. ${message}`
-            : message
-        );
+            : message;
+        setError(errorMessage);
+        toast.error(errorMessage);
         return;
       }
-      toast.success(`${NOTICE_STATUS_LABELS[status]} 상태로 저장했습니다.`);
+      const finalStatus = progress.current.updateResult
+        ? fromAdminNoticeStatus(progress.current.updateResult.status)
+        : status;
+      toast.success(
+        `${NOTICE_STATUS_LABELS[finalStatus]} 상태로 저장했습니다.`
+      );
       navigationAllowed.current = true;
       if (blocker.state === 'blocked') blocker.reset();
       navigate(
-        status === 'published'
+        finalStatus === 'published'
           ? PATHS.NOTICE_GENERAL
-          : `${PATHS.NOTICE_GENERAL}?status=${status}&page=1`
+          : `${PATHS.NOTICE_GENERAL}?status=${finalStatus}&page=1`
       );
     } catch (error) {
-      setError(
-        getErrorMessage(
-          error,
-          '공지를 저장하지 못했습니다. 다시 시도해 주세요.'
-        )
+      const message = getErrorMessage(
+        error,
+        '공지를 저장하지 못했습니다. 다시 시도해 주세요.'
       );
+      setError(message);
+      toast.error(message);
     } finally {
-      setCreatedPostId(progress.current.result?.postId);
-      setCreateOutcomeUnknown(!!progress.current.createOutcomeUnknown);
+      setCreatedPostId(
+        progress.current.result?.postId ?? progress.current.updateResult?.postId
+      );
+      setCreateOutcomeUnknown(
+        !!progress.current.createOutcomeUnknown ||
+          !!progress.current.updateOutcomeUnknown
+      );
       saving.current = false;
       setIsSaving(false);
     }
   };
   const attachFiles = (files: FileList | null, kind: NoticeMediaKind) => {
-    if (!files || isFormLocked()) return;
+    if (!files || isFormLocked() || attachmentsUnavailable) return;
     const selected = selectNoticeFiles(
       Array.from(files),
       form.attachments,
       kind
     );
     setError(selected.error);
+    if (selected.error) toast.error(selected.error);
     if (selected.files.length === 0) return;
     const attachments = createAttachments(selected.files);
     setForm((previous) => ({
@@ -218,6 +264,7 @@ export function useNoticeEditorState(notice?: Notice) {
   const updateForm = (changes: Partial<NoticeForm>) => {
     if (isFormLocked()) return;
     if (changes.attachments) {
+      if (attachmentsUnavailable) return;
       const remaining = new Set(
         changes.attachments.map((attachment) => attachment.id)
       );
@@ -244,7 +291,7 @@ export function useNoticeEditorState(notice?: Notice) {
     }));
   };
   const changeMode = (nextMode: NoticeEditorMode) => {
-    if (isFormLocked()) return;
+    if (isFormLocked() || (nextMode === 'scheduled' && !canSchedule)) return;
     setMode(nextMode);
   };
   const requestLeave = () =>
@@ -266,7 +313,6 @@ export function useNoticeEditorState(notice?: Notice) {
     group,
     categories,
     mode,
-    setMode: changeMode,
     error,
     contentRef,
     titleRef,
@@ -282,12 +328,31 @@ export function useNoticeEditorState(notice?: Notice) {
       if (!isFormLocked()) onTimeChange(nextTime);
     },
     canSaveDraft,
+    canSchedule,
+    visibilityAction,
+    changeVisibility: () =>
+      requestSave(visibilityAction === 'public' ? 'published' : 'private'),
     canSave: writable,
     isSaving,
     createdPostId,
     createOutcomeUnknown,
-    formLocked: isSaving || createdPostId !== undefined || createOutcomeUnknown,
-    retrySave: () => requestSave(savedStatus.current ?? mode),
+    formLocked:
+      isDeleted ||
+      isSaving ||
+      createdPostId !== undefined ||
+      createOutcomeUnknown,
+    attachmentsUnavailable,
+    preserveSchedule: scheduleUnknown && !rescheduleRequested,
+    scheduleUnknown,
+    changeSchedule: () => {
+      if (!isFormLocked()) setRescheduleRequested(true);
+    },
+    keepSchedule: () => {
+      if (isFormLocked()) return;
+      setRescheduleRequested(false);
+      setDateTime('');
+      setForm((previous) => ({ ...previous, scheduledAt: '' }));
+    },
     actionText,
     requestSave,
     attachFiles,
@@ -298,6 +363,7 @@ export function useNoticeEditorState(notice?: Notice) {
       changeMode(mode === 'scheduled' ? 'published' : 'scheduled'),
     dialogProps: {
       form,
+      originalStatus: notice?.status,
       confirmStatus,
       onSave: confirmSave,
       onCloseSave: () => setConfirmStatus(null),

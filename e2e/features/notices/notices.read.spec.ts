@@ -2,6 +2,129 @@ import { expect, test } from '@playwright/test';
 
 import { NoticesApi } from './notices.api';
 
+test('TC-ADM-NOTICE-015 유저단 첨부 제한과 오류 토스트를 적용하며 유효하지 않은 파일을 전송하지 않는다', async ({
+  page,
+}) => {
+  const writes: string[] = [];
+  page.on('request', (request) => {
+    if (
+      request.method() === 'POST' &&
+      new URL(request.url()).pathname === '/v1/admin/notices'
+    )
+      writes.push(request.method());
+  });
+  await page.goto('/notices/general/new');
+  const input = page.getByLabel('이미지 파일 선택');
+  await expect(input).toHaveAttribute(
+    'accept',
+    '.jpg,.jpeg,.png,.jfif,.bmp,.webp'
+  );
+  await expect(page.getByLabel('동영상 파일 선택')).toHaveAttribute(
+    'accept',
+    '.mp4,.mov'
+  );
+  await input.setInputFiles({
+    name: 'invalid.jpng',
+    mimeType: 'image/png',
+    buffer: Buffer.from('invalid'),
+  });
+  await expect(
+    page.locator('[data-sonner-toast][data-type=error]')
+  ).toContainText('JPG, JPEG, PNG');
+  await expect(page.getByRole('list', { name: '첨부 순서' })).toHaveCount(0);
+  await input.setInputFiles({
+    name: 'large.png',
+    mimeType: 'image/png',
+    buffer: Buffer.alloc(7 * 1024 * 1024 + 1),
+  });
+  await expect(page.getByRole('alert')).toContainText('7MB');
+  await expect(page.getByRole('list', { name: '첨부 순서' })).toHaveCount(0);
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
+    canvas.getContext('2d')!.fillRect(0, 0, 32, 32);
+    return canvas.toDataURL('image/png').split(',')[1];
+  });
+  await input.setInputFiles({
+    name: 'valid.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(png, 'base64'),
+  });
+  await expect(
+    page.getByRole('img', { name: 'valid.png', exact: true })
+  ).toBeVisible();
+  expect(writes).toEqual([]);
+});
+
+test('TC-ADM-NOTICE-014 추가 오픈 게시판을 필터와 작성 화면에서 선택한다', async ({
+  page,
+  context,
+}) => {
+  const items = await new NoticesApi(context).all();
+  const boards = [
+    [25, '홍보게시판', '커뮤니티'],
+    [70, '동아리 이모저모', '캠퍼스'],
+    [1015, '리빙·소품', '문화생활'],
+    [1016, '여성학', '문화생활'],
+  ] as const;
+  const writes: string[] = [];
+  page.on('request', (request) => {
+    if (
+      new URL(request.url()).pathname.startsWith('/v1/admin/notices') &&
+      request.method() !== 'GET'
+    )
+      writes.push(request.method());
+  });
+  await page.goto('/notices/general');
+  await expect(page.getByText('조회 중…')).toHaveCount(0);
+  const form = page.getByRole('form', { name: '공지사항 검색', exact: true });
+  const count = page
+    .getByRole('region', { name: '공지사항 목록', exact: true })
+    .getByRole('status')
+    .filter({ hasText: /^총/ })
+    .locator('span');
+  for (const [id, name, group] of boards) {
+    await form.getByRole('combobox', { name: '게시판', exact: true }).click();
+    await page.getByRole('option', { name: group, exact: true }).click();
+    await form
+      .getByRole('combobox', { name: '하위 게시판', exact: true })
+      .click();
+    await page.getByRole('option', { name, exact: true }).click();
+    expect(new URL(page.url()).searchParams.get('board')).toBe(name);
+    await expect(count).toHaveText(
+      items.filter((item) => item.boardId === id).length.toLocaleString('ko-KR')
+    );
+  }
+  await page
+    .getByRole('link', { name: '공지사항 작성하기', exact: true })
+    .click();
+  await expect(
+    page.getByRole('heading', { name: '공지사항 작성', exact: true })
+  ).toBeVisible();
+  const selection = page.getByRole('group', {
+    name: /게시판 선택/,
+  });
+  await selection
+    .getByRole('button', { name: '공지사항', exact: true })
+    .click();
+  await page
+    .getByRole('group', { name: '카테고리', exact: true })
+    .getByRole('button', { name: '회계', exact: true })
+    .click();
+  for (const [, name, group] of boards) {
+    await selection.getByRole('button', { name: group, exact: true }).click();
+    await selection.getByRole('button', { name, exact: true }).click();
+    await expect(
+      selection.getByRole('button', { name, exact: true })
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      page.getByRole('group', { name: '카테고리', exact: true })
+    ).toHaveCount(0);
+  }
+  expect(writes).toEqual([]);
+});
+
 test('TC-ADM-NOTICE-009 게시판 드롭다운의 하위 선택을 전환하고 이전 조건을 지운다', async ({
   page,
   context,
@@ -112,8 +235,8 @@ test('TC-ADM-NOTICE-001 실제 API의 목록·개수·페이지 순서를 화면
     await expect(row).toContainText(item.boardName);
     if (item.adminNickname) await expect(row).toContainText(item.adminNickname);
     await expect(
-      row.getByRole('button', { name: `${item.title} 수정`, exact: true })
-    ).toBeDisabled();
+      row.getByRole('link', { name: `${item.title} 수정`, exact: true })
+    ).toHaveAttribute('href', `/notices/general/${item.postId}/edit`);
   }
   const totalPages = Math.max(1, Math.ceil(expected.length / 10));
   if (totalPages > 1) {
@@ -126,9 +249,7 @@ test('TC-ADM-NOTICE-001 실제 API의 목록·개수·페이지 순서를 화면
     for (const item of expected.slice((totalPages - 1) * 10))
       await expect(table).toContainText(item.title);
   }
-  expect(requests).toEqual(
-    Array.from({ length: totalPages }, (_, index) => index)
-  );
+  expect(requests).toEqual(totalPages > 1 ? [0, totalPages - 1] : [0]);
   expect(writes).toEqual([]);
   expect(errors).toEqual([]);
 });
@@ -191,6 +312,27 @@ test('TC-ADM-NOTICE-003 작성자는 서버 닉네임으로 검색하고 작성 
     .first()
     .getByRole('button', { name: expected[0].adminNickname, exact: true })
     .click();
+  await page.getByRole('menuitem', { name: '회원 정보', exact: true }).click();
+  const memberDialog = page.getByRole('dialog', {
+    name: '회원 정보',
+    exact: true,
+  });
+  await expect(memberDialog).toBeVisible();
+  await expect(page).toHaveURL(/\/notices\/general$/);
+  await expect(memberDialog).toContainText(expected[0].adminNickname);
+  await memberDialog
+    .getByRole('button', { name: '유저 상세 페이지로 이동', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/member\/info\/[^/?#]+$/);
+  await expect(
+    page.getByRole('heading', { name: '회원 정보', exact: true })
+  ).toBeVisible();
+  await page.goto('/notices/general');
+  await table
+    .locator('tbody tr')
+    .first()
+    .getByRole('button', { name: expected[0].adminNickname, exact: true })
+    .click();
   await page
     .getByRole('menuitem', { name: '작성한 공지글', exact: true })
     .click();
@@ -225,6 +367,72 @@ test('TC-ADM-NOTICE-003 작성자는 서버 닉네임으로 검색하고 작성 
   await expect(
     page.getByRole('heading', { name: '공지사항 작성' })
   ).toBeVisible();
+});
+
+test('TC-ADM-NOTICE-010 데스크톱 컬럼을 스크롤 없이 표시하고 간편 예약 시간을 입력한다', async ({
+  page,
+}) => {
+  const writes: string[] = [];
+  page.on('request', (request) => {
+    if (
+      request.method() !== 'GET' &&
+      new URL(request.url()).pathname === '/v1/admin/notices'
+    )
+      writes.push(request.method());
+  });
+  await page.goto('/notices/general');
+  await expect(page.getByRole('table')).toBeVisible();
+  for (const width of [1440, 1280, 1024]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const bounds = await page.getByRole('table').evaluate((table) => ({
+      container: table.parentElement!.clientWidth,
+      scroll: table.parentElement!.scrollWidth,
+    }));
+    expect(bounds.scroll).toBeLessThanOrEqual(bounds.container);
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page
+    .getByRole('link', { name: '공지사항 작성하기', exact: true })
+    .click();
+  await page.getByRole('button', { name: '예약', exact: true }).click();
+  await page
+    .getByRole('combobox', { name: '예약 게시 일시 오전/오후', exact: true })
+    .click();
+  await page.getByRole('option', { name: '오후', exact: true }).click();
+  await page
+    .getByRole('combobox', { name: '예약 게시 일시 시', exact: true })
+    .click();
+  await expect(page.getByRole('option')).toHaveCount(12);
+  await page.getByRole('option', { name: '12시', exact: true }).click();
+  const minute = page.getByRole('combobox', {
+    name: '예약 게시 일시 분',
+    exact: true,
+  });
+  await minute.click();
+  await expect(page.getByRole('option')).toHaveCount(12);
+  await page.getByRole('option', { name: '5분', exact: true }).click();
+  await expect(minute).toHaveValue('05');
+  await minute.fill('59');
+  await minute.press('Enter');
+  await expect(minute).toHaveValue('59');
+  for (const width of [1440, 1280, 1024]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const bounds = await minute.evaluate((input: HTMLInputElement) => ({
+      client: input.clientWidth,
+      scroll: input.scrollWidth,
+      groupClient: input.parentElement!.parentElement!.clientWidth,
+      groupScroll: input.parentElement!.parentElement!.scrollWidth,
+    }));
+    expect(bounds.scroll, '두 자리 분 숫자를 가리지 않음').toBeLessThanOrEqual(
+      bounds.client
+    );
+    expect(
+      bounds.groupScroll,
+      '시간 입력이 영역을 넘지 않음'
+    ).toBeLessThanOrEqual(bounds.groupClient);
+  }
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  expect(writes).toEqual([]);
 });
 
 test('TC-ADM-NOTICE-008 날짜 범위와 정렬을 즉시 조합하고 날짜 해제 후에도 정렬을 유지한다', async ({

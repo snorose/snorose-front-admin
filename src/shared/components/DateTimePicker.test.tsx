@@ -35,6 +35,97 @@ function ControlledPicker({ initialDate = '2026-10-09', required = false }) {
 }
 
 describe('DateTimePicker', () => {
+  function CompactPicker({ initialTime = '00:23', disabled = false }) {
+    const [time, setTime] = useState(initialTime);
+    return (
+      <>
+        <DateTimePicker
+          label='공지 예약'
+          date={parseDateValue('2026-11-20')}
+          time={time}
+          onDateSelect={vi.fn()}
+          onTimeChange={setTime}
+          hour12
+          minuteStep={5}
+          editableMinutes
+          disabled={disabled}
+        />
+        <output>{time}</output>
+      </>
+    );
+  }
+
+  test('오전·오후와 12시간제에서 자정·정오를 24시간 값으로 정확히 변환한다', async () => {
+    const user = userEvent.setup();
+    render(<CompactPicker />);
+    const period = () =>
+      screen.getByRole('combobox', { name: '공지 예약 오전/오후' });
+    const hour = () => screen.getByRole('combobox', { name: '공지 예약 시' });
+    expect(period()).toHaveTextContent('오전');
+    expect(hour()).toHaveTextContent('12시');
+    await user.click(hour());
+    expect(screen.getAllByRole('option')).toHaveLength(12);
+    await user.click(screen.getByRole('option', { name: '12시' }));
+    expect(screen.getByRole('status')).toHaveTextContent('00:23');
+    await user.click(period());
+    await user.click(screen.getByRole('option', { name: '오후' }));
+    expect(screen.getByRole('status')).toHaveTextContent('12:23');
+    await user.click(hour());
+    await user.click(screen.getByRole('option', { name: '1시' }));
+    expect(screen.getByRole('status')).toHaveTextContent('13:23');
+    await user.click(period());
+    await user.click(screen.getByRole('option', { name: '오전' }));
+    expect(screen.getByRole('status')).toHaveTextContent('01:23');
+  });
+
+  test('분은 5분 간격 12개를 제시하면서 0~59 직접 입력과 키보드 선택을 지원한다', async () => {
+    const user = userEvent.setup();
+    const submit = vi.fn((event) => event.preventDefault());
+    render(
+      <form onSubmit={submit}>
+        <CompactPicker initialTime='13:23' />
+      </form>
+    );
+    const minute = screen.getByRole('combobox', { name: '공지 예약 분' });
+    await user.click(minute);
+    expect(screen.getAllByRole('option')).toHaveLength(12);
+    await user.click(minute);
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: '5분' }));
+    expect(minute).toHaveValue('05');
+    expect(screen.getByRole('status')).toHaveTextContent('13:05');
+    await user.clear(minute);
+    await user.type(minute, '59');
+    expect(minute).toHaveValue('59');
+    await user.tab();
+    expect(screen.getByRole('status')).toHaveTextContent('13:59');
+    await user.clear(minute);
+    await user.paste('60');
+    await user.tab();
+    expect(minute).toHaveValue('59');
+    await user.click(minute);
+    await user.keyboard('{ArrowDown}{Home}{ArrowUp}{Enter}');
+    expect(minute).toHaveValue('55');
+    expect(screen.getByRole('status')).toHaveTextContent('13:55');
+    expect(submit).not.toHaveBeenCalled();
+  });
+
+  test('편집형 분 입력을 열어 둔 상태에서 비활성화해도 변경할 수 없다', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<CompactPicker />);
+    await user.click(screen.getByRole('combobox', { name: '공지 예약 분' }));
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    rerender(<CompactPicker disabled />);
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: '공지 예약 분' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: '공지 예약 분 목록 열기' })
+    ).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent('00:23');
+  });
+
   test('레이블을 날짜 버튼에 연결하고 각 시간 입력에 고유 이름과 id를 제공한다', () => {
     render(
       <>

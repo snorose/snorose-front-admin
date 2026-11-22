@@ -10,15 +10,13 @@ import type {
   AdminCreateNoticeResult,
   AdminNoticeListItem,
   AdminNoticeListResult,
-} from '@/domains/Notices/types';
-import type {
+  AdminNoticeStatus,
   Notice,
   NoticeBoard,
   NoticeStatus,
 } from '@/domains/Notices/types';
 import {
   fromAdminNotice,
-  toAdminNotice,
   toNoticeLocalDateTime,
 } from '@/domains/Notices/utils/api.mapper';
 import { toNoticeHtml } from '@/domains/Notices/utils/content';
@@ -214,4 +212,69 @@ export function createMockNoticeCreateResponse(
       scheduledAt: request.scheduledAt,
     },
   };
+}
+
+const API_STATUS: Record<NoticeStatus, AdminNoticeStatus> = {
+  published: 'PUBLISHED',
+  scheduled: 'SCHEDULED',
+  draft: 'DRAFT',
+  private: 'PRIVATE',
+};
+
+function toAdminNotice(notice: Notice): AdminNoticeListItem {
+  return {
+    postId: notice.id,
+    boardId: notice.boardId,
+    boardName: notice.board,
+    title: notice.title,
+    content: notice.content,
+    adminNickname: notice.author,
+    viewCount: notice.views,
+    likeCount: notice.likes,
+    scrapCount: notice.scraps,
+    status: API_STATUS[notice.status],
+    isNew: notice.isNew,
+    isPinned: notice.pinned,
+    updatedAt: toNoticeLocalDateTime(notice.updatedAt),
+  };
+}
+
+export function getLatestNoticeId(notices: Notice[]) {
+  // 목록 API의 isNew를 신뢰합니다. 수정 시각으로 NEW를 다시 판단하지 않습니다.
+  return notices.find((notice) => notice.status === 'published' && notice.isNew)
+    ?.id;
+}
+
+export function publishScheduledNotices(notices: Notice[], now = Date.now()) {
+  let published = false;
+  const next = notices.map((notice) => {
+    const scheduledTime = Date.parse(`${notice.scheduledAt}+09:00`);
+    if (
+      notice.status !== 'scheduled' ||
+      !Number.isFinite(scheduledTime) ||
+      scheduledTime > now
+    )
+      return notice;
+    const publishedAt = new Date(`${notice.scheduledAt}+09:00`).toISOString();
+    published = true;
+    return {
+      ...notice,
+      status: 'published' as const,
+      publishedAt,
+      updatedAt: publishedAt,
+    };
+  });
+  if (!published) return next;
+  const latest = next
+    .filter((notice) => notice.status === 'published')
+    .sort(
+      (a, b) =>
+        Date.parse(b.publishedAt ?? b.createdAt) -
+          Date.parse(a.publishedAt ?? a.createdAt) || b.id - a.id
+    )[0];
+  return next.map((notice) =>
+    notice.isNew === (notice.id === latest?.id)
+      ? notice
+      : { ...notice, isNew: notice.id === latest?.id }
+  );
 }

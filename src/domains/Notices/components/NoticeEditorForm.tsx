@@ -6,6 +6,7 @@ import { Button, Card, Input, Label } from '@/shared/components/ui';
 import { NOTICE_STATUS_LABELS } from '../constants';
 import { useNoticeEditorState } from '../hooks/useNoticeEditorState';
 import type { Notice } from '../types';
+import { NOTICE_ATTACHMENT_ACCEPT } from '../utils/attachments';
 import { hasNoticeContent } from '../utils/content';
 import NoticeAttachmentList from './NoticeAttachmentList';
 import NoticeBoardSelect from './NoticeBoardSelect';
@@ -20,7 +21,6 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
     group,
     categories,
     mode,
-    setMode,
     error,
     contentRef,
     titleRef,
@@ -32,12 +32,19 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
     onDateSelect,
     onTimeChange,
     canSaveDraft,
+    canSchedule,
+    visibilityAction,
+    changeVisibility,
     canSave,
     isSaving,
     createdPostId,
     createOutcomeUnknown,
     formLocked,
-    retrySave,
+    attachmentsUnavailable,
+    preserveSchedule,
+    scheduleUnknown,
+    changeSchedule,
+    keepSchedule,
     actionText,
     requestSave,
     attachFiles,
@@ -61,15 +68,29 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
           목록으로
         </Button>
         <PageHeader
-          title={notice ? '공지사항 수정' : '공지사항 작성'}
-          description='모든 공지사항의 댓글 기능은 비활성화됩니다.'
+          title={
+            notice?.deletionStatus
+              ? '공지사항 조회'
+              : notice
+                ? '공지사항 수정'
+                : '공지사항 작성'
+          }
+          description={
+            notice?.deletionStatus
+              ? '삭제된 공지는 읽기 전용으로 표시됩니다.'
+              : '모든 공지사항의 댓글 기능은 비활성화됩니다.'
+          }
         />
       </div>
       {notice && (
         <div className='flex items-center gap-2 text-xs text-gray-500'>
           게시글 ID {notice.id}
-          <StatusBadge tone='outline'>
-            {NOTICE_STATUS_LABELS[notice.status]}
+          <StatusBadge tone={notice.deletionStatus ? 'danger' : 'outline'}>
+            {notice.deletionStatus === 'USER_DELETED'
+              ? '유저 삭제'
+              : notice.deletionStatus === 'ADMIN_DELETED'
+                ? '어드민 삭제'
+                : NOTICE_STATUS_LABELS[notice.status]}
           </StatusBadge>
         </div>
       )}
@@ -130,6 +151,9 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
               aria-describedby='notice-title-help'
               placeholder='제목을 입력해 주세요.'
               value={form.title}
+              className={
+                notice?.deletionStatus ? 'disabled:opacity-100' : undefined
+              }
               required
               aria-invalid={!!error && !form.title.trim()}
               onChange={(event) => updateForm({ title: event.target.value })}
@@ -162,8 +186,9 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
               ref={imageInputRef}
               id='notice-image-upload'
               type='file'
-              accept='image/*'
+              accept={NOTICE_ATTACHMENT_ACCEPT.image}
               multiple
+              disabled={attachmentsUnavailable}
               className='hidden'
               aria-label='이미지 파일 선택'
               onChange={(event) => {
@@ -174,9 +199,10 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
             <Input
               ref={fileInputRef}
               id='notice-file-upload'
-              accept='video/*'
+              accept={NOTICE_ATTACHMENT_ACCEPT.video}
               type='file'
               multiple
+              disabled={attachmentsUnavailable}
               className='hidden'
               aria-label='동영상 파일 선택'
               onChange={(event) => {
@@ -188,6 +214,7 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
               <Button
                 type='button'
                 variant='outline'
+                disabled={attachmentsUnavailable}
                 onClick={() => imageInputRef.current?.click()}
               >
                 <ImagePlus className='size-4 text-blue-600' />
@@ -196,47 +223,74 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
               <Button
                 type='button'
                 variant='outline'
+                disabled={attachmentsUnavailable}
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Video className='size-4' />
                 동영상 업로드
               </Button>
             </div>
-            <NoticeAttachmentList
-              disabled={formLocked}
-              attachments={form.attachments}
-              onChange={(attachments) => updateForm({ attachments })}
-            />
+            {attachmentsUnavailable ? (
+              <p className='text-xs text-gray-500'>
+                {notice?.deletionStatus
+                  ? '기존 첨부파일은 이 화면에서 확인할 수 없습니다.'
+                  : '첨부파일 수정은 현재 지원하지 않습니다. 스노로즈의 해당 게시글 수정 화면에서 변경해 주세요. 기존 첨부파일은 그대로 유지됩니다.'}
+              </p>
+            ) : (
+              <NoticeAttachmentList
+                disabled={formLocked}
+                attachments={form.attachments}
+                onChange={(attachments) => updateForm({ attachments })}
+              />
+            )}
           </Card>
-          {(mode === 'scheduled' || notice?.status === 'private') && (
+          {mode === 'scheduled' && (
             <Card className='space-y-4 bg-white p-5'>
-              {mode === 'scheduled' && (
-                <div className='max-w-lg space-y-2 border-t pt-4'>
+              <div className='max-w-lg space-y-2 border-t pt-4'>
+                {preserveSchedule ? (
+                  <div className='space-y-2'>
+                    <p className='text-sm text-gray-700'>
+                      기존 예약을 유지합니다.
+                    </p>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={changeSchedule}
+                    >
+                      예약 시각 변경
+                    </Button>
+                  </div>
+                ) : (
                   <DateTimePicker
                     label='예약 게시 일시'
-                    required
+                    hour12
+                    minuteStep={5}
+                    editableMinutes
+                    disabled={formLocked}
+                    required={!preserveSchedule}
                     date={date}
                     time={time}
                     onDateSelect={onDateSelect}
                     onTimeChange={onTimeChange}
                   />
-                  <p className='text-xs text-gray-500'>
-                    한국 시간(KST) 기준으로 선택합니다.
-                  </p>
-                </div>
-              )}
-              {notice?.status === 'private' && (
-                <label className='flex items-center gap-2 text-sm'>
-                  <input
-                    type='checkbox'
-                    checked={mode === 'published'}
-                    onChange={(event) =>
-                      setMode(event.target.checked ? 'published' : 'private')
-                    }
-                  />
-                  공개 게시로 전환
-                </label>
-              )}
+                )}
+                <p className='text-xs text-gray-500'>
+                  한국 시간(KST) 기준으로 선택합니다.
+                  {preserveSchedule &&
+                    ' 예약 시각을 변경하려면 날짜와 시간을 새로 지정해 주세요.'}
+                </p>
+                {scheduleUnknown && !preserveSchedule && (
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
+                    onClick={keepSchedule}
+                  >
+                    기존 예약 유지
+                  </Button>
+                )}
+              </div>
             </Card>
           )}
         </fieldset>
@@ -251,13 +305,16 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
           </p>
         )}
         <NoticeEditorActions
+          isDraft={notice?.status === 'draft'}
           isSaving={isSaving}
           createdPostId={createdPostId}
           createOutcomeUnknown={createOutcomeUnknown}
-          onRetry={retrySave}
           canSave={canSave}
           mode={mode}
           canSaveDraft={canSaveDraft}
+          canSchedule={canSchedule}
+          visibilityAction={visibilityAction}
+          onChangeVisibility={changeVisibility}
           actionText={actionText}
           onCancel={requestLeave}
           onToggleSchedule={toggleSchedule}
@@ -265,7 +322,9 @@ export default function NoticeEditorForm({ notice }: { notice?: Notice }) {
         />
         {!canSave && (
           <p className='text-right text-xs text-gray-500'>
-            공지 작성·수정 기능은 준비 중입니다.
+            {notice?.deletionStatus
+              ? '삭제된 공지는 수정하거나 공개·예약 상태로 변경할 수 없습니다.'
+              : '공지 작성·수정 기능은 준비 중입니다.'}
           </p>
         )}
       </form>

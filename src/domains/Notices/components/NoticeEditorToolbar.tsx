@@ -28,11 +28,13 @@ import { getNoticeListType, toggleNoticeList } from '../utils/editor-lists';
 interface NoticeEditorToolbarProps {
   editor: Editor | null;
   onOpenLink: () => void;
+  disabled?: boolean;
 }
 
 export default function NoticeEditorToolbar({
   editor,
   onOpenLink,
+  disabled = false,
 }: NoticeEditorToolbarProps) {
   const state = useEditorState({
     editor,
@@ -62,7 +64,7 @@ export default function NoticeEditorToolbar({
   });
   const refocus = (event: Event) => {
     event.preventDefault();
-    if (editor && !editor.isDestroyed) editor.commands.focus();
+    if (!disabled && editor && !editor.isDestroyed) editor.commands.focus();
   };
   const colorMenu = (highlight: boolean) => {
     const colors = highlight ? NOTICE_HIGHLIGHT_COLORS : NOTICE_TEXT_COLORS;
@@ -82,7 +84,7 @@ export default function NoticeEditorToolbar({
             type='button'
             variant={active ? 'secondary' : 'ghost'}
             size='icon-sm'
-            disabled={!editor}
+            disabled={disabled || !editor}
             aria-label={label}
             title={label}
             onMouseDown={(event) => event.preventDefault()}
@@ -102,7 +104,7 @@ export default function NoticeEditorToolbar({
           <DropdownMenu.RadioGroup
             value={selected}
             onValueChange={(value) => {
-              if (!editor) return;
+              if (!editor || disabled) return;
               if (highlight) {
                 if (value)
                   editor.chain().focus().setBackgroundColor(value).run();
@@ -113,11 +115,15 @@ export default function NoticeEditorToolbar({
               }
             }}
           >
-            <DropdownMenu.RadioItem value=''>
+            <DropdownMenu.RadioItem disabled={disabled} value=''>
               {label} 없음
             </DropdownMenu.RadioItem>
             {colors.map((color) => (
-              <DropdownMenu.RadioItem key={color.value} value={color.value}>
+              <DropdownMenu.RadioItem
+                disabled={disabled}
+                key={color.value}
+                value={color.value}
+              >
                 <span
                   className='size-4 rounded-sm border border-gray-200'
                   style={{ backgroundColor: color.value }}
@@ -214,7 +220,7 @@ export default function NoticeEditorToolbar({
             type='button'
             variant='ghost'
             size='sm'
-            disabled={!editor}
+            disabled={disabled || !editor}
             aria-label='문단 형식'
             onMouseDown={(event) => event.preventDefault()}
           >
@@ -226,15 +232,16 @@ export default function NoticeEditorToolbar({
           <DropdownMenu.RadioGroup
             value={state?.heading ?? 'paragraph'}
             onValueChange={(value) => {
+              if (disabled) return;
               if (value === 'heading')
                 editor?.chain().focus().setHeading({ level: 1 }).run();
               else editor?.chain().focus().setParagraph().run();
             }}
           >
-            <DropdownMenu.RadioItem value='paragraph'>
+            <DropdownMenu.RadioItem disabled={disabled} value='paragraph'>
               본문
             </DropdownMenu.RadioItem>
-            <DropdownMenu.RadioItem value='heading'>
+            <DropdownMenu.RadioItem disabled={disabled} value='heading'>
               소제목
             </DropdownMenu.RadioItem>
           </DropdownMenu.RadioGroup>
@@ -251,7 +258,7 @@ export default function NoticeEditorToolbar({
               type='button'
               variant={action.active ? 'secondary' : 'ghost'}
               size='icon-sm'
-              disabled={!editor}
+              disabled={disabled || !editor}
               aria-label={action.label}
               title={action.label}
               aria-pressed={!!action.active}
@@ -273,7 +280,7 @@ export default function NoticeEditorToolbar({
                   size='icon-sm'
                   aria-label='번호 형식'
                   title='번호 형식'
-                  disabled={!editor}
+                  disabled={disabled || !editor}
                   onMouseDown={(event) => event.preventDefault()}
                 >
                   <ChevronDown className='size-3.5' />
@@ -283,7 +290,7 @@ export default function NoticeEditorToolbar({
                 <DropdownMenu.RadioGroup
                   value={state?.listFormat ?? '1'}
                   onValueChange={(value) => {
-                    if (!editor) return;
+                    if (!editor || disabled) return;
                     const chain = editor.chain().focus();
                     if (state?.list !== 'orderedList')
                       chain.toggleOrderedList();
@@ -295,13 +302,13 @@ export default function NoticeEditorToolbar({
                       .run();
                   }}
                 >
-                  <DropdownMenu.RadioItem value='1'>
+                  <DropdownMenu.RadioItem disabled={disabled} value='1'>
                     숫자 (1, 2, 3)
                   </DropdownMenu.RadioItem>
-                  <DropdownMenu.RadioItem value='a'>
+                  <DropdownMenu.RadioItem disabled={disabled} value='a'>
                     알파벳 (a, b, c)
                   </DropdownMenu.RadioItem>
-                  <DropdownMenu.RadioItem value='i'>
+                  <DropdownMenu.RadioItem disabled={disabled} value='i'>
                     로마 숫자 (i, ii, iii)
                   </DropdownMenu.RadioItem>
                 </DropdownMenu.RadioGroup>

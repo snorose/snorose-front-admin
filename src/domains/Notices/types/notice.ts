@@ -9,10 +9,12 @@ export interface Notice {
   content: string;
   category: string;
   attachments: NoticeAttachment[];
+  attachmentsKnown?: boolean;
   board: NoticeBoard;
   authorId: string;
   author: string;
   status: NoticeStatus;
+  deletionStatus?: 'USER_DELETED' | 'ADMIN_DELETED';
   pinned: boolean;
   createdAt: string;
   updatedAt: string;
@@ -36,6 +38,7 @@ export type NoticeForm = Pick<
 
 export interface NoticeAttachment {
   id: string;
+  attachmentId?: number;
   name: string;
   type: string;
   size: number;

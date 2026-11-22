@@ -46,10 +46,7 @@ const mediaForm: NoticeForm = {
     },
   ],
 };
-const progress = (): NoticeSaveProgress => ({
-  uploaded: new Set(),
-  thumbnailReady: false,
-});
+const progress = (): NoticeSaveProgress => ({});
 const result = {
   postId: 123,
   imageUploadUrls: ['https://upload.test/photo', 'https://upload.test/video'],
@@ -113,24 +110,21 @@ test('파일 없는 공지는 업로드와 썸네일 호출 없이 저장한다'
   expect(createNoticeThumbnail).not.toHaveBeenCalled();
 });
 
-test('일부 업로드 실패 후 공지를 다시 만들지 않고 실패한 파일만 재시도한다', async () => {
+test('일부 업로드 실패 후 생성·파일 업로드를 다시 전송하지 않는다', async () => {
   const state = progress();
   vi.mocked(uploadNoticeFile).mockRejectedValueOnce(new Error('실패'));
   await expect(saveNewNotice(mediaForm, 'published', state)).rejects.toThrow(
     '일부 첨부'
   );
-  expect(state.uploaded).toEqual(new Set([1]));
-  await saveNewNotice(mediaForm, 'published', state);
-  expect(createAdminNotice).toHaveBeenCalledOnce();
-  expect(uploadNoticeFile).toHaveBeenCalledTimes(3);
-  expect(uploadNoticeFile).toHaveBeenLastCalledWith(
-    result.imageUploadUrls[0],
-    mediaForm.attachments[0].file
+  await expect(saveNewNotice(mediaForm, 'published', state)).rejects.toThrow(
+    '이미 생성된'
   );
-  expect(createNoticeThumbnail).toHaveBeenCalledOnce();
+  expect(createAdminNotice).toHaveBeenCalledOnce();
+  expect(uploadNoticeFile).toHaveBeenCalledTimes(2);
+  expect(createNoticeThumbnail).not.toHaveBeenCalled();
 });
 
-test('썸네일 실패는 POST와 파일 업로드를 반복하지 않고 해당 단계만 재시도한다', async () => {
+test('썸네일 실패 후에도 이미 저장된 공지의 처리를 다시 실행하지 않는다', async () => {
   const state = progress();
   vi.mocked(createNoticeThumbnail).mockRejectedValueOnce(
     new Error('썸네일 실패')
@@ -138,10 +132,12 @@ test('썸네일 실패는 POST와 파일 업로드를 반복하지 않고 해당
   await expect(saveNewNotice(mediaForm, 'published', state)).rejects.toThrow(
     '썸네일 실패'
   );
-  await saveNewNotice(mediaForm, 'published', state);
+  await expect(saveNewNotice(mediaForm, 'published', state)).rejects.toThrow(
+    '이미 생성된'
+  );
   expect(createAdminNotice).toHaveBeenCalledOnce();
   expect(uploadNoticeFile).toHaveBeenCalledTimes(2);
-  expect(createNoticeThumbnail).toHaveBeenCalledTimes(2);
+  expect(createNoticeThumbnail).toHaveBeenCalledOnce();
 });
 
 test('생성 결과를 확인하지 못하면 같은 작성 화면에서 POST를 반복하지 않는다', async () => {
@@ -170,7 +166,7 @@ test('생성 후 잘못된 업로드 주소나 변경된 요청을 다시 POST�
     '주소'
   );
   await expect(saveNewNotice(mediaForm, 'draft', state)).rejects.toThrow(
-    '주소'
+    '이미 생성된'
   );
   await expect(
     saveNewNotice({ ...mediaForm, title: '다른 제목' }, 'draft', state)

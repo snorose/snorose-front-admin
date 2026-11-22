@@ -12,12 +12,13 @@ import type { Notice, NoticeForm, NoticeStatus } from '@/domains/Notices/types';
 import { toCreateNoticeRequest } from '@/domains/Notices/utils/api.mapper';
 import { getNoticeFileType } from '@/domains/Notices/utils/attachments';
 import { toNoticeHtml } from '@/domains/Notices/utils/content';
-import {
-  publishScheduledNotices,
-  validateNotice,
-} from '@/domains/Notices/utils/notice';
+import { validateNotice } from '@/domains/Notices/utils/notice';
 
-import { createMockNoticeCreateResponse, createSampleNotices } from './notices';
+import {
+  createMockNoticeCreateResponse,
+  createSampleNotices,
+  publishScheduledNotices,
+} from './notices';
 
 function useNoticeTestState() {
   const { user } = useAuth();

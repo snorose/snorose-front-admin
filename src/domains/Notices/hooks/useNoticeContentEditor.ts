@@ -95,6 +95,7 @@ export function useNoticeContentEditor({
   }, [editor, invalid]);
   useEffect(() => {
     editor?.setEditable(!disabled, false);
+    editor?.view.dom.setAttribute('aria-readonly', String(disabled));
   }, [editor, disabled]);
   useEffect(() => {
     if (!editor) return;
@@ -122,12 +123,13 @@ export function useNoticeContentEditor({
   }, [editor]);
 
   const openLink = () => {
-    if (!editor) return;
+    if (!editor || disabled) return;
     setLinkUrl(editor.getAttributes('link').href ?? '');
     setLinkError('');
     setLinkOpen(true);
   };
   const applyLink = () => {
+    if (disabled) return;
     const href = normalizeNoticeLink(linkUrl);
     if (!href) {
       setLinkError(
@@ -155,7 +157,8 @@ export function useNoticeContentEditor({
     setLinkOpen(false);
   };
   const applyEmbed = () => {
-    if (editor && insertNoticeEmbed(editor, linkUrl)) setLinkOpen(false);
+    if (!disabled && editor && insertNoticeEmbed(editor, linkUrl))
+      setLinkOpen(false);
   };
   const link = state?.link;
   const linkKey = link ? `${link.pos}:${link.url}` : '';
@@ -185,7 +188,7 @@ export function useNoticeContentEditor({
       editor?.commands.focus();
     },
     convertLinkToEmbed: () => {
-      if (editor && embedLink)
+      if (!disabled && editor && embedLink)
         insertNoticeEmbed(editor, embedLink.url, embedLink.pos);
     },
   };
