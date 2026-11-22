@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -28,7 +28,7 @@ interface MemberInfoPopoverProps {
   className?: string;
   showSanctionAction?: boolean;
   onViewNotices?: () => void;
-  onViewMemberInfo?: () => void;
+  resolveMemberId?: () => Promise<string>;
 }
 
 export function MemberInfoPopover({
@@ -37,7 +37,7 @@ export function MemberInfoPopover({
   className,
   showSanctionAction = true,
   onViewNotices,
-  onViewMemberInfo,
+  resolveMemberId,
 }: MemberInfoPopoverProps) {
   const navigate = useNavigate();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -45,33 +45,43 @@ export function MemberInfoPopover({
   const [isFetching, setIsFetching] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isSanctionModalOpen, setIsSanctionModalOpen] = useState(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const hasMemberIdentity = Boolean(encryptedUserId);
-  const canViewMemberInfo = hasMemberIdentity || Boolean(onViewMemberInfo);
+  const canViewMemberInfo = hasMemberIdentity || Boolean(resolveMemberId);
   const canSanction = hasMemberIdentity && showSanctionAction;
 
   const fetchMemberInfo = async (): Promise<MemberInfo | null> => {
-    if (!hasMemberIdentity) return null;
+    if (!canViewMemberInfo) return null;
     if (memberInfo) return memberInfo;
     if (isFetching) return null;
     setIsFetching(true);
     try {
-      const member = await getUserDetailAPI(encryptedUserId);
+      const memberId = encryptedUserId || (await resolveMemberId?.());
+      if (!mounted.current) return null;
+      if (!memberId) throw new Error('회원 ID가 없습니다.');
+      const member = {
+        ...(await getUserDetailAPI(memberId)),
+        encryptedUserId: memberId,
+      };
+      if (!mounted.current) return null;
       setMemberInfo(member);
       return member;
     } catch {
-      toast.error('회원 정보를 불러오지 못했습니다.');
+      if (mounted.current) toast.error('회원 정보를 불러오지 못했습니다.');
       return null;
     } finally {
-      setIsFetching(false);
+      if (mounted.current) setIsFetching(false);
     }
   };
 
   const handleInfoClick = async () => {
     setIsPopoverOpen(false);
-    if (onViewMemberInfo) {
-      onViewMemberInfo();
-      return;
-    }
     const member = await fetchMemberInfo();
     if (member) setIsInfoModalOpen(true);
   };
@@ -195,7 +205,7 @@ export function MemberInfoPopover({
         isOpen={isInfoModalOpen}
         onClose={() => setIsInfoModalOpen(false)}
         memberInfo={memberInfo}
-        encryptedUserId={encryptedUserId}
+        encryptedUserId={memberInfo?.encryptedUserId ?? encryptedUserId}
       />
 
       {canSanction && (

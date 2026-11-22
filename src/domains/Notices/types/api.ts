@@ -1,4 +1,4 @@
-/** 첨부한 어드민 공지 목록 조회/작성 API 문서(2026-11-04) 기준. */
+/** 어드민 공지 목록·작성 및 수정 API 문서 기준. */
 export type AdminNoticeStatus = 'PUBLISHED' | 'SCHEDULED' | 'DRAFT' | 'PRIVATE';
 
 export interface AdminNoticeListItem {
@@ -50,11 +50,33 @@ export interface AdminCreateNoticeResult {
   scheduledAt: string | null;
 }
 
-/** 한 작성 화면의 재시도 상태. 생성 성공·결과 불명일 때 POST를 반복하지 않습니다. */
+export interface UpdateNoticeAttachmentRequest
+  extends CreateNoticeAttachmentRequest {
+  id: number | null;
+}
+
+/** 미전달 필드는 기존 값을 유지하며, images: []는 기존 첨부 전체 삭제입니다. */
+export interface AdminUpdateNoticeRequest {
+  boardId?: number;
+  category?: string;
+  title?: string;
+  content?: string;
+  images?: UpdateNoticeAttachmentRequest[];
+  isVisible?: boolean;
+  scheduledAt?: string;
+}
+
+export interface AdminUpdateNoticeResult {
+  postId: number;
+  imageUploadUrls: string[];
+  status: AdminNoticeStatus;
+  scheduledAt: string | null;
+}
+
+/** 저장이 반영됐거나 결과가 불명확하면 같은 편집 화면에서 다시 전송하지 않습니다. */
 export interface NoticeSaveProgress {
   createOutcomeUnknown?: boolean;
   result?: AdminCreateNoticeResult;
-  request?: AdminCreateNoticeRequest;
-  uploaded: Set<number>;
-  thumbnailReady: boolean;
+  updateOutcomeUnknown?: boolean;
+  updateResult?: AdminUpdateNoticeResult;
 }

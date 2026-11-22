@@ -6,9 +6,17 @@ import {
   createSampleNotices,
 } from '@/test/fixtures/notices';
 
-import { NOTICE_BOARD_CATALOG, getNoticeCategories } from '../constants/boards';
+import {
+  NOTICE_BOARD_CATALOG,
+  NOTICE_BOARD_GROUPS,
+  getNoticeCategories,
+} from '../constants/boards';
 import type { NoticeForm } from '../types';
-import { fromAdminNotice, toCreateNoticeRequest } from './api.mapper';
+import {
+  fromAdminNotice,
+  toCreateNoticeRequest,
+  toUpdateNoticeRequest,
+} from './api.mapper';
 import { validateNotice } from './notice';
 
 const form: NoticeForm = {
@@ -22,12 +30,11 @@ const form: NoticeForm = {
 };
 
 describe('공개 게시판과 API 계약', () => {
-  test('공개 게시판 27개를 중복 없이 제공하고 미오픈·모아보기·문의 게시판을 제외한다', () => {
+  test('공개 게시판 31개를 중복 없이 제공하고 모아보기·문의 게시판을 제외한다', () => {
     const ids = NOTICE_BOARD_CATALOG.map((board) => board.id);
-    expect(ids).toHaveLength(27);
-    expect(new Set(ids).size).toBe(27);
-    for (const id of [13, 20, 25, 70, 1015, 1016])
-      expect(ids).not.toContain(id);
+    expect(ids).toHaveLength(31);
+    expect(new Set(ids).size).toBe(31);
+    for (const id of [13, 20]) expect(ids).not.toContain(id);
     expect(getNoticeCategories('공지사항')).toEqual([
       '일반',
       '회계',
@@ -57,12 +64,46 @@ describe('공개 게시판과 API 계약', () => {
     }
   });
 
+  test.each([
+    [25, '홍보게시판', '커뮤니티'],
+    [70, '동아리 이모저모', '캠퍼스'],
+    [1015, '리빙·소품', '문화생활'],
+    [1016, '여성학', '문화생활'],
+  ] as const)(
+    '%s 게시판은 해당 분류에서 조회·작성·수정하며 카테고리가 없다',
+    (id, name, group) => {
+      expect(
+        NOTICE_BOARD_GROUPS.find((item) => item.label === group)?.boards
+      ).toContain(name);
+      expect(getNoticeCategories(name)).toEqual([]);
+      const emptyCategory = { ...form, board: name, category: '' };
+      expect(toCreateNoticeRequest(emptyCategory, 'published')).toMatchObject({
+        boardId: id,
+      });
+      const original = createSampleNotices()[0];
+      expect(
+        toUpdateNoticeRequest(original, emptyCategory, 'published')
+      ).toMatchObject({ boardId: id, category: '' });
+    }
+  );
+
+  test('서버의 이전 게시판명도 게시판 ID를 기준으로 현재 표시명에 연결한다', () => {
+    const item = createMockNoticeListResponse().result.data[0];
+    expect(
+      fromAdminNotice({ ...item, boardId: 25, boardName: '홍보' }).board
+    ).toBe('홍보게시판');
+    expect(
+      fromAdminNotice({ ...item, boardId: 9999, boardName: '기타 게시판' })
+        .board
+    ).toBe('기타 게시판');
+  });
+
   test('목 응답은 문서의 envelope·페이지·컬럼과 상태값을 그대로 사용한다', () => {
     const response = createMockNoticeListResponse(0);
     expect(response).toMatchObject({
       isSuccess: true,
       code: 1000,
-      result: { hasNext: true, totalPage: 3, totalCount: 30, currentCount: 10 },
+      result: { hasNext: true, totalPage: 4, totalCount: 34, currentCount: 10 },
     });
     expect(response.result.data[0]).toMatchObject({
       postId: 1082,
@@ -93,9 +134,9 @@ describe('공개 게시판과 API 계약', () => {
     expect(response.result.data[0].updatedAt).toMatch(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
     );
-    const lastPage = createMockNoticeListResponse(2).result;
+    const lastPage = createMockNoticeListResponse(3).result;
     expect(lastPage.hasNext).toBe(false);
-    expect(lastPage.currentCount).toBe(10);
+    expect(lastPage.currentCount).toBe(4);
     expect(lastPage.data.at(-1)?.status).toBe('PRIVATE');
   });
 

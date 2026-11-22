@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-import { PATHS } from '@/shared/constants';
 import { useManagePageUrl } from '@/shared/hooks';
 import { clampOneBasedPage } from '@/shared/utils';
 
@@ -11,8 +9,8 @@ import { filterNotices, sortNotices } from '../utils/notice';
 import { useNotices } from './useNotices';
 
 export function useNoticeListState() {
-  const { notices, isLoading, isError, retry, canEdit } = useNotices();
-  const navigate = useNavigate();
+  const { notices, pagination, isLoading, isError, retry, canEdit } =
+    useNotices();
   const [authorSelectionVersion, setAuthorSelectionVersion] = useState(0);
   const {
     searchParams: filters,
@@ -24,20 +22,32 @@ export function useNoticeListState() {
     (notice) => notice.authorId === filters.author
   );
   const authorSearch = filters.keywordAuthor || selectedAuthor?.author || '';
-  const sorted = filterNotices(sortNotices(notices, filters.sort), filters);
-  const totalPage = Math.max(1, Math.ceil(sorted.length / 10));
+  const sorted = pagination
+    ? notices
+    : filterNotices(sortNotices(notices, filters.sort), filters);
+  const totalPage = Math.max(
+    1,
+    pagination?.totalPage ?? Math.ceil(sorted.length / 10)
+  );
   const currentPage = clampOneBasedPage(requestedPage, totalPage);
-  const visible = sorted.slice((currentPage - 1) * 10, currentPage * 10);
+  const visible = pagination
+    ? sorted
+    : sorted.slice((currentPage - 1) * 10, currentPage * 10);
+  useEffect(() => {
+    if (pagination && requestedPage !== currentPage)
+      handlePageChange(currentPage);
+  }, [pagination, requestedPage, currentPage, handlePageChange]);
   const updateFilters = (updates: NoticeFilters) =>
     handleSearchChange({ ...filters, ...updates });
 
-  const handleViewMemberInfo = (authorId: string) =>
-    navigate(`${PATHS.MEMBER_INFO}/${encodeURIComponent(authorId)}`);
   return {
     filters,
     authorSearch,
     authorSelectionVersion,
-    totalCount: isLoading || isError ? undefined : sorted.length,
+    totalCount:
+      isLoading || isError
+        ? undefined
+        : (pagination?.totalCount ?? sorted.length),
     countStatus: isLoading
       ? ('loading' as const)
       : isError
@@ -57,7 +67,6 @@ export function useNoticeListState() {
       ? (selectedAuthor?.author ?? '선택한 관리자')
       : undefined,
     onClearAuthor: () => updateFilters({ author: '', keywordAuthor: '' }),
-    onViewMemberInfo: handleViewMemberInfo,
     onViewAuthorNotices: (notice: Notice) => {
       // 같은 작성자를 다시 선택한 경우에도 미적용 텍스트를 실제 조회 조건으로 되돌립니다.
       setAuthorSelectionVersion((version) => version + 1);

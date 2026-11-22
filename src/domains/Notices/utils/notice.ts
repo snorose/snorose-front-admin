@@ -7,12 +7,21 @@ import {
   type NoticeStatus,
 } from '../types';
 import { validateNoticeAttachments } from './attachments';
-import { hasNoticeContent, noticeContentToText } from './content';
+import { hasNoticeContent, noticeContentToText, toNoticeHtml } from './content';
 
-export function getLatestNoticeId(notices: Notice[]) {
-  // 목록 API의 isNew를 신뢰합니다. 수정 시각으로 NEW를 다시 판단하지 않습니다.
-  return notices.find((notice) => notice.status === 'published' && notice.isNew)
-    ?.id;
+export function hasNoticeListFilters(filters: NoticeFilters) {
+  return !!(
+    filters.startDate ||
+    filters.endDate ||
+    filters.keyword?.trim() ||
+    filters.keywordAuthor?.trim() ||
+    filters.author ||
+    filters.group ||
+    filters.board ||
+    filters.status ||
+    filters.kind ||
+    (filters.sort && filters.sort !== 'latest')
+  );
 }
 
 export function sortNotices(notices: Notice[], sort = 'latest') {
@@ -102,26 +111,46 @@ export function validateNotice(
   status: NoticeStatus,
   notices: Notice[],
   editingId?: number,
-  now = Date.now()
+  now = Date.now(),
+  original?: Notice
 ) {
   if (!NOTICE_BOARDS.includes(form.board)) return '게시판을 선택해 주세요.';
   if (
     form.category &&
+    form.category !== original?.category &&
     getNoticeCategories(form.board).length > 0 &&
     !getNoticeCategories(form.board).includes(form.category)
   )
     return '카테고리를 선택해 주세요.';
-  if (!form.title.trim()) return '제목을 입력해 주세요.';
-  if (form.title.trim().length > 127)
+  const titleChanged = !original || form.title.trim() !== original.title.trim();
+  const contentChanged =
+    !original || toNoticeHtml(form.content) !== toNoticeHtml(original.content);
+  const leavingDraft = original?.status === 'draft' && status !== 'draft';
+  if ((titleChanged || leavingDraft) && !form.title.trim())
+    return '제목을 입력해 주세요.';
+  if ((titleChanged || leavingDraft) && form.title.trim().length > 127)
     return '제목은 최대 127자까지 입력할 수 있습니다.';
-  if (form.category.length > 20)
+  if (form.category !== original?.category && form.category.length > 20)
     return '카테고리는 최대 20자까지 입력할 수 있습니다.';
-  const attachmentError = validateNoticeAttachments(form.attachments);
-  if (attachmentError) return attachmentError;
-  if (status !== 'draft' && !hasNoticeContent(form.content))
+  if (
+    !original ||
+    JSON.stringify(form.attachments) !== JSON.stringify(original.attachments)
+  ) {
+    const attachmentError = validateNoticeAttachments(form.attachments);
+    if (attachmentError) return attachmentError;
+  }
+  if (
+    (contentChanged || leavingDraft) &&
+    (status !== 'draft' || !!original) &&
+    !hasNoticeContent(form.content)
+  )
     return '본문을 입력해 주세요.';
   if (
     status === 'scheduled' &&
+    !(
+      original?.status === 'scheduled' &&
+      form.scheduledAt === original.scheduledAt
+    ) &&
     (!form.scheduledAt ||
       !Number.isFinite(Date.parse(`${form.scheduledAt}+09:00`)) ||
       Date.parse(`${form.scheduledAt}+09:00`) <= now)
@@ -130,46 +159,13 @@ export function validateNotice(
   }
   if (
     form.pinned &&
+    form.pinned !== original?.pinned &&
     notices.filter((notice) => notice.id !== editingId && notice.pinned)
       .length >= 4
   ) {
     return '직접 고정하는 공지는 최대 4개입니다. 기존 공지의 고정을 해제해 주세요.';
   }
   return null;
-}
-
-export function publishScheduledNotices(notices: Notice[], now = Date.now()) {
-  let published = false;
-  const next = notices.map((notice) => {
-    const scheduledTime = Date.parse(`${notice.scheduledAt}+09:00`);
-    if (
-      notice.status !== 'scheduled' ||
-      !Number.isFinite(scheduledTime) ||
-      scheduledTime > now
-    )
-      return notice;
-    const publishedAt = new Date(`${notice.scheduledAt}+09:00`).toISOString();
-    published = true;
-    return {
-      ...notice,
-      status: 'published' as const,
-      publishedAt,
-      updatedAt: publishedAt,
-    };
-  });
-  if (!published) return next;
-  const latest = next
-    .filter((notice) => notice.status === 'published')
-    .sort(
-      (a, b) =>
-        Date.parse(b.publishedAt ?? b.createdAt) -
-          Date.parse(a.publishedAt ?? a.createdAt) || b.id - a.id
-    )[0];
-  return next.map((notice) =>
-    notice.isNew === (notice.id === latest?.id)
-      ? notice
-      : { ...notice, isNew: notice.id === latest?.id }
-  );
 }
 
 export function formatNoticeDate(value: string) {

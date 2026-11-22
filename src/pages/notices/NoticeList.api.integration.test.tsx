@@ -5,7 +5,11 @@ import {
   createMemoryRouter,
 } from 'react-router-dom';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  focusManager,
+} from '@tanstack/react-query';
 import {
   act,
   cleanup,
@@ -16,6 +20,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import {
   afterEach,
   beforeAll,
@@ -39,8 +44,12 @@ import type {
 import GeneralNoticePage from './GeneralNoticePage';
 import NoticeEditorPage from './NoticeEditorPage';
 
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
+
 vi.mock('@/shared/axios/instance', () => ({
-  axiosInstance: { get: vi.fn(), post: vi.fn() },
+  axiosInstance: { get: vi.fn(), post: vi.fn(), patch: vi.fn() },
 }));
 
 const items: AdminNoticeListItem[] = Array.from({ length: 23 }, (_, index) => ({
@@ -109,6 +118,7 @@ const renderPage = (path = '/notices/general') => {
         children: [
           { path: '/notices/general', element: <GeneralNoticePage /> },
           { path: '/notices/general/new', element: <NoticeEditorPage /> },
+          { path: '/member/info/:memberKey', element: <p>작성자 회원 상세</p> },
           {
             path: '/notices/general/:noticeId/edit',
             element: <NoticeEditorPage />,
@@ -140,9 +150,78 @@ beforeAll(() => {
 beforeEach(() => {
   vi.resetAllMocks();
   serverItems = [...items];
-  vi.mocked(axiosInstance.get).mockImplementation(async (_path, config) =>
-    response((config?.params as { page: number } | undefined)?.page ?? 0)
-  );
+  vi.mocked(axiosInstance.get).mockImplementation(async (path, config) => {
+    if (String(path).startsWith('/v1/admin/users/'))
+      return {
+        data: {
+          result: {
+            encryptedUserId: String(path).split('/').at(-1),
+            userName: '운영자',
+            loginId: 'admin',
+            studentNumber: '20260000',
+            nickname: '운영리자',
+            pointBalance: 10,
+            totalWarningCount: 0,
+            isBlacklist: false,
+          },
+        },
+      };
+    if (String(path).startsWith('/v1/admin/posts/')) {
+      const item = serverItems.find(
+        (item) => item.postId === Number(String(path).split('/').at(-1))
+      )!;
+      return {
+        data: {
+          result: {
+            ...item,
+            isNotice: true,
+            category: '일반',
+            encryptedUserId: 'server-author',
+            createdAt: item.updatedAt,
+          },
+        },
+      };
+    }
+    return response(
+      (config?.params as { page: number } | undefined)?.page ?? 0
+    );
+  });
+  vi.mocked(axiosInstance.patch).mockImplementation(async (url, body) => {
+    const id = Number(String(url).split('/').at(-1));
+    const input =
+      body as import('@/domains/Notices/types').AdminUpdateNoticeRequest;
+    serverItems = serverItems.map((item) =>
+      item.postId !== id
+        ? item
+        : {
+            ...item,
+            title: input.title ?? item.title,
+            content: input.content ?? item.content,
+            status: input.scheduledAt
+              ? 'SCHEDULED'
+              : input.isVisible === undefined
+                ? item.status
+                : input.isVisible
+                  ? 'PUBLISHED'
+                  : 'PRIVATE',
+          }
+    );
+    const item = serverItems.find((item) => item.postId === id)!;
+    return {
+      data: {
+        isSuccess: true,
+        result: {
+          postId: id,
+          imageUploadUrls: [],
+          status: item.status,
+          scheduledAt:
+            item.status === 'SCHEDULED'
+              ? (input.scheduledAt ?? '2030-01-01T09:00:00')
+              : null,
+        },
+      },
+    };
+  });
   vi.mocked(axiosInstance.post).mockImplementation(async (url, body) => {
     if (url !== '/v1/admin/notices')
       return { data: { isSuccess: true, result: {} } };
@@ -187,6 +266,430 @@ afterEach(() => {
 });
 
 describe('실제 목록 조회 경로', () => {
+  test.each([
+    ['USER_DELETED', '유저 삭제', 'PUBLISHED'],
+    ['ADMIN_DELETED', '어드민 삭제', 'PUBLISHED'],
+    ['USER_DELETED', '유저 삭제', 'PRIVATE'],
+    ['ADMIN_DELETED', '어드민 삭제', 'PRIVATE'],
+  ] as const)(
+    '%s / %s / %s 공지는 제목·본문을 읽기 전용으로 표시하고 하단 변경 버튼을 비활성화한다',
+    async (deletionStatus, label, status) => {
+      serverItems[0] = { ...serverItems[0], status };
+      const normalGet = vi.mocked(axiosInstance.get).getMockImplementation()!;
+      vi.mocked(axiosInstance.get).mockImplementation(async (...args) => {
+        if (!String(args[0]).startsWith('/v1/admin/posts/'))
+          return normalGet(...args);
+        return {
+          data: {
+            result: {
+              ...serverItems[0],
+              isNotice: true,
+              adminCommonStatuses: [deletionStatus],
+            },
+          },
+        };
+      });
+      const user = userEvent.setup();
+      const router = renderPage('/notices/general/5000/edit');
+      await screen.findByRole('heading', { name: '공지사항 조회' });
+      expect(screen.getByText(label)).toBeInTheDocument();
+      expect(
+        screen.getByText('삭제된 공지는 읽기 전용으로 표시됩니다.')
+      ).toBeInTheDocument();
+      const title = screen.getByRole('textbox', { name: /제목/ });
+      expect(title).toHaveValue('서버 공지 1');
+      expect(title).toBeDisabled();
+      const content = screen.getByRole('textbox', { name: '내용' });
+      expect(content).toHaveTextContent('서버 본문 1');
+      await waitFor(() =>
+        expect(content).toHaveAttribute('contenteditable', 'false')
+      );
+      expect(content).toHaveAttribute('aria-readonly', 'true');
+      for (const name of [
+        status === 'PRIVATE' ? '공개' : '비공개',
+        status === 'PRIVATE' ? '비공개로 저장' : '수정사항 반영',
+      ]) {
+        const button = screen.getByRole('button', { name });
+        expect(button).toBeDisabled();
+        await user.click(button);
+      }
+      if (status === 'PUBLISHED')
+        expect(screen.getByRole('button', { name: '예약' })).toBeDisabled();
+      await user.type(title, '변경 시도');
+      expect(title).toHaveValue('서버 공지 1');
+      fireEvent.submit(title.closest('form')!);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(axiosInstance.patch).not.toHaveBeenCalled();
+      expect(axiosInstance.post).not.toHaveBeenCalled();
+      await user.click(screen.getByRole('button', { name: '목록으로' }));
+      await screen.findByRole('heading', { name: '일반 공지 관리' });
+      expect(router.state.location.pathname).toBe('/notices/general');
+    }
+  );
+
+  test('다른 창에서 임시저장 공지를 게시한 뒤 돌아오면 최신 서버 순서로 목록을 갱신한다', async () => {
+    serverItems[22] = { ...serverItems[22], status: 'DRAFT' };
+    renderPage();
+    await screen.findByText('서버 공지 1', { selector: 'tbody p' });
+    try {
+      focusManager.setFocused(false);
+      const published = {
+        ...serverItems[22],
+        status: 'PUBLISHED' as const,
+        isNew: true,
+        updatedAt: '2026-11-22T23:36:34',
+      };
+      serverItems = [
+        published,
+        ...serverItems.filter((item) => item.postId !== published.postId),
+      ];
+      await act(async () => focusManager.setFocused(true));
+      await screen.findByText('서버 공지 23', { selector: 'tbody p' });
+      expect(
+        within(screen.getAllByRole('row')[1]).getAllByRole('cell')[0]
+      ).toHaveTextContent('4978');
+      expect(
+        vi
+          .mocked(axiosInstance.get)
+          .mock.calls.filter(([url]) => url === '/v1/admin/notices')
+          .map(
+            ([, config]) =>
+              (config?.params as { page: number } | undefined)?.page
+          )
+      ).toEqual([0, 0]);
+    } finally {
+      focusManager.setFocused(undefined);
+    }
+  });
+
+  test.each([
+    ['PUBLISHED', 'PRIVATE', '공개', '비공개'],
+    ['PRIVATE', 'PUBLISHED', '비공개', '공개'],
+  ] as const)(
+    '목록을 연 뒤 %s에서 %s로 변경된 공지는 최신 상태에 맞는 전환 버튼을 표시한다',
+    async (initialStatus, latestStatus, expectedAction, previousAction) => {
+      serverItems[0] = { ...serverItems[0], status: initialStatus };
+      const user = userEvent.setup();
+      renderPage();
+      clients.at(-1)!.setDefaultOptions({
+        queries: { retry: false, gcTime: 0, staleTime: 300_000 },
+      });
+      await screen.findByText('서버 공지 1', { selector: 'tbody p' });
+      serverItems[0] = { ...serverItems[0], status: latestStatus };
+      await user.click(screen.getByRole('link', { name: '서버 공지 1 수정' }));
+      await screen.findByRole('heading', { name: '공지사항 수정' });
+      expect(
+        screen.getByRole('button', { name: expectedAction })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: previousAction })
+      ).not.toBeInTheDocument();
+      expect(
+        vi
+          .mocked(axiosInstance.get)
+          .mock.calls.filter(([url]) => url === '/v1/admin/notices')
+          .map(
+            ([, config]) =>
+              (config?.params as { page: number } | undefined)?.page
+          )
+      ).toEqual([0, 0]);
+      await user.click(screen.getByRole('button', { name: expectedAction }));
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', { name: '저장' })
+      );
+      await screen.findByRole('heading', { name: '일반 공지 관리' });
+      expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+        '/v1/admin/notices/5000',
+        { isVisible: latestStatus === 'PRIVATE' }
+      );
+    }
+  );
+
+  test('상태 변경으로 공지가 캐시된 마지막 페이지에서 이동해도 최신 상태를 찾는다', async () => {
+    const user = userEvent.setup();
+    renderPage('/notices/general?page=3');
+    await screen.findByText('서버 공지 21', { selector: 'tbody p' });
+    const moved = { ...serverItems[20], status: 'PRIVATE' as const };
+    serverItems = [
+      moved,
+      ...serverItems.filter((item) => item.postId !== moved.postId),
+    ];
+    await user.click(screen.getByRole('link', { name: '서버 공지 21 수정' }));
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    expect(screen.getByRole('button', { name: '공개' })).toBeInTheDocument();
+    expect(
+      vi
+        .mocked(axiosInstance.get)
+        .mock.calls.filter(([url]) => url === '/v1/admin/notices')
+        .map(
+          ([, config]) => (config?.params as { page: number } | undefined)?.page
+        )
+    ).toEqual([2, 2, 0]);
+  });
+
+  test('홍보의 이전 서버 표기에도 현재 게시판을 선택하고 제목만 수정한다', async () => {
+    serverItems[0] = { ...serverItems[0], boardId: 25, boardName: '홍보' };
+    const user = userEvent.setup();
+    renderPage('/notices/general/5000/edit');
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    expect(screen.getByRole('button', { name: '홍보게시판' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(
+      screen.queryByText('카테고리', { selector: 'legend' })
+    ).not.toBeInTheDocument();
+    const title = screen.getByRole('textbox', { name: /제목/ });
+    await user.clear(title);
+    await user.type(title, '홍보게시판 공지 수정');
+    await user.click(screen.getByRole('button', { name: '수정사항 반영' }));
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: '저장' })
+    );
+    await screen.findByRole('heading', { name: '일반 공지 관리' });
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/v1/admin/notices/5000',
+      { title: '홍보게시판 공지 수정' }
+    );
+    expect(
+      screen.getByText('홍보게시판', { selector: 'tbody *' })
+    ).toBeInTheDocument();
+  });
+
+  test('기존 공지의 제목·본문·카테고리만 PATCH하고 알 수 없는 첨부는 유지한다', async () => {
+    const user = userEvent.setup();
+    const router = renderPage('/notices/general/5000/edit');
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    expect(
+      screen.getByRole('button', { name: '이미지 업로드' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: '동영상 업로드' })
+    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: '예약' })).toBeDisabled();
+    await user.clear(screen.getByRole('textbox', { name: /제목/ }));
+    await user.type(
+      screen.getByRole('textbox', { name: /제목/ }),
+      '실제 수정 제목'
+    );
+    await user.clear(screen.getByRole('textbox', { name: '내용' }));
+    await user.type(screen.getByRole('textbox', { name: '내용' }), '수정 본문');
+    await user.click(screen.getByRole('button', { name: '회계' }));
+    await user.click(screen.getByRole('button', { name: '수정사항 반영' }));
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: '저장' })
+    );
+    await screen.findByRole('heading', { name: '일반 공지 관리' });
+    expect(router.state.location.pathname).toBe('/notices/general');
+    expect(await screen.findByText('실제 수정 제목')).toBeInTheDocument();
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/v1/admin/notices/5000',
+      { title: '실제 수정 제목', content: '<p>수정 본문</p>', category: '회계' }
+    );
+    expect(axiosInstance.post).not.toHaveBeenCalled();
+  });
+
+  test.each(['DRAFT', 'SCHEDULED', 'PRIVATE'] as const)(
+    '%s의 내용을 수정해도 첨부와 기존 예약·공개 상태를 임의로 바꾸지 않는다',
+    async (status) => {
+      serverItems[0] = { ...serverItems[0], status };
+      const user = userEvent.setup();
+      renderPage('/notices/general/5000/edit');
+      await screen.findByRole('heading', { name: '공지사항 수정' });
+      if (status === 'DRAFT')
+        expect(screen.getByRole('button', { name: '삭제' })).toBeDisabled();
+      else
+        expect(
+          screen.queryByRole('button', { name: '삭제' })
+        ).not.toBeInTheDocument();
+      if (status === 'SCHEDULED')
+        expect(screen.getByText('기존 예약을 유지합니다.')).toBeInTheDocument();
+      await user.type(screen.getByRole('textbox', { name: /제목/ }), ' 수정');
+      await user.click(
+        screen.getByRole('button', {
+          name:
+            status === 'DRAFT'
+              ? '임시저장'
+              : status === 'SCHEDULED'
+                ? '예약 게시'
+                : '비공개로 저장',
+        })
+      );
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', {
+          name: status === 'DRAFT' ? '임시저장' : '저장',
+        })
+      );
+      await screen.findByRole('heading', { name: '일반 공지 관리' });
+      expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+        '/v1/admin/notices/5000',
+        { title: '서버 공지 1 수정' }
+      );
+      expect(axiosInstance.post).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(['PUBLISHED', 'SCHEDULED', 'PRIVATE'] as const)(
+    '%s의 공개·비공개 전환에는 예약 시각을 함께 보내지 않는다',
+    async (status) => {
+      serverItems[0] = { ...serverItems[0], status };
+      const user = userEvent.setup();
+      renderPage('/notices/general/5000/edit');
+      await screen.findByRole('heading', { name: '공지사항 수정' });
+      await user.click(
+        screen.getByRole('button', {
+          name: status === 'PRIVATE' ? '공개' : '비공개',
+        })
+      );
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', { name: '저장' })
+      );
+      await screen.findByRole('heading', { name: '일반 공지 관리' });
+      expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+        '/v1/admin/notices/5000',
+        { isVisible: status === 'PRIVATE' }
+      );
+    }
+  );
+
+  test('예약 변경을 선택하면 날짜가 필요하며 취소하면 원래 예약을 유지한다', async () => {
+    serverItems[0] = { ...serverItems[0], status: 'SCHEDULED' };
+    const user = userEvent.setup();
+    renderPage('/notices/general/5000/edit');
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    await user.click(screen.getByRole('button', { name: '예약 시각 변경' }));
+    await user.click(screen.getByRole('button', { name: '예약 게시' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('날짜와 시간을 선택');
+    expect(axiosInstance.patch).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '기존 예약 유지' }));
+    await user.type(screen.getByRole('textbox', { name: /제목/ }), ' 수정');
+    await user.click(screen.getByRole('button', { name: '예약 게시' }));
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: '저장' })
+    );
+    await screen.findByRole('heading', { name: '일반 공지 관리' });
+    expect(axiosInstance.patch).toHaveBeenCalledExactlyOnceWith(
+      '/v1/admin/notices/5000',
+      { title: '서버 공지 1 수정' }
+    );
+  });
+
+  test('수정 응답 유실 시 입력과 상태 전환을 잠그고 PATCH를 재전송하지 않는다', async () => {
+    vi.mocked(axiosInstance.patch).mockRejectedValue(
+      new TypeError('응답 유실')
+    );
+    const user = userEvent.setup();
+    renderPage('/notices/general/5000/edit');
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    await user.type(screen.getByRole('textbox', { name: /제목/ }), ' 수정');
+    await user.click(screen.getByRole('button', { name: '수정사항 반영' }));
+    await user.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: '저장' })
+    );
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      '수정 결과를 확인하지 못했습니다'
+    );
+    expect(screen.getByRole('textbox', { name: /제목/ })).toBeDisabled();
+    expect(
+      screen.getByRole('link', { name: '목록에서 확인 (새 창)' })
+    ).toHaveAttribute('target', '_blank');
+    fireEvent.submit(
+      screen.getByRole('textbox', { name: /제목/ }).closest('form')!
+    );
+    expect(axiosInstance.patch).toHaveBeenCalledOnce();
+    expect(axiosInstance.post).not.toHaveBeenCalled();
+  });
+
+  test('상세 조회 실패 시 빈 폼으로 수정하지 않고 다시 조회할 수 있다', async () => {
+    const normalGet = vi.mocked(axiosInstance.get).getMockImplementation()!;
+    vi.mocked(axiosInstance.get).mockImplementation((...args) =>
+      String(args[0]).startsWith('/v1/admin/posts/')
+        ? Promise.reject(new Error('상세 조회 실패'))
+        : normalGet(...args)
+    );
+    const user = userEvent.setup();
+    renderPage('/notices/general/5000/edit');
+    await screen.findByRole('heading', { name: '공지를 불러오지 못했습니다.' });
+    expect(
+      screen.queryByRole('textbox', { name: /제목/ })
+    ).not.toBeInTheDocument();
+    vi.mocked(axiosInstance.get).mockImplementation(normalGet);
+    await user.click(screen.getByRole('button', { name: '다시 조회' }));
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    expect(axiosInstance.patch).not.toHaveBeenCalled();
+  });
+
+  test('작성자 조회 중 다른 페이지로 이동하면 늦은 응답이 화면을 바꾸지 않는다', async () => {
+    let complete!: () => void;
+    vi.mocked(axiosInstance.get).mockImplementation(async (url, config) => {
+      if (url === '/v2/admin/users') {
+        await new Promise<void>((resolve) => {
+          complete = resolve;
+        });
+        return {
+          data: {
+            result: {
+              data: [{ nickname: '운영리자', encryptedUserId: 'late-author' }],
+              hasNext: false,
+            },
+          },
+        };
+      }
+      return response(
+        (config?.params as { page: number } | undefined)?.page ?? 0
+      );
+    });
+    const user = userEvent.setup();
+    const router = renderPage();
+    await screen.findByText('서버 공지 1', { exact: true });
+    await user.click(screen.getAllByRole('button', { name: '운영리자' })[0]);
+    await user.click(screen.getByRole('menuitem', { name: '회원 정보' }));
+    await act(async () => {
+      await router.navigate('/elsewhere');
+    });
+    await act(async () => complete());
+    expect(router.state.location.pathname).toBe('/elsewhere');
+  });
+
+  test('목록에 작성자 ID가 없어도 정확한 회원의 기존 팝업을 열고 버튼으로 상세에 이동한다', async () => {
+    const normalGet = vi.mocked(axiosInstance.get).getMockImplementation()!;
+    vi.mocked(axiosInstance.get).mockImplementation(async (url, config) => {
+      if (url === '/v2/admin/users')
+        return {
+          data: {
+            result: {
+              data: [
+                { nickname: '운영리자2', encryptedUserId: 'wrong' },
+                { nickname: '운영리자', encryptedUserId: 'correct-author' },
+              ],
+              hasNext: false,
+            },
+          },
+        };
+      return normalGet(url, config);
+    });
+    const user = userEvent.setup();
+    const router = renderPage();
+    await screen.findByText('서버 공지 1', { exact: true });
+    await user.click(screen.getAllByRole('button', { name: '운영리자' })[0]);
+    expect(
+      screen.getAllByRole('menuitem').map((item) => item.textContent)
+    ).toEqual(['회원 정보', '작성한 공지글']);
+    await user.click(screen.getByRole('menuitem', { name: '회원 정보' }));
+    const dialog = await screen.findByRole('dialog', { name: '회원 정보' });
+    expect(dialog).toHaveTextContent('운영자');
+    expect(router.state.location.pathname).toBe('/notices/general');
+    expect(axiosInstance.get).toHaveBeenCalledWith(
+      '/v1/admin/users/correct-author'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: '유저 상세 페이지로 이동' })
+    );
+    await screen.findByText('작성자 회원 상세');
+    expect(router.state.location.pathname).toBe('/member/info/correct-author');
+    expect(axiosInstance.post).not.toHaveBeenCalled();
+  });
+
   test('하위 게시판은 대분류에 따라 활성화하고 대분류 변경 시 이전 선택을 지운다', async () => {
     const user = userEvent.setup();
     const router = renderPage('/notices/general?status=published&sort=views');
@@ -298,7 +801,7 @@ describe('실제 목록 조회 경로', () => {
       sort: 'views',
     });
     expect(screen.getAllByRole('row')).toHaveLength(6);
-    expect(axiosInstance.get).toHaveBeenCalledTimes(3);
+    expect(axiosInstance.get).toHaveBeenCalledTimes(4);
     await user.click(screen.getByRole('combobox', { name: '상태' }));
     await user.click(screen.getByRole('option', { name: '전체' }));
     expect(
@@ -455,8 +958,52 @@ describe('실제 목록 조회 경로', () => {
     expect(screen.getByLabelText('게시글 검색')).toHaveValue('');
   });
 
-  test('모든 서버 페이지를 기다린 뒤 개수·10개 페이지네이션과 전체 범위 검색을 적용한다', async () => {
+  test('서버의 총 48건·5페이지를 표시하고 선택한 페이지만 조회한다', async () => {
+    serverItems = Array.from({ length: 48 }, (_, index) => ({
+      ...items[index % items.length],
+      postId: 6000 - index,
+      title: `목록 공지 ${index + 1}`,
+    }));
     const user = userEvent.setup();
+    renderPage();
+    await screen.findByText('목록 공지 1', { exact: true });
+    expect(screen.getByText('48', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(11);
+    expect(axiosInstance.get).toHaveBeenCalledExactlyOnceWith(
+      '/v1/admin/notices',
+      { params: { page: 0 } }
+    );
+    await user.click(screen.getByRole('link', { name: '5' }));
+    await screen.findByText('목록 공지 41', { exact: true });
+    expect(screen.getAllByRole('row')).toHaveLength(9);
+    expect(
+      vi
+        .mocked(axiosInstance.get)
+        .mock.calls.map(
+          ([, config]) => (config?.params as { page: number } | undefined)?.page
+        )
+    ).toEqual([0, 4]);
+    await user.click(screen.getByRole('link', { name: '목록 공지 41 수정' }));
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    expect(
+      vi
+        .mocked(axiosInstance.get)
+        .mock.calls.filter(([path]) => path === '/v1/admin/notices')
+        .map(
+          ([, config]) => (config?.params as { page: number } | undefined)?.page
+        )
+    ).toEqual([0, 4, 4]);
+  });
+
+  test('작성 화면 진입은 공지 목록을 미리 조회하지 않는다', () => {
+    renderPage('/notices/general/new');
+    expect(
+      screen.getByRole('heading', { name: '공지사항 작성' })
+    ).toBeInTheDocument();
+    expect(axiosInstance.get).not.toHaveBeenCalled();
+  });
+
+  test('검색 조건을 적용한 경우에만 전체 페이지를 수집해 전체 글을 검색한다', async () => {
     let finish!: (value: ReturnType<typeof response>) => void;
     const deferred = new Promise<ReturnType<typeof response>>((resolve) => {
       finish = resolve;
@@ -466,8 +1013,7 @@ describe('실제 목록 조회 경로', () => {
         ? deferred
         : response((config?.params as { page: number } | undefined)?.page ?? 0)
     );
-    renderPage();
-    expect(screen.getByText('조회 중…')).toBeInTheDocument();
+    renderPage('/notices/general?keyword=서버 공지 23');
     await waitFor(() => expect(axiosInstance.get).toHaveBeenCalledTimes(2));
     expect(
       screen.queryByText('서버 공지 1', { exact: true })
@@ -475,9 +1021,9 @@ describe('실제 목록 조회 경로', () => {
     await act(async () => {
       finish(response(1));
     });
-    await screen.findByText('서버 공지 1', { exact: true });
-    expect(screen.getAllByRole('row')).toHaveLength(11);
-    expect(screen.getByText('23', { selector: 'span' })).toBeInTheDocument();
+    await screen.findByText('서버 공지 23', { exact: true });
+    expect(screen.getAllByRole('row')).toHaveLength(2);
+    expect(screen.getByRole('status')).toHaveTextContent('총 1건');
     expect(
       vi
         .mocked(axiosInstance.get)
@@ -485,18 +1031,6 @@ describe('실제 목록 조회 경로', () => {
           ([, config]) => (config?.params as { page: number } | undefined)?.page
         )
     ).toEqual([0, 1, 2]);
-    await user.click(screen.getByRole('link', { name: '3' }));
-    expect(screen.getAllByRole('row')).toHaveLength(4);
-    expect(screen.getByText('서버 공지 23')).toBeInTheDocument();
-    await user.type(screen.getByLabelText('게시글 검색'), '서버 공지 23');
-    expect(screen.getAllByRole('row')).toHaveLength(4);
-    await user.click(screen.getByRole('button', { name: '검색' }));
-    expect(screen.getAllByRole('row')).toHaveLength(2);
-    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute(
-      'aria-current',
-      'page'
-    );
-    expect(axiosInstance.get).toHaveBeenCalledTimes(3);
   });
 
   test('서버의 NEW를 모두 표시·검색하고 작성자 ID 없이 닉네임으로 작성 공지를 조회한다', async () => {
@@ -510,7 +1044,7 @@ describe('실제 목록 조회 경로', () => {
     expect(screen.getByText('11', { selector: 'span' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '검색 조건 초기화' }));
     await user.click(screen.getAllByRole('button', { name: '운영리자' })[0]);
-    expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+    expect(screen.getAllByRole('menuitem')).toHaveLength(2);
     await user.click(screen.getByRole('menuitem', { name: '작성한 공지글' }));
     expect(screen.getByLabelText('작성자 검색 (닉네임)')).toHaveValue(
       '운영리자'
@@ -522,9 +1056,10 @@ describe('실제 목록 조회 경로', () => {
       screen.queryByRole('menuitem', { name: '회원 정보' })
     ).not.toBeInTheDocument();
     for (const row of screen.getAllByRole('row').slice(1)) {
-      expect(
-        within(row).getByRole('button', { name: / 수정$/ })
-      ).toBeDisabled();
+      expect(within(row).getByRole('link', { name: / 수정$/ })).toHaveAttribute(
+        'href',
+        expect.stringMatching(/\/edit$/)
+      );
       expect(
         within(row).getByRole('button', { name: '운영리자' })
       ).toBeInTheDocument();
@@ -537,7 +1072,7 @@ describe('실제 목록 조회 경로', () => {
     vi.mocked(axiosInstance.get)
       .mockResolvedValueOnce(response(0))
       .mockRejectedValueOnce(new Error('서버 오류'));
-    renderPage();
+    renderPage('/notices/general?keyword=서버 공지 1');
     await screen.findByRole('alert');
     expect(screen.getByText('개수 확인 불가')).toBeInTheDocument();
     expect(
@@ -558,11 +1093,12 @@ describe('실제 목록 조회 경로', () => {
     expect(axiosInstance.get).toHaveBeenCalledOnce();
   });
 
-  test('수정은 비활성화하고 새 공지 작성은 필수 항목을 검증한다', async () => {
+  test('공지 상세를 불러와 수정하고 새 공지 작성은 필수 항목을 검증한다', async () => {
     const router = renderPage('/notices/general/5000/edit');
-    expect(
-      screen.getByRole('heading', { name: '공지 수정은 준비 중입니다.' })
-    ).toBeInTheDocument();
+    await screen.findByRole('heading', { name: '공지사항 수정' });
+    expect(screen.getByRole('textbox', { name: /제목/ })).toHaveValue(
+      '서버 공지 1'
+    );
     await act(() => router.navigate('/notices/general/new'));
     expect(screen.getByRole('button', { name: '게시' })).toBeEnabled();
     expect(screen.getByRole('button', { name: '임시저장' })).toBeEnabled();
@@ -680,6 +1216,8 @@ describe('실제 목록 조회 경로', () => {
       );
     });
     expect(await screen.findByRole('alert')).toHaveTextContent('등록 실패');
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith('등록 실패');
+    expect(toast.success).not.toHaveBeenCalled();
     expect(screen.getByRole('textbox', { name: /제목/ })).toHaveValue(
       '실패해도 남는 제목'
     );
@@ -754,7 +1292,7 @@ describe('실제 목록 조회 경로', () => {
     expect(URL.revokeObjectURL).toHaveBeenLastCalledWith('blob:preview-2');
   });
 
-  test('첨부 실패 뒤에는 입력을 잠그고 새 POST 없이 남은 업로드만 재시도한다', async () => {
+  test('첨부 실패 뒤에는 재시도 없이 오류를 알리고 중복 전송을 막는다', async () => {
     globalThis.URL = class extends NativeURL {
       static createObjectURL = vi.fn(() => 'blob:upload');
       static revokeObjectURL = vi.fn();
@@ -769,7 +1307,7 @@ describe('실제 목록 조회 경로', () => {
     await user.click(screen.getByRole('button', { name: '공지사항' }));
     await user.type(
       screen.getByRole('textbox', { name: /제목/ }),
-      '첨부 재시도 확인'
+      '첨부 실패 확인'
     );
     await user.upload(screen.getByLabelText('이미지 파일 선택'), [
       new File(['1'], 'one.png', { type: 'image/png' }),
@@ -784,22 +1322,73 @@ describe('실제 목록 조회 경로', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       '공지 6000번은 생성되었습니다.'
     );
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith(
+      expect.stringMatching(
+        /^공지 6000번은 생성되었습니다\. 일부 첨부 업로드에 실패했습니다\./
+      )
+    );
+    expect(toast.success).not.toHaveBeenCalled();
     expect(screen.getByRole('textbox', { name: /제목/ })).toBeDisabled();
-    await user.click(
-      screen.getByRole('button', { name: '첨부 처리 다시 시도' })
+    expect(
+      screen.queryByRole('button', { name: '첨부 처리 다시 시도' })
+    ).not.toBeInTheDocument();
+    const checkList = screen.getByRole('link', {
+      name: '목록에서 확인 (새 창)',
+    });
+    expect(checkList).toHaveAttribute('href', '/notices/general');
+    expect(checkList).toHaveAttribute('target', '_blank');
+    fireEvent.submit(
+      screen.getByRole('textbox', { name: /제목/ }).closest('form')!
     );
-    await user.click(
-      within(screen.getByRole('dialog')).getByRole('button', {
-        name: '다시 시도',
-      })
-    );
-    await screen.findByRole('heading', { name: '일반 공지 관리' });
-    await screen.findByText('첨부 재시도 확인');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(axiosInstance.post).toHaveBeenCalledOnce();
-    expect(uploads).toHaveBeenCalledTimes(3);
+    expect(uploads).toHaveBeenCalledTimes(2);
+    expect(toast.success).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: '취소' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent(
+      '목록에서 저장 상태를 확인해 주세요.'
+    );
+    expect(screen.getByRole('dialog')).not.toHaveTextContent('다시 시도');
   });
 
-  test('저장 응답·파일 업로드·재시도 대기 중과 지연 drop에서 최초 첨부 순서를 유지한다', async () => {
+  test('첨부 형식 오류도 공통 오류 토스트로 알리고 저장 요청을 보내지 않는다', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    renderPage('/notices/general/new');
+    await user.upload(
+      screen.getByLabelText('이미지 파일 선택'),
+      new File(['pdf'], 'unsupported.pdf', { type: 'application/pdf' })
+    );
+    const error = await screen.findByRole('alert');
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith(error.textContent);
+    expect(axiosInstance.post).not.toHaveBeenCalled();
+  });
+
+  test('.jpng는 이미지 MIME이어도 선택 즉시 제외하고 토스트로 알린다', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    renderPage('/notices/general/new');
+    const input = screen.getByLabelText('이미지 파일 선택');
+    expect(input).toHaveAttribute('accept', '.jpg,.jpeg,.png,.jfif,.bmp,.webp');
+    expect(screen.getByLabelText('동영상 파일 선택')).toHaveAttribute(
+      'accept',
+      '.mp4,.mov'
+    );
+    await user.upload(
+      input,
+      new File(['image'], '잘못된.jpng', { type: 'image/png' })
+    );
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'JPG, JPEG, PNG'
+    );
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith(
+      expect.stringContaining('JPG, JPEG, PNG')
+    );
+    expect(
+      screen.queryByRole('img', { name: '잘못된.jpng' })
+    ).not.toBeInTheDocument();
+    expect(axiosInstance.post).not.toHaveBeenCalled();
+  });
+
+  test('저장 응답·파일 업로드·업로드 실패 후와 지연 drop에서 최초 첨부 순서를 유지한다', async () => {
     globalThis.URL = class extends NativeURL {
       static createObjectURL = vi.fn(() => 'blob:locked-upload');
       static revokeObjectURL = vi.fn();
@@ -900,8 +1489,11 @@ describe('실제 목록 조회 경로', () => {
     });
     await screen.findByRole('alert');
     expect(
-      screen.getByRole('button', { name: '첨부 처리 다시 시도' })
-    ).toBeEnabled();
+      screen.queryByRole('button', { name: '첨부 처리 다시 시도' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: '목록에서 확인 (새 창)' })
+    ).toHaveAttribute('target', '_blank');
     assertLocked();
     const sent = vi.mocked(axiosInstance.post).mock
       .calls[0][1] as AdminCreateNoticeRequest;
@@ -909,18 +1501,13 @@ describe('실제 목록 조회 경로', () => {
       'A.png',
       'B.png',
     ]);
-    await user.click(
-      screen.getByRole('button', { name: '첨부 처리 다시 시도' })
+    fireEvent.submit(
+      screen.getByRole('textbox', { name: /제목/ }).closest('form')!
     );
-    await user.click(
-      within(screen.getByRole('dialog')).getByRole('button', {
-        name: '다시 시도',
-      })
-    );
-    await screen.findByRole('heading', { name: '일반 공지 관리' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(axiosInstance.post).toHaveBeenCalledOnce();
     expect(
       uploads.mock.calls.map(([, options]) => (options.body as File).name)
-    ).toEqual(['A.png', 'B.png', 'A.png']);
+    ).toEqual(['A.png', 'B.png']);
   });
 });

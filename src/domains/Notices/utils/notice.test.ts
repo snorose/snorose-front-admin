@@ -1,15 +1,13 @@
 import { describe, expect, test } from 'vitest';
 
-import { createSampleNotices } from '@/test/fixtures/notices';
-
-import type { NoticeForm } from '../types';
 import {
-  filterNotices,
+  createSampleNotices,
   getLatestNoticeId,
   publishScheduledNotices,
-  sortNotices,
-  validateNotice,
-} from './notice';
+} from '@/test/fixtures/notices';
+
+import type { NoticeForm } from '../types';
+import { filterNotices, sortNotices, validateNotice } from './notice';
 
 const now = Date.parse('2026-11-05T10:00:00+09:00');
 const samples = () => createSampleNotices(new Date(now));
@@ -59,9 +57,26 @@ describe('공지 목록 정책', () => {
     );
   });
 
+  test('변경하지 않는 기존 고정 상태 때문에 제목·본문 수정이 차단되지 않는다', () => {
+    const notices = samples()
+      .slice(0, 5)
+      .map((notice) => ({ ...notice, pinned: true }));
+    const original = notices[0];
+    expect(
+      validateNotice(
+        { ...original, title: '제목 수정' },
+        'published',
+        notices,
+        original.id,
+        now,
+        original
+      )
+    ).toBeNull();
+  });
+
   test('게시판 대분류·하위 게시판·상태·본문 검색을 조합한다', () => {
     const notices = samples();
-    expect(filterNotices(notices, { group: '커뮤니티' })).toHaveLength(3);
+    expect(filterNotices(notices, { group: '커뮤니티' })).toHaveLength(4);
     expect(
       filterNotices(notices, {
         group: '커뮤니티',

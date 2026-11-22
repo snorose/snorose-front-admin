@@ -1,10 +1,10 @@
 import { BOARD_NAMES } from '@/shared/utils';
 
 /**
- * snorose-front 공개 게시판 스냅샷 (2026-11-05).
+ * snorose-front 공개 게시판 스냅샷 (2026-11-22).
  * 출처: shared/lib/board-registry.ts, shared/constant/board.js,
  * shared/constant/board-config.ts, shared/lib/new-board.ts.
- * new-board는 현재 OFF: 25·70·1015·1016 제외 (운영 상태 확인).
+ * new-board ON 확인: 25·70·1015·1016을 포함합니다.
  * 베숙트는 모아보기이며 NOTICE 미지원, 문의·신고는 별도 기능이므로 제외.
  * 공지사항·이벤트는 각각 표시하고, 게시판별 카테고리는 선택 사항으로 사용합니다.
  */
@@ -38,6 +38,7 @@ const NOTICE_BOARD_CONFIG = [
     group: '커뮤니티',
     categories: [],
   },
+  { id: 25, group: '커뮤니티', categories: [] },
   {
     id: 60,
     group: '공식 게시판',
@@ -117,10 +118,17 @@ const NOTICE_BOARD_CONFIG = [
     categories: ['PC', '모바일', '기타'],
   },
   { id: 1012, group: '문화생활', categories: [] },
+  { id: 1015, group: '문화생활', categories: [] },
+  { id: 1016, group: '문화생활', categories: [] },
   {
     id: 54,
     group: '커리어',
     categories: ['어학', '자격증'],
+  },
+  {
+    id: 70,
+    group: '캠퍼스',
+    categories: [],
   },
   {
     id: 71,
@@ -154,6 +162,10 @@ export const NOTICE_BOARDS: readonly string[] = NOTICE_BOARD_CATALOG.map(
 
 export function getNoticeBoard(name: string) {
   return NOTICE_BOARD_CATALOG.find((board) => board.name === name);
+}
+
+export function getNoticeBoardById(id: number) {
+  return NOTICE_BOARD_CATALOG.find((board) => board.id === id);
 }
 
 export function getNoticeCategories(name: string): readonly string[] {

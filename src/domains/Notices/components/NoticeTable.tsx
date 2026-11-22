@@ -28,7 +28,6 @@ interface NoticeTableProps {
   selectedAuthorName?: string;
   onPageChange: (page: number) => void;
   onClearAuthor: () => void;
-  onViewMemberInfo: (authorId: string) => void;
   onViewAuthorNotices: (notice: Notice) => void;
 }
 
@@ -45,7 +44,6 @@ export default function NoticeTable({
   selectedAuthorName,
   onPageChange,
   onClearAuthor,
-  onViewMemberInfo,
   onViewAuthorNotices,
 }: NoticeTableProps) {
   const titleId = useId();
@@ -86,24 +84,26 @@ export default function NoticeTable({
         </div>
       )}
       <div className='overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
-        <Table className='w-full min-w-[1390px] table-fixed text-[13px]'>
+        <Table className='w-full min-w-[720px] table-fixed text-xs'>
           <Table.Header className='h-[42px] border-b border-gray-200'>
             <Table.Row>
-              <Table.Head className='w-[80px] px-3'>ID</Table.Head>
-              <Table.Head className='w-[145px] px-3'>게시판</Table.Head>
-              <Table.Head className='w-[100px] px-3 text-center'>
+              <Table.Head className='w-[8%] px-1.5'>ID</Table.Head>
+              <Table.Head className='w-[12%] px-1.5'>게시판</Table.Head>
+              <Table.Head className='w-[10%] px-1.5 text-center'>
                 구분
               </Table.Head>
-              <Table.Head className='w-[360px] px-3'>제목 / 내용</Table.Head>
-              <Table.Head className='w-[125px] px-3'>작성자</Table.Head>
-              <Table.Head className='w-[160px] px-3 text-center'>
+              <Table.Head className='w-[21%] px-1.5'>제목 / 내용</Table.Head>
+              <Table.Head className='w-[11%] px-1.5'>작성자</Table.Head>
+              <Table.Head className='w-[8%] px-1.5 text-center'>
                 통계
               </Table.Head>
-              <Table.Head className='w-[100px] px-3 text-center'>
+              <Table.Head className='w-[10%] px-1.5 text-center'>
                 상태
               </Table.Head>
-              <Table.Head className='w-[205px] px-3'>마지막 수정일</Table.Head>
-              <Table.Head className='w-[75px] px-3 text-center'>
+              <Table.Head className='w-[14%] px-1.5 !whitespace-normal'>
+                마지막 수정일
+              </Table.Head>
+              <Table.Head className='w-[6%] px-1.5 text-center'>
                 수정
               </Table.Head>
             </Table.Row>
@@ -126,7 +126,6 @@ export default function NoticeTable({
                   key={notice.id}
                   notice={notice}
                   canEdit={canEdit}
-                  onViewMemberInfo={onViewMemberInfo}
                   onViewNotices={() => onViewAuthorNotices(notice)}
                 />
               ))}

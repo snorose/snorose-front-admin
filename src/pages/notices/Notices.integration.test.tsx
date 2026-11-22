@@ -8,6 +8,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   act,
   cleanup,
@@ -22,11 +23,26 @@ import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 import { AuthContext } from '@/shared/contexts';
 import type { AuthContextType } from '@/shared/types';
 
+import NoticeContentEditor from '@/domains/Notices/components/NoticeContentEditor';
+
 import { NoticeTestProvider } from '@/test/fixtures/notice-provider';
 import { createSampleNotices } from '@/test/fixtures/notices';
 
 import GeneralNoticePage from './GeneralNoticePage';
 import NoticeEditorPage from './NoticeEditorPage';
+
+vi.mock('@/apis', () => ({
+  getUserDetailAPI: vi.fn(async (encryptedUserId: string) => ({
+    encryptedUserId,
+    userName: '관리자',
+    loginId: 'admin',
+    studentNumber: '20260000',
+    nickname: '운영리자',
+    pointBalance: 10,
+    totalWarningCount: 0,
+    isBlacklist: false,
+  })),
+}));
 
 const auth: AuthContextType = {
   user: {
@@ -89,7 +105,17 @@ function renderNotices(
     ),
     { initialEntries, initialIndex }
   );
-  return { ...render(<RouterProvider router={router} />), router };
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  });
+  return {
+    ...render(
+      <QueryClientProvider client={client}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    ),
+    router,
+  };
 }
 
 beforeAll(() => {
@@ -105,6 +131,88 @@ afterEach(() => {
 });
 
 describe('공지 조회와 작성 흐름', () => {
+  test.each(['글자색', '링크'])(
+    '%s 메뉴를 열어 둔 채 잠겨도 본문과 서식을 변경할 수 없다',
+    async (menu) => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      const props = {
+        id: 'locked-editor',
+        value: '<p>기존 본문</p>',
+        onChange,
+      };
+      const { rerender } = render(<NoticeContentEditor {...props} />);
+      await user.click(screen.getByRole('button', { name: menu }));
+      rerender(<NoticeContentEditor {...props} disabled />);
+      expect(screen.getByRole('button', { name: menu })).toBeDisabled();
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('dialog', { name: '링크 설정' })
+      ).not.toBeInTheDocument();
+      const content = screen.getByRole('textbox', { name: '내용' });
+      expect(content).toHaveAttribute('aria-readonly', 'true');
+      expect(content).toHaveTextContent('기존 본문');
+      expect(content.querySelector('span[style], a')).toBeNull();
+      expect(onChange).not.toHaveBeenCalled();
+    }
+  );
+
+  test.each(['published', 'scheduled', 'private'] as const)(
+    '%s 수정 UI에서 상태에 맞는 예약·공개·비공개 동작을 제공한다',
+    async (status) => {
+      const notice = createSampleNotices().find(
+        (item) => item.status === status
+      )!;
+      const user = userEvent.setup();
+      renderNotices(`/notices/general/${notice.id}/edit`);
+      expect(
+        screen.queryByRole('button', { name: '임시저장' })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: '삭제' })
+      ).not.toBeInTheDocument();
+      if (status === 'published') {
+        expect(screen.getByRole('button', { name: '예약' })).toBeDisabled();
+        await user.click(screen.getByRole('button', { name: '예약' }));
+        expect(
+          screen.queryByRole('button', { name: '예약 게시 일시' })
+        ).not.toBeInTheDocument();
+      } else if (status === 'scheduled') {
+        expect(
+          screen.getByRole('combobox', { name: '예약 게시 일시 오전/오후' })
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: '즉시 게시로 변경' })
+        ).toBeEnabled();
+      } else {
+        expect(
+          screen.queryByRole('button', { name: '예약' })
+        ).not.toBeInTheDocument();
+      }
+      await user.click(
+        screen.getByRole('button', {
+          name: status === 'private' ? '공개' : '비공개',
+        })
+      );
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveTextContent(
+        status === 'private'
+          ? '공개로 전환할까요?'
+          : '비공개 상태로 저장할까요?'
+      );
+      if (status === 'scheduled')
+        expect(dialog).toHaveTextContent('예약 게시를 취소');
+      await user.click(within(dialog).getByRole('button', { name: '저장' }));
+      await screen.findByRole('heading', { name: '일반 공지 관리' });
+      const row = screen.getByText(notice.title).closest('tr')!;
+      expect(
+        within(row).getByText(status === 'private' ? '게시' : '비공개', {
+          exact: true,
+        })
+      ).toBeInTheDocument();
+    }
+  );
+
   test('고정 설정 영역 없이 소제목·글자색·형광펜을 적용하고 저장 후 다시 편집한다', async () => {
     const user = userEvent.setup();
     renderNotices('/notices/general/new');
@@ -387,7 +495,7 @@ describe('공지 조회와 작성 흐름', () => {
     await user.click(screen.getByRole('combobox', { name: '게시판' }));
     await user.click(screen.getByRole('option', { name: '커뮤니티' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
-    expect(screen.getAllByRole('row')).toHaveLength(4);
+    expect(screen.getAllByRole('row')).toHaveLength(5);
     await user.click(screen.getByRole('combobox', { name: '하위 게시판' }));
     await user.click(screen.getByRole('option', { name: '함박눈방' }));
     await user.click(screen.getByRole('button', { name: '검색' }));
@@ -508,7 +616,7 @@ describe('공지 조회와 작성 흐름', () => {
     expect(within(updated).queryByText('NEW')).not.toBeInTheDocument();
   });
 
-  test('회원 정보는 기존 회원 상세 경로로 이동하고 작성한 공지는 이름을 검색창에 채운다', async () => {
+  test('회원 정보는 공통 팝업에서 상세로 이동하고 작성한 공지는 이름을 검색창에 채운다', async () => {
     const user = userEvent.setup();
     renderNotices();
     const openAuthor = async () =>
@@ -525,6 +633,17 @@ describe('공지 조회와 작성 흐름', () => {
       screen.queryByRole('menuitem', { name: '제재하기' })
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: '회원 정보' }));
+    const memberDialog = await screen.findByRole('dialog', {
+      name: '회원 정보',
+    });
+    expect(screen.getByTestId('current-url')).toHaveTextContent(
+      '/notices/general'
+    );
+    await user.click(
+      within(memberDialog).getByRole('button', {
+        name: '유저 상세 페이지로 이동',
+      })
+    );
     expect(screen.getByTestId('current-url')).toHaveTextContent(
       '/member/info/sample-admin-0'
     );
@@ -733,6 +852,14 @@ describe('공지 조회와 작성 흐름', () => {
       within(savedRow).getByRole('button', { name: '테스트리자' })
     );
     await user.click(screen.getByRole('menuitem', { name: '회원 정보' }));
+    const memberDialog = await screen.findByRole('dialog', {
+      name: '회원 정보',
+    });
+    await user.click(
+      within(memberDialog).getByRole('button', {
+        name: '유저 상세 페이지로 이동',
+      })
+    );
     expect(screen.getByTestId('current-url')).toHaveTextContent(
       '/member/info/101'
     );
