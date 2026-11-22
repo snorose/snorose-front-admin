@@ -8,14 +8,28 @@ export const NOTICE_ATTACHMENT_LIMITS = {
 export type NoticeMediaKind = keyof typeof NOTICE_ATTACHMENT_LIMITS;
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'jfif', 'bmp', 'webp'];
 const VIDEO_EXTENSIONS = ['mp4', 'mov'];
+export const NOTICE_ATTACHMENT_ACCEPT = {
+  image: IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(','),
+  video: VIDEO_EXTENSIONS.map((extension) => `.${extension}`).join(','),
+} as const;
+const FILE_FORMAT_ERRORS = {
+  image: '이미지는 JPG, JPEG, PNG, JFIF, BMP, WEBP 파일만 첨부할 수 있습니다.',
+  video: '동영상은 MP4, MOV 파일만 첨부할 수 있습니다.',
+} as const;
 const VALID_FILE_NAME = /^[\p{L}\p{N} ~!@$^&()\-_=[\]{};`',.]+$/u;
 
 export function getNoticeFileType(file: Pick<File, 'name' | 'type'>) {
-  if (file.type) return /^(image|video)\//.test(file.type) ? file.type : null;
   const extension = file.name.split('.').at(-1)?.toLowerCase() ?? '';
-  if (IMAGE_EXTENSIONS.includes(extension))
+  const kind = IMAGE_EXTENSIONS.includes(extension)
+    ? 'image'
+    : VIDEO_EXTENSIONS.includes(extension)
+      ? 'video'
+      : null;
+  if (!kind) return null;
+  if (file.type) return file.type.startsWith(`${kind}/`) ? file.type : null;
+  if (kind === 'image')
     return `image/${extension === 'jpg' || extension === 'jfif' ? 'jpeg' : extension}`;
-  if (VIDEO_EXTENSIONS.includes(extension))
+  if (kind === 'video')
     return extension === 'mov' ? 'video/quicktime' : 'video/mp4';
   return null;
 }
@@ -29,6 +43,7 @@ function getAttachmentError(
       ? 'video'
       : null;
   if (!kind) return '이미지와 동영상만 첨부할 수 있습니다.';
+  if (!getNoticeFileType(file)) return FILE_FORMAT_ERRORS[kind];
   if (!VALID_FILE_NAME.test(file.name))
     return '파일 이름에 사용할 수 없는 문자가 있습니다. 파일 이름을 변경해 주세요.';
   if (file.size > NOTICE_ATTACHMENT_LIMITS[kind].size)
@@ -60,10 +75,7 @@ export function selectNoticeFiles(
   if (types.some((type) => !type?.startsWith(`${kind}/`)))
     return {
       files: [],
-      error:
-        kind === 'image'
-          ? '이미지 파일을 선택해 주세요.'
-          : '동영상 파일을 선택해 주세요.',
+      error: FILE_FORMAT_ERRORS[kind],
     };
   if (
     current.filter((file) => file.type.startsWith(`${kind}/`)).length +

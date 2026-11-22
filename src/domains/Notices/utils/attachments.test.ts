@@ -78,7 +78,12 @@ describe('공지 첨부 순서', () => {
       });
       expect(
         validateNoticeAttachments([
-          { ...attachments[0], type, size: oversized.size },
+          {
+            ...attachments[0],
+            name: oversized.name,
+            type,
+            size: oversized.size,
+          },
         ])
       ).toContain(`${limit}MB`);
     }
@@ -100,6 +105,61 @@ describe('공지 첨부 순서', () => {
       selectNoticeFiles([new File(['x'], '알수없음.bin')], [], 'video').files
     ).toEqual([]);
   });
+
+  test.each(['jpng', 'gif', 'svg', 'heic', 'avif'])(
+    'MIME이 이미지여도 미지원 확장자 .%s는 선택과 저장 전에 거절한다',
+    (extension) => {
+      const file = new File(['invalid'], `사진.${extension}`, {
+        type: 'image/png',
+      });
+      expect(selectNoticeFiles([file], [], 'image')).toMatchObject({
+        files: [],
+        error: expect.stringContaining('JPG, JPEG, PNG'),
+      });
+      expect(
+        validateNoticeAttachments([
+          { ...attachments[0], name: file.name, type: file.type },
+        ])
+      ).toContain('JPG, JPEG, PNG');
+    }
+  );
+
+  test.each(['jpg', 'jpeg', 'png', 'jfif', 'bmp', 'webp'])(
+    '유저단에서 허용하는 .%s 확장자는 대소문자와 관계없이 선택한다',
+    (extension) => {
+      const file = new File(['image'], `사진.${extension.toUpperCase()}`, {
+        type: 'image/png',
+      });
+      expect(selectNoticeFiles([file], [], 'image')).toEqual({
+        files: [file],
+        error: null,
+      });
+    }
+  );
+
+  test.each(['avi', 'webm', 'wmv'])(
+    '유저단에서 허용하지 않는 동영상 .%s는 선택하지 않는다',
+    (extension) => {
+      const file = new File(['video'], `영상.${extension}`, {
+        type: 'video/mp4',
+      });
+      expect(selectNoticeFiles([file], [], 'video')).toMatchObject({
+        files: [],
+        error: expect.stringContaining('MP4, MOV'),
+      });
+    }
+  );
+
+  test.each([
+    ['사진.jpg', 'video/mp4', 'image'],
+    ['영상.mp4', 'image/jpeg', 'video'],
+  ] as const)(
+    '확장자와 MIME 종류가 맞지 않는 %s는 거절한다',
+    (name, type, kind) => {
+      const file = new File(['file'], name, { type });
+      expect(selectNoticeFiles([file], [], kind).files).toEqual([]);
+    }
+  );
 
   test('이동한 순서가 썸네일 선택과 API 첨부 배열 순서에 반영된다', () => {
     const moved = moveNoticeAttachment(attachments, 'two', 0);
