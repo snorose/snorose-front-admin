@@ -114,7 +114,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         url: PATHS.PUSH_NOTIFICATIONS,
       },
       {
-        title: '서버 점검',
+        title: '서버 점검 일정 관리',
         url: PATHS.SERVER_MAINTENANCE,
       },
       // {
