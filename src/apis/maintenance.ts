@@ -3,7 +3,10 @@ import { isAxiosError } from 'axios';
 import { axiosInstance } from '@/shared/axios/instance';
 import type { BaseResponse } from '@/shared/types';
 
-import type { ServerMaintenanceListItem } from '@/domains/Operation/types/maintenance';
+import type {
+  ServerMaintenanceDetail,
+  ServerMaintenanceListItem,
+} from '@/domains/Operation/types/maintenance';
 
 export interface CreateMaintenanceRequest {
   title: string;
@@ -87,6 +90,14 @@ export async function updateAdminMaintenance(
 export async function deleteAdminMaintenance(id: number) {
   const { data } = await axiosInstance.delete<
     BaseResponse<{ message: string }>
+  >(`/v1/admin/server-maintenances/${id}`);
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+}
+
+export async function getAdminMaintenance(id: number) {
+  const { data } = await axiosInstance.get<
+    BaseResponse<ServerMaintenanceDetail>
   >(`/v1/admin/server-maintenances/${id}`);
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;

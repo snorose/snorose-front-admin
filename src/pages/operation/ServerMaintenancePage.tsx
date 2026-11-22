@@ -8,6 +8,7 @@ import { Alert, Button } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
 import { MaintenanceDeleteModal } from '@/domains/Operation/components/MaintenanceDeleteModal';
+import { MaintenanceDetailModal } from '@/domains/Operation/components/MaintenanceDetailModal';
 import { MaintenanceEditModal } from '@/domains/Operation/components/MaintenanceEditModal';
 import { MaintenanceListSection } from '@/domains/Operation/components/MaintenanceListSection';
 import {
@@ -27,6 +28,7 @@ const MAINTENANCE_QUERY_KEY = ['server-maintenances'];
 
 export default function ServerMaintenancePage() {
   const queryClient = useQueryClient();
+  const [detailId, setDetailId] = useState<number>();
   const [editing, setEditing] = useState<ServerMaintenanceListItem>();
   const [deleting, setDeleting] = useState<ServerMaintenanceListItem>();
   const refreshList = () => {
@@ -160,6 +162,7 @@ export default function ServerMaintenancePage() {
       )}
       <MaintenanceListSection
         items={list.data ?? []}
+        onDetail={(item) => setDetailId(item.id)}
         onEdit={setEditing}
         onDelete={setDeleting}
         isLoading={list.isPending}
@@ -173,6 +176,12 @@ export default function ServerMaintenancePage() {
           void list.refetch();
         }}
       />
+      {detailId !== undefined && (
+        <MaintenanceDetailModal
+          id={detailId}
+          onClose={() => setDetailId(undefined)}
+        />
+      )}
       {editing && (
         <MaintenanceEditModal
           key={editing.id}

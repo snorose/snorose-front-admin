@@ -3,7 +3,7 @@ import { useId, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { DateTimePicker } from '@/shared/components';
-import { Button, Dialog, Input, Label } from '@/shared/components/ui';
+import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
 import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
 
@@ -12,31 +12,51 @@ import {
   uploadMaintenanceImage,
 } from '@/apis/maintenance';
 
-import type { ServerMaintenanceListItem } from '../types/maintenance';
+import type {
+  ServerMaintenanceDetail,
+  ServerMaintenanceListItem,
+} from '../types/maintenance';
+import { MaintenanceDetailLoader } from './MaintenanceDetailLoader';
 
 type ChangeMode = 'keep' | 'change' | 'remove';
 
-export function MaintenanceEditModal({
-  item,
-  onClose,
-  onChanged,
-}: {
+export function MaintenanceEditModal(props: {
   item: ServerMaintenanceListItem;
   onClose: () => void;
   onChanged: () => void;
 }) {
+  return (
+    <MaintenanceDetailLoader
+      id={props.item.id}
+      title='서버 점검 일정 수정'
+      onClose={props.onClose}
+    >
+      {(detail) => <MaintenanceEditForm {...props} detail={detail} />}
+    </MaintenanceDetailLoader>
+  );
+}
+
+function MaintenanceEditForm({
+  item,
+  detail,
+  onClose,
+  onChanged,
+}: {
+  item: ServerMaintenanceListItem;
+  detail: ServerMaintenanceDetail;
+  onClose: () => void;
+  onChanged: () => void;
+}) {
   const id = useId();
-  const [title, setTitle] = useState(item.title);
+  const [title, setTitle] = useState(detail.title);
   const start = useDateTimeField({
-    initialDateTime: toDateTimeInputValue(item.startAt),
+    initialDateTime: toDateTimeInputValue(detail.startAt),
   });
   const end = useDateTimeField({
-    initialDateTime: toDateTimeInputValue(item.endAt),
+    initialDateTime: toDateTimeInputValue(detail.endAt),
   });
-  const [memo, setMemo] = useState('');
-  const [changeMemo, setChangeMemo] = useState(false);
-  const [noticeMode, setNoticeMode] = useState<ChangeMode>('keep');
-  const [notice, setNotice] = useState('');
+  const [memo, setMemo] = useState(detail.memo);
+  const [notice, setNotice] = useState(detail.noticeMessage ?? '');
   const [imageMode, setImageMode] = useState<ChangeMode>('keep');
   const [image, setImage] = useState<File>();
   const [pendingUpload, setPendingUpload] = useState<{
@@ -50,13 +70,7 @@ export function MaintenanceEditModal({
   const submit = async () => {
     if (busy.current) return;
     if (!pendingUpload) {
-      if (
-        !title.trim() ||
-        !start.dateTime ||
-        !end.dateTime ||
-        (changeMemo && !memo.trim()) ||
-        (noticeMode === 'change' && !notice.trim())
-      ) {
+      if (!title.trim() || !start.dateTime || !end.dateTime || !memo.trim()) {
         setError('변경할 항목의 필수값을 입력해 주세요.');
         return;
       }
@@ -82,9 +96,9 @@ export function MaintenanceEditModal({
           title: title.trim(),
           startAt: `${start.dateTime.replace('T', ' ')}:00`,
           endAt: `${end.dateTime.replace('T', ' ')}:00`,
-          ...(changeMemo ? { memo: memo.trim() } : {}),
-          ...(noticeMode !== 'keep'
-            ? { noticeMessage: noticeMode === 'remove' ? '' : notice.trim() }
+          ...(memo.trim() !== detail.memo ? { memo: memo.trim() } : {}),
+          ...(notice.trim() !== (detail.noticeMessage ?? '')
+            ? { noticeMessage: notice.trim() }
             : {}),
           ...(imageMode === 'remove'
             ? { attachments: [] }
@@ -111,6 +125,7 @@ export function MaintenanceEditModal({
           throw new Error('업로드 주소가 없습니다. 관리자에게 확인해 주세요.');
         await uploadMaintenanceImage(upload.url, upload.file);
       }
+      if (upload) onChanged();
       toast.success('서버 점검 일정이 수정되었습니다.');
       onClose();
     } catch (error) {
@@ -155,8 +170,8 @@ export function MaintenanceEditModal({
         <Dialog.Header>
           <Dialog.Title>서버 점검 일정 수정</Dialog.Title>
           <Dialog.Description>
-            안내 문구와 이미지는 점검 중 사용자에게 표시됩니다. 관리자 메모·안내
-            문구·이미지는 변경을 선택한 경우에만 반영됩니다.
+            기존 일정 정보를 수정합니다. 안내 문구와 이미지는 점검 중 사용자에게
+            표시됩니다.
           </Dialog.Description>
         </Dialog.Header>
         <form
@@ -193,34 +208,33 @@ export function MaintenanceEditModal({
               onDateSelect={end.onDateSelect}
               onTimeChange={end.onTimeChange}
             />
-            <label className='flex items-center gap-2 text-sm'>
-              <input
-                type='checkbox'
-                checked={changeMemo}
-                onChange={(event) => setChangeMemo(event.target.checked)}
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor={`${id}-memo`}>관리자 메모</Label>
+              <Input
+                id={`${id}-memo`}
+                value={memo}
+                onChange={(event) => setMemo(event.target.value)}
               />
-              관리자 메모 변경
-            </label>
-            {changeMemo && (
-              <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-memo`}>관리자 메모</Label>
-                <Input
-                  id={`${id}-memo`}
-                  value={memo}
-                  onChange={(event) => setMemo(event.target.value)}
-                />
-              </div>
+            </div>
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
+              <Textarea
+                id={`${id}-notice`}
+                value={notice}
+                onChange={(event) => setNotice(event.target.value)}
+              />
+            </div>
+            {detail.imageUrl && imageMode === 'keep' && (
+              <img
+                src={detail.imageUrl}
+                alt='현재 사용자 안내 이미지'
+                className='max-h-48 max-w-full rounded-md object-contain'
+              />
             )}
-            {modeSelect('사용자 안내 문구 처리', noticeMode, setNoticeMode)}
-            {noticeMode === 'change' && (
-              <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
-                <Input
-                  id={`${id}-notice`}
-                  value={notice}
-                  onChange={(event) => setNotice(event.target.value)}
-                />
-              </div>
+            {!detail.imageUrl && imageMode === 'keep' && (
+              <p className='text-muted-foreground text-sm'>
+                첨부 이미지 없음 (기본 이미지 표시)
+              </p>
             )}
             {modeSelect('사용자 안내 이미지 처리', imageMode, setImageMode)}
             {imageMode === 'change' && (

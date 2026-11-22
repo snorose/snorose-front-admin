@@ -126,3 +126,26 @@ test('삭제는 실제 id를 사용하고 진행 중 일정 거부 메시지를 
     '진행 중인 서버 점검'
   );
 });
+
+test('상세 조회는 id 경로를 사용하고 서버 실패 메시지를 전달한다', async () => {
+  const { getAdminMaintenance } = await import('./maintenance');
+  const result = {
+    title: '점검',
+    memo: '메모',
+    noticeMessage: '안내',
+    imageUrl: null,
+  };
+  vi.mocked(axiosInstance.get).mockResolvedValue({
+    data: { isSuccess: true, result },
+  });
+  expect(await getAdminMaintenance(12)).toEqual(result);
+  expect(axiosInstance.get).toHaveBeenCalledWith(
+    '/v1/admin/server-maintenances/12'
+  );
+  vi.mocked(axiosInstance.get).mockResolvedValue({
+    data: { isSuccess: false, message: '일정을 찾을 수 없습니다.' },
+  });
+  await expect(getAdminMaintenance(12)).rejects.toThrow(
+    '일정을 찾을 수 없습니다.'
+  );
+});

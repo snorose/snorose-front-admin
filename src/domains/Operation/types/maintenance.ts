@@ -11,3 +11,12 @@ export interface ServerMaintenanceListItem extends ServerMaintenance {
   number: number;
   status: 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED';
 }
+
+export interface ServerMaintenanceDetail {
+  title: string;
+  noticeMessage: string | null;
+  startAt: string;
+  endAt: string;
+  memo: string;
+  imageUrl: string | null;
+}
