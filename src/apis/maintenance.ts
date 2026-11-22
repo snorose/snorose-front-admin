@@ -70,3 +70,24 @@ export async function getAdminMaintenances() {
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 }
+
+export type UpdateMaintenanceRequest = Partial<CreateMaintenanceRequest>;
+
+export async function updateAdminMaintenance(
+  id: number,
+  body: UpdateMaintenanceRequest
+) {
+  const { data } = await axiosInstance.patch<
+    BaseResponse<CreateMaintenanceResult>
+  >(`/v1/admin/server-maintenances/${id}`, body);
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+}
+
+export async function deleteAdminMaintenance(id: number) {
+  const { data } = await axiosInstance.delete<
+    BaseResponse<{ message: string }>
+  >(`/v1/admin/server-maintenances/${id}`);
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+}

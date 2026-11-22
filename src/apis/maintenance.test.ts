@@ -5,7 +5,12 @@ import { axiosInstance } from '@/shared/axios/instance';
 import { createAdminMaintenance, uploadMaintenanceImage } from './maintenance';
 
 vi.mock('@/shared/axios/instance', () => ({
-  axiosInstance: { post: vi.fn(), get: vi.fn() },
+  axiosInstance: {
+    post: vi.fn(),
+    get: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+  },
 }));
 beforeEach(() => {
   vi.clearAllMocks();
@@ -80,4 +85,44 @@ test('목록은 인증 axios로 조회하고 배열을 그대로 반환한다', 
     data: { isSuccess: false, message: '조회 실패' },
   });
   await expect(getAdminMaintenances()).rejects.toThrow('조회 실패');
+});
+
+test('수정은 생략한 필드를 유지하고 명시적인 문구·이미지 삭제를 전송한다', async () => {
+  const { updateAdminMaintenance } = await import('./maintenance');
+  const result = { id: 12, attachmentUrlList: [] };
+  vi.mocked(axiosInstance.patch).mockResolvedValue({
+    data: { isSuccess: true, result },
+  });
+  expect(
+    await updateAdminMaintenance(12, { noticeMessage: '', attachments: [] })
+  ).toEqual(result);
+  expect(axiosInstance.patch).toHaveBeenCalledWith(
+    '/v1/admin/server-maintenances/12',
+    { noticeMessage: '', attachments: [] }
+  );
+  vi.mocked(axiosInstance.patch).mockResolvedValue({
+    data: { isSuccess: false, message: '중복 기간' },
+  });
+  await expect(updateAdminMaintenance(12, { title: '변경' })).rejects.toThrow(
+    '중복 기간'
+  );
+});
+test('삭제는 실제 id를 사용하고 진행 중 일정 거부 메시지를 전달한다', async () => {
+  const { deleteAdminMaintenance } = await import('./maintenance');
+  vi.mocked(axiosInstance.delete).mockResolvedValue({
+    data: { isSuccess: true, result: { message: 'Complete' } },
+  });
+  expect(await deleteAdminMaintenance(12)).toEqual({ message: 'Complete' });
+  expect(axiosInstance.delete).toHaveBeenCalledWith(
+    '/v1/admin/server-maintenances/12'
+  );
+  vi.mocked(axiosInstance.delete).mockResolvedValue({
+    data: {
+      isSuccess: false,
+      message: '진행 중인 서버 점검은 삭제할 수 없습니다.',
+    },
+  });
+  await expect(deleteAdminMaintenance(12)).rejects.toThrow(
+    '진행 중인 서버 점검'
+  );
 });

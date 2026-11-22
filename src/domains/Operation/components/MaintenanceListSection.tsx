@@ -1,5 +1,7 @@
+import { MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
+
 import { SectionTitle, StatusBadge } from '@/shared/components';
-import { Button, Skeleton, Table } from '@/shared/components/ui';
+import { Button, DropdownMenu, Skeleton, Table } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { ServerMaintenanceListItem } from '../types/maintenance';
@@ -16,6 +18,8 @@ interface Props {
   isFetching?: boolean;
   errorMessage?: string;
   onRetry?: () => void;
+  onEdit: (item: ServerMaintenanceListItem) => void;
+  onDelete: (item: ServerMaintenanceListItem) => void;
 }
 
 export function MaintenanceListSection({
@@ -24,6 +28,8 @@ export function MaintenanceListSection({
   isFetching = false,
   errorMessage,
   onRetry,
+  onEdit,
+  onDelete,
 }: Props) {
   return (
     <section
@@ -64,6 +70,7 @@ export function MaintenanceListSection({
                 '종료 일시',
                 '생성 일시',
                 '수정 일시',
+                '더보기',
               ].map((label) => (
                 <Table.Head key={label} className='text-center'>
                   {label}
@@ -74,7 +81,7 @@ export function MaintenanceListSection({
           <Table.Body>
             {isLoading ? (
               <Table.Row>
-                <Table.Cell colSpan={7}>
+                <Table.Cell colSpan={8}>
                   <span role='status' className='sr-only'>
                     서버 점검 일정을 불러오는 중입니다.
                   </span>
@@ -115,12 +122,43 @@ export function MaintenanceListSection({
                         {formatDateTimeToMinutes(date)}
                       </Table.Cell>
                     ))}
+                    <Table.Cell className='text-center'>
+                      <DropdownMenu>
+                        <DropdownMenu.Trigger asChild>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label={`${item.title} 서버 점검 일정 메뉴 열기`}
+                          >
+                            <MoreHorizontalIcon aria-hidden='true' />
+                          </Button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Content align='end'>
+                          <DropdownMenu.Item onClick={() => onEdit(item)}>
+                            <Pencil aria-hidden='true' />
+                            수정
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Separator />
+                          <DropdownMenu.Item
+                            variant='destructive'
+                            disabled={item.status === 'IN_PROGRESS'}
+                            onClick={() => onDelete(item)}
+                          >
+                            <Trash2 aria-hidden='true' />
+                            {item.status === 'IN_PROGRESS'
+                              ? '삭제 (진행 중에는 불가)'
+                              : '삭제'}
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Content>
+                      </DropdownMenu>
+                    </Table.Cell>
                   </Table.Row>
                 );
               })
             ) : (
               <Table.Row>
-                <Table.Cell colSpan={7} className='text-center'>
+                <Table.Cell colSpan={8} className='text-center'>
                   {errorMessage
                     ? '서버 점검 일정을 불러오지 못했습니다.'
                     : '등록된 일정이 없습니다.'}

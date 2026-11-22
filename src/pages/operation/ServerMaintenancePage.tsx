@@ -7,11 +7,14 @@ import { PageHeader } from '@/shared/components';
 import { Alert, Button } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
+import { MaintenanceDeleteModal } from '@/domains/Operation/components/MaintenanceDeleteModal';
+import { MaintenanceEditModal } from '@/domains/Operation/components/MaintenanceEditModal';
 import { MaintenanceListSection } from '@/domains/Operation/components/MaintenanceListSection';
 import {
   type MaintenanceDraft,
   MaintenanceScheduleForm,
 } from '@/domains/Operation/components/MaintenanceScheduleForm';
+import type { ServerMaintenanceListItem } from '@/domains/Operation/types/maintenance';
 
 import {
   MaintenanceOutcomeUnknownError,
@@ -24,6 +27,11 @@ const MAINTENANCE_QUERY_KEY = ['server-maintenances'];
 
 export default function ServerMaintenancePage() {
   const queryClient = useQueryClient();
+  const [editing, setEditing] = useState<ServerMaintenanceListItem>();
+  const [deleting, setDeleting] = useState<ServerMaintenanceListItem>();
+  const refreshList = () => {
+    void queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
+  };
   const list = useQuery({
     queryKey: MAINTENANCE_QUERY_KEY,
     queryFn: getAdminMaintenances,
@@ -92,7 +100,7 @@ export default function ServerMaintenancePage() {
     <div className='flex w-full min-w-0 flex-col gap-6'>
       <PageHeader
         title='서버 점검 일정 관리'
-        description='서버 점검 일정을 등록하고 조회할 수 있어요.'
+        description='서버 점검 일정을 등록, 조회, 수정, 삭제할 수 있어요.'
       />
       {unknownOutcome ? (
         <Alert variant='destructive'>
@@ -146,6 +154,8 @@ export default function ServerMaintenancePage() {
       )}
       <MaintenanceListSection
         items={list.data ?? []}
+        onEdit={setEditing}
+        onDelete={setDeleting}
         isLoading={list.isPending}
         isFetching={list.isFetching}
         errorMessage={
@@ -157,6 +167,22 @@ export default function ServerMaintenancePage() {
           void list.refetch();
         }}
       />
+      {editing && (
+        <MaintenanceEditModal
+          key={editing.id}
+          item={editing}
+          onClose={() => setEditing(undefined)}
+          onChanged={refreshList}
+        />
+      )}
+      {deleting && (
+        <MaintenanceDeleteModal
+          key={deleting.id}
+          item={deleting}
+          onClose={() => setDeleting(undefined)}
+          onChanged={refreshList}
+        />
+      )}
     </div>
   );
 }
