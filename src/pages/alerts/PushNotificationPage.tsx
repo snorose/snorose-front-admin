@@ -13,7 +13,10 @@ import {
 import type { PushNotification } from '@/shared/types';
 import { formatDateValue, getErrorMessage } from '@/shared/utils';
 
-import { PushNotificationConfirmModal } from '@/domains/Alerts/components';
+import {
+  PushNotificationConfirmModal,
+  PushNotificationList,
+} from '@/domains/Alerts/components';
 
 import { postPushNotificationAPI } from '@/apis';
 
@@ -553,6 +556,7 @@ export default function PushNotificationPage() {
           알림 전송
         </Button>
       </div>
+      <PushNotificationList />
     </div>
   );
 }

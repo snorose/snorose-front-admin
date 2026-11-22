@@ -26,7 +26,8 @@ vi.mock('@/shared/utils', async (importOriginal) => ({
   getErrorMessage: vi.fn((_error, defaultMessage) => defaultMessage),
 }));
 
-vi.mock('@/domains/Alerts/components', () => ({
+vi.mock('@/domains/Alerts/components', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/domains/Alerts/components')>()),
   PushNotificationConfirmModal: ({
     isOpen,
     isLoading,
@@ -87,7 +88,9 @@ describe('PushNotificationPage', () => {
     expect(screen.getByLabelText(/스노로즈 내부 URL/)).toBeInTheDocument();
     expect(screen.getByLabelText(/외부 URL/)).toBeInTheDocument();
     expect(screen.getByText(/메시지 유형/)).toBeInTheDocument();
-    expect(screen.getByText(/발송 대상/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/발송 대상/, { selector: 'label' })
+    ).toBeInTheDocument();
   });
 
   test('알림명 입력란에 값을 입력할 수 있다', async () => {
