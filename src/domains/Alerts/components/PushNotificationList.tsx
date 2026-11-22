@@ -113,7 +113,7 @@ export function PushNotificationList() {
   return (
     <section
       aria-labelledby='notification-history-title'
-      className='flex min-w-0 flex-col gap-3 border-t pt-6'
+      className='flex w-full min-w-0 flex-col gap-1'
     >
       <SectionTitleWithCount
         title='알림 발송 목록 조회'
@@ -121,132 +121,147 @@ export function PushNotificationList() {
         totalCount={MOCK_NOTIFICATIONS.length}
         status='ready'
       />
-      <Table className='min-w-[1120px] table-fixed border-b [&_td]:px-3 [&_td]:py-3 [&_th]:px-3 [&_th]:py-3'>
-        <caption className='sr-only'>알림 발송 목록 조회</caption>
-        <colgroup>
-          <col className='w-[5%]' />
-          <col className='w-[11%]' />
-          <col className='w-[17%]' />
-          <col className='w-[11%]' />
-          <col className='w-[19%]' />
-          <col className='w-[9%]' />
-          <col className='w-[12%]' />
-          <col className='w-[11%]' />
-          <col className='w-[5%]' />
-        </colgroup>
-        <Table.Header>
-          <Table.Row>
-            {[
-              'ID',
-              '발송 상태',
-              '발송 요청 일시',
-              '발송 대상',
-              '알림명',
-              '알림 구분',
-              '발송 대상 회원 수',
-              '요청 관리자',
-              '더보기',
-            ].map((header) => (
-              <Table.Head key={header} scope='col' className='font-semibold'>
-                {header}
-              </Table.Head>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {MOCK_NOTIFICATIONS.length === 0 ? (
-            <TableStateRow
-              state='empty'
-              colSpan={9}
-              message='발송한 알림이 없습니다.'
-            />
-          ) : (
-            MOCK_NOTIFICATIONS.map((notification) => (
-              <Table.Row key={notification.id}>
-                <Table.Cell>{notification.id}</Table.Cell>
-                <Table.Cell>
-                  <HistoryBadge className={STATUS_STYLES[notification.status]}>
-                    {notification.status}
-                  </HistoryBadge>
-                </Table.Cell>
-                <Table.Cell>{notification.requestedAt}</Table.Cell>
-                <Table.Cell>
-                  <HistoryBadge className={TARGET_STYLES[notification.target]}>
-                    {notification.target}
-                  </HistoryBadge>
-                </Table.Cell>
-                <Table.Cell>
-                  <span className='block truncate' title={notification.name}>
-                    {notification.name}
-                  </span>
-                </Table.Cell>
-                <Table.Cell>
-                  <HistoryBadge
-                    className={
-                      notification.category === '광고성'
-                        ? STATUS_STYLES['일부 실패']
-                        : NEUTRAL_BADGE
-                    }
-                  >
-                    {notification.category}
-                  </HistoryBadge>
-                </Table.Cell>
-                <Table.Cell>
-                  {formatMemberCount(notification.memberCount)}
-                </Table.Cell>
-                <Table.Cell>{notification.admin}</Table.Cell>
-                <Table.Cell>
-                  {notification.status === '예약' && (
-                    <Dialog>
-                      <Dialog.Trigger asChild>
-                        <Button
-                          type='button'
-                          variant='ghost'
-                          size='icon-sm'
-                          aria-label={`알림 ${notification.id} 더보기`}
-                        >
-                          <MoreHorizontal aria-hidden='true' />
-                        </Button>
-                      </Dialog.Trigger>
-                      <Dialog.Content>
-                        <Dialog.Header>
-                          <Dialog.Title>알림 발송 상세</Dialog.Title>
-                          <Dialog.Description>
-                            선택한 알림의 발송 요청 정보입니다.
-                          </Dialog.Description>
-                        </Dialog.Header>
-                        <DescriptionList
-                          items={[
-                            { label: 'ID', value: notification.id },
-                            { label: '발송 상태', value: notification.status },
-                            {
-                              label: '발송 요청 일시',
-                              value: notification.requestedAt,
-                            },
-                            { label: '발송 대상', value: notification.target },
-                            { label: '알림명', value: notification.name },
-                            {
-                              label: '알림 구분',
-                              value: notification.category,
-                            },
-                            {
-                              label: '발송 대상 회원 수',
-                              value: formatMemberCount(
-                                notification.memberCount
-                              ),
-                            },
-                            { label: '요청 관리자', value: notification.admin },
-                          ]}
-                        />
-                      </Dialog.Content>
-                    </Dialog>
-                  )}
-                </Table.Cell>
-              </Table.Row>
-            ))
-          )}
-        </Table.Body>
-      </Table>
+      <div className='overflow-x-auto rounded-lg border'>
+        <Table className='w-full min-w-[1120px] table-fixed [&_td]:text-center'>
+          <caption className='sr-only'>알림 발송 목록 조회</caption>
+          <colgroup>
+            <col className='w-[5%]' />
+            <col className='w-[11%]' />
+            <col className='w-[17%]' />
+            <col className='w-[11%]' />
+            <col className='w-[19%]' />
+            <col className='w-[9%]' />
+            <col className='w-[12%]' />
+            <col className='w-[11%]' />
+            <col className='w-[5%]' />
+          </colgroup>
+          <Table.Header>
+            <Table.Row>
+              {[
+                'ID',
+                '발송 상태',
+                '발송 요청 일시',
+                '발송 대상',
+                '알림명',
+                '알림 구분',
+                '발송 대상 회원 수',
+                '요청 관리자',
+                '더보기',
+              ].map((header) => (
+                <Table.Head key={header} scope='col' className='text-center'>
+                  {header}
+                </Table.Head>
+              ))}
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {MOCK_NOTIFICATIONS.length === 0 ? (
+              <TableStateRow
+                state='empty'
+                colSpan={9}
+                message='발송한 알림이 없습니다.'
+              />
+            ) : (
+              MOCK_NOTIFICATIONS.map((notification) => (
+                <Table.Row key={notification.id}>
+                  <Table.Cell>{notification.id}</Table.Cell>
+                  <Table.Cell>
+                    <HistoryBadge
+                      className={STATUS_STYLES[notification.status]}
+                    >
+                      {notification.status}
+                    </HistoryBadge>
+                  </Table.Cell>
+                  <Table.Cell>{notification.requestedAt}</Table.Cell>
+                  <Table.Cell>
+                    <HistoryBadge
+                      className={TARGET_STYLES[notification.target]}
+                    >
+                      {notification.target}
+                    </HistoryBadge>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span className='block truncate' title={notification.name}>
+                      {notification.name}
+                    </span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <HistoryBadge
+                      className={
+                        notification.category === '광고성'
+                          ? STATUS_STYLES['일부 실패']
+                          : NEUTRAL_BADGE
+                      }
+                    >
+                      {notification.category}
+                    </HistoryBadge>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {formatMemberCount(notification.memberCount)}
+                  </Table.Cell>
+                  <Table.Cell>{notification.admin}</Table.Cell>
+                  <Table.Cell>
+                    {notification.status === '예약' && (
+                      <Dialog>
+                        <Dialog.Trigger asChild>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label={`알림 ${notification.id} 더보기`}
+                          >
+                            <MoreHorizontal aria-hidden='true' />
+                          </Button>
+                        </Dialog.Trigger>
+                        <Dialog.Content>
+                          <Dialog.Header>
+                            <Dialog.Title>알림 발송 상세</Dialog.Title>
+                            <Dialog.Description>
+                              선택한 알림의 발송 요청 정보입니다.
+                            </Dialog.Description>
+                          </Dialog.Header>
+                          <DescriptionList
+                            items={[
+                              { label: 'ID', value: notification.id },
+                              {
+                                label: '발송 상태',
+                                value: notification.status,
+                              },
+                              {
+                                label: '발송 요청 일시',
+                                value: notification.requestedAt,
+                              },
+                              {
+                                label: '발송 대상',
+                                value: notification.target,
+                              },
+                              { label: '알림명', value: notification.name },
+                              {
+                                label: '알림 구분',
+                                value: notification.category,
+                              },
+                              {
+                                label: '발송 대상 회원 수',
+                                value: formatMemberCount(
+                                  notification.memberCount
+                                ),
+                              },
+                              {
+                                label: '요청 관리자',
+                                value: notification.admin,
+                              },
+                            ]}
+                          />
+                        </Dialog.Content>
+                      </Dialog>
+                    )}
+                  </Table.Cell>
+                </Table.Row>
+              ))
+            )}
+          </Table.Body>
+        </Table>
+      </div>
     </section>
   );
 }
