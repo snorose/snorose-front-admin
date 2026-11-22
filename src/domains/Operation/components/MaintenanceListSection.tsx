@@ -1,4 +1,10 @@
-import { Eye, MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
+import {
+  Eye,
+  MoreHorizontalIcon,
+  Pencil,
+  SquareCheck,
+  Trash2,
+} from 'lucide-react';
 
 import { SectionTitle, StatusBadge } from '@/shared/components';
 import { Button, DropdownMenu, Skeleton, Table } from '@/shared/components/ui';
@@ -18,6 +24,7 @@ interface Props {
   isFetching?: boolean;
   errorMessage?: string;
   onRetry?: () => void;
+  onComplete: (item: ServerMaintenanceListItem) => void;
   onDetail: (item: ServerMaintenanceListItem) => void;
   onEdit: (item: ServerMaintenanceListItem) => void;
   onDelete: (item: ServerMaintenanceListItem) => void;
@@ -29,6 +36,7 @@ export function MaintenanceListSection({
   isFetching = false,
   errorMessage,
   onRetry,
+  onComplete,
   onDetail,
   onEdit,
   onDelete,
@@ -145,6 +153,12 @@ export function MaintenanceListSection({
                             <Pencil aria-hidden='true' />
                             수정
                           </DropdownMenu.Item>
+                          {item.status === 'IN_PROGRESS' && (
+                            <DropdownMenu.Item onClick={() => onComplete(item)}>
+                              <SquareCheck aria-hidden='true' />
+                              즉시 종료
+                            </DropdownMenu.Item>
+                          )}
                           <DropdownMenu.Separator />
                           <DropdownMenu.Item
                             variant='destructive'

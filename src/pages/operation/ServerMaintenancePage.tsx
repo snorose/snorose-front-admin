@@ -7,6 +7,7 @@ import { NoticePanel, PageHeader } from '@/shared/components';
 import { Alert, Button } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
+import { MaintenanceCompleteModal } from '@/domains/Operation/components/MaintenanceCompleteModal';
 import { MaintenanceDeleteModal } from '@/domains/Operation/components/MaintenanceDeleteModal';
 import { MaintenanceDetailModal } from '@/domains/Operation/components/MaintenanceDetailModal';
 import { MaintenanceEditModal } from '@/domains/Operation/components/MaintenanceEditModal';
@@ -30,6 +31,7 @@ export default function ServerMaintenancePage() {
   const queryClient = useQueryClient();
   const [detailId, setDetailId] = useState<number>();
   const [editing, setEditing] = useState<ServerMaintenanceListItem>();
+  const [completing, setCompleting] = useState<ServerMaintenanceListItem>();
   const [deleting, setDeleting] = useState<ServerMaintenanceListItem>();
   const refreshList = () => {
     void queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
@@ -105,7 +107,7 @@ export default function ServerMaintenancePage() {
       <NoticePanel
         items={[
           '서버 점검 일정은 시작 일시에 자동 노출되고 종료 일시에 자동 해제됩니다.',
-          '진행 중 일정은 삭제할 수 없으며, 필요 시 종료 일시를 앞당겨 조기 종료할 수 있습니다.',
+          '진행 중 일정은 삭제할 수 없으며, 필요 시 즉시 종료할 수 있습니다.',
           '종료 일시는 시작 일시보다 이후여야 하며, 현재 시각보다 이전으로 설정할 수 없습니다.',
           '중복된 서버 점검 일정은 생성할 수 없습니다.',
         ]}
@@ -165,6 +167,7 @@ export default function ServerMaintenancePage() {
         onDetail={(item) => setDetailId(item.id)}
         onEdit={setEditing}
         onDelete={setDeleting}
+        onComplete={setCompleting}
         isLoading={list.isPending}
         isFetching={list.isFetching}
         errorMessage={
@@ -187,6 +190,14 @@ export default function ServerMaintenancePage() {
           key={editing.id}
           item={editing}
           onClose={() => setEditing(undefined)}
+          onChanged={refreshList}
+        />
+      )}
+      {completing && (
+        <MaintenanceCompleteModal
+          key={completing.id}
+          item={completing}
+          onClose={() => setCompleting(undefined)}
           onChanged={refreshList}
         />
       )}

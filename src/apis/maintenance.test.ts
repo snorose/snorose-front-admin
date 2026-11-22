@@ -149,3 +149,24 @@ test('상세 조회는 id 경로를 사용하고 서버 실패 메시지를 전�
     '일정을 찾을 수 없습니다.'
   );
 });
+
+test('즉시 완료는 body 없이 전용 경로에 요청하고 완료 결과를 반환한다', async () => {
+  const { completeAdminMaintenance } = await import('./maintenance');
+  const result = { id: 12, endAt: '2026-11-10 03:15:00', status: 'COMPLETED' };
+  vi.mocked(axiosInstance.patch).mockResolvedValue({
+    data: { isSuccess: true, result },
+  });
+  expect(await completeAdminMaintenance(12)).toEqual(result);
+  expect(axiosInstance.patch).toHaveBeenCalledWith(
+    '/v1/admin/server-maintenances/12/complete'
+  );
+  vi.mocked(axiosInstance.patch).mockResolvedValue({
+    data: {
+      isSuccess: false,
+      message: '예정된 서버 점검은 완료할 수 없습니다.',
+    },
+  });
+  await expect(completeAdminMaintenance(12)).rejects.toThrow(
+    '예정된 서버 점검은 완료할 수 없습니다.'
+  );
+});

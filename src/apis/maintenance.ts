@@ -102,3 +102,11 @@ export async function getAdminMaintenance(id: number) {
   if (!data.isSuccess) throw new Error(data.message);
   return data.result;
 }
+
+export async function completeAdminMaintenance(id: number) {
+  const { data } = await axiosInstance.patch<
+    BaseResponse<{ id: number; endAt: string; status: 'COMPLETED' }>
+  >(`/v1/admin/server-maintenances/${id}/complete`);
+  if (!data.isSuccess) throw new Error(data.message);
+  return data.result;
+}
