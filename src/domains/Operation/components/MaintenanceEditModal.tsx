@@ -155,7 +155,7 @@ export function MaintenanceEditModal({
         <Dialog.Header>
           <Dialog.Title>서버 점검 일정 수정</Dialog.Title>
           <Dialog.Description>
-            일정 정보를 수정합니다. 메모·안내 문구·이미지는 변경을 선택한
+            일정 정보를 수정합니다. 관리자 메모·안내 문구·이미지는 변경을 선택한
             경우에만 반영됩니다.
           </Dialog.Description>
         </Dialog.Header>
@@ -199,11 +199,11 @@ export function MaintenanceEditModal({
                 checked={changeMemo}
                 onChange={(event) => setChangeMemo(event.target.checked)}
               />
-              메모 변경
+              관리자 메모 변경
             </label>
             {changeMemo && (
               <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-memo`}>메모</Label>
+                <Label htmlFor={`${id}-memo`}>관리자 메모</Label>
                 <Input
                   id={`${id}-memo`}
                   value={memo}

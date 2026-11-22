@@ -76,7 +76,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             return;
           }
           if (!initial && !memo.trim()) {
-            setError('메모를 입력해 주세요.');
+            setError('관리자 메모를 입력해 주세요.');
             return;
           }
           if (
@@ -177,7 +177,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
                 </div>
                 <div className='flex flex-col gap-1'>
                   <Label htmlFor={`${id}-memo`} required>
-                    메모
+                    관리자 메모
                   </Label>
                   <Input
                     id={`${id}-memo`}
