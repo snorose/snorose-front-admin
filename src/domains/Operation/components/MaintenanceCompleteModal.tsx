@@ -26,7 +26,7 @@ export function MaintenanceCompleteModal({
       onClose={onClose}
       title='서버 점검 즉시 종료'
       description='서버 점검을 즉시 종료할까요? 종료 일시가 현재 시각으로 변경되며 점검 안내가 해제됩니다.'
-      className='max-w-xs sm:max-w-sm'
+      className='max-w-xs sm:max-w-sm [&_[data-slot=dialog-description]]:break-keep'
       items={[
         { label: '관리용 일정 제목', value: item.title },
         { label: '시작 일시', value: formatDateTimeToMinutes(item.startAt) },
