@@ -153,13 +153,16 @@ export function MaintenanceListSection({
                             <Pencil aria-hidden='true' />
                             수정
                           </DropdownMenu.Item>
+                          <DropdownMenu.Separator />
                           {item.status === 'IN_PROGRESS' && (
-                            <DropdownMenu.Item onClick={() => onComplete(item)}>
+                            <DropdownMenu.Item
+                              variant='destructive'
+                              onClick={() => onComplete(item)}
+                            >
                               <SquareCheck aria-hidden='true' />
                               즉시 종료
                             </DropdownMenu.Item>
                           )}
-                          <DropdownMenu.Separator />
                           <DropdownMenu.Item
                             variant='destructive'
                             disabled={item.status === 'IN_PROGRESS'}
