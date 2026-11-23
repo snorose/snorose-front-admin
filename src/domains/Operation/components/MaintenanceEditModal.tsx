@@ -72,7 +72,8 @@ function MaintenanceEditForm({
     if (busy.current) return;
     if (!pendingUpload) {
       if (!title.trim() || !start.dateTime || !end.dateTime || !memo.trim()) {
-        setError('변경할 항목의 필수값을 입력해 주세요.');
+        setError('');
+        toast.error('모든 필수 항목을 입력해 주세요.');
         return;
       }
       if (end.dateTime <= start.dateTime) {
@@ -174,6 +175,7 @@ function MaintenanceEditForm({
           </Dialog.Description>
         </Dialog.Header>
         <form
+          noValidate
           className='flex min-w-0 flex-col gap-4'
           onSubmit={(event) => {
             event.preventDefault();

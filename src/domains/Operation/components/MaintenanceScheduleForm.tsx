@@ -71,12 +71,14 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
         {initial ? '서버 점검 일정 수정' : '서버 점검 일정 등록'}
       </SectionTitle>
       <form
+        noValidate
         className='@container flex flex-col gap-4 rounded-lg border p-4 pb-5'
         onSubmit={async (event) => {
           event.preventDefault();
           if (saving.current) return;
           if (!draft.title.trim() || !draft.startAt || !draft.endAt) {
-            setError('모든 필수 항목을 입력해 주세요.');
+            setError('');
+            toast.error('모든 필수 항목을 입력해 주세요.');
             return;
           }
           if (
@@ -89,7 +91,8 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             return;
           }
           if (!initial && !memo.trim()) {
-            setError('관리자 메모를 입력해 주세요.');
+            setError('');
+            toast.error('관리자 메모를 입력해 주세요.');
             return;
           }
           if (

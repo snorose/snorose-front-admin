@@ -317,3 +317,18 @@ test('생성일시와 같은 수정일시는 수정 이력 없이 표시한다',
   expect(cells[5]).toHaveTextContent('2026-11-23 21:47');
   expect(cells[6]).toHaveTextContent('-');
 });
+
+test.each(['관리용 일정 제목', '관리자 메모'])(
+  '수정 시 필수 항목 %s 누락은 토스트로 안내한다',
+  async (label) => {
+    const user = userEvent.setup();
+    render(
+      <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={vi.fn()} />
+    );
+    await user.clear(await screen.findByLabelText(new RegExp(label)));
+    await user.click(screen.getByRole('button', { name: '수정' }));
+    expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
+    expect(updateAdminMaintenance).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  }
+);
