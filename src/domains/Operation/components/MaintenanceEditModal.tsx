@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
@@ -137,25 +137,20 @@ function MaintenanceEditForm({
     }
   };
 
-  const modeSelect = (
-    label: string,
-    mode: ChangeMode,
-    setMode: (mode: ChangeMode) => void
-  ) => (
-    <div className='flex flex-col gap-1'>
-      <Label htmlFor={`${id}-${label}`}>{label}</Label>
-      <select
-        id={`${id}-${label}`}
-        className='border-input bg-background focus-visible:ring-ring h-9 rounded-md border px-3 text-sm focus-visible:ring-2'
-        value={mode}
-        onChange={(event) => setMode(event.target.value as ChangeMode)}
-      >
-        <option value='keep'>기존 값 유지</option>
-        <option value='change'>변경</option>
-        <option value='remove'>삭제</option>
-      </select>
-    </div>
-  );
+  const [previewUrl, setPreviewUrl] = useState<string>();
+  useEffect(() => {
+    if (!image) {
+      setPreviewUrl(undefined);
+      return;
+    }
+    const url = URL.createObjectURL(image);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+  const resetImage = () => {
+    setImage(undefined);
+    setImageMode('keep');
+  };
 
   return (
     <Dialog
@@ -165,7 +160,7 @@ function MaintenanceEditForm({
       }}
     >
       <Dialog.Content
-        className='max-h-[90dvh] overflow-y-auto sm:max-w-lg'
+        className='max-h-[90dvh] min-w-0 overflow-y-auto sm:max-w-lg'
         showCloseButton={!isPending}
       >
         <Dialog.Header>
@@ -176,7 +171,7 @@ function MaintenanceEditForm({
           </Dialog.Description>
         </Dialog.Header>
         <form
-          className='flex flex-col gap-4'
+          className='flex min-w-0 flex-col gap-4'
           onSubmit={(event) => {
             event.preventDefault();
             void submit();
@@ -187,9 +182,12 @@ function MaintenanceEditForm({
             className='flex min-w-0 flex-col gap-4 [&_[data-slot=label]]:py-0 [&_[data-slot=label]]:font-medium'
           >
             <div className='flex flex-col gap-1'>
-              <Label htmlFor={`${id}-title`}>관리용 일정 제목</Label>
+              <Label htmlFor={`${id}-title`} required>
+                관리용 일정 제목
+              </Label>
               <Input
                 id={`${id}-title`}
+                required
                 value={title}
                 maxLength={100}
                 onChange={(event) => setTitle(event.target.value)}
@@ -197,6 +195,7 @@ function MaintenanceEditForm({
             </div>
             <DateTimePicker
               label='시작 일시'
+              required
               date={start.date}
               time={start.time}
               onDateSelect={start.onDateSelect}
@@ -204,15 +203,19 @@ function MaintenanceEditForm({
             />
             <DateTimePicker
               label='종료 일시'
+              required
               date={end.date}
               time={end.time}
               onDateSelect={end.onDateSelect}
               onTimeChange={end.onTimeChange}
             />
             <div className='flex flex-col gap-1'>
-              <Label htmlFor={`${id}-memo`}>관리자 메모</Label>
+              <Label htmlFor={`${id}-memo`} required>
+                관리자 메모
+              </Label>
               <Input
                 id={`${id}-memo`}
+                required
                 value={memo}
                 onChange={(event) => setMemo(event.target.value)}
               />
@@ -225,29 +228,72 @@ function MaintenanceEditForm({
                 onChange={(event) => setNotice(event.target.value)}
               />
             </div>
-            {detail.imageUrl && imageMode === 'keep' && (
-              <img
-                src={detail.imageUrl}
-                alt='현재 사용자 안내 이미지'
-                className='max-h-48 max-w-full rounded-md object-contain'
-              />
-            )}
-            {!detail.imageUrl && imageMode === 'keep' && (
-              <p className='text-muted-foreground text-sm'>
-                첨부 이미지 없음 (기본 이미지 표시)
-              </p>
-            )}
-            {modeSelect('사용자 안내 이미지 처리', imageMode, setImageMode)}
-            {imageMode === 'change' && (
-              <div className='flex flex-col gap-1'>
-                <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
-                <MaintenanceImageInput
-                  id={`${id}-image`}
-                  file={image}
-                  onChange={setImage}
+            <div className='flex min-w-0 flex-col gap-2'>
+              <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
+              {imageMode === 'keep' && detail.imageUrl && (
+                <img
+                  src={detail.imageUrl}
+                  alt='현재 사용자 안내 이미지'
+                  className='max-h-48 w-full min-w-0 rounded-md object-contain'
                 />
+              )}
+              {imageMode === 'change' && previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt='선택한 사용자 안내 이미지'
+                  className='max-h-48 w-full min-w-0 rounded-md object-contain'
+                />
+              )}
+              {(imageMode === 'remove' ||
+                (imageMode === 'keep' && !detail.imageUrl)) && (
+                <p className='text-muted-foreground text-sm' role='status'>
+                  {imageMode === 'remove'
+                    ? '저장하면 기본 안내 이미지가 표시됩니다.'
+                    : '기본 안내 이미지 사용 중'}
+                </p>
+              )}
+              <MaintenanceImageInput
+                key={imageMode}
+                id={`${id}-image`}
+                file={image}
+                buttonLabel={
+                  imageMode === 'change'
+                    ? '다시 선택'
+                    : detail.imageUrl && imageMode === 'keep'
+                      ? '이미지 변경'
+                      : '이미지 추가'
+                }
+                onChange={(file) => {
+                  setImage(file);
+                  setImageMode('change');
+                }}
+              />
+              <div className='flex flex-wrap gap-2'>
+                {detail.imageUrl && imageMode !== 'remove' && (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() => {
+                      setImage(undefined);
+                      setImageMode('remove');
+                    }}
+                  >
+                    기본 이미지 사용
+                  </Button>
+                )}
+                {imageMode !== 'keep' && (
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
+                    onClick={resetImage}
+                  >
+                    변경 취소
+                  </Button>
+                )}
               </div>
-            )}
+            </div>
           </fieldset>
           {pendingUpload && (
             <p className='text-sm'>

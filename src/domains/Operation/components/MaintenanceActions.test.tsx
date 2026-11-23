@@ -39,6 +39,8 @@ const item: ServerMaintenanceListItem = {
 };
 beforeEach(() => {
   vi.clearAllMocks();
+  URL.createObjectURL = vi.fn(() => 'blob:maintenance-preview');
+  URL.revokeObjectURL = vi.fn();
   vi.mocked(getAdminMaintenance).mockResolvedValue({
     title: '점검',
     startAt: item.startAt,
@@ -68,8 +70,8 @@ test('수정 기본값은 메모·문구·이미지를 보내지 않으며 성�
   render(
     <MaintenanceEditModal item={item} onChanged={onChanged} onClose={onClose} />
   );
-  await user.clear(await screen.findByLabelText('관리용 일정 제목'));
-  expect(screen.getByLabelText('관리자 메모')).toHaveValue('기존 메모');
+  await user.clear(await screen.findByLabelText(/관리용 일정 제목/));
+  expect(screen.getByLabelText(/관리자 메모/)).toHaveValue('기존 메모');
   expect(screen.getByLabelText('사용자 안내 문구')).toHaveValue(
     '기존 안내 문구'
   );
@@ -77,7 +79,7 @@ test('수정 기본값은 메모·문구·이미지를 보내지 않으며 성�
     'src',
     'https://example.com/old.png'
   );
-  await user.type(screen.getByLabelText('관리용 일정 제목'), '변경 점검');
+  await user.type(screen.getByLabelText(/관리용 일정 제목/), '변경 점검');
   await user.click(screen.getByRole('button', { name: '수정' }));
   expect(updateAdminMaintenance).toHaveBeenCalledExactlyOnceWith(12, {
     title: '변경 점검',
@@ -95,9 +97,8 @@ test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오
     <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={onClose} />
   );
   await user.clear(await screen.findByLabelText('사용자 안내 문구'));
-  await user.selectOptions(
-    await screen.findByLabelText('사용자 안내 이미지 처리'),
-    'remove'
+  await user.click(
+    await screen.findByRole('button', { name: '기본 이미지 사용' })
   );
   await user.click(screen.getByRole('button', { name: '수정' }));
   expect(updateAdminMaintenance).toHaveBeenCalledWith(
@@ -120,10 +121,7 @@ test('이미지 재시도는 PATCH를 반복하지 않는다', async () => {
   render(
     <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={onClose} />
   );
-  await user.selectOptions(
-    await screen.findByLabelText('사용자 안내 이미지 처리'),
-    'change'
-  );
+  await screen.findByRole('button', { name: '이미지 변경' });
   await user.upload(
     screen.getByLabelText('사용자 안내 이미지'),
     new File(['image'], 'a.png', { type: 'image/png' })
@@ -211,7 +209,7 @@ test('상세 조회 실패 시 편집 폼 대신 오류와 재시도를 표시�
     screen.queryByRole('button', { name: '수정' })
   ).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: '다시 시도' }));
-  expect(await screen.findByLabelText('관리자 메모')).toHaveValue('기존 메모');
+  expect(await screen.findByLabelText(/관리자 메모/)).toHaveValue('기존 메모');
 });
 
 test('즉시 종료 처리 중 중복 실행과 닫기를 막고 성공 후 목록을 갱신한다', async () => {

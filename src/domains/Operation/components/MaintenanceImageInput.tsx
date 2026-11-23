@@ -5,16 +5,23 @@ import { InputGroup } from '@/shared/components/ui';
 interface Props {
   id: string;
   file?: File;
+  buttonLabel?: string;
   inputRef?: RefObject<HTMLInputElement | null>;
   onChange: (file: File) => void;
 }
 
-export function MaintenanceImageInput({ id, file, inputRef, onChange }: Props) {
+export function MaintenanceImageInput({
+  id,
+  file,
+  inputRef,
+  onChange,
+  buttonLabel = '이미지 업로드',
+}: Props) {
   const localRef = useRef<HTMLInputElement>(null);
   const ref = inputRef ?? localRef;
 
   return (
-    <InputGroup className='min-w-0'>
+    <InputGroup className='max-w-full min-w-0 overflow-hidden'>
       <InputGroup.Button
         type='button'
         variant='default'
@@ -22,10 +29,10 @@ export function MaintenanceImageInput({ id, file, inputRef, onChange }: Props) {
         className='mx-1 shrink-0'
         onClick={() => ref.current?.click()}
       >
-        이미지 업로드
+        {buttonLabel}
       </InputGroup.Button>
       <p
-        className='min-w-0 truncate pr-2 text-sm text-gray-500'
+        className='min-w-0 flex-1 truncate pr-2 text-sm text-gray-500'
         title={file?.name}
         aria-live='polite'
       >
