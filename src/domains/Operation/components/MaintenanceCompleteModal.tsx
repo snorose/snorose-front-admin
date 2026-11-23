@@ -25,7 +25,7 @@ export function MaintenanceCompleteModal({
       open
       onClose={onClose}
       title='서버 점검 즉시 종료'
-      description='서버 점검을 즉시 종료할까요? 종료 일시가 현재 시각으로 변경되며 점검 안내가 해제됩니다.'
+      description='서버 점검을 즉시 종료할까요? 종료 일시가 현재 시각으로 변경되며 점검 안내가 즉시 해제됩니다.'
       className='max-w-xs sm:max-w-sm [&_[data-slot=dialog-description]]:break-keep'
       items={[
         { label: '관리용 일정 제목', value: item.title },
@@ -35,7 +35,7 @@ export function MaintenanceCompleteModal({
       isPending={isPending}
       action={{
         label: '즉시 종료',
-        variant: 'default',
+        variant: 'destructive',
         disabled: item.status !== 'IN_PROGRESS',
         pendingLabel: '종료 중…',
         onClick: async () => {
