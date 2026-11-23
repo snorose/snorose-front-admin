@@ -168,50 +168,50 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
           </div>
           {!initial && (
             <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='flex min-w-0 flex-col gap-1'>
-                <div className='flex items-center gap-1'>
-                  <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
-                  <Tooltip.Provider delayDuration={150}>
-                    <Tooltip
-                      open={noticeTooltipOpen}
-                      onOpenChange={setNoticeTooltipOpen}
-                    >
-                      <Tooltip.Trigger asChild>
-                        <Button
-                          type='button'
-                          variant='ghost'
-                          size='icon-sm'
-                          aria-label='사용자 안내 문구 입력 안내'
-                          className='relative size-5 shrink-0 p-0 text-inherit after:absolute after:-inset-2.5 hover:text-inherit sm:after:-inset-1'
-                          onClick={(event) => {
-                            event.preventDefault();
-                            setNoticeTooltipOpen(true);
-                          }}
-                        >
-                          <InfoIcon className='size-3.5' aria-hidden='true' />
-                        </Button>
-                      </Tooltip.Trigger>
-                      <Tooltip.Content
-                        side='top'
-                        sideOffset={6}
-                        collisionPadding={12}
-                        className='max-w-64 text-center leading-5 break-keep'
-                      >
-                        입력한 경우에만 사용자에게 노출
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </Tooltip.Provider>
-                </div>
-                <Textarea
-                  id={`${id}-notice`}
-                  className='field-sizing-fixed h-28 min-h-28 resize-y'
-                  value={noticeMessage}
-                  onChange={(event) => setNoticeMessage(event.target.value)}
-                  placeholder={DEFAULT_MAINTENANCE_NOTICE}
-                />
-              </div>
               <div className='flex min-w-0 flex-col gap-4'>
-                <div className='flex flex-col gap-1'>
+                <div className='flex min-w-0 flex-col gap-1'>
+                  <div className='flex min-h-6 items-center gap-1'>
+                    <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
+                    <Tooltip.Provider delayDuration={150}>
+                      <Tooltip
+                        open={noticeTooltipOpen}
+                        onOpenChange={setNoticeTooltipOpen}
+                      >
+                        <Tooltip.Trigger asChild>
+                          <Button
+                            type='button'
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label='사용자 안내 문구 입력 안내'
+                            className='relative size-5 shrink-0 p-0 text-inherit after:absolute after:-inset-2.5 hover:text-inherit sm:after:-inset-1'
+                            onClick={(event) => {
+                              event.preventDefault();
+                              setNoticeTooltipOpen(true);
+                            }}
+                          >
+                            <InfoIcon className='size-3.5' aria-hidden='true' />
+                          </Button>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                          side='top'
+                          sideOffset={6}
+                          collisionPadding={12}
+                          className='max-w-64 text-center leading-5 break-keep'
+                        >
+                          입력한 경우에만 사용자에게 노출
+                        </Tooltip.Content>
+                      </Tooltip>
+                    </Tooltip.Provider>
+                  </div>
+                  <Textarea
+                    id={`${id}-notice`}
+                    className='field-sizing-fixed h-28 min-h-28 resize-y'
+                    value={noticeMessage}
+                    onChange={(event) => setNoticeMessage(event.target.value)}
+                    placeholder={DEFAULT_MAINTENANCE_NOTICE}
+                  />
+                </div>
+                <div className='flex min-w-0 flex-col gap-1'>
                   <div className='flex items-center gap-1'>
                     <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
                     <Tooltip.Provider delayDuration={150}>
@@ -252,17 +252,18 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
                     onChange={setImage}
                   />
                 </div>
-                <div className='flex flex-col gap-1'>
-                  <Label htmlFor={`${id}-memo`} required>
-                    관리자 메모
-                  </Label>
-                  <Input
-                    id={`${id}-memo`}
-                    value={memo}
-                    onChange={(event) => setMemo(event.target.value)}
-                    required
-                  />
-                </div>
+              </div>
+              <div className='flex min-w-0 flex-col gap-1'>
+                <Label htmlFor={`${id}-memo`} className='min-h-6' required>
+                  관리자 메모
+                </Label>
+                <Textarea
+                  id={`${id}-memo`}
+                  className='field-sizing-fixed min-h-48 flex-1 resize-y'
+                  value={memo}
+                  onChange={(event) => setMemo(event.target.value)}
+                  required
+                />
               </div>
             </div>
           )}

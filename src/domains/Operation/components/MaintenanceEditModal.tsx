@@ -218,8 +218,9 @@ function MaintenanceEditForm({
               <Label htmlFor={`${id}-memo`} required>
                 관리자 메모
               </Label>
-              <Input
+              <Textarea
                 id={`${id}-memo`}
+                className='field-sizing-fixed min-h-24 resize-y'
                 required
                 value={memo}
                 onChange={(event) => setMemo(event.target.value)}
