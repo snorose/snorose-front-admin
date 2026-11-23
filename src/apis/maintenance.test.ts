@@ -170,3 +170,16 @@ test('즉시 완료는 body 없이 전용 경로에 요청하고 완료 결과�
     '예정된 서버 점검은 완료할 수 없습니다.'
   );
 });
+
+test('저장소 연결 실패는 일정 중복 등록을 막는 안내로 전달한다', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
+  );
+  await expect(
+    uploadMaintenanceImage(
+      'https://example.com/upload',
+      new File(['image'], 'a.png', { type: 'image/png' })
+    )
+  ).rejects.toThrow('일정은 이미 저장되었으므로 다시 등록하지 않아도 됩니다.');
+});

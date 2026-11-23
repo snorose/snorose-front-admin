@@ -55,14 +55,21 @@ export async function uploadMaintenanceImage(url: string, file: File) {
   const target = new URL(url);
   if (target.protocol !== 'https:' || target.username || target.password)
     throw new Error('이미지 업로드 주소를 확인할 수 없습니다.');
-  const response = await fetch(url, {
-    method: 'PUT',
-    body: file,
-    credentials: 'omit',
-    redirect: 'error',
-    headers: { 'Content-Type': file.type },
-    signal: AbortSignal.timeout(120_000),
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'PUT',
+      body: file,
+      credentials: 'omit',
+      redirect: 'error',
+      headers: { 'Content-Type': file.type },
+      signal: AbortSignal.timeout(120_000),
+    });
+  } catch {
+    throw new Error(
+      '이미지 저장소에 연결하지 못했습니다. 네트워크 연결 또는 저장소의 업로드 허용 설정을 확인해 주세요. 일정은 이미 저장되었으므로 다시 등록하지 않아도 됩니다.'
+    );
+  }
   if (!response.ok) throw new Error('이미지 업로드에 실패했습니다.');
 }
 

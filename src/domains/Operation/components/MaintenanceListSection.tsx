@@ -123,7 +123,7 @@ export function MaintenanceListSection({
                       item.startAt,
                       item.endAt,
                       item.createdAt,
-                      item.updatedAt,
+                      item.updatedAt === item.createdAt ? '' : item.updatedAt,
                     ].map((date, index) => (
                       <Table.Cell
                         key={index}

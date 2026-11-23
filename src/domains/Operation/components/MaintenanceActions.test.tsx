@@ -292,3 +292,24 @@ test.each(['SCHEDULED', 'IN_PROGRESS', 'COMPLETED'] as const)(
       ).not.toBeInTheDocument();
   }
 );
+
+test('생성일시와 같은 수정일시는 수정 이력 없이 표시한다', () => {
+  const { container } = render(
+    <MaintenanceListSection
+      items={[
+        {
+          ...item,
+          createdAt: '2026-11-23 21:47:00',
+          updatedAt: '2026-11-23 21:47:00',
+        },
+      ]}
+      onDetail={vi.fn()}
+      onEdit={vi.fn()}
+      onDelete={vi.fn()}
+      onComplete={vi.fn()}
+    />
+  );
+  const cells = container.querySelectorAll('tbody td');
+  expect(cells[5]).toHaveTextContent('2026-11-23 21:47');
+  expect(cells[6]).toHaveTextContent('-');
+});
