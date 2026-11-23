@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render as rtlRender, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { beforeEach, expect, test, vi } from 'vitest';
 
 import {
@@ -19,6 +20,8 @@ import { MaintenanceDeleteModal } from './MaintenanceDeleteModal';
 import { MaintenanceDetailModal } from './MaintenanceDetailModal';
 import { MaintenanceEditModal } from './MaintenanceEditModal';
 import { MaintenanceListSection } from './MaintenanceListSection';
+
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 vi.mock('@/apis/maintenance', () => ({
   completeAdminMaintenance: vi.fn(),
@@ -105,7 +108,8 @@ test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오
     12,
     expect.objectContaining({ noticeMessage: '', attachments: [] })
   );
-  expect(await screen.findByRole('alert')).toHaveTextContent('중복된 기간');
+  await waitFor(() => expect(toast.error).toHaveBeenCalledWith('중복된 기간'));
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   expect(onClose).not.toHaveBeenCalled();
 });
 test('이미지 재시도는 PATCH를 반복하지 않는다', async () => {

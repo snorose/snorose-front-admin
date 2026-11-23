@@ -1,9 +1,12 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 
 import type { ServerMaintenance } from '../types/maintenance';
 import { MaintenanceScheduleForm } from './MaintenanceScheduleForm';
+
+vi.mock('sonner', () => ({ toast: { error: vi.fn() } }));
 
 beforeAll(() => {
   HTMLElement.prototype.hasPointerCapture = () => false;
@@ -61,9 +64,10 @@ describe('서버 점검 날짜·시간 입력', () => {
         />
       );
       await user.click(screen.getByRole('button', { name: '수정' }));
-      expect(screen.getByRole('alert')).toHaveTextContent(
+      expect(toast.error).toHaveBeenCalledWith(
         '종료 일시는 시작 일시보다 늦어야 합니다.'
       );
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       expect(onSave).not.toHaveBeenCalled();
     }
   );

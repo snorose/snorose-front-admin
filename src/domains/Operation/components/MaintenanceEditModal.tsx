@@ -76,7 +76,8 @@ function MaintenanceEditForm({
         return;
       }
       if (end.dateTime <= start.dateTime) {
-        setError('종료 일시는 시작 일시보다 늦어야 합니다.');
+        setError('');
+        toast.error('종료 일시는 시작 일시보다 늦어야 합니다.');
         return;
       }
       if (
@@ -130,7 +131,9 @@ function MaintenanceEditForm({
       toast.success('서버 점검 일정이 수정되었습니다.');
       onClose();
     } catch (error) {
-      setError(getErrorMessage(error, '서버 점검 일정 수정에 실패했습니다.'));
+      toast.error(
+        getErrorMessage(error, '서버 점검 일정 수정에 실패했습니다.')
+      );
     } finally {
       busy.current = false;
       setIsPending(false);

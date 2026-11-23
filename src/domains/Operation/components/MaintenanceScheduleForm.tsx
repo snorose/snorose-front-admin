@@ -1,6 +1,7 @@
 import { useId, useRef, useState } from 'react';
 
 import { InfoIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { DateTimePicker, SectionTitle } from '@/shared/components';
 import {
@@ -83,7 +84,8 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             !Number.isFinite(new Date(draft.endAt).getTime()) ||
             draft.endAt <= draft.startAt
           ) {
-            setError('종료 일시는 시작 일시보다 늦어야 합니다.');
+            setError('');
+            toast.error('종료 일시는 시작 일시보다 늦어야 합니다.');
             return;
           }
           if (!initial && !memo.trim()) {
@@ -114,7 +116,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             });
             reset();
           } catch (error) {
-            setError(
+            toast.error(
               getErrorMessage(error, '서버 점검 일정 등록에 실패했습니다.')
             );
           } finally {

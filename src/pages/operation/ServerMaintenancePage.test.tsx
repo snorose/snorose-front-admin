@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
@@ -10,6 +11,8 @@ import {
 } from '@/apis/maintenance';
 
 import ServerMaintenancePage from './ServerMaintenancePage';
+
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
 vi.mock('@/apis/maintenance', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/apis/maintenance')>()),
@@ -109,9 +112,14 @@ describe('서버 점검 생성 API 연동', () => {
     renderPage();
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: '생성' }));
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        '중복된 서버 점검 기간 일정이 있습니다'
+      )
+    );
     expect(
-      await screen.findByText('중복된 서버 점검 기간 일정이 있습니다')
-    ).toBeInTheDocument();
+      screen.queryByText('중복된 서버 점검 기간 일정이 있습니다')
+    ).not.toBeInTheDocument();
     expect(screen.getByLabelText(/일정 제목/)).toHaveValue('정기 점검');
     expect(screen.getByLabelText(/메모/)).toHaveValue('DB 작업');
   });
