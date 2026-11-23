@@ -18,6 +18,10 @@ import type {
 } from '../types/maintenance';
 import { MaintenanceDetailLoader } from './MaintenanceDetailLoader';
 import { MaintenanceImageInput } from './MaintenanceImageInput';
+import {
+  type MaintenanceChange,
+  MaintenanceUpdateConfirmModal,
+} from './MaintenanceUpdateConfirmModal';
 
 type ChangeMode = 'keep' | 'change' | 'remove';
 
@@ -67,8 +71,34 @@ function MaintenanceEditForm({
   const [isPending, setIsPending] = useState(false);
   const busy = useRef(false);
   const [error, setError] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const changes: MaintenanceChange[] = [
+    { label: '관리용 일정 제목', before: detail.title, after: title.trim() },
+    {
+      label: '시작 일시',
+      before: toDateTimeInputValue(detail.startAt),
+      after: start.dateTime,
+    },
+    {
+      label: '종료 일시',
+      before: toDateTimeInputValue(detail.endAt),
+      after: end.dateTime,
+    },
+    {
+      label: '사용자 안내 문구',
+      before: detail.noticeMessage ?? '',
+      after: notice.trim(),
+    },
+    { label: '관리자 메모', before: detail.memo, after: memo.trim() },
+  ].filter((change) => change.before !== change.after);
+  if (imageMode !== 'keep')
+    changes.push({
+      label: '사용자 안내 이미지',
+      before: detail.imageUrl ? '기존 첨부 이미지' : '기본 안내 이미지',
+      after: imageMode === 'remove' ? '기본 안내 이미지' : (image?.name ?? ''),
+    });
 
-  const submit = async () => {
+  const submit = async (confirmed = false) => {
     if (busy.current) return;
     if (!pendingUpload) {
       if (!title.trim() || !start.dateTime || !end.dateTime || !memo.trim()) {
@@ -88,6 +118,15 @@ function MaintenanceEditForm({
         setError('파일명이 218자 이하인 이미지를 선택해 주세요.');
         return;
       }
+    }
+    if (!pendingUpload && !confirmed) {
+      if (!changes.length) {
+        toast.error('변경된 항목이 없습니다.');
+        return;
+      }
+      setError('');
+      setConfirming(true);
+      return;
     }
     busy.current = true;
     setIsPending(true);
@@ -132,6 +171,7 @@ function MaintenanceEditForm({
       toast.success('서버 점검 일정이 수정되었습니다.');
       onClose();
     } catch (error) {
+      setConfirming(false);
       toast.error(
         getErrorMessage(error, '서버 점검 일정 수정에 실패했습니다.')
       );
@@ -155,6 +195,18 @@ function MaintenanceEditForm({
     setImage(undefined);
     setImageMode('keep');
   };
+
+  if (confirming)
+    return (
+      <MaintenanceUpdateConfirmModal
+        changes={changes}
+        isPending={isPending}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => {
+          void submit(true);
+        }}
+      />
+    );
 
   return (
     <Dialog

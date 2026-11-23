@@ -85,6 +85,8 @@ test('수정 기본값은 메모·문구·이미지를 보내지 않으며 성�
   );
   await user.type(screen.getByLabelText(/관리용 일정 제목/), '변경 점검');
   await user.click(screen.getByRole('button', { name: '수정' }));
+  expect(updateAdminMaintenance).not.toHaveBeenCalled();
+  await user.click(screen.getByRole('button', { name: '저장' }));
   expect(updateAdminMaintenance).toHaveBeenCalledExactlyOnceWith(12, {
     title: '변경 점검',
     startAt: item.startAt,
@@ -105,6 +107,7 @@ test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오
     await screen.findByRole('button', { name: '기본 이미지 사용' })
   );
   await user.click(screen.getByRole('button', { name: '수정' }));
+  await user.click(screen.getByRole('button', { name: '저장' }));
   expect(updateAdminMaintenance).toHaveBeenCalledWith(
     12,
     expect.objectContaining({ noticeMessage: '', attachments: [] })
@@ -132,6 +135,7 @@ test('이미지 재시도는 PATCH를 반복하지 않는다', async () => {
     new File(['image'], 'a.png', { type: 'image/png' })
   );
   await user.click(screen.getByRole('button', { name: '수정' }));
+  await user.click(screen.getByRole('button', { name: '저장' }));
   await user.click(
     await screen.findByRole('button', { name: '이미지 업로드 재시도' })
   );
@@ -380,4 +384,21 @@ test('빈 관리자 메모는 빈 상태를 표시한다', async () => {
   expect(
     await screen.findByText('등록된 메모가 없습니다.')
   ).toBeInTheDocument();
+});
+
+test('수정 비교는 변경된 메모만 표시하고 취소하면 입력을 유지한다', async () => {
+  const user = userEvent.setup();
+  render(
+    <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={vi.fn()} />
+  );
+  await user.clear(await screen.findByLabelText(/관리자 메모/));
+  await user.type(screen.getByLabelText(/관리자 메모/), '변경된 메모');
+  await user.click(screen.getByRole('button', { name: '수정' }));
+  expect(screen.getByText('수정 전')).toBeInTheDocument();
+  expect(screen.getByText('기존 메모')).toBeInTheDocument();
+  expect(screen.getByText('변경된 메모')).toBeInTheDocument();
+  expect(screen.queryByText('관리용 일정 제목')).not.toBeInTheDocument();
+  expect(updateAdminMaintenance).not.toHaveBeenCalled();
+  await user.click(screen.getByRole('button', { name: '취소' }));
+  expect(screen.getByLabelText(/관리자 메모/)).toHaveValue('변경된 메모');
 });
