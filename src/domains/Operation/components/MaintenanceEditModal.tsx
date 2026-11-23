@@ -184,7 +184,7 @@ function MaintenanceEditForm({
         >
           <fieldset
             disabled={isPending || Boolean(pendingUpload)}
-            className='flex min-w-0 flex-col gap-4 [&_[data-slot=label]]:py-0 [&_[data-slot=label]]:font-medium'
+            className='flex min-w-0 flex-col gap-4'
           >
             <div className='flex flex-col gap-1'>
               <Label htmlFor={`${id}-title`} required>
@@ -215,18 +215,6 @@ function MaintenanceEditForm({
               onTimeChange={end.onTimeChange}
             />
             <div className='flex flex-col gap-1'>
-              <Label htmlFor={`${id}-memo`} required>
-                관리자 메모
-              </Label>
-              <Textarea
-                id={`${id}-memo`}
-                className='field-sizing-fixed min-h-24 resize-y'
-                required
-                value={memo}
-                onChange={(event) => setMemo(event.target.value)}
-              />
-            </div>
-            <div className='flex flex-col gap-1'>
               <Label htmlFor={`${id}-notice`}>사용자 안내 문구</Label>
               <Textarea
                 id={`${id}-notice`}
@@ -234,7 +222,7 @@ function MaintenanceEditForm({
                 onChange={(event) => setNotice(event.target.value)}
               />
             </div>
-            <div className='flex min-w-0 flex-col gap-2'>
+            <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
               {imageMode === 'keep' && detail.imageUrl && (
                 <img
@@ -267,7 +255,7 @@ function MaintenanceEditForm({
                     ? '다시 선택'
                     : detail.imageUrl && imageMode === 'keep'
                       ? '이미지 변경'
-                      : '이미지 추가'
+                      : '이미지 업로드'
                 }
                 onChange={(file) => {
                   setImage(file);
@@ -299,6 +287,18 @@ function MaintenanceEditForm({
                   </Button>
                 )}
               </div>
+            </div>
+            <div className='flex flex-col gap-1'>
+              <Label htmlFor={`${id}-memo`} required>
+                관리자 메모
+              </Label>
+              <Textarea
+                id={`${id}-memo`}
+                className='field-sizing-fixed min-h-24 resize-y'
+                required
+                value={memo}
+                onChange={(event) => setMemo(event.target.value)}
+              />
             </div>
           </fieldset>
           {pendingUpload && (

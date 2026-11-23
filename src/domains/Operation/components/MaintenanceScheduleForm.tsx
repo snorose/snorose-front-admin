@@ -68,7 +68,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
   return (
     <section className='flex flex-col gap-1' aria-labelledby={headingId}>
       <SectionTitle id={headingId}>
-        {initial ? '서버 점검 일정 수정' : '서버 점검 일정 등록'}
+        {initial ? '서버 점검 일정 수정' : '서버 점검 일정 생성'}
       </SectionTitle>
       <form
         noValidate
