@@ -1,6 +1,7 @@
 import {
   Eye,
   MoreHorizontalIcon,
+  NotebookPen,
   Pencil,
   SquareCheck,
   Trash2,
@@ -25,6 +26,7 @@ interface Props {
   errorMessage?: string;
   onRetry?: () => void;
   onComplete: (item: ServerMaintenanceListItem) => void;
+  onMemo: (item: ServerMaintenanceListItem) => void;
   onDetail: (item: ServerMaintenanceListItem) => void;
   onEdit: (item: ServerMaintenanceListItem) => void;
   onDelete: (item: ServerMaintenanceListItem) => void;
@@ -38,6 +40,7 @@ export function MaintenanceListSection({
   onRetry,
   onComplete,
   onDetail,
+  onMemo,
   onEdit,
   onDelete,
 }: Props) {
@@ -73,7 +76,7 @@ export function MaintenanceListSection({
           <Table.Header>
             <Table.Row className='text-center'>
               {[
-                '번호',
+                'id',
                 '상태',
                 '관리용 일정 제목',
                 '시작 일시',
@@ -103,9 +106,7 @@ export function MaintenanceListSection({
                 const status = STATUS_META[item.status];
                 return (
                   <Table.Row key={item.id}>
-                    <Table.Cell className='text-center'>
-                      {item.number}
-                    </Table.Cell>
+                    <Table.Cell className='text-center'>{item.id}</Table.Cell>
                     <Table.Cell className='text-center'>
                       <div className='flex items-center justify-center'>
                         <StatusBadge tone={status?.tone ?? 'neutral'}>
@@ -152,6 +153,10 @@ export function MaintenanceListSection({
                           <DropdownMenu.Item onClick={() => onEdit(item)}>
                             <Pencil aria-hidden='true' />
                             수정
+                          </DropdownMenu.Item>
+                          <DropdownMenu.Item onClick={() => onMemo(item)}>
+                            <NotebookPen aria-hidden='true' />
+                            메모 조회
                           </DropdownMenu.Item>
                           <DropdownMenu.Separator />
                           {item.status === 'IN_PROGRESS' && (

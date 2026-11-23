@@ -20,6 +20,7 @@ import { MaintenanceDeleteModal } from './MaintenanceDeleteModal';
 import { MaintenanceDetailModal } from './MaintenanceDetailModal';
 import { MaintenanceEditModal } from './MaintenanceEditModal';
 import { MaintenanceListSection } from './MaintenanceListSection';
+import { MaintenanceMemoModal } from './MaintenanceMemoModal';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
@@ -174,6 +175,7 @@ test('진행 중인 일정의 삭제 메뉴를 비활성화한다', async () => 
     <MaintenanceListSection
       items={[{ ...item, status: 'IN_PROGRESS' }]}
       onComplete={vi.fn()}
+      onMemo={vi.fn()}
       onDetail={vi.fn()}
       onEdit={vi.fn()}
       onDelete={vi.fn()}
@@ -277,6 +279,7 @@ test.each(['SCHEDULED', 'IN_PROGRESS', 'COMPLETED'] as const)(
       <MaintenanceListSection
         items={[{ ...item, status }]}
         onComplete={onComplete}
+        onMemo={vi.fn()}
         onDetail={vi.fn()}
         onEdit={vi.fn()}
         onDelete={vi.fn()}
@@ -307,6 +310,7 @@ test('생성일시와 같은 수정일시는 수정 이력 없이 표시한다',
           updatedAt: '2026-11-23 21:47:00',
         },
       ]}
+      onMemo={vi.fn()}
       onDetail={vi.fn()}
       onEdit={vi.fn()}
       onDelete={vi.fn()}
@@ -332,3 +336,48 @@ test.each(['관리용 일정 제목', '관리자 메모'])(
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   }
 );
+
+test('메모 조회 메뉴는 선택한 일정을 전달한다', async () => {
+  const user = userEvent.setup();
+  const onMemo = vi.fn();
+  render(
+    <MaintenanceListSection
+      items={[item]}
+      onMemo={onMemo}
+      onDetail={vi.fn()}
+      onEdit={vi.fn()}
+      onDelete={vi.fn()}
+      onComplete={vi.fn()}
+    />
+  );
+  await user.click(
+    screen.getByRole('button', { name: '점검 서버 점검 일정 메뉴 열기' })
+  );
+  await user.click(screen.getByRole('menuitem', { name: '메모 조회' }));
+  expect(onMemo).toHaveBeenCalledWith(item);
+});
+test('메모 조회는 관리자 메모만 표시하며 닫을 수 있다', async () => {
+  const user = userEvent.setup();
+  const onClose = vi.fn();
+  render(<MaintenanceMemoModal id={12} onClose={onClose} />);
+  expect(await screen.findByText('기존 메모')).toBeInTheDocument();
+  expect(getAdminMaintenance).toHaveBeenCalledWith(12);
+  expect(screen.queryByText('기존 안내 문구')).not.toBeInTheDocument();
+  expect(screen.queryByAltText('사용자 안내 이미지')).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '닫기' }));
+  expect(onClose).toHaveBeenCalledOnce();
+});
+test('빈 관리자 메모는 빈 상태를 표시한다', async () => {
+  vi.mocked(getAdminMaintenance).mockResolvedValue({
+    title: '점검',
+    startAt: item.startAt,
+    endAt: item.endAt,
+    memo: '  ',
+    noticeMessage: null,
+    imageUrl: null,
+  });
+  render(<MaintenanceMemoModal id={12} onClose={vi.fn()} />);
+  expect(
+    await screen.findByText('등록된 메모가 없습니다.')
+  ).toBeInTheDocument();
+});

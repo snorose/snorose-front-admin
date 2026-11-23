@@ -170,7 +170,7 @@ describe('서버 점검 생성 API 연동', () => {
   });
 });
 
-test('목록 조회 실패 후 다시 시도하면 서버 번호와 상태를 표시한다', async () => {
+test('목록 조회 실패 후 다시 시도하면 일정 ID와 상태를 표시한다', async () => {
   vi.mocked(getAdminMaintenances)
     .mockRejectedValueOnce(new Error('목록 조회 실패'))
     .mockResolvedValueOnce([
@@ -193,7 +193,7 @@ test('목록 조회 실패 후 다시 시도하면 서버 번호와 상태를 �
   expect(
     await screen.findByRole('cell', { name: '완료 점검' })
   ).toBeInTheDocument();
-  expect(screen.getByRole('cell', { name: '9' })).toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: '12' })).toBeInTheDocument();
   expect(screen.getByText('종료')).toBeInTheDocument();
 });
 

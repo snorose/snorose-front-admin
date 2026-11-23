@@ -12,6 +12,7 @@ import { MaintenanceDeleteModal } from '@/domains/Operation/components/Maintenan
 import { MaintenanceDetailModal } from '@/domains/Operation/components/MaintenanceDetailModal';
 import { MaintenanceEditModal } from '@/domains/Operation/components/MaintenanceEditModal';
 import { MaintenanceListSection } from '@/domains/Operation/components/MaintenanceListSection';
+import { MaintenanceMemoModal } from '@/domains/Operation/components/MaintenanceMemoModal';
 import {
   type MaintenanceDraft,
   MaintenanceScheduleForm,
@@ -29,6 +30,7 @@ const MAINTENANCE_QUERY_KEY = ['server-maintenances'];
 
 export default function ServerMaintenancePage() {
   const queryClient = useQueryClient();
+  const [memoId, setMemoId] = useState<number>();
   const [detailId, setDetailId] = useState<number>();
   const [editing, setEditing] = useState<ServerMaintenanceListItem>();
   const [completing, setCompleting] = useState<ServerMaintenanceListItem>();
@@ -165,6 +167,7 @@ export default function ServerMaintenancePage() {
       <MaintenanceListSection
         items={list.data ?? []}
         onDetail={(item) => setDetailId(item.id)}
+        onMemo={(item) => setMemoId(item.id)}
         onEdit={setEditing}
         onDelete={setDeleting}
         onComplete={setCompleting}
@@ -179,6 +182,12 @@ export default function ServerMaintenancePage() {
           void list.refetch();
         }}
       />
+      {memoId !== undefined && (
+        <MaintenanceMemoModal
+          id={memoId}
+          onClose={() => setMemoId(undefined)}
+        />
+      )}
       {detailId !== undefined && (
         <MaintenanceDetailModal
           id={detailId}
