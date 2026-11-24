@@ -151,7 +151,9 @@ test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오
     <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={onClose} />
   );
   await user.clear(await screen.findByLabelText('사용자 안내 문구'));
-  await user.click(await screen.findByRole('button', { name: '이미지 제거' }));
+  await user.click(
+    await screen.findByRole('button', { name: '첨부 이미지 삭제' })
+  );
   await user.click(screen.getByRole('button', { name: '수정' }));
   await user.click(screen.getByRole('button', { name: '저장' }));
   expect(updateAdminMaintenance).toHaveBeenCalledWith(
@@ -447,4 +449,55 @@ test('수정 비교는 변경된 메모만 표시하고 취소하면 입력을 �
   expect(updateAdminMaintenance).not.toHaveBeenCalled();
   await user.click(screen.getByRole('button', { name: '취소' }));
   expect(screen.getByLabelText(/관리자 메모/)).toHaveValue('변경된 메모');
+});
+
+test('관리용 일정 제목을 클릭하면 해당 일정의 상세 조회를 요청한다', async () => {
+  const user = userEvent.setup();
+  const onDetail = vi.fn();
+  render(
+    <MaintenanceListSection
+      items={[item]}
+      onComplete={vi.fn()}
+      onMemo={vi.fn()}
+      onDetail={onDetail}
+      onEdit={vi.fn()}
+      onDelete={vi.fn()}
+    />
+  );
+  const title = screen.getByRole('button', { name: '점검' });
+  expect(title).toHaveAttribute('aria-haspopup', 'dialog');
+  await user.click(title);
+  expect(onDetail).toHaveBeenCalledExactlyOnceWith(item);
+});
+
+test('새 첨부를 X로 지우면 미리보기와 파일명이 초기화되고 같은 파일을 다시 선택할 수 있다', async () => {
+  vi.mocked(getAdminMaintenance).mockResolvedValue({
+    title: '점검',
+    startAt: item.startAt,
+    endAt: item.endAt,
+    memo: '기존 메모',
+    noticeMessage: null,
+    imageUrl: null,
+  });
+  const user = userEvent.setup();
+  render(
+    <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={vi.fn()} />
+  );
+  const file = new File(['image'], 'new.png', { type: 'image/png' });
+  await user.upload(await screen.findByLabelText('사용자 안내 이미지'), file);
+  expect(screen.getByAltText('선택한 사용자 안내 이미지')).toBeInTheDocument();
+  expect(screen.getByText('new.png')).toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '첨부 이미지 삭제' }));
+  expect(
+    screen.queryByAltText('선택한 사용자 안내 이미지')
+  ).not.toBeInTheDocument();
+  expect(screen.getByText('선택된 이미지 없음')).toBeInTheDocument();
+  expect(screen.getByText('기본 안내 이미지 사용 중')).toBeInTheDocument();
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:maintenance-preview');
+  await user.click(screen.getByRole('button', { name: '수정' }));
+  expect(toast.error).toHaveBeenCalledWith('변경된 항목이 없습니다.');
+  expect(updateAdminMaintenance).not.toHaveBeenCalled();
+  await user.upload(screen.getByLabelText('사용자 안내 이미지'), file);
+  expect(screen.getByAltText('선택한 사용자 안내 이미지')).toBeInTheDocument();
+  expect(screen.getByText('new.png')).toBeInTheDocument();
 });

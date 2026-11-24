@@ -284,6 +284,15 @@ function MaintenanceEditForm({
                 key={imageMode}
                 id={`${id}-image`}
                 file={image}
+                fileName={
+                  imageMode === 'keep' && detail.imageUrl
+                    ? '기존 이미지'
+                    : undefined
+                }
+                onRemove={() => {
+                  setImage(undefined);
+                  setImageMode(detail.imageUrl ? 'remove' : 'keep');
+                }}
                 buttonLabel={
                   imageMode === 'change'
                     ? '이미지 업로드'
@@ -312,25 +321,11 @@ function MaintenanceEditForm({
                       className='h-auto max-h-36 w-auto max-w-full rounded-md border border-gray-200 object-contain'
                     />
                   )}
-                  {imageMode === 'keep' && !detail.imageUrl && (
+                  {(imageMode === 'remove' ||
+                    (imageMode === 'keep' && !detail.imageUrl)) && (
                     <p className='text-muted-foreground text-sm' role='status'>
                       기본 안내 이미지 사용 중
                     </p>
-                  )}
-                </div>
-                <div className='flex shrink-0 flex-col gap-2'>
-                  {detail.imageUrl && imageMode !== 'remove' && (
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      onClick={() => {
-                        setImage(undefined);
-                        setImageMode('remove');
-                      }}
-                    >
-                      이미지 제거
-                    </Button>
                   )}
                 </div>
               </div>

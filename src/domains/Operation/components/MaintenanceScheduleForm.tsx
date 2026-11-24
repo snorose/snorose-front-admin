@@ -250,6 +250,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
                     id={`${id}-image`}
                     file={image}
                     onChange={setImage}
+                    onRemove={() => setImage(undefined)}
                   />
                 </div>
               </div>

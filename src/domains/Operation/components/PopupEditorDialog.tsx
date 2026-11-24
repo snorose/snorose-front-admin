@@ -181,6 +181,7 @@ export function PopupEditorDialog({
                     type='button'
                     variant='ghost'
                     size='icon-sm'
+                    className='text-gray-500 hover:text-gray-700'
                     aria-label='첨부 이미지 삭제'
                     onClick={handleImageRemove}
                   >

@@ -220,3 +220,19 @@ test('공백 메모는 토스트로 안내하고 저장을 막는다', async () 
   expect(toast.error).toHaveBeenCalledWith('관리자 메모를 입력해 주세요.');
   expect(onSave).not.toHaveBeenCalled();
 });
+
+test('생성 폼의 X 버튼으로 첨부를 취소하고 동일한 파일을 다시 선택한다', async () => {
+  const user = userEvent.setup();
+  render(<MaintenanceScheduleForm onSave={vi.fn()} />);
+  const file = new File(['image'], 'notice.png', { type: 'image/png' });
+  const input = screen.getByLabelText<HTMLInputElement>('사용자 안내 이미지');
+  await user.upload(input, file);
+  expect(screen.getByText('notice.png')).toBeInTheDocument();
+  const remove = screen.getByRole('button', { name: '첨부 이미지 삭제' });
+  expect(remove.closest('[data-slot="input-group"]')).toContainElement(input);
+  await user.click(remove);
+  expect(input.files).toHaveLength(0);
+  expect(screen.getByText('선택된 이미지 없음')).toBeInTheDocument();
+  await user.upload(input, file);
+  expect(screen.getByText('notice.png')).toBeInTheDocument();
+});
