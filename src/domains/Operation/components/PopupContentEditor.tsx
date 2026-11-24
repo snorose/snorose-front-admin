@@ -135,9 +135,11 @@ export function PopupContentEditor({
           }
         }}
       />
-      <p id={`${id}-help`} className='border-t px-3 py-2 text-xs text-gray-500'>
-        마크다운으로 입력합니다. 링크할 텍스트를 선택하고 링크 버튼을 누르면
-        [텍스트](주소) 형식이 삽입됩니다.
+      <p
+        id={`${id}-help`}
+        className='border-t px-3 py-2 text-xs break-keep text-gray-500'
+      >
+        글자를 선택해 서식을 적용하고, 링크는 [글자](주소)로 입력해 주세요.
       </p>
     </div>
   );
