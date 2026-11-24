@@ -207,17 +207,12 @@ export default function PopupManagementPage() {
       <NoticePanel
         items={[
           <>
-            <strong>게시 기간:</strong> 한국 시간(KST) 기준으로 시작일과
-            종료일을 포함해 날짜 단위로 노출됩니다.
+            <strong>게시 기간:</strong> 한국 시간 기준, 시작일과 종료일을
+            포함합니다.
           </>,
           <>
-            <strong>노출 순서:</strong> 0부터 시작하며 작은 숫자부터 표시됩니다.
-            등록·이동·삭제 시 다른 팝업의 순서도 조정됩니다. 관리자 목록은 최신
+            <strong>노출 순번:</strong> 0부터 입력합니다. 관리자 목록은 최신
             등록순입니다.
-          </>,
-          <>
-            <strong>본문 서식:</strong> 마크다운으로 굵은 글씨, 목록,
-            [링크명](URL)을 입력하고 미리 볼 수 있습니다.
           </>,
         ]}
       />
