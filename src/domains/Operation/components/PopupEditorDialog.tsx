@@ -127,9 +127,7 @@ export function PopupEditorDialog({
                 id='popup-display-priority-description'
                 className='text-xs leading-5 text-gray-500'
               >
-                0부터 {maxDisplayOrder ?? 0}까지 입력할 수 있습니다. 작은
-                숫자부터 표시되며, 해당 위치로 이동하면 다른 팝업의 순서도
-                조정됩니다.
+                0부터 {maxDisplayOrder ?? 0}까지의 정수를 입력해 주세요.
               </p>
             </div>
 
