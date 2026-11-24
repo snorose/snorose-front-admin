@@ -106,7 +106,10 @@ beforeEach(() => {
 });
 
 async function openEdit(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(await screen.findByRole('button', { name: '수정' }));
+  await user.click(
+    await screen.findByRole('button', { name: '서버 팝업 팝업 메뉴 열기' })
+  );
+  await user.click(await screen.findByRole('menuitem', { name: '수정' }));
   return screen.findByRole('dialog', { name: '팝업 수정' });
 }
 async function saveEdit(
@@ -274,7 +277,10 @@ describe('팝업 관리 API 흐름', () => {
     await screen.findByText('서버 팝업');
     await user.click(screen.getByRole('link', { name: '2' }));
     await waitFor(() => expect(getPopups).toHaveBeenLastCalledWith(1));
-    await user.click(await screen.findByRole('button', { name: '삭제' }));
+    await user.click(
+      await screen.findByRole('button', { name: '서버 팝업 팝업 메뉴 열기' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: '삭제' }));
     const confirm = await screen.findByRole('dialog', {
       name: '팝업을 삭제할까요?',
     });

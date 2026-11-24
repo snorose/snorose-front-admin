@@ -1,6 +1,17 @@
-import { CircleHelpIcon } from 'lucide-react';
+import {
+  CircleHelpIcon,
+  MoreHorizontalIcon,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 
-import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
+import {
+  Badge,
+  Button,
+  DropdownMenu,
+  Table,
+  Tooltip,
+} from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { PopupSummary } from '@/domains/Operation/types/popup';
@@ -55,7 +66,7 @@ export function PopupManagementTable({
             </Table.Head>
             <Table.Head>생성일시</Table.Head>
             <Table.Head>수정일시</Table.Head>
-            <Table.Head className='text-center'>관리</Table.Head>
+            <Table.Head className='text-center'>더보기</Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -89,26 +100,33 @@ export function PopupManagementTable({
                   {formatDateTimeToMinutes(popup.updatedAt)}
                 </Table.Cell>
                 <Table.Cell className='text-center'>
-                  <div className='flex items-center justify-center gap-2'>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='xs'
-                      disabled={disabled}
-                      onClick={() => onUpdate(popup)}
-                    >
-                      수정
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='destructive-outline'
-                      size='xs'
-                      disabled={disabled}
-                      onClick={() => onDelete(popup.id)}
-                    >
-                      삭제
-                    </Button>
-                  </div>
+                  <DropdownMenu>
+                    <DropdownMenu.Trigger asChild>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon-sm'
+                        disabled={disabled}
+                        aria-label={`${popup.title || '제목 없는 팝업'} 팝업 메뉴 열기`}
+                      >
+                        <MoreHorizontalIcon aria-hidden='true' />
+                      </Button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Content align='end'>
+                      <DropdownMenu.Item onClick={() => onUpdate(popup)}>
+                        <Pencil aria-hidden='true' />
+                        수정
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Separator />
+                      <DropdownMenu.Item
+                        variant='destructive'
+                        onClick={() => onDelete(popup.id)}
+                      >
+                        <Trash2 aria-hidden='true' />
+                        삭제
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu>
                 </Table.Cell>
               </Table.Row>
             ))
