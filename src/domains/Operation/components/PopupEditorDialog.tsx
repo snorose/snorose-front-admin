@@ -9,11 +9,12 @@ import {
   Input,
   InputGroup,
   Label,
-  Textarea,
 } from '@/shared/components/ui';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
+
+import { PopupContentEditor } from './PopupContentEditor';
 
 type PopupEditorMode = 'create' | 'edit';
 
@@ -208,26 +209,11 @@ export function PopupEditorDialog({
 
               <div className='flex flex-col gap-1'>
                 <Label htmlFor='popup-body-markdown'>본문</Label>
-                <Textarea
+                <PopupContentEditor
                   id='popup-body-markdown'
-                  className='min-h-[320px] min-w-0'
-                  placeholder={`본문을 입력해 주세요.
-
-**굵게 표시할 문장**
-
-1. 숫자 리스트
-2. 숫자 리스트
-
-- 순서 없는 리스트
-- 순서 없는 리스트
-
-[외부 링크](https://naver.com)
-[내부 링크](/board/notice/post/123)`}
                   value={popup.bodyMarkdown}
-                  rows={10}
-                  onChange={(event) =>
-                    onPopupChange('bodyMarkdown', event.target.value)
-                  }
+                  disabled={disabled}
+                  onChange={(value) => onPopupChange('bodyMarkdown', value)}
                 />
               </div>
             </div>

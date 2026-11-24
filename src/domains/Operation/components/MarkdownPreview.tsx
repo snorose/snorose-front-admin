@@ -9,7 +9,28 @@ type MarkdownPreviewProps = {
   className?: string;
 };
 
-const ALLOWED_MARKDOWN_ELEMENTS = ['a', 'br', 'li', 'ol', 'p', 'strong', 'ul'];
+const ALLOWED_MARKDOWN_ELEMENTS = [
+  'a',
+  'br',
+  'li',
+  'ol',
+  'p',
+  'strong',
+  'ul',
+  'em',
+  's',
+  'del',
+  'blockquote',
+  'code',
+  'pre',
+  'hr',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+];
 
 function isExternalHref(href?: string) {
   return href?.startsWith('http://') || href?.startsWith('https://');
@@ -19,7 +40,7 @@ export function MarkdownPreview({ markdown, className }: MarkdownPreviewProps) {
   return (
     <div
       className={cn(
-        'space-y-2 text-sm leading-[18.2px] tracking-[-0.5px] text-gray-700',
+        'space-y-2 text-sm leading-[18.2px] tracking-[-0.5px] text-gray-700 [&_blockquote]:border-l-2 [&_blockquote]:pl-3 [&_em]:italic [&_pre]:whitespace-pre-wrap',
         '[&_ol]:list-decimal [&_ol]:space-y-1 [&_ol]:pl-5',
         '[&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5',
         className
