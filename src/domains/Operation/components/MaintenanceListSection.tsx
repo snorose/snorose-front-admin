@@ -135,7 +135,14 @@ export function MaintenanceListSection({
                       className='max-w-56 truncate text-center'
                       title={item.title}
                     >
-                      {item.title}
+                      <button
+                        type='button'
+                        className='block w-full truncate font-medium hover:underline focus-visible:underline'
+                        aria-haspopup='dialog'
+                        onClick={() => onDetail(item)}
+                      >
+                        {item.title}
+                      </button>
                     </Table.Cell>
                     {[
                       item.startAt,
