@@ -43,6 +43,10 @@ const item: ServerMaintenanceListItem = {
 };
 beforeEach(() => {
   vi.clearAllMocks();
+  HTMLElement.prototype.hasPointerCapture = () => false;
+  HTMLElement.prototype.setPointerCapture = () => undefined;
+  HTMLElement.prototype.releasePointerCapture = () => undefined;
+  HTMLElement.prototype.scrollIntoView = () => undefined;
   URL.createObjectURL = vi.fn(() => 'blob:maintenance-preview');
   URL.revokeObjectURL = vi.fn();
   vi.mocked(getAdminMaintenance).mockResolvedValue({
@@ -67,7 +71,7 @@ function render(element: ReactElement) {
     <QueryClientProvider client={client}>{element}</QueryClientProvider>
   );
 }
-test('수정 기본값은 메모·문구·이미지를 보내지 않으며 성공 후 갱신하고 닫는다', async () => {
+test('제목만 수정하면 제목만 전송하며 성공 후 갱신하고 닫는다', async () => {
   const user = userEvent.setup();
   const onChanged = vi.fn();
   const onClose = vi.fn();
@@ -89,11 +93,55 @@ test('수정 기본값은 메모·문구·이미지를 보내지 않으며 성�
   await user.click(screen.getByRole('button', { name: '저장' }));
   expect(updateAdminMaintenance).toHaveBeenCalledExactlyOnceWith(12, {
     title: '변경 점검',
-    startAt: item.startAt,
-    endAt: item.endAt,
   });
   expect(onChanged).toHaveBeenCalledOnce();
   expect(onClose).toHaveBeenCalledOnce();
+});
+test('초가 있는 일정의 메모만 수정하면 날짜를 전송하지 않는다', async () => {
+  vi.mocked(getAdminMaintenance).mockResolvedValue({
+    title: '점검',
+    startAt: '2026-11-10 02:00:21',
+    endAt: '2026-11-10 03:15:42',
+    memo: '기존 메모',
+    noticeMessage: '기존 안내 문구',
+    imageUrl: null,
+  });
+  const user = userEvent.setup();
+  render(
+    <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={vi.fn()} />
+  );
+  await user.clear(await screen.findByLabelText(/관리자 메모/));
+  await user.type(screen.getByLabelText(/관리자 메모/), '변경 메모');
+  await user.click(screen.getByRole('button', { name: '수정' }));
+  expect(screen.queryByText('시작 일시')).not.toBeInTheDocument();
+  expect(screen.queryByText('종료 일시')).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: '저장' }));
+  expect(updateAdminMaintenance).toHaveBeenCalledExactlyOnceWith(12, {
+    memo: '변경 메모',
+  });
+});
+
+test('종료 시간을 변경했다가 되돌리면 생략하고 변경한 경우에만 전송한다', async () => {
+  const user = userEvent.setup();
+  render(
+    <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={vi.fn()} />
+  );
+  await screen.findByLabelText(/관리자 메모/);
+  const selectHour = async (hour: string) => {
+    await user.click(screen.getByRole('combobox', { name: '종료 일시 시' }));
+    await user.click(screen.getByRole('option', { name: `${hour}시` }));
+  };
+  await selectHour('05');
+  await selectHour('04');
+  await user.click(screen.getByRole('button', { name: '수정' }));
+  expect(toast.error).toHaveBeenCalledWith('변경된 항목이 없습니다.');
+  expect(updateAdminMaintenance).not.toHaveBeenCalled();
+  await selectHour('05');
+  await user.click(screen.getByRole('button', { name: '수정' }));
+  await user.click(screen.getByRole('button', { name: '저장' }));
+  expect(updateAdminMaintenance).toHaveBeenCalledExactlyOnceWith(12, {
+    endAt: '2026-11-10 05:00:00',
+  });
 });
 test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오류 시 모달을 유지한다', async () => {
   vi.mocked(updateAdminMaintenance).mockRejectedValue(new Error('중복된 기간'));

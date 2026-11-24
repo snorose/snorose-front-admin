@@ -135,9 +135,13 @@ function MaintenanceEditForm({
       let upload = pendingUpload;
       if (!upload) {
         const result = await updateAdminMaintenance(item.id, {
-          title: title.trim(),
-          startAt: `${start.dateTime.replace('T', ' ')}:00`,
-          endAt: `${end.dateTime.replace('T', ' ')}:00`,
+          ...(title.trim() !== detail.title ? { title: title.trim() } : {}),
+          ...(start.dateTime !== toDateTimeInputValue(detail.startAt)
+            ? { startAt: `${start.dateTime.replace('T', ' ')}:00` }
+            : {}),
+          ...(end.dateTime !== toDateTimeInputValue(detail.endAt)
+            ? { endAt: `${end.dateTime.replace('T', ' ')}:00` }
+            : {}),
           ...(memo.trim() !== detail.memo ? { memo: memo.trim() } : {}),
           ...(notice.trim() !== (detail.noticeMessage ?? '')
             ? { noticeMessage: notice.trim() }
