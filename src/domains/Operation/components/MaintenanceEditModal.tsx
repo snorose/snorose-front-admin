@@ -5,7 +5,11 @@ import { toast } from 'sonner';
 import { DateTimePicker } from '@/shared/components';
 import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
 import { useDateTimeField } from '@/shared/hooks';
-import { getErrorMessage, toDateTimeInputValue } from '@/shared/utils';
+import {
+  formatDateTimeToMinutes,
+  getErrorMessage,
+  toDateTimeInputValue,
+} from '@/shared/utils';
 
 import {
   updateAdminMaintenance,
@@ -76,13 +80,13 @@ function MaintenanceEditForm({
     { label: '관리용 일정 제목', before: detail.title, after: title.trim() },
     {
       label: '시작 일시',
-      before: toDateTimeInputValue(detail.startAt),
-      after: start.dateTime,
+      before: formatDateTimeToMinutes(detail.startAt),
+      after: formatDateTimeToMinutes(start.dateTime),
     },
     {
       label: '종료 일시',
-      before: toDateTimeInputValue(detail.endAt),
-      after: end.dateTime,
+      before: formatDateTimeToMinutes(detail.endAt),
+      after: formatDateTimeToMinutes(end.dateTime),
     },
     {
       label: '사용자 안내 문구',
