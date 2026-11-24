@@ -118,7 +118,7 @@ export const SIDEBAR_MENUS: SidebarMenu[] = [
         url: PATHS.SERVER_MAINTENANCE,
       },
       {
-        title: '팝업창 관리',
+        title: '팝업 관리',
         url: PATHS.POPUPS,
       },
     ],

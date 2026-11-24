@@ -200,7 +200,7 @@ export default function PopupManagementPage() {
   return (
     <div className='flex w-full flex-col gap-6'>
       <PageHeader
-        title='팝업창 관리'
+        title='팝업 관리'
         description='사용자 홈 화면에 노출되는 공지 팝업 콘텐츠와 노출 기간을 관리할 수 있어요.'
       />
       {isPopupMockEnabled() && (
