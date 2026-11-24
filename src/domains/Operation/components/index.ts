@@ -15,5 +15,6 @@ export {
   MaintenanceUpdateConfirmModal,
 } from './MaintenanceUpdateConfirmModal';
 export { MarkdownPreview } from './MarkdownPreview';
+export { PopupDetailModal } from './PopupDetailModal';
 export { PopupEditorDialog } from './PopupEditorDialog';
 export { PopupManagementTable } from './PopupManagementTable';

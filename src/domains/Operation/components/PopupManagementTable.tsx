@@ -1,17 +1,6 @@
-import {
-  CircleAlertIcon,
-  MoreHorizontalIcon,
-  Pencil,
-  Trash2,
-} from 'lucide-react';
+import { Eye, MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
-import {
-  Badge,
-  Button,
-  DropdownMenu,
-  Table,
-  Tooltip,
-} from '@/shared/components/ui';
+import { Badge, Button, DropdownMenu, Table } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
 import type { PopupSummary } from '@/domains/Operation/types/popup';
@@ -20,6 +9,7 @@ type PopupManagementTableProps = {
   popups: PopupSummary[];
   getStatusLabel: (popup: PopupSummary) => string;
   getStatusClassName: (popup: PopupSummary) => string;
+  onDetail: (popup: PopupSummary) => void;
   onUpdate: (popup: PopupSummary) => void;
   onDelete: (id: number) => void;
   disabled?: boolean;
@@ -29,6 +19,7 @@ export function PopupManagementTable({
   popups,
   getStatusLabel,
   getStatusClassName,
+  onDetail,
   onUpdate,
   onDelete,
   disabled = false,
@@ -41,35 +32,10 @@ export function PopupManagementTable({
             <Table.Head className='text-center'>상태</Table.Head>
             <Table.Head className='text-center'>노출 순번</Table.Head>
             <Table.Head className='text-center'>팝업 제목</Table.Head>
-            <Table.Head className='text-center'>
-              <div className='flex items-center justify-center gap-1'>
-                <span>게시 시작일</span>
-                <Tooltip.Provider delayDuration={200}>
-                  <Tooltip>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type='button'
-                        variant='ghost'
-                        size='icon-sm'
-                        className='cursor-help'
-                        aria-label='게시 날짜 안내'
-                      >
-                        <CircleAlertIcon
-                          className='size-4'
-                          aria-hidden='true'
-                        />
-                      </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content side='top' sideOffset={4}>
-                      설정한 기간에만 사용자 홈 화면에 노출됩니다.
-                    </Tooltip.Content>
-                  </Tooltip>
-                </Tooltip.Provider>
-              </div>
-            </Table.Head>
+            <Table.Head className='text-center'>게시 시작일</Table.Head>
             <Table.Head className='text-center'>게시 종료일</Table.Head>
             <Table.Head className='text-center'>생성일시</Table.Head>
-            <Table.Head className='text-center'>마지막 수정일시</Table.Head>
+            <Table.Head className='text-center'>수정일시</Table.Head>
             <Table.Head className='text-center'>더보기</Table.Head>
           </Table.Row>
         </Table.Header>
@@ -115,6 +81,10 @@ export function PopupManagementTable({
                       </Button>
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Content align='end'>
+                      <DropdownMenu.Item onClick={() => onDetail(popup)}>
+                        <Eye aria-hidden='true' />
+                        상세 조회
+                      </DropdownMenu.Item>
                       <DropdownMenu.Item onClick={() => onUpdate(popup)}>
                         <Pencil aria-hidden='true' />
                         수정

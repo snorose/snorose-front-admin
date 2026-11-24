@@ -126,6 +126,29 @@ async function saveEdit(
 }
 
 describe('팝업 관리 API 흐름', () => {
+  test('더보기에서 상세를 조회하고 읽기 전용 정보와 이미지를 확인한다', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(
+      await screen.findByRole('button', { name: '서버 팝업 팝업 메뉴 열기' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: '상세 조회' })
+    );
+    const dialog = await screen.findByRole('dialog', { name: '팝업 상세' });
+    expect(await within(dialog).findByText('기존 본문')).toBeInTheDocument();
+    expect(getPopupDetail).toHaveBeenCalledWith(9);
+    expect(within(dialog).getByRole('img')).toHaveAttribute(
+      'src',
+      detail.imageUrl
+    );
+    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: '닫기' }));
+    expect(
+      screen.queryByRole('dialog', { name: '팝업 상세' })
+    ).not.toBeInTheDocument();
+    expect(updatePopup).not.toHaveBeenCalled();
+  });
   test('서버 상태와 최신 등록순을 그대로 표시하고 페이지를 0 기반으로 요청한다', async () => {
     vi.mocked(getPopups).mockResolvedValue({
       data: [

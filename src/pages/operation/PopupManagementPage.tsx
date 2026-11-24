@@ -9,6 +9,7 @@ import { Alert, Button, ConfirmModal } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
+  PopupDetailModal,
   PopupEditorDialog,
   PopupManagementTable,
 } from '@/domains/Operation/components';
@@ -61,6 +62,7 @@ export default function PopupManagementPage() {
     queryKey: ['popups', page],
     queryFn: () => getPopups(page),
   });
+  const [detailPopupId, setDetailPopupId] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isSaveConfirmOpen, setIsSaveConfirmOpen] = useState(false);
   const [deletingPopupId, setDeletingPopupId] = useState<number | null>(null);
@@ -279,6 +281,7 @@ export default function PopupManagementPage() {
               popups={list.data.data}
               getStatusLabel={(popup) => STATUS_LABELS[popup.status]}
               getStatusClassName={(popup) => STATUS_CLASSES[popup.status]}
+              onDetail={(popup) => setDetailPopupId(popup.id)}
               onUpdate={(popup: PopupSummary) => detail.mutate(popup.id)}
               onDelete={setDeletingPopupId}
               disabled={busy || list.isFetching}
@@ -295,6 +298,12 @@ export default function PopupManagementPage() {
           </>
         )}
       </section>
+      {detailPopupId !== null && (
+        <PopupDetailModal
+          id={detailPopupId}
+          onClose={() => setDetailPopupId(null)}
+        />
+      )}
       {isEditorOpen && (
         <PopupEditorDialog
           open={isEditorOpen}
