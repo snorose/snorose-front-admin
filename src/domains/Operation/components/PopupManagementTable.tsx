@@ -59,12 +59,14 @@ export function PopupManagementTable({
                     {popup.title || '제목 없는 팝업'}
                   </div>
                 </Table.Cell>
-                <Table.Cell>{popup.startDate}</Table.Cell>
-                <Table.Cell>{popup.endDate}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell className='text-center'>
+                  {popup.startDate}
+                </Table.Cell>
+                <Table.Cell className='text-center'>{popup.endDate}</Table.Cell>
+                <Table.Cell className='text-center'>
                   {formatDateTimeToMinutes(popup.createdAt)}
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell className='text-center'>
                   {formatDateTimeToMinutes(popup.updatedAt)}
                 </Table.Cell>
                 <Table.Cell className='text-center'>
