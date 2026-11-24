@@ -55,9 +55,16 @@ export function PopupManagementTable({
                   </Badge>
                 </Table.Cell>
                 <Table.Cell className='max-w-[280px]'>
-                  <div className='truncate font-medium'>
+                  <button
+                    type='button'
+                    className='block max-w-full truncate text-left font-medium hover:underline focus-visible:underline disabled:cursor-not-allowed disabled:opacity-50'
+                    disabled={disabled}
+                    onClick={() => onDetail(popup)}
+                    aria-haspopup='dialog'
+                    title={popup.title || '제목 없는 팝업'}
+                  >
                     {popup.title || '제목 없는 팝업'}
-                  </div>
+                  </button>
                 </Table.Cell>
                 <Table.Cell className='text-center'>
                   {popup.startDate}
