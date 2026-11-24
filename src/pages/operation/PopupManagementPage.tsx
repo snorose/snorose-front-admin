@@ -13,12 +13,15 @@ import {
   PopupEditorDialog,
   PopupManagementTable,
 } from '@/domains/Operation/components';
+import {
+  STATUS_CLASSES,
+  STATUS_LABELS,
+} from '@/domains/Operation/constants/popup';
 import { isPopupMockEnabled } from '@/domains/Operation/mocks/config';
 import type { PopupContent } from '@/domains/Operation/types';
 import type {
   CreatePopupRequest,
   PopupDetail,
-  PopupStatus,
   PopupSummary,
   UpdatePopupRequest,
 } from '@/domains/Operation/types/popup';
@@ -43,16 +46,6 @@ const EMPTY_POPUP: PopupContent = {
   displayPriority: 0,
   createdAt: '',
   updatedAt: '',
-};
-const STATUS_LABELS: Record<PopupStatus, string> = {
-  ACTIVE: '진행중',
-  SCHEDULED: '예약',
-  ENDED: '종료',
-};
-const STATUS_CLASSES: Record<PopupStatus, string> = {
-  ACTIVE: 'border-green-200 bg-green-50 text-green-700',
-  SCHEDULED: 'border-blue-200 bg-blue-50 text-blue-700',
-  ENDED: 'border-gray-200 bg-gray-50 text-gray-600',
 };
 
 export default function PopupManagementPage() {

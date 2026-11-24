@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { DescriptionList } from '@/shared/components';
-import { Button, Dialog } from '@/shared/components/ui';
+import { Badge, Button, Dialog } from '@/shared/components/ui';
 import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
+
+import {
+  STATUS_CLASSES,
+  STATUS_LABELS,
+} from '@/domains/Operation/constants/popup';
 
 import { getPopupDetail } from '@/apis/popups';
 
@@ -64,9 +69,14 @@ export function PopupDetailModal({
                 { label: '팝업 제목', value: detail.title },
                 {
                   label: '상태',
-                  value: { SCHEDULED: '예약', ACTIVE: '진행중', ENDED: '종료' }[
-                    detail.status
-                  ],
+                  value: (
+                    <Badge
+                      variant='outline'
+                      className={STATUS_CLASSES[detail.status]}
+                    >
+                      {STATUS_LABELS[detail.status]}
+                    </Badge>
+                  ),
                 },
                 { label: '노출 순번', value: detail.displayOrder },
                 { label: '게시 시작일', value: detail.startDate },
@@ -79,30 +89,28 @@ export function PopupDetailModal({
                   label: '수정일시',
                   value: formatDateTimeToMinutes(detail.updatedAt),
                 },
+                {
+                  label: '본문 내용',
+                  value: detail.description ? (
+                    <MarkdownPreview markdown={detail.description} />
+                  ) : (
+                    '없음'
+                  ),
+                },
+                {
+                  label: '팝업 이미지',
+                  value: detail.imageUrl ? (
+                    <img
+                      src={detail.imageUrl}
+                      alt='팝업 이미지'
+                      className='h-auto max-h-48 w-auto max-w-full rounded-md border object-contain'
+                    />
+                  ) : (
+                    '첨부 이미지 없음'
+                  ),
+                },
               ]}
             />
-            <dl className='flex min-w-0 flex-col gap-2.5 text-sm'>
-              <dt className='font-medium text-gray-700'>본문 내용</dt>
-              <dd>
-                {detail.description ? (
-                  <MarkdownPreview markdown={detail.description} />
-                ) : (
-                  '없음'
-                )}
-              </dd>
-              <dt className='font-medium text-gray-700'>팝업 이미지</dt>
-              <dd>
-                {detail.imageUrl ? (
-                  <img
-                    src={detail.imageUrl}
-                    alt='팝업 이미지'
-                    className='h-auto max-h-48 w-auto max-w-full rounded-md border object-contain'
-                  />
-                ) : (
-                  '첨부 이미지 없음'
-                )}
-              </dd>
-            </dl>
           </>
         ) : null}
         <Dialog.Footer>
