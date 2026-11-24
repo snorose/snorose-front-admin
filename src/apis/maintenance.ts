@@ -6,7 +6,7 @@ import type { BaseResponse } from '@/shared/types';
 import type {
   ServerMaintenanceDetail,
   ServerMaintenanceListItem,
-} from '@/domains/Operation/types/maintenance';
+} from '@/domains/Operation/types';
 
 export interface CreateMaintenanceRequest {
   title: string;

@@ -7,17 +7,17 @@ import { NoticePanel, PageHeader } from '@/shared/components';
 import { Alert, Button } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
-import { MaintenanceCompleteModal } from '@/domains/Operation/components/MaintenanceCompleteModal';
-import { MaintenanceDeleteModal } from '@/domains/Operation/components/MaintenanceDeleteModal';
-import { MaintenanceDetailModal } from '@/domains/Operation/components/MaintenanceDetailModal';
-import { MaintenanceEditModal } from '@/domains/Operation/components/MaintenanceEditModal';
-import { MaintenanceListSection } from '@/domains/Operation/components/MaintenanceListSection';
-import { MaintenanceMemoModal } from '@/domains/Operation/components/MaintenanceMemoModal';
 import {
+  MaintenanceCompleteModal,
+  MaintenanceDeleteModal,
+  MaintenanceDetailModal,
   type MaintenanceDraft,
+  MaintenanceEditModal,
+  MaintenanceListSection,
+  MaintenanceMemoModal,
   MaintenanceScheduleForm,
-} from '@/domains/Operation/components/MaintenanceScheduleForm';
-import type { ServerMaintenanceListItem } from '@/domains/Operation/types/maintenance';
+} from '@/domains/Operation/components';
+import type { ServerMaintenanceListItem } from '@/domains/Operation/types';
 
 import {
   MaintenanceOutcomeUnknownError,
