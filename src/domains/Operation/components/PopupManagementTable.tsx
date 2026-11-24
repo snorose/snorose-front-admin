@@ -1,5 +1,5 @@
 import {
-  CircleHelpIcon,
+  CircleAlertIcon,
   MoreHorizontalIcon,
   Pencil,
   Trash2,
@@ -39,11 +39,11 @@ export function PopupManagementTable({
         <Table.Header>
           <Table.Row>
             <Table.Head className='text-center'>상태</Table.Head>
-            <Table.Head className='text-center'>노출 순서</Table.Head>
-            <Table.Head>팝업명</Table.Head>
-            <Table.Head>
-              <div className='flex items-center gap-1'>
-                <span>게시 기간</span>
+            <Table.Head className='text-center'>노출 순번</Table.Head>
+            <Table.Head className='text-center'>팝업 제목</Table.Head>
+            <Table.Head className='text-center'>
+              <div className='flex items-center justify-center gap-1'>
+                <span>게시 시작일</span>
                 <Tooltip.Provider delayDuration={200}>
                   <Tooltip>
                     <Tooltip.Trigger asChild>
@@ -52,9 +52,12 @@ export function PopupManagementTable({
                         variant='ghost'
                         size='icon-sm'
                         className='cursor-help'
-                        aria-label='게시 기간 안내'
+                        aria-label='게시 날짜 안내'
                       >
-                        <CircleHelpIcon className='size-4' aria-hidden='true' />
+                        <CircleAlertIcon
+                          className='size-4'
+                          aria-hidden='true'
+                        />
                       </Button>
                     </Tooltip.Trigger>
                     <Tooltip.Content side='top' sideOffset={4}>
@@ -64,8 +67,9 @@ export function PopupManagementTable({
                 </Tooltip.Provider>
               </div>
             </Table.Head>
-            <Table.Head>생성일시</Table.Head>
-            <Table.Head>수정일시</Table.Head>
+            <Table.Head className='text-center'>게시 종료일</Table.Head>
+            <Table.Head className='text-center'>생성일시</Table.Head>
+            <Table.Head className='text-center'>마지막 수정일시</Table.Head>
             <Table.Head className='text-center'>더보기</Table.Head>
           </Table.Row>
         </Table.Header>
@@ -89,10 +93,8 @@ export function PopupManagementTable({
                     {popup.title || '제목 없는 팝업'}
                   </div>
                 </Table.Cell>
-                <Table.Cell>
-                  {formatDateTimeToMinutes(popup.startDate)} ~{' '}
-                  {formatDateTimeToMinutes(popup.endDate)}
-                </Table.Cell>
+                <Table.Cell>{popup.startDate}</Table.Cell>
+                <Table.Cell>{popup.endDate}</Table.Cell>
                 <Table.Cell>
                   {formatDateTimeToMinutes(popup.createdAt)}
                 </Table.Cell>
@@ -132,7 +134,7 @@ export function PopupManagementTable({
             ))
           ) : (
             <Table.Row>
-              <Table.Cell colSpan={7} className='h-40 text-center'>
+              <Table.Cell colSpan={8} className='h-40 text-center'>
                 <div className='flex flex-col items-center justify-center gap-2'>
                   <Badge variant='outline'>팝업 없음</Badge>
                   <p className='text-sm text-gray-500'>
