@@ -3,7 +3,14 @@ import { useRef } from 'react';
 import { X } from 'lucide-react';
 
 import { DatePicker } from '@/shared/components';
-import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
+import {
+  Button,
+  Dialog,
+  Input,
+  InputGroup,
+  Label,
+  Textarea,
+} from '@/shared/components/ui';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
@@ -144,25 +151,25 @@ export function PopupEditorDialog({
                   }
                 }}
               />
-              <div className='flex min-w-0 items-center gap-2'>
-                <Button
+              <InputGroup className='max-w-full min-w-0 overflow-hidden'>
+                <InputGroup.Button
                   type='button'
-                  variant='outline'
-                  className='min-w-0 flex-1 justify-start'
+                  variant='default'
+                  size='xs'
+                  className='mx-1 shrink-0'
                   aria-label='이미지 첨부'
                   aria-describedby='popup-image-file-description'
                   onClick={() => imageInputRef.current?.click()}
                 >
-                  <span
-                    className={
-                      popup.imageFileName
-                        ? 'block truncate text-gray-700'
-                        : 'block truncate text-gray-500'
-                    }
-                  >
-                    {popup.imageFileName || '클릭하여 이미지를 첨부해 주세요.'}
-                  </span>
-                </Button>
+                  이미지 업로드
+                </InputGroup.Button>
+                <p
+                  className='min-w-0 flex-1 truncate pr-2 pl-1 text-sm text-gray-500'
+                  title={popup.imageFileName || undefined}
+                  aria-live='polite'
+                >
+                  {popup.imageFileName || '선택된 이미지 없음'}
+                </p>
                 {popup.imageFileName && (
                   <Button
                     type='button'
@@ -175,7 +182,7 @@ export function PopupEditorDialog({
                     <X className='size-4' aria-hidden='true' />
                   </Button>
                 )}
-              </div>
+              </InputGroup>
               <p
                 id='popup-image-file-description'
                 className='text-xs leading-5 text-gray-500'
