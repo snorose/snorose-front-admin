@@ -29,8 +29,8 @@ export function PopupManagementTable({
       <Table>
         <Table.Header>
           <Table.Row>
-            <Table.Head className='text-center'>상태</Table.Head>
             <Table.Head className='text-center'>노출 순번</Table.Head>
+            <Table.Head className='text-center'>상태</Table.Head>
             <Table.Head className='text-center'>팝업 제목</Table.Head>
             <Table.Head className='text-center'>게시 시작일</Table.Head>
             <Table.Head className='text-center'>게시 종료일</Table.Head>
@@ -44,15 +44,15 @@ export function PopupManagementTable({
             popups.map((popup) => (
               <Table.Row key={popup.id}>
                 <Table.Cell className='text-center'>
+                  {popup.displayOrder}
+                </Table.Cell>
+                <Table.Cell className='text-center'>
                   <Badge
                     variant='outline'
                     className={getStatusClassName(popup)}
                   >
                     {getStatusLabel(popup)}
                   </Badge>
-                </Table.Cell>
-                <Table.Cell className='text-center'>
-                  {popup.displayOrder}
                 </Table.Cell>
                 <Table.Cell className='max-w-[280px]'>
                   <div className='truncate font-medium'>
