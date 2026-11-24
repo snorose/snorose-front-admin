@@ -3,6 +3,7 @@ import {
   MoreHorizontalIcon,
   NotebookPen,
   Pencil,
+  RefreshCw,
   SquareCheck,
   Trash2,
 } from 'lucide-react';
@@ -25,6 +26,7 @@ interface Props {
   isFetching?: boolean;
   errorMessage?: string;
   onRetry?: () => void;
+  onRefresh?: () => void;
   onComplete: (item: ServerMaintenanceListItem) => void;
   onMemo: (item: ServerMaintenanceListItem) => void;
   onDetail: (item: ServerMaintenanceListItem) => void;
@@ -38,6 +40,7 @@ export function MaintenanceListSection({
   isFetching = false,
   errorMessage,
   onRetry,
+  onRefresh,
   onComplete,
   onDetail,
   onMemo,
@@ -49,9 +52,23 @@ export function MaintenanceListSection({
       className='flex w-full flex-col gap-1'
       aria-labelledby='maintenance-list-title'
     >
-      <SectionTitle id='maintenance-list-title'>
-        서버 점검 일정 조회
-      </SectionTitle>
+      <div className='flex items-center justify-between gap-2'>
+        <SectionTitle id='maintenance-list-title'>
+          서버 점검 일정 조회
+        </SectionTitle>
+        {onRefresh && (
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            disabled={isFetching}
+            onClick={onRefresh}
+          >
+            <RefreshCw aria-hidden='true' />
+            새로고침
+          </Button>
+        )}
+      </div>
       {errorMessage && (
         <div
           role='alert'

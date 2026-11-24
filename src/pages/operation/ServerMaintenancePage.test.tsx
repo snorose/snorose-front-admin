@@ -1,5 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  QueryClient,
+  QueryClientProvider,
+  focusManager,
+} from '@tanstack/react-query';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -35,16 +39,64 @@ beforeAll(() => {
   HTMLElement.prototype.scrollIntoView = () => undefined;
 });
 
-function renderPage() {
-  const client = new QueryClient({
+function renderPage(
+  client = new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: 0 } },
-  });
+  })
+) {
   return render(
     <QueryClientProvider client={client}>
       <ServerMaintenancePage />
     </QueryClientProvider>
   );
 }
+
+test('최신 캐시가 있어도 페이지 진입과 탭 복귀 시 목록을 다시 조회한다', async () => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+        staleTime: 300_000,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+  client.setQueryData(['server-maintenances'], []);
+  renderPage(client);
+  await waitFor(() => expect(getAdminMaintenances).toHaveBeenCalledTimes(1));
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: '새로고침' })).toBeEnabled()
+  );
+  try {
+    act(() => focusManager.setFocused(false));
+    act(() => focusManager.setFocused(true));
+    await waitFor(() => expect(getAdminMaintenances).toHaveBeenCalledTimes(2));
+  } finally {
+    act(() => focusManager.setFocused(undefined));
+  }
+});
+
+test('목록 새로고침 중 입력 내용을 유지하고 중복 조회를 막는다', async () => {
+  const user = userEvent.setup();
+  renderPage();
+  const refresh = screen.getByRole('button', { name: '새로고침' });
+  await waitFor(() => expect(refresh).toBeEnabled());
+  await user.type(screen.getByLabelText(/일정 제목/), '작성 중인 점검');
+  let finish!: (value: []) => void;
+  vi.mocked(getAdminMaintenances).mockReturnValueOnce(
+    new Promise((resolve) => {
+      finish = resolve;
+    })
+  );
+  await user.click(refresh);
+  expect(refresh).toBeDisabled();
+  expect(screen.getByLabelText(/일정 제목/)).toHaveValue('작성 중인 점검');
+  await user.click(refresh);
+  expect(getAdminMaintenances).toHaveBeenCalledTimes(2);
+  await act(async () => finish([]));
+  await waitFor(() => expect(refresh).toBeEnabled());
+});
 
 async function chooseDate(
   user: ReturnType<typeof userEvent.setup>,

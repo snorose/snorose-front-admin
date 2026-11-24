@@ -41,6 +41,9 @@ export default function ServerMaintenancePage() {
   const list = useQuery({
     queryKey: MAINTENANCE_QUERY_KEY,
     queryFn: getAdminMaintenances,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
   const [upload, setUpload] = useState<{
     id: number;
@@ -173,6 +176,9 @@ export default function ServerMaintenancePage() {
         onComplete={setCompleting}
         isLoading={list.isPending}
         isFetching={list.isFetching}
+        onRefresh={() => {
+          void list.refetch();
+        }}
         errorMessage={
           list.isError
             ? getErrorMessage(list.error, '서버 점검 일정 조회에 실패했습니다.')
