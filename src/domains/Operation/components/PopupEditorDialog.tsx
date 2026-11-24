@@ -262,16 +262,17 @@ export function PopupEditorDialog({
           </div>
         </fieldset>
 
-        <Dialog.Footer>
+        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2'>
           <Button
             type='button'
             variant='outline'
+            disabled={disabled}
             onClick={() => onOpenChange(false)}
           >
             취소
           </Button>
           <Button type='button' disabled={disabled} onClick={onSave}>
-            저장 후 반영
+            {mode === 'create' ? '등록' : '수정'}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>

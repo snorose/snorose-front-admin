@@ -116,9 +116,7 @@ async function saveEdit(
   user: ReturnType<typeof userEvent.setup>,
   dialog: HTMLElement
 ) {
-  await user.click(
-    within(dialog).getByRole('button', { name: '저장 후 반영' })
-  );
+  await user.click(within(dialog).getByRole('button', { name: '수정' }));
   const confirm = await screen.findByRole('dialog', {
     name: '팝업을 수정할까요?',
   });
@@ -187,9 +185,7 @@ describe('팝업 관리 API 흐름', () => {
       within(dialog).getByLabelText('게시 종료일', { exact: true }),
       { target: { value: '2026-10-22' } }
     );
-    await user.click(
-      within(dialog).getByRole('button', { name: '저장 후 반영' })
-    );
+    await user.click(within(dialog).getByRole('button', { name: '등록' }));
     const confirm = await screen.findByRole('dialog', {
       name: '팝업을 등록할까요?',
     });
