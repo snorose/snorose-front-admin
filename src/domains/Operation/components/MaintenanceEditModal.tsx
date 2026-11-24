@@ -195,10 +195,6 @@ function MaintenanceEditForm({
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [image]);
-  const resetImage = () => {
-    setImage(undefined);
-    setImageMode('keep');
-  };
 
   if (confirming)
     return (
@@ -280,35 +276,13 @@ function MaintenanceEditForm({
             </div>
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor={`${id}-image`}>사용자 안내 이미지</Label>
-              {imageMode === 'keep' && detail.imageUrl && (
-                <img
-                  src={detail.imageUrl}
-                  alt='현재 사용자 안내 이미지'
-                  className='max-h-48 w-full min-w-0 rounded-md object-contain'
-                />
-              )}
-              {imageMode === 'change' && previewUrl && (
-                <img
-                  src={previewUrl}
-                  alt='선택한 사용자 안내 이미지'
-                  className='max-h-48 w-full min-w-0 rounded-md object-contain'
-                />
-              )}
-              {(imageMode === 'remove' ||
-                (imageMode === 'keep' && !detail.imageUrl)) && (
-                <p className='text-muted-foreground text-sm' role='status'>
-                  {imageMode === 'remove'
-                    ? '저장하면 기본 안내 이미지가 표시됩니다.'
-                    : '기본 안내 이미지 사용 중'}
-                </p>
-              )}
               <MaintenanceImageInput
                 key={imageMode}
                 id={`${id}-image`}
                 file={image}
                 buttonLabel={
                   imageMode === 'change'
-                    ? '다시 선택'
+                    ? '이미지 업로드'
                     : detail.imageUrl && imageMode === 'keep'
                       ? '이미지 변경'
                       : '이미지 업로드'
@@ -318,30 +292,43 @@ function MaintenanceEditForm({
                   setImageMode('change');
                 }}
               />
-              <div className='flex flex-wrap gap-2'>
-                {detail.imageUrl && imageMode !== 'remove' && (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    onClick={() => {
-                      setImage(undefined);
-                      setImageMode('remove');
-                    }}
-                  >
-                    기본 이미지 사용
-                  </Button>
-                )}
-                {imageMode !== 'keep' && (
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='sm'
-                    onClick={resetImage}
-                  >
-                    변경 취소
-                  </Button>
-                )}
+              <div className='flex min-w-0 items-end gap-3'>
+                <div className='min-w-0 flex-1'>
+                  {imageMode === 'keep' && detail.imageUrl && (
+                    <img
+                      src={detail.imageUrl}
+                      alt='현재 사용자 안내 이미지'
+                      className='max-h-48 w-full min-w-0 rounded-md object-contain'
+                    />
+                  )}
+                  {imageMode === 'change' && previewUrl && (
+                    <img
+                      src={previewUrl}
+                      alt='선택한 사용자 안내 이미지'
+                      className='max-h-48 w-full min-w-0 rounded-md object-contain'
+                    />
+                  )}
+                  {imageMode === 'keep' && !detail.imageUrl && (
+                    <p className='text-muted-foreground text-sm' role='status'>
+                      기본 안내 이미지 사용 중
+                    </p>
+                  )}
+                </div>
+                <div className='flex shrink-0 flex-col gap-2'>
+                  {detail.imageUrl && imageMode !== 'remove' && (
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => {
+                        setImage(undefined);
+                        setImageMode('remove');
+                      }}
+                    >
+                      이미지 제거
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
             <div className='flex flex-col gap-1'>

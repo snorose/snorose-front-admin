@@ -151,9 +151,7 @@ test('명시적 삭제 선택은 빈 문자열과 빈 배열을 전송하고 오
     <MaintenanceEditModal item={item} onChanged={vi.fn()} onClose={onClose} />
   );
   await user.clear(await screen.findByLabelText('사용자 안내 문구'));
-  await user.click(
-    await screen.findByRole('button', { name: '기본 이미지 사용' })
-  );
+  await user.click(await screen.findByRole('button', { name: '이미지 제거' }));
   await user.click(screen.getByRole('button', { name: '수정' }));
   await user.click(screen.getByRole('button', { name: '저장' }));
   expect(updateAdminMaintenance).toHaveBeenCalledWith(

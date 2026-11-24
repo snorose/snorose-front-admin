@@ -32,11 +32,11 @@ export function MaintenanceImageInput({
         {buttonLabel}
       </InputGroup.Button>
       <p
-        className='min-w-0 flex-1 truncate pr-2 text-sm text-gray-500'
+        className='min-w-0 flex-1 truncate pr-2 pl-1 text-sm text-gray-500'
         title={file?.name}
         aria-live='polite'
       >
-        {file?.name ?? '선택된 파일이 없습니다.'}
+        {file?.name ?? '선택된 이미지 없음'}
       </p>
       <input
         ref={ref}
