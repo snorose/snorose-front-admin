@@ -1,9 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { toast } from 'sonner';
+import { beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ServerMaintenance } from '../types/maintenance';
 import { MaintenanceScheduleForm } from './MaintenanceScheduleForm';
+
+vi.mock('sonner', () => ({ toast: { error: vi.fn() } }));
+
+beforeEach(() => vi.clearAllMocks());
 
 beforeAll(() => {
   HTMLElement.prototype.hasPointerCapture = () => false;
@@ -21,11 +26,12 @@ const INITIAL: ServerMaintenance = {
 };
 
 describe('서버 점검 날짜·시간 입력', () => {
-  test('날짜 없이 시간만 선택해도 필수값 검증으로 저장을 막고 설명을 연결한다', async () => {
+  test('날짜 없이 시간만 선택해도 필수값 토스트로 저장을 막는다', async () => {
     const user = userEvent.setup();
     const onSave = vi.fn();
     render(<MaintenanceScheduleForm onSave={onSave} />);
     await user.type(screen.getByLabelText(/일정 제목/), '점검');
+    await user.type(screen.getByLabelText(/메모/), '작업');
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
     await user.click(screen.getByRole('option', { name: '09시' }));
     await user.click(screen.getByRole('button', { name: '생성' }));
@@ -33,19 +39,8 @@ describe('서버 점검 날짜·시간 입력', () => {
     expect(screen.getByRole('button', { name: '시작 일시' })).toHaveTextContent(
       '시작 날짜 선택'
     );
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      '모든 필수 항목을 입력해 주세요.'
-    );
-    for (const input of [
-      screen.getByRole('button', { name: '시작 일시' }),
-      screen.getByRole('combobox', { name: '시작 일시 시' }),
-      screen.getByRole('combobox', { name: '종료 일시 분' }),
-    ]) {
-      expect(input).toHaveAttribute('aria-invalid', 'true');
-      expect(input).toHaveAccessibleDescription(
-        '모든 필수 항목을 입력해 주세요.'
-      );
-    }
+    expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   test.each(['2026-10-09T08:30', '2026-10-09T08:29'])(
@@ -60,9 +55,10 @@ describe('서버 점검 날짜·시간 입력', () => {
         />
       );
       await user.click(screen.getByRole('button', { name: '수정' }));
-      expect(screen.getByRole('alert')).toHaveTextContent(
+      expect(toast.error).toHaveBeenCalledWith(
         '종료 일시는 시작 일시보다 늦어야 합니다.'
       );
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       expect(onSave).not.toHaveBeenCalled();
     }
   );
@@ -105,7 +101,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
     await user.click(screen.getByRole('option', { name: '23시' }));
     await user.click(screen.getByRole('button', { name: '수정' }));
-    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
     await user.click(screen.getByRole('button', { name: '입력 초기화' }));
     expect(screen.getByLabelText(/일정 제목/)).toHaveValue(INITIAL.title);
     expect(screen.getByRole('button', { name: '시작 일시' })).toHaveTextContent(
@@ -126,6 +122,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     const user = userEvent.setup();
     render(<MaintenanceScheduleForm onSave={vi.fn()} />);
     await user.type(screen.getByLabelText(/일정 제목/), '점검');
+    await user.type(screen.getByLabelText(/메모/), '작업');
     await user.click(screen.getByRole('button', { name: '시작 일시' }));
     const day = screen
       .getAllByRole('button')
@@ -161,9 +158,8 @@ describe('서버 점검 날짜·시간 입력', () => {
     );
     await user.click(screen.getByRole('button', { name: '수정' }));
     expect(onSave).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      '모든 필수 항목을 입력해 주세요.'
-    );
+    expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   test('일정 key가 바뀌면 새 수정 초기값을 반영하며 필수 제목도 검사한다', () => {
@@ -188,8 +184,39 @@ describe('서버 점검 날짜·시간 입력', () => {
       screen.getByLabelText(/일정 제목/).closest('form') as HTMLFormElement
     );
     expect(onSave).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      '모든 필수 항목을 입력해 주세요.'
-    );
+    expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+});
+
+test('빈 필수 입력값은 브라우저 팝업 대신 토스트로 안내한다', async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn();
+  render(<MaintenanceScheduleForm onSave={onSave} />);
+  await user.click(screen.getByRole('button', { name: '생성' }));
+  expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
+  expect(onSave).not.toHaveBeenCalled();
+});
+test('공백 메모는 토스트로 안내하고 저장을 막는다', async () => {
+  const user = userEvent.setup();
+  const onSave = vi.fn();
+  render(<MaintenanceScheduleForm onSave={onSave} />);
+  await user.type(screen.getByLabelText(/일정 제목/), '점검');
+  await user.type(screen.getByLabelText(/메모/), '   ');
+  for (const label of ['시작 일시', '종료 일시']) {
+    await user.click(screen.getByRole('button', { name: label }));
+    const day = screen
+      .getAllByRole('button')
+      .find(
+        (button) =>
+          button.getAttribute('data-day') && !button.hasAttribute('disabled')
+      );
+    if (!day) throw new Error('선택 가능한 날짜가 없습니다.');
+    await user.click(day);
+  }
+  await user.click(screen.getByRole('combobox', { name: '종료 일시 시' }));
+  await user.click(screen.getByRole('option', { name: '01시' }));
+  await user.click(screen.getByRole('button', { name: '생성' }));
+  expect(toast.error).toHaveBeenCalledWith('관리자 메모를 입력해 주세요.');
+  expect(onSave).not.toHaveBeenCalled();
 });
