@@ -47,20 +47,22 @@ export function MaintenanceDetailModal({
                   value: detail.noticeMessage || '없음',
                 },
                 { label: '관리자 메모', value: detail.memo || '없음' },
-                {
-                  label: '사용자 안내 이미지',
-                  value: detail.imageUrl ? (
-                    <img
-                      src={detail.imageUrl}
-                      alt='사용자 안내 이미지'
-                      className='max-h-72 max-w-full rounded-md object-contain'
-                    />
-                  ) : (
-                    '첨부 이미지 없음 (기본 이미지 표시)'
-                  ),
-                },
               ]}
             />
+            <dl className='flex min-w-0 flex-col gap-2.5 text-sm'>
+              <dt className='font-medium text-gray-700'>사용자 안내 이미지</dt>
+              <dd className='text-foreground min-w-0'>
+                {detail.imageUrl ? (
+                  <img
+                    src={detail.imageUrl}
+                    alt='사용자 안내 이미지'
+                    className='max-h-72 max-w-full rounded-md object-contain'
+                  />
+                ) : (
+                  '첨부 이미지 없음 (기본 이미지 표시)'
+                )}
+              </dd>
+            </dl>
             <Dialog.Footer>
               <Button type='button' variant='outline' onClick={onClose}>
                 닫기
