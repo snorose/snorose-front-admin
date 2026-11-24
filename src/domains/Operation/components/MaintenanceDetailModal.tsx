@@ -56,7 +56,7 @@ export function MaintenanceDetailModal({
                   <img
                     src={detail.imageUrl}
                     alt='사용자 안내 이미지'
-                    className='max-h-72 max-w-full rounded-md object-contain'
+                    className='h-auto max-h-48 w-auto max-w-full rounded-md border border-gray-200 object-contain'
                   />
                 ) : (
                   '첨부 이미지 없음 (기본 이미지 표시)'

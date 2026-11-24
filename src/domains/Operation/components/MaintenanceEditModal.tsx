@@ -302,14 +302,14 @@ function MaintenanceEditForm({
                     <img
                       src={detail.imageUrl}
                       alt='현재 사용자 안내 이미지'
-                      className='max-h-48 w-full min-w-0 rounded-md object-contain'
+                      className='h-auto max-h-36 w-auto max-w-full rounded-md border border-gray-200 object-contain'
                     />
                   )}
                   {imageMode === 'change' && previewUrl && (
                     <img
                       src={previewUrl}
                       alt='선택한 사용자 안내 이미지'
-                      className='max-h-48 w-full min-w-0 rounded-md object-contain'
+                      className='h-auto max-h-36 w-auto max-w-full rounded-md border border-gray-200 object-contain'
                     />
                   )}
                   {imageMode === 'keep' && !detail.imageUrl && (
