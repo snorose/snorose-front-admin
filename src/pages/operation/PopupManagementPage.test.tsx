@@ -278,6 +278,28 @@ describe('팝업 관리 API 흐름', () => {
     await screen.findByText('서버 팝업');
     expect(getPopups).toHaveBeenCalledTimes(2);
   });
+  test('삭제할 내용을 조회하지 못하면 삭제를 막고 재시도한다', async () => {
+    vi.mocked(getPopupDetail).mockRejectedValueOnce(
+      new Error('상세 조회 실패')
+    );
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(
+      await screen.findByRole('button', { name: '서버 팝업 팝업 메뉴 열기' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: '삭제' }));
+    const dialog = await screen.findByRole('dialog', {
+      name: '팝업을 삭제할까요?',
+    });
+    expect(
+      await within(dialog).findByText('상세 조회 실패')
+    ).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '삭제' })).toBeDisabled();
+    expect(deletePopup).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole('button', { name: '다시 시도' }));
+    expect(await within(dialog).findByText('기존 본문')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '삭제' })).toBeEnabled();
+  });
   test('마지막 페이지의 마지막 항목 삭제 후 이전 페이지를 조회한다', async () => {
     vi.mocked(getPopups).mockImplementation(async (page) => ({
       data: [summary],
@@ -298,6 +320,13 @@ describe('팝업 관리 API 흐름', () => {
     const confirm = await screen.findByRole('dialog', {
       name: '팝업을 삭제할까요?',
     });
+    expect(await within(confirm).findByText('기존 본문')).toBeInTheDocument();
+    expect(
+      within(confirm).getByText(`${detail.startDate} ~ ${detail.endDate}`)
+    ).toBeInTheDocument();
+    expect(
+      within(confirm).getByRole('img', { name: '삭제할 팝업 이미지' })
+    ).toHaveAttribute('src', detail.imageUrl);
     await user.click(within(confirm).getByRole('button', { name: '삭제' }));
     await waitFor(() => expect(deletePopup).toHaveBeenCalledWith(9));
     await waitFor(() => expect(getPopups).toHaveBeenLastCalledWith(0));

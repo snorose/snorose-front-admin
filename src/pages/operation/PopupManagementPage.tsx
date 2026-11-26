@@ -4,7 +4,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { NoticePanel, PageHeader, PaginationBar } from '@/shared/components';
+import {
+  DescriptionList,
+  NoticePanel,
+  PageHeader,
+  PaginationBar,
+} from '@/shared/components';
 import { Alert, Button, ConfirmModal } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
@@ -13,6 +18,7 @@ import {
   PopupEditorDialog,
   PopupManagementTable,
 } from '@/domains/Operation/components';
+import { MarkdownPreview } from '@/domains/Operation/components/MarkdownPreview';
 import {
   STATUS_CLASSES,
   STATUS_LABELS,
@@ -57,6 +63,18 @@ export default function PopupManagementPage() {
   const [detailPopupId, setDetailPopupId] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [deletingPopupId, setDeletingPopupId] = useState<number | null>(null);
+  const deleteDetail = useQuery({
+    queryKey: ['popups', 'delete-detail', deletingPopupId],
+    queryFn: () => {
+      if (deletingPopupId === null) throw new Error('삭제할 팝업이 없습니다.');
+      return getPopupDetail(deletingPopupId);
+    },
+    enabled: deletingPopupId !== null,
+    retry: false,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
   const [originalPopup, setOriginalPopup] = useState<PopupDetail | null>(null);
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
   const [imageFile, setImageFile] = useState<File>();
@@ -305,16 +323,79 @@ export default function PopupManagementPage() {
         title='팝업을 삭제할까요?'
         description='삭제한 팝업은 목록에서 제거됩니다.'
         confirmText={remove.isPending ? '삭제 중…' : '삭제'}
-        confirmDisabled={remove.isPending}
+        className='max-w-xs sm:max-w-sm'
+        isPending={remove.isPending}
+        confirmDisabled={!deleteDetail.isSuccess || deleteDetail.isFetching}
         closeText='취소'
         onConfirm={() => {
-          if (deletingPopupId !== null && !remove.isPending)
+          if (
+            deletingPopupId !== null &&
+            deleteDetail.isSuccess &&
+            !deleteDetail.isFetching &&
+            !remove.isPending
+          )
             remove.mutate(deletingPopupId);
         }}
         onClose={() => {
           if (!remove.isPending) setDeletingPopupId(null);
         }}
-      />
+      >
+        {deleteDetail.isFetching ? (
+          <p role='status' className='text-sm'>
+            팝업 정보를 불러오는 중입니다.
+          </p>
+        ) : deleteDetail.isError ? (
+          <div role='alert' className='flex flex-col gap-3 text-sm'>
+            <p>
+              {getErrorMessage(
+                deleteDetail.error,
+                '삭제할 팝업 정보를 불러오지 못했습니다.'
+              )}
+            </p>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => void deleteDetail.refetch()}
+            >
+              다시 시도
+            </Button>
+          </div>
+        ) : deleteDetail.data ? (
+          <>
+            <DescriptionList
+              items={[
+                { label: '팝업 제목', value: deleteDetail.data.title },
+                {
+                  label: '게시일',
+                  value: `${deleteDetail.data.startDate} ~ ${deleteDetail.data.endDate}`,
+                },
+                {
+                  label: '본문',
+                  value: deleteDetail.data.description ? (
+                    <MarkdownPreview markdown={deleteDetail.data.description} />
+                  ) : (
+                    '없음'
+                  ),
+                },
+              ]}
+            />
+            <dl className='flex min-w-0 flex-col gap-2.5 text-sm'>
+              <dt className='font-medium text-gray-700'>팝업 이미지</dt>
+              <dd className='text-foreground min-w-0'>
+                {deleteDetail.data.imageUrl ? (
+                  <img
+                    src={deleteDetail.data.imageUrl}
+                    alt='삭제할 팝업 이미지'
+                    className='h-auto max-h-48 w-auto max-w-full rounded-md border border-gray-200 object-contain'
+                  />
+                ) : (
+                  '첨부 이미지 없음'
+                )}
+              </dd>
+            </dl>
+          </>
+        ) : null}
+      </ConfirmModal>
     </div>
   );
 }
