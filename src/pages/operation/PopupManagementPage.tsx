@@ -14,29 +14,28 @@ import { Alert, Button, ConfirmModal } from '@/shared/components/ui';
 import { getErrorMessage } from '@/shared/utils';
 
 import {
+  MarkdownPreview,
   PopupDetailModal,
   PopupEditorDialog,
   PopupManagementTable,
 } from '@/domains/Operation/components';
-import { MarkdownPreview } from '@/domains/Operation/components/MarkdownPreview';
-import {
-  STATUS_CLASSES,
-  STATUS_LABELS,
-} from '@/domains/Operation/constants/popup';
-import type { PopupContent } from '@/domains/Operation/types';
+import { STATUS_CLASSES, STATUS_LABELS } from '@/domains/Operation/constants';
+import { popupDetailQueryOptions } from '@/domains/Operation/hooks';
 import type {
   CreatePopupRequest,
+  PopupContent,
   PopupDetail,
   PopupSummary,
   UpdatePopupRequest,
-} from '@/domains/Operation/types/popup';
-import { validatePopupContent } from '@/domains/Operation/utils';
-import { validatePopupImage } from '@/domains/Operation/utils/validate-popup';
+} from '@/domains/Operation/types';
+import {
+  validatePopupContent,
+  validatePopupImage,
+} from '@/domains/Operation/utils';
 
 import {
   createPopup,
   deletePopup,
-  getPopupDetail,
   getPopups,
   updatePopup,
 } from '@/apis/popups';
@@ -63,18 +62,7 @@ export default function PopupManagementPage() {
   const [detailPopupId, setDetailPopupId] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [deletingPopupId, setDeletingPopupId] = useState<number | null>(null);
-  const deleteDetail = useQuery({
-    queryKey: ['popups', 'delete-detail', deletingPopupId],
-    queryFn: () => {
-      if (deletingPopupId === null) throw new Error('삭제할 팝업이 없습니다.');
-      return getPopupDetail(deletingPopupId);
-    },
-    enabled: deletingPopupId !== null,
-    retry: false,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  const deleteDetail = useQuery(popupDetailQueryOptions(deletingPopupId));
   const [originalPopup, setOriginalPopup] = useState<PopupDetail | null>(null);
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
   const [imageFile, setImageFile] = useState<File>();
@@ -94,7 +82,8 @@ export default function PopupManagementPage() {
   );
 
   const detail = useMutation({
-    mutationFn: (id: number) => getPopupDetail(id),
+    mutationFn: (id: number) =>
+      queryClient.fetchQuery(popupDetailQueryOptions(id)),
     onSuccess: (popup) => {
       setOriginalPopup(popup);
       setEditingPopup({

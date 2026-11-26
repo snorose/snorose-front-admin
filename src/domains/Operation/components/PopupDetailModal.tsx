@@ -4,12 +4,8 @@ import { DescriptionList } from '@/shared/components';
 import { Badge, Button, Dialog } from '@/shared/components/ui';
 import { formatDateTimeToMinutes, getErrorMessage } from '@/shared/utils';
 
-import {
-  STATUS_CLASSES,
-  STATUS_LABELS,
-} from '@/domains/Operation/constants/popup';
-
-import { getPopupDetail } from '@/apis/popups';
+import { STATUS_CLASSES, STATUS_LABELS } from '@/domains/Operation/constants';
+import { popupDetailQueryOptions } from '@/domains/Operation/hooks';
 
 import { MarkdownPreview } from './MarkdownPreview';
 
@@ -20,12 +16,7 @@ export function PopupDetailModal({
   id: number;
   onClose: () => void;
 }) {
-  const query = useQuery({
-    queryKey: ['popups', 'detail', id],
-    queryFn: () => getPopupDetail(id),
-    retry: false,
-    refetchOnMount: 'always',
-  });
+  const query = useQuery(popupDetailQueryOptions(id));
   const detail = query.data;
 
   return (

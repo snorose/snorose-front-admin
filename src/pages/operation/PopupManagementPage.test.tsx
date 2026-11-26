@@ -278,6 +278,50 @@ describe('팝업 관리 API 흐름', () => {
     await screen.findByText('서버 팝업');
     expect(getPopups).toHaveBeenCalledTimes(2);
   });
+  test('조회·수정·삭제에서 같은 상세 캐시를 재사용하고 만료되면 다시 조회한다', async () => {
+    const user = userEvent.setup();
+    const client = renderPage();
+    await user.click(await screen.findByRole('button', { name: '서버 팝업' }));
+    const view = await screen.findByRole('dialog', { name: '팝업 상세' });
+    await within(view).findByText('기존 본문');
+    await user.click(within(view).getByRole('button', { name: '닫기' }));
+    const editor = await openEdit(user);
+    await user.click(within(editor).getByRole('button', { name: '취소' }));
+    await user.click(
+      screen.getByRole('button', { name: '서버 팝업 팝업 메뉴 열기' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: '삭제' }));
+    const deletion = await screen.findByRole('dialog', {
+      name: '팝업을 삭제할까요?',
+    });
+    await within(deletion).findByText('기존 본문');
+    expect(getPopupDetail).toHaveBeenCalledTimes(1);
+    await user.click(within(deletion).getByRole('button', { name: '취소' }));
+    await client.invalidateQueries({ queryKey: ['popups', 'detail', 9] });
+    await openEdit(user);
+    expect(getPopupDetail).toHaveBeenCalledTimes(2);
+  });
+
+  test('수정 성공 후 상세 캐시를 무효화해 변경 내용을 다시 조회한다', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    const editor = await openEdit(user);
+    await user.type(within(editor).getByLabelText(/팝업 제목/), ' 변경');
+    await saveEdit(user, editor);
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: '팝업 수정' })
+      ).not.toBeInTheDocument()
+    );
+    vi.mocked(getPopupDetail).mockResolvedValue({
+      ...detail,
+      title: '서버 팝업 변경',
+    });
+    await openEdit(user);
+    expect(getPopupDetail).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText(/팝업 제목/)).toHaveValue('서버 팝업 변경');
+  });
+
   test('삭제할 내용을 조회하지 못하면 삭제를 막고 재시도한다', async () => {
     vi.mocked(getPopupDetail).mockRejectedValueOnce(
       new Error('상세 조회 실패')
