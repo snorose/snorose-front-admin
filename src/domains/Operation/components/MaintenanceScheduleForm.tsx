@@ -135,7 +135,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
             </Label>
             <Input
               id={titleId}
-              placeholder='예: 정기 서버점검'
+              placeholder='예: 정기 서버 점검 안내'
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               maxLength={100}
