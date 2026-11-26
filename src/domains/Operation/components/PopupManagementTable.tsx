@@ -32,8 +32,7 @@ export function PopupManagementTable({
             <Table.Head className='text-center'>노출 순번</Table.Head>
             <Table.Head className='text-center'>상태</Table.Head>
             <Table.Head className='text-center'>팝업 제목</Table.Head>
-            <Table.Head className='text-center'>게시 시작일</Table.Head>
-            <Table.Head className='text-center'>게시 종료일</Table.Head>
+            <Table.Head className='text-center'>게시일</Table.Head>
             <Table.Head className='text-center'>생성일시</Table.Head>
             <Table.Head className='text-center'>수정일시</Table.Head>
             <Table.Head className='text-center'>더보기</Table.Head>
@@ -67,9 +66,8 @@ export function PopupManagementTable({
                   </button>
                 </Table.Cell>
                 <Table.Cell className='text-center'>
-                  {popup.startDate}
+                  {popup.startDate} ~ {popup.endDate}
                 </Table.Cell>
-                <Table.Cell className='text-center'>{popup.endDate}</Table.Cell>
                 <Table.Cell className='text-center'>
                   {formatDateTimeToMinutes(popup.createdAt)}
                 </Table.Cell>
@@ -113,7 +111,7 @@ export function PopupManagementTable({
             ))
           ) : (
             <Table.Row>
-              <Table.Cell colSpan={8} className='h-40 text-center'>
+              <Table.Cell colSpan={7} className='h-40 text-center'>
                 <p className='text-sm text-gray-500'>
                   등록된 팝업창이 없습니다.
                 </p>
