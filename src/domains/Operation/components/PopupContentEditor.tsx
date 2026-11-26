@@ -118,7 +118,7 @@ export function PopupContentEditor({
         aria-describedby={`${id}-help`}
         value={value}
         disabled={disabled}
-        className='field-sizing-fixed min-h-80 resize-y rounded-t-none border-0 font-mono text-[14px] shadow-none md:text-[14px]'
+        className='field-sizing-fixed min-h-80 resize-y rounded-t-none border-0 font-mono text-[14px] leading-[1.4] shadow-none md:text-[14px]'
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => {
           if (

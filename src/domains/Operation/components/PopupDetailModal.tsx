@@ -79,8 +79,10 @@ export function PopupDetailModal({
                   ),
                 },
                 { label: '노출 순번', value: detail.displayOrder },
-                { label: '게시 시작일', value: detail.startDate },
-                { label: '게시 종료일', value: detail.endDate },
+                {
+                  label: '게시일',
+                  value: `${detail.startDate} ~ ${detail.endDate}`,
+                },
                 {
                   label: '생성일시',
                   value: formatDateTimeToMinutes(detail.createdAt),
@@ -97,20 +99,22 @@ export function PopupDetailModal({
                     '없음'
                   ),
                 },
-                {
-                  label: '팝업 이미지',
-                  value: detail.imageUrl ? (
-                    <img
-                      src={detail.imageUrl}
-                      alt='팝업 이미지'
-                      className='h-auto max-h-48 w-auto max-w-full rounded-md border object-contain'
-                    />
-                  ) : (
-                    '첨부 이미지 없음'
-                  ),
-                },
               ]}
             />
+            <dl className='flex min-w-0 flex-col gap-2.5 text-sm'>
+              <dt className='font-medium text-gray-700'>팝업 이미지</dt>
+              <dd className='text-foreground min-w-0'>
+                {detail.imageUrl ? (
+                  <img
+                    src={detail.imageUrl}
+                    alt='팝업 이미지'
+                    className='h-auto max-h-48 w-auto max-w-full rounded-md border border-gray-200 object-contain'
+                  />
+                ) : (
+                  '첨부 이미지 없음'
+                )}
+              </dd>
+            </dl>
           </>
         ) : null}
         <Dialog.Footer>
