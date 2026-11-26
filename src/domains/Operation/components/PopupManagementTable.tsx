@@ -1,65 +1,50 @@
-import { CircleHelpIcon, Pencil, Trash2 } from 'lucide-react';
+import { Eye, MoreHorizontalIcon, Pencil, Trash2 } from 'lucide-react';
 
-import { Badge, Button, Table, Tooltip } from '@/shared/components/ui';
+import { Badge, Button, DropdownMenu, Table } from '@/shared/components/ui';
 import { formatDateTimeToMinutes } from '@/shared/utils';
 
-import type { PopupContent } from '@/domains/Operation/types';
+import type { PopupSummary } from '@/domains/Operation/types/popup';
 
 type PopupManagementTableProps = {
-  popups: PopupContent[];
-  getStatusLabel: (popup: PopupContent) => string;
-  getStatusClassName: (popup: PopupContent) => string;
-  onUpdate: (popup: PopupContent) => void;
+  popups: PopupSummary[];
+  getStatusLabel: (popup: PopupSummary) => string;
+  getStatusClassName: (popup: PopupSummary) => string;
+  onDetail: (popup: PopupSummary) => void;
+  onUpdate: (popup: PopupSummary) => void;
   onDelete: (id: number) => void;
+  disabled?: boolean;
 };
 
 export function PopupManagementTable({
   popups,
   getStatusLabel,
   getStatusClassName,
+  onDetail,
   onUpdate,
   onDelete,
+  disabled = false,
 }: PopupManagementTableProps) {
   return (
     <div className='overflow-x-auto rounded-lg border'>
       <Table>
         <Table.Header>
           <Table.Row>
+            <Table.Head className='text-center'>노출 순번</Table.Head>
             <Table.Head className='text-center'>상태</Table.Head>
-            <Table.Head className='text-center'>노출 순서</Table.Head>
-            <Table.Head>팝업명</Table.Head>
-            <Table.Head>
-              <div className='flex items-center gap-1'>
-                <span>게시 기간</span>
-                <Tooltip.Provider delayDuration={200}>
-                  <Tooltip>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type='button'
-                        variant='ghost'
-                        size='icon-sm'
-                        className='cursor-help'
-                        aria-label='게시 기간 안내'
-                      >
-                        <CircleHelpIcon className='size-4' aria-hidden='true' />
-                      </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content side='top' sideOffset={4}>
-                      설정한 기간에만 사용자 홈 화면에 노출됩니다.
-                    </Tooltip.Content>
-                  </Tooltip>
-                </Tooltip.Provider>
-              </div>
-            </Table.Head>
-            <Table.Head>생성일시</Table.Head>
-            <Table.Head>수정일시</Table.Head>
-            <Table.Head className='text-center'>관리</Table.Head>
+            <Table.Head className='text-center'>팝업 제목</Table.Head>
+            <Table.Head className='text-center'>게시일</Table.Head>
+            <Table.Head className='text-center'>생성일시</Table.Head>
+            <Table.Head className='text-center'>수정일시</Table.Head>
+            <Table.Head className='text-center'>더보기</Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {popups.length > 0 ? (
             popups.map((popup) => (
               <Table.Row key={popup.id}>
+                <Table.Cell className='text-center'>
+                  {popup.displayOrder}
+                </Table.Cell>
                 <Table.Cell className='text-center'>
                   <Badge
                     variant='outline'
@@ -68,57 +53,68 @@ export function PopupManagementTable({
                     {getStatusLabel(popup)}
                   </Badge>
                 </Table.Cell>
-                <Table.Cell className='text-center'>
-                  {popup.displayPriority}
-                </Table.Cell>
                 <Table.Cell className='max-w-[280px]'>
-                  <div className='truncate font-medium'>
+                  <button
+                    type='button'
+                    className='block max-w-full truncate text-left font-medium hover:underline focus-visible:underline disabled:cursor-not-allowed disabled:opacity-50'
+                    disabled={disabled}
+                    onClick={() => onDetail(popup)}
+                    aria-haspopup='dialog'
+                    title={popup.title || '제목 없는 팝업'}
+                  >
                     {popup.title || '제목 없는 팝업'}
-                  </div>
+                  </button>
                 </Table.Cell>
-                <Table.Cell>
-                  {formatDateTimeToMinutes(popup.startDate)} ~{' '}
-                  {formatDateTimeToMinutes(popup.endDate)}
+                <Table.Cell className='text-center'>
+                  {popup.startDate} ~ {popup.endDate}
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell className='text-center'>
                   {formatDateTimeToMinutes(popup.createdAt)}
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell className='text-center'>
                   {formatDateTimeToMinutes(popup.updatedAt)}
                 </Table.Cell>
-                <Table.Cell className='text-right'>
-                  <div className='flex justify-center gap-1'>
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='sm'
-                      onClick={() => onUpdate(popup)}
-                    >
-                      <Pencil aria-hidden='true' />
-                      수정
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='destructive-outline'
-                      size='sm'
-                      onClick={() => onDelete(popup.id)}
-                    >
-                      <Trash2 aria-hidden='true' />
-                      삭제
-                    </Button>
-                  </div>
+                <Table.Cell className='text-center'>
+                  <DropdownMenu>
+                    <DropdownMenu.Trigger asChild>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon-sm'
+                        disabled={disabled}
+                        aria-label={`${popup.title || '제목 없는 팝업'} 팝업 메뉴 열기`}
+                      >
+                        <MoreHorizontalIcon aria-hidden='true' />
+                      </Button>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Content align='end'>
+                      <DropdownMenu.Item onClick={() => onDetail(popup)}>
+                        <Eye aria-hidden='true' />
+                        상세 조회
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item onClick={() => onUpdate(popup)}>
+                        <Pencil aria-hidden='true' />
+                        수정
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Separator />
+                      <DropdownMenu.Item
+                        variant='destructive'
+                        onClick={() => onDelete(popup.id)}
+                      >
+                        <Trash2 aria-hidden='true' />
+                        삭제
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu>
                 </Table.Cell>
               </Table.Row>
             ))
           ) : (
             <Table.Row>
               <Table.Cell colSpan={7} className='h-40 text-center'>
-                <div className='flex flex-col items-center justify-center gap-2'>
-                  <Badge variant='outline'>팝업 없음</Badge>
-                  <p className='text-sm text-gray-500'>
-                    등록된 팝업창이 없습니다.
-                  </p>
-                </div>
+                <p className='text-sm text-gray-500'>
+                  등록된 팝업창이 없습니다.
+                </p>
               </Table.Cell>
             </Table.Row>
           )}

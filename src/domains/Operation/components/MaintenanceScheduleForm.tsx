@@ -14,7 +14,7 @@ import {
 import { useDateTimeField } from '@/shared/hooks';
 import { getErrorMessage } from '@/shared/utils';
 
-import { DEFAULT_MAINTENANCE_NOTICE } from '../constants/maintenance';
+import { DEFAULT_MAINTENANCE_NOTICE } from '../constants';
 import type { ServerMaintenance } from '../types/maintenance';
 import { MaintenanceImageInput } from './MaintenanceImageInput';
 

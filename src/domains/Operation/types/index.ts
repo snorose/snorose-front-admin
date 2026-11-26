@@ -3,4 +3,13 @@ export type {
   ServerMaintenanceDetail,
   ServerMaintenanceListItem,
 } from './maintenance';
-export type { PopupContent, PopupLink } from './popup';
+export type {
+  CreatePopupRequest,
+  PopupContent,
+  PopupDetail,
+  PopupLink,
+  PopupListResult,
+  PopupStatus,
+  PopupSummary,
+  UpdatePopupRequest,
+} from './popup';

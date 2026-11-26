@@ -1,13 +1,20 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { X } from 'lucide-react';
 
-import { DateTimePicker } from '@/shared/components';
-import { Button, Dialog, Input, Label, Textarea } from '@/shared/components/ui';
-import { useDateTimeField } from '@/shared/hooks';
+import { DatePicker } from '@/shared/components';
+import {
+  Button,
+  Dialog,
+  Input,
+  InputGroup,
+  Label,
+} from '@/shared/components/ui';
 
 import { MarkdownPreview } from '@/domains/Operation/components';
 import type { PopupContent } from '@/domains/Operation/types';
+
+import { PopupContentEditor } from './PopupContentEditor';
 
 type PopupEditorMode = 'create' | 'edit';
 
@@ -16,6 +23,8 @@ type PopupEditorDialogProps = {
   mode: PopupEditorMode;
   popup: PopupContent;
   imagePreviewUrl: string;
+  maxDisplayOrder?: number;
+  disabled?: boolean;
   onOpenChange: (open: boolean) => void;
   onPopupChange: (
     field: keyof PopupContent,
@@ -31,6 +40,8 @@ export function PopupEditorDialog({
   mode,
   popup,
   imagePreviewUrl,
+  maxDisplayOrder,
+  disabled = false,
   onOpenChange,
   onPopupChange,
   onImageAttach,
@@ -38,32 +49,6 @@ export function PopupEditorDialog({
   onSave,
 }: PopupEditorDialogProps) {
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const {
-    date: startDate,
-    time: startTime,
-    onDateSelect: onStartDateSelect,
-    onTimeChange: onStartTimeChange,
-    setDateTime: setStartDateTime,
-  } = useDateTimeField({
-    initialDateTime: popup.startDate,
-    onDateTimeChange: (dateTime) => onPopupChange('startDate', dateTime),
-  });
-  const {
-    date: endDate,
-    time: endTime,
-    onDateSelect: onEndDateSelect,
-    onTimeChange: onEndTimeChange,
-    setDateTime: setEndDateTime,
-  } = useDateTimeField({
-    initialDateTime: popup.endDate,
-    onDateTimeChange: (dateTime) => onPopupChange('endDate', dateTime),
-  });
-
-  useEffect(() => {
-    setStartDateTime(popup.startDate);
-    setEndDateTime(popup.endDate);
-  }, [popup.startDate, popup.endDate, setStartDateTime, setEndDateTime]);
-
   const handleImageRemove = () => {
     onImageRemove();
 
@@ -84,27 +69,35 @@ export function PopupEditorDialog({
           </Dialog.Description>
         </Dialog.Header>
 
-        <div className='flex min-w-0 flex-col gap-5'>
+        <fieldset disabled={disabled} className='flex min-w-0 flex-col gap-5'>
           <div className='grid gap-4 md:grid-cols-2'>
-            <DateTimePicker
-              className='min-w-0'
-              label='게시 시작일시'
-              date={startDate}
-              time={startTime}
-              onDateSelect={onStartDateSelect}
-              onTimeChange={onStartTimeChange}
-              required
-            />
-
-            <DateTimePicker
-              className='min-w-0'
-              label='게시 종료일시'
-              date={endDate}
-              time={endTime}
-              onDateSelect={onEndDateSelect}
-              onTimeChange={onEndTimeChange}
-              required
-            />
+            <div className='flex min-w-0 flex-col gap-1'>
+              <Label htmlFor='popup-start-date' required>
+                게시 시작일
+              </Label>
+              <DatePicker
+                id='popup-start-date'
+                aria-label='게시 시작일'
+                value={popup.startDate}
+                onValueChange={(value) =>
+                  onPopupChange('startDate', value ?? '')
+                }
+                disabled={disabled}
+              />
+            </div>
+            <div className='flex min-w-0 flex-col gap-1'>
+              <Label htmlFor='popup-end-date' required>
+                게시 종료일
+              </Label>
+              <DatePicker
+                id='popup-end-date'
+                aria-label='게시 종료일'
+                value={popup.endDate}
+                minDate={popup.startDate || undefined}
+                onValueChange={(value) => onPopupChange('endDate', value ?? '')}
+                disabled={disabled}
+              />
+            </div>
 
             <div className='flex min-w-0 flex-col gap-1'>
               <Label htmlFor='popup-display-priority' required>
@@ -113,7 +106,8 @@ export function PopupEditorDialog({
               <Input
                 id='popup-display-priority'
                 type='number'
-                min={1}
+                min={0}
+                max={maxDisplayOrder}
                 step={1}
                 value={
                   Number.isNaN(popup.displayPriority)
@@ -134,8 +128,7 @@ export function PopupEditorDialog({
                 id='popup-display-priority-description'
                 className='text-xs leading-5 text-gray-500'
               >
-                작은 숫자부터 상단에 표시되며, 같은 숫자는 먼저 등록한 팝업부터
-                표시됩니다.
+                0부터 {maxDisplayOrder ?? 0}까지의 정수를 입력해 주세요.
               </p>
             </div>
 
@@ -145,7 +138,7 @@ export function PopupEditorDialog({
                 ref={imageInputRef}
                 id='popup-image-file'
                 type='file'
-                accept='image/*'
+                accept='image/png,image/jpeg,image/webp'
                 className='sr-only'
                 tabIndex={-1}
                 aria-hidden='true'
@@ -157,25 +150,25 @@ export function PopupEditorDialog({
                   }
                 }}
               />
-              <div className='flex min-w-0 items-center gap-2'>
-                <Button
+              <InputGroup className='max-w-full min-w-0 overflow-hidden'>
+                <InputGroup.Button
                   type='button'
-                  variant='outline'
-                  className='min-w-0 flex-1 justify-start'
+                  variant='default'
+                  size='xs'
+                  className='mx-1 shrink-0'
                   aria-label='이미지 첨부'
                   aria-describedby='popup-image-file-description'
                   onClick={() => imageInputRef.current?.click()}
                 >
-                  <span
-                    className={
-                      popup.imageFileName
-                        ? 'block truncate text-gray-700'
-                        : 'block truncate text-gray-500'
-                    }
-                  >
-                    {popup.imageFileName || '클릭하여 이미지를 첨부해 주세요.'}
-                  </span>
-                </Button>
+                  이미지 업로드
+                </InputGroup.Button>
+                <p
+                  className='min-w-0 flex-1 truncate pr-2 pl-1 text-sm text-gray-500'
+                  title={popup.imageFileName || undefined}
+                  aria-live='polite'
+                >
+                  {popup.imageFileName || '선택된 이미지 없음'}
+                </p>
                 {popup.imageFileName && (
                   <Button
                     type='button'
@@ -188,12 +181,12 @@ export function PopupEditorDialog({
                     <X className='size-4' aria-hidden='true' />
                   </Button>
                 )}
-              </div>
+              </InputGroup>
               <p
                 id='popup-image-file-description'
                 className='text-xs leading-5 text-gray-500'
               >
-                첨부한 이미지는 본문 가장 아래에 표시됩니다.
+                PNG·JPEG·WebP 파일을 최대 10MB까지 첨부할 수 있습니다.
               </p>
             </div>
           </div>
@@ -216,26 +209,11 @@ export function PopupEditorDialog({
 
               <div className='flex flex-col gap-1'>
                 <Label htmlFor='popup-body-markdown'>본문</Label>
-                <Textarea
+                <PopupContentEditor
                   id='popup-body-markdown'
-                  className='min-h-[320px] min-w-0'
-                  placeholder={`본문을 입력해 주세요.
-
-**굵게 표시할 문장**
-
-1. 숫자 리스트
-2. 숫자 리스트
-
-- 순서 없는 리스트
-- 순서 없는 리스트
-
-[외부 링크](https://naver.com)
-[내부 링크](/board/notice/post/123)`}
                   value={popup.bodyMarkdown}
-                  rows={10}
-                  onChange={(event) =>
-                    onPopupChange('bodyMarkdown', event.target.value)
-                  }
+                  disabled={disabled}
+                  onChange={(value) => onPopupChange('bodyMarkdown', value)}
                 />
               </div>
             </div>
@@ -268,18 +246,19 @@ export function PopupEditorDialog({
               </div>
             </div>
           </div>
-        </div>
+        </fieldset>
 
-        <Dialog.Footer>
+        <Dialog.Footer className='grid grid-cols-2 gap-3 sm:grid sm:grid-cols-2'>
           <Button
             type='button'
             variant='outline'
+            disabled={disabled}
             onClick={() => onOpenChange(false)}
           >
             취소
           </Button>
-          <Button type='button' onClick={onSave}>
-            저장 후 반영
+          <Button type='button' disabled={disabled} onClick={onSave}>
+            {mode === 'create' ? '등록' : '수정'}
           </Button>
         </Dialog.Footer>
       </Dialog.Content>

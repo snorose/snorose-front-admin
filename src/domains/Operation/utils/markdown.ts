@@ -1,48 +1,33 @@
-const ALLOWED_MARKDOWN_URL_PROTOCOLS = new Set([
-  'http:',
-  'https:',
-  'mailto:',
-  'tel:',
-]);
-
-function normalizeUrlForProtocolCheck(url: string) {
-  return Array.from(url.trim())
-    .filter((character) => {
-      const charCode = character.charCodeAt(0);
-
-      return charCode > 31 && charCode !== 127 && !/\s/.test(character);
-    })
-    .join('')
-    .toLowerCase();
+export function sanitizeMarkdownUrl(url: string) {
+  const value = url.trim();
+  if (
+    !value ||
+    /[\s\\]/u.test(value) ||
+    Array.from(value).some(
+      (character) =>
+        character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127
+    )
+  )
+    return '';
+  const address = value.replace(/^https?:\/\//i, '');
+  if (
+    !/^(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]*[\p{L}\p{N}])?\.)+[\p{L}]{2,}(?::\d+)?(?:[/?#]|$)/u.test(
+      address
+    )
+  )
+    return '';
+  try {
+    const result = new URL(`https://${address}`);
+    return result.protocol === 'https:' && !result.username && !result.password
+      ? `https://${address}`
+      : '';
+  } catch {
+    return '';
+  }
 }
 
 export function isAllowedMarkdownUrl(url: string) {
-  const normalizedUrl = normalizeUrlForProtocolCheck(url);
-
-  if (!normalizedUrl) {
-    return false;
-  }
-
-  if (
-    normalizedUrl.startsWith('/') ||
-    normalizedUrl.startsWith('./') ||
-    normalizedUrl.startsWith('../') ||
-    normalizedUrl.startsWith('#')
-  ) {
-    return !normalizedUrl.startsWith('//');
-  }
-
-  const protocolMatch = normalizedUrl.match(/^[a-z][a-z\d+.-]*:/);
-
-  if (!protocolMatch) {
-    return true;
-  }
-
-  return ALLOWED_MARKDOWN_URL_PROTOCOLS.has(protocolMatch[0]);
-}
-
-export function sanitizeMarkdownUrl(url: string) {
-  return isAllowedMarkdownUrl(url) ? url : '';
+  return sanitizeMarkdownUrl(url) !== '';
 }
 
 export function extractMarkdownUrls(markdown: string) {
