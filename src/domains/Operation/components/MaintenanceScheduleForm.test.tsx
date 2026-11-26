@@ -30,7 +30,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     const user = userEvent.setup();
     const onSave = vi.fn();
     render(<MaintenanceScheduleForm onSave={onSave} />);
-    await user.type(screen.getByLabelText(/일정 제목/), '점검');
+    await user.type(screen.getByLabelText(/사용자 안내 제목/), '점검');
     await user.type(screen.getByLabelText(/메모/), '작업');
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
     await user.click(screen.getByRole('option', { name: '09시' }));
@@ -94,8 +94,8 @@ describe('서버 점검 날짜·시간 입력', () => {
         onCancel={onCancel}
       />
     );
-    await user.clear(screen.getByLabelText(/일정 제목/));
-    await user.type(screen.getByLabelText(/일정 제목/), '변경');
+    await user.clear(screen.getByLabelText(/사용자 안내 제목/));
+    await user.type(screen.getByLabelText(/사용자 안내 제목/), '변경');
     await user.click(screen.getByRole('button', { name: '시작 일시' }));
     await user.click(screen.getByRole('button', { name: '날짜 선택 해제' }));
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
@@ -103,7 +103,9 @@ describe('서버 점검 날짜·시간 입력', () => {
     await user.click(screen.getByRole('button', { name: '수정' }));
     expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
     await user.click(screen.getByRole('button', { name: '입력 초기화' }));
-    expect(screen.getByLabelText(/일정 제목/)).toHaveValue(INITIAL.title);
+    expect(screen.getByLabelText(/사용자 안내 제목/)).toHaveValue(
+      INITIAL.title
+    );
     expect(screen.getByRole('button', { name: '시작 일시' })).toHaveTextContent(
       '2026-10-09'
     );
@@ -121,7 +123,7 @@ describe('서버 점검 날짜·시간 입력', () => {
   test('생성 초기화는 빈 날짜·00:00·빈 제목으로 복귀한다', async () => {
     const user = userEvent.setup();
     render(<MaintenanceScheduleForm onSave={vi.fn()} />);
-    await user.type(screen.getByLabelText(/일정 제목/), '점검');
+    await user.type(screen.getByLabelText(/사용자 안내 제목/), '점검');
     await user.type(screen.getByLabelText(/메모/), '작업');
     await user.click(screen.getByRole('button', { name: '시작 일시' }));
     const day = screen
@@ -135,7 +137,7 @@ describe('서버 점검 날짜·시간 입력', () => {
     await user.click(screen.getByRole('combobox', { name: '시작 일시 시' }));
     await user.click(screen.getByRole('option', { name: '23시' }));
     await user.click(screen.getByRole('button', { name: '입력 초기화' }));
-    expect(screen.getByLabelText(/일정 제목/)).toHaveValue('');
+    expect(screen.getByLabelText(/사용자 안내 제목/)).toHaveValue('');
     expect(screen.getByRole('button', { name: '시작 일시' })).toHaveTextContent(
       '시작 날짜 선택'
     );
@@ -181,7 +183,9 @@ describe('서버 점검 날짜·시간 입력', () => {
       screen.getByRole('combobox', { name: '시작 일시 분' })
     ).toHaveTextContent('34분');
     fireEvent.submit(
-      screen.getByLabelText(/일정 제목/).closest('form') as HTMLFormElement
+      screen
+        .getByLabelText(/사용자 안내 제목/)
+        .closest('form') as HTMLFormElement
     );
     expect(onSave).not.toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith('모든 필수 항목을 입력해 주세요.');
@@ -201,7 +205,7 @@ test('공백 메모는 토스트로 안내하고 저장을 막는다', async () 
   const user = userEvent.setup();
   const onSave = vi.fn();
   render(<MaintenanceScheduleForm onSave={onSave} />);
-  await user.type(screen.getByLabelText(/일정 제목/), '점검');
+  await user.type(screen.getByLabelText(/사용자 안내 제목/), '점검');
   await user.type(screen.getByLabelText(/메모/), '   ');
   for (const label of ['시작 일시', '종료 일시']) {
     await user.click(screen.getByRole('button', { name: label }));

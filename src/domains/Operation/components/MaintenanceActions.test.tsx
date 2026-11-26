@@ -78,7 +78,7 @@ test('제목만 수정하면 제목만 전송하며 성공 후 갱신하고 닫�
   render(
     <MaintenanceEditModal item={item} onChanged={onChanged} onClose={onClose} />
   );
-  await user.clear(await screen.findByLabelText(/관리용 일정 제목/));
+  await user.clear(await screen.findByLabelText(/사용자 안내 제목/));
   expect(screen.getByLabelText(/관리자 메모/)).toHaveValue('기존 메모');
   expect(screen.getByLabelText('사용자 안내 문구')).toHaveValue(
     '기존 안내 문구'
@@ -87,7 +87,7 @@ test('제목만 수정하면 제목만 전송하며 성공 후 갱신하고 닫�
     'src',
     'https://example.com/old.png'
   );
-  await user.type(screen.getByLabelText(/관리용 일정 제목/), '변경 점검');
+  await user.type(screen.getByLabelText(/사용자 안내 제목/), '변경 점검');
   await user.click(screen.getByRole('button', { name: '수정' }));
   expect(updateAdminMaintenance).not.toHaveBeenCalled();
   await user.click(screen.getByRole('button', { name: '저장' }));
@@ -374,7 +374,7 @@ test('생성일시와 같은 수정일시는 수정 이력 없이 표시한다',
   expect(cells[6]).toHaveTextContent('-');
 });
 
-test.each(['관리용 일정 제목', '관리자 메모'])(
+test.each(['사용자 안내 제목', '관리자 메모'])(
   '수정 시 필수 항목 %s 누락은 토스트로 안내한다',
   async (label) => {
     const user = userEvent.setup();
@@ -445,13 +445,13 @@ test('수정 비교는 변경된 메모만 표시하고 취소하면 입력을 �
   expect(screen.getByText('수정 전')).toBeInTheDocument();
   expect(screen.getByText('기존 메모')).toBeInTheDocument();
   expect(screen.getByText('변경된 메모')).toBeInTheDocument();
-  expect(screen.queryByText('관리용 일정 제목')).not.toBeInTheDocument();
+  expect(screen.queryByText('사용자 안내 제목')).not.toBeInTheDocument();
   expect(updateAdminMaintenance).not.toHaveBeenCalled();
   await user.click(screen.getByRole('button', { name: '취소' }));
   expect(screen.getByLabelText(/관리자 메모/)).toHaveValue('변경된 메모');
 });
 
-test('관리용 일정 제목을 클릭하면 해당 일정의 상세 조회를 요청한다', async () => {
+test('사용자 안내 제목을 클릭하면 해당 일정의 상세 조회를 요청한다', async () => {
   const user = userEvent.setup();
   const onDetail = vi.fn();
   render(

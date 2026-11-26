@@ -33,7 +33,7 @@ export function MaintenanceDetailModal({
             </Dialog.Header>
             <DescriptionList
               items={[
-                { label: '관리용 일정 제목', value: detail.title },
+                { label: '사용자 안내 제목', value: detail.title },
                 {
                   label: '시작 일시',
                   value: formatDateTimeToMinutes(detail.startAt),

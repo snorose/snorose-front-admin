@@ -28,7 +28,7 @@ export function MaintenanceMemoModal({
             </Dialog.Header>
             <DescriptionList
               items={[
-                { label: '관리용 일정 제목', value: detail.title },
+                { label: '사용자 안내 제목', value: detail.title },
                 {
                   label: '관리자 메모',
                   value: detail.memo?.trim()
