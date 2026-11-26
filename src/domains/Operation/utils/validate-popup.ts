@@ -44,7 +44,7 @@ export function validatePopupContent(
   );
 
   if (invalidUrl) {
-    return '본문 링크에는 http, https, mailto, tel 또는 내부 경로만 사용할 수 있습니다.';
+    return '본문 링크에 example.com 또는 https://example.com 형태의 외부 주소를 입력해주세요.';
   }
 
   return null;

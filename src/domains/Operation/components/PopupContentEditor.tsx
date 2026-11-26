@@ -140,6 +140,8 @@ export function PopupContentEditor({
         className='border-t px-3 py-2 text-xs break-keep text-gray-500'
       >
         글자를 선택해 서식을 적용하고, 링크는 [글자](주소)로 입력해 주세요.
+        example.com 또는 https://example.com 형태로 입력하면 HTTPS 주소로
+        열립니다.
       </p>
     </div>
   );

@@ -33,7 +33,7 @@ const ALLOWED_MARKDOWN_ELEMENTS = [
 ];
 
 function isExternalHref(href?: string) {
-  return href?.startsWith('http://') || href?.startsWith('https://');
+  return /^https?:\/\//i.test(href ?? '');
 }
 
 export function MarkdownPreview({ markdown, className }: MarkdownPreviewProps) {
