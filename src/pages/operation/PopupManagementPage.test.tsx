@@ -167,7 +167,7 @@ describe('팝업 관리 API 흐름', () => {
     await user.click(screen.getByRole('link', { name: '2' }));
     await waitFor(() => expect(getPopups).toHaveBeenLastCalledWith(1));
   });
-  test('제목과 날짜만으로 등록하고 저장 후 목록을 갱신한다', async () => {
+  test('제목과 날짜만으로 확인 모달 없이 바로 등록하고 목록을 갱신한다', async () => {
     const user = userEvent.setup();
     renderPage();
     await screen.findByText('서버 팝업');
@@ -186,10 +186,9 @@ describe('팝업 관리 API 흐름', () => {
       { target: { value: '2026-10-22' } }
     );
     await user.click(within(dialog).getByRole('button', { name: '등록' }));
-    const confirm = await screen.findByRole('dialog', {
-      name: '팝업을 등록할까요?',
-    });
-    await user.click(within(confirm).getByRole('button', { name: '등록' }));
+    expect(
+      screen.queryByRole('dialog', { name: '팝업을 등록할까요?' })
+    ).not.toBeInTheDocument();
     await waitFor(() =>
       expect(createPopup).toHaveBeenCalledWith(
         {

@@ -181,9 +181,14 @@ export default function PopupManagementPage() {
     handlePopupChange('imageFileName', file.name);
   };
   const handleSave = () => {
+    if (save.isPending) return;
     const message = validatePopupContent(editingPopup, maxDisplayOrder);
     if (message) {
       toast.error(message);
+      return;
+    }
+    if (editorMode === 'create') {
+      save.mutate();
       return;
     }
     setIsSaveConfirmOpen(true);
@@ -304,17 +309,9 @@ export default function PopupManagementPage() {
       )}
       <ConfirmModal
         isOpen={isSaveConfirmOpen}
-        title={
-          editorMode === 'create' ? '팝업을 등록할까요?' : '팝업을 수정할까요?'
-        }
+        title='팝업을 수정할까요?'
         description='입력한 내용으로 저장합니다.'
-        confirmText={
-          save.isPending
-            ? '저장 중…'
-            : editorMode === 'create'
-              ? '등록'
-              : '수정'
-        }
+        confirmText={save.isPending ? '저장 중…' : '수정'}
         confirmDisabled={save.isPending}
         closeText='취소'
         onConfirm={() => {
