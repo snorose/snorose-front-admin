@@ -11,9 +11,9 @@ const SHORTCUT_CLASS_NAME =
   'border-border flex min-h-12 w-full min-w-0 items-center gap-3 rounded-md border px-3 py-2.5 text-left text-sm transition-colors';
 
 export default function MemberActivitySection({
-  studentNumber,
+  nickname,
 }: {
-  studentNumber: string;
+  nickname: string;
 }) {
   return (
     <SectionCard
@@ -24,10 +24,7 @@ export default function MemberActivitySection({
       <ul className='grid gap-2'>
         {DETAIL_SHORTCUTS.map((shortcut) => (
           <li key={shortcut.title} className='min-w-0'>
-            <ActivityShortcut
-              shortcut={shortcut}
-              studentNumber={studentNumber}
-            />
+            <ActivityShortcut shortcut={shortcut} nickname={nickname} />
           </li>
         ))}
       </ul>
@@ -37,13 +34,13 @@ export default function MemberActivitySection({
 
 function ActivityShortcut({
   shortcut,
-  studentNumber,
+  nickname,
 }: {
   shortcut: DetailShortcut;
-  studentNumber: string;
+  nickname: string;
 }) {
-  const href = studentNumber.trim()
-    ? shortcut.getHref?.(studentNumber.trim())
+  const href = nickname.trim()
+    ? shortcut.getHref?.(nickname.trim())
     : undefined;
   const content = (
     <>

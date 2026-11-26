@@ -160,7 +160,7 @@ export default function MemberDetailSection({
             onPointAdjustmentOpen={() => setIsPointDialogOpen(true)}
             onPointHistoryOpen={() => setIsPointHistoryOpen(true)}
           />
-          <MemberActivitySection studentNumber={member.studentNumber} />
+          <MemberActivitySection nickname={member.nickname} />
           <MemberWithdrawalSection />
         </div>
       </div>
