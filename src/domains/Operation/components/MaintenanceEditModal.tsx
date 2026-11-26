@@ -77,7 +77,7 @@ function MaintenanceEditForm({
   const [error, setError] = useState('');
   const [confirming, setConfirming] = useState(false);
   const changes: MaintenanceChange[] = [
-    { label: '관리용 일정 제목', before: detail.title, after: title.trim() },
+    { label: '사용자 안내 제목', before: detail.title, after: title.trim() },
     {
       label: '시작 일시',
       before: formatDateTimeToMinutes(detail.startAt),
@@ -244,7 +244,7 @@ function MaintenanceEditForm({
           >
             <div className='flex flex-col gap-1'>
               <Label htmlFor={`${id}-title`} required>
-                관리용 일정 제목
+                사용자 안내 제목
               </Label>
               <Input
                 id={`${id}-title`}

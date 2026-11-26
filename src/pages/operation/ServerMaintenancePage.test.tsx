@@ -82,7 +82,7 @@ test('목록 새로고침 중 입력 내용을 유지하고 중복 조회를 막
   renderPage();
   const refresh = screen.getByRole('button', { name: '새로고침' });
   await waitFor(() => expect(refresh).toBeEnabled());
-  await user.type(screen.getByLabelText(/일정 제목/), '작성 중인 점검');
+  await user.type(screen.getByLabelText(/사용자 안내 제목/), '작성 중인 점검');
   let finish!: (value: []) => void;
   vi.mocked(getAdminMaintenances).mockReturnValueOnce(
     new Promise((resolve) => {
@@ -91,7 +91,9 @@ test('목록 새로고침 중 입력 내용을 유지하고 중복 조회를 막
   );
   await user.click(refresh);
   expect(refresh).toBeDisabled();
-  expect(screen.getByLabelText(/일정 제목/)).toHaveValue('작성 중인 점검');
+  expect(screen.getByLabelText(/사용자 안내 제목/)).toHaveValue(
+    '작성 중인 점검'
+  );
   await user.click(refresh);
   expect(getAdminMaintenances).toHaveBeenCalledTimes(2);
   await act(async () => finish([]));
@@ -129,7 +131,7 @@ async function chooseHour(
 }
 
 async function fillForm(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText(/일정 제목/), '정기 점검');
+  await user.type(screen.getByLabelText(/사용자 안내 제목/), '정기 점검');
   await user.type(screen.getByLabelText(/메모/), 'DB 작업');
   await chooseDate(user, '시작 일시');
   await chooseHour(user, '시작 일시', '02');
@@ -143,7 +145,7 @@ describe('서버 점검 생성 API 연동', () => {
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: '생성' }));
     await waitFor(() =>
-      expect(screen.getByLabelText(/일정 제목/)).toHaveValue('')
+      expect(screen.getByLabelText(/사용자 안내 제목/)).toHaveValue('')
     );
     expect(createAdminMaintenance).toHaveBeenCalledExactlyOnceWith({
       title: '정기 점검',
@@ -172,7 +174,7 @@ describe('서버 점검 생성 API 연동', () => {
     expect(
       screen.queryByText('중복된 서버 점검 기간 일정이 있습니다')
     ).not.toBeInTheDocument();
-    expect(screen.getByLabelText(/일정 제목/)).toHaveValue('정기 점검');
+    expect(screen.getByLabelText(/사용자 안내 제목/)).toHaveValue('정기 점검');
     expect(screen.getByLabelText(/메모/)).toHaveValue('DB 작업');
   });
   test('저장 응답을 기다리는 동안 중복 제출을 차단한다', async () => {
@@ -192,7 +194,7 @@ describe('서버 점검 생성 API 연동', () => {
     expect(createAdminMaintenance).toHaveBeenCalledTimes(1);
     finish({ id: 7, attachmentUrlList: [] });
     await waitFor(() =>
-      expect(screen.getByLabelText(/일정 제목/)).toHaveValue('')
+      expect(screen.getByLabelText(/사용자 안내 제목/)).toHaveValue('')
     );
   });
   test('이미지 실패 후 재시도는 생성 API를 다시 호출하지 않는다', async () => {

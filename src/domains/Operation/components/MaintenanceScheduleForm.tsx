@@ -131,7 +131,7 @@ export function MaintenanceScheduleForm({ initial, onSave, onCancel }: Props) {
         <fieldset disabled={isSaving} className='flex min-w-0 flex-col gap-4'>
           <div className='flex flex-col gap-1'>
             <Label htmlFor={titleId} required>
-              관리용 일정 제목
+              사용자 안내 제목
             </Label>
             <Input
               id={titleId}

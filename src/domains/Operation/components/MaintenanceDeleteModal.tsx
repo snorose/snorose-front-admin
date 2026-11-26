@@ -28,7 +28,7 @@ export function MaintenanceDeleteModal({
       description='서버 점검 일정을 삭제하시겠습니까?'
       className='max-w-xs sm:max-w-sm'
       items={[
-        { label: '관리용 일정 제목', value: item.title },
+        { label: '사용자 안내 제목', value: item.title },
         { label: '시작 일시', value: formatDateTimeToMinutes(item.startAt) },
         { label: '종료 일시', value: formatDateTimeToMinutes(item.endAt) },
       ]}
