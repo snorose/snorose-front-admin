@@ -7,6 +7,7 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type {
@@ -117,10 +118,9 @@ async function saveEdit(
   dialog: HTMLElement
 ) {
   await user.click(within(dialog).getByRole('button', { name: '수정' }));
-  const confirm = await screen.findByRole('dialog', {
-    name: '팝업을 수정할까요?',
-  });
-  await user.click(within(confirm).getByRole('button', { name: '수정' }));
+  expect(
+    screen.queryByRole('dialog', { name: '팝업을 수정할까요?' })
+  ).not.toBeInTheDocument();
 }
 
 describe('팝업 관리 API 흐름', () => {
@@ -263,11 +263,7 @@ describe('팝업 관리 API 흐름', () => {
     const dialog = await openEdit(user);
     await user.type(within(dialog).getByLabelText(/팝업 제목/), ' 변경');
     await saveEdit(user, dialog);
-    await waitFor(() =>
-      expect(
-        screen.queryByRole('dialog', { name: '팝업을 수정할까요?' })
-      ).not.toBeInTheDocument()
-    );
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('서버 오류'));
     expect(within(dialog).getByLabelText(/팝업 제목/)).toHaveValue(
       '서버 팝업 변경'
     );

@@ -56,7 +56,6 @@ export default function PopupManagementPage() {
   });
   const [detailPopupId, setDetailPopupId] = useState<number | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [isSaveConfirmOpen, setIsSaveConfirmOpen] = useState(false);
   const [deletingPopupId, setDeletingPopupId] = useState<number | null>(null);
   const [originalPopup, setOriginalPopup] = useState<PopupDetail | null>(null);
   const [editingPopup, setEditingPopup] = useState<PopupContent>(EMPTY_POPUP);
@@ -129,7 +128,6 @@ export default function PopupManagementPage() {
       toast.success(
         originalPopup ? '팝업이 수정되었습니다.' : '팝업이 등록되었습니다.'
       );
-      setIsSaveConfirmOpen(false);
       setIsEditorOpen(false);
       setImageFile(undefined);
       setImagePreviewUrl('');
@@ -138,7 +136,6 @@ export default function PopupManagementPage() {
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, '팝업을 저장하지 못했습니다.'));
-      setIsSaveConfirmOpen(false);
     },
   });
 
@@ -159,7 +156,6 @@ export default function PopupManagementPage() {
     if (save.isPending) return;
     setIsEditorOpen(open);
     if (!open) {
-      setIsSaveConfirmOpen(false);
       setImageFile(undefined);
       setImagePreviewUrl('');
     }
@@ -187,11 +183,7 @@ export default function PopupManagementPage() {
       toast.error(message);
       return;
     }
-    if (editorMode === 'create') {
-      save.mutate();
-      return;
-    }
-    setIsSaveConfirmOpen(true);
+    save.mutate();
   };
 
   return (
@@ -295,7 +287,7 @@ export default function PopupManagementPage() {
           popup={editingPopup}
           imagePreviewUrl={imagePreviewUrl}
           maxDisplayOrder={maxDisplayOrder}
-          disabled={save.isPending || isSaveConfirmOpen}
+          disabled={save.isPending}
           onOpenChange={handleEditorOpenChange}
           onPopupChange={handlePopupChange}
           onImageAttach={handleImageAttach}
@@ -307,20 +299,6 @@ export default function PopupManagementPage() {
           onSave={handleSave}
         />
       )}
-      <ConfirmModal
-        isOpen={isSaveConfirmOpen}
-        title='팝업을 수정할까요?'
-        description='입력한 내용으로 저장합니다.'
-        confirmText={save.isPending ? '저장 중…' : '수정'}
-        confirmDisabled={save.isPending}
-        closeText='취소'
-        onConfirm={() => {
-          if (!save.isPending) save.mutate();
-        }}
-        onClose={() => {
-          if (!save.isPending) setIsSaveConfirmOpen(false);
-        }}
-      />
       <ConfirmModal
         isOpen={deletingPopupId !== null}
         confirmVariant='destructive'
